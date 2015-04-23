@@ -1,0 +1,243 @@
+﻿/* Layout */
+
+.simple-layout,
+.simple-layout-tablet {
+    height: 100%;
+    width: 100%;
+    position: relative;
+}
+
+.simple-layout .layout-header {
+    position: absolute;
+    width: 100%;
+}
+
+.simple-layout .layout-content {
+    position: absolute;
+    width: 100%;
+    overflow: hidden;
+}
+
+.simple-layout .layout-content > div,
+.simple-layout .transition-frame {
+    -position: absolute;
+    height: 100%;
+    width: 100%;
+}
+
+/*.simple-layout .layout-footer {
+    width: 100%;
+    position: absolute;
+}*/
+
+/* ios */
+
+.dx-theme-ios .simple-layout .layout-header {
+    top: 0;
+    height: 44px;
+}
+
+.dx-theme-ios .simple-layout .layout-content {
+    top: 44px;
+    bottom: 0;
+}
+
+/*
+.dx-theme-ios .simple-layout.has-navbar .layout-content {
+    bottom: 59px;
+}
+
+.dx-theme-ios .simple-layout .layout-footer {
+    height: 59px;
+    bottom: 0;
+}*/
+
+.dx-theme-ios .simple-layout .view-toolbar-bottom.dx-toolbar {
+    background: transparent;
+    border: none;
+    margin-bottom: 10px;
+}
+ 
+.dx-theme-ios .simple-layout .view-footer {
+    position: static;
+}
+
+.dx-theme-ios .simple-layout .view-footer .dx-toolbar {
+    height: 57px;
+}
+
+.dx-theme-ios .simple-layout .view-toolbar-bottom.dx-toolbar .dx-toolbar-center {
+    width: 100%;
+}
+
+.dx-theme-ios .simple-layout .view-footer .dx-button {
+    width: 97%;
+    overflow: visible;
+    height: 40px;
+}
+
+.dx-theme-ios .simple-layout .view-footer .dx-button .dx-button-content {
+    height: 44px;
+    border-radius: 6px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.dx-theme-ios .simple-layout .view-footer .dx-button .dx-button-content .dx-button-text {
+    font-size: 20px;
+    line-height: 38px;
+}
+
+/* ios7 */
+
+.dx-theme-ios7 .simple-layout .layout-header {
+    top: 0;
+    height: 44px;
+}
+
+.dx-theme-ios7 .simple-layout .layout-content {
+    top: 45px;
+    bottom: 0;
+    background-color: #EFEFF4;
+}
+
+.dx-theme-ios7 .simple-layout .view-footer {
+    position: static;
+}
+
+.dx-theme-ios7 .simple-layout .view-toolbar-bottom.dx-toolbar {
+    background: transparent;
+    border: none;
+    margin-bottom: 10px;
+}
+
+.dx-theme-ios7 .simple-layout .view-toolbar-bottom.dx-toolbar .dx-toolbar-center {
+    width: 100%;
+}
+
+.dx-theme-ios7 .simple-layout .view-footer .dx-toolbar {
+    height: 57px;
+}
+
+.dx-theme-ios7 .slideout-layout .view-footer .dx-toolbar-center {
+    width: 100%;
+}
+
+.dx-theme-ios7 .simple-layout .view-footer .dx-button {
+    width: 97%;
+    overflow: visible;
+}
+
+.dx-theme-ios7 .simple-layout .view-footer .dx-button .dx-button-content {
+    height: 44px;
+    border-radius: 6px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.dx-theme-ios7 .simple-layout .view-footer .dx-button .dx-button-content .dx-button-text {
+    font-size: 20px;
+    line-height: 38px;
+}
+
+/* android */
+
+.dx-theme-android .simple-layout .layout-content {
+    top: 46px;
+    bottom: 0;
+}
+
+/* android5 */
+
+.dx-theme-android5 .simple-layout .layout-content {
+    top: 56px;
+    bottom: 0;
+}
+
+/* tizen */
+
+.dx-theme-tizen .simple-layout .layout-content {
+    top: 45px;
+    bottom: 0;
+}
+
+/* generic */
+
+.dx-theme-generic .simple-layout .layout-content {
+    top: 80px;
+    bottom: 0;
+}
+
+.dx-theme-generic.dx-device-phone .simple-layout .layout-content {
+    top: 50px;
+}
+
+.dx-theme-generic .simple-layout .view-footer {
+    position: static;
+}
+
+.dx-theme-generic .simple-layout .view-footer .view-toolbar-bottom {
+    position: static;
+}
+
+
+/* Windows Phone 8*/
+.win8phone-layout {
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+}
+
+.win8phone-layout .layout-header {
+    height: 20px;
+    margin-left: 10px;
+    text-transform: uppercase;
+}
+
+.win8phone-layout .layout-content {
+    position: absolute;
+    top: 20px;
+    bottom: 0;
+    width: 100%;
+    overflow: hidden;
+}
+
+.win8phone-layout .layout-content > div {
+    height: 100%;
+    width: 100%;
+}
+
+.win8phone-layout .view-content {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+}
+
+.win8phone-layout .layout-frame {
+    top: 0;
+    bottom: 0;
+    position: absolute;
+    width: 100%;
+}
+.win8phone-layout.has-toolbar-bottom .layout-frame,
+.win8phone-layout .has-toolbar-bottom.layout-frame {
+    bottom: 40px;
+}
+
+.win8phone-layout .dx-toolbar.layout-toolbar-bottom {
+    position: absolute;
+    bottom: 0;
+    margin-bottom: 0;
+}
+
+.win8phone-layout .layout-footer {
+    position: absolute;
+    bottom: 0;
+    height: 0;
+    width: 100%;
+}
+
+.win8phone-layout.has-toolbar-bottom .layout-footer {
+    height: 40px;
+}

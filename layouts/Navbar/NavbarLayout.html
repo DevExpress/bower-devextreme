@@ -1,0 +1,107 @@
+﻿<div class="navbar-layout" data-options="dxLayout : { name: 'navbar', platform: 'ios' } " >
+    <div class="transition-frame" data-options="dxTransition: { name: 'main', type: 'slide' }">
+        <div class="layout-header">
+            <div data-bind="dxToolbar: { items: [ { text: title, location: 'center' } ] }" 
+                 data-options="dxCommandContainer : { id: 'ios-header-toolbar' }">
+            </div>
+        </div>
+
+        <div class="layout-content dx-ios-stripes" data-options="dxContentPlaceholder : { name: 'content' }">
+            <div class="dx-loadindicator-container">
+                <div data-options="dxLoadIndicator: { visible: true }"></div>
+            </div>
+        </div>
+    </div>
+    <div class="layout-footer">
+        <div class="navbar-container" data-bind="dxNavBar: { }, dxCommandContainer: { id: 'global-navigation' }">
+        </div>
+    </div>
+
+    <div class="view-footer" data-options="dxContent : { targetPlaceholder: 'view-footer' } " >
+        <div class="view-toolbar-bottom" data-options="dxToolbar: { visible: false }, dxCommandContainer : { id: 'ios-view-footer' } " >
+        </div>
+    </div>
+
+</div>
+
+<div class="navbar-layout" data-options="dxLayout : { name: 'navbar', platform: 'android' } " >
+
+    <div class="layout-header">
+        <div class="navbar-container" data-bind="dxNavBar: {}, dxCommandContainer: { id: 'global-navigation' }">
+        </div>
+    </div>
+
+    <div class="layout-content" data-options="dxContentPlaceholder : { name: 'content', transition: 'slide' }">
+        <div class="dx-loadindicator-container">
+            <div data-options="dxLoadIndicator: { visible: true }"></div>
+        </div>
+    </div>
+
+    <div class="layout-footer" data-options="dxContentPlaceholder: { name: 'footer' } ">
+        <div data-options="dxToolbar: { visible: false }, dxCommandContainer : { id: 'android-footer-toolbar' } "></div>
+    </div>
+
+</div>
+
+<div class="navbar-layout" data-options="dxLayout : { name: 'navbar', platform: 'tizen' } " >
+
+    <div class="layout-header" >
+        <div class="navbar-container" data-bind="dxNavBar: {}, dxCommandContainer: { id: 'global-navigation' }">
+        </div>
+    </div>
+
+    <div class="layout-content" data-options="dxContentPlaceholder : { name: 'content', transition: 'slide' }">
+        <div class="dx-loadindicator-container">
+            <div data-options="dxLoadIndicator: { visible: true }"></div>
+        </div>
+    </div>
+
+    <div class="layout-footer" data-options="dxContentPlaceholder : { name: 'footer' } " >
+        <div data-options="dxToolbar: { visible: false }, dxCommandContainer : { id: 'tizen-footer-toolbar' } ">
+        </div>
+    </div>
+
+</div>
+
+<div class="navbar-layout" data-options="dxLayout : { name: 'navbar', platform: 'generic' } " >
+
+    <div class="transition-frame" data-options="dxTransition: { name: 'main', type: 'slide' }">
+        <div class="layout-header">
+            <div data-bind="dxToolbar: { items: [{ text: title, location: 'center' }] }" 
+                 data-options="dxCommandContainer : { id: 'generic-header-toolbar' }">
+            </div>
+        </div>
+
+        <div class="layout-content" data-options="dxContentPlaceholder : { name: 'content' }">
+            <div class="dx-loadindicator-container">
+                <div data-options="dxLoadIndicator: { visible: true }"></div>
+            </div>
+        </div>
+    </div>
+    <div class="layout-footer">
+        <div class="navbar-container" data-bind="dxNavBar: {}, dxCommandContainer: { id: 'global-navigation' }">
+        </div>
+    </div>
+
+    <div class="view-footer" data-options="dxContent : { targetPlaceholder: 'view-footer' } " >
+        <div class="view-toolbar-bottom" data-options="dxToolbar: { visible: false }, dxCommandContainer : { id: 'generic-view-footer' } " >
+        </div>
+    </div>
+
+</div>
+
+<div class="navbar-layout-tablet" data-options="dxLayout : { name: 'navbar', platform: 'win8', phone: false }">
+    <div class="layout-header">
+        <div data-options="dxContentPlaceholder : { name: 'header', contentCssPosition: 'static' }">
+            <h1 class="view-title" data-bind="text: title"></h1>
+        </div>
+        <div class="navbar-container" data-options="dxNavBar: { }, dxCommandContainer : { id: 'global-navigation' }"></div>
+    </div>
+    <div class="layout-content-wrapper">
+        <div class="layout-content" data-options="dxContentPlaceholder : { name: 'content', contentCssPosition: 'static' }">
+            <div class="dx-loadindicator-container">
+                <div data-options="dxLoadIndicator: { visible: true }"></div>
+            </div>
+        </div>
+    </div>
+</div>
