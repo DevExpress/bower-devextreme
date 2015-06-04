@@ -1,9 +1,9 @@
 /*! 
 * DevExtreme
-* Version: 14.2.7
-* Build date: Apr 17, 2015
+* Version: 15.1.3
+* Build date: Jun 1, 2015
 *
-* Copyright (c) 2011 - 2014 Developer Express Inc. ALL RIGHTS RESERVED
+* Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
 */
 
@@ -34,7 +34,8 @@ Globalize.addCultureInfo("ja", {messages: {
         "validation-pattern": "値がパターンと一致しません",
         "validation-pattern-formatted": "{0} がパターンと一致しません",
         "validation-email": "電子メール アドレスが無効です。",
-        "validation-email-formatted": "{0} が無効です。"
+        "validation-email-formatted": "{0} が無効です。",
+        "validation-mask": "値が無効です。"
     }});
 Globalize.addCultureInfo("ja", {messages: {
         "dxLookup-searchPlaceholder": "最低文字数: {0}",
@@ -59,7 +60,15 @@ Globalize.addCultureInfo("ja", {messages: {
         "dxFileUploader-bytes": "バイト",
         "dxFileUploader-kb": "kb",
         "dxFileUploader-Mb": "Mb",
-        "dxFileUploader-Gb": "Gb"
+        "dxFileUploader-Gb": "Gb",
+        "dxFileUploader-upload": "アップロード",
+        "dxFileUploader-uploaded": "アップロード済み",
+        "dxFileUploader-readyToUpload": "アップロードの準備中",
+        "dxFileUploader-uploadFailedMessage": "アップロードに失敗しました",
+        "dxRangeSlider-ariaFrom": "{0} から",
+        "dxRangeSlider-ariaTill": "{0} まで",
+        "dxSwitch-onText": "オン",
+        "dxSwitch-offText": "オフ"
     }});
 
 Globalize.addCultureInfo("ja", {messages: {
@@ -107,7 +116,72 @@ Globalize.addCultureInfo("ja", {messages: {
         "dxDataGrid-summarySum": "合計: {0}",
         "dxDataGrid-summarySumOtherColumn": "{1} の合計は {0}",
         "dxDataGrid-summaryCount": "総数: {0}",
+        "dxDataGrid-columnFixingFix": "固定",
+        "dxDataGrid-columnFixingUnfix": "固定の解除",
+        "dxDataGrid-columnFixingLeftPosition": "左に固定",
+        "dxDataGrid-columnFixingRightPosition": "右に固定",
+        "dxDataGrid-exportTo": "エクスポート先",
+        "dxDataGrid-exportToExcel": "Excel ファイルにエクスポート",
+        "dxDataGrid-excelFormat": "Excel ファイル",
+        "dxDataGrid-selectedRows": "選択された行",
+        "dxDataGrid-headerFilterEmptyValue": "(空白)",
+        "dxDataGrid-headerFilterOK": "OK",
+        "dxDataGrid-headerFilterCancel": "キャンセル",
+        "dxDataGrid-ariaColumn": "列",
+        "dxDataGrid-ariaValue": "値",
+        "dxDataGrid-ariaFilterCell": "フィルター セル",
+        "dxDataGrid-ariaCollapse": "折りたたむ",
+        "dxDataGrid-ariaExpand": "展開",
+        "dxDataGrid-ariaDataGrid": "データ グリッド",
+        "dxDataGrid-ariaSearchInGrid": "データ グリッド内で検索",
+        "dxDataGrid-ariaSelectAll": "すべてを選択",
+        "dxDataGrid-ariaSelectRow": "行の選択",
         "dxPager-infoText": "ページ {0} / {1}",
-        "dxSwitch-onText": "オン",
-        "dxSwitch-offText": "オフ"
+        "dxPivotGrid-grandTotal": "総計",
+        "dxPivotGrid-total": "{0} 合計",
+        "dxPivotGrid-fieldChooserTitle": "フィールドの選択",
+        "dxPivotGrid-showFieldChooser": "フィールドの選択を表示",
+        "dxPivotGrid-expandAll": "すべて展開",
+        "dxPivotGrid-collapseAll": "すべて折りたたむ",
+        "dxPivotGrid-sortColumnBySummary": "この列で \"{0}\" を並べ替え",
+        "dxPivotGrid-sortRowBySummary": "この行で {0} を並べ替え",
+        "dxPivotGrid-removeAllSorting": "すべての並べ替えを削除",
+        "dxPivotGrid-rowFields": "行のフィールド",
+        "dxPivotGrid-columnFields": "列のフィールド",
+        "dxPivotGrid-dataFields": "データ  フィールド",
+        "dxPivotGrid-filterFields": "フィルター フィールド",
+        "dxPivotGrid-allFields": "すべてのフィールド",
+        "dxScheduler-editorLabelTitle": "件名",
+        "dxScheduler-editorLabelStartDate": "開始時刻",
+        "dxScheduler-editorLabelEndDate": "終了時刻",
+        "dxScheduler-editorLabelDescription": "説明",
+        "dxScheduler-editorLabelRecurrence": "リピート",
+        "dxScheduler-openAppointment": "オープンの予定",
+        "dxScheduler-recurrenceNever": "無効",
+        "dxScheduler-recurrenceDaily": "日間毎日",
+        "dxScheduler-recurrenceWeekly": "毎週",
+        "dxScheduler-recurrenceMonthly": "毎月",
+        "dxScheduler-recurrenceYearly": "毎年",
+        "dxScheduler-recurrenceEvery": "リピートの頻度",
+        "dxScheduler-recurrenceEnd": "リピートの終了日",
+        "dxScheduler-recurrenceAfter": "次の発生回数後に終了",
+        "dxScheduler-recurrenceOn": "リピート解除の日付",
+        "dxScheduler-recurrenceRepeatDaily": "日後",
+        "dxScheduler-recurrenceRepeatWeekly": "週間後",
+        "dxScheduler-recurrenceRepeatMonthly": "カ月後",
+        "dxScheduler-recurrenceRepeatYearly": "年後",
+        "dxScheduler-switcherDay": "日ビュー",
+        "dxScheduler-switcherWeek": "週ビュー",
+        "dxScheduler-switcherWorkWeek": "稼働週ビュー",
+        "dxScheduler-switcherMonth": "月ビュー",
+        "dxScheduler-recurrenceRepeatOnDate": "次の日付に終了",
+        "dxScheduler-recurrenceRepeatCount": "出現",
+        "dxScheduler-allDay": "終日イベント",
+        "dxCalendar-todayButtonText": "今日",
+        "dxCalendar-ariaWidgetName": "カレンダー",
+        "dxColorView-ariaRed": "赤",
+        "dxColorView-ariaGreen": "緑",
+        "dxColorView-ariaBlue": "青",
+        "dxColorView-ariaAlpha": "透明度",
+        "dxColorView-ariaHex": "色コード"
     }});

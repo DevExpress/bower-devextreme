@@ -1,9 +1,9 @@
 /*! 
 * DevExtreme (Gauges)
-* Version: 14.2.7
-* Build date: Apr 17, 2015
+* Version: 15.1.3
+* Build date: Jun 1, 2015
 *
-* Copyright (c) 2011 - 2014 Developer Express Inc. ALL RIGHTS RESERVED
+* Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
 */
 
@@ -148,7 +148,7 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
             },
             dispose: function() {
                 var that = this;
-                $.each(that, function(name, value) {
+                $.each(that, function(name) {
                     that[name] = null
                 });
                 return that
@@ -289,8 +289,7 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
                 tailWidth,
                 tailHeight,
                 cx = x,
-                cy = y,
-                points;
+                cy = y;
             tailWidth = tailHeight = options.tailLength;
             if (type[0] & 1)
                 tailHeight = _min(tailHeight, cloudHeight / 3);
@@ -686,7 +685,7 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
                 this.vertical = this._options.vertical;
                 return this._options.length > 0 && this._options.width > 0
             },
-            _isVisible: function(layout) {
+            _isVisible: function() {
                 return true
             },
             _getTrackerSettings: function() {
@@ -1231,7 +1230,7 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
                 that._inverted = that.vertical ? _String(that._options.horizontalOrientation).toLowerCase() === 'right' : _String(that._options.verticalOrientation).toLowerCase() === 'bottom';
                 return that._options.size > 0
             },
-            _isVisible: function(layout) {
+            _isVisible: function() {
                 return true
             },
             _createBarItem: function() {
@@ -1453,9 +1452,6 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
             _min = _math.min,
             _max = _math.max,
             _abs = _math.abs,
-            _atan = _math.atan,
-            _acos = _math.acos,
-            _ceil = _math.ceil,
             PI_DIV_180 = _math.PI / 180,
             utils = DX.utils,
             _isFunction = utils.isFunction,
@@ -1488,9 +1484,6 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
         }
         function sortAsc(x, y) {
             return x - y
-        }
-        function sortDes(x, y) {
-            return y - x
         }
         viz.gauges.__internals.BaseScale = viz.gauges.__internals.BaseElement.inherit({
             _init: function() {
@@ -1730,20 +1723,6 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
                 return that
             }
         });
-        function getBasedAngle(startAngle, endAngle) {
-            var startDelta,
-                endDelta,
-                tmp;
-            if (startAngle > endAngle) {
-                tmp = endAngle;
-                endAngle = startAngle;
-                startAngle = tmp
-            }
-            startDelta = 0 <= startAngle && startAngle <= 180 ? _abs(90 - startAngle) : _abs(270 - startAngle);
-            startDelta = startAngle < 90 && 90 < endAngle || startAngle < 270 && 270 < endAngle ? 0 : startDelta;
-            endDelta = 0 < endAngle && endAngle < 180 ? _abs(90 - endAngle) : _abs(270 - endAngle);
-            return startDelta < endDelta ? startDelta : endDelta
-        }
         viz.gauges.__internals.CircularScale = viz.gauges.__internals.BaseScale.inherit({
             _getGridSpacingFactor: function() {
                 return {
@@ -1863,14 +1842,14 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
                         minorTicks: 5
                     }
             },
-            _getTranslateFunction: function(layout) {
+            _getTranslateFunction: function() {
                 var tr = this._translator;
                 return function(value) {
                         return tr.translate(value)
                     }
             },
             _overlappingBehaviorType: "linear",
-            _getScreenDelta: function(layout) {
+            _getScreenDelta: function() {
                 return _abs(this._translator.getCodomainEnd() - this._translator.getCodomainStart())
             },
             _setupOrientation: function() {
@@ -1922,7 +1901,7 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
                 }
                 return [x1, y1, x2, y1, x2, y2, x1, y2]
             },
-            _moveTick: function(element, tick, layout) {
+            _moveTick: function(element, tick) {
                 var x = 0,
                     y = 0;
                 if (this.vertical)
@@ -2255,7 +2234,7 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
                             break
                     }
             },
-            _isVisible: function(layout) {
+            _isVisible: function() {
                 return true
             },
             _createRange: function(range, layout) {
@@ -2359,71 +2338,10 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
             }
         })
     })(DevExpress, jQuery);
-    /*! Module viz-gauges, file tooltip.js */
-    (function(DX, $, undefined) {
-        var _extend = $.extend;
-        DX.viz.gauges.__internals.Tooltip = DX.viz.core.Tooltip.inherit({
-            ctor: function(parameters) {
-                var that = this;
-                that._container = parameters.container;
-                that._tracker = parameters.tracker;
-                that._root = parameters.renderer.g().attr({'class': 'dxg-tooltip'});
-                that.callBase($.extend({group: that._root}, parameters));
-                that._setTrackerCallbacks()
-            },
-            dispose: function() {
-                var that = this;
-                that._container = that._tracker = that._root = null;
-                return that._shadow ? that.callBase.apply(that, arguments) : that
-            },
-            _setTrackerCallbacks: function() {
-                var that = this;
-                function prepareCallback(target, info) {
-                    var tooltipParameters = target.getTooltipParameters(),
-                        formatObject = _extend({
-                            value: tooltipParameters.value,
-                            valueText: that.formatValue(tooltipParameters.value),
-                            color: tooltipParameters.color
-                        }, info);
-                    return that.prepare(formatObject, {
-                            x: tooltipParameters.x,
-                            y: tooltipParameters.y,
-                            offset: tooltipParameters.offset
-                        })
-                }
-                function showCallback() {
-                    return that.show({})
-                }
-                function hideCallback() {
-                    return that.hide({})
-                }
-                that._tracker.setCallbacks({
-                    'tooltip-prepare': prepareCallback,
-                    'tooltip-show': showCallback,
-                    'tooltip-hide': hideCallback
-                })
-            },
-            clean: function() {
-                this._root.remove();
-                return this
-            },
-            render: function(options, size) {
-                var that = this;
-                options.canvasWidth = size.width;
-                options.canvasHeight = size.height;
-                options.text = {'class': 'dxg-text'};
-                that.update(options);
-                that._tracker.setTooltipState(that.enabled());
-                that.enabled() && that._root.append(that._container);
-                return that
-            }
-        })
-    })(DevExpress, jQuery);
     /*! Module viz-gauges, file layoutManager.js */
     (function(DX, $, undefined) {
         var _Number = Number,
             _String = String,
-            _min = Math.min,
             _max = Math.max,
             _each = $.each;
         function patchLayoutOptions(options) {
@@ -2591,11 +2509,9 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
             _extend = $.extend,
             _each = $.each;
         DX.viz.gauges.dxBaseGauge = DX.viz.core.BaseWidget.inherit({
-            _init: function() {
-                var that = this;
-                that._themeManager = that._factory.createThemeManager();
-                that._themeManager.setTheme(that.option("theme"));
-                that.callBase.apply(that, arguments)
+            _rootClassPrefix: "dxg",
+            _createThemeManager: function() {
+                return this._factory.createThemeManager()
             },
             _initCore: function() {
                 var that = this;
@@ -2607,12 +2523,6 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
                     container: that._root
                 });
                 that._layoutManager = that._factory.createLayoutManager();
-                that._tooltip = that._factory.createTooltip({
-                    renderer: that._renderer,
-                    container: that._root,
-                    tracker: that._tracker,
-                    eventTrigger: that._eventTrigger
-                });
                 that._title = that._factory.createTitle({
                     renderer: that._renderer,
                     container: that._root
@@ -2621,7 +2531,35 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
                     renderer: that._renderer,
                     container: that._root
                 });
-                that._setupDomain()
+                that._setupDomain();
+                that._setTrackerCallbacks()
+            },
+            _setTrackerCallbacks: function() {
+                var that = this,
+                    renderer = that._renderer,
+                    tooltip = that._tooltip;
+                that._tracker.setCallbacks({
+                    'tooltip-show': function(target, info) {
+                        var tooltipParameters = target.getTooltipParameters(),
+                            offset = DX.utils.getRootOffset(renderer),
+                            formatObject = _extend({
+                                value: tooltipParameters.value,
+                                valueText: tooltip.formatValue(tooltipParameters.value),
+                                color: tooltipParameters.color
+                            }, info);
+                        return tooltip.show(formatObject, {
+                                x: tooltipParameters.x + offset.left,
+                                y: tooltipParameters.y + offset.top,
+                                offset: tooltipParameters.offset
+                            }, {})
+                    },
+                    'tooltip-hide': function() {
+                        return tooltip.hide({})
+                    }
+                });
+                that._resetTrackerCallbacks = function() {
+                    that._resetTrackerCallbacks = that = renderer = tooltip = null
+                }
             },
             _initNotifiers: function() {
                 var that = this,
@@ -2637,28 +2575,13 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
                     }
                 }
             },
-            _getRendererParameters: function() {
-                return {
-                        width: 1,
-                        height: 1,
-                        pathModified: this.option('pathModified'),
-                        rtl: this.option('rtlEnabled'),
-                        cssClass: 'dxg ' + this._rootClass
-                    }
-            },
-            _getOption: function(name, isScalar) {
-                var theme = this._themeManager.theme(name),
-                    option = this.option(name);
-                return isScalar ? option !== undefined ? option : theme : _extend(true, {}, theme, option)
-            },
             _disposeCore: function() {
                 var that = this;
                 that._themeManager.dispose();
                 that._tracker.dispose();
                 that._title.dispose();
                 that._deltaIndicator && that._deltaIndicator.dispose();
-                that._tooltip.dispose();
-                that._root = that._translator = that._notifiers = that._themeManager = that._tracker = that._layoutManager = that._title = that._tooltip = null
+                that._root = that._translator = that._notifiers = that._tracker = that._layoutManager = that._title = null
             },
             _refresh: function() {
                 var that = this,
@@ -2679,7 +2602,6 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
             },
             _cleanCore: function() {
                 var that = this;
-                that._tooltip.clean();
                 that._title.clean();
                 that._deltaIndicator && that._deltaIndicator.clean();
                 that._tracker.deactivate();
@@ -2701,14 +2623,16 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
                 that._mainRect = that._layoutManager.getRect();
                 that._renderContent();
                 that._layoutManager.endLayout();
-                that._tooltip.render(_extend(true, {}, theme.tooltip, that.option("tooltip")), {
-                    width: that._width,
-                    height: that._height
-                });
+                that._tracker.setTooltipState(that._tooltip.isEnabled());
                 that._tracker.activate();
                 that._noAnimation = null;
                 that.option("debugMode") === true && that._renderDebugInfo();
                 that._debug_rendered && that._debug_rendered()
+            },
+            _setTooltipOptions: function() {
+                var that = this;
+                that.callBase();
+                that._tracker && that._tracker.setTooltipState(that._tooltip.isEnabled())
             },
             _renderDebugInfo: function() {
                 var that = this,
@@ -2767,10 +2691,6 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
             _optionChanged: function(args) {
                 var that = this;
                 switch (args.name) {
-                    case"theme":
-                        that._themeManager.setTheme(args.value);
-                        that._invalidate();
-                        break;
                     case"startValue":
                     case"endValue":
                         that._setupDomain();
@@ -2817,7 +2737,6 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
             _setupCodomain: null,
             _getApproximateScreenRange: null,
             _factory: {
-                createRenderer: DX.viz.core.CoreFactory.createRenderer,
                 createTranslator: function() {
                     return new DX.viz.core.Translator1D
                 },
@@ -2832,9 +2751,6 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
                 },
                 createDeltaIndicator: function(parameters) {
                     return DX.viz.gauges.__internals.DeltaIndicator ? new DX.viz.gauges.__internals.DeltaIndicator(parameters) : null
-                },
-                createTooltip: function(parameters) {
-                    return new DX.viz.gauges.__internals.Tooltip(parameters)
                 }
             }
         });
@@ -2844,8 +2760,7 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
     })(DevExpress, jQuery);
     /*! Module viz-gauges, file gauge.js */
     (function(DX, $, undefined) {
-        var _Rectangle = DX.viz.core.Rectangle,
-            _isDefined = DX.utils.isDefined,
+        var _isDefined = DX.utils.isDefined,
             _isArray = DX.utils.isArray,
             _isNumber = DX.utils.isNumber,
             _isFinite = isFinite,
@@ -3335,7 +3250,6 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
                     indicators = that._indicators,
                     i,
                     ii,
-                    indicatorOptions,
                     indicator,
                     indicatorsLen = indicators.length;
                 if (indicatorsLen > count) {
@@ -3664,7 +3578,6 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
             _extend = $.extend,
             _getSampleText = DX.viz.gauges.__internals.getSampleText,
             _formatValue = DX.viz.gauges.__internals.formatValue,
-            _Rectangle = DX.viz.core.Rectangle,
             _Palette = DX.viz.core.Palette,
             OPTION_VALUES = "values";
         var dxBarGauge = DX.viz.gauges.dxBaseGauge.inherit({
@@ -3884,7 +3797,7 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
                         that._barsGroup.animate({_: 0}, that._animationSettings)
                     }
                 },
-                _updateValues: function(values, noAnimation) {
+                _updateValues: function(values) {
                     var that = this,
                         list = _isArray(values) && values || _isFinite(values) && [values] || [],
                         i,
@@ -4110,9 +4023,7 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
     })(DevExpress, jQuery);
     /*! Module viz-gauges, file tracker.js */
     (function(DX, $, undefined) {
-        var _setTimeout = setTimeout,
-            _clearTimeout = clearTimeout,
-            _abs = Math.abs,
+        var _abs = Math.abs,
             TOOLTIP_SHOW_DELAY = 300,
             TOOLTIP_HIDE_DELAY = 300,
             TOOLTIP_TOUCH_SHOW_DELAY = 400,
@@ -4133,12 +4044,11 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
                 });
                 that._showTooltipCallback = function() {
                     that._showTooltipTimeout = null;
-                    var target = that._tooltipEvent.target;
+                    var target = that._tooltipEvent.target,
+                        data = $(target).data();
                     that._targetEvent = null;
-                    if (that._tooltipTarget !== target) {
-                        that._tooltipTarget = target;
-                        that._callbacks['tooltip-show']()
-                    }
+                    if (that._tooltipTarget !== target && that._callbacks['tooltip-show'](data.target, data.info))
+                        that._tooltipTarget = target
                 };
                 that._hideTooltipCallback = function() {
                     that._hideTooltipTimeout = null;
@@ -4149,11 +4059,15 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
                     }
                 };
                 that._dispose = function() {
-                    _clearTimeout(that._showTooltipTimeout);
-                    _clearTimeout(that._hideTooltipTimeout);
+                    clearTimeout(that._showTooltipTimeout);
+                    clearTimeout(that._hideTooltipTimeout);
                     that._showTooltipCallback = that._hideTooltipCallback = that._dispose = null
                 };
-                that._DEBUG_showTooltipTimeoutSet = that._DEBUG_showTooltipTimeoutCleared = that._DEBUG_hideTooltipTimeoutSet = that._DEBUG_hideTooltipTimeoutCleared = 0
+                that._DEBUG_showTooltipTimeoutSet = that._DEBUG_showTooltipTimeoutCleared = that._DEBUG_hideTooltipTimeoutSet = that._DEBUG_hideTooltipTimeoutCleared = 0;
+                that.TOOLTIP_SHOW_DELAY = TOOLTIP_SHOW_DELAY;
+                that.TOOLTIP_HIDE_DELAY = TOOLTIP_HIDE_DELAY;
+                that.TOOLTIP_TOUCH_SHOW_DELAY = TOOLTIP_TOUCH_SHOW_DELAY;
+                that.TOOLTIP_TOUCH_HIDE_DELAY = TOOLTIP_TOUCH_HIDE_DELAY
             },
             dispose: function() {
                 var that = this;
@@ -4197,26 +4111,25 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
                 return this
             },
             _showTooltip: function(event, delay) {
-                var that = this,
-                    data = $(event.target).data();
-                if (that._tooltipTarget === event.target || that._callbacks['tooltip-prepare'](data.target, data.info)) {
-                    that._hideTooltipTimeout && ++that._DEBUG_hideTooltipTimeoutCleared;
-                    _clearTimeout(that._hideTooltipTimeout);
-                    that._hideTooltipTimeout = null;
-                    _clearTimeout(that._showTooltipTimeout);
-                    that._tooltipEvent = event;
-                    ++that._DEBUG_showTooltipTimeoutSet;
-                    that._showTooltipTimeout = _setTimeout(that._showTooltipCallback, delay)
-                }
+                var that = this;
+                that._hideTooltipTimeout && ++that._DEBUG_hideTooltipTimeoutCleared;
+                clearTimeout(that._hideTooltipTimeout);
+                that._hideTooltipTimeout = null;
+                if (that._tooltipTarget === event.target)
+                    return;
+                clearTimeout(that._showTooltipTimeout);
+                that._tooltipEvent = event;
+                ++that._DEBUG_showTooltipTimeoutSet;
+                that._showTooltipTimeout = setTimeout(that._showTooltipCallback, delay)
             },
             _hideTooltip: function(delay) {
                 var that = this;
                 that._showTooltipTimeout && ++that._DEBUG_showTooltipTimeoutCleared;
-                _clearTimeout(that._showTooltipTimeout);
+                clearTimeout(that._showTooltipTimeout);
                 that._showTooltipTimeout = null;
-                _clearTimeout(that._hideTooltipTimeout);
+                clearTimeout(that._hideTooltipTimeout);
                 ++that._DEBUG_hideTooltipTimeoutSet;
-                that._hideTooltipTimeout = _setTimeout(that._hideTooltipCallback, delay)
+                that._hideTooltipTimeout = setTimeout(that._hideTooltipCallback, delay)
             }
         });
         var tooltipMouseEvents = {
@@ -4258,7 +4171,7 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
             tracker._showTooltip(event, TOOLTIP_TOUCH_SHOW_DELAY);
             tracker._touch = true
         }
-        function handleTooltipDocumentTouchStart(event) {
+        function handleTooltipDocumentTouchStart() {
             var tracker = active_touch_tooltip_tracker;
             if (tracker) {
                 if (!tracker._touch) {
@@ -4268,7 +4181,7 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
                 tracker._touch = null
             }
         }
-        function handleTooltipDocumentTouchEnd(event) {
+        function handleTooltipDocumentTouchEnd() {
             var tracker = active_touch_tooltip_tracker;
             if (tracker)
                 if (tracker._showTooltipTimeout) {

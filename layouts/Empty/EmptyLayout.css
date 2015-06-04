@@ -4,10 +4,6 @@
     position: relative;
 }
 
-.dx-theme-ios7 .empty-layout .layout-content{
-    background-color: #EFEFF4;
-}
-
 /* Prevent margin collapse */
 .empty-layout::before {
     content: "\00a0";

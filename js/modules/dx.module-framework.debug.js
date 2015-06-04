@@ -1,9 +1,9 @@
 /*! 
 * DevExtreme (Single Page App Framework)
-* Version: 14.2.7
-* Build date: Apr 17, 2015
+* Version: 15.1.3
+* Build date: Jun 1, 2015
 *
-* Copyright (c) 2011 - 2014 Developer Express Inc. ALL RIGHTS RESERVED
+* Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
 */
 
@@ -47,7 +47,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
             };
         var resolveTextValue = function(command, containerOptions) {
                 var showText = resolvePropertyValue(command, containerOptions, "showText"),
-                    hasIcon = !!command.option("icon") || command.option("iconSrc"),
+                    hasIcon = !!command.option("icon"),
                     titleValue = resolvePropertyValue(command, containerOptions, "title", "");
                 return showText || !hasIcon ? titleValue : ""
             };
@@ -328,7 +328,6 @@ if (!DevExpress.MOD_FRAMEWORK) {
     })(jQuery, DevExpress);
     /*! Module framework, file framework.command.js */
     (function($, DX) {
-        var ui = DX.ui;
         var Command = DX.DOMComponent.inherit({
                 ctor: function(element, options) {
                     if ($.isPlainObject(element)) {
@@ -342,10 +341,16 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 },
                 _setDeprecatedOptions: function() {
                     this.callBase();
-                    $.extend(this._deprecatedOptions, {action: {
+                    $.extend(this._deprecatedOptions, {
+                        action: {
                             since: "14.2",
                             alias: "onExecute"
-                        }})
+                        },
+                        iconSrc: {
+                            since: "15.1",
+                            alias: "icon"
+                        }
+                    })
                 },
                 _setDefaultOptions: function() {
                     this.callBase();
@@ -354,7 +359,6 @@ if (!DevExpress.MOD_FRAMEWORK) {
                         id: null,
                         title: "",
                         icon: "",
-                        iconSrc: "",
                         visible: true,
                         disabled: false
                     })
@@ -561,72 +565,6 @@ if (!DevExpress.MOD_FRAMEWORK) {
                         location: "before"
                     }]
             },
-            "tizen-header-toolbar": {
-                defaults: {
-                    showIcon: true,
-                    showText: false,
-                    location: "after"
-                },
-                commands: [{
-                        id: "back",
-                        showIcon: false,
-                        location: "before"
-                    }, "create", "edit", "save", {
-                        id: "cancel",
-                        showText: true,
-                        location: "menu"
-                    }, {
-                        id: "delete",
-                        showText: true,
-                        location: "menu"
-                    }]
-            },
-            "tizen-footer-toolbar": {
-                defaults: {location: "after"},
-                commands: [{
-                        id: "create",
-                        showText: false
-                    }, {
-                        id: "edit",
-                        showText: false,
-                        location: "before"
-                    }, {
-                        id: "delete",
-                        location: "menu"
-                    }, {
-                        id: "save",
-                        showIcon: false,
-                        location: "before"
-                    }]
-            },
-            "tizen-simple-toolbar": {
-                defaults: {
-                    showIcon: true,
-                    showText: false,
-                    location: "after"
-                },
-                commands: [{
-                        id: "back",
-                        showIcon: false,
-                        location: "before"
-                    }, {id: "create"}, {
-                        id: "save",
-                        showText: true,
-                        location: "before"
-                    }, {
-                        id: "edit",
-                        showText: true,
-                        location: "menu"
-                    }, {
-                        id: "cancel",
-                        showText: true,
-                        location: "menu"
-                    }, {
-                        id: "delete",
-                        showText: true,
-                        location: "menu"
-                    }]
-            },
             "generic-header-toolbar": {
                 defaults: {
                     showIcon: false,
@@ -731,7 +669,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
     (function($, DX, undefined) {
         var Class = DX.Class;
         DX.framework.ViewCache = Class.inherit({
-            ctor: function(options) {
+            ctor: function() {
                 this._cache = {};
                 this.viewRemoved = $.Callbacks();
                 this._callbacksToEvents("ViewCache", ["viewRemoved"])
@@ -1376,6 +1314,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
                         if (this.currentItem().uri !== uri)
                             this.currentStack.navigate(uri, true)
                     }
+                    options.direction = options.direction || "none"
                 }
                 else {
                     var prevIndex = this.currentStack.currentIndex,
@@ -1679,7 +1618,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
             ctor: function(options) {
                 options = options || {};
                 this._options = options;
-                this.namespace = options.namespace || options.ns || window;
+                this.namespace = options.namespace || window;
                 this._applicationMode = options.mode ? options.mode : "mobileApp";
                 this.components = [];
                 BACK_COMMAND_TITLE = DX.localization.localizeString("@Back");
@@ -1746,8 +1685,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
             _createNavigationCommands: function(commandConfig) {
                 if (!commandConfig)
                     return [];
-                var that = this,
-                    generatedIdCount = 0;
+                var generatedIdCount = 0;
                 return $.map(commandConfig, function(item) {
                         var command;
                         if (item instanceof frameworkNS.dxCommand)
@@ -1816,32 +1754,24 @@ if (!DevExpress.MOD_FRAMEWORK) {
             _onNavigated: function(args) {
                 var that = this,
                     direction = args.options.direction,
-                    deferred = $.Deferred(),
+                    resultDeferred,
                     viewInfo = that._acquireViewInfo(args.item, args.options);
-                if (!that._isViewReadyToShow(viewInfo))
-                    that._setViewLoadingState(viewInfo, direction).done(function() {
+                if (!viewInfo.model) {
+                    this._processEvent("beforeViewSetup", {viewInfo: viewInfo});
+                    that._createViewModel(viewInfo);
+                    that._createViewCommands(viewInfo);
+                    this._processEvent("afterViewSetup", {viewInfo: viewInfo})
+                }
+                that._highlightCurrentNavigationCommand(viewInfo);
+                resultDeferred = that._showView(viewInfo, direction).always(function() {
+                    that._isNavigating = false;
+                    var pendingArgs = that._pendingNavigationArgs;
+                    if (pendingArgs)
                         DX.utils.executeAsync(function() {
-                            that._createViewModel(viewInfo);
-                            that._createViewCommands(viewInfo);
-                            deferred.resolve()
+                            that.navigate(pendingArgs.uri, pendingArgs.options)
                         })
-                    }).fail(function() {
-                        that._isNavigating = false;
-                        deferred.reject()
-                    });
-                else
-                    deferred.resolve();
-                deferred.done(function() {
-                    that._highlightCurrentNavigationCommand(viewInfo);
-                    that._showView(viewInfo, direction).always(function() {
-                        that._isNavigating = false;
-                        var pendingArgs = that._pendingNavigationArgs;
-                        if (pendingArgs)
-                            DX.utils.executeAsync(function() {
-                                that.navigate(pendingArgs.uri, pendingArgs.options)
-                            })
-                    })
-                })
+                });
+                return resultDeferred
             },
             _isViewReadyToShow: function(viewInfo) {
                 return !!viewInfo.model
@@ -1853,7 +1783,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
                     if (currentItem)
                         DX.utils.executeAsync(function() {
                             var viewInfo = that._acquireViewInfo(currentItem, args.options);
-                            that._highlightCurrentNavigationCommand(viewInfo)
+                            that._highlightCurrentNavigationCommand(viewInfo, true)
                         });
                     that._isNavigating = false
                 }
@@ -1912,9 +1842,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 return viewInfo
             },
             _createViewModel: function(viewInfo) {
-                this._processEvent("beforeViewSetup", {viewInfo: viewInfo});
-                viewInfo.model = viewInfo.model || this._callViewCodeBehind(viewInfo);
-                this._processEvent("afterViewSetup", {viewInfo: viewInfo})
+                viewInfo.model = viewInfo.model || this._callViewCodeBehind(viewInfo)
             },
             _createViewCommands: function(viewInfo) {
                 viewInfo.commands = viewInfo.model.commands || [];
@@ -1943,7 +1871,8 @@ if (!DevExpress.MOD_FRAMEWORK) {
                                 that.back({stack: stackKey})
                             },
                             icon: "arrowleft",
-                            type: "back"
+                            type: "back",
+                            renderStage: that._options.useViewTitleAsBackText ? "onViewRendering" : "onViewShown"
                         })];
                 var result = DX.framework.utils.mergeCommands(toMergeTo, commands);
                 commands.length = 0;
@@ -1955,7 +1884,6 @@ if (!DevExpress.MOD_FRAMEWORK) {
                         viewInfo: viewInfo,
                         direction: direction
                     };
-                that._processEvent("viewShowing", eventArgs, viewInfo.model);
                 return that._showViewImpl(eventArgs.viewInfo, eventArgs.direction).done(function() {
                         DX.utils.executeAsync(function() {
                             that._processEvent("viewShown", eventArgs, viewInfo.model);
@@ -1963,10 +1891,9 @@ if (!DevExpress.MOD_FRAMEWORK) {
                         })
                     })
             },
-            _highlightCurrentNavigationCommand: function(viewInfo) {
+            _highlightCurrentNavigationCommand: function(viewInfo, forceUpdate) {
                 var that = this,
                     selectedCommand,
-                    currentUri = viewInfo.uri,
                     currentNavigationItemId = viewInfo.model && viewInfo.model.currentNavigationItemId;
                 if (currentNavigationItemId !== undefined)
                     $.each(this.navigation, function(index, command) {
@@ -1987,7 +1914,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
                         }
                     });
                 $.each(this.navigation, function(index, command) {
-                    if (command === selectedCommand && command.option("highlighted"))
+                    if (forceUpdate && command === selectedCommand && command.option("highlighted"))
                         command.fireEvent("optionChanged", [{
                                 name: "highlighted",
                                 value: true,
@@ -1996,7 +1923,6 @@ if (!DevExpress.MOD_FRAMEWORK) {
                     command.option("highlighted", command === selectedCommand)
                 })
             },
-            _setViewLoadingState: DX.abstract,
             _showViewImpl: DX.abstract,
             _obtainViewLink: function(viewInfo) {
                 var key = viewInfo.key;
@@ -2061,8 +1987,232 @@ if (!DevExpress.MOD_FRAMEWORK) {
     /*! Module framework, file framework.html.js */
     (function($, DX, undefined) {
         DX.framework.html = {
-            layoutControllers: [],
-            layoutSets: {}
+            layoutSets: {},
+            animationSets: {
+                "native": {
+                    "view-content-change": [{animation: "slide"}, {
+                            animation: "ios7-slide",
+                            device: {platform: "ios"}
+                        }, {
+                            animation: "none",
+                            device: {
+                                deviceType: "desktop",
+                                platform: "generic"
+                            }
+                        }, {
+                            animation: "none",
+                            device: {grade: "C"}
+                        }],
+                    "view-header-toolbar": [{animation: "ios7-toolbar"}, {
+                            animation: "slide",
+                            device: {grade: "B"}
+                        }, {
+                            animation: "none",
+                            device: {grade: "C"}
+                        }]
+                },
+                "default": {
+                    "view-content-change": [{animation: "slide"}, {
+                            animation: "ios7-slide",
+                            device: {platform: "ios"}
+                        }, {
+                            animation: "fade",
+                            device: {
+                                deviceType: "desktop",
+                                platform: "generic"
+                            }
+                        }, {
+                            animation: "none",
+                            device: {grade: "C"}
+                        }],
+                    "view-content-rendered": [{animation: "fade"}, {
+                            animation: "none",
+                            device: {grade: "C"}
+                        }],
+                    "view-header-toolbar": [{animation: "ios7-toolbar"}, {
+                            animation: "slide",
+                            device: {grade: "B"}
+                        }, {
+                            animation: "none",
+                            device: {grade: "C"}
+                        }],
+                    "command-rendered": [{animation: "stagger-fade-drop"}, {
+                            animation: "fade",
+                            device: {grade: "B"}
+                        }, {
+                            animation: "fade",
+                            device: {deviceType: "desktop"}
+                        }, {
+                            animation: "none",
+                            device: {grade: "C"}
+                        }],
+                    "list-item-rendered": [{
+                            animation: "stagger-3d-drop",
+                            device: {grade: "A"}
+                        }, {
+                            animation: "fade",
+                            device: {deviceType: "desktop"}
+                        }, {
+                            animation: "none",
+                            device: {grade: "C"}
+                        }],
+                    "detail-item-rendered": [{
+                            animation: "stagger-3d-drop",
+                            device: {grade: "A"}
+                        }, {
+                            animation: "fade",
+                            device: {deviceType: "desktop"}
+                        }, {
+                            animation: "none",
+                            device: {grade: "C"}
+                        }],
+                    "edit-item-rendered": [{
+                            animation: "stagger-3d-drop",
+                            device: {grade: "A"}
+                        }, {
+                            animation: "fade",
+                            device: {deviceType: "desktop"}
+                        }, {
+                            animation: "none",
+                            device: {grade: "C"}
+                        }]
+                },
+                slide: {
+                    "view-content-change": [{animation: "slide"}, {
+                            animation: "ios7-slide",
+                            device: {platform: "ios"}
+                        }, {
+                            animation: "fade",
+                            device: {
+                                deviceType: "desktop",
+                                platform: "generic"
+                            }
+                        }, {
+                            animation: "none",
+                            device: {grade: "C"}
+                        }],
+                    "view-content-rendered": [{animation: "fade"}, {
+                            animation: "none",
+                            device: {grade: "C"}
+                        }],
+                    "view-header-toolbar": [{animation: "ios7-toolbar"}, {
+                            animation: "slide",
+                            device: {grade: "B"}
+                        }, {
+                            animation: "none",
+                            device: {grade: "C"}
+                        }],
+                    "command-rendered": [{animation: "stagger-fade-drop"}, {
+                            animation: "fade",
+                            device: {grade: "B"}
+                        }, {
+                            animation: "fade",
+                            device: {deviceType: "desktop"}
+                        }, {
+                            animation: "none",
+                            device: {grade: "C"}
+                        }],
+                    "list-item-rendered": [{
+                            animation: "stagger-fade-slide",
+                            device: {grade: "A"}
+                        }, {
+                            animation: "fade",
+                            device: {deviceType: "desktop"}
+                        }, {
+                            animation: "none",
+                            device: {grade: "C"}
+                        }],
+                    "detail-item-rendered": [{
+                            animation: "stagger-fade-slide",
+                            device: {grade: "A"}
+                        }, {
+                            animation: "fade",
+                            device: {deviceType: "desktop"}
+                        }, {
+                            animation: "none",
+                            device: {grade: "C"}
+                        }],
+                    "edit-item-rendered": [{
+                            animation: "stagger-fade-slide",
+                            device: {grade: "A"}
+                        }, {
+                            animation: "fade",
+                            device: {deviceType: "desktop"}
+                        }, {
+                            animation: "none",
+                            device: {grade: "C"}
+                        }]
+                },
+                zoom: {
+                    "view-content-change": [{animation: "slide"}, {
+                            animation: "ios7-slide",
+                            device: {platform: "ios"}
+                        }, {
+                            animation: "fade",
+                            device: {
+                                deviceType: "desktop",
+                                platform: "generic"
+                            }
+                        }, {
+                            animation: "none",
+                            device: {grade: "C"}
+                        }],
+                    "view-content-rendered": [{animation: "fade"}, {
+                            animation: "none",
+                            device: {grade: "C"}
+                        }],
+                    "view-header-toolbar": [{animation: "ios7-toolbar"}, {
+                            animation: "slide",
+                            device: {grade: "B"}
+                        }, {
+                            animation: "fade",
+                            device: {deviceType: "desktop"}
+                        }, {
+                            animation: "none",
+                            device: {grade: "C"}
+                        }],
+                    "command-rendered": [{animation: "stagger-fade-zoom"}, {
+                            animation: "fade",
+                            device: {grade: "B"}
+                        }, {
+                            animation: "fade",
+                            device: {deviceType: "desktop"}
+                        }, {
+                            animation: "none",
+                            device: {grade: "C"}
+                        }],
+                    "list-item-rendered": [{
+                            animation: "stagger-fade-zoom",
+                            device: {grade: "A"}
+                        }, {
+                            animation: "fade",
+                            device: {deviceType: "desktop"}
+                        }, {
+                            animation: "none",
+                            device: {grade: "C"}
+                        }],
+                    "detail-item-rendered": [{
+                            animation: "stagger-fade-zoom",
+                            device: {grade: "A"}
+                        }, {
+                            animation: "fade",
+                            device: {deviceType: "desktop"}
+                        }, {
+                            animation: "none",
+                            device: {grade: "C"}
+                        }],
+                    "edit-item-rendered": [{
+                            animation: "stagger-fade-zoom",
+                            device: {grade: "A"}
+                        }, {
+                            animation: "fade",
+                            device: {deviceType: "desktop"}
+                        }, {
+                            animation: "none",
+                            device: {grade: "C"}
+                        }]
+                }
+            }
         }
     })(jQuery, DevExpress);
     /*! Module framework, file framework.widgetCommandAdapters.js */
@@ -2106,9 +2256,14 @@ if (!DevExpress.MOD_FRAMEWORK) {
                     this.$widgetElement = $widgetElement;
                     this.$widgetElement.data(DX_COMMAND_TO_WIDGET_ADAPTER, this);
                     this.widget = this._getWidgetByElement($widgetElement);
+                    this._widgetWidgetContentReadyHandler = $.proxy(this._onWidgetContentReady, this);
+                    this._widgetWidgetItemRenderedHandler = $.proxy(this._onWidgetItemRendered, this);
                     this._widgetDisposingHandler = $.proxy(this._onWidgetDisposing, this);
+                    this.widget.on("itemRendered", this._widgetWidgetItemRenderedHandler);
+                    this.widget.on("contentReady", this._widgetWidgetContentReadyHandler);
                     this.widget.on("disposing", this._widgetDisposingHandler);
-                    this.itemWrappers = []
+                    this.itemWrappers = [];
+                    this._transitionExecutor = new DX.TransitionExecutor
                 },
                 addCommand: function(command, containerOptions) {
                     var itemWrapper = this._createItemWrapper(command, containerOptions);
@@ -2124,6 +2279,15 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 endUpdate: function() {
                     this.widget.endUpdate()
                 },
+                _onWidgetItemRendered: function(e) {
+                    if (e.itemData.isJustAdded && e.itemElement.is(":visible")) {
+                        this._transitionExecutor.enter(e.itemElement, "command-rendered");
+                        delete e.itemData.isJustAdded
+                    }
+                },
+                _onWidgetContentReady: function(e) {
+                    this._transitionExecutor.start()
+                },
                 _onWidgetDisposing: function() {
                     this.dispose(true)
                 },
@@ -2133,7 +2297,9 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 },
                 _addItemToWidget: function(itemWrapper) {
                     var items = this.widget.option("items");
-                    items.push(itemWrapper.widgetItem)
+                    items.push(itemWrapper.widgetItem);
+                    if (this.widget.element().is(":visible"))
+                        itemWrapper.widgetItem.isJustAdded = true
                 },
                 refresh: function() {
                     var items = this.widget.option("items");
@@ -2155,6 +2321,8 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 dispose: function(widgetDisposing) {
                     this.clear(widgetDisposing);
                     if (this.widget) {
+                        this.widget.off("itemRendered", this._widgetWidgetItemRenderedHandler);
+                        this.widget.off("contentReady", this._widgetContentReadyHandler);
                         this.widget.off("disposing", this._widgetDisposingHandler);
                         this.$widgetElement.removeData(DX_COMMAND_TO_WIDGET_ADAPTER);
                         delete this.widget;
@@ -2209,7 +2377,6 @@ if (!DevExpress.MOD_FRAMEWORK) {
                     optionsTarget.text = commandToContainer.resolveTextValue(command, containerOptions);
                     optionsTarget.disabled = command.option("disabled");
                     optionsTarget.icon = commandToContainer.resolveIconValue(command, containerOptions, "icon");
-                    optionsTarget.iconSrc = commandToContainer.resolveIconValue(command, containerOptions, "iconSrc");
                     optionsTarget.type = commandToContainer.resolveTypeValue(command, containerOptions)
                 }});
         var dxToolbarAdapter = WidgetAdapterBase.inherit({
@@ -2232,8 +2399,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
                         command = this.command,
                         containerOptions = this.containerOptions;
                     widgetItem.text = commandToContainer.resolveTextValue(command, containerOptions);
-                    widgetItem.icon = commandToContainer.resolveIconValue(command, containerOptions, "icon");
-                    widgetItem.iconSrc = commandToContainer.resolveIconValue(command, containerOptions, "iconSrc")
+                    widgetItem.icon = commandToContainer.resolveIconValue(command, containerOptions, "icon")
                 }});
         var dxActionSheetAdapter = WidgetAdapterBase.inherit({
                 _createItemWrapper: function(command, containerOptions) {
@@ -2246,15 +2412,14 @@ if (!DevExpress.MOD_FRAMEWORK) {
         var dxListItemWrapper = WidgetItemWrapperBase.inherit({
                 _createWidgetItem: function(command, containerOptions) {
                     this.callBase(command, containerOptions);
-                    this.widgetItem.click = $.proxy(this._itemClick, this)
+                    this.widgetItem.onClick = $.proxy(this._itemClick, this)
                 },
                 _updateItem: function() {
                     var widgetItem = this.widgetItem,
                         command = this.command,
                         containerOptions = this.containerOptions;
                     widgetItem.title = commandToContainer.resolveTextValue(command, containerOptions);
-                    widgetItem.icon = commandToContainer.resolveIconValue(command, containerOptions, "icon");
-                    widgetItem.iconSrc = commandToContainer.resolveIconValue(command, containerOptions, "iconSrc")
+                    widgetItem.icon = commandToContainer.resolveIconValue(command, containerOptions, "icon")
                 },
                 _itemClick: function(e) {
                     this.command.execute(e)
@@ -2273,8 +2438,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
                         containerOptions = this.containerOptions;
                     if (optionName !== "highlighted") {
                         this.widgetItem.text = commandToContainer.resolveTextValue(command, containerOptions);
-                        this.widgetItem.icon = commandToContainer.resolveIconValue(command, containerOptions, "icon");
-                        this.widgetItem.iconSrc = commandToContainer.resolveIconValue(command, containerOptions, "iconSrc")
+                        this.widgetItem.icon = commandToContainer.resolveIconValue(command, containerOptions, "icon")
                     }
                 }});
         var dxNavBarAdapter = WidgetAdapterBase.inherit({
@@ -2300,8 +2464,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 },
                 _onCommandChanged: function(args) {
                     var optionName = args.name,
-                        newValue = args.value,
-                        oldValue = args.previousValue;
+                        newValue = args.value;
                     if (optionName !== "highlighted" || newValue)
                         this._updateSelectedIndex();
                     this.callBase(args)
@@ -2315,14 +2478,9 @@ if (!DevExpress.MOD_FRAMEWORK) {
                         }
                 }
             });
-        var dxPivotItemWrapper = WidgetItemWrapperBase.inherit({_updateItem: function(optionName, newValue, oldValue) {
-                    if (optionName === "title")
-                        this.widgetItem.title = commandToContainer.resolveTextValue(this.command, this.containerOptions)
-                }});
         var dxPivotAdapter = WidgetAdapterBase.inherit({
                 ctor: function($widgetElement) {
                     this.callBase($widgetElement);
-                    this._highlighting = false;
                     this.widget.option("onSelectionChanged", $.proxy(this._onPivotSelectionChange, this))
                 },
                 _onPivotSelectionChange: function(e) {
@@ -2357,8 +2515,6 @@ if (!DevExpress.MOD_FRAMEWORK) {
                     DX.fx.off = true;
                     for (var i = 0, itemsCount = items.length; i < itemsCount; i++)
                         if (items[i].highlighted) {
-                            if (this._highlighting && pivot.option("selectedIndex") === i)
-                                this._highlighting = false;
                             pivot.option("selectedIndex", i);
                             break
                         }
@@ -2381,8 +2537,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
                         containerOptions = this.containerOptions;
                     if (name !== "highlighted") {
                         widgetItem.title = commandToContainer.resolveTextValue(command, containerOptions);
-                        widgetItem.icon = commandToContainer.resolveIconValue(command, containerOptions, "icon");
-                        widgetItem.iconSrc = commandToContainer.resolveIconValue(command, containerOptions, "iconSrc")
+                        widgetItem.icon = commandToContainer.resolveIconValue(command, containerOptions, "icon")
                     }
                 }});
         var dxSlideOutAdapter = WidgetAdapterBase.inherit({
@@ -2413,8 +2568,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 },
                 _onCommandChanged: function(args) {
                     var optionName = args.name,
-                        newValue = args.value,
-                        oldValue = args.previousValue;
+                        newValue = args.value;
                     if (optionName !== "highlighted" || newValue)
                         this._updateSelectedIndex();
                     this.callBase(args)
@@ -2444,8 +2598,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
     })(jQuery, DevExpress);
     /*! Module framework, file framework.commandManager.js */
     (function($, DX, undefined) {
-        var Class = DX.Class,
-            ui = DevExpress.ui;
+        var Class = DX.Class;
         var CommandContainer = DX.DOMComponent.inherit({
                 ctor: function(element, options) {
                     if ($.isPlainObject(element)) {
@@ -2472,7 +2625,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
             },
             _getDefaultWidgetAdapter: function() {
                 return {
-                        addCommand: this._defaultAddCommand,
+                        addCommand: $.noop,
                         clearContainer: $.noop
                     }
             },
@@ -2548,33 +2701,26 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 if (adapter.endUpdate)
                     adapter.endUpdate($container);
                 return true
-            },
-            _defaultAddCommand: function($container, command, options) {
-                var $source = command.element();
-                if ($source) {
-                    $container.append($source);
-                    $source.on("dxclick", function() {
-                        command.execute()
-                    })
-                }
             }
         })
     })(jQuery, DevExpress);
     /*! Module framework, file framework.layoutController.js */
     (function($, DX, undefined) {
-        var Class = DX.Class;
-        var HIDDEN_BAG_ID = "__hidden-bag";
-        var TRANSITION_SELECTOR = ".dx-transition:not(.dx-transition .dx-transition)";
+        var Class = DX.Class,
+            HIDDEN_BAG_ID = "__hidden-bag",
+            TRANSITION_SELECTOR = ".dx-transition:not(.dx-transition .dx-transition)",
+            CONTENT_SELECTOR = ".dx-content",
+            DEFAULT_COMMAND_RENDER_STAGE = "onViewShown";
         var transitionSelector = function(transitionName) {
                 return ".dx-transition-" + transitionName
             };
         DX.framework.html.DefaultLayoutController = Class.inherit({
             ctor: function(options) {
                 options = options || {};
-                this.name = options.layoutTemplateName || options.name || "";
-                this._disableViewLoadingState = options.disableViewLoadingState;
+                this.name = options.name || "";
                 this._layoutModel = options.layoutModel || {};
                 this._defaultPaneName = options.defaultPaneName || "content";
+                this._transitionDuration = options.transitionDuration === undefined ? 400 : options.transitionDuration;
                 this.viewReleased = $.Callbacks();
                 this.viewRendered = $.Callbacks();
                 this._callbacksToEvents("DefaultLayoutController", ["viewReleased", "viewRendered"])
@@ -2585,10 +2731,10 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 this._$viewPort = options.$viewPort || $("body");
                 this._commandManager = options.commandManager;
                 this._viewEngine = options.viewEngine;
+                this.transitionExecutor = new DX.TransitionExecutor;
                 this._prepareTemplates();
                 this._$viewPort.append(this._getRootElement());
                 this._hideElements(this._getRootElement());
-                this.DEFAULT_LOADING_TITLE = DX.localization.localizeString("@Loading");
                 if (options.templateContext) {
                     this._templateContext = options.templateContext;
                     this._proxiedTemplateContextChangedHandler = $.proxy(this._templateContextChangedHandler, this)
@@ -2645,8 +2791,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 that._$mainLayout = that._createEmptyLayout();
                 that._showElements(that._$mainLayout);
                 that._applyTemplate(that._$mainLayout, that._layoutModel);
-                that._$navigationWidget = that._createNavigationWidget();
-                that._loadingStateViewInfo = that._createLoadingStateViewInfo($layoutTemplate)
+                that._$navigationWidget = that._createNavigationWidget()
             },
             renderNavigation: function(navigationCommands) {
                 this._clearNavigationWidget();
@@ -2656,11 +2801,13 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 this._renderCommands(this._$mainLayout, navigationCommands)
             },
             _createNavigationWidget: function() {
-                var result;
-                this._$mainLayout.find(".dx-command-container").each(function() {
-                    var container = $(this).dxCommandContainer("instance");
-                    if (container.option("id") === "global-navigation")
-                        result = $(this)
+                var containers = this._findCommandContainers(this._$mainLayout),
+                    result;
+                $.each(containers, function(k, container) {
+                    if (container.option("id") === "global-navigation") {
+                        result = container.element();
+                        return false
+                    }
                 });
                 return result
             },
@@ -2683,67 +2830,34 @@ if (!DevExpress.MOD_FRAMEWORK) {
                     that._applyTemplate($(item).children(), model)
                 })
             },
-            _createLoadingStateViewModel: function() {
-                return {title: ko.observable()}
-            },
-            _createLoadingStateViewInfo: function($layoutTemplate) {
-                var $loadingStateView = $layoutTemplate.clone().addClass("dx-loading-state-view"),
-                    model = this._createLoadingStateViewModel();
-                this._hideElements($loadingStateView);
-                DX.utils.createComponents($loadingStateView);
-                this._applyModelToTransitionElements($loadingStateView, model);
-                var result = {
-                        model: model,
-                        renderResult: {
-                            $markup: $loadingStateView,
-                            $viewItems: $()
-                        },
-                        isLoadingStateView: true
-                    };
-                this._appendViewToLayout(result);
-                return result
-            },
             _createViewLayoutTemplate: function() {
                 var that = this;
                 var $viewLayoutTemplate = that._$layoutTemplate.clone();
                 this._hideElements($viewLayoutTemplate);
-                DX.utils.createComponents($viewLayoutTemplate);
                 return $viewLayoutTemplate
             },
             _createEmptyLayout: function() {
                 var that = this;
                 var $result = that._$layoutTemplate.clone();
                 this._hideElements($result);
-                DX.utils.createComponents($result);
-                that._removeTransitionContent($result);
+                this._getTransitionElements($result).empty();
+                $result.children(CONTENT_SELECTOR).remove();
                 return $result
-            },
-            _removeTransitionContent: function($markup) {
-                var $transitionElements = this._getTransitionElements($markup);
-                $transitionElements.children().remove()
             },
             _getTransitionElements: function($markup) {
                 return $markup.find(TRANSITION_SELECTOR).addBack(TRANSITION_SELECTOR)
             },
-            setViewLoadingState: function(viewInfo, direction) {
-                var that = this;
-                if (that._disableViewLoadingState)
-                    return $.Deferred().resolve().promise();
-                var loadingStateViewInfo = $.extend({}, viewInfo, that._loadingStateViewInfo);
-                that._loadingStateViewInfo.model.title((viewInfo.viewTemplateInfo || {}).title || this.DEFAULT_LOADING_TITLE);
-                return that._showViewImpl(loadingStateViewInfo, direction)
-            },
             showView: function(viewInfo, direction) {
+                direction = direction || "forward";
                 var that = this,
                     previousViewInfo = that._getPreviousViewInfo(viewInfo),
-                    previousViewTemplateId = previousViewInfo && previousViewInfo.currentViewTemplateId;
+                    previousViewTemplateId = previousViewInfo === viewInfo ? previousViewInfo.currentViewTemplateId : undefined;
                 this._defineCurrentViewTemplateId(viewInfo);
                 if (previousViewTemplateId && previousViewTemplateId === viewInfo.currentViewTemplateId && viewInfo === previousViewInfo)
                     return $.Deferred().resolve().promise();
-                if (previousViewInfo && previousViewInfo.isLoadingStateView)
-                    direction = "none";
                 that._ensureViewRendered(viewInfo);
-                return this._showViewImpl(viewInfo, direction).done(function() {
+                this.fireEvent("viewShowing", [viewInfo]);
+                return this._showViewImpl(viewInfo, direction, previousViewTemplateId).done(function() {
                         that._onViewShown(viewInfo)
                     })
             },
@@ -2757,9 +2871,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
                     delete viewInfo.renderResult
                 }
             },
-            _prepareViewTemplate: function($viewTemplate, viewInfo) {
-                DX.utils.createComponents($viewTemplate)
-            },
+            _prepareViewTemplate: function($viewTemplate, viewInfo){},
             _renderViewImpl: function($viewTemplate, viewInfo) {
                 var that = this,
                     allowedChildrenSelector = ".dx-command,.dx-content,script",
@@ -2790,12 +2902,26 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 var commandContainers = this._findCommandContainers($markup);
                 this._commandManager.renderCommandsToContainers(commands, commandContainers)
             },
-            _applyViewCommands: function(viewInfo) {
+            _prepareViewCommands: function(viewInfo) {
                 var $viewItems = viewInfo.renderResult.$viewItems,
-                    $markup = viewInfo.renderResult.$markup,
-                    viewCommands = this._commandManager.findCommands($viewItems);
+                    viewCommands = this._commandManager.findCommands($viewItems),
+                    commandsToRenderMap = {};
                 viewInfo.commands = DX.framework.utils.mergeCommands(viewInfo.commands || [], viewCommands);
-                this._renderCommands($markup, viewInfo.commands)
+                viewInfo.commandsToRenderMap = commandsToRenderMap;
+                $.each(viewInfo.commands, function(index, command) {
+                    var renderStage = command.option("renderStage") || DEFAULT_COMMAND_RENDER_STAGE,
+                        targetArray = commandsToRenderMap[renderStage] = commandsToRenderMap[renderStage] || [];
+                    targetArray.push(command)
+                })
+            },
+            _applyViewCommands: function(viewInfo, renderStage) {
+                renderStage = renderStage || DEFAULT_COMMAND_RENDER_STAGE;
+                var commandsToRender = viewInfo.commandsToRenderMap[renderStage],
+                    $markup = viewInfo.renderResult.$markup;
+                if (commandsToRender) {
+                    this._renderCommands($markup, commandsToRender);
+                    delete viewInfo.commandsToRenderMap[renderStage]
+                }
             },
             _findCommandContainers: function($markup) {
                 return DX.utils.createComponents($markup, ["dxCommandContainer"])
@@ -2819,7 +2945,8 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 var $viewTemplate = viewInfo.$viewTemplate || this._viewEngine.getViewTemplate(viewInfo.viewName);
                 this._prepareViewTemplate($viewTemplate, viewInfo);
                 this._renderViewImpl($viewTemplate, viewInfo);
-                this._applyViewCommands(viewInfo);
+                this._prepareViewCommands(viewInfo);
+                this._applyViewCommands(viewInfo, "onViewRendering");
                 this._appendViewToLayout(viewInfo);
                 $viewTemplate.remove();
                 this._onRenderComplete(viewInfo);
@@ -2829,71 +2956,107 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 var that = this,
                     $viewFrame = that._getViewFrame(viewInfo),
                     $markup = viewInfo.renderResult.$markup,
-                    $transitionContentElements = $();
+                    $transitionContentElements = $(),
+                    animationItems = [];
                 $.each($markup.find(".dx-content-placeholder"), function(index, el) {
-                    var placeholder = $(el).dxContentPlaceholder("instance");
-                    placeholder.prepareTransition()
+                    DX.framework.prepareTransition($(el), $(el).attr("data-dx-content-placeholder-name"))
                 });
                 $.each(that._getTransitionElements($viewFrame), function(index, transitionElement) {
                     var $transition = $(transitionElement),
-                        $viewElement = $markup.find(transitionSelector($transition.data("dx-transition-name"))).children();
+                        $viewElement = $markup.find(transitionSelector($transition.attr("data-dx-transition-name"))).children(),
+                        animationItem = {
+                            $element: $viewElement,
+                            animation: $transition.attr("data-dx-transition-type")
+                        };
+                    animationItems.push(animationItem);
                     that._hideViewElements($viewElement);
                     $transition.append($viewElement);
                     $transitionContentElements = $transitionContentElements.add($viewElement)
                 });
                 that._$mainLayout.append(viewInfo.renderResult.$viewItems.filter(".dx-command"));
                 $markup.remove();
-                viewInfo.renderResult.$markup = $transitionContentElements
+                viewInfo.renderResult.$markup = $transitionContentElements;
+                viewInfo.renderResult.animationItems = animationItems
             },
             _onRenderComplete: function(viewInfo){},
             _onViewShown: function(viewInfo) {
                 $(document).trigger("dx.viewchanged")
             },
-            _doTransition: function(viewInfo, direction) {
-                var that = this,
-                    deferred = $.Deferred();
-                var transitions = $.map(viewInfo.renderResult.$markup, function(transitionContent) {
-                        var $transitionContent = $(transitionContent),
-                            $transition = $transitionContent.parent(),
-                            transitionType = that._disableTransitions ? "none" : $transition.data("dx-transition-type");
-                        return {
-                                destination: $transition,
-                                source: $transitionContent,
-                                type: transitionType || "none",
-                                direction: direction || "none"
-                            }
-                    });
-                that._executeTransitions(transitions).done(function() {
-                    deferred.resolve()
-                });
-                return deferred.promise()
+            _enter: function(animationItems) {
+                var transitionExecutor = this.transitionExecutor;
+                $.each(animationItems, function(index, item) {
+                    transitionExecutor.enter(item.$element, item.animation)
+                })
             },
-            _hideView: function(viewInfo) {
-                if (viewInfo.renderResult)
-                    this._hideViewElements(viewInfo.renderResult.$markup)
+            _leave: function(animationItems) {
+                var transitionExecutor = this.transitionExecutor;
+                $.each(animationItems, function(index, item) {
+                    transitionExecutor.leave(item.$element, item.animation)
+                })
             },
-            _showViewImpl: function(viewInfo, direction) {
+            _doTransition: function(oldViewInfo, newViewInfo, direction) {
+                if (oldViewInfo)
+                    this._leave(oldViewInfo.renderResult.animationItems);
+                this._enter(newViewInfo.renderResult.animationItems);
+                return this.transitionExecutor.start({direction: direction})
+            },
+            _showViewImpl: function(viewInfo, direction, previousViewTemplateId) {
                 var that = this,
-                    deferred = $.Deferred(),
+                    result,
                     previousViewInfo = this._getPreviousViewInfo(viewInfo);
-                if (!previousViewInfo || previousViewInfo === viewInfo)
-                    direction = "none";
-                return that._doTransition(viewInfo, direction).done(function() {
+                this._showView(viewInfo);
+                if (!previousViewInfo || previousViewInfo === viewInfo) {
+                    that._changeView(viewInfo, previousViewTemplateId);
+                    result = $.Deferred().resolve().promise()
+                }
+                else
+                    result = that._doTransition(previousViewInfo, viewInfo, direction).done(function() {
                         that._changeView(viewInfo)
-                    })
+                    });
+                return result
             },
             _releaseView: function(viewInfo) {
                 this.viewReleased.fireWith(this, [viewInfo])
             },
-            _changeView: function(viewInfo) {
+            _changeView: function(viewInfo, previousViewTemplateId) {
                 var that = this;
-                var previousViewInfo = that._getPreviousViewInfo(viewInfo);
-                if (previousViewInfo && previousViewInfo !== viewInfo) {
-                    that._hideView(previousViewInfo);
-                    if (!previousViewInfo.isLoadingStateView)
-                        this._releaseView(previousViewInfo)
+                if (previousViewTemplateId)
+                    that._hideView(viewInfo, previousViewTemplateId);
+                else {
+                    var previousViewInfo = that._getPreviousViewInfo(viewInfo);
+                    if (previousViewInfo && previousViewInfo !== viewInfo) {
+                        that._hideView(previousViewInfo);
+                        that._releaseView(previousViewInfo)
+                    }
+                    this._visibleViews[this._getViewPaneName(viewInfo.viewTemplateInfo)] = viewInfo
                 }
-                this._visibleViews[this._getViewPaneName(viewInfo.viewTemplateInfo)] = viewInfo
+                this._applyViewCommands(viewInfo);
+                this._subscribeToDeferredItems(viewInfo);
+                this._renderDeferredItems(viewInfo.renderResult.$markup)
+            },
+            _subscribeToDeferredItems: function(viewInfo) {
+                var that = this,
+                    $markup = viewInfo.renderResult.$markup;
+                $markup.find(".dx-pending-rendering").add($markup.filter(".dx-pending-rendering")).each(function() {
+                    var $element = $(this),
+                        promise = $element.data("dx-rendered-promise");
+                    if (promise)
+                        promise.done(function() {
+                            that._renderCommands($element, viewInfo.commands)
+                        })
+                })
+            },
+            _renderDeferredItems: function($items) {
+                var that = this,
+                    $pendingItem = $items.find(".dx-pending-rendering-manual").add($items.filter(".dx-pending-rendering-manual")).first();
+                if ($pendingItem.length) {
+                    var render = $pendingItem.data("dx-render-delegate");
+                    setTimeout(function() {
+                        render().done(function() {
+                            that._renderDeferredItems($items)
+                        })
+                    })
+                }
             },
             _getViewPaneName: function(viewTemplateInfo) {
                 return this._defaultPaneName
@@ -2903,41 +3066,29 @@ if (!DevExpress.MOD_FRAMEWORK) {
             },
             _showElements: function($elements) {
                 $elements.removeClass("dx-hidden");
-                $elements.find(".dx-visibility-change-handler").each(function() {
-                    $(this).triggerHandler("dxshown")
-                })
+                DX.utils.triggerShownEvent($elements)
             },
             _hideViewElements: function($elements) {
-                DX.utils.triggerHidingEvent($elements.filter(".dx-active-view"));
+                DX.utils.triggerHidingEvent($elements);
                 this._patchIDs($elements);
                 this._disableInputs($elements);
                 $elements.removeClass("dx-active-view").addClass("dx-inactive-view")
+            },
+            _hideView: function(viewInfo, templateId) {
+                if (viewInfo.renderResult) {
+                    var $markupToHide = templateId === undefined ? viewInfo.renderResult.$markup : viewInfo.renderResult.markupCache[templateId];
+                    this._hideViewElements($markupToHide)
+                }
             },
             _showViewElements: function($elements) {
                 this._unpatchIDs($elements);
                 this._enableInputs($elements);
                 $elements.removeClass("dx-inactive-view").addClass("dx-active-view");
-                DX.utils.triggerShownEvent($elements.filter(".dx-active-view"))
+                DX.utils.triggerShownEvent($elements)
             },
-            _executeTransitions: function(transitions) {
-                var that = this;
-                var animatedTransitions = $.map(transitions, function(transitionOptions) {
-                        that._showViewElements(transitionOptions.source);
-                        if (transitionOptions.source.children().length)
-                            return DX.framework.html.TransitionExecutor.create(transitionOptions.destination, transitionOptions)
-                    });
-                var animatedDeferreds = $.map(animatedTransitions, function(transition) {
-                        transition.options.source.addClass("dx-transition-source");
-                        return transition.exec()
-                    });
-                var result = $.when.apply($, animatedDeferreds).done(function() {
-                        $.each(animatedTransitions, function(index, transition) {
-                            transition.finalize();
-                            that._hideViewElements(transition.options.source.parent().find(".dx-active-view:not(.dx-transition-source)"));
-                            transition.options.source.removeClass("dx-transition-source")
-                        })
-                    });
-                return result
+            _showView: function(viewInfo) {
+                if (viewInfo.renderResult)
+                    this._showViewElements(viewInfo.renderResult.$markup)
             },
             _patchIDs: function($markup) {
                 this._processIDs($markup, function(id) {
@@ -2994,8 +3145,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 this.callBase();
                 this.option({
                     name: null,
-                    title: null,
-                    layout: null
+                    title: null
                 })
             },
             ctor: function() {
@@ -3004,7 +3154,8 @@ if (!DevExpress.MOD_FRAMEWORK) {
             },
             _render: function() {
                 this.callBase();
-                this.element().addClass("dx-view")
+                this.element().addClass("dx-view");
+                this.element().attr("dx-data-template-id", this._id)
             },
             getId: function() {
                 return this._id
@@ -3035,9 +3186,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
                     $element.addClass("dx-transition-absolute");
                 else
                     $element.addClass("dx-transition-static");
-                $element.addClass("dx-transition").addClass("dx-transition-" + transitionName);
-                $element.data("dx-transition-type", transitionType);
-                $element.data("dx-transition-name", transitionName)
+                $element.addClass("dx-transition").addClass("dx-transition-" + transitionName).addClass("dx-transition-" + transitionType).attr("data-dx-transition-type", transitionType).attr("data-dx-transition-name", transitionName)
             };
         var setupTransitionInnerElement = function($element) {
                 $element.addClass("dx-transition-inner-wrapper")
@@ -3047,27 +3196,37 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 this.callBase();
                 this.option({
                     name: null,
-                    type: "slide"
+                    type: undefined,
+                    animation: "slide"
                 })
             },
             _render: function() {
                 this.callBase();
                 var element = this.element();
-                setupTransitionElement(element, this.option("type"), this.option("name"), "absolute");
+                setupTransitionElement(element, this.option("type") || this.option("animation"), this.option("name"), "absolute");
                 element.wrapInner("<div/>");
-                setupTransitionInnerElement(element.children())
+                setupTransitionInnerElement(element.children());
+                if (this.option("type"))
+                    DX.log("W0003", "dxTransition", "type", "15.1", "Use the 'animation' property instead")
             },
             _clean: function() {
                 this.callBase();
                 this.element().empty()
             }
         }));
+        DX.framework.prepareTransition = function($element, targetPlaceholderName) {
+            if ($element.children(".dx-content").length === 0) {
+                $element.wrapInner("<div>");
+                $element.children().dxContent({targetPlaceholder: targetPlaceholderName})
+            }
+        };
         DX.registerComponent("dxContentPlaceholder", framework, DX.DOMComponent.inherit({
             _setDefaultOptions: function() {
                 this.callBase();
                 this.option({
                     name: null,
-                    transition: "none",
+                    transition: undefined,
+                    animation: "none",
                     contentCssPosition: "absolute"
                 })
             },
@@ -3075,14 +3234,13 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 this.callBase();
                 var $element = this.element();
                 $element.addClass("dx-content-placeholder").addClass("dx-content-placeholder-" + this.option("name"));
-                setupTransitionElement($element, this.option("transition"), this.option("name"), this.option("contentCssPosition"))
+                $element.attr("data-dx-content-placeholder-name", this.option("name"));
+                setupTransitionElement($element, this.option("transition") || this.option("animation"), this.option("name"), this.option("contentCssPosition"));
+                if (this.option("transition"))
+                    DX.log("W0003", "dxContentPlaceholder", "transition", "15.1", "Use the 'animation' property instead")
             },
             prepareTransition: function() {
-                var $element = this.element();
-                if ($element.children(".dx-content").length === 0) {
-                    $element.wrapInner("<div>");
-                    $element.children().dxContent({targetPlaceholder: this.option("name")})
-                }
+                DX.framework.prepareTransition(this.element(), this.option("name"))
             }
         }));
         DX.registerComponent("dxContent", framework, DX.DOMComponent.inherit({
@@ -3090,7 +3248,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 this.callBase();
                 this.option({targetPlaceholder: null})
             },
-            _optionChanged: function(args) {
+            _optionChanged: function() {
                 this._refresh()
             },
             _clean: function() {
@@ -3102,6 +3260,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 var element = this.element();
                 element.addClass("dx-content");
                 this._currentClass = "dx-content-" + this.option("targetPlaceholder");
+                element.attr("data-dx-target-placeholder-id", this.option("targetPlaceholder"));
                 element.addClass(this._currentClass);
                 setupTransitionInnerElement(element)
             }
@@ -3140,7 +3299,6 @@ if (!DevExpress.MOD_FRAMEWORK) {
                     throw DX.Error("E3013", role, name);
                 var $template = component.element(),
                     $result = $template.clone().removeClass("dx-hidden");
-                DX.utils.createComponents($result, [role]);
                 return $result
             },
             _extendModelFromViewData: function($view, model) {
@@ -3156,6 +3314,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 $.each(components, function(index, component) {
                     var $element = component.element();
                     $element.addClass("dx-hidden");
+                    DX.utils.createComponents($markup, ["dxContent", "dxContentPlaceholder", "dxTransition"]);
                     that._registerTemplateComponent(component);
                     component.element().detach()
                 })
@@ -3189,8 +3348,8 @@ if (!DevExpress.MOD_FRAMEWORK) {
             _loadTemplatesFromURL: function(url) {
                 var that = this,
                     options = this._getLoadOptions(),
-                    deferred = $.Deferred(),
-                    url = options.winPhonePrefix + url;
+                    deferred = $.Deferred();
+                url = options.winPhonePrefix + url;
                 this._ajaxImpl({
                     url: url,
                     isLocal: options.isLocal,
@@ -3268,13 +3427,11 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 $viewTemplate.children().eq(0).dxContent({targetPlaceholder: 'content'})
             },
             _initDefaultLayout: function() {
-                this._$defaultLayoutTemplate = $("<div class=\"dx-full-height\" data-options=\"dxLayout : { name: 'default' } \"> \
-                <div class=\"dx-full-height\" data-options=\"dxContentPlaceholder : { name: 'content' } \" ></div> \
-            </div>")
+                this._$defaultLayoutTemplate = $("<div class=\"dx-full-height\" data-options=\"dxLayout : { name: 'default' } \"> \n" + "    <div class=\"dx-full-height\" data-options=\"dxContentPlaceholder : { name: 'content' } \" ></div> \n" + "</div>");
+                DX.utils.createComponents(this._$defaultLayoutTemplate)
             },
             _getDefaultLayoutTemplate: function() {
                 var $result = this._$defaultLayoutTemplate.clone();
-                DX.utils.createComponents($result);
                 return $result
             },
             applyLayout: function($view, $layout) {
@@ -3286,7 +3443,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 var $placeholderContents = $toMerge.find(".dx-content");
                 $.each($placeholderContents, function() {
                     var $placeholderContent = $(this);
-                    var placeholderId = $placeholderContent.data("dxContent").option("targetPlaceholder");
+                    var placeholderId = $placeholderContent.attr("data-dx-target-placeholder-id");
                     var $placeholder = $toMerge.find(".dx-content-placeholder-" + placeholderId);
                     $placeholder.empty();
                     $placeholder.append($placeholderContent)
@@ -3342,21 +3499,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 if (this._applicationMode === "mobileApp")
                     DX.utils.initMobileViewport(options.viewPort);
                 this.device = options.device || DX.devices.current();
-                var layoutSets = DX.framework.html.layoutSets;
                 this.commandManager = options.commandManager || new DX.framework.html.CommandManager({commandMapping: this.commandMapping});
-                $.each(options.layoutControllers || DX.framework.html.layoutControllers, function(_, layoutControllerInfo) {
-                    var targetLayoutSet = layoutControllerInfo.navigationType;
-                    layoutSets[targetLayoutSet] = layoutSets[targetLayoutSet] || [];
-                    layoutSets[targetLayoutSet].push(layoutControllerInfo);
-                    delete layoutControllerInfo.navigationType
-                });
-                if (options.navigationType)
-                    DX.log("W0001", "HtmlApplication", "navigationType", "14.1", "Use the 'layoutSet' option instead.");
-                if (options.defaultLayout)
-                    DX.log("W0001", "HtmlApplication", "defaultLayout", "13.2", "Use the 'layoutSet' option instead.");
-                var navigationType = options.navigationType || options.defaultLayout;
-                if (navigationType)
-                    options.layoutSet = layoutSets[navigationType];
                 this._initTemplateContext();
                 this.viewEngine = options.viewEngine || new htmlNS.ViewEngine({
                     $root: this._$root,
@@ -3366,11 +3509,23 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 this.components.push(this.viewEngine);
                 this._initMarkupFilters(this.viewEngine);
                 this.viewRendered = $.Callbacks();
-                this._layoutSet = options.layoutSet || (options.layoutControllers && options.layoutControllers.length ? options.layoutControllers : layoutSets["default"]);
+                this._layoutSet = options.layoutSet || DX.framework.html.layoutSets["default"];
+                this._animationSet = options.animationSet || DX.framework.html.animationSets["default"];
                 this._availableLayoutControllers = [];
                 this._activeLayoutControllersStack = [];
                 this.resolveLayoutController = $.Callbacks();
-                this._callbacksToEvents("HtmlApplication", ["viewRendered", "resolveLayoutController"])
+                this._callbacksToEvents("HtmlApplication", ["viewRendered", "resolveLayoutController"]);
+                this._initAnimations(this._animationSet)
+            },
+            _initAnimations: function(animationSet) {
+                if (!animationSet)
+                    return;
+                $.each(animationSet, function(name, configs) {
+                    $.each(configs, function(index, config) {
+                        DX.animationPresets.registerPreset(name, config)
+                    })
+                });
+                DX.animationPresets.applyChanges()
             },
             _localizeMarkup: function($markup) {
                 DX.localization.localizeNode($markup)
@@ -3422,26 +3577,17 @@ if (!DevExpress.MOD_FRAMEWORK) {
             },
             _showViewImpl: function(viewInfo, direction) {
                 var that = this,
-                    result = $.Deferred(),
+                    deferred = $.Deferred(),
+                    result = deferred.promise(),
                     layoutController = viewInfo.layoutController;
                 that._obtainViewLink(viewInfo);
                 layoutController.showView(viewInfo, direction).done(function() {
                     that._activateLayoutController(layoutController, that._getTargetNode(viewInfo)).done(function() {
-                        result.resolve()
+                        deferred.resolve()
                     })
                 });
-                return result.promise()
-            },
-            _setViewLoadingState: function(viewInfo, direction) {
-                var that = this,
-                    result = $.Deferred(),
-                    layoutController = viewInfo.layoutController;
-                layoutController.setViewLoadingState(viewInfo, direction).done(function() {
-                    that._activateLayoutController(layoutController, that._getTargetNode(viewInfo)).done(function() {
-                        result.resolve()
-                    })
-                });
-                return result.promise()
+                DX.ui.events.lockFeedback(result);
+                return result
             },
             _resolveLayoutController: function(viewInfo) {
                 var args = {
@@ -3579,6 +3725,9 @@ if (!DevExpress.MOD_FRAMEWORK) {
                             });
                             controller.on("viewRendered", function(viewInfo) {
                                 that._processEvent("viewRendered", {viewInfo: viewInfo}, viewInfo.model)
+                            });
+                            controller.on("viewShowing", function(viewInfo) {
+                                that._processEvent("viewShowing", {viewInfo: viewInfo}, viewInfo.model)
                             })
                         }
                     }
@@ -3610,220 +3759,6 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 return this._templateContext
             }
         })
-    })(jQuery, DevExpress);
-    /*! Module framework, file framework.transitionExecutor.js */
-    (function($, DX) {
-        $.fn.extend({unwrapInner: function(selector) {
-                return this.each(function() {
-                        var t = this,
-                            c = $(t).children(selector);
-                        c.each(function() {
-                            var e = $(this);
-                            e.contents().appendTo(t);
-                            e.remove()
-                        })
-                    })
-            }});
-        var TRANSITION_DURATION = 400;
-        var TransitionExecutor = DX.Class.inherit({
-                ctor: function(container, options) {
-                    this.container = container;
-                    this.options = options
-                },
-                exec: function() {
-                    var that = this,
-                        options = that.options;
-                    var $source = options.source,
-                        $destination = options.destination;
-                    var $sourceAbsoluteWrapper = $source,
-                        $destinationRelativeWrapper = $destination,
-                        $destinationAbsoluteWrapper = that._getTransitionInnerElement($destination);
-                    this._finalize = function(){};
-                    return that._animate($.extend({}, options, {
-                            source: $sourceAbsoluteWrapper,
-                            destination: $destinationAbsoluteWrapper
-                        }))
-                },
-                finalize: function() {
-                    if (!this._finalize)
-                        throw DX.Error("E3015");
-                    this._finalize()
-                },
-                _getTransitionInnerElement: function($transitionElement) {
-                    return $transitionElement.children(".dx-active-view:not(.dx-transition-source)")
-                },
-                _animate: function() {
-                    return (new $.Deferred).resolve().promise()
-                }
-            });
-        var NoneTransitionExecutor = TransitionExecutor.inherit({_animate: function(options) {
-                    var $source = options.source,
-                        $destination = options.destination;
-                    var containerWidth = this.container.width();
-                    DX.fx.animate($source, {
-                        type: "slide",
-                        from: {left: 0},
-                        to: {left: 0},
-                        duration: 0
-                    });
-                    DX.fx.animate($destination, {
-                        type: "slide",
-                        from: {left: -containerWidth},
-                        to: {left: -containerWidth},
-                        duration: 0
-                    });
-                    return $.Deferred().resolve().promise()
-                }});
-        var SlideTransitionExecutor = TransitionExecutor.inherit({_animate: function(options) {
-                    if (options.direction === "none")
-                        return $.Deferred().resolve().promise();
-                    var $source = options.source,
-                        $destination = options.destination;
-                    var directionModifier = options.direction === "backward" ? -1 : 1,
-                        rtlModifier = DX.rtlEnabled ? -1 : 1,
-                        containerWidth = this.container.width() * directionModifier * rtlModifier;
-                    var promiseSource = DX.fx.animate($source, {
-                            type: "slide",
-                            from: {left: containerWidth},
-                            to: {left: 0},
-                            duration: TRANSITION_DURATION
-                        });
-                    var promiseDestination = DX.fx.animate($destination, {
-                            type: "slide",
-                            from: {left: 0},
-                            to: {left: -containerWidth},
-                            duration: TRANSITION_DURATION
-                        });
-                    return $.when(promiseDestination, promiseSource)
-                }});
-        var SlideIOS7TransitionExecutor = TransitionExecutor.inherit({_animate: function(options) {
-                    if (options.direction === "none")
-                        return $.Deferred().resolve().promise();
-                    var $source = options.source,
-                        $destination = options.destination;
-                    var rtlModifier = DX.rtlEnabled ? -1 : 1,
-                        containerWidth = this.container.width() * rtlModifier,
-                        slowTransitionWidth = containerWidth / 5,
-                        sourceLeftFrom,
-                        sourceLeftTo,
-                        destinationLeftFrom,
-                        destinationLeftTo,
-                        sourceZIndex = $source.css("z-index"),
-                        destinationZIndex = $destination.css("z-index");
-                    if (options.direction === "backward") {
-                        sourceLeftFrom = -slowTransitionWidth;
-                        sourceLeftTo = 0;
-                        destinationLeftFrom = 0;
-                        destinationLeftTo = containerWidth;
-                        $source.css("z-index", 1);
-                        $destination.css("z-index", 2)
-                    }
-                    else {
-                        sourceLeftFrom = containerWidth;
-                        sourceLeftTo = 0;
-                        destinationLeftFrom = 0;
-                        destinationLeftTo = -slowTransitionWidth;
-                        $source.css("z-index", 2);
-                        $destination.css("z-index", 1)
-                    }
-                    var promiseSource = DX.fx.animate($source, {
-                            type: "slide",
-                            from: {left: sourceLeftFrom},
-                            to: {left: sourceLeftTo},
-                            duration: TRANSITION_DURATION
-                        });
-                    var promiseDestination = DX.fx.animate($destination, {
-                            type: "slide",
-                            from: {left: destinationLeftFrom},
-                            to: {left: destinationLeftTo},
-                            duration: TRANSITION_DURATION
-                        });
-                    return $.when(promiseDestination, promiseSource).done(function() {
-                            $source.css("z-index", sourceZIndex);
-                            $destination.css("z-index", destinationZIndex)
-                        })
-                }});
-        var OverflowTransitionExecutor = TransitionExecutor.inherit({_animate: function(options) {
-                    var $source = options.source,
-                        $destination = options.destination,
-                        destinationTop = $destination.position().top,
-                        destinationLeft = $destination.position().left,
-                        containerWidth = this.container.width();
-                    if (options.direction === "backward")
-                        containerWidth = -containerWidth;
-                    var animations = [];
-                    if (options.direction === "forward")
-                        animations.push(DX.fx.animate($source, {
-                            type: "slide",
-                            from: {
-                                top: destinationTop,
-                                left: containerWidth + destinationLeft,
-                                "z-index": 1
-                            },
-                            to: {left: destinationLeft},
-                            duration: TRANSITION_DURATION
-                        }));
-                    else {
-                        animations.push(DX.fx.animate($source, {
-                            type: "slide",
-                            from: {
-                                left: destinationLeft,
-                                "z-index": 1
-                            },
-                            to: {left: destinationLeft},
-                            duration: TRANSITION_DURATION
-                        }));
-                        animations.push(DX.fx.animate($destination, {
-                            type: "slide",
-                            from: {"z-index": 2},
-                            to: {left: destinationLeft - containerWidth},
-                            duration: TRANSITION_DURATION
-                        }))
-                    }
-                    return $.when.apply($, animations)
-                }});
-        var FadeTransitionExecutor = TransitionExecutor.inherit({_animate: function(options) {
-                    var $source = options.source,
-                        $destination = options.destination,
-                        d = new $.Deferred;
-                    $source.css({opacity: 0});
-                    $destination.animate({opacity: 0}, TRANSITION_DURATION);
-                    $source.animate({opacity: 1}, TRANSITION_DURATION, function() {
-                        d.resolve()
-                    });
-                    return d.promise()
-                }});
-        var transitionType = function(options) {
-                if (options.type === "fade")
-                    return options.type;
-                if (options.direction === "none")
-                    return "none";
-                return options.type
-            };
-        TransitionExecutor.create = function(container, options) {
-            var device = DX.devices.current();
-            switch (transitionType(options)) {
-                case"none":
-                    return new NoneTransitionExecutor(container, options);
-                case"slide":
-                    if (device.platform === "ios" && device.version[0] >= 7)
-                        return new SlideIOS7TransitionExecutor(container, options);
-                    else
-                        return new SlideTransitionExecutor(container, options);
-                case"fade":
-                    return new FadeTransitionExecutor(container, options);
-                case"overflow":
-                    return new OverflowTransitionExecutor(container, options);
-                default:
-                    throw DX.Error("E3016", options.type);
-            }
-        };
-        DX.framework.html.TransitionExecutor = TransitionExecutor;
-        DX.framework.html.NoneTransitionExecutor = NoneTransitionExecutor;
-        DX.framework.html.SlideIOS7TransitionExecutor = SlideIOS7TransitionExecutor;
-        DX.framework.html.SlideTransitionExecutor = SlideTransitionExecutor;
-        DX.framework.html.OverflowTransitionExecutor = OverflowTransitionExecutor;
-        DX.framework.html.FadeTransitionExecutor = FadeTransitionExecutor
     })(jQuery, DevExpress);
     DevExpress.MOD_FRAMEWORK = true
 }

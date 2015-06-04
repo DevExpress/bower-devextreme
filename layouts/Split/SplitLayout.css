@@ -83,7 +83,6 @@
     width: 100%;
     bottom: -104px;
     transition: bottom .4s;
-    background-color: rgba(0, 0, 0, 1);
 }
 
 .dx-theme-win8 .split-layout .dx-app-bar.dx-app-bar-visible {
@@ -119,8 +118,9 @@
     top: 0;
     bottom: 0;
     overflow: hidden;
-    border-right: solid 1px #808080;
     box-sizing: border-box;
+    border-right-width: 1px;
+    border-right-style: solid;
 }
 
 .master-detail-layout .detail-pane {
@@ -146,13 +146,4 @@
     top: 48px;
     bottom: 0;
     width: 100%;
-}
-
-.dx-theme-ios7 .master-detail-layout .master-pane {
-    border-right: solid 1px #c8c8c8;
-}
-
-/* generic */
-.dx-theme-generic .master-detail-layout .master-pane {
-    border-right: solid 1px #d6d6d7;
 }

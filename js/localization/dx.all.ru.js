@@ -1,9 +1,9 @@
 /*! 
 * DevExtreme
-* Version: 14.2.7
-* Build date: Apr 17, 2015
+* Version: 15.1.3
+* Build date: Jun 1, 2015
 *
-* Copyright (c) 2011 - 2014 Developer Express Inc. ALL RIGHTS RESERVED
+* Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
 */
 
@@ -34,7 +34,8 @@ Globalize.addCultureInfo("ru", {messages: {
         "validation-pattern": "Значение не соответствует шаблону",
         "validation-pattern-formatted": "Значение поля {0} не соответствует шаблону",
         "validation-email": "Недопустимое значение email",
-        "validation-email-formatted": "Недопустимое значениe {0}"
+        "validation-email-formatted": "Недопустимое значениe {0}",
+        "validation-mask": "Недопустимое значение"
     }});
 Globalize.addCultureInfo("ru", {messages: {
         "dxLookup-searchPlaceholder": "Минимальное количество символов: {0}",
@@ -60,6 +61,12 @@ Globalize.addCultureInfo("ru", {messages: {
         "dxFileUploader-kb": "кБ",
         "dxFileUploader-Mb": "МБ",
         "dxFileUploader-Gb": "ГБ",
+        "dxFileUploader-upload": "Загрузить",
+        "dxFileUploader-uploaded": "Загружено",
+        "dxFileUploader-readyToUpload": "Готово к загрузке",
+        "dxFileUploader-uploadFailedMessage": "Загрузка не удалась",
+        "dxRangeSlider-ariaFrom": "От {0}",
+        "dxRangeSlider-ariaTill": "До {0}",
         "dxSwitch-onText": "ВКЛ",
         "dxSwitch-offText": "ВЫКЛ"
     }});
@@ -109,5 +116,72 @@ Globalize.addCultureInfo("ru", {messages: {
         "dxDataGrid-summarySum": "Сумм: {0}",
         "dxDataGrid-summarySumOtherColumn": "Сумм по {1} : {0}",
         "dxDataGrid-summaryCount": "Кол-во: {0}",
-        "dxPager-infoText": "Страница {0} из {1}"
+        "dxDataGrid-columnFixingFix": "Закрепить",
+        "dxDataGrid-columnFixingUnfix": "Открепить",
+        "dxDataGrid-columnFixingLeftPosition": "Налево",
+        "dxDataGrid-columnFixingRightPosition": "Направо",
+        "dxDataGrid-exportTo": "Экспортировать",
+        "dxDataGrid-exportToExcel": "Экспортировать в Excel файл",
+        "dxDataGrid-excelFormat": "Excel файл",
+        "dxDataGrid-selectedRows": "Выбранные строки",
+        "dxDataGrid-headerFilterEmptyValue": "(Пустое)",
+        "dxDataGrid-headerFilterOK": "ОК",
+        "dxDataGrid-headerFilterCancel": "Отменить",
+        "dxDataGrid-ariaColumn": "Столбец",
+        "dxDataGrid-ariaValue": "Значение",
+        "dxDataGrid-ariaFilterCell": "Фильтр",
+        "dxDataGrid-ariaCollapse": "Свернуть",
+        "dxDataGrid-ariaExpand": "Развернуть",
+        "dxDataGrid-ariaDataGrid": "Таблица данных",
+        "dxDataGrid-ariaSearchInGrid": "Искать в таблице данных",
+        "dxDataGrid-ariaSelectAll": "Выбрать всё",
+        "dxDataGrid-ariaSelectRow": "Выбрать строку",
+        "dxPager-infoText": "Страница {0} из {1}",
+        "dxPivotGrid-grandTotal": "Итого",
+        "dxPivotGrid-total": "{0} Всего",
+        "dxPivotGrid-fieldChooserTitle": "Выбор полей",
+        "dxPivotGrid-showFieldChooser": "Показать выбор полей",
+        "dxPivotGrid-expandAll": "Раскрыть все",
+        "dxPivotGrid-collapseAll": "Свернуть все",
+        "dxPivotGrid-sortColumnBySummary": "Сортировать \"{0}\" по этой колонке",
+        "dxPivotGrid-sortRowBySummary": "Сортировать \"{0}\" по этой строке",
+        "dxPivotGrid-removeAllSorting": "Сбросить все сортировки",
+        "dxPivotGrid-rowFields": "Поля строк",
+        "dxPivotGrid-columnFields": "Поля столбцов",
+        "dxPivotGrid-dataFields": "Поля данных",
+        "dxPivotGrid-filterFields": "Поля фильтров",
+        "dxPivotGrid-allFields": "Все поля",
+        "dxScheduler-editorLabelTitle": "Название",
+        "dxScheduler-editorLabelStartDate": "Дата начала",
+        "dxScheduler-editorLabelEndDate": "Дата завершения",
+        "dxScheduler-editorLabelDescription": "Описание",
+        "dxScheduler-editorLabelRecurrence": "Повторение",
+        "dxScheduler-openAppointment": "Открыть задачу",
+        "dxScheduler-recurrenceNever": "Никогда",
+        "dxScheduler-recurrenceDaily": "Ежедневно",
+        "dxScheduler-recurrenceWeekly": "Еженедельно",
+        "dxScheduler-recurrenceMonthly": "Ежемесячно",
+        "dxScheduler-recurrenceYearly": "Ежегодно",
+        "dxScheduler-recurrenceEvery": "Интервал",
+        "dxScheduler-recurrenceEnd": "Завершить повторение",
+        "dxScheduler-recurrenceAfter": "Количество повторений",
+        "dxScheduler-recurrenceOn": "Повторять до",
+        "dxScheduler-recurrenceRepeatDaily": "дней(дня)",
+        "dxScheduler-recurrenceRepeatWeekly": "недели(недель)",
+        "dxScheduler-recurrenceRepeatMonthly": "месяца(месяцев)",
+        "dxScheduler-recurrenceRepeatYearly": "года(лет)",
+        "dxScheduler-recurrenceRepeatOnDate": "до даты",
+        "dxScheduler-recurrenceRepeatCount": "повторений",
+        "dxScheduler-switcherDay": "День",
+        "dxScheduler-switcherWeek": "Неделя",
+        "dxScheduler-switcherWorkWeek": "Рабочая неделя",
+        "dxScheduler-switcherMonth": "Месяц",
+        "dxScheduler-allDay": "Весь день",
+        "dxCalendar-todayButtonText": "Сегодня",
+        "dxCalendar-ariaWidgetName": "Календарь",
+        "dxColorView-ariaRed": "Красный",
+        "dxColorView-ariaGreen": "Зеленый",
+        "dxColorView-ariaBlue": "Синий",
+        "dxColorView-ariaAlpha": "Прозрачность",
+        "dxColorView-ariaHex": "Код цвета"
     }});

@@ -1,9 +1,9 @@
 ﻿/*! 
 * DevExtreme (Vector Map)
-* Version: 14.2.7
-* Build date: Apr 17, 2015
+* Version: 15.1.3
+* Build date: Jun 1, 2015
 *
-* Copyright (c) 2011 - 2014 Developer Express Inc. ALL RIGHTS RESERVED
+* Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
 */
 "use strict";
@@ -525,7 +525,7 @@ function processFile(file, options) {
         return { coordinates: feature.coordinates, attributes: feature.attributes };
     });
     if (options.processAttributes) {
-        features.forEach(function (feature){
+        features.forEach(function (feature) {
             feature.attributes = options.processAttributes(feature.attributes);
         });
     }

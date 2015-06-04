@@ -3,9 +3,6 @@
     layoutSets["desktop"] = layoutSets["desktop"] || [];
     layoutSets["desktop"].push({
         platform: "generic",
-        controller: new DX.framework.html.DefaultLayoutController({
-            name: "desktop",
-            disableViewLoadingState: true
-        })
+        controller: new DX.framework.html.DefaultLayoutController({name: "desktop"})
     })
 })(jQuery, DevExpress);

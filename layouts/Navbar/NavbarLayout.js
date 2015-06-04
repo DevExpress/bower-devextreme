@@ -15,12 +15,12 @@
             this.callBase(options)
         },
         _createNavigationWidget: function(navigationCommands) {
+            this.callBase(navigationCommands);
             this.$navbar = this._$mainLayout.find(".navbar-container");
             return this.$navbar
         },
         _renderNavigationImpl: function(navigationCommands) {
-            var container = this.$navbar.dxCommandContainer("instance");
-            this._commandManager.renderCommandsToContainers(navigationCommands, [container]);
+            this.callBase(navigationCommands);
             if (navigationCommands.length)
                 this._$mainLayout.addClass(HAS_NAVBAR_CLASS)
         },
@@ -41,10 +41,6 @@
     });
     layoutSets["navbar"].push({
         platform: "android",
-        controller: new DX.framework.html.NavBarController
-    });
-    layoutSets["navbar"].push({
-        platform: "tizen",
         controller: new DX.framework.html.NavBarController
     });
     layoutSets["navbar"].push({

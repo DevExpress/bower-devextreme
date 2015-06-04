@@ -62,6 +62,7 @@ If you are an individual, business or government entity and are using the SOFTWA
 The following files in the SOFTWARE DEVELOPMENT PRODUCT(S) distribution are considered REDISTRIBUTABLES under this EULA. Refer to Section 9 of this EULA for licensing and subscription terms:
 
 Lib\css\*.css
+Lib\css\icons\*.*
 Lib\js\*.js
 Lib\js\localization\*.js
 Lib\js\modules\*.js
@@ -98,6 +99,10 @@ http://jquery.org/license
 AngularJS JavaScript Library (Open Source - MIT License)
 Copyright (C) Google, Inc.
 http://angularjs.org/
+
+JSZip JavaScript Library (Open Source - MIT License)
+Copyright (c) Stuart Knightley, David Duponchel, Franz Buchinger, António Afonso
+https://stuk.github.io/jszip/
 
 The open source libraries included in the SOFTWARE DEVELOPMENT PRODUCT(S) are done so pursuant to each individual open source library license and subject to the disclaimers and limitations on liability set forth in each open source library license.
 

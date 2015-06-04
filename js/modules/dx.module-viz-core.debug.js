@@ -1,9 +1,9 @@
 /*! 
 * DevExtreme (Visualization Core Library)
-* Version: 14.2.7
-* Build date: Apr 17, 2015
+* Version: 15.1.3
+* Build date: Jun 1, 2015
 *
-* Copyright (c) 2011 - 2014 Developer Express Inc. ALL RIGHTS RESERVED
+* Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
 */
 
@@ -174,7 +174,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
             _isDefined = utils.isDefined,
             _convertDateUnitToMilliseconds = utils.convertDateUnitToMilliseconds,
             _correctDateWithUnitBeginning = utils.correctDateWithUnitBeginning,
-            _convertDateTickIntervalToMilliseconds = utils.convertDateTickIntervalToMilliseconds,
+            _dateToMilliseconds = utils.dateToMilliseconds,
             _convertMillisecondsToDateUnits = utils.convertMillisecondsToDateUnits,
             _math = Math,
             _abs = _math.abs,
@@ -192,15 +192,15 @@ if (!DevExpress.MOD_VIZ_CORE) {
             };
         core.tickManager.datetime = $.extend({}, core.tickManager.continuous, {
             _correctInterval: function(step) {
-                var tickIntervalInMs = _convertDateTickIntervalToMilliseconds(this._tickInterval);
+                var tickIntervalInMs = _dateToMilliseconds(this._tickInterval);
                 this._tickInterval = _convertMillisecondsToDateUnits(tickIntervalInMs * step)
             },
             _correctMax: function(tickInterval) {
-                var interval = _convertDateTickIntervalToMilliseconds(tickInterval);
+                var interval = _dateToMilliseconds(tickInterval);
                 this._max = new Date(_ceil(this._max / interval) * interval)
             },
             _correctMin: function(tickInterval) {
-                var interval = _convertDateTickIntervalToMilliseconds(tickInterval);
+                var interval = _dateToMilliseconds(tickInterval);
                 this._min = new Date(_floor(this._min / interval) * interval);
                 if (this._options.setTicksAtUnitBeginning)
                     _correctDateWithUnitBeginning(this._min, tickInterval)
@@ -211,7 +211,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
             _getBoundInterval: function() {
                 var that = this,
                     interval = that._tickInterval,
-                    intervalInMs = _convertDateTickIntervalToMilliseconds(interval),
+                    intervalInMs = _dateToMilliseconds(interval),
                     boundCoef = that._options.boundCoef,
                     boundIntervalInMs = _isDefined(boundCoef) && isFinite(boundCoef) ? intervalInMs * _abs(boundCoef) : intervalInMs / 2;
                 return _convertMillisecondsToDateUnits(boundIntervalInMs)
@@ -258,7 +258,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     count;
                 if (_isDefined(options.minorTickInterval) && that._isTickIntervalCorrect(options.minorTickInterval, MINOR_TICKS_COUNT_LIMIT, businessDelta)) {
                     interval = options.minorTickInterval;
-                    intervalInMs = _convertDateTickIntervalToMilliseconds(interval);
+                    intervalInMs = _dateToMilliseconds(interval);
                     count = intervalInMs < businessDelta ? _ceil(businessDelta / intervalInMs) - 1 : 0
                 }
                 else {
@@ -296,7 +296,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 return ticks[1] - ticks[0] !== ticks[2] - ticks[1] && this._options.setTicksAtUnitBeginning && this._options.minorTickCount
             },
             _isTickIntervalValid: function(tickInterval) {
-                return _isDefined(tickInterval) && _convertDateTickIntervalToMilliseconds(tickInterval) !== 0
+                return _isDefined(tickInterval) && _dateToMilliseconds(tickInterval) !== 0
             },
             _removeBoundedOverlappingDates: function() {
                 var dates = this._ticks;
@@ -320,11 +320,11 @@ if (!DevExpress.MOD_VIZ_CORE) {
             _floor = _math.floor,
             _round = _math.round;
         core.tickManager.logarithmic = $.extend({}, core.tickManager.continuous, {
-            _correctMax: function(_tickInterval) {
+            _correctMax: function() {
                 var base = this._options.base;
                 this._max = _adjustValue(_raiseTo(_ceil(_adjustValue(_getLog(this._max, base))), base))
             },
-            _correctMin: function(_tickInterval) {
+            _correctMin: function() {
                 var base = this._options.base;
                 this._min = _adjustValue(_raiseTo(_floor(_adjustValue(_getLog(this._min, base))), base))
             },
@@ -415,7 +415,6 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     return STAGGER;
                 case STAGGER:
                     return ROTATE;
-                case ROTATE:
                 default:
                     return "end"
             }
@@ -763,45 +762,41 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 this._options = null
             },
             update: function(types, data, options) {
-                this.updateOptions(options || {});
-                this._min = data.min || 0;
-                this.updateTypes(types || {});
-                this.updateData(data || {})
+                this._updateOptions(options || {});
+                this._min = data.min;
+                this._updateTypes(types || {});
+                this._updateData(data || {})
             },
-            updateMinMax: function(data) {
+            _updateMinMax: function(data) {
                 var min = data.min || 0,
                     max = data.max || 0,
                     newMinMax = this._applyMinMaxMargins(min, max);
                 this._min = this._originalMin = newMinMax.min;
                 this._max = this._originalMax = newMinMax.max;
-                this.updateBusinessDelta()
+                this._updateBusinessDelta()
             },
-            updateBusinessDelta: function() {
+            _updateBusinessDelta: function() {
                 this._businessDelta = this._findBusinessDelta && this._findBusinessDelta(this._min, this._max)
             },
-            updateTypes: function(types) {
+            _updateTypes: function(types) {
                 var that = this,
                     axisType = that._validateAxisType(types.axisType),
-                    dataType = that._validateDataType(types.dataType, that._min);
+                    dataType = that._validateDataType(types.dataType);
                 that._resetMethods();
                 this._axisType = axisType;
                 this._dataType = dataType;
-                this._initMethods();
-                that.updateMinMax({
-                    min: that._min,
-                    max: that._max
-                })
+                this._initMethods()
             },
-            updateData: function(data) {
+            _updateData: function(data) {
                 data = $.extend({}, data);
                 data.min = _isDefined(data.min) ? data.min : this._originalMin;
                 data.max = _isDefined(data.max) ? data.max : this._originalMax;
-                this.updateMinMax(data);
+                this._updateMinMax(data);
                 this._customTicks = data.customTicks && data.customTicks.slice();
                 this._customMinorTicks = data.customMinorTicks;
                 this._screenDelta = data.screenDelta || 0
             },
-            updateOptions: function(options) {
+            _updateOptions: function(options) {
                 var opt;
                 this._options = opt = options;
                 this._useAutoArrangement = !!this._options.useTicksAutoArrangement;
@@ -861,21 +856,6 @@ if (!DevExpress.MOD_VIZ_CORE) {
             },
             getOptions: function() {
                 return this._options
-            },
-            getTypes: function() {
-                return {
-                        axisType: this._axisType,
-                        dataType: this._dataType
-                    }
-            },
-            getData: function() {
-                return {
-                        min: this._min,
-                        max: this._max,
-                        customTicks: this._customTicks,
-                        customMinorTicks: this._customMinorTicks,
-                        screenDelta: this._screenDelta
-                    }
             },
             _getMajorTicks: function() {
                 var ticks;
@@ -976,15 +956,14 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     };
                 return allowedTypes[type] ? type : defaultType
             },
-            _validateDataType: function(type, min) {
+            _validateDataType: function(type) {
                 var allowedTypes = {
                         numeric: true,
                         datetime: true,
                         string: true
                     };
-                min = min || this._min;
                 if (!allowedTypes[type])
-                    type = _isDefined(min) ? this._getDataType(min) : "numeric";
+                    type = _isDefined(this._min) ? this._getDataType(this._min) : "numeric";
                 return type
             },
             _getDataType: function(value) {
@@ -1068,7 +1047,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 if (that._isTickIntervalValid(tickInterval)) {
                     that._correctValue("min", tickInterval, that._correctMin);
                     that._correctValue("max", tickInterval, that._correctMax);
-                    that.updateBusinessDelta()
+                    that._updateBusinessDelta()
                 }
                 that._tickInterval = tickInterval;
                 return tickInterval
@@ -1175,6 +1154,21 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     minorTicks = that._createTicks(minorTicks, tickInterval, startTick, endTick, false, false, needCorrectTick)
                 }
                 return minorTicks
+            },
+            getTypes: function() {
+                return {
+                        axisType: this._axisType,
+                        dataType: this._dataType
+                    }
+            },
+            getData: function() {
+                return {
+                        min: this._min,
+                        max: this._max,
+                        customTicks: this._customTicks,
+                        customMinorTicks: this._customMinorTicks,
+                        screenDelta: this._screenDelta
+                    }
             }
         })
     })(jQuery, DevExpress);
@@ -1182,7 +1176,6 @@ if (!DevExpress.MOD_VIZ_CORE) {
     (function($, DX, undefined) {
         var utils = DX.utils,
             isDefined = utils.isDefined,
-            getPower = utils.getPower,
             round = Math.round;
         DX.viz.core.numericTranslatorFunctions = {
             translate: function(bp) {
@@ -1256,7 +1249,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
             numericTranslator = core.numericTranslatorFunctions;
         core.datetimeTranslatorFunctions = {
             translate: numericTranslator.translate,
-            untranslate: function(pos) {
+            untranslate: function() {
                 var result = numericTranslator.untranslate.apply(this, arguments);
                 return result === null ? result : new Date(result)
             },
@@ -1348,7 +1341,6 @@ if (!DevExpress.MOD_VIZ_CORE) {
             getMinScale: function(zoom) {
                 var that = this,
                     canvasOptions = that._canvasOptions,
-                    interval = canvasOptions.interval,
                     categoriesLength = (that.visibleCategories || that._categories).length;
                 categoriesLength += (parseInt(categoriesLength * 0.1) || 1) * (zoom ? -2 : 2);
                 return canvasOptions.canvasLength / (Math.max(categoriesLength, 1) * canvasOptions.interval)
@@ -1383,7 +1375,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     return specialValue;
                 return numericTranslator.translate.call(that, getLog(bp, that._businessRange.base))
             },
-            untranslate: function(pos) {
+            untranslate: function() {
                 var result = numericTranslator.untranslate.apply(this, arguments);
                 return result === null ? result : raiseTo(result, this._businessRange.base)
             },
@@ -1518,7 +1510,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     categories = range.categories || [],
                     script = {},
                     canvasOptions = that._prepareCanvasOptions(),
-                    visibleCategories = utils.getCategoriesInfo(categories, range.startCategories, range.endCategories).categories,
+                    visibleCategories = utils.getCategoriesInfo(categories, range.minVisible, range.maxVisible).categories,
                     categoriesLength = (visibleCategories || categories).length;
                 switch (range.axisType) {
                     case"logarithmic":
@@ -1567,6 +1559,12 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     base = range.base,
                     isDateTime = utils.isDate(max) || utils.isDate(min),
                     correction = isDateTime ? DATETIME_EQUALITY_CORRECTION : NUMBER_EQUALITY_CORRECTION;
+                if (range.axisType === 'logarithmic') {
+                    maxVisible = getLog(maxVisible, base);
+                    minVisible = getLog(minVisible, base);
+                    min = getLog(min, base);
+                    max = getLog(max, base)
+                }
                 if (isDefined(min) && isDefined(max) && min.valueOf() === max.valueOf()) {
                     newMin = min.valueOf() - correction;
                     newMax = max.valueOf() + correction;
@@ -1591,12 +1589,6 @@ if (!DevExpress.MOD_VIZ_CORE) {
                             minVisible = newMin < min ? min : newMin;
                         maxVisible = newMax > max ? max : newMax
                     }
-                }
-                if (range.axisType === 'logarithmic') {
-                    maxVisible = getLog(maxVisible, base);
-                    minVisible = getLog(minVisible, base);
-                    min = getLog(min, base);
-                    max = getLog(max, base)
                 }
                 return {
                         base: base,
@@ -1805,6 +1797,20 @@ if (!DevExpress.MOD_VIZ_CORE) {
             getStartAngle: function() {
                 return this.startAngle
             },
+            getComponent: function(type) {
+                var that = this,
+                    translator = this["_" + type];
+                translator.getRadius = function() {
+                    return that.getValLength()
+                };
+                translator.getCenter = function() {
+                    return that.getCenter()
+                };
+                translator.getStartAngle = function() {
+                    return that.getStartAngle()
+                };
+                return translator
+            },
             _untranslate: function(x, y) {
                 var radius = utils.getDistance(this._x0, this._y0, x, y),
                     angle = Math.atan2(y - this._y0, x - this._x0);
@@ -1812,12 +1818,6 @@ if (!DevExpress.MOD_VIZ_CORE) {
                         r: radius,
                         phi: angle
                     }
-            },
-            checkVisibility: function(rad, minRad) {
-                var radiusRange = this._val.getCanvasVisibleArea();
-                radiusRange.min = _round(radiusRange.min);
-                radiusRange.max = _round(radiusRange.max);
-                return radiusRange.min <= minRad && radiusRange.max >= minRad || radiusRange.max >= rad && radiusRange.min <= rad
             },
             untranslate: function(x, y) {
                 var pos = this._untranslate(x, y);
@@ -1899,65 +1899,229 @@ if (!DevExpress.MOD_VIZ_CORE) {
             }
         })
     })(DevExpress);
+    /*! Module viz-core, file layoutElement.js */
+    (function($, DX, undefined) {
+        var core = DX.viz.core,
+            _round = Math.round;
+        var _splitPair = DX.utils.splitPair;
+        var defaultPosition = ["center", "center"],
+            defaultOffset = [0, 0];
+        var getAlignFactor = function(align) {
+                switch (align) {
+                    case"center":
+                        return 0.5;
+                    case"right":
+                    case"bottom":
+                        return 1;
+                    default:
+                        return 0
+                }
+            };
+        function WrapperLayoutElement(renderElement, bbox) {
+            this._renderElement = renderElement;
+            this._cacheBBox = bbox
+        }
+        WrapperLayoutElement.prototype = {
+            position: function(options) {
+                var that = this,
+                    ofBBox = options.of.getBBox ? options.of.getBBox() : options.of,
+                    myBBox = this.getBBox(),
+                    at = _splitPair(options.at) || defaultPosition,
+                    my = _splitPair(options.my) || defaultPosition,
+                    offset = _splitPair(options.offset) || defaultOffset,
+                    shiftX = -getAlignFactor(my[0]) * myBBox.width + ofBBox.x - myBBox.x + getAlignFactor(at[0]) * ofBBox.width + parseInt(offset[0]),
+                    shiftY = -getAlignFactor(my[1]) * myBBox.height + ofBBox.y - myBBox.y + getAlignFactor(at[1]) * ofBBox.height + parseInt(offset[1]);
+                that._renderElement.move(_round(shiftX), _round(shiftY))
+            },
+            getBBox: function() {
+                return this._cacheBBox || this._renderElement.getBBox()
+            },
+            draw: function(){}
+        };
+        core.WrapperLayoutElement = WrapperLayoutElement
+    })(jQuery, DevExpress);
     /*! Module viz-core, file themes.js */
     (function(DX, $, undefined) {
-        var themes = DX.viz.themes = {},
-            INIT_THEME = "desktop",
-            currentName = INIT_THEME,
-            lightTone = ["light", "holo-light", "white"],
-            darkTone = ["dark", "holo-dark", "black"];
-        function checkName(themeName, tones) {
-            var findTheme;
-            tones && $.each(tones, function(_, tone) {
-                findTheme = themes[themeName + "." + tone];
-                if (findTheme) {
-                    themeName += "." + tone;
-                    return false
-                }
-            });
-            return themes[themeName] && themeName
+        var themes = {},
+            themesMapping = {},
+            themesSchemeMapping = {},
+            _extend = $.extend,
+            _each = $.each,
+            currentThemeName = null,
+            nextCacheUid = 0,
+            widgetsCache = {};
+        function normalizeName(name) {
+            return name ? String(name).toLowerCase() : null
         }
         function findTheme(themeName) {
-            return themes[themeName] || themes[currentName]
+            var name = normalizeName(themeName);
+            return themes[name] || themes[themesMapping[name] || currentThemeName]
+        }
+        function findThemeNameByName(name, scheme) {
+            return themesMapping[name + '.' + scheme] || themesSchemeMapping[name + '.' + scheme] || themesMapping[name]
+        }
+        function findThemeNameByPlatform(platform, version, scheme) {
+            return findThemeNameByName(platform + version, scheme) || findThemeNameByName(platform, scheme)
         }
         function currentTheme(themeName, colorScheme) {
-            var findName,
-                tones,
-                version;
-            if (arguments.length === 0)
-                return currentName;
-            switch (colorScheme) {
-                case"light":
-                    tones = lightTone;
-                    break;
-                case"dark":
-                    tones = darkTone;
-                    break;
-                default:
-                    tones = [""]
-            }
-            if ($.isPlainObject(themeName)) {
-                version = themeName.version;
-                themeName = themeName.platform
-            }
-            if (version && colorScheme)
-                findName = checkName(themeName + version, tones);
-            if (!findName && version)
-                findName = checkName(themeName + version);
-            if (!findName && colorScheme)
-                findName = checkName(themeName, tones);
-            if (!findName)
-                findName = checkName(themeName);
-            currentName = findName || currentName
+            if (!arguments.length)
+                return currentThemeName;
+            var scheme = normalizeName(colorScheme);
+            currentThemeName = (themeName && themeName.platform ? findThemeNameByPlatform(normalizeName(themeName.platform), themeName.version, scheme) : findThemeNameByName(normalizeName(themeName), scheme)) || currentThemeName;
+            return this
         }
-        function registerTheme(theme, basedOnThemeName) {
-            if (theme && theme.name)
-                themes[theme.name] = $.extend(true, {}, findTheme(basedOnThemeName), theme)
+        function getThemeInfo(themeName, splitter) {
+            var k = themeName.indexOf(splitter);
+            return k > 0 ? {
+                    name: themeName.substring(0, k),
+                    scheme: themeName.substring(k + 1)
+                } : null
         }
-        $.extend(DX.viz.core, {
+        function registerThemeName(themeName, targetThemeName) {
+            var themeInfo = getThemeInfo(themeName, '.') || getThemeInfo(themeName, '-') || {name: themeName},
+                name = themeInfo.name,
+                scheme = themeInfo.scheme;
+            if (scheme) {
+                themesMapping[name] = themesMapping[name] || targetThemeName;
+                themesMapping[name + '.' + scheme] = themesMapping[name + '-' + scheme] = targetThemeName
+            }
+            else
+                themesMapping[name] = targetThemeName
+        }
+        function registerTheme(theme, baseThemeName) {
+            var themeName = normalizeName(theme && theme.name);
+            if (themeName) {
+                registerThemeName(themeName, themeName);
+                themes[themeName] = _extend(true, {}, findTheme(baseThemeName), patchTheme(theme))
+            }
+        }
+        function registerThemeAlias(alias, theme) {
+            registerThemeName(normalizeName(alias), normalizeName(theme))
+        }
+        function registerThemeSchemeAlias(from, to) {
+            themesSchemeMapping[from] = to
+        }
+        function mergeScalar(target, field, source, sourceValue) {
+            var _value = source ? source[field] : sourceValue;
+            if (_value !== undefined && target[field] === undefined)
+                target[field] = _value
+        }
+        function mergeObject(target, field, source, sourceValue) {
+            var _value = source ? source[field] : sourceValue;
+            if (_value !== undefined)
+                target[field] = _extend(true, {}, _value, target[field])
+        }
+        function patchTheme(theme) {
+            theme = _extend(true, {
+                loadingIndicator: {font: {}},
+                legend: {
+                    font: {},
+                    border: {}
+                },
+                title: {font: {}},
+                tooltip: {font: {}},
+                "chart:common": {},
+                "chart:common:axis": {
+                    grid: {},
+                    minorGrid: {},
+                    tick: {},
+                    minorTick: {},
+                    title: {font: {}},
+                    label: {font: {}}
+                },
+                chart: {commonSeriesSettings: {candlestick: {}}},
+                pie: {},
+                polar: {},
+                gauge: {scale: {
+                        majorTick: {},
+                        minorTick: {},
+                        label: {font: {}}
+                    }},
+                barGauge: {},
+                map: {background: {}},
+                rangeSelector: {
+                    scale: {label: {font: {}}},
+                    chart: {}
+                },
+                sparkline: {},
+                bullet: {}
+            }, theme);
+            mergeScalar(theme.loadingIndicator, "backgroundColor", theme);
+            mergeScalar(theme.chart.commonSeriesSettings.candlestick, "innerColor", null, theme.backgroundColor);
+            mergeScalar(theme.map.background, "color", null, theme.backgroundColor);
+            mergeScalar(theme.title.font, "color", null, theme.primaryTitleColor);
+            mergeScalar(theme.legend.font, "color", null, theme.secondaryTitleColor);
+            mergeScalar(theme.legend.border, "color", null, theme.axisColor);
+            patchAxes(theme);
+            _each(["chart", "pie", "polar", "gauge", "barGauge", "map", "rangeSelector", "sparkline", "bullet"], function(_, section) {
+                mergeScalar(theme[section], "redrawOnResize", theme);
+                mergeScalar(theme[section], "containerBackgroundColor", null, theme.backgroundColor);
+                mergeObject(theme[section], "tooltip", theme)
+            });
+            _each(["chart", "pie", "polar", "gauge", "barGauge", "map", "rangeSelector"], function(_, section) {
+                mergeObject(theme[section], "loadingIndicator", theme);
+                mergeObject(theme[section], "legend", theme)
+            });
+            _each(["chart", "pie", "polar", "gauge", "barGauge"], function(_, section) {
+                mergeObject(theme[section], "title", theme)
+            });
+            _each(["gauge", "barGauge"], function(_, section) {
+                mergeObject(theme[section], "subtitle", null, theme.title)
+            });
+            _each(["chart", "pie", "polar"], function(_, section) {
+                mergeObject(theme, section, null, theme["chart:common"])
+            });
+            _each(["chart", "polar"], function(_, section) {
+                theme[section] = theme[section] || {};
+                mergeObject(theme[section], "commonAxisSettings", null, theme["chart:common:axis"])
+            });
+            mergeObject(theme.rangeSelector.chart, "commonSeriesSettings", theme.chart);
+            mergeObject(theme.rangeSelector.chart, "dataPrepareSettings", theme.chart);
+            mergeScalar(theme.map.legend, "backgroundColor", theme);
+            return theme
+        }
+        function patchAxes(theme) {
+            var commonAxisSettings = theme["chart:common:axis"],
+                colorFieldName = "color";
+            _each([commonAxisSettings, commonAxisSettings.grid, commonAxisSettings.minorGrid, commonAxisSettings.tick, commonAxisSettings.minorTick], function(_, obj) {
+                mergeScalar(obj, colorFieldName, null, theme.axisColor)
+            });
+            mergeScalar(commonAxisSettings.title.font, colorFieldName, null, theme.secondaryTitleColor);
+            mergeScalar(commonAxisSettings.label.font, colorFieldName, null, theme.axisLabelColor);
+            mergeScalar(theme.gauge.scale.label.font, colorFieldName, null, theme.axisLabelColor);
+            mergeScalar(theme.gauge.scale.majorTick, colorFieldName, null, theme.backgroundColor);
+            mergeScalar(theme.gauge.scale.minorTick, colorFieldName, null, theme.backgroundColor);
+            mergeScalar(theme.rangeSelector.scale.label.font, colorFieldName, null, theme.axisLabelColor)
+        }
+        function addCacheItem(target) {
+            var cacheUid = ++nextCacheUid;
+            target._cache = cacheUid;
+            widgetsCache[cacheUid] = target
+        }
+        function removeCacheItem(target) {
+            delete widgetsCache[target._cache]
+        }
+        function refreshAll() {
+            _each(widgetsCache, function() {
+                this.refresh()
+            });
+            return this
+        }
+        _extend(DX.viz.core, {
             findTheme: findTheme,
             currentTheme: currentTheme,
-            registerTheme: registerTheme
+            registerTheme: registerTheme,
+            registerThemeAlias: registerThemeAlias,
+            registerThemeSchemeAlias: registerThemeSchemeAlias,
+            refreshAll: refreshAll,
+            addCacheItem: addCacheItem,
+            removeCacheItem: removeCacheItem
+        });
+        _extend(DX.viz.core, {
+            themes: themes,
+            themesMapping: themesMapping,
+            themesSchemeMapping: themesSchemeMapping,
+            widgetsCache: widgetsCache
         })
     })(DevExpress, jQuery);
     /*! Module viz-core, file palette.js */
@@ -2063,7 +2227,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
             var ind = 0;
             this.next = function() {
                 var res = buf[ind++];
-                if (ind == buf.length)
+                if (ind === buf.length)
                     this.reset();
                 return res
             };
@@ -2134,10 +2298,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 nsource = source.length - 1,
                 colors = [],
                 gradient = [],
-                i,
-                k,
-                kl,
-                kr;
+                i;
             for (i = 0; i <= nsource; ++i)
                 colors.push(new _Color(source[i]));
             if (ncolors > 0)
@@ -2162,10 +2323,85 @@ if (!DevExpress.MOD_VIZ_CORE) {
         });
         DX.viz.core._DEBUG_palettes = palettes
     })(DevExpress, jQuery);
+    /*! Module viz-core, file utils.js */
+    (function(DX, $, undefined) {
+        var _ceil = Math.ceil,
+            _min = Math.min,
+            _round = Math.round;
+        DX.viz.core.utils = {
+            decreaseGaps: function(object, keys, decrease) {
+                var arrayGaps,
+                    eachDecrease,
+                    middleValue;
+                do {
+                    arrayGaps = $.map(keys, function(key) {
+                        return object[key] ? object[key] : null
+                    });
+                    middleValue = _ceil(decrease / arrayGaps.length);
+                    arrayGaps.push(middleValue);
+                    eachDecrease = _min.apply(null, arrayGaps);
+                    $.each(keys, function(_, key) {
+                        if (object[key]) {
+                            object[key] -= eachDecrease;
+                            decrease -= eachDecrease
+                        }
+                    })
+                } while (decrease > 0 && arrayGaps.length > 1);
+                return decrease
+            },
+            parseScalar: function(value, defaultValue) {
+                return value !== undefined ? value : defaultValue
+            },
+            enumParser: function(values) {
+                var stored = {},
+                    i,
+                    ii;
+                for (i = 0, ii = values.length; i < ii; ++i)
+                    stored[String(values[i]).toLowerCase()] = 1;
+                return function(value, defaultValue) {
+                        var _value = String(value).toLowerCase();
+                        return stored[_value] ? _value : defaultValue
+                    }
+            },
+            patchFontOptions: function(options) {
+                var fontOptions = {};
+                $.each(options || {}, function(key, value) {
+                    if (/^(cursor|opacity)$/i.test(key));
+                    else if (key === "color")
+                        key = "fill";
+                    else
+                        key = "font-" + key;
+                    fontOptions[key] = value
+                });
+                return fontOptions
+            },
+            convertPolarToXY: function(centerCoords, startAngle, angle, radius) {
+                var shiftAngle = 90,
+                    cossin;
+                angle = DX.utils.isDefined(angle) ? angle + startAngle - shiftAngle : 0;
+                cossin = DX.utils.getCosAndSin(angle);
+                return {
+                        x: _round(centerCoords.x + radius * cossin.cos),
+                        y: _round(centerCoords.y + radius * cossin.sin)
+                    }
+            },
+            convertXYToPolar: function(centerCoords, x, y) {
+                var radius = DX.utils.getDistance(centerCoords.x, centerCoords.y, x, y),
+                    angle = Math.atan2(y - centerCoords.y, x - centerCoords.x);
+                return {
+                        phi: _round(DX.utils.normalizeAngle(angle * 180 / Math.PI)),
+                        r: _round(radius)
+                    }
+            }
+        }
+    })(DevExpress, jQuery);
     /*! Module viz-core, file baseThemeManager.js */
     (function(DX, $, undefined) {
         var _isString = DX.utils.isString,
+            _parseScalar = DX.viz.core.utils.parseScalar,
             _findTheme = DX.viz.core.findTheme,
+            _addCacheItem = DX.viz.core.addCacheItem,
+            _removeCacheItem = DX.viz.core.removeCacheItem,
             _extend = $.extend,
             _each = $.each;
         function getThemePart(theme, path) {
@@ -2176,21 +2412,38 @@ if (!DevExpress.MOD_VIZ_CORE) {
             return _theme
         }
         DX.viz.core.BaseThemeManager = DX.Class.inherit({
+            ctor: function() {
+                _addCacheItem(this)
+            },
             dispose: function() {
-                this._theme = this._font = null;
+                var that = this;
+                _removeCacheItem(that);
+                that._callback = that._theme = that._font = null;
+                return that
+            },
+            setCallback: function(callback) {
+                this._callback = callback;
                 return this
             },
-            setTheme: function(theme) {
-                theme = theme || {};
+            setTheme: function(theme, rtl) {
+                this._current = theme;
+                this._rtl = rtl;
+                return this.refresh()
+            },
+            refresh: function() {
                 var that = this,
-                    themeObj = _findTheme(_isString(theme) ? theme : theme.name);
-                that._themeName = themeObj.name;
-                that._font = _extend({}, themeObj.font, theme.font);
+                    current = that._current || {},
+                    theme = _findTheme(current.name || current);
+                that._themeName = theme.name;
+                that._font = _extend({}, theme.font, current.font);
                 that._themeSection && _each(that._themeSection.split('.'), function(_, path) {
-                    themeObj = _extend(true, {}, themeObj[path], that._IE8 ? themeObj[path + 'IE8'] : {})
+                    theme = _extend(true, {}, theme[path], that._IE8 ? theme[path + 'IE8'] : {})
                 });
-                that._theme = _extend(true, {}, themeObj, _isString(theme) ? {} : theme);
+                that._theme = _extend(true, {}, theme, _isString(current) ? {} : current);
                 that._initializeTheme();
+                if (_parseScalar(that._rtl, that._theme.rtlEnabled))
+                    _extend(true, that._theme, that._theme._rtl);
+                that._callback();
                 return that
             },
             theme: function(path) {
@@ -2252,59 +2505,6 @@ if (!DevExpress.MOD_VIZ_CORE) {
             });
         core.ParseUtils = parseUtils
     })(jQuery, DevExpress);
-    /*! Module viz-core, file utils.js */
-    (function(DX, $, undefined) {
-        var _ceil = Math.ceil,
-            _min = Math.min;
-        DX.viz.core.utils = {
-            decreaseGaps: function(object, keys, decrease) {
-                var arrayGaps,
-                    eachDecrease,
-                    middleValue;
-                do {
-                    arrayGaps = $.map(keys, function(key) {
-                        return object[key] ? object[key] : null
-                    });
-                    middleValue = _ceil(decrease / arrayGaps.length);
-                    arrayGaps.push(middleValue);
-                    eachDecrease = _min.apply(null, arrayGaps);
-                    $.each(keys, function(_, key) {
-                        if (object[key]) {
-                            object[key] -= eachDecrease;
-                            decrease -= eachDecrease
-                        }
-                    })
-                } while (decrease > 0 && arrayGaps.length > 1);
-                return decrease
-            },
-            parseScalar: function(value, defaultValue) {
-                return value !== undefined ? value : defaultValue
-            },
-            enumParser: function(values) {
-                var stored = {},
-                    i,
-                    ii;
-                for (i = 0, ii = values.length; i < ii; ++i)
-                    stored[String(values[i]).toLowerCase()] = 1;
-                return function(value, defaultValue) {
-                        var _value = String(value).toLowerCase();
-                        return stored[_value] ? _value : defaultValue
-                    }
-            },
-            patchFontOptions: function(options) {
-                var fontOptions = {};
-                $.each(options || {}, function(key, value) {
-                    if (/^(cursor|opacity)$/i.test(key));
-                    else if (key === "color")
-                        key = "fill";
-                    else
-                        key = "font-" + key;
-                    fontOptions[key] = value
-                });
-                return fontOptions
-            }
-        }
-    })(DevExpress, jQuery);
     /*! Module viz-core, file loadIndicator.js */
     (function(DX, $, undefined) {
         var _patchFontOptions = DX.viz.core.utils.patchFontOptions;
@@ -2455,563 +2655,380 @@ if (!DevExpress.MOD_VIZ_CORE) {
         DX.viz.core.LoadIndicator = LoadIndicator
     })(DevExpress, jQuery);
     /*! Module viz-core, file tooltip.js */
-    (function(DX, $, undefined) {
-        var ARROW_WIDTH = 20,
-            MAX_SHADOW_SIZE = 10,
-            formatHelper = DX.formatHelper,
-            core = DX.viz.core,
-            X_INTERVAL = 15,
-            _max = Math.max,
-            _round = Math.round,
-            _isFunction = DX.utils.isFunction,
-            _isDefined = DX.utils.isDefined,
-            _extend = $.extend,
+    (function(DX, $, doc, undefined) {
+        var HALF_ARROW_WIDTH = 10,
             FORMAT_PRECISION = {
-                argument: ['argumentFormat', 'argumentPrecision'],
-                percent: ['percent', 'percentPrecision'],
-                value: ['format', 'precision']
+                argument: ["argumentFormat", "argumentPrecision"],
+                percent: ["percent", "percentPrecision"],
+                value: ["format", "precision"]
             },
-            VISIBLE = {visibility: 'visible'},
-            HIDDEN = {visibility: 'hidden'},
-            LEFT = 'left',
-            RIGHT = 'right';
-        core.Tooltip = DX.Class.inherit({
-            ctor: function(parameters) {
-                var that = this;
-                that._state = {};
-                that._eventTrigger = parameters.eventTrigger;
-                that._renderer = parameters.renderer;
-                that._group = parameters.group;
-                that._cloud = that._renderer.path([], "area");
-                that._textGroup = that._renderer.g();
-                that._options = {_justify: parameters._justify};
-                that._createTextContent()
-            },
+            formatHelper = DX.formatHelper,
+            mathCeil = Math.ceil;
+        function hideElement($element) {
+            $element.css({left: "-9999px"}).detach()
+        }
+        function Tooltip(params) {
+            var that = this,
+                renderer,
+                root;
+            that._eventTrigger = params.eventTrigger;
+            that._wrapper = $("<div></div>").css({
+                position: "absolute",
+                overflow: "visible",
+                width: 0,
+                height: 0
+            }).addClass(params.cssClass);
+            that._renderer = renderer = new DX.viz.renderers.Renderer({});
+            root = renderer.root;
+            root.attr({"pointer-events": "none"});
+            renderer.draw(that._wrapper.get(0));
+            that._cloud = renderer.path([], "area").sharp().append(root);
+            that._shadow = renderer.shadowFilter();
+            that._textGroup = renderer.g().attr({align: "center"}).append(root);
+            that._text = renderer.text(undefined, 0, 0).append(that._textGroup);
+            that._textGroupHtml = $("<div></div>").css({
+                position: "absolute",
+                width: 0,
+                padding: 0,
+                margin: 0,
+                border: "0px solid transparent"
+            }).appendTo(that._wrapper);
+            that._textHtml = $("<div></div>").css({
+                position: "relative",
+                display: "inline-block",
+                padding: 0,
+                margin: 0,
+                border: "0px solid transparent"
+            }).appendTo(that._textGroupHtml)
+        }
+        Tooltip.prototype = {
+            constructor: Tooltip,
             dispose: function() {
+                this._wrapper.remove();
+                this._renderer.dispose();
+                this._options = null
+            },
+            setOptions: function(options) {
+                options = options || {};
+                var that = this,
+                    cloudSettings = that._cloudSettigns = {
+                        opacity: options.opacity,
+                        filter: that._shadow.ref,
+                        "stroke-width": null,
+                        stroke: null
+                    },
+                    borderOptions = options.border || {};
+                that._shadowSettigns = $.extend({
+                    x: "-50%",
+                    y: "-50%",
+                    width: "200%",
+                    height: "200%"
+                }, options.shadow);
+                that._options = options;
+                if (borderOptions.visible)
+                    $.extend(cloudSettings, {
+                        "stroke-width": borderOptions.width,
+                        stroke: borderOptions.color,
+                        "stroke-opacity": borderOptions.opacity,
+                        dashStyle: borderOptions.dashStyle
+                    });
+                that._textFontStyles = DX.viz.core.utils.patchFontOptions(options.font);
+                that._textFontStyles.color = options.font.color;
+                that._customizeTooltip = $.isFunction(options.customizeTooltip) ? options.customizeTooltip : null;
+                return that
+            },
+            setRendererOptions: function(options) {
+                this._renderer.setOptions(options);
+                this._textGroupHtml.css({direction: options.rtl ? "rtl" : "ltr"});
+                return this
+            },
+            render: function() {
                 var that = this;
-                that.off();
-                that._shadow && that._shadow.dispose();
-                that._shadow = that._cloud = that._text = that._group = that._options = that._renderer = that._tooltipTextArray = that._textGroup = null;
+                hideElement(that._wrapper);
+                that._cloud.attr(that._cloudSettigns);
+                that._shadow.attr(that._shadowSettigns);
+                that._textGroupHtml.css(that._textFontStyles);
+                that._textGroup.css(that._textFontStyles);
+                that._text.css(that._textFontStyles);
                 return that
             },
             update: function(options) {
-                options = options || {};
+                return this.setOptions(options).render()
+            },
+            _prepare: function(formatObject) {
                 var that = this,
-                    group = that._group,
-                    shadowOptions = options.shadow || {},
-                    shadow = that._shadow = that._shadow || that._renderer.shadowFilter('-50%', '-50%', '200%', '200%', shadowOptions.offsetX, shadowOptions.offsetY, shadowOptions.blur, shadowOptions.color, shadowOptions.opacity),
-                    borderSettings = options.border,
-                    shapeSettings = _extend({
-                        opacity: options.opacity,
-                        filter: shadow.ref
-                    }, borderSettings && borderSettings.visible ? {
-                        "stroke-width": borderSettings.width,
-                        stroke: borderSettings.color,
-                        "stroke-opacity": borderSettings.opacity,
-                        dashStyle: borderSettings.dashStyle
-                    } : {
-                        "stroke-width": null,
-                        stroke: null
-                    }),
-                    textSettings = _extend({}, {align: 'center'}, options.text);
-                that._options = options;
-                that._textFontStyles = core.utils.patchFontOptions(options.font);
-                that.setSize(options.canvasWidth, options.canvasHeight);
-                that._customizeTooltip = _isFunction(options.customizeTooltip) ? options.customizeTooltip : null;
-                if (!that._customizeTooltip && _isFunction(options.customizeText))
-                    that._customizeTooltip = function() {
-                        return {text: options.customizeText.apply(this, arguments)}
+                    options = that._options,
+                    defaultText = formatObject.valueText || "",
+                    state = that._state,
+                    customize = {};
+                if (that._customizeTooltip) {
+                    customize = that._customizeTooltip.call(formatObject, formatObject);
+                    customize = $.isPlainObject(customize) ? customize : {};
+                    if ("text" in customize)
+                        state.text = DX.utils.isDefined(customize.text) ? String(customize.text) : "";
+                    if ("html" in customize)
+                        state.html = DX.utils.isDefined(customize.html) ? String(customize.html) : ""
+                }
+                if (!("text" in state) && !("html" in state))
+                    state.text = defaultText;
+                state.color = customize.color || options.color;
+                state.borderColor = customize.borderColor || (options.border || {}).color;
+                state.textColor = customize.fontColor || (options.font || {}).color;
+                return !!state.text || !!state.html
+            },
+            show: function(formatObject, params, eventData) {
+                var that = this,
+                    state,
+                    options = that._options,
+                    plr = options.paddingLeftRight,
+                    ptb = options.paddingTopBottom,
+                    textGroupHtml = that._textGroupHtml,
+                    textHtml = that._textHtml,
+                    preprationResult,
+                    bBox,
+                    contentSize,
+                    ss = that._shadowSettigns,
+                    xOff = ss.offsetX,
+                    yOff = ss.offsetY,
+                    blur = ss.blur * 2 + 1;
+                state = that._state = {
+                    x: -9999,
+                    y: -9999,
+                    offset: 0,
+                    tc: {}
+                };
+                if (!(preprationResult = that._prepare(formatObject)))
+                    return preprationResult;
+                that._wrapper.appendTo($("body"));
+                $.extend(state, params);
+                that._cloud.attr({
+                    fill: state.color,
+                    stroke: state.borderColor
+                });
+                if (state.html) {
+                    that._text.attr({text: ""});
+                    textGroupHtml.css({
+                        color: state.textColor,
+                        width: that._getCanvas().width
+                    });
+                    textHtml.html(state.html);
+                    bBox = textHtml.get(0).getBoundingClientRect();
+                    bBox = {
+                        x: 0,
+                        y: 0,
+                        width: mathCeil(bBox.right - bBox.left),
+                        height: mathCeil(bBox.bottom - bBox.top)
                     };
-                that._cloud.attr(shapeSettings).append(group);
-                that._text && that._text.css(that._textFontStyles);
-                that._textGroup.attr(textSettings).css(that._textFontStyles).append(group);
-                that.hide();
-                return that
+                    textGroupHtml.width(bBox.width);
+                    textGroupHtml.height(bBox.height)
+                }
+                else {
+                    textHtml.html("");
+                    that._text.css({fill: state.textColor}).attr({text: state.text});
+                    bBox = that._textGroup.css({fill: state.textColor}).getBBox()
+                }
+                contentSize = state.contentSize = {
+                    x: bBox.x - plr,
+                    y: bBox.y - ptb,
+                    width: bBox.width + 2 * plr,
+                    height: bBox.height + 2 * ptb,
+                    lm: blur - xOff > 0 ? blur - xOff : 0,
+                    rm: blur + xOff > 0 ? blur + xOff : 0,
+                    tm: blur - yOff > 0 ? blur - yOff : 0,
+                    bm: blur + yOff > 0 ? blur + yOff : 0
+                };
+                contentSize.fullWidth = contentSize.width + contentSize.lm + contentSize.rm;
+                contentSize.fullHeight = contentSize.height + contentSize.tm + contentSize.bm + options.arrowLength;
+                that.move(state.x, state.y, state.offset);
+                eventData && that._eventTrigger("tooltipShown", eventData);
+                return preprationResult
+            },
+            hide: function(eventData) {
+                hideElement(this._wrapper);
+                eventData && this._eventTrigger("tooltipHidden", eventData)
+            },
+            move: function(x, y, offset) {
+                offset = offset || 0;
+                var that = this,
+                    canvas = that._getCanvas(),
+                    state = that._state,
+                    coords = state.tc,
+                    contentSize = state.contentSize;
+                if (that._calculatePosition(x, y, offset)) {
+                    that._cloud.attr({points: coords.cloudPoints}).move(contentSize.lm, contentSize.tm);
+                    if (state.html)
+                        that._textGroupHtml.css({
+                            left: -contentSize.x + contentSize.lm,
+                            top: -contentSize.y + contentSize.tm + coords.correction
+                        });
+                    else
+                        that._textGroup.move(-contentSize.x + contentSize.lm, -contentSize.y + contentSize.tm + coords.correction);
+                    that._renderer.resize(coords.hp === "out" ? canvas.fullWidth - canvas.left : contentSize.fullWidth, coords.vp === "out" ? canvas.fullHeight - canvas.top : contentSize.fullHeight)
+                }
+                that._wrapper.css({
+                    left: coords.x,
+                    top: coords.y
+                })
             },
             formatValue: function(value, specialFormat) {
-                var formatObj = FORMAT_PRECISION[specialFormat || 'value'],
+                var formatObj = FORMAT_PRECISION[specialFormat || "value"],
                     format = formatObj[0] in this._options ? this._options[formatObj[0]] : specialFormat;
                 return formatHelper.format(value, format, this._options[formatObj[1]] || 0)
             },
             getLocation: function() {
-                return (this._options.location + '').toLowerCase()
+                return (this._options.location + "").toLowerCase()
             },
-            prepare: function(formatObject, params, defaultTextValueField) {
-                var that = this,
-                    options = that._options,
-                    defaultText = formatObject[defaultTextValueField || 'valueText'] || '',
-                    state = that._state = that._state || {},
-                    customize;
-                _extend(state, params);
-                if (that._customizeTooltip) {
-                    customize = that._customizeTooltip.call(formatObject, formatObject);
-                    customize = $.isPlainObject(customize) ? customize : {};
-                    if ('text' in customize)
-                        state.text = _isDefined(customize.text) ? String(customize.text) : '';
-                    else {
-                        if ($.isArray(defaultText)) {
-                            options._justify = true;
-                            that._createTextContent();
-                            defaultText = defaultText.join('<br/>')
-                        }
-                        state.text = defaultText
-                    }
-                    state.color = customize.color || options.color;
-                    state.borderColor = customize.borderColor || (options.border || {}).color;
-                    state.textColor = customize.fontColor || (options.font || {}).color
-                }
-                else {
-                    state.text = defaultText;
-                    state.color = options.color;
-                    state.borderColor = (options.border || {}).color;
-                    state.textColor = (options.font || {}).color
-                }
-                if (options._justify)
-                    state.text = state.text.split('<br/>');
-                return !!state.text
-            },
-            enabled: function() {
+            isEnabled: function() {
                 return !!this._options.enabled
             },
-            shared: function() {
+            isShared: function() {
                 return !!this._options.shared
             },
-            formatColorTooltip: function(that) {
-                return that._customizeTooltip && that._customizeTooltip.call(this, this)
-            },
-            _getHorizontalData: function(cloudWidth, cloudHeight, arrowLength, paddingLeftRight) {
+            _calculatePosition: function(x, y, offset) {
                 var that = this,
-                    horPosition = that._state.cloudHorizontalPosition,
-                    x = that._state.x,
-                    y = that._state.y,
-                    xt = x,
-                    points = [],
-                    align = 'center',
-                    inverted;
-                if (_isDefined(that._state.arrowSide)) {
-                    points = that._setArrowOnSide(cloudWidth, cloudHeight, arrowLength, x, y);
-                    inverted = that._getHorizontalInvert(cloudWidth, arrowLength, x);
-                    xt = inverted ? xt - cloudWidth / 2 - arrowLength : xt + cloudWidth / 2 + arrowLength
-                }
-                else if (_isDefined(horPosition) ? horPosition === RIGHT : cloudWidth / 2 > x) {
-                    points = that._setArrowLeft(cloudWidth, cloudHeight, arrowLength, x, y);
-                    align = LEFT;
-                    xt += paddingLeftRight
-                }
-                else if (_isDefined(horPosition) ? horPosition === LEFT : x + cloudWidth / 2 > that._canvasWidth) {
-                    points = that._setArrowRight(cloudWidth, cloudHeight, arrowLength, x, y);
-                    align = RIGHT;
-                    xt -= paddingLeftRight
-                }
-                else
-                    points = that._setArrowCenter(cloudWidth, cloudHeight, arrowLength, x, y);
-                return {
-                        points: points,
-                        align: align,
-                        xt: xt
-                    }
-            },
-            _getVerticalData: function(cloudHeight, arrowLength) {
-                var that = this,
+                    canvas = that._getCanvas(),
+                    options = that._options,
+                    arrowLength = options.arrowLength,
                     state = that._state,
-                    bbox = state.textBBox,
-                    yt = state.y,
-                    invert,
-                    delta;
-                if (_isDefined(that._state.arrowSide))
-                    yt += bbox.height / 2;
-                else {
-                    invert = that._getVerticalInvert(cloudHeight, arrowLength, state.y);
-                    delta = arrowLength + cloudHeight / 2 + state.offset;
-                    yt = invert ? yt + bbox.height / 2 + delta : yt - delta + bbox.height / 2
+                    coords = state.tc,
+                    contentSize = state.contentSize,
+                    contentWidth = contentSize.width,
+                    halfContentWidth = contentWidth / 2,
+                    contentHeight = contentSize.height,
+                    cTop = y - canvas.top,
+                    cBottom = canvas.top + canvas.height - y,
+                    cLeft = x - canvas.left,
+                    cRight = canvas.width + canvas.left - x,
+                    tTop = contentHeight + arrowLength + offset + contentSize.tm,
+                    tBottom = contentHeight + arrowLength + offset + contentSize.bm,
+                    tLeft = contentWidth + contentSize.lm,
+                    tRight = contentWidth + contentSize.rm,
+                    tHalfLeft = halfContentWidth + contentSize.lm,
+                    tHalfRight = halfContentWidth + contentSize.rm,
+                    correction = 0,
+                    cloudPoints,
+                    arrowPoints = [6, 0],
+                    x1 = halfContentWidth + HALF_ARROW_WIDTH,
+                    x2 = halfContentWidth,
+                    x3 = halfContentWidth - HALF_ARROW_WIDTH,
+                    y1,
+                    y3,
+                    y2 = contentHeight + arrowLength,
+                    hp = "center",
+                    vp = "bottom",
+                    hasDeprecatedPosition;
+                y1 = y3 = contentHeight;
+                switch (options.verticalAlignment) {
+                    case"top":
+                        vp = "bottom";
+                        hasDeprecatedPosition = true;
+                        break;
+                    case"bottom":
+                        vp = "top";
+                        hasDeprecatedPosition = true;
+                        break
                 }
-                return {yt: that._correctYTextContent(yt)}
-            },
-            _getData: function() {
-                var that = this,
-                    bbox = that._state.textBBox,
-                    options = that._options,
-                    paddingLeftRight = options.paddingLeftRight,
-                    paddingTopBottom = options.paddingTopBottom,
-                    arrowLength = options.arrowLength > 0 ? options.arrowLength : 0,
-                    cloudWidth = bbox.width + paddingLeftRight * 2,
-                    cloudHeight = bbox.height + paddingTopBottom * 2,
-                    updatedText,
-                    horizontalData,
-                    verticalData;
-                updatedText = that._checkWidthText(cloudWidth, cloudHeight);
-                if (updatedText) {
-                    that._state.textBBox = bbox = updatedText.bbox;
-                    cloudWidth = updatedText.cloudWidth;
-                    cloudHeight = updatedText.cloudHeight;
-                    paddingLeftRight = updatedText.paddingLeftRight;
-                    paddingTopBottom = updatedText.paddingTopBottom
+                if (!hasDeprecatedPosition)
+                    if (tTop > cTop && tBottom > cBottom)
+                        vp = "out";
+                    else if (tTop > cTop)
+                        vp = "top";
+                hasDeprecatedPosition = false;
+                switch (options.horizontalAlignment) {
+                    case"left":
+                        hp = "right";
+                        hasDeprecatedPosition = true;
+                        break;
+                    case"center":
+                        hp = "center";
+                        hasDeprecatedPosition = true;
+                        break;
+                    case"right":
+                        hp = "left";
+                        hasDeprecatedPosition = true;
+                        break
                 }
-                horizontalData = that._getHorizontalData(cloudWidth, cloudHeight, arrowLength, paddingLeftRight);
-                verticalData = that._getVerticalData(cloudHeight, arrowLength);
-                return {
-                        points: horizontalData.points,
-                        text: {
-                            x: horizontalData.xt,
-                            y: verticalData.yt,
-                            align: horizontalData.align
-                        }
-                    }
-            },
-            _updateTextContent: function() {
-                if (this._options._justify) {
-                    this._textGroup.clear();
-                    this._calculateTextContent();
-                    this._locateTextContent(0, 0, 'center')
+                if (!hasDeprecatedPosition)
+                    if (tLeft > cLeft && tRight > cRight)
+                        hp = "out";
+                    else if (tHalfLeft > cLeft && tRight < cRight)
+                        hp = "left";
+                    else if (tHalfRight > cRight && tLeft < cLeft)
+                        hp = "right";
+                if (hp === "out")
+                    x = canvas.left;
+                else if (hp === "left") {
+                    x1 = HALF_ARROW_WIDTH;
+                    x2 = x3 = 0
                 }
-                else
-                    this._text.attr({text: this._state.text}).css({fill: this._state.textColor});
-                this._textGroup.css({fill: this._state.textColor});
-                this._state.textBBox = this._textGroup.getBBox()
-            },
-            _correctYTextContent: function(y) {
-                var bbox;
-                if (this._options._justify) {
-                    this._locateTextContent(0, y, 'center');
-                    bbox = this._textGroup.getBBox()
+                else if (hp === "right") {
+                    x1 = x2 = contentWidth;
+                    x3 = contentWidth - HALF_ARROW_WIDTH;
+                    x = x - contentWidth
                 }
-                else {
-                    this._text.attr({y: y});
-                    bbox = this._text.getBBox()
-                }
-                return y - (bbox.y + bbox.height - y)
-            },
-            _adjustTextContent: function(data) {
-                if (this._options._justify)
-                    this._locateTextContent(data.text.x, data.text.y, data.text.align);
-                else
-                    this._text.attr({
-                        x: data.text.x,
-                        y: data.text.y,
-                        align: data.text.align
-                    })
-            },
-            _updateTooltip: function() {
-                var that = this,
-                    box,
-                    data,
-                    scale;
-                data = that._getData();
-                that._cloud.attr({
-                    points: data.points,
-                    fill: that._state.color,
-                    'class': that._state.className,
-                    stroke: that._state.borderColor
-                }).sharp();
-                that._adjustTextContent(data);
-                box = that._group.getBBox();
-                if (box.y + box.height > that._canvasHeight) {
-                    scale = (that._canvasHeight - box.y) / box.height;
-                    that._group.attr({
-                        scaleX: scale,
-                        scaleY: scale,
-                        translateX: that._state.x * (1 - scale),
-                        translateY: that._state.y * (1 - scale)
-                    })
+                else if (hp === "center")
+                    x = x - halfContentWidth;
+                if (vp === "out")
+                    y = canvas.top;
+                else if (vp === "top") {
+                    hp !== "out" && (correction = arrowLength);
+                    arrowPoints[0] = 2;
+                    y1 = y3 = arrowLength;
+                    y2 = x1;
+                    x1 = x3;
+                    x3 = y2;
+                    y2 = 0;
+                    y = y + offset
                 }
                 else
-                    that._group.attr({
-                        scaleX: 1,
-                        scaleY: 1,
-                        translateX: 0,
-                        translateY: 0
-                    })
-            },
-            _createTextContent: function() {
-                var that = this;
-                that._textGroup.clear();
-                that._text = null;
-                if (!that._options._justify)
-                    that._text = that._renderer.text(undefined, 0, 0).css(that._textFontStyles).append(that._textGroup)
-            },
-            _getTextContentParams: function() {
-                var that = this,
-                    i,
-                    text,
-                    textBBox,
-                    textArray = that._state.text,
-                    textArrayLength = textArray.length,
-                    textParams = {
-                        width: [],
-                        height: []
-                    };
-                that._tooltipTextArray = [];
-                for (i = 0; i < textArrayLength; i++) {
-                    text = that._renderer.text(textArray[i], 0, 0).append(that._textGroup);
-                    that._tooltipTextArray.push(text);
-                    textBBox = text.getBBox();
-                    textParams.width.push(textBBox.width)
-                }
-                that._lineHeight = -2 * textBBox.y - textBBox.height;
-                return textParams
-            },
-            _locateTextContent: function(x, y, alignment) {
-                var that = this,
-                    tooltipTextArray = that._tooltipTextArray,
-                    textWidth = that._textContentWidth,
-                    lineSpacing = that._options.lineSpacing,
-                    yDelta = (lineSpacing > 0 ? lineSpacing : 0) + that._lineHeight,
-                    leftXCoord,
-                    rightXCoord,
-                    i,
-                    rtl = that._options._rtl;
-                if (alignment === LEFT)
-                    leftXCoord = x;
-                else if (alignment === RIGHT)
-                    leftXCoord = x - textWidth;
-                else
-                    leftXCoord = _round(x - textWidth / 2);
-                rightXCoord = leftXCoord + textWidth;
-                for (i = tooltipTextArray.length - 1; i >= 0; i -= 2) {
-                    tooltipTextArray[i].attr({
-                        x: !rtl ? rightXCoord : leftXCoord,
-                        y: y,
-                        align: !rtl ? RIGHT : LEFT
-                    });
-                    if (tooltipTextArray[i - 1])
-                        tooltipTextArray[i - 1].attr({
-                            x: !rtl ? leftXCoord : rightXCoord,
-                            y: y,
-                            align: !rtl ? LEFT : RIGHT
-                        });
-                    y -= yDelta
-                }
-            },
-            _calculateTextContent: function() {
-                var that = this,
-                    textArray = that._state.text,
-                    textArrayLength = textArray.length,
-                    textParams,
-                    width,
-                    stringWidthArray = [],
-                    i;
-                textParams = that._getTextContentParams();
-                for (i = 0; i < textArrayLength; i += 2) {
-                    if (textParams.width[i + 1])
-                        width = textParams.width[i] + X_INTERVAL + textParams.width[i + 1];
-                    else
-                        width = textParams.width[i];
-                    stringWidthArray.push(width)
-                }
-                that._textContentWidth = _max.apply(null, stringWidthArray)
-            },
-            setSize: function(width, height) {
-                this._canvasWidth = _isDefined(width) ? width : this._canvasWidth;
-                this._canvasHeight = _isDefined(height) ? height : this._canvasHeight;
-                return this
-            },
-            getBBox: function() {
-                var that = this,
-                    options = that._options,
-                    paddingLeftRight = options.paddingLeftRight || 0,
-                    paddingTopBottom = options.paddingTopBottom || 0,
-                    borderWidth = options.border.visible && options.border.width || 0,
-                    tooltipBBox = that._textGroup.getBBox();
-                return tooltipBBox.isEmpty ? tooltipBBox : {
-                        x: tooltipBBox.x - paddingLeftRight - borderWidth / 2 - MAX_SHADOW_SIZE,
-                        y: tooltipBBox.y - paddingTopBottom - borderWidth / 2 - MAX_SHADOW_SIZE,
-                        height: tooltipBBox.height + 2 * paddingTopBottom + borderWidth + MAX_SHADOW_SIZE * 2,
-                        width: tooltipBBox.width + 2 * paddingLeftRight + borderWidth + MAX_SHADOW_SIZE * 2,
-                        isEmpty: false
-                    }
-            },
-            show: function(eventData) {
-                var that = this;
-                that._state.visibility = VISIBLE;
-                that._updateTextContent();
-                that.move(that._state.x, that._state.y, that._state.offset);
-                that._cloud.attr(VISIBLE);
-                that._textGroup.attr(VISIBLE);
-                eventData && that._eventTrigger("tooltipShown", eventData);
-                return that
-            },
-            hide: function(eventData) {
-                var that = this;
-                that._state.visibility = HIDDEN;
-                that._cloud.attr(HIDDEN);
-                that._textGroup.attr(HIDDEN);
-                eventData && that._eventTrigger("tooltipHidden", eventData);
-                return that
-            },
-            move: function(x, y, offset) {
-                this._state.x = _isDefined(x) ? x : this._state.x || 0;
-                this._state.y = _isDefined(y) ? y : this._state.y || 0;
-                this._state.offset = _isDefined(offset) ? offset : this._state.offset || 0;
-                this._updateTooltip();
-                return this
-            },
-            _getVerticalInvert: function(cloudHeight, arrowLength, y) {
-                var pos = this._state.cloudVerticalPosition;
-                if (_isDefined(pos) && pos === 'bottom')
-                    return cloudHeight + arrowLength < this._canvasHeight - y;
-                else
-                    return !(cloudHeight + arrowLength < y)
-            },
-            _getHorizontalInvert: function(cloudWidth, arrowLength, x) {
-                var arrowSide = this._state.arrowSide;
-                if (arrowSide === 'right')
-                    return cloudWidth + arrowLength < x;
-                else
-                    return cloudWidth + arrowLength > this._canvasWidth - x
-            },
-            _setArrowCenter: function(cloudWidth, cloudHeight, arrowLength, x, y) {
-                var that = this,
-                    verticalInvert = that._getVerticalInvert(cloudHeight, arrowLength, y),
-                    x0 = _round(x),
-                    y0 = _round(verticalInvert ? y + that._state.offset : y - that._state.offset),
-                    x1 = _round(x0 + ARROW_WIDTH / 2),
-                    y1 = _round(verticalInvert ? y0 + arrowLength : y0 - arrowLength),
-                    x2 = _round(x1 + cloudWidth / 2 - ARROW_WIDTH / 2),
-                    y2 = y1,
-                    x3 = x2,
-                    y3 = _round(verticalInvert ? y2 + cloudHeight : y2 - cloudHeight),
-                    x4 = _round(x3 - cloudWidth),
-                    y4 = y3,
-                    x5 = x4,
-                    y5 = _round(verticalInvert ? y4 - cloudHeight : y4 + cloudHeight),
-                    x6 = _round(x5 + cloudWidth / 2 - ARROW_WIDTH / 2),
-                    y6 = y5;
-                return [x0, y0, x1, y1, x2, y2, x3, y3, x4, y4, x5, y5, x6, y6]
-            },
-            _setArrowOnSide: function(cloudWidth, cloudHeight, arrowLength, x, y) {
-                var that = this,
-                    horizontalInvert = that._getHorizontalInvert(cloudWidth, arrowLength, x),
-                    halfSideWithoutArrow = (cloudHeight - ARROW_WIDTH) / 2,
-                    x0 = _round(horizontalInvert ? x - that._state.offset : x + that._state.offset),
-                    y0 = _round(y),
-                    x1 = _round(horizontalInvert ? x0 - arrowLength : x0 + arrowLength),
-                    y1 = _round(y0 - ARROW_WIDTH / 2),
-                    x2 = x1,
-                    y2 = _round(y1 - halfSideWithoutArrow),
-                    x3 = _round(horizontalInvert ? x2 - cloudWidth : x2 + cloudWidth),
-                    y3 = y2,
-                    x4 = x3,
-                    y4 = _round(y3 + cloudHeight),
-                    x5 = _round(horizontalInvert ? x4 + cloudWidth : x4 - cloudWidth),
-                    y5 = y4,
-                    x6 = x5,
-                    y6 = _round(y5 - halfSideWithoutArrow);
-                return [x0, y0, x1, y1, x2, y2, x3, y3, x4, y4, x5, y5, x6, y6]
-            },
-            _setArrowLeft: function(cloudWidth, cloudHeight, arrowLength, x, y) {
-                var that = this,
-                    verticalInvert = that._getVerticalInvert(cloudHeight, arrowLength, y),
-                    x0 = _round(x),
-                    y0 = _round(verticalInvert ? y + that._state.offset : y - that._state.offset),
-                    x1 = _round(x0 + ARROW_WIDTH),
-                    y1 = _round(verticalInvert ? y0 + arrowLength : y0 - arrowLength),
-                    x2 = _round(x1 + cloudWidth - ARROW_WIDTH),
-                    y2 = y1,
-                    x3 = x2,
-                    y3 = _round(verticalInvert ? y2 + cloudHeight : y2 - cloudHeight),
-                    x4 = _round(x3 - cloudWidth),
-                    y4 = y3,
-                    x5 = x4,
-                    y5 = _round(verticalInvert ? y4 - cloudHeight - arrowLength : y4 + cloudHeight + arrowLength);
-                return [x0, y0, x1, y1, x2, y2, x3, y3, x4, y4, x5, y5]
-            },
-            _setArrowRight: function(cloudWidth, cloudHeight, arrowLength, x, y) {
-                var that = this,
-                    verticalInvert = that._getVerticalInvert(cloudHeight, arrowLength, y),
-                    x0 = _round(x),
-                    y0 = _round(verticalInvert ? y + that._state.offset : y - that._state.offset),
-                    x1 = x0,
-                    y1 = _round(verticalInvert ? y0 + arrowLength + cloudHeight : y0 - arrowLength - cloudHeight),
-                    x2 = _round(x1 - cloudWidth),
-                    y2 = y1,
-                    x3 = x2,
-                    y3 = _round(verticalInvert ? y2 - cloudHeight : y2 + cloudHeight),
-                    x4 = _round(x3 + cloudWidth - ARROW_WIDTH),
-                    y4 = y3,
-                    x5 = _round(x4 + ARROW_WIDTH),
-                    y5 = _round(verticalInvert ? y4 - arrowLength : y4 + arrowLength);
-                return [x0, y0, x1, y1, x2, y2, x3, y3, x4, y4, x5, y5]
-            },
-            _checkWidthText: function(cloudWidth, cloudHeight) {
-                if (this._options._justify)
-                    return;
-                var x = this._state.x,
-                    text = this._state.text,
-                    index,
-                    paddingLeftRight = this._options.paddingLeftRight,
-                    paddingTopBottom = this._options.paddingTopBottom,
-                    textLength,
-                    maxTooltipWidth,
-                    remainLength,
-                    newIndex,
-                    bbox = this._state.textBBox;
-                if (cloudWidth < x || x + cloudWidth < this._canvasWidth || cloudWidth / 2 < x && x + cloudWidth / 2 < this._canvasWidth)
+                    y = y - (contentHeight + arrowLength + offset);
+                coords.x = x - contentSize.lm;
+                coords.y = y - contentSize.tm;
+                coords.correction = correction;
+                if (hp === coords.hp && vp === coords.vp)
                     return false;
-                if (text.indexOf("<br/>") === -1 && text.indexOf(" ") !== -1) {
-                    maxTooltipWidth = _max(x, this._canvasWidth - x, 2 * Math.min(x, this._canvasWidth - x));
-                    textLength = text.length * maxTooltipWidth / bbox.width;
-                    index = text.substr(0, ~~textLength).lastIndexOf(" ");
-                    if (index === -1)
-                        index = text.substr(0).indexOf(" ");
-                    remainLength = text.substr(index + 1).length;
-                    this._state.text = text.substr(0, index) + "<br/>";
-                    while (textLength <= remainLength) {
-                        newIndex = text.substr(index + 1, ~~textLength).lastIndexOf(" ");
-                        if (newIndex === -1)
-                            newIndex = text.substr(index + 1).indexOf(" ");
-                        if (newIndex !== -1) {
-                            this._state.text += text.substr(index + 1, newIndex) + "<br/>";
-                            remainLength = text.substr(index + 1 + newIndex).length;
-                            index += newIndex + 1
-                        }
-                        else
-                            break
-                    }
-                    this._state.text += text.substr(index + 1);
-                    this._text.attr({text: this._state.text});
-                    bbox = this._text.getBBox();
-                    cloudWidth = bbox.width + paddingLeftRight * 2;
-                    cloudHeight = bbox.height + paddingTopBottom * 2
+                coords.hp = hp;
+                coords.vp = vp;
+                cloudPoints = [0, 0 + correction, contentWidth, 0 + correction, contentWidth, contentHeight + correction, 0, contentHeight + correction];
+                if (hp !== "out" && vp !== "out") {
+                    arrowPoints.splice(2, 0, x1, y1, x2, y2, x3, y3);
+                    cloudPoints.splice.apply(cloudPoints, arrowPoints)
                 }
-                if (cloudWidth > x && x + cloudWidth > this._canvasWidth && (cloudWidth / 2 > x || x + cloudWidth / 2 > this._canvasWidth)) {
-                    paddingLeftRight = 5;
-                    paddingTopBottom = 5;
-                    cloudWidth = bbox.width + 2 * paddingLeftRight;
-                    cloudHeight = bbox.height + 2 * paddingTopBottom
-                }
+                coords.cloudPoints = cloudPoints;
+                return true
+            },
+            _getCanvas: function() {
+                var html = doc.documentElement,
+                    body = doc.body,
+                    win = window;
                 return {
-                        bbox: bbox,
-                        cloudWidth: cloudWidth,
-                        cloudHeight: cloudHeight,
-                        paddingTopBottom: paddingTopBottom,
-                        paddingLeftRight: paddingLeftRight
+                        left: win.pageXOffset || html.scrollLeft || 0,
+                        top: win.pageYOffset || html.scrollTop || 0,
+                        width: html.clientWidth || 0,
+                        height: html.clientHeight || 0,
+                        fullWidth: Math.max(body.scrollWidth, html.scrollWidth, body.offsetWidth, html.offsetWidth, body.clientWidth, html.clientWidth),
+                        fullHeight: Math.max(body.scrollHeight, html.scrollHeight, body.offsetHeight, html.offsetHeight, body.clientHeight, html.clientHeight)
                     }
-            },
-            on: function() {
-                this._group.on.apply(this._group, arguments);
-                return this
-            },
-            off: function() {
-                this._group.off.apply(this._group, arguments);
-                return this
             }
-        })
-    })(DevExpress, jQuery);
+        };
+        DX.viz.core.Tooltip = Tooltip
+    })(DevExpress, jQuery, document);
     /*! Module viz-core, file legend.js */
     (function(DX, $, undefined) {
         var core = DX.viz.core,
             coreUtils = core.utils,
+            WrapperLayoutElement = core.WrapperLayoutElement,
             _Number = Number,
             _String = String,
             _math = Math,
             _round = _math.round,
-            _ceil = _math.ceil,
-            _floor = _math.floor,
             _max = _math.max,
+            _min = _math.min,
+            _ceil = _math.ceil,
             utils = DX.utils,
             _isDefined = utils.isDefined,
             _isFunction = utils.isFunction,
-            _decreaseGaps = coreUtils.decreaseGaps,
+            _enumParser = coreUtils.enumParser,
             _extend = $.extend,
             _each = $.each,
             _map = $.map,
@@ -3028,12 +3045,14 @@ if (!DevExpress.MOD_VIZ_CORE) {
             INSIDE = "inside",
             OUTSIDE = "outside",
             NONE = "none",
-            parseHorizontalAlignment = coreUtils.enumParser([LEFT, CENTER, RIGHT]),
-            parseVerticalAlignment = coreUtils.enumParser([TOP, BOTTOM]),
-            parseOrientation = coreUtils.enumParser([VERTICAL, HORIZONTAL]),
-            parseItemTextPosition = coreUtils.enumParser([LEFT, RIGHT, TOP, BOTTOM]),
-            parsePosition = coreUtils.enumParser([OUTSIDE, INSIDE]),
-            parseItemsAlignment = coreUtils.enumParser([LEFT, CENTER, RIGHT]);
+            HEIGHT = "height",
+            WIDTH = "width",
+            parseHorizontalAlignment = _enumParser([LEFT, CENTER, RIGHT]),
+            parseVerticalAlignment = _enumParser([TOP, BOTTOM]),
+            parseOrientation = _enumParser([VERTICAL, HORIZONTAL]),
+            parseItemTextPosition = _enumParser([LEFT, RIGHT, TOP, BOTTOM]),
+            parsePosition = _enumParser([OUTSIDE, INSIDE]),
+            parseItemsAlignment = _enumParser([LEFT, CENTER, RIGHT]);
         function getPattern(renderer, states, action, color) {
             if (!states || !states[action])
                 return;
@@ -3069,201 +3088,35 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 };
             options.margin = margin
         }
-        function takeElementIndex(rowCount, colCount, rowIndex, colIndex) {
-            if (rowCount < colCount)
-                return rowIndex * colCount + colIndex;
-            else
-                return rowIndex + colIndex * rowCount
-        }
-        function getMaxBBox(items) {
-            var maxWidth = 0,
-                maxHeight = 0,
-                bbox;
-            _each(items, function(_, item) {
-                bbox = item.bbox;
-                if (bbox.width > maxWidth)
-                    maxWidth = bbox.width;
-                if (bbox.height > maxHeight)
-                    maxHeight = bbox.height
-            });
-            return {
-                    width: maxWidth,
-                    height: maxHeight
-                }
-        }
-        function moveItems(data, items, horizontalTextPosition, options) {
-            var i,
-                j,
-                rows = data.rows,
-                cols = data.cols,
-                item,
-                box,
-                xShift = 0,
-                yShift = 0,
-                widthColumn,
-                xPadding = options.columnItemSpacing,
-                yPadding = options.rowItemSpacing,
-                delta,
-                x,
-                trackerX;
-            for (i = 0; i < rows; i++) {
-                delta = data.itemsAlignmentDelta[i];
-                for (j = 0; j < cols; j++) {
-                    item = items[takeElementIndex(rows, cols, i, j)];
-                    if (!item)
-                        break;
-                    box = item.bbox;
-                    widthColumn = data.maxWidthPerColumn[j] || box.width;
-                    if (horizontalTextPosition === RIGHT) {
-                        x = xShift - box.x;
-                        trackerX = xShift - xPadding / 2
-                    }
-                    else if (horizontalTextPosition === LEFT) {
-                        x = box.x + widthColumn - box.width + xShift - xPadding / 2;
-                        trackerX = box.x + widthColumn - box.width + xShift - xPadding / 2
-                    }
-                    else {
-                        x = xShift - box.x - box.width / 2 + widthColumn / 2;
-                        trackerX = xShift - xPadding / 2
-                    }
-                    item.group.move(_ceil(x + delta), _ceil(yShift));
-                    item.tracker.left = trackerX + delta;
-                    item.tracker.top = yShift + box.y - yPadding / 2;
-                    item.tracker.bottom = yShift + box.y - yPadding / 2 + data.maxHeightRow + yPadding;
-                    item.tracker.right = trackerX + delta + widthColumn + xPadding;
-                    xShift = xShift + widthColumn + xPadding
-                }
-                yShift = yShift + data.maxHeightRow + yPadding;
-                xShift = 0
-            }
-        }
-        function getRowsColumns(count, options) {
-            var isHorizontal = options.orientation === HORIZONTAL,
-                rows = options.rowCount > 0 ? _Number(options.rowCount) : 0,
-                columns = options.columnCount > 0 ? _Number(options.columnCount) : 0,
-                onRows = _ceil(count / rows),
-                onColumns = _ceil(count / columns),
-                autoEdit = false;
-            if (columns && !rows)
-                rows = onColumns;
-            else if (!columns && rows)
-                columns = onRows;
-            else if (columns && rows) {
-                if (isHorizontal && columns < onRows)
-                    columns = onRows;
-                else if (!isHorizontal && rows < onColumns)
-                    rows = onColumns
-            }
-            else {
-                autoEdit = true;
-                if (isHorizontal) {
-                    rows = 1;
-                    columns = count
-                }
-                else {
-                    columns = 1;
-                    rows = count
-                }
-            }
-            return {
-                    rows: rows,
-                    columns: columns,
-                    autoEdit: autoEdit
-                }
-        }
-        function locateLabelAndMarker(label, marker, options, markerSize, maxMarkerSize) {
+        function getSizeItem(options, markerSize, labelBBox) {
             var defaultXMargin = 7,
                 defaultTopMargin = 4,
-                labelX = 0,
-                labelY = 0,
-                markerX,
-                markerY,
-                labelBox = label.getBBox(),
-                approximateLabelY = _round(maxMarkerSize / 2 - (labelBox.y + labelBox.height / 2)),
-                approximateLabelX = _round(maxMarkerSize / 2 - (labelBox.x + labelBox.width / 2));
+                width,
+                height;
             switch (options.itemTextPosition) {
                 case LEFT:
-                    labelY = approximateLabelY;
-                    markerX = labelBox.width + defaultXMargin;
-                    break;
                 case RIGHT:
-                    labelX = maxMarkerSize + defaultXMargin;
-                    labelY = approximateLabelY;
+                    width = markerSize + defaultXMargin + labelBBox.width;
+                    height = _max(markerSize, labelBBox.height);
                     break;
                 case TOP:
-                    labelX = approximateLabelX;
-                    markerY = labelBox.y + labelBox.height + defaultTopMargin;
-                    break;
                 case BOTTOM:
-                    labelX = approximateLabelX;
-                    markerY = labelBox.y - markerSize - defaultTopMargin;
+                    width = _max(markerSize, labelBBox.width);
+                    height = markerSize + defaultTopMargin + labelBBox.height;
                     break
             }
-            label.attr({
-                x: labelX,
-                y: labelY
-            });
-            marker.attr({
-                translateX: markerX,
-                translateY: markerY
-            })
-        }
-        function getItemsAlignmentDelta(alignment, maxRowWidth, rowWidth) {
-            if (alignment === RIGHT)
-                return maxRowWidth - rowWidth;
-            else if (alignment === CENTER)
-                return (maxRowWidth - rowWidth) / 2;
-            else
-                return 0
-        }
-        function getDataRowsColumns(items, rows, cols, options) {
-            var i,
-                j,
-                columnPadding = options.columnItemSpacing,
-                itemsAlignment = options.itemsAlignment,
-                rowsWidth = [],
-                maxWidthPerColumn = [],
-                itemsAlignmentDelta = [],
-                maxHeight = 0,
-                value;
-            for (j = 0; j < cols; j++)
-                maxWidthPerColumn[j] = 0;
-            for (i = 0; i < rows; i++) {
-                rowsWidth[i] = itemsAlignmentDelta[i] = 0;
-                for (j = 0; j < cols; j++) {
-                    value = items[takeElementIndex(rows, cols, i, j)];
-                    if (value) {
-                        value = value.bbox;
-                        if (maxHeight < value.height)
-                            maxHeight = value.height;
-                        if (maxWidthPerColumn[j] < value.width)
-                            maxWidthPerColumn[j] = value.width;
-                        rowsWidth[i] += value.width + columnPadding
-                    }
-                }
-                rowsWidth[i] -= columnPadding
-            }
-            if (itemsAlignment) {
-                value = _max.apply(null, rowsWidth);
-                for (i = 0; i < rows; ++i)
-                    itemsAlignmentDelta[i] = getItemsAlignmentDelta(itemsAlignment, value, rowsWidth[i]);
-                maxWidthPerColumn = []
-            }
-            else if (options.equalColumnWidth) {
-                value = _max.apply(null, maxWidthPerColumn);
-                for (j = 0; j < cols; ++j)
-                    maxWidthPerColumn[j] = value
-            }
             return {
-                    rows: rows,
-                    cols: cols,
-                    maxWidthPerColumn: maxWidthPerColumn,
-                    maxHeightRow: maxHeight,
-                    itemsAlignmentDelta: itemsAlignmentDelta
+                    width: width,
+                    height: height
                 }
         }
-        function validateRowsOrColumnsCount(rowsOrColumnsCount, count) {
-            return rowsOrColumnsCount < 1 || rowsOrColumnsCount > count ? count : rowsOrColumnsCount
+        function calculateBboxLabelAndMarker(markerBBox, labelBBox) {
+            var bbox = {};
+            bbox.left = _min(markerBBox.x, labelBBox.x);
+            bbox.top = _min(markerBBox.y, labelBBox.y);
+            bbox.right = _max(markerBBox.x + markerBBox.width, labelBBox.x + labelBBox.width);
+            bbox.bottom = _max(markerBBox.y + markerBBox.height, labelBBox.y + labelBBox.height);
+            return bbox
         }
         function applyMarkerState(id, idToIndexMap, items, stateName) {
             var item = idToIndexMap && items[idToIndexMap[id]];
@@ -3282,7 +3135,6 @@ if (!DevExpress.MOD_VIZ_CORE) {
             DX.utils.debug.assertParam(options.paddingTopBottom, "paddingTopBottom was not passed");
             DX.utils.debug.assertParam(options.columnItemSpacing, "columnItemSpacing was not passed");
             DX.utils.debug.assertParam(options.rowItemSpacing, "rowItemSpacing was not passed");
-            DX.utils.debug.assertParam(options.equalColumnWidth, "equalColumnWidth was not passed");
             parseMargins(options);
             options.horizontalAlignment = parseHorizontalAlignment(options.horizontalAlignment, RIGHT);
             options.verticalAlignment = parseVerticalAlignment(options.verticalAlignment, options.horizontalAlignment === CENTER ? BOTTOM : TOP);
@@ -3309,28 +3161,129 @@ if (!DevExpress.MOD_VIZ_CORE) {
         function getMarkerCreator(type) {
             return isCircle(type) ? createCircleMarker : createSquareMarker
         }
-        function getMarkerResizer(type) {
-            return isCircle(type) ? resizeCircleMarker : resizeSquareMarker
-        }
-        function resizeSquareMarker(marker, size, maxSize) {
-            var centerOfMarker = _ceil((maxSize - size) / 2);
-            marker.attr({
-                width: size,
-                height: size,
-                x: centerOfMarker,
-                y: centerOfMarker
-            })
-        }
-        function resizeCircleMarker(marker, size) {
-            marker.attr({r: _ceil(size / 2)})
-        }
         function inRect(rect, x, y) {
             return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom
         }
-        function updateItemsSize(maxSize, markersOptions, markerResizer) {
-            _each(markersOptions, function(i, item) {
-                markerResizer(item.marker, item.size, maxSize)
+        function checkLinesSize(lines, layoutOptions, countItems) {
+            var position = {
+                    x: 0,
+                    y: 0
+                },
+                maxMeasureLength = 0,
+                maxOrtMeasureLength = 0;
+            $.each(lines, function(i, line) {
+                var firstItem = line[0];
+                $.each(line, function(_, item) {
+                    var offset = item.offset || layoutOptions.spacing;
+                    position[layoutOptions.direction] += item[layoutOptions.measure] + offset;
+                    maxMeasureLength = _max(maxMeasureLength, position[layoutOptions.direction])
+                });
+                position[layoutOptions.direction] = 0;
+                position[layoutOptions.ortDirection] += firstItem[layoutOptions.ortMeasure] + firstItem.ortOffset || layoutOptions.ortSpacing;
+                maxOrtMeasureLength = _max(maxOrtMeasureLength, position[layoutOptions.ortDirection])
+            });
+            if (maxMeasureLength > layoutOptions.length) {
+                layoutOptions.countItem = decreaseItemCount(layoutOptions, countItems);
+                return true
+            }
+        }
+        function decreaseItemCount(layoutOptions, countItems) {
+            layoutOptions.ortCountItem++;
+            return _ceil(countItems / layoutOptions.ortCountItem)
+        }
+        function getLineLength(line, layoutOptions) {
+            var lineLength = 0;
+            $.each(line, function(_, item) {
+                var offset = item.offset || layoutOptions.spacing;
+                lineLength += item[layoutOptions.measure] + offset
+            });
+            return lineLength
+        }
+        function getMaxLineLength(lines, layoutOptions) {
+            var maxLineLength = 0;
+            $.each(lines, function(_, line) {
+                maxLineLength = _max(maxLineLength, getLineLength(line, layoutOptions))
+            });
+            return maxLineLength
+        }
+        function getInitPositionForDirection(line, layoutOptions, maxLineLength) {
+            var lineLength = getLineLength(line, layoutOptions),
+                initPosition;
+            switch (layoutOptions.itemsAlignment) {
+                case LEFT:
+                    initPosition = maxLineLength - lineLength;
+                    break;
+                case CENTER:
+                    initPosition = (maxLineLength - lineLength) / 2;
+                    break;
+                default:
+                    initPosition = 0
+            }
+            return initPosition
+        }
+        function getPos(layoutOptions) {
+            switch (layoutOptions.itemTextPosition) {
+                case BOTTOM:
+                    return CENTER + " " + TOP;
+                case TOP:
+                    return CENTER + " " + BOTTOM;
+                case LEFT:
+                    return RIGHT + " " + CENTER;
+                case RIGHT:
+                    return LEFT + " " + CENTER
+            }
+        }
+        function getLines(lines, layoutOptions, itemIndex) {
+            var tableLine = {};
+            if (!(itemIndex % layoutOptions.countItem))
+                if (layoutOptions.markerOffset)
+                    lines.push([], []);
+                else
+                    lines.push([]);
+            if (layoutOptions.markerOffset) {
+                tableLine.firstLine = lines[lines.length - 1];
+                tableLine.secondLine = lines[lines.length - 2]
+            }
+            else
+                tableLine.firstLine = tableLine.secondLine = lines[lines.length - 1];
+            return tableLine
+        }
+        function setMaxInLine(line, mesuare) {
+            var maxLineSize = 0;
+            $.each(line, function(_, item) {
+                if (!item)
+                    return;
+                maxLineSize = _max(maxLineSize, item[mesuare])
+            });
+            $.each(line, function(_, item) {
+                if (!item)
+                    return;
+                item[mesuare] = maxLineSize
             })
+        }
+        function transpose(array) {
+            var width = array.length,
+                height = array[0].length,
+                i,
+                j,
+                transposeArray = [];
+            for (i = 0; i < height; i++) {
+                transposeArray[i] = [];
+                for (j = 0; j < width; j++)
+                    transposeArray[i][j] = array[j][i]
+            }
+            return transposeArray
+        }
+        function getAlign(position) {
+            switch (position) {
+                case TOP:
+                case BOTTOM:
+                    return CENTER;
+                case LEFT:
+                    return RIGHT;
+                case RIGHT:
+                    return LEFT
+            }
         }
         var _Legend = DX.viz.core.Legend = function(settings) {
                 var that = this;
@@ -3367,52 +3320,52 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 var that = this,
                     options = that._options,
                     renderer = that._renderer,
-                    createMarker,
-                    items,
-                    maxMarkerSize = 0,
-                    initMarkerSize,
-                    markersOptions = [],
-                    resizeMarker,
-                    markerType,
-                    i = 0;
-                if (size)
-                    that._size = {
-                        width: size.width,
-                        height: size.height
-                    };
-                if (!(options && options.visible && that._data && that._data.length))
+                    items = that._data;
+                size && that.setSize(size);
+                if (!(options && options.visible && items && items.length))
                     return that;
                 that.erase();
-                markerType = options.markerType;
-                initMarkerSize = options.markerSize;
                 that._insideLegendGroup = renderer.g().append(that._legendGroup);
                 that._createBackground();
-                createMarker = getMarkerCreator(markerType);
-                resizeMarker = getMarkerResizer(markerType);
-                that._markersId = {};
-                items = that._data;
-                if (options.inverted)
-                    items = items.slice().reverse();
+                that._createItems(that._getItemData());
+                that._locateElements(options);
+                that._finalUpdate(options);
+                return that
+            },
+            _createItems: function(items) {
+                var that = this,
+                    options = that._options,
+                    initMarkerSize = options.markerSize,
+                    renderer = that._renderer,
+                    markersOptions = [],
+                    maxMarkerSize = 0,
+                    i = 0,
+                    bbox,
+                    maxBboxWidth = 0,
+                    maxBboxHeight = 0,
+                    createMarker = getMarkerCreator(options.markerType);
                 _each(items, function(_i, item) {
                     maxMarkerSize = _max(maxMarkerSize, _Number(item.size > 0 ? item.size : initMarkerSize))
                 });
+                that._markersId = {};
                 for (; i < that._patterns.length; i++)
                     that._patterns[i].dispose();
                 that._patterns = [];
                 that._items = _map(items, function(dataItem, i) {
-                    var group = renderer.g().attr({"class": that._itemGroupClass}).append(that._insideLegendGroup),
+                    var group = that._insideLegendGroup,
                         markerSize = _Number(dataItem.size > 0 ? dataItem.size : initMarkerSize),
                         stateOfDataItem = dataItem.states,
                         normalState = stateOfDataItem.normal,
                         normalStateFill = normalState.fill,
-                        marker = createMarker(renderer, maxMarkerSize).attr({
+                        marker = createMarker(renderer, markerSize).attr({
                             fill: normalStateFill || options.markerColor,
                             opacity: normalState.opacity
                         }).append(group),
                         label = that._createLabel(dataItem, group),
                         hoverPattern = getPattern(renderer, stateOfDataItem, "hover", normalStateFill),
                         selectionPattern = getPattern(renderer, stateOfDataItem, "selection", normalStateFill),
-                        states = {normal: {fill: normalStateFill}};
+                        states = {normal: {fill: normalStateFill}},
+                        labelBBox = label.getBBox();
                     if (hoverPattern) {
                         states.hovered = {fill: hoverPattern.id};
                         that._patterns.push(hoverPattern)
@@ -3423,24 +3376,38 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     }
                     if (dataItem.id !== undefined)
                         that._markersId[dataItem.id] = i;
-                    locateLabelAndMarker(label, marker, options, markerSize, maxMarkerSize);
+                    bbox = getSizeItem(options, markerSize, labelBBox);
+                    maxBboxWidth = _max(maxBboxWidth, bbox.width);
+                    maxBboxHeight = _max(maxBboxHeight, bbox.height);
                     markersOptions.push({
                         size: markerSize,
                         marker: marker
                     });
                     that._createHint(dataItem, label);
                     return {
+                            label: label,
+                            labelBBox: labelBBox,
                             group: group,
+                            bbox: bbox,
                             marker: marker,
+                            markerSize: markerSize,
                             tracker: {id: dataItem.id},
                             states: states,
-                            bbox: group.getBBox()
+                            itemTextPosition: options.itemTextPosition,
+                            markerOffset: 0,
+                            bboxs: []
                         }
                 });
-                that._locateElements(options);
-                updateItemsSize(maxMarkerSize, markersOptions, resizeMarker);
-                that._finalUpdate(options);
-                return that
+                if (options.equalRowHeight)
+                    $.each(that._items, function(_, item) {
+                        item.bbox.height = maxBboxHeight
+                    })
+            },
+            _getItemData: function() {
+                var items = this._data;
+                if (this._options.inverted)
+                    items = items.slice().reverse();
+                return items
             },
             _finalUpdate: function(options) {
                 this._adjustBackgroundSettings(options);
@@ -3449,7 +3416,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
             erase: function() {
                 var that = this;
                 that._insideLegendGroup && that._insideLegendGroup.dispose();
-                that._insideLegendGroup = that._width = that._height = that._x = that._y = null;
+                that._insideLegendGroup = that._x1 = that._x2 = that._y2 = that._y2 = null;
                 return that
             },
             _locateElements: function(locationOptions) {
@@ -3479,11 +3446,11 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 return this
             },
             _createLabel: function(data, group) {
-                var position = this._options.itemTextPosition,
-                    align = position === TOP || position === BOTTOM ? CENTER : LEFT,
-                    labelFormatObject = this._getCustomizeObject(data),
-                    text = this._options.customizeText.call(labelFormatObject, labelFormatObject);
-                return this._renderer.text(text, 0, 0).css(core.utils.patchFontOptions(this._options.font)).attr({align: align}).append(group)
+                var labelFormatObject = this._getCustomizeObject(data),
+                    align = getAlign(this._options.itemTextPosition),
+                    text = this._options.customizeText.call(labelFormatObject, labelFormatObject),
+                    fontStyle = _isDefined(data.textOpacity) ? _extend({}, this._options.font, {opacity: data.textOpacity}) : this._options.font;
+                return this._renderer.text(text, 0, 0).css(coreUtils.patchFontOptions(fontStyle)).attr({align: align}).append(group)
             },
             _createHint: function(data, label) {
                 var labelFormatObject = this._getCustomizeObject(data),
@@ -3495,53 +3462,175 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 var that = this,
                     isInside = that._options.position === INSIDE,
                     color = that._options.backgroundColor,
-                    fill = color || (isInside ? that._options.containerBackgroundColor : NONE),
-                    border = that._options.border,
-                    borderVisible = border.visible && border.width && border.color && border.color !== NONE;
-                if (borderVisible || (isInside || color) && color !== NONE)
+                    fill = color || (isInside ? that._options.containerBackgroundColor : NONE);
+                if (that._options.border.visible || (isInside || color) && color !== NONE)
                     that._background = that._renderer.rect(0, 0, 0, 0).attr({
                         fill: fill,
-                        "class": that._backgroundClass
+                        'class': that._backgroundClass
                     }).append(that._insideLegendGroup)
             },
-            _DEBUG_getDataRowsColumns: getDataRowsColumns,
-            _moveRowsColumns: function(rowCount, colCount, locationOptions) {
-                var rowsColumnsData = getDataRowsColumns(this._items, rowCount, colCount, locationOptions);
-                moveItems(rowsColumnsData, this._items, locationOptions.itemTextPosition, locationOptions)
-            },
-            _locateRowsColumns: function(locationOptions) {
+            _locateRowsColumns: function() {
                 var that = this,
-                    count = that._data.length,
-                    legendBox,
-                    rowsColumns = getRowsColumns(count, locationOptions),
-                    rows = rowsColumns.rows,
-                    columns = rowsColumns.columns,
-                    margin = locationOptions.margin,
-                    paddingLeftRight = that._background ? locationOptions.paddingLeftRight : 0,
-                    paddingTopBottom = that._background ? locationOptions.paddingTopBottom : 0,
-                    placeholderWidth = that._size.width - margin.left - margin.right - 2 * paddingLeftRight,
-                    placeholderHeight = that._size.height - margin.top - margin.bottom - 2 * paddingTopBottom,
-                    maxBBox = getMaxBBox(that._items);
-                that._moveRowsColumns(rows, columns, locationOptions);
-                legendBox = that._insideLegendGroup.getBBox();
-                if (rowsColumns.autoEdit)
-                    if (rows === 1) {
-                        if (legendBox.width > placeholderWidth && columns > 1) {
-                            columns = _floor(placeholderWidth / (maxBBox.width + locationOptions.columnItemSpacing)) || 1;
-                            columns = validateRowsOrColumnsCount(columns, count);
-                            rows = _ceil(count / columns);
-                            that._moveRowsColumns(rows, columns, locationOptions)
-                        }
+                    iteration = 0,
+                    layoutOptions = that._getItemsLayoutOptions(),
+                    countItems = that._items.length,
+                    lines;
+                do {
+                    lines = [];
+                    that._createLines(lines, layoutOptions);
+                    that._alignLines(lines, layoutOptions);
+                    iteration++
+                } while (checkLinesSize(lines, layoutOptions, countItems) && iteration < countItems);
+                that._applyItemPosition(lines, layoutOptions)
+            },
+            _createLines: function(lines, layoutOptions) {
+                $.each(this._items, function(i, item) {
+                    var tableLine = getLines(lines, layoutOptions, i),
+                        labelBox = {
+                            width: item.labelBBox.width,
+                            height: item.labelBBox.height,
+                            element: item.label,
+                            bbox: item.labelBBox,
+                            pos: getPos(layoutOptions),
+                            itemIndex: i
+                        },
+                        markerBox = {
+                            width: item.markerSize,
+                            height: item.markerSize,
+                            element: item.marker,
+                            bbox: {
+                                width: item.markerSize,
+                                height: item.markerSize,
+                                x: 0,
+                                y: 0
+                            },
+                            itemIndex: i
+                        },
+                        firstItem,
+                        secondItem,
+                        offsetDirection = layoutOptions.markerOffset ? "ortOffset" : "offset";
+                    if (layoutOptions.inverseLabelPosition) {
+                        firstItem = labelBox;
+                        secondItem = markerBox
                     }
-                    else if (columns === 1)
-                        if (legendBox.height > placeholderHeight && rows > 1) {
-                            rows = _floor(placeholderHeight / (maxBBox.height + locationOptions.rowItemSpacing)) || 1;
-                            rows = validateRowsOrColumnsCount(rows, count);
-                            columns = _ceil(count / rows);
-                            that._moveRowsColumns(rows, columns, locationOptions)
-                        }
-                that._rowsCountDrawed = rows;
-                that._columnsCountDrawed = columns
+                    else {
+                        firstItem = markerBox;
+                        secondItem = labelBox
+                    }
+                    firstItem[offsetDirection] = layoutOptions.labelOffset;
+                    tableLine.secondLine.push(firstItem);
+                    tableLine.firstLine.push(secondItem)
+                })
+            },
+            _alignLines: function(lines, layoutOptions) {
+                $.each(lines, function(_, line) {
+                    setMaxInLine(line, layoutOptions.ortMeasure)
+                });
+                if (layoutOptions.itemsAlignment) {
+                    if (layoutOptions.markerOffset)
+                        for (var i = 0; i < lines.length; i += 2)
+                            $.each(transpose(lines.slice(i, i + 2)), function(_, line) {
+                                setMaxInLine(line, layoutOptions.measure)
+                            })
+                }
+                else
+                    $.each(transpose(lines), function(_, line) {
+                        setMaxInLine(line, layoutOptions.measure)
+                    })
+            },
+            _applyItemPosition: function(lines, layoutOptions) {
+                var that = this,
+                    position = {
+                        x: 0,
+                        y: 0
+                    },
+                    maxLineLength = getMaxLineLength(lines, layoutOptions),
+                    itemIndex = 0;
+                $.each(lines, function(i, line) {
+                    var firstItem = line[0],
+                        ortOffset = firstItem.ortOffset || layoutOptions.ortSpacing;
+                    position[layoutOptions.direction] = getInitPositionForDirection(line, layoutOptions, maxLineLength);
+                    $.each(line, function(_, item) {
+                        var offset = item.offset || layoutOptions.spacing,
+                            wrap = new WrapperLayoutElement(item.element, item.bbox),
+                            itemBBox = {
+                                x: position.x,
+                                y: position.y,
+                                width: item.width,
+                                height: item.height
+                            },
+                            itemLegend = that._items[item.itemIndex];
+                        wrap.position({
+                            of: itemBBox,
+                            my: item.pos,
+                            at: item.pos
+                        });
+                        itemLegend.bboxs.push(itemBBox);
+                        position[layoutOptions.direction] += item[layoutOptions.measure] + offset;
+                        itemIndex++
+                    });
+                    position[layoutOptions.ortDirection] += firstItem[layoutOptions.ortMeasure] + ortOffset
+                });
+                $.each(this._items, function(_, item) {
+                    var itemBBox = calculateBboxLabelAndMarker(item.bboxs[0], item.bboxs[1]),
+                        horizontal = that._options.columnItemSpacing / 2,
+                        vertical = that._options.rowItemSpacing / 2;
+                    item.tracker.left = itemBBox.left - horizontal;
+                    item.tracker.right = itemBBox.right + horizontal;
+                    item.tracker.top = itemBBox.top - vertical;
+                    item.tracker.bottom = itemBBox.bottom + vertical
+                })
+            },
+            _getItemsLayoutOptions: function() {
+                var that = this,
+                    options = that._options,
+                    border = options.border.visible,
+                    orientation = options.orientation,
+                    layoutOptions = {
+                        itemsAlignment: options.itemsAlignment,
+                        orientation: options.orientation
+                    },
+                    width = that._size.width - (border ? 2 * options.paddingLeftRight : 0),
+                    height = that._size.height - (border ? 2 * options.paddingTopBottom : 0);
+                if (orientation === HORIZONTAL) {
+                    layoutOptions.length = width;
+                    layoutOptions.ortLength = height;
+                    layoutOptions.spacing = options.columnItemSpacing;
+                    layoutOptions.direction = "x";
+                    layoutOptions.measure = WIDTH;
+                    layoutOptions.ortMeasure = HEIGHT;
+                    layoutOptions.ortDirection = "y";
+                    layoutOptions.ortSpacing = options.rowItemSpacing;
+                    layoutOptions.countItem = options.columnCount || that._items.length;
+                    layoutOptions.marginTextLabel = 4;
+                    layoutOptions.labelOffset = 7;
+                    if (options.itemTextPosition === BOTTOM || options.itemTextPosition === TOP) {
+                        layoutOptions.labelOffset = 4;
+                        layoutOptions.markerOffset = true
+                    }
+                }
+                else {
+                    layoutOptions.length = height;
+                    layoutOptions.ortLength = width;
+                    layoutOptions.spacing = options.rowItemSpacing;
+                    layoutOptions.direction = "y";
+                    layoutOptions.measure = HEIGHT;
+                    layoutOptions.ortMeasure = WIDTH;
+                    layoutOptions.ortDirection = "x";
+                    layoutOptions.ortSpacing = options.columnItemSpacing;
+                    layoutOptions.countItem = options.rowCount || that._items.length;
+                    layoutOptions.marginTextLabel = 7;
+                    layoutOptions.labelOffset = 4;
+                    if (options.itemTextPosition === RIGHT || options.itemTextPosition === LEFT) {
+                        layoutOptions.labelOffset = 7;
+                        layoutOptions.markerOffset = true
+                    }
+                }
+                if (options.itemTextPosition === TOP || options.itemTextPosition === LEFT)
+                    layoutOptions.inverseLabelPosition = true;
+                layoutOptions.itemTextPosition = options.itemTextPosition;
+                layoutOptions.ortCountItem = _ceil(that._items.length / layoutOptions.countItem);
+                return layoutOptions
             },
             _adjustBackgroundSettings: function(locationOptions) {
                 if (!this._background)
@@ -3580,34 +3669,24 @@ if (!DevExpress.MOD_VIZ_CORE) {
             },
             fit: function(sizeForDecrease) {
                 var that = this,
-                    widthForDecrease = sizeForDecrease.width,
-                    heightForDecrease = sizeForDecrease.height,
-                    options = _extend(true, {}, that._options),
-                    margin = options.margin;
-                if (heightForDecrease >= 0) {
-                    heightForDecrease = _decreaseGaps(margin, ["top", "bottom"], heightForDecrease);
-                    if (options.border.visible)
-                        heightForDecrease = 2 * _decreaseGaps(options, ["paddingTopBottom"], heightForDecrease / 2);
-                    if (that._rowsCountDrawed - 1)
-                        heightForDecrease = (that._rowsCountDrawed - 1) * _decreaseGaps(options, ["rowItemSpacing"], heightForDecrease / (that._rowsCountDrawed - 1))
+                    beforeFit = that.getLayoutOptions(),
+                    afterFit;
+                function fitLegendToDirection(direction) {
+                    var size = $.extend({}, that._size);
+                    size[direction] = beforeFit[direction] - sizeForDecrease[direction];
+                    that.draw(size);
+                    afterFit = that.getLayoutOptions();
+                    if (that._insideLegendGroup)
+                        if (beforeFit[direction] - sizeForDecrease[direction] < afterFit[direction]) {
+                            that._options._incidentOccured("W2104");
+                            that.erase()
+                        }
                 }
-                if (widthForDecrease >= 0) {
-                    widthForDecrease = _decreaseGaps(margin, ["left", "right"], widthForDecrease);
-                    if (options.border.visible)
-                        widthForDecrease = 2 * _decreaseGaps(options, ["paddingLeftRight"], widthForDecrease / 2);
-                    if (that._columnsCountDrawed - 1)
-                        widthForDecrease = (that._columnsCountDrawed - 1) * _decreaseGaps(options, ["columnItemSpacing"], widthForDecrease / (that._columnsCountDrawed - 1))
-                }
-                if (that._insideLegendGroup)
-                    if (widthForDecrease > 0 || heightForDecrease > 0) {
-                        that._options._incidentOccured("W2104");
-                        that.erase()
-                    }
-                    else {
-                        that._locateElements(options);
-                        that._finalUpdate(options)
-                    }
-                return that
+                if (sizeForDecrease.width > 0)
+                    fitLegendToDirection(WIDTH);
+                if (sizeForDecrease.height > 0)
+                    fitLegendToDirection(HEIGHT);
+                return this
             },
             getActionCallback: function(point) {
                 var that = this;
@@ -3642,23 +3721,25 @@ if (!DevExpress.MOD_VIZ_CORE) {
             },
             shift: function(x, y) {
                 var that = this,
-                    box = that.getLayoutOptions(),
-                    settings = {
-                        translateX: x - box.x,
-                        translateY: y - box.y
-                    };
-                that._insideLegendGroup && that._insideLegendGroup.attr(settings);
-                that._width = box.width;
-                that._height = box.height;
-                that._x = x;
-                that._y = y;
+                    box = {};
+                if (that._insideLegendGroup) {
+                    that._insideLegendGroup.attr({
+                        translateX: x - that._boundingRect.x,
+                        translateY: y - that._boundingRect.y
+                    });
+                    box = that._legendGroup.getBBox()
+                }
+                that._x1 = box.x;
+                that._y1 = box.y;
+                that._x2 = box.x + box.width;
+                that._y2 = box.y + box.height;
                 return that
             },
             getPosition: function() {
                 return this._options.position
             },
             coordsIn: function(x, y) {
-                return x >= this._x && x <= this._x + this._width && y >= this._y && y <= this._y + this._height
+                return x >= this._x1 && x <= this._x2 && y >= this._y1 && y <= this._y2
             },
             getItemByCoord: function(x, y) {
                 var items = this._items,
@@ -3776,16 +3857,20 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 checkField("invert");
                 checkField(axisTypeSelector);
                 checkField("dataType");
-                checkField("startCategories");
-                checkField("endCategories");
                 if (that[axisTypeSelector] === "logarithmic")
                     checkField(baseSelector);
                 else
                     that[baseSelector] = undefined;
                 compareAndReplaceByField(minSelector, otherLessThan);
                 compareAndReplaceByField(maxSelector, otherGreaterThan);
-                compareAndReplaceByField(minVisibleSelector, otherLessThan);
-                compareAndReplaceByField(maxVisibleSelector, otherGreaterThan);
+                if (that[axisTypeSelector] === "discrete") {
+                    checkField(minVisibleSelector);
+                    checkField(maxVisibleSelector)
+                }
+                else {
+                    compareAndReplaceByField(minVisibleSelector, otherLessThan);
+                    compareAndReplaceByField(maxVisibleSelector, otherGreaterThan)
+                }
                 compareAndReplaceByField("interval", otherLessThan);
                 controlValuesByVisibleBounds(minSelector, minVisibleSelector, otherLessThan);
                 controlValuesByVisibleBounds(minSelector, maxVisibleSelector, otherLessThan);
@@ -3849,8 +3934,9 @@ if (!DevExpress.MOD_VIZ_CORE) {
             mathCos = math.cos,
             mathAbs = math.abs,
             mathPI = math.PI,
+            PI_DIV_180 = mathPI / 180,
             _parseInt = parseInt,
-            MAX_PIXEL_COUNT = 10000000000,
+            MAX_PIXEL_COUNT = 1E10,
             SHARPING_CORRECTION = 0.5,
             ARC_COORD_PREC = 5;
         var pxAddingExceptions = {
@@ -3874,7 +3960,8 @@ if (!DevExpress.MOD_VIZ_CORE) {
             KEY_FONT_SIZE = "font-size",
             KEY_FONT_STYLE = "font-style",
             KEY_FONT_WEIGHT = "font-weight",
-            KEY_TEXT_DECORATION = "text-decoration";
+            KEY_TEXT_DECORATION = "text-decoration",
+            NONE = "none";
         var DEFAULTS = {
                 scaleX: 1,
                 scaleY: 1
@@ -3912,26 +3999,44 @@ if (!DevExpress.MOD_VIZ_CORE) {
             }
             return a
         }
-        function normalizeBBox(bBox) {
-            var rxl = mathFloor(bBox.x),
-                ryt = mathFloor(bBox.y),
-                rxr = mathCeil(bBox.width + bBox.x),
-                ryb = mathCeil(bBox.height + bBox.y),
-                width,
-                height,
-                ret = {};
-            ret.x = rxl < MAX_PIXEL_COUNT && rxl > -MAX_PIXEL_COUNT ? rxl : 0;
-            ret.y = ryt < MAX_PIXEL_COUNT && ryt > -MAX_PIXEL_COUNT ? ryt : 0;
-            width = rxr - rxl;
-            height = ryb - ryt;
-            ret.width = width < MAX_PIXEL_COUNT && width > -MAX_PIXEL_COUNT ? width : 0;
-            ret.height = height < MAX_PIXEL_COUNT && height > -MAX_PIXEL_COUNT ? height : 0;
-            ret.isEmpty = !ret.x && !ret.y && !ret.width && !ret.height;
-            return ret
+        function rotateBBox(bbox, center, angle) {
+            var cos = Number(mathCos(angle * PI_DIV_180).toFixed(3)),
+                sin = Number(mathSin(angle * PI_DIV_180).toFixed(3)),
+                w2 = bbox.width / 2,
+                h2 = bbox.height / 2,
+                xc = bbox.x + w2,
+                yc = bbox.y + h2,
+                w2_ = mathAbs(w2 * cos) + mathAbs(h2 * sin),
+                h2_ = mathAbs(w2 * sin) + mathAbs(h2 * cos),
+                xc_ = center[0] + (xc - center[0]) * cos + (yc - center[1]) * sin,
+                yc_ = center[1] - (xc - center[0]) * sin + (yc - center[1]) * cos;
+            return normalizeBBox({
+                    x: xc_ - w2_,
+                    y: yc_ - h2_,
+                    width: 2 * w2_,
+                    height: 2 * h2_
+                })
+        }
+        function normalizeBBoxField(value) {
+            return -MAX_PIXEL_COUNT < value && value < +MAX_PIXEL_COUNT ? value : 0
+        }
+        function normalizeBBox(bbox) {
+            var rxl = normalizeBBoxField(mathFloor(bbox.x)),
+                ryt = normalizeBBoxField(mathFloor(bbox.y)),
+                rxr = normalizeBBoxField(mathCeil(bbox.width + bbox.x)),
+                ryb = normalizeBBoxField(mathCeil(bbox.height + bbox.y)),
+                result = {
+                    x: rxl,
+                    y: ryt,
+                    width: rxr - rxl,
+                    height: ryb - ryt
+                };
+            result.isEmpty = !result.x && !result.y && !result.width && !result.height;
+            return result
         }
         function getPreserveAspectRatio(location) {
             return {
-                    full: "none",
+                    full: NONE,
                     lefttop: "xMinYMin",
                     leftcenter: "xMinYMid",
                     leftbottom: "xMinYMax",
@@ -3941,7 +4046,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     righttop: "xMaxYMin",
                     rightcenter: "xMaxYMid",
                     rightbottom: "xMaxYMax"
-                }[(location || "").toLowerCase()] || "none"
+                }[(location || "").toLowerCase()] || NONE
         }
         rendererNS._normalizeArcParams = function(x, y, innerR, outerR, startAngle, endAngle) {
             var isCircle,
@@ -3961,8 +4066,8 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     startAngle -= 360;
                 noArc = false
             }
-            startAngle = startAngle * mathPI / 180;
-            endAngle = endAngle * mathPI / 180;
+            startAngle = startAngle * PI_DIV_180;
+            endAngle = endAngle * PI_DIV_180;
             return [x, y, mathMin(outerR, innerR), mathMax(outerR, innerR), mathCos(startAngle), mathSin(startAngle), mathCos(endAngle), mathSin(endAngle), isCircle, mathFloor(mathAbs(endAngle - startAngle) / mathPI) % 2 ? "1" : "0", noArc]
         };
         function buildArcPath(x, y, innerR, outerR, startAngleCos, startAngleSin, endAngleCos, endAngleSin, isCircle, longFlag) {
@@ -4172,7 +4277,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     hasTransformations = true;
                     continue
                 }
-                else if (/^(x|y)$/i.test(key))
+                else if (/^(x|y|d)$/i.test(key))
                     hasTransformations = true;
                 if (value === null)
                     elem.removeAttribute(key);
@@ -4184,7 +4289,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 sw = ("_originalSW" in that ? that._originalSW : settings[KEY_STROKE_WIDTH]) || 1;
                 key = "stroke-dasharray";
                 value = value === null ? "" : value.toLowerCase();
-                if (value === "" || value === "solid" || value === "none")
+                if (value === "" || value === "solid" || value === NONE)
                     that.element.removeAttribute(key);
                 else {
                     value = value.replace(/longdash/g, "8,3,").replace(/dash/g, "4,3,").replace(/dot/g, "1,3,").replace(/,$/, "").split(",");
@@ -4261,11 +4366,11 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     if (isObjectArgument(attrs)) {
                         attrs = extend({}, attrs);
                         if (!inh && (attrs.x !== undefined || attrs.y !== undefined || attrs.width !== undefined || attrs.height !== undefined || attrs[KEY_STROKE_WIDTH] !== undefined)) {
-                            attrs.x !== undefined ? x = that._originalX = mathFloor(attrs.x) : x = that._originalX || 0;
-                            attrs.y !== undefined ? y = that._originalY = mathFloor(attrs.y) : y = that._originalY || 0;
-                            attrs.width !== undefined ? width = that._originalWidth = mathFloor(attrs.width) : width = that._originalWidth || 0;
-                            attrs.height !== undefined ? height = that._originalHeight = mathFloor(attrs.height) : height = that._originalHeight || 0;
-                            attrs[KEY_STROKE_WIDTH] !== undefined ? sw = that._originalSW = mathFloor(attrs[KEY_STROKE_WIDTH]) : sw = that._originalSW;
+                            attrs.x !== undefined ? x = that._originalX = attrs.x : x = that._originalX || 0;
+                            attrs.y !== undefined ? y = that._originalY = attrs.y : y = that._originalY || 0;
+                            attrs.width !== undefined ? width = that._originalWidth = attrs.width : width = that._originalWidth || 0;
+                            attrs.height !== undefined ? height = that._originalHeight = attrs.height : height = that._originalHeight || 0;
+                            attrs[KEY_STROKE_WIDTH] !== undefined ? sw = that._originalSW = attrs[KEY_STROKE_WIDTH] : sw = that._originalSW;
                             maxSW = ~~((width < height ? width : height) / 2);
                             newSW = (sw || 0) < maxSW ? sw || 0 : maxSW;
                             attrs.x = x + newSW / 2;
@@ -4531,7 +4636,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                             to: value
                         }
                 }
-                renderer.animateElement(that, animationParams, extend(extend({}, renderer.animOptions), options))
+                renderer.animateElement(that, animationParams, extend(extend({}, renderer._animation), options))
             }
             else {
                 options.step && options.step.call(that, 1, 1);
@@ -4632,7 +4737,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
             arcAttr = createArcAttr(baseAttr, buildArcPath);
             rectAttr = createRectAttr(baseAttr)
         };
-        function SvgElement(renderer, tagName) {
+        function SvgElement() {
             this.ctor.apply(this, arguments)
         }
         rendererNS.SvgElement = SvgElement;
@@ -4752,46 +4857,24 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 return this
             },
             getBBox: function() {
-                var that = this,
-                    elem = that.element,
-                    transformation = that._settings,
-                    rotateAngle = mathPI * (transformation.rotate || 0) / 180,
-                    rotateX = ("rotateX" in transformation ? transformation.rotateX : transformation.x) || 0,
-                    rotateY = ("rotateY" in transformation ? transformation.rotateY : transformation.y) || 0,
+                var elem = this.element,
+                    transformation = this._settings,
                     bBox;
                 try {
-                    bBox = elem.getBBox ? elem.getBBox() : null
+                    bBox = elem.getBBox && elem.getBBox()
                 }
                 catch(e) {}
-                if (!bBox)
-                    bBox = {
-                        x: 0,
-                        y: 0,
-                        width: elem.offsetWidth || 0,
-                        height: elem.offsetHeight || 0
-                    };
-                bBox = extend({}, bBox);
-                if (rotateAngle) {
-                    var cos = mathCos(rotateAngle).toFixed(3),
-                        sin = mathSin(rotateAngle).toFixed(3),
-                        ltx = bBox.x - rotateX,
-                        lty = bBox.y - rotateY,
-                        rtx = bBox.x + bBox.width - rotateX,
-                        rty = bBox.y - rotateY,
-                        lbx = bBox.x - rotateX,
-                        lby = bBox.y + bBox.height - rotateY,
-                        rbx = bBox.x + bBox.width - rotateX,
-                        rby = bBox.y + bBox.height - rotateY,
-                        w,
-                        h;
-                    w = mathAbs(bBox.height * sin) + mathAbs(bBox.width * cos);
-                    h = mathAbs(bBox.height * cos) + mathAbs(bBox.width * sin);
-                    bBox.x = mathMin(ltx * cos - lty * sin + rotateX, rtx * cos - rty * sin + rotateX, lbx * cos - lby * sin + rotateX, rbx * cos - rby * sin + rotateX);
-                    bBox.y = mathMin(ltx * sin + lty * cos + rotateY, rtx * sin + rty * cos + rotateY, lbx * sin + lby * cos + rotateY, rbx * sin + rby * cos + rotateY);
-                    bBox.width = w;
-                    bBox.height = h
-                }
-                return normalizeBBox(bBox)
+                bBox = bBox || {
+                    x: 0,
+                    y: 0,
+                    width: elem.offsetWidth || 0,
+                    height: elem.offsetHeight || 0
+                };
+                if (transformation.rotate)
+                    bBox = rotateBBox(bBox, [("rotateX" in transformation ? transformation.rotateX : transformation.x) || 0, ("rotateY" in transformation ? transformation.rotateY : transformation.y) || 0], -transformation.rotate);
+                else
+                    bBox = normalizeBBox(bBox);
+                return bBox
             },
             markup: function() {
                 var temp = doc.createElement('div'),
@@ -4827,61 +4910,55 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 return this
             }
         };
-        function SvgRenderer() {
-            this.ctor.apply(this, arguments)
+        function SvgRenderer(options) {
+            var that = this;
+            that.root = that._createElement("svg", {
+                xmlns: "http://www.w3.org/2000/svg",
+                "xmlns:xlink": "http://www.w3.org/1999/xlink",
+                version: "1.1",
+                fill: NONE,
+                stroke: NONE,
+                "stroke-width": 0,
+                "class": options.cssClass
+            }).css({
+                "line-height": "normal",
+                "-ms-user-select": NONE,
+                "-moz-user-select": NONE,
+                "-webkit-user-select": NONE,
+                "-webkit-tap-highlight-color": "rgba(0, 0, 0, 0)",
+                display: "block",
+                overflow: "hidden"
+            });
+            that._defs = that._createElement("defs");
+            that._animationController = new rendererNS.AnimationController(that.root.element);
+            that._animation = {
+                enabled: true,
+                duration: 1000,
+                easing: "easeOutCubic"
+            }
         }
         rendererNS.SvgRenderer = SvgRenderer;
         SvgRenderer.prototype = {
-            ctor: function(options) {
+            constructor: SvgRenderer,
+            setOptions: function(options) {
                 var that = this;
-                options = options || {};
                 that.pathModified = !!options.pathModified;
                 that.rtl = !!options.rtl;
-                that.cssClass = options.cssClass || "";
-                that.root = that._createRoot();
-                that.resize(options.width, options.height);
-                that._init(options)
+                that.encodeHtml = !!options.encodeHtml,
+                that.updateAnimationOptions(options.animation || {});
+                that.root.attr({direction: that.rtl ? "rtl" : "ltr"})
             },
-            encodeHtml: false,
             _createElement: function(tagName, attr, type) {
                 var elem = new rendererNS.SvgElement(this, tagName, type);
                 attr && elem.attr(attr);
                 return elem
-            },
-            _createRoot: function() {
-                return this._createElement("svg", {
-                        xmlns: "http://www.w3.org/2000/svg",
-                        "xmlns:xlink": "http://www.w3.org/1999/xlink",
-                        version: "1.1",
-                        "class": this.cssClass,
-                        direction: this.rtl ? "rtl" : "ltr",
-                        fill: "none",
-                        stroke: "none",
-                        "stroke-width": 0
-                    }).css({
-                        "line-height": "normal",
-                        "-webkit-tap-highlight-color": "rgba(0, 0, 0, 0)",
-                        display: "block",
-                        overflow: "hidden"
-                    })
-            },
-            _init: function(options) {
-                var that = this;
-                that.defs = that._createElement("defs");
-                that.animOptions = {
-                    enabled: true,
-                    duration: 1000,
-                    easing: "easeOutCubic"
-                };
-                that.updateAnimationOptions(options.animation);
-                that.animationController = new rendererNS.AnimationController(that.root.element)
             },
             draw: function(container) {
                 var that = this;
                 if (!container || that.drawn)
                     return that;
                 that.root.append(container);
-                that.defs.append(that.root);
+                that._defs.append(that.root);
                 that.drawn = true;
                 return that
             },
@@ -4896,7 +4973,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
             clear: function() {
                 var that = this;
                 that.root.remove();
-                that.defs.remove();
+                that._defs.remove();
                 that.drawn = null;
                 return this
             },
@@ -4904,32 +4981,32 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 var that = this,
                     key;
                 that.root.dispose();
-                that.defs.dispose();
-                that.animationController.dispose();
+                that._defs.dispose();
+                that._animationController.dispose();
                 for (key in that)
                     that[key] = null;
                 return null
             },
             animationEnabled: function() {
-                return !!this.animOptions.enabled
+                return !!this._animation.enabled
             },
             updateAnimationOptions: function(newOptions) {
-                extend(this.animOptions, newOptions);
+                extend(this._animation, newOptions);
                 return this
             },
             stopAllAnimations: function(lock) {
-                this.animationController[lock ? "lock" : "stop"]();
+                this._animationController[lock ? "lock" : "stop"]();
                 return this
             },
             animateElement: function(element, params, options) {
-                this.animationController.animateElement(element, params, options);
+                this._animationController.animateElement(element, params, options);
                 return this
             },
             svg: function() {
                 return this.root.markup()
             },
             onEndAnimation: function(endAnimation) {
-                this.animationController.onEndAnimation(endAnimation)
+                this._animationController.onEndAnimation(endAnimation)
             },
             rect: function(x, y, width, height) {
                 return this._createElement("rect", {
@@ -4999,7 +5076,8 @@ if (!DevExpress.MOD_VIZ_CORE) {
                                 return this
                             },
                             clear: function(){},
-                            dispose: function(){}
+                            dispose: function(){},
+                            remove: function(){}
                         };
                 id = getNextDefsSvgId();
                 d = direction === "right" ? "M " + stepTo2 + " " + -stepTo2 + " L " + -stepTo2 + " " + stepTo2 + " M 0 " + step + " L " + step + " 0 M " + stepBy15 + " " + stepTo2 + " L " + stepTo2 + " " + stepBy15 : "M 0 0 L " + step + " " + step + " M " + -stepTo2 + " " + stepTo2 + " L " + stepTo2 + " " + stepBy15 + " M " + stepTo2 + " " + -stepTo2 + " L " + stepBy15 + " " + stepTo2;
@@ -5008,7 +5086,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     width: step,
                     height: step,
                     patternUnits: "userSpaceOnUse"
-                }).append(that.defs);
+                }).append(that._defs);
                 pattern.id = getPatternUrl(id, that.pathModified);
                 rect = that.rect(0, 0, step, step).attr({
                     fill: color,
@@ -5026,7 +5104,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
             clipRect: function(x, y, width, height) {
                 var that = this,
                     id = getNextDefsSvgId(),
-                    clipPath = that._createElement("clipPath", {id: id}).append(that.defs),
+                    clipPath = that._createElement("clipPath", {id: id}).append(that._defs),
                     rect = that.rect(x, y, width, height).append(clipPath);
                 rect.id = id;
                 rect.clipPath = clipPath;
@@ -5040,7 +5118,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 };
                 return rect
             },
-            shadowFilter: function(x, y, width, height, dx, dy, blur, color, opacity) {
+            shadowFilter: function(x, y, width, height, offsetX, offsetY, blur, color, opacity) {
                 var that = this,
                     id = getNextDefsSvgId(),
                     filter = that._createElement("filter", {
@@ -5049,7 +5127,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                         y: y || 0,
                         width: width || 0,
                         height: height || 0
-                    }).append(that.defs),
+                    }).append(that._defs),
                     gaussianBlur = that._createElement("feGaussianBlur", {
                         "in": "SourceGraphic",
                         result: "gaussianBlurResult",
@@ -5058,8 +5136,8 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     offset = that._createElement("feOffset", {
                         "in": "gaussianBlurResult",
                         result: "offsetResult",
-                        dx: dx || 0,
-                        dy: dy || 0
+                        dx: offsetX || 0,
+                        dy: offsetY || 0
                     }).append(filter),
                     flood = that._createElement("feFlood", {
                         result: "floodResult",
@@ -5094,8 +5172,8 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     "height" in attrs && (filterAttrs.height = attrs.height);
                     baseAttr.call(that, filterAttrs);
                     "blur" in attrs && that.gaussianBlur.attr({stdDeviation: attrs.blur});
-                    "dx" in attrs && (offsetAttrs.dx = attrs.dx);
-                    "dy" in attrs && (offsetAttrs.dy = attrs.dy);
+                    "offsetX" in attrs && (offsetAttrs.dx = attrs.offsetX);
+                    "offsetY" in attrs && (offsetAttrs.dy = attrs.offsetY);
                     that.offset.attr(offsetAttrs);
                     "color" in attrs && (floodAttrs["flood-color"] = attrs.color);
                     "opacity" in attrs && (floodAttrs["flood-opacity"] = attrs.opacity);
@@ -5105,6 +5183,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 return filter
             }
         };
+        rendererNS.rotateBBox = rotateBBox;
         rendererNS._createArcAttr = createArcAttr;
         rendererNS._createPathAttr = createPathAttr;
         rendererNS._createRectAttr = createRectAttr
@@ -5116,13 +5195,9 @@ if (!DevExpress.MOD_VIZ_CORE) {
             math = Math,
             mathMin = math.min,
             mathMax = math.max,
-            mathCeil = math.ceil,
             mathFloor = math.floor,
-            mathRound = math.round,
             mathSin = math.sin,
             mathCos = math.cos,
-            mathAbs = math.abs,
-            mathPI = math.PI,
             baseElementPrototype = rendererNS.SvgElement.prototype,
             documentFragment = doc.createDocumentFragment(),
             DEFAULT_STYLE = {
@@ -5267,7 +5342,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
             !inh && this._applyStyleSheet();
             return this
         }
-        function vmlAttr(attrs) {
+        function vmlAttr() {
             var elem = this.element,
                 result = baseAttr.apply(this, arguments);
             for (var i = 0; i < elem.childNodes.length; i++) {
@@ -5459,8 +5534,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                         processVmlAttr(element, attr, value, params)
                     },
                     _getBBox: function() {
-                        var element = this.element,
-                            settings = this._fullSettings,
+                        var settings = this._fullSettings,
                             x = settings.cx || 0,
                             y = settings.cy || 0,
                             r = settings.r || 0;
@@ -5492,15 +5566,15 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     },
                     attr: baseAttr,
                     _applyTransformation: function(params) {
+                        this.element.offsetHeight;
                         var that = this,
                             style = params.style,
                             settings = that._fullSettings,
                             x = isDefined(settings.x) ? settings.x : 0,
                             y = isDefined(settings.y) ? settings.y : 0,
-                            textHeight = that.element.offsetHeight,
                             bbox = that._bbox || that.element.getBoundingClientRect(),
-                            textWidth = bbox.right - bbox.left,
                             textHeight = bbox.bottom - bbox.top,
+                            textWidth = bbox.right - bbox.left,
                             rotateAngle = settings.rotate,
                             cos = 1,
                             sin = 0,
@@ -5693,10 +5767,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     element = that.element,
                     settings = that._fullSettings,
                     x = that.type !== "arc" ? settings.x || settings.cx - settings.r || 0 : 0,
-                    y = that.type !== "arc" ? settings.y || settings.cy - settings.r || 0 : 0,
-                    width = settings.width || 0,
-                    height = settings.height || 0,
-                    rotateAngle = settings.rotate;
+                    y = that.type !== "arc" ? settings.y || settings.cy - settings.r || 0 : 0;
                 if (settings.rotate) {
                     var radianAngle = settings.rotate * Math.PI / 180.0,
                         rotateX = isDefined(settings.rotateX) ? settings.rotateX : x,
@@ -5762,7 +5833,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 this.element.setAttribute('title', text)
             }
         });
-        var ClipRect = function(renderer, id) {
+        var ClipRect = function() {
                 this.ctor.apply(this, arguments)
             };
         extend(ClipRect.prototype, VmlElement.prototype);
@@ -5798,14 +5869,12 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 return this
             },
             addElement: function(element) {
-                var hasElement = false,
-                    elements = this._elements;
+                var elements = this._elements;
                 if (inArray(elements, element) === -1)
                     elements.push(element)
             },
             removeElement: function(element) {
-                var elements = this._elements,
-                    index = inArray(this._elements, element);
+                var index = inArray(this._elements, element);
                 index > -1 && this._elements.splice(index, 1)
             },
             getValue: function() {
@@ -5817,33 +5886,33 @@ if (!DevExpress.MOD_VIZ_CORE) {
             css: stubReturnedThis,
             remove: stubReturnedThis
         });
-        var VmlRenderer = function() {
-                this.ctor.apply(this, arguments)
-            };
-        extend(VmlRenderer.prototype, rendererNS.SvgRenderer.prototype);
-        extend(VmlRenderer.prototype, {
-            _createRoot: function() {
-                return this._createElement("div", {
-                        "class": this.cssClass,
-                        fill: "none",
-                        stroke: "none",
-                        "stroke-width": 0
-                    }).css({
-                        position: "relative",
-                        display: "inline-block",
-                        overflow: "hidden",
-                        direction: this.rtl ? "rtl" : "ltr"
-                    })
-            },
-            _init: function(options) {
-                this._clipRects = [];
-                this.animOptions = {enabled: false};
-                this.defs = {
+        var VmlRenderer = function(options) {
+                var that = this;
+                that.root = that._createElement("div", {
+                    fill: "none",
+                    stroke: "none",
+                    "stroke-width": 0
+                }).css({
+                    position: "relative",
+                    display: "inline-block",
+                    overflow: "hidden"
+                });
+                that._clipRects = [];
+                that._animation = {enabled: false};
+                that._defs = {
                     clear: stubReturnedThis,
                     remove: stubReturnedThis,
                     append: stubReturnedThis,
                     dispose: stubReturnedThis
-                }
+                };
+                that.setOptions(options)
+            };
+        extend(VmlRenderer.prototype, rendererNS.SvgRenderer.prototype);
+        extend(VmlRenderer.prototype, {
+            constructor: VmlRenderer,
+            setOptions: function() {
+                rendererNS.SvgRenderer.prototype.setOptions.apply(this, arguments);
+                this.root.css({direction: this.rtl ? "rtl" : "ltr"})
             },
             _createElement: function(tagName, attr, type) {
                 tagName = svgToVmlConv[tagName] || tagName;
@@ -6015,7 +6084,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 that._animateStep.complete && that._animateStep.complete(that.element, that._currentParams);
                 that.options.complete && !disableComplete && that.options.complete()
             },
-            tick: function(now) {
+            tick: function() {
                 return true
             },
             stop: function(breakAnimation, disableComplete) {
@@ -6179,9 +6248,10 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     debug.assert(options.type, "type was not passed or empty");
                     var that = this,
                         stubFunction = $.noop;
-                    $.extend(that, options);
-                    that.type = that.type.toLowerCase();
+                    that.type = options.type.toLowerCase();
+                    that.pane = options.pane;
                     that.series = [];
+                    that.updateOptions(options);
                     switch (that.type) {
                         case"bar":
                             that.adjustSeriesDimensions = adjustBarSeriesDimensions;
@@ -6239,6 +6309,11 @@ if (!DevExpress.MOD_VIZ_CORE) {
                             break
                     }
                 };
+            var updateOptions = function(options) {
+                    this.equalBarWidth = options.equalBarWidth;
+                    this.minBubbleSize = options.minBubbleSize;
+                    this.maxBubbleSize = options.maxBubbleSize
+                };
             var dispose = function() {
                     this.series = null;
                     this.translators = null
@@ -6262,7 +6337,6 @@ if (!DevExpress.MOD_VIZ_CORE) {
                         middleIndex,
                         stackIndex,
                         i,
-                        point,
                         points,
                         seriesOffset,
                         stackName,
@@ -6404,7 +6478,6 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     var debug = DX.utils.debug;
                     debug.assert(translators, "translators was not passed or empty");
                     var that = this,
-                        interval,
                         series = getVisibleSeries(that),
                         stackIndexes = {},
                         stackCount = 0,
@@ -6470,8 +6543,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                         var points = singleSeries.getPoints(),
                             holes = singleSeries.holes;
                         _each(points, function(index, point) {
-                            var argument = point.argument.valueOf(),
-                                holeValue;
+                            var argument = point.argument.valueOf();
                             point.resetHoles();
                             !point._skipSetLeftHole && point.setHole(holes.left[argument] || holesStack.left[argument] && 0, "left");
                             !point._skipSetRightHole && point.setHole(holes.right[argument] || holesStack.right[argument] && 0, "right");
@@ -6565,7 +6637,8 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 };
             var getInterval = function(that, translators) {
                     var argTranslator = translators.arg;
-                    return that.interval = argTranslator.getInterval()
+                    that.interval = argTranslator.getInterval();
+                    return that.interval
                 };
             var adjustBubbleSeriesDimensions = function(translators) {
                     var debug = DX.utils.debug;
@@ -6614,7 +6687,8 @@ if (!DevExpress.MOD_VIZ_CORE) {
             return {
                     ctor: ctor,
                     dispose: dispose,
-                    add: add
+                    add: add,
+                    updateOptions: updateOptions
                 }
         }())
     })(jQuery, DevExpress);
@@ -6896,6 +6970,8 @@ if (!DevExpress.MOD_VIZ_CORE) {
                         lastPointIndex++
                     }
                 });
+                that._disposePoints(that._aggregatedPoints);
+                that._aggregatedPoints = null;
                 that._points = that._originalPoints = points;
                 that._correctPointsLength(lastPointIndex, points);
                 that._endUpdateData()
@@ -7236,21 +7312,21 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     }
             },
             show: function() {
-                var that = this;
-                if (!that._visible) {
-                    that._visible = true;
-                    that.hidePointTooltip();
-                    that._options.visibilityChanged()
-                }
+                if (!this._visible)
+                    this._changeVisibility(true)
             },
             hide: function() {
-                var that = this;
-                if (that._visible) {
-                    that._visible = false;
-                    that.hidePointTooltip();
-                    that._options.visibilityChanged()
-                }
+                if (this._visible)
+                    this._changeVisibility(false)
             },
+            _changeVisibility: function(visibility) {
+                var that = this;
+                that._visible = that._options.visible = visibility;
+                that._updatePointsVisibility();
+                that.hidePointTooltip();
+                that._options.visibilityChanged()
+            },
+            _updatePointsVisibility: $.noop,
             hideLabels: function() {
                 _each(this._points, function(_, point) {
                     point._label.hide()
@@ -7306,6 +7382,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 }
                 that._aggregatedPoints = that._aggregatedPoints || [];
                 _each(originalPoints, function(_, point) {
+                    point.setInvisibility();
                     switch (that._isInInterval(point.argument, ticks, nowIndexTicks, ticksInterval)) {
                         case true:
                             fusPoints.push(point);
@@ -7333,7 +7410,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 var minTick = ticks[nowIndexTicks],
                     maxTick = ticks[nowIndexTicks + 1],
                     sumMinTickTicksInterval;
-                ticksInterval = $.isNumeric(ticksInterval) ? ticksInterval : utils.convertDateTickIntervalToMilliseconds(ticksInterval);
+                ticksInterval = $.isNumeric(ticksInterval) ? ticksInterval : utils.dateToMilliseconds(ticksInterval);
                 sumMinTickTicksInterval = utils.isDate(minTick) ? new Date(minTick.getTime() + ticksInterval) : minTick + ticksInterval;
                 if (argument >= minTick && argument < sumMinTickTicksInterval)
                     return true;
@@ -7470,6 +7547,9 @@ if (!DevExpress.MOD_VIZ_CORE) {
             getColor: function() {
                 return this.getLegendStyles().normal.fill
             },
+            getOpacity: function() {
+                return this._options.opacity
+            },
             getStackName: function() {
                 return this.type === "stackedbar" || this.type === "fullstackedbar" ? this._stackName : null
             },
@@ -7489,10 +7569,6 @@ if (!DevExpress.MOD_VIZ_CORE) {
             _isEmptyObject = $.isEmptyObject,
             _isDefined = DX.utils.isDefined,
             _isFinite = isFinite,
-            FULLSTACKED_SERIES_VALUE_MARGIN_PRIORITY = 15,
-            BAR_ZERO_VALUE_MARGIN_PRIORITY = 20,
-            SERIES_VALUE_MARGIN_PRIORITY = 20,
-            SERIES_LABEL_VALUE_MARGIN = 0.3,
             MIN_VISIBLE = "minVisible",
             MAX_VISIBLE = "maxVisible",
             DISCRETE = "discrete";
@@ -7529,10 +7605,8 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     data.maxVisible = value
             }
         }
-        function _processRangeValue(series, val, minVal, prevVal, prevMinVal) {
-            var data = series._rangeData.val,
-                interval,
-                currentInterval = data.interval;
+        function _processRangeValue(series, val, minVal) {
+            var data = series._rangeData.val;
             if (series.valueAxisType === DISCRETE) {
                 data.categories = data.categories || [];
                 data.categories.push(val, minVal)
@@ -7555,8 +7629,8 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 minArg,
                 maxArg;
             if (isDiscrete) {
-                data.startCategories = zoomArgs.minArg;
-                data.endCategories = zoomArgs.maxArg;
+                data.minVisible = zoomArgs.minArg;
+                data.maxVisible = zoomArgs.maxArg;
                 return
             }
             minArg = zoomArgs.minArg < zoomArgs.maxArg ? zoomArgs.minArg : zoomArgs.maxArg;
@@ -7592,7 +7666,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
             _each(points, function(index, point) {
                 var arg = point.argument,
                     prevPoint = index > 0 ? points[index - 1] : null;
-                if (adjustOnZoom && arg >= rangeData.arg.minVisible && arg <= rangeData.arg.maxVisible) {
+                if (adjustOnZoom && series.argumentAxisType !== DISCRETE && arg >= rangeData.arg.minVisible && arg <= rangeData.arg.maxVisible) {
                     if (!prevPointAdded) {
                         if (prevPoint && prevPoint.hasValue()) {
                             _addToVisibleRange(series, prevPoint.value);
@@ -7614,12 +7688,13 @@ if (!DevExpress.MOD_VIZ_CORE) {
         function _processZoomRangeValue(series, zoomArgs, maxValueName, minValueName) {
             var adjustOnZoom = zoomArgs.adjustOnZoom,
                 points = series._points || [],
+                argRangeData = series._rangeData.arg,
                 lastVisibleIndex,
                 prevPointAdded = false;
             _each(points, function(index, point) {
                 var arg = point.argument,
                     prevPoint = index > 0 ? points[index - 1] : null;
-                if (adjustOnZoom && arg >= series._rangeData.arg.minVisible && arg <= series._rangeData.arg.maxVisible) {
+                if (adjustOnZoom && series.argumentAxisType !== DISCRETE && arg >= argRangeData.minVisible && arg <= argRangeData.maxVisible) {
                     if (!prevPointAdded) {
                         if (prevPoint && prevPoint.hasValue()) {
                             _addToVisibleRange(series, prevPoint[maxValueName]);
@@ -7651,9 +7726,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
             })
         }
         function _fillRangeData(series) {
-            var data = series._rangeData,
-                mainAxis = series._getMainAxisName(),
-                axis = mainAxis === "X" ? "Y" : "X";
+            var data = series._rangeData;
             data.arg.categories && (data.arg.categories = _unique(data.arg.categories));
             data.val.categories && (data.val.categories = _unique(data.val.categories));
             data.arg.axisType = series.argumentAxisType;
@@ -7921,8 +7994,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     return mainSeriesColor
                 },
                 _getPointOptions: function() {
-                    var that = this;
-                    return that._pointOptions || (that._pointOptions = that._parsePointOptions(that._preparePointOptions(), that._options.label))
+                    return this._parsePointOptions(this._preparePointOptions(), this._options.label)
                 },
                 _preparePointOptions: function(customOptions) {
                     var point = this._options.point;
@@ -8024,7 +8096,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     that._labelsGroup && that._labelsGroup.animate({opacity: 1}, animationSettings);
                     that._errorBarGroup && that._errorBarGroup.animate({opacity: (that._options.valueErrorBar || {}).opacity || 1}, animationSettings)
                 },
-                _animate: function(complete) {
+                _animate: function() {
                     var that = this,
                         lastPointIndex = that._drawedPoints.length - 1;
                     _each(that._drawedPoints || [], function(i, p) {
@@ -8212,7 +8284,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     minDistance,
                     oppositeCoord = this._options.rotated ? x : y,
                     opositeCoordName = this._options.rotated ? "vx" : "vy";
-                if (cat) {
+                if (this.isVisible() && cat) {
                     point = cat[pCoord];
                     do {
                         point = cat[nCoord] || cat[pCoord];
@@ -8652,7 +8724,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     element.line && element.line.remove();
                     element.area.remove()
                 },
-                _drawElement: function(segment, group) {
+                _drawElement: function(segment) {
                     return {
                             line: this._bordersGroup && this._createBorderElement(segment.line, {"stroke-width": this._styles.normal.border["stroke-width"]}).append(this._bordersGroup),
                             area: this._createMainElement(segment.area).append(this._elementsGroup)
@@ -8855,6 +8927,12 @@ if (!DevExpress.MOD_VIZ_CORE) {
                             selection: that._parsePointStyle(pointOptions.selectionStyle || {}, specialMainColor, mainColor, isCustomPointOptions)
                         }
                 },
+                _updatePointsVisibility: function() {
+                    var visibility = this._options.visible;
+                    $.each(this._points, function(_, point) {
+                        point._options.visible = visibility
+                    })
+                },
                 _preparePointOptions: function(customOptions) {
                     var options = this._options;
                     return customOptions ? _extend(true, {}, options, customOptions) : options
@@ -8888,7 +8966,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 }
             };
         chartSeries.bar = _extend({}, scatterSeries, baseBarSeriesMethods, {
-            _getAffineCoordOptions: function(translators, grounded) {
+            _getAffineCoordOptions: function(translators) {
                 var rotated = this._options.rotated,
                     direction = rotated ? "x" : "y",
                     settings = {
@@ -8898,7 +8976,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 settings["translate" + direction.toUpperCase()] = translators[direction].translate("canvas_position_default");
                 return settings
             },
-            _getRangeData: function(zoomArgs, calcIntervalFunction) {
+            _getRangeData: function() {
                 var rangeData = areaSeries._getRangeData.apply(this, arguments);
                 rangeData.arg.stick = false;
                 return rangeData
@@ -8919,13 +8997,13 @@ if (!DevExpress.MOD_VIZ_CORE) {
             _animatePoints: function(firstDrawing, complete, animateFunc) {
                 animateFunc(this._drawedPoints, complete)
             },
-            _createGroups: function(animationEnabled, style) {
+            _createGroups: function() {
                 scatterSeries._createGroups.apply(this, arguments)
             },
             _drawPoint: function(point, groups, animationEnabled) {
                 scatterSeries._drawPoint.call(this, point, groups, animationEnabled)
             },
-            _parsePointStyle: function(style, defaultColor, defaultBorderColor, isCustomPointOptions) {
+            _parsePointStyle: function(style) {
                 var base = baseBarSeriesMethods._parsePointStyle.apply(this, arguments);
                 base.opacity = style.opacity;
                 return base
@@ -8986,7 +9064,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                             argument: data[options.argumentField || "arg"]
                         }
                 },
-                _fusionPoints: function(fusionPoints, tick, index) {
+                _fusionPoints: function(fusionPoints, tick) {
                     var calcMedianValue = series.scatter._calcMedianValue,
                         value = calcMedianValue.call(this, fusionPoints, "value"),
                         minValue = calcMedianValue.call(this, fusionPoints, "minValue");
@@ -9085,6 +9163,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
             _getMainColor: barSeries._getMainColor,
             _createPointStyles: barSeries._createPointStyles,
             _createPattern: barSeries._createPattern,
+            _updatePointsVisibility: barSeries._updatePointsVisibility,
             _preparePointOptions: barSeries._preparePointOptions,
             _getSpecialColor: barSeries._getSpecialColor,
             _applyMarkerClipRect: series.line._applyElementsClipRect,
@@ -9101,7 +9180,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 pointData.size = data[options.sizeField || "size"];
                 return pointData
             },
-            _fusionPoints: function(fusionPoints, tick, index) {
+            _fusionPoints: function(fusionPoints, tick) {
                 var calcMedianValue = scatterSeries._calcMedianValue;
                 return {
                         size: calcMedianValue.call(this, fusionPoints, "size"),
@@ -9137,7 +9216,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     })
                 })
             },
-            _animate: function(firstDrawing) {
+            _animate: function() {
                 var that = this,
                     lastPointIndex = that._drawedPoints.length - 1,
                     labelsGroup = that._labelsGroup,
@@ -9167,10 +9246,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
             _noop = $.noop,
             _map = $.map,
             _isFinite = isFinite,
-            _max = Math.max,
-            _sqrt = Math.sqrt,
-            _pow = Math.pow,
-            _round = Math.round;
+            _max = Math.max;
         pieSeries.pie = _extend({}, barSeries, {
             _createLabelGroup: scatterSeries._createLabelGroup,
             _createGroups: scatterSeries._createGroups,
@@ -9188,7 +9264,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     maxLabelLength,
                     labelsBBoxes = [];
                 _each(points, function(_, point) {
-                    if (point._label.hasText() && point._label.getLayoutOptions().position !== "inside") {
+                    if (point._label.isVisible() && point._label.getLayoutOptions().position !== "inside") {
                         point.setLabelEllipsis();
                         labelsBBoxes.push(point._label.getBoundingRect().width)
                     }
@@ -9196,7 +9272,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 if (labelsBBoxes.length)
                     maxLabelLength = _max.apply(null, labelsBBoxes);
                 _each(points, function(_, point) {
-                    if (point._label.hasText() && point._label.getLayoutOptions().position !== "inside") {
+                    if (point._label.isVisible() && point._label.getLayoutOptions().position !== "inside") {
                         point._maxLabelLength = maxLabelLength;
                         point.updateLabelCoord()
                     }
@@ -9223,7 +9299,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 that._createGroups();
                 labelsGroup = that._labelsGroup;
                 _each(points, function(_, point) {
-                    point.drawLabel(translators, that._renderer, labelsGroup, true)
+                    point.drawLabel(translators, that._renderer, labelsGroup)
                 });
                 return true
             },
@@ -9318,12 +9394,16 @@ if (!DevExpress.MOD_VIZ_CORE) {
             },
             arrangePoints: function() {
                 var that = this,
+                    originalPoints = that._originalPoints || [],
                     minSegmentSize = that._options.minSegmentSize,
                     minShownValue,
                     pointIndex = 0,
                     total,
-                    points = that._originalPoints = that._points = _map(that._originalPoints || [], function(point) {
-                        if (point.value === null || point.value < 0 || point.value === 0 && !minSegmentSize) {
+                    isAllPointsNegative = _max.apply(null, _map(originalPoints, function(p) {
+                        return p.value
+                    })) <= 0,
+                    points = that._originalPoints = that._points = _map(originalPoints, function(point) {
+                        if (point.value === null || !isAllPointsNegative && point.value < 0 || point.value === 0 && !minSegmentSize) {
                             point.dispose();
                             return null
                         }
@@ -9392,6 +9472,12 @@ if (!DevExpress.MOD_VIZ_CORE) {
             _beginUpdateData: function() {
                 this._deletePatterns();
                 this._patterns = []
+            },
+            getCenter: function() {
+                return {
+                        x: this._centerX,
+                        y: this._centerY
+                    }
             }
         });
         pieSeries.doughnut = pieSeries.donut = pieSeries.pie
@@ -9414,6 +9500,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
             _applyMarkerClipRect: function(settings) {
                 settings.clipId = this._forceClipping ? this._paneClipRectID : this._widePaneClipRectID
             },
+            _updatePointsVisibility: barSeries._updatePointsVisibility,
             _preparePointOptions: barSeries._preparePointOptions,
             _getRangeCorrector: _noop,
             _createErrorBarGroup: _noop,
@@ -9574,7 +9661,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 }
                 return result
             },
-            _fusionPoints: function(fusionPoints, tick, nowIndexTicks) {
+            _fusionPoints: function(fusionPoints, tick) {
                 var fusedPointData = {},
                     reductionLevel,
                     highValue = -Infinity,
@@ -9702,7 +9789,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 this._processStackedRange();
                 return barSeries._getRangeData.apply(this, arguments)
             }});
-        chartSeries.fullstackedbar = _extend({}, barSeries, baseFullStackedSeries, {_getRangeData: function(zoomArgs, calcIntervalFunction) {
+        chartSeries.fullstackedbar = _extend({}, barSeries, baseFullStackedSeries, {_getRangeData: function() {
                 var rangeData = baseFullStackedSeries._getRangeData.apply(this, arguments);
                 rangeData.arg.stick = false;
                 return rangeData
@@ -9715,8 +9802,8 @@ if (!DevExpress.MOD_VIZ_CORE) {
             point.argument = point.argument + position;
             return point
         }
-        function preparePointsForStackedAreaSegment(points, prevSeries) {
-            points = $.map(points, function(p, i) {
+        function preparePointsForStackedAreaSegment(points) {
+            points = $.map(points, function(p) {
                 var result = [p];
                 if (p.leftHole)
                     result = [clonePoint(p, p.leftHole, p.minLeftHole, "left"), p];
@@ -9743,7 +9830,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 var that = this,
                     areaSegment;
                 points = preparePointsForStackedAreaSegment(points, that._prevSeries);
-                if (!this._prevSeries || points.length == 1)
+                if (!this._prevSeries || points.length === 1)
                     areaSegment = chartSeries.splinearea._prepareSegment.call(this, points, rotated);
                 else {
                     var fwPoints = chartSeries.spline._calculateBezierPoints(points, rotated),
@@ -9788,7 +9875,10 @@ if (!DevExpress.MOD_VIZ_CORE) {
             }});
         chartSeries.fullstackedarea = _extend({}, areaSeries, baseFullStackedSeries, {_prepareSegment: chartSeries.stackedarea._prepareSegment});
         chartSeries.fullstackedsplinearea = _extend({}, chartSeries.splinearea, baseFullStackedSeries, {_prepareSegment: chartSeries.stackedsplinearea._prepareSegment});
-        polarSeries.stackedbar = _extend({}, polarSeries.bar, baseStackedSeries, {_getRangeData: chartSeries.stackedbar._getRangeData})
+        polarSeries.stackedbar = _extend({}, polarSeries.bar, baseStackedSeries, {_getRangeData: function() {
+                this._processStackedRange();
+                return polarSeries.bar._getRangeData.apply(this, arguments)
+            }})
     })(jQuery, DevExpress);
     /*! Module viz-core, file basePoint.js */
     (function($, DX) {
@@ -9865,7 +9955,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     that._needClearingOnDraw = false
                 }
                 if (!that._hasGraphic())
-                    that._options.visible && that._drawMarker(renderer, groups.markers, animationEnabled, firstDrawing);
+                    that._getMarkerVisibility() && that._drawMarker(renderer, groups.markers, animationEnabled, firstDrawing);
                 else
                     that._updateMarker(animationEnabled, undefined, groups.markers);
                 that._drawLabel(renderer, groups.labels);
@@ -9955,8 +10045,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 return oldOptions.styles.usePointCustomOptions && !newOptions.styles.usePointCustomOptions
             },
             _getCustomLabelVisibility: function() {
-                if (this._styles.useLabelCustomOptions)
-                    return this._options.label.visible ? "visible" : "hidden"
+                return this._styles.useLabelCustomOptions ? !!this._options.label.visible : null
             },
             getBoundingRect: function() {
                 return this._getGraphicBbox()
@@ -9987,7 +10076,6 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 return this._options
             },
             animate: function(complete, settings, partitionDuration) {
-                var that = this;
                 if (!this.graphic) {
                     complete && complete();
                     return
@@ -10115,119 +10203,148 @@ if (!DevExpress.MOD_VIZ_CORE) {
         }
     })(jQuery, DevExpress);
     /*! Module viz-core, file label.js */
-    (function($, DX, undefined) {
-        var _utils = DX.utils,
-            core = DX.viz.core,
-            _isDefined = _utils.isDefined,
-            _extend = $.extend,
+    (function(DX, $, undefined) {
+        var _degreesToRadians = DX.utils.degreesToRadians,
+            _patchFontOptions = DX.viz.core.utils.patchFontOptions,
             _round = Math.round,
+            _abs = Math.abs,
             _min = Math.min,
+            _max = Math.max,
             _ceil = Math.ceil,
-            _getClosestCoord = _utils.getClosestCoord,
-            _getCosAndSin = _utils.getCosAndSin,
+            _getCosAndSin = DX.utils.getCosAndSin,
+            _rotateBBox = DX.viz.renderers.rotateBBox,
             LABEL_BACKGROUND_PADDING_X = 8,
             LABEL_BACKGROUND_PADDING_Y = 4;
-        function pointInsideBox(point, box) {
-            return point.x >= box.x && point.x <= box.x + box.width && point.y >= box.y && point.y <= box.y + box.height
-        }
-        function connectorToInner(point, labelPoint) {
-            var normalAngle = _utils.normalizeAngle(point.angle);
-            return normalAngle < 180 ? point.y > labelPoint.y : point.y < labelPoint.y
-        }
-        function getPointOnBoxFigure(figure, extraOptions) {
-            var pointOnLabel = !extraOptions.background ? _getClosestCoord(figure.center, extraOptions.points) : {
-                    x: extraOptions.x0,
-                    y: extraOptions.y0
-                };
-            return [_getClosestCoord(pointOnLabel, [{
-                            x: figure.x,
-                            y: figure.center.y
-                        }, {
-                            x: figure.center.x,
-                            y: figure.y + figure.height
-                        }, {
-                            x: figure.x + figure.width,
-                            y: figure.center.y
-                        }, {
-                            x: figure.center.x,
-                            y: figure.y
-                        }])].concat([pointOnLabel])
-        }
-        function getPointOnCircular(figure, extraOptions) {
-            var pointOnLabel = !extraOptions.background ? _getClosestCoord(figure.center, extraOptions.points) : {
-                    x: extraOptions.x0,
-                    y: extraOptions.y0
-                },
-                angle = Math.atan2(pointOnLabel.y - figure.y, pointOnLabel.x - figure.x),
-                cossin = _getCosAndSin(-angle / Math.PI * 180);
-            return [{
-                        x: figure.x + figure.r * cossin.cos,
-                        y: figure.y - figure.r * cossin.sin
-                    }].concat([pointOnLabel])
-        }
-        function getPointsOnAngle(figure, extraOptions) {
-            var angle = figure.angle,
-                pointOnLabel = _getClosestCoord(figure.center, getPointsOnRotatedLabel(extraOptions)),
-                xConnector = _round(figure.x + (pointOnLabel.y - figure.y) / Math.tan(_utils.degreesToRadians(-angle))),
-                connectorPoint = {};
-            if (connectorToInner(figure, pointOnLabel)) {
-                connectorPoint.x = xConnector;
-                connectorPoint.y = pointOnLabel.y
-            }
-            else
-                connectorPoint = pointOnLabel;
-            return [figure.center, _getClosestCoord(figure, [connectorPoint, pointOnLabel])].concat([pointOnLabel])
-        }
-        function getPointsOnRotatedLabel(options) {
-            var rotatedCoords = [],
-                x0 = options.x0,
-                y0 = options.y0,
-                angleFunction = _getCosAndSin(options.rotationAngle || 0);
-            $.each(options.points, function(_, point) {
-                rotatedCoords.push({
-                    x: _round((point.x - x0) * angleFunction.cos - (point.y - y0) * angleFunction.sin + x0),
-                    y: _round((point.x - x0) * angleFunction.sin + (point.y - y0) * angleFunction.cos + y0)
-                })
+        function getClosestCoord(point, coords) {
+            var closestDistase = Infinity,
+                closestCoord;
+            $.each(coords, function(_, coord) {
+                var x = point[0] - coord[0],
+                    y = point[1] - coord[1],
+                    distance = x * x + y * y;
+                if (distance < closestDistase) {
+                    closestDistase = distance;
+                    closestCoord = coord
+                }
             });
-            return rotatedCoords
+            return closestCoord
+        }
+        var barPointStrategy = {
+                isLabelInside: function(labelPoint, figure) {
+                    return labelPoint.x >= figure.x && labelPoint.x <= figure.x + figure.width && labelPoint.y >= figure.y && labelPoint.y <= figure.y + figure.height
+                },
+                prepareLabelPoints: function(points, center, angle, hasBackground) {
+                    return !hasBackground ? points : [center]
+                },
+                getFigureCenter: function(figure) {
+                    return [figure.x + figure.width / 2, figure.y + figure.height / 2]
+                },
+                findFigurePoint: function(figure, labelPoint) {
+                    var figureCenter = barPointStrategy.getFigureCenter(figure),
+                        point = getClosestCoord(labelPoint, [[figure.x, figureCenter[1]], [figureCenter[0], figure.y + figure.height], [figure.x + figure.width, figureCenter[1]], [figureCenter[0], figure.y]]);
+                    return [_round(point[0]), _round(point[1])]
+                }
+            };
+        var symbolPointStrategy = {
+                isLabelInside: function() {
+                    return false
+                },
+                prepareLabelPoints: barPointStrategy.prepareLabelPoints,
+                getFigureCenter: function(figure) {
+                    return [figure.x, figure.y]
+                },
+                findFigurePoint: function(figure, labelPoint) {
+                    var angle = Math.atan2(figure.y - labelPoint[1], labelPoint[0] - figure.x);
+                    return [_round(figure.x + figure.r * Math.cos(angle)), _round(figure.y - figure.r * Math.sin(angle))]
+                }
+            };
+        var piePointStrategy = {
+                isLabelInside: function(_0, _1, isOutside) {
+                    return !isOutside
+                },
+                prepareLabelPoints: function(points, center, angle) {
+                    var rotatedPoints = [],
+                        x0 = center[0],
+                        y0 = center[1],
+                        cossin = _getCosAndSin(angle || 0);
+                    $.each(points, function(_, point) {
+                        rotatedPoints.push([_round((point[0] - x0) * cossin.cos + (point[1] - y0) * cossin.sin + x0), _round(-(point[0] - x0) * cossin.sin + (point[1] - y0) * cossin.cos + y0)])
+                    });
+                    return rotatedPoints
+                },
+                getFigureCenter: symbolPointStrategy.getFigureCenter,
+                findFigurePoint: function(figure, labelPoint) {
+                    var x = figure.x + (figure.y - labelPoint[1]) / Math.tan(_degreesToRadians(figure.angle)),
+                        point = [figure.x, figure.y];
+                    if (figure.x <= x && x <= labelPoint[0] || figure.x >= x && x >= labelPoint[0])
+                        point.push(_round(x), labelPoint[1]);
+                    return point
+                }
+            };
+        function selectStrategy(figure) {
+            return figure.angle !== undefined && piePointStrategy || figure.r !== undefined && symbolPointStrategy || barPointStrategy
+        }
+        function disposeItem(obj, field) {
+            obj[field] && obj[field].dispose();
+            obj[field] = null
+        }
+        function checkBackground(background) {
+            return background && (background.fill && background.fill !== "none" || background["stroke-width"] > 0 && background.stroke && background.stroke !== "none")
+        }
+        function checkConnector(connector) {
+            return connector && connector["stroke-width"] > 0 && connector.stroke && connector.stroke !== "none"
+        }
+        function formatValue(value, format, precision) {
+            return DX.formatHelper.format(value, format, precision)
+        }
+        function formatText(data, options) {
+            var format = options.format,
+                precision = options.precision;
+            data.valueText = formatValue(data.value, format, precision);
+            data.argumentText = formatValue(data.argument, options.argumentFormat, options.argumentPrecision);
+            if (data.percent !== undefined)
+                data.percentText = formatValue(data.percent, "percent", options.percentPrecision);
+            if (data.total !== undefined)
+                data.totalText = formatValue(data.total, format, precision);
+            if (data.openValue !== undefined)
+                data.openValueText = formatValue(data.openValue, format, precision);
+            if (data.closeValue !== undefined)
+                data.closeValueText = formatValue(data.closeValue, format, precision);
+            if (data.lowValue !== undefined)
+                data.lowValueText = formatValue(data.lowValue, format, precision);
+            if (data.highValue !== undefined)
+                data.highValueText = formatValue(data.highValue, format, precision);
+            if (data.reductionValue !== undefined)
+                data.reductionValueText = formatValue(data.reductionValue, format, precision);
+            return options.customizeText ? options.customizeText.call(data, data) : data.valueText
         }
         function Label(){}
         Label.prototype = {
             constructor: Label,
+            _setVisibility: function(value, state) {
+                this._group && this._group.attr({visibility: value});
+                this._visible = state
+            },
             clearVisibility: function() {
-                if (this._group && this._group.attr("visibility"))
-                    this._group.attr({visibility: null})
+                this._setVisibility(null, true)
             },
             hide: function() {
-                if (this._group && this._group.attr("visibility") !== "hidden")
-                    this._group.attr({visibility: "hidden"})
+                this._setVisibility("hidden", false)
             },
             show: function() {
-                if (this._group && this._group.attr("visibility") !== "visible")
-                    this._group.attr({visibility: "visible"})
+                this._setVisibility("visible", true)
             },
-            getVisibility: function() {
-                return this._group && this._group.attr("visibility")
+            isVisible: function() {
+                return this._visible
             },
-            updateData: function(data) {
-                if (_isDefined(data))
-                    this._data = data.formatObject;
-                return this
+            setColor: function(color) {
+                this._color = color
             },
-            updateOptions: function(options) {
-                this.setOptions(_extend(true, {}, this._options, options));
-                return this
+            setOptions: function(options) {
+                this._options = options
             },
-            setOptions: function(newOptions) {
-                var that = this,
-                    oldOptions = that._options;
-                newOptions = newOptions || {};
-                that._fontStyles = core.utils.patchFontOptions(newOptions.attributes && newOptions.attributes.font);
-                that._options = newOptions;
-                if (oldOptions) {
-                    that._isBackgroundChanged(oldOptions.background, that._options.background) && that._deleteBackground();
-                    that._isConnectorChanged(oldOptions.connector, that._options.connector) && that._deleteConnector()
-                }
+            setData: function(data) {
+                this._data = data
             },
             setDataField: function(fieldName, fieldValue) {
                 this._data = this._data || {};
@@ -10237,290 +10354,140 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 return this._data
             },
             setFigureToDrawConnector: function(figure) {
-                this.figure = figure;
-                this._setFigureOptions(figure)
-            },
-            _deleteElements: function() {
-                this._deleteConnector();
-                this._deleteBackground();
-                this._deleteText();
-                this._deleteGroups()
+                this._figure = figure
             },
             dispose: function() {
-                this._data = null;
-                this._options = null;
-                this._positioningFunction = null;
-                this._deleteElements()
-            },
-            _deleteText: function() {
-                this._text && this._text.dispose();
-                this._text = null
-            },
-            _deleteGroups: function() {
-                this._insideGroup = null;
-                this._group && this._group.dispose();
-                this._group = null
-            },
-            _drawGroups: function(renderer, group) {
-                if (!this._group)
-                    this._group = renderer.g().append(group);
-                if (!this._insideGroup)
-                    this._insideGroup = renderer.g().append(this._group)
-            },
-            _drawText: function(renderer, text) {
                 var that = this;
-                if (!that._text)
-                    that._text = renderer.text("", 0, 0).append(that._insideGroup);
-                that._text.css(that._fontStyles).attr({text: text});
-                that._initTextBbox = that._textBBox = that._text.getBBox()
+                disposeItem(that, "_group");
+                that._data = that._options = that._textContent = that._visible = that._insideGroup = that._text = that._background = that._connector = that._figure = null
+            },
+            draw: function(renderer, container, customVisibility) {
+                var that = this,
+                    options = that._options || {},
+                    text = that._textContent = formatText(that._data, that._options) || null;
+                that.clearVisibility();
+                if (text) {
+                    if (!that._group) {
+                        that._group = renderer.g().append(container);
+                        that._insideGroup = renderer.g().append(that._group);
+                        that._text = renderer.text("", 0, 0).append(that._insideGroup)
+                    }
+                    that._text.css(options.attributes ? _patchFontOptions(options.attributes.font) : {});
+                    if (checkBackground(options.background)) {
+                        that._background = that._background || renderer.rect().append(that._insideGroup).toBackground();
+                        that._background.attr(options.background);
+                        that._color && that._background.attr({fill: that._color})
+                    }
+                    else
+                        disposeItem(that, "_background");
+                    if (checkConnector(options.connector)) {
+                        that._connector = that._connector || renderer.path([], "line").sharp().append(that._group).toBackground();
+                        that._connector.attr(options.connector);
+                        that._color && that._connector.attr({stroke: that._color})
+                    }
+                    else
+                        disposeItem(that, "_connector");
+                    that._updateText(text);
+                    if (customVisibility !== null)
+                        customVisibility ? that.show() : that.hide()
+                }
+                else
+                    that.hide();
+                return that
             },
             _updateText: function(text) {
-                this._text.attr({text: text});
-                this._textBBox = this._text.getBBox()
-            },
-            _drawBackground: function(renderer) {
                 var that = this,
-                    options = that._options,
-                    background = options.background || {},
-                    settings = _extend(that._getBackgroundSettings(), background);
-                if (that._checkBackground(background)) {
-                    if (!that._background)
-                        that._background = renderer.rect().append(that._insideGroup);
-                    that._background.attr(settings).toBackground();
-                    that._backgroundBbox = settings
+                    bbox = that._text.attr({text: text}).getBBox();
+                that._textSize = [bbox.width, bbox.height];
+                if (that._background) {
+                    bbox.x -= LABEL_BACKGROUND_PADDING_X;
+                    bbox.y -= LABEL_BACKGROUND_PADDING_Y;
+                    bbox.width += 2 * LABEL_BACKGROUND_PADDING_X;
+                    bbox.height += 2 * LABEL_BACKGROUND_PADDING_Y;
+                    that._background.attr(bbox)
                 }
-            },
-            _drawConnector: function(renderer, group) {
-                var that = this,
-                    connectorOptions = that._options.connector || {},
-                    connector = that._connector;
-                if (that._checkConnector(connectorOptions)) {
-                    if (!connector)
-                        that._connector = connector = renderer.path([], "line").append(group);
-                    else
-                        connector.attr({points: that._getConnectorPoints()});
-                    connector.attr(connectorOptions).sharp().toBackground()
+                that._labelSize = [bbox.width / 2, bbox.height / 2];
+                if (that._options.rotationAngle) {
+                    that._insideGroup.rotate(that._options.rotationAngle, bbox.x + bbox.width / 2, bbox.y + bbox.height / 2);
+                    bbox = _rotateBBox(bbox, [bbox.x + bbox.width / 2, bbox.y + bbox.height / 2], -that._options.rotationAngle)
                 }
+                that._bbox = bbox
             },
             _getConnectorPoints: function() {
                 var that = this,
-                    figure = that.figure,
-                    labelBbox = that.getBoundingRect(),
-                    centerX = labelBbox.x + labelBbox.width / 2,
-                    centerY = labelBbox.y + labelBbox.height / 2,
-                    points = [{
-                            x: centerX,
-                            y: labelBbox.y
-                        }, {
-                            x: labelBbox.x + labelBbox.width,
-                            y: centerY
-                        }, {
-                            x: centerX,
-                            y: labelBbox.y + labelBbox.height
-                        }, {
-                            x: labelBbox.x,
-                            y: centerY
-                        }],
-                    rotationAngle = that._options.rotationAngle;
-                if (!figure || pointInsideBox(labelBbox, figure))
-                    return [];
-                return that._getConnectorPointsOnFigure(figure, {
-                        rotationAngle: rotationAngle,
-                        points: points,
-                        x0: centerX,
-                        y0: centerY,
-                        background: that._background
-                    })
-            },
-            _setFigureOptions: function(figure) {
-                var that = this,
-                    getConnectorPointsOnFigure;
-                if (!figure)
-                    return;
-                if (_isDefined(figure.r)) {
-                    that.figure.center = figure;
-                    getConnectorPointsOnFigure = getPointOnCircular
+                    figure = that._figure,
+                    strategy = selectStrategy(figure),
+                    bbox = that.getBoundingRect(),
+                    labelPoint,
+                    figurePoint,
+                    xc,
+                    yc,
+                    points = [];
+                if (!strategy.isLabelInside(bbox, figure, that._options.position !== "inside")) {
+                    xc = bbox.x + bbox.width / 2;
+                    yc = bbox.y + bbox.height / 2;
+                    points = strategy.prepareLabelPoints([[xc, yc - that._labelSize[1]], [xc + that._labelSize[0], yc], [xc, yc + that._labelSize[1]], [xc - that._labelSize[0], yc]], [xc, yc], -that._options.rotationAngle || 0, !!that._background);
+                    labelPoint = getClosestCoord(strategy.getFigureCenter(figure), points);
+                    labelPoint = [_round(labelPoint[0]), _round(labelPoint[1])];
+                    figurePoint = strategy.findFigurePoint(figure, labelPoint);
+                    points = figurePoint.concat(labelPoint)
                 }
-                else if (_isDefined(figure.angle)) {
-                    that.figure.center = figure;
-                    getConnectorPointsOnFigure = getPointsOnAngle
-                }
-                else {
-                    that.figure.center = {
-                        x: figure.x + figure.width / 2,
-                        y: figure.y + figure.height / 2
-                    };
-                    getConnectorPointsOnFigure = getPointOnBoxFigure
-                }
-                that._getConnectorPointsOnFigure = getConnectorPointsOnFigure
-            },
-            _setVisibility: function(visibility) {
-                this._group && this._group.attr({visibility: visibility})
-            },
-            draw: function(renderer, group, visibility) {
-                var that = this,
-                    text = that._format();
-                if (_isDefined(text) && text !== "") {
-                    that._drawGroups(renderer, group);
-                    that._setVisibility(visibility);
-                    that._drawText(renderer, text);
-                    that._drawBackground(renderer);
-                    that._rotateLabel();
-                    that._setBoundingRect();
-                    that._drawConnector(renderer, that._group)
-                }
-                else {
-                    that._setVisibility("hidden");
-                    that._insideGroup = null
-                }
-                that._formatText = text;
-                return that
+                return points
             },
             fit: function(size) {
-                var that = this,
+                var that = this;
+                if (!that._textContent)
+                    return that;
+                var cossin = _getCosAndSin(-that._options.rotationAngle || 0),
+                    textSize = _min(_abs(that._textSize[0] / cossin.cos), _abs(that._textSize[1] / cossin.sin)),
+                    requiredTextSize = _min(_abs(size.width / cossin.cos), _abs(size.height / cossin.sin)),
+                    text = that._textContent,
+                    i,
+                    ii,
+                    line,
+                    lines,
                     lineLength,
-                    updateText = "",
-                    rotationAngle = that._options.rotationAngle,
-                    angleFunction = _getCosAndSin(rotationAngle),
-                    text = that._formatText,
-                    bbox = that._initTextBbox,
-                    lines = [],
-                    index,
-                    lastIndex,
-                    maxLineLength = 0,
-                    lengthText,
-                    needLengthText;
-                function pushLines(text) {
-                    lines.push(text.replace(/<[^>]+>/g, ''));
-                    if (maxLineLength < lines[lines.length - 1].length)
-                        maxLineLength = lines[lines.length - 1].length
-                }
-                if (!that._text)
-                    return;
-                lengthText = rotationAngle ? _min(bbox.width / angleFunction.cos, bbox.height / angleFunction.sin) : bbox.width;
-                needLengthText = rotationAngle ? _min(size.width / angleFunction.cos, size.height / angleFunction.sin) : size.width;
-                if (lengthText <= needLengthText) {
-                    that._updateText(text);
-                    that._drawBackground();
-                    that._setBoundingRect();
-                    return
-                }
-                index = text.indexOf("<br/>");
-                lastIndex = 0;
-                while (index !== -1) {
-                    pushLines(text.slice(lastIndex, index));
-                    lastIndex = index + 5;
-                    index = text.indexOf(lastIndex, "<br/>")
-                }
-                pushLines(text.slice(lastIndex, text.length));
-                lineLength = _ceil(maxLineLength * needLengthText / lengthText);
-                for (var i = 0; i < lines.length; i++) {
-                    if (i > 0)
-                        updateText += "<br/>";
-                    if (lines[i].length > lineLength)
-                        updateText += lines[i].substr(0, lineLength - 1 - 3) + "...";
-                    else
-                        updateText += lines[i]
-                }
-                if (text !== updateText) {
-                    that._updateText(updateText);
-                    that._drawBackground();
-                    that._setBoundingRect()
-                }
-                return that
-            },
-            _deleteBackground: function() {
-                this._background && this._background.dispose();
-                this._background = null
-            },
-            _isBackgroundChanged: function(oldBackground, newBackground) {
-                return this._checkBackground(oldBackground || {}) !== this._checkBackground(newBackground || {})
-            },
-            _checkBackground: function(background) {
-                var hasColor = background.fill && background.fill !== "none",
-                    hasBorder = background['stroke-width'] && background.stroke && background.stroke !== "none";
-                return hasColor || hasBorder
-            },
-            _getBackgroundSettings: function() {
-                var bbox = this._textBBox;
-                return {
-                        x: bbox.x - LABEL_BACKGROUND_PADDING_X,
-                        y: bbox.y - LABEL_BACKGROUND_PADDING_Y,
-                        width: bbox.width + 2 * LABEL_BACKGROUND_PADDING_X,
-                        height: bbox.height + 2 * LABEL_BACKGROUND_PADDING_Y
+                    requiredLineLength;
+                if (textSize > requiredTextSize) {
+                    lines = text.split("<br/>");
+                    for (i = 0, ii = lines.length, lineLength = 0; i < ii; ++i) {
+                        line = lines[i] = lines[i].replace(/<[^>]+>/g, '');
+                        lineLength = _max(lineLength, line.length)
                     }
-            },
-            _deleteConnector: function() {
-                this._connector && this._connector.dispose();
-                this._connector = null
-            },
-            _isConnectorChanged: function(oldConnector, newConnector) {
-                return this._checkConnector(oldConnector || {}) !== this._checkConnector(newConnector || {})
-            },
-            _checkConnector: function(connector) {
-                return connector && connector["stroke-width"]
-            },
-            _rotateLabel: function() {
-                var bbox = this._initTextBbox;
-                this._insideGroup.rotate(this._options.rotationAngle, bbox.x + bbox.width / 2, bbox.y + bbox.height / 2)
-            },
-            _format: function() {
-                var that = this,
-                    data = that._data,
-                    options = that._options,
-                    formatHelper = DX.formatHelper;
-                data.valueText = formatHelper.format(data.value, options.format, options.precision);
-                data.argumentText = formatHelper.format(data.argument, options.argumentFormat, options.argumentPrecision);
-                if (data.percent !== undefined)
-                    data.percentText = formatHelper.format(data.percent, "percent", options.percentPrecision);
-                if (data.total !== undefined)
-                    data.totalText = formatHelper.format(data.total, options.format, options.precision);
-                if (data.openValue !== undefined)
-                    data.openValueText = formatHelper.format(data.openValue, options.format, options.precision);
-                if (data.closeValue !== undefined)
-                    data.closeValueText = formatHelper.format(data.closeValue, options.format, options.precision);
-                if (data.lowValue !== undefined)
-                    data.lowValueText = formatHelper.format(data.lowValue, options.format, options.precision);
-                if (data.highValue !== undefined)
-                    data.highValueText = formatHelper.format(data.highValue, options.format, options.precision);
-                if (data.reductionValue !== undefined)
-                    data.reductionValueText = formatHelper.format(data.reductionValue, options.format, options.precision);
-                return options.customizeText ? options.customizeText.call(data, data) : data.valueText
+                    requiredLineLength = _ceil(lineLength * requiredTextSize / textSize);
+                    for (i = 0; i < ii; ++i)
+                        lines[i] = (line = lines[i]).length > requiredLineLength ? line.substr(0, requiredLineLength - 4) + "..." : line;
+                    text = lines.join("<br/>")
+                }
+                that._updateText(text);
+                return that
             },
             shift: function(x, y) {
                 var that = this;
-                if (!that._insideGroup)
-                    return;
-                that._insideGroup.attr({
-                    translateX: _round(x - that.BBox.x),
-                    translateY: _round(y - that.BBox.y)
-                });
-                that._drawConnector();
+                if (that._textContent) {
+                    that._insideGroup.attr({
+                        translateX: that._x = _round(x - that._bbox.x),
+                        translateY: that._y = _round(y - that._bbox.y)
+                    });
+                    if (that._connector)
+                        that._connector.attr({points: that._getConnectorPoints()})
+                }
                 return that
             },
-            _setBoundingRect: function() {
-                this.BBox = this._backgroundBbox || this._textBBox
-            },
             getBoundingRect: function() {
-                var coords = {},
-                    that = this,
-                    insideGroup = this._insideGroup;
-                if (insideGroup) {
-                    coords.width = that.BBox.width;
-                    coords.height = that.BBox.height;
-                    coords.x = this.BBox.x + insideGroup.attr("translateX");
-                    coords.y = this.BBox.y + insideGroup.attr("translateY")
-                }
-                return coords
-            },
-            hasText: function() {
-                return !!this._text
+                var bbox = this._bbox;
+                return this._textContent ? {
+                        x: bbox.x + this._x,
+                        y: bbox.y + this._y,
+                        width: bbox.width,
+                        height: bbox.height
+                    } : {}
             },
             getLayoutOptions: function() {
                 var options = this._options;
                 return {
                         alignment: options.alignment,
-                        background: this._checkBackground(options.background || {}),
+                        background: checkBackground(options.background),
                         horizontalOffset: options.horizontalOffset,
                         verticalOffset: options.verticalOffset,
                         radialOffset: options.radialOffset,
@@ -10528,14 +10495,14 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     }
             }
         };
-        core.series.points.Label = Label
-    })(jQuery, DevExpress);
+        DX.viz.core.series.points.Label = Label;
+        Label._DEBUG_formatText = formatText
+    })(DevExpress, jQuery);
     /*! Module viz-core, file symbolPoint.js */
     (function($, DX) {
         var core = DX.viz.core,
             seriesNS = core.series,
             _extend = $.extend,
-            _isNumber = DX.utils.isNumber,
             _isDefined = DX.utils.isDefined,
             _math = Math,
             _round = _math.round,
@@ -10559,8 +10526,11 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 ceilHalfRadius = _ceil(r / 2);
             return [-r, -floorHalfRadius, -floorHalfRadius, -r, 0, -ceilHalfRadius, floorHalfRadius, -r, r, -floorHalfRadius, ceilHalfRadius, 0, r, floorHalfRadius, floorHalfRadius, r, 0, ceilHalfRadius, -floorHalfRadius, r, -r, floorHalfRadius, -ceilHalfRadius, 0]
         }
-        function getTriangleMarkerCoords(radius) {
+        function getTriangleDownMarkerCoords(radius) {
             return [-radius, -radius, radius, -radius, 0, radius, -radius, -radius]
+        }
+        function getTriangleUpMarkerCoords(radius) {
+            return [-radius, radius, radius, radius, 0, -radius, -radius, radius]
         }
         seriesNS.points.mixins = seriesNS.points.mixins || {};
         seriesNS.points.mixins.symbolPoint = {
@@ -10600,10 +10570,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 this._label = core.CoreFactory.createLabel()
             },
             _updateLabelData: function() {
-                this._label.updateData({
-                    formatObject: this._getLabelFormatObject(),
-                    initialValue: this.initialValue
-                })
+                this._label.setData(this._getLabelFormatObject())
             },
             _updateLabelOptions: function() {
                 !this._label && this._createLabel();
@@ -10629,7 +10596,10 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     case"polygon":
                         return getPolygonMarkerCoords(radius);
                     case"triangle":
-                        return getTriangleMarkerCoords(radius);
+                    case"triangleDown":
+                        return getTriangleDownMarkerCoords(radius);
+                    case"triangleUp":
+                        return getTriangleUpMarkerCoords(radius);
                     case"cross":
                         return getCrossMarkerCoords(radius)
                 }
@@ -10679,6 +10649,8 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     case"square":
                     case"polygon":
                     case"triangle":
+                    case"triangleDown":
+                    case"triangleUp":
                     case"cross":
                         marker = renderer.path([], "area").attr(pointSettings).sharp();
                         break
@@ -10743,17 +10715,23 @@ if (!DevExpress.MOD_VIZ_CORE) {
                         }
                 }
             },
+            _isLabelInsidePoint: $.noop,
+            _getShiftLabelCoords: function(label) {
+                var coord = this._addLabelAlignmentAndOffset(label, this._getLabelCoords(label));
+                return this._checkLabelPosition(label, coord)
+            },
             _drawLabel: function(renderer, group) {
                 var that = this,
                     customVisibility = that._getCustomLabelVisibility(),
                     coord,
                     label = that._label;
-                if ((that.series.getLabelVisibility() || customVisibility) && that.hasValue() && that._showForZeroValues()) {
+                if ((that.series.getLabelVisibility() || customVisibility !== null) && that.hasValue() && that._showForZeroValues()) {
                     label.draw(renderer, group, customVisibility);
-                    coord = that._addLabelAlignmentAndOffset(label, that._getLabelCoords(label));
-                    coord = that._checkLabelPosition(label, coord);
-                    label.setFigureToDrawConnector(that._getLabelConnector(label));
-                    label.shift(_round(coord.x), _round(coord.y))
+                    if (!that._isLabelInsidePoint(label)) {
+                        coord = that._getShiftLabelCoords(label);
+                        label.setFigureToDrawConnector(that._getLabelConnector());
+                        label.shift(_round(coord.x), _round(coord.y))
+                    }
                 }
                 else
                     label.hide()
@@ -10761,19 +10739,15 @@ if (!DevExpress.MOD_VIZ_CORE) {
             _showForZeroValues: function() {
                 return true
             },
-            _getLabelConnector: function(label, pointPosition) {
-                var options = this._options,
-                    figure,
-                    pos = this._getPositionFromLocation(pointPosition);
-                if (options.symbol === "circle")
-                    figure = {
-                        x: pos.x,
-                        y: pos.y,
-                        r: options.visible ? options.styles.normal.r : 0
-                    };
-                else
-                    figure = this._getGraphicBbox(pointPosition);
-                return figure
+            _getLabelConnector: function() {
+                var bbox = this._getGraphicBbox(),
+                    w2 = bbox.width / 2,
+                    h2 = bbox.height / 2;
+                return {
+                        x: bbox.x + w2,
+                        y: bbox.y + h2,
+                        r: this._options.visible ? Math.max(w2, h2) : 0
+                    }
             },
             _getPositionFromLocation: function() {
                 return {
@@ -11000,10 +10974,13 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 var style = this._currentStyle || this._getStyle(),
                     options = this._options,
                     r = style.r,
-                    extraSpace;
+                    extraSpace,
+                    symbol = options.symbol,
+                    isSquare = symbol === "square",
+                    isTriangle = symbol === "triangle" || symbol === "triangleDown" || symbol === "triangleUp";
                 if (options.visible && !options.image && r) {
                     extraSpace = style["stroke-width"] / 2;
-                    return (options.symbol === "square" || options.symbol === "triangle" ? 1.4 * r : r) + extraSpace
+                    return (isSquare || isTriangle ? 1.4 * r : r) + extraSpace
                 }
                 return 0
             },
@@ -11052,6 +11029,9 @@ if (!DevExpress.MOD_VIZ_CORE) {
                         valueText: tooltip.formatValue(that.initialValue)
                     }, _isDefined(labelFormatObject.percent) ? {percentText: tooltip.formatValue(labelFormatObject.percent, "percent")} : {}, _isDefined(labelFormatObject.total) ? {totalText: tooltip.formatValue(labelFormatObject.total)} : {})
             },
+            _getMarkerVisibility: function() {
+                return this._options.visible
+            },
             coordsIn: function(x, y) {
                 var trackerRadius = this._storeTrackerR();
                 return x >= this.x - trackerRadius && x <= this.x + trackerRadius && y >= this.y - trackerRadius && y <= this.y + trackerRadius
@@ -11063,7 +11043,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
         var points = DX.viz.core.series.points.mixins,
             _extend = $.extend,
             _math = Math,
-            _round = _math.round,
+            _floor = _math.floor,
             _abs = _math.abs,
             _min = _math.min,
             CANVAS_POSITION_DEFAULT = "canvas_position_default",
@@ -11075,7 +11055,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
             BOTTOM = "bottom";
         points.barPoint = _extend({}, points.symbolPoint, {
             correctCoordinates: function(correctOptions) {
-                var correction = correctOptions.offset - _round(correctOptions.width / 2),
+                var correction = _floor(correctOptions.offset - correctOptions.width / 2),
                     rotated = this._options.rotated,
                     valueSelector = rotated ? "height" : "width",
                     correctionSelector = (rotated ? "y" : "x") + "Correction";
@@ -11090,6 +11070,9 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 bbox.width = that.width;
                 bbox.height = that.height;
                 return bbox
+            },
+            _getLabelConnector: function() {
+                return this._getGraphicBbox()
             },
             _getLabelPosition: function() {
                 var that = this,
@@ -11127,15 +11110,21 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     visibleArea = that._getVisibleArea(),
                     rotated = that._options.rotated,
                     graphicBbox = that._getGraphicBbox(),
-                    labelBbox = label.getBoundingRect(),
-                    visible = true;
-                if (that._options.resolveLabelsOverlapping && label.getLayoutOptions().position === "inside")
-                    if (labelBbox.width > graphicBbox.width || labelBbox.height > graphicBbox.height)
-                        visible = false;
-                visible ? label.show() : label.hide();
+                    labelBbox = label.getBoundingRect();
                 if (that._isPointInVisibleArea(visibleArea, graphicBbox))
                     return that._moveLabelOnCanvas(coord, visibleArea, labelBbox, that.adjustSeriesLabels || rotated, that.adjustSeriesLabels || !rotated);
                 return coord
+            },
+            _isLabelInsidePoint: function(label) {
+                var that = this,
+                    graphicBbox = that._getGraphicBbox(),
+                    labelBbox = label.getBoundingRect();
+                if (that._options.resolveLabelsOverlapping && label.getLayoutOptions().position === "inside")
+                    if (labelBbox.width > graphicBbox.width || labelBbox.height > graphicBbox.height) {
+                        label.hide();
+                        return true
+                    }
+                return false
             },
             _moveLabelOnCanvas: function(coord, visibleArea, labelBbox, horizontalAdjust, verticalAdjust) {
                 var x = coord.x,
@@ -11214,37 +11203,25 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 var isPositive = this.value >= 0,
                     invertedY = this.translators.y.getBusinessRange().invert,
                     invertedX = this.translators.x.getBusinessRange().invert,
-                    arrowSide,
-                    verticalPosition,
                     xCoord,
                     yCoord;
                 if (this._options.rotated) {
                     yCoord = y + height / 2;
-                    if (invertedX) {
+                    if (invertedX)
                         xCoord = isPositive ? x : x + width;
-                        arrowSide = isPositive ? RIGHT : LEFT
-                    }
-                    else {
-                        xCoord = isPositive ? x + width : x;
-                        arrowSide = isPositive ? LEFT : RIGHT
-                    }
+                    else
+                        xCoord = isPositive ? x + width : x
                 }
                 else {
                     xCoord = x + width / 2;
-                    if (invertedY) {
+                    if (invertedY)
                         yCoord = isPositive ? y + height : y;
-                        verticalPosition = isPositive ? BOTTOM : TOP
-                    }
-                    else {
-                        yCoord = isPositive ? y : y + height;
-                        verticalPosition = isPositive ? TOP : BOTTOM
-                    }
+                    else
+                        yCoord = isPositive ? y : y + height
                 }
                 return {
                         x: xCoord,
                         y: yCoord,
-                        arrowSide: arrowSide,
-                        cloudVerticalPosition: verticalPosition,
                         offset: 0
                     }
             },
@@ -11408,18 +11385,33 @@ if (!DevExpress.MOD_VIZ_CORE) {
             points = series.points.mixins,
             _extend = $.extend,
             _round = Math.round,
+            _sqrt = Math.sqrt,
             _acos = Math.acos,
             DEG = 180 / Math.PI,
             _abs = Math.abs,
-            _utils = DX.utils,
-            INDENT_FROM_PIE = series.helpers.consts.pieLabelIndent,
-            _getCosAndSin = _utils.getCosAndSin;
+            _normalizeAngle = DX.utils.normalizeAngle,
+            _getCosAndSin = DX.utils.getCosAndSin,
+            _isDefined = DX.utils.isDefined,
+            INDENT_FROM_PIE = series.helpers.consts.pieLabelIndent;
+        function getVerticallyShiftedAngularCoords(bbox, dy, center) {
+            var isPositive = bbox.x + bbox.width / 2 >= center.x,
+                dx1 = (isPositive ? bbox.x : bbox.x + bbox.width) - center.x,
+                dy1 = bbox.y - center.y,
+                dy2 = dy1 + dy,
+                dx2 = _round(_sqrt(dx1 * dx1 + dy1 * dy1 - dy2 * dy2)),
+                dx = (isPositive ? +dx2 : -dx2) || dx1;
+            return {
+                    x: center.x + (isPositive ? dx : dx - bbox.width),
+                    y: bbox.y + dy
+                }
+        }
+        DX.viz.core.utils.getVerticallyShiftedAngularCoords = getVerticallyShiftedAngularCoords;
         points.piePoint = _extend({}, points.symbolPoint, {
             _updateData: function(data) {
                 var that = this;
                 points.symbolPoint._updateData.call(this, data);
                 that._visible = true;
-                that.minValue = that.initialMinValue = that.originalMinValue = _utils.isDefined(data.minValue) ? data.minValue : 0
+                that.minValue = that.initialMinValue = that.originalMinValue = _isDefined(data.minValue) ? data.minValue : 0
             },
             animate: function(complete, duration, step) {
                 var that = this;
@@ -11450,33 +11442,22 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 that._label.setDataField("percent", percent)
             },
             _updateLabelData: function() {
-                this._label.updateData({formatObject: this._getLabelFormatObject()})
+                this._label.setData(this._getLabelFormatObject())
             },
             _updateLabelOptions: function() {
                 var that = this;
                 !that._label && that._createLabel();
                 that._label.setOptions(that._options.label)
             },
-            _drawLabel: function(renderer, group, isFirstDraw) {
+            _getShiftLabelCoords: function() {
                 var that = this,
-                    coord,
-                    bbox,
-                    visibleArea,
-                    customVisibility = that._getCustomLabelVisibility();
-                if ((that.series.getLabelVisibility() || customVisibility) && that.hasValue()) {
+                    bbox = that._label.getBoundingRect(),
+                    coord = that._getLabelCoords(that._label),
                     visibleArea = that._getVisibleArea();
-                    that._label.draw(renderer, group, customVisibility);
-                    bbox = that._label.getBoundingRect();
-                    coord = that._getLabelCoords(that._label);
-                    that._label.setFigureToDrawConnector(that._getLabelConnector(that._label));
-                    if (isFirstDraw)
-                        coord = that._checkLabelPosition(coord, bbox, visibleArea);
-                    else
-                        coord = that._getLabelExtraCoord(coord, that._checkVerticalLabelPosition(coord, bbox, visibleArea), bbox);
-                    that._label.shift(_round(coord.x), _round(coord.y))
-                }
+                if (that._isLabelDrawingWithoutPoints)
+                    return that._checkLabelPosition(coord, bbox, visibleArea);
                 else
-                    that._label.hide()
+                    return that._getLabelExtraCoord(coord, that._checkVerticalLabelPosition(coord, bbox, visibleArea), bbox)
             },
             _getLabelPosition: function(options) {
                 return options.position
@@ -11518,7 +11499,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     canvas = that.series.canvas,
                     rightBorderX = canvas.width - canvas.right - bbox.width,
                     leftBorderX = canvas.left,
-                    angleOfPoint = _utils.normalizeAngle(that.middleAngle),
+                    angleOfPoint = _normalizeAngle(that.middleAngle),
                     x;
                 if (options.position !== 'columns')
                     return coord;
@@ -11534,9 +11515,11 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 coord.x = x;
                 return coord
             },
-            drawLabel: function(translators, renderer, group, isFirstDraw) {
+            drawLabel: function(translators, renderer, group) {
                 this.translate(translators);
-                this._drawLabel(renderer, group, isFirstDraw)
+                this._isLabelDrawingWithoutPoints = true;
+                this._drawLabel(renderer, group);
+                this._isLabelDrawingWithoutPoints = false
             },
             updateLabelCoord: function() {
                 var that = this,
@@ -11558,18 +11541,14 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     }
             },
             _getLabelExtraCoord: function(coord, shiftCoord, box) {
-                return coord.y !== shiftCoord.y ? _utils.getShiftingCoordOnRad({
+                return coord.y !== shiftCoord.y ? getVerticallyShiftedAngularCoords({
                         x: coord.x,
                         y: coord.y,
                         width: box.width,
                         height: box.height
-                    }, {
-                        x: shiftCoord.x,
-                        y: shiftCoord.y
-                    }, {
-                        centerX: this.centerX,
-                        centerY: this.centerY,
-                        angle: this.middleAngle
+                    }, shiftCoord.y - coord.y, {
+                        x: this.centerX,
+                        y: this.centerY
                     }) : coord
             },
             _checkHorizontalLabelPosition: function(coord, box, visibleArea) {
@@ -11618,17 +11597,10 @@ if (!DevExpress.MOD_VIZ_CORE) {
                         y: _round(that.centerY - (rad - borderWidth) * angleFunctions.sin)
                     }
             },
-            _getLabelConnector: function(label) {
-                if (label.getLayoutOptions().position !== "inside") {
-                    var coords = this.getBoundaryCoords();
-                    return {
-                            x: coords.x,
-                            y: coords.y,
-                            angle: this.middleAngle,
-                            centerX: this.centerX,
-                            centerY: this.centerY
-                        }
-                }
+            _getLabelConnector: function() {
+                var coords = this.getBoundaryCoords();
+                coords.angle = this.middleAngle;
+                return coords
             },
             _drawMarker: function(renderer, group, animationEnabled, firstDrawing) {
                 var that = this,
@@ -11664,6 +11636,9 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 that.middleAngle = translator.translate((value - minValue) / 2 + minValue) + angle;
                 if (!that.isVisible())
                     that.middleAngle = that.toAngle = that.fromAngle = that.fromAngle || angle
+            },
+            _getMarkerVisibility: function() {
+                return true
             },
             _updateMarker: function(animationEnabled, style) {
                 var that = this;
@@ -11720,7 +11695,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 var that = this,
                     lx = x - that.centerX,
                     ly = y - that.centerY,
-                    r = Math.sqrt(lx * lx + ly * ly),
+                    r = _sqrt(lx * lx + ly * ly),
                     fromAngle = that.fromAngle % 360,
                     toAngle = that.toAngle % 360,
                     isArc = !!(that.toAngle - that.fromAngle),
@@ -11813,19 +11788,12 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     }
             },
             _updateLabelData: function() {
-                var that = this,
-                    maxFormatObject = that._getLabelFormatObject();
+                var maxFormatObject = this._getLabelFormatObject();
                 maxFormatObject.index = 1;
-                that._topLabel.updateData({
-                    formatObject: maxFormatObject,
-                    initialValue: that.initialValue
-                });
-                that._bottomLabel.updateData({
-                    formatObject: that._getLabelMinFormatObject(),
-                    initialValue: that.initialMinValue
-                })
+                this._topLabel.setData(maxFormatObject);
+                this._bottomLabel.setData(this._getLabelMinFormatObject())
             },
-            _updateLabelOptions: function(type) {
+            _updateLabelOptions: function() {
                 var that = this,
                     options = this._options.label;
                 (!that._topLabel || !that._bottomLabel) && that._createLabel();
@@ -11837,6 +11805,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 this._bottomLabel = core.CoreFactory.createLabel()
             },
             _getGraphicBbox: function(location) {
+                location = location || this._labelLocation;
                 var options = this._options,
                     images = this._getImage(options.image),
                     image = location === "top" ? this._checkImage(images.top) : this._checkImage(images.bottom),
@@ -11938,7 +11907,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     customVisibility = that._getCustomLabelVisibility();
                 that._topLabel.pointPosition = notInverted ? "top" : "bottom";
                 that._bottomLabel.pointPosition = notInverted ? "bottom" : "top";
-                if ((that.series.getLabelVisibility() || customVisibility) && that.hasValue()) {
+                if ((that.series.getLabelVisibility() || customVisibility !== null) && that.hasValue()) {
                     that.visibleTopMarker !== false && labels.push(that._topLabel);
                     that.visibleBottomMarker !== false && labels.push(that._bottomLabel);
                     $.each(labels, function(_, label) {
@@ -11946,7 +11915,9 @@ if (!DevExpress.MOD_VIZ_CORE) {
                         label.draw(renderer, group, customVisibility);
                         coord = that._addLabelAlignmentAndOffset(label, that._getLabelCoords(label, pointPosition));
                         coord = that._checkLabelPosition(label, coord, pointPosition);
-                        label.setFigureToDrawConnector(that._getLabelConnector(label, pointPosition));
+                        that._labelLocation = label.pointPosition;
+                        label.setFigureToDrawConnector(that._getLabelConnector());
+                        that._labelLocation = null;
                         label.shift(_round(coord.x), _round(coord.y))
                     });
                     that._checkLabelsOverlay(that._topLabel.pointPosition)
@@ -12211,12 +12182,10 @@ if (!DevExpress.MOD_VIZ_CORE) {
             getTooltipParams: function(location) {
                 var edgeLocation = location === 'edge',
                     x,
-                    y,
-                    arrowSide;
+                    y;
                 if (this._options.rotated) {
                     x = edgeLocation ? this.x + this.width : this.x + this.width / 2;
-                    y = this.y + this.height / 2;
-                    arrowSide = edgeLocation ? 'left' : undefined
+                    y = this.y + this.height / 2
                 }
                 else {
                     x = this.x + this.width / 2;
@@ -12225,8 +12194,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 return {
                         x: x,
                         y: y,
-                        offset: 0,
-                        arrowSide: arrowSide
+                        offset: 0
                     }
             },
             _translate: function(translator) {
@@ -12251,6 +12219,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
             _drawLabel: rangeSymbolPointMethods._drawLabel,
             _getLabelCoords: rangeSymbolPointMethods._getLabelCoords,
             _getGraphicBbox: function(location) {
+                location = location || this._labelLocation;
                 var isTop = location === "top",
                     bbox = points.barPoint._getGraphicBbox.call(this);
                 if (!this._options.rotated) {
@@ -12429,8 +12398,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                         maxValue = _max(that.lowY, that.highY),
                         visibleAreaX = that.translators.x.getCanvasVisibleArea(),
                         visibleAreaY = that.translators.y.getCanvasVisibleArea(),
-                        edgeLocation = location === 'edge',
-                        arrowSide;
+                        edgeLocation = location === 'edge';
                     if (!that._options.rotated) {
                         min = _max(visibleAreaY.min, minValue);
                         max = _min(visibleAreaY.max, maxValue);
@@ -12441,14 +12409,12 @@ if (!DevExpress.MOD_VIZ_CORE) {
                         min = _max(visibleAreaX.min, minValue);
                         max = _min(visibleAreaX.max, maxValue);
                         y = that.x;
-                        x = edgeLocation ? max : min + (max - min) / 2;
-                        arrowSide = edgeLocation ? 'left' : undefined
+                        x = edgeLocation ? max : min + (max - min) / 2
                     }
                     return {
                             x: x,
                             y: y,
-                            offset: 0,
-                            arrowSide: arrowSide
+                            offset: 0
                         }
                 }
             },
@@ -12503,10 +12469,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 that._isPositive = data.openValue < data.closeValue;
                 that._isReduction = data.isReduction;
                 if (that._isReduction)
-                    label.updateOptions({
-                        background: {fill: reductionColor},
-                        connector: {stroke: reductionColor}
-                    })
+                    label.setColor(reductionColor)
             },
             _updateMarker: function(animationEnabled, style, group) {
                 var that = this,
@@ -12622,10 +12585,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 that.defaultX = that.centerX = center.x;
                 that.defaultY = that.centerY = center.y;
                 that._translateErrorBars(translator);
-                that.inVisibleArea = that._checkVisibility(translator)
-            },
-            _checkVisibility: function(translator) {
-                return translator.checkVisibility(this.radius)
+                that.inVisibleArea = true
             },
             _translateErrorBars: function(translator) {
                 var that = this;
@@ -12763,96 +12723,107 @@ if (!DevExpress.MOD_VIZ_CORE) {
         })
     })(jQuery, DevExpress);
     /*! Module viz-core, file dataValidator.js */
-    (function($, DX) {
+    (function($, DX, undefined) {
         var viz = DX.viz,
             parseUtils = new viz.core.ParseUtils,
-            dataTypes = {
-                STRING: 'string',
-                NUMERIC: 'numeric',
-                DATETIME: 'datetime'
-            },
-            axisTypes = {
-                DISCRETE: 'discrete',
-                CONTINUOUS: 'continuous',
-                LOGARITHMIC: 'logarithmic'
-            },
+            STRING = "string",
+            NUMERIC = "numeric",
+            DATETIME = "datetime",
+            DISCRETE = "discrete",
+            CONTINUOUS = "continuous",
+            LOGARITHMIC = "logarithmic",
+            VALUE_TYPE = "valueType",
+            ARGUMENT_TYPE = "argumentType",
+            axisTypeParser = viz.core.utils.enumParser([STRING, NUMERIC, DATETIME]),
             utils = DX.utils,
             _each = $.each,
             _isDefined = utils.isDefined;
-        var mergeSort = function(data, field) {
-                function merge_sort(array, low, high, field) {
-                    if (low < high) {
-                        var mid = Math.floor((low + high) / 2);
-                        merge_sort(array, low, mid, field);
-                        merge_sort(array, mid + 1, high, field);
-                        merge(array, low, mid, high, field)
-                    }
+        function groupingValues(data, others, valueField, index) {
+            if (!_isDefined(index) || index < 0)
+                return;
+            _each(data.slice(index), function(_, cell) {
+                if (!_isDefined(cell[valueField]))
+                    return;
+                others[valueField] += cell[valueField];
+                cell[valueField] = undefined;
+                cell["original" + valueField] = undefined
+            })
+        }
+        function mergeSort(data, field) {
+            function merge_sort(array, low, high, field) {
+                if (low < high) {
+                    var mid = Math.floor((low + high) / 2);
+                    merge_sort(array, low, mid, field);
+                    merge_sort(array, mid + 1, high, field);
+                    merge(array, low, mid, high, field)
                 }
-                var n = data.length;
-                merge_sort(data, 0, n - 1, field);
-                return data
-            };
-        var merge = function(array, low, mid, high, field) {
-                var newArray = new Array(high - low + 1),
-                    countL = low,
-                    countR = mid + 1,
-                    k,
-                    i = 0;
-                while (countL <= mid && countR <= high) {
-                    if (array[countL][field] <= array[countR][field] || !_isDefined(array[countR][field])) {
-                        newArray[i] = array[countL];
-                        countL++
-                    }
-                    else {
-                        newArray[i] = array[countR];
-                        countR++
-                    }
-                    i++
+            }
+            var n = data.length;
+            merge_sort(data, 0, n - 1, field);
+            return data
+        }
+        function merge(array, low, mid, high, field) {
+            var newArray = new Array(high - low + 1),
+                countL = low,
+                countR = mid + 1,
+                k,
+                i = 0;
+            while (countL <= mid && countR <= high) {
+                if (array[countL][field] <= array[countR][field] || !_isDefined(array[countR][field])) {
+                    newArray[i] = array[countL];
+                    countL++
                 }
-                if (countL > mid)
-                    for (k = countR; k <= high; k++, i++)
-                        newArray[i] = array[k];
-                else
-                    for (k = countL; k <= mid; k++, i++)
-                        newArray[i] = array[k];
-                for (k = 0; k <= high - low; k++)
-                    array[k + low] = newArray[k];
-                return array
-            };
-        viz.core.DataValidator = DX.Class.inherit({
-            ctor: function(data, groups, incidentOccured, dataPrepareOptions) {
-                var that = this;
-                groups = groups || [[]];
-                if (!data)
-                    that._nullData = true;
-                that.groups = groups;
-                that.data = data || [];
-                that._parsers = {};
-                that._errorShowList = {};
-                that._skipFields = {};
-                that.options = dataPrepareOptions || {};
-                that.incidentOccured = incidentOccured;
-                that.userArgumentCategories = that.groups.argumentOptions && that.groups.argumentOptions.categories || [];
-                if (!incidentOccured)
-                    that.incidentOccured = $.noop
-            },
+                else {
+                    newArray[i] = array[countR];
+                    countR++
+                }
+                i++
+            }
+            if (countL > mid)
+                for (k = countR; k <= high; k++, i++)
+                    newArray[i] = array[k];
+            else
+                for (k = countL; k <= mid; k++, i++)
+                    newArray[i] = array[k];
+            for (k = 0; k <= high - low; k++)
+                array[k + low] = newArray[k];
+            return array
+        }
+        function DataValidator(data, groups, incidentOccured, dataPrepareOptions) {
+            var that = this;
+            groups = groups || [[]];
+            that._nullData = !data;
+            that.groups = groups;
+            that.data = data || [];
+            that._parsers = {};
+            that._errorShowList = {};
+            that._skipFields = {};
+            that.options = dataPrepareOptions || {};
+            that.incidentOccured = incidentOccured;
+            that.userArgumentCategories = that.groups.argumentOptions && that.groups.argumentOptions.categories || [];
+            if (!incidentOccured)
+                that.incidentOccured = $.noop
+        }
+        viz.core.DataValidator = DataValidator;
+        DataValidator.prototype = {
+            ctor: DataValidator,
             validate: function validate() {
-                var that = this;
+                var that = this,
+                    dataLength;
                 that._data = that.data;
                 that.groups.argumentType = null;
                 that.groups.argumentAxisType = null;
-                $.each(that.groups, function(_, group) {
+                _each(that.groups, function(_, group) {
                     group.valueType = null;
                     group.valueAxisType = null;
-                    $.each(group, function(_, series) {
+                    _each(group, function(_, series) {
                         series.updateDataType({})
                     });
-                    if (group.valueAxis)
-                        group.valueAxis.resetTypes("valueType")
+                    group.valueAxis && group.valueAxis.resetTypes(VALUE_TYPE)
                 });
                 if (that.groups.argumentAxes)
-                    $.each(that.groups.argumentAxes, function(_, axis) {
-                        axis.resetTypes("argumentType")
+                    _each(that.groups.argumentAxes, function(_, axis) {
+                        axis.resetTypes(ARGUMENT_TYPE)
                     });
                 that._checkType();
                 that._checkAxisType();
@@ -12864,53 +12835,55 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 }
                 that._groupData();
                 that._sort();
-                $.each(that._skipFields, function(field, fieldValue) {
-                    if (fieldValue === that._data.length)
+                dataLength = that._data.length;
+                _each(that._skipFields, function(field, fieldValue) {
+                    if (fieldValue === dataLength)
                         that.incidentOccured("W2002", [field])
                 });
                 return that._data
+            },
+            _checkValueTypeOfGroup: function(group, cell) {
+                var that = this;
+                _each(group, function(_, series) {
+                    _each(series.getValueFields(), function(_, field) {
+                        group.valueType = that._getType(cell[field], group.valueType)
+                    })
+                });
+                return group.valueType
+            },
+            _checkArgumentTypeOfGroup: function(group, cell) {
+                var that = this;
+                _each(group, function(_, series) {
+                    that.groups.argumentType = that._getType(cell[series.getArgumentField()], that.groups.argumentType)
+                });
+                return that.groups.argumentType
             },
             _checkType: function _checkType() {
                 var that = this,
                     groupsWithUndefinedValueType = [],
                     groupsWithUndefinedArgumentType = [],
-                    checkValueTypeOfGroup = function checkValueTypeOfGroup(group, cell) {
-                        $.each(group, function(_, series) {
-                            $.each(series.getValueFields(), function(_, field) {
-                                group.valueType = that._getType(cell[field], group.valueType)
-                            })
-                        });
-                        if (group.valueType)
-                            return true
-                    },
-                    checkArgumentTypeOfGroup = function checkArgumentTypeOfGroup(group, cell) {
-                        $.each(group, function(_, series) {
-                            that.groups.argumentType = that._getType(cell[series.getArgumentField()], that.groups.argumentType)
-                        });
-                        if (that.groups.argumentType)
-                            return true
-                    },
-                    argumentTypeGroup = that.groups.argumentOptions && that.groups.argumentOptions.argumentType;
-                $.each(that.groups, function(_, group) {
+                    groups = that.groups,
+                    argumentTypeGroup = groups.argumentOptions && axisTypeParser(groups.argumentOptions.argumentType);
+                _each(groups, function(_, group) {
                     if (!group.length)
                         return null;
-                    var valueTypeGroup = group.valueOptions && group.valueOptions.valueType;
+                    var valueTypeGroup = group.valueOptions && axisTypeParser(group.valueOptions.valueType);
                     group.valueType = valueTypeGroup;
-                    that.groups.argumentType = argumentTypeGroup;
+                    groups.argumentType = argumentTypeGroup;
                     !valueTypeGroup && groupsWithUndefinedValueType.push(group);
                     !argumentTypeGroup && groupsWithUndefinedArgumentType.push(group)
                 });
                 if (groupsWithUndefinedValueType.length || groupsWithUndefinedArgumentType.length)
-                    $.each(that.data, function(_, cell) {
+                    _each(that.data, function(_, cell) {
                         var defineVal,
                             defineArg;
                         if (!utils.isObject(cell))
                             return;
-                        $.each(groupsWithUndefinedValueType, function(index, group) {
-                            defineVal = checkValueTypeOfGroup(group, cell)
+                        _each(groupsWithUndefinedValueType, function(_, group) {
+                            defineVal = that._checkValueTypeOfGroup(group, cell)
                         });
-                        $.each(groupsWithUndefinedArgumentType, function(index, group) {
-                            defineArg = checkArgumentTypeOfGroup(group, cell)
+                        _each(groupsWithUndefinedArgumentType, function(_, group) {
+                            defineArg = that._checkArgumentTypeOfGroup(group, cell)
                         });
                         if (!that.options.checkTypeForAllData && defineVal && defineArg)
                             return false
@@ -12918,39 +12891,41 @@ if (!DevExpress.MOD_VIZ_CORE) {
             },
             _checkAxisType: function _checkAxisType() {
                 var that = this,
-                    argumentOptions = that.groups.argumentOptions || {};
-                $.each(that.groups, function(_, group) {
-                    $.each(group, function(_, series) {
+                    groups = that.groups,
+                    argumentOptions = groups.argumentOptions || {};
+                _each(groups, function(_, group) {
+                    _each(group, function(_, series) {
                         var optionsSeries = {},
                             valueOptions = group.valueOptions || {},
                             valueCategories = valueOptions.categories || [];
-                        optionsSeries.argumentAxisType = that._correctAxisType(that.groups.argumentType, argumentOptions.type, !!that.userArgumentCategories.length);
+                        optionsSeries.argumentAxisType = that._correctAxisType(groups.argumentType, argumentOptions.type, !!that.userArgumentCategories.length);
                         optionsSeries.valueAxisType = that._correctAxisType(group.valueType, valueOptions.type, !!valueCategories.length);
-                        that.groups.argumentAxisType = that.groups.argumentAxisType || optionsSeries.argumentAxisType;
+                        groups.argumentAxisType = groups.argumentAxisType || optionsSeries.argumentAxisType;
                         group.valueAxisType = group.valueAxisType || optionsSeries.valueAxisType;
-                        optionsSeries.argumentType = that.groups.argumentType;
+                        optionsSeries.argumentType = groups.argumentType;
                         optionsSeries.valueType = group.valueType;
                         optionsSeries.showZero = valueOptions.showZero;
                         series.updateDataType(optionsSeries)
                     });
                     if (group.valueAxis) {
-                        group.valueAxis.setTypes(group.valueAxisType, group.valueType, "valueType");
-                        group.valueAxis.validate(false, that.incidentOccured)
+                        group.valueAxis.setTypes(group.valueAxisType, group.valueType, VALUE_TYPE);
+                        group.valueAxis.validate(false)
                     }
                 });
                 if (that.groups.argumentAxes)
                     _each(that.groups.argumentAxes, function(_, axis) {
-                        axis.setTypes(that.groups.argumentAxisType, that.groups.argumentType, "argumentType");
-                        axis.validate(true, that.incidentOccured)
+                        axis.setTypes(that.groups.argumentAxisType, that.groups.argumentType, ARGUMENT_TYPE);
+                        axis.validate(true)
                     })
             },
             _createParser: function _createParser() {
-                var that = this;
-                $.each(that.groups, function(index, group) {
-                    $.each(group, function(_, series) {
-                        that._parsers[series.getArgumentField()] = that._createParserUnit(that.groups.argumentType, that.groups.argumentAxisType === axisTypes.LOGARITHMIC ? that._filterForLogAxis : null);
-                        $.each(series.getValueFields(), function(_, field) {
-                            that._parsers[field] = that._createParserUnit(group.valueType, group.valueAxisType === axisTypes.LOGARITHMIC ? that._filterForLogAxis : null, series.getOptions().ignoreEmptyPoints)
+                var that = this,
+                    groups = that.groups;
+                _each(groups, function(_, group) {
+                    _each(group, function(_, series) {
+                        that._parsers[series.getArgumentField()] = that._createParserUnit(groups.argumentType, groups.argumentAxisType === LOGARITHMIC ? that._filterForLogAxis : null);
+                        _each(series.getValueFields(), function(_, field) {
+                            that._parsers[field] = that._createParserUnit(group.valueType, group.valueAxisType === LOGARITHMIC ? that._filterForLogAxis : null, series.getOptions().ignoreEmptyPoints)
                         });
                         if (series.getTagField())
                             that._parsers[series.getTagField()] = null
@@ -12960,13 +12935,13 @@ if (!DevExpress.MOD_VIZ_CORE) {
             _parse: function _parse() {
                 var that = this,
                     parsedData = [];
-                $.each(that.data, function(_, cell) {
+                _each(that.data, function(_, cell) {
                     var parserObject = {};
                     if (!utils.isObject(cell)) {
                         cell && that._incorrectDataMessage();
                         return
                     }
-                    $.each(that._parsers, function(field, parser) {
+                    _each(that._parsers, function(field, parser) {
                         parserObject[field] = parser ? parser(cell[field], field) : cell[field];
                         parserObject["original" + field] = cell[field]
                     });
@@ -12975,8 +12950,8 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 this._data = parsedData
             },
             _groupMinSlices: function(argumentField, valueField, smallValuesGrouping) {
+                smallValuesGrouping = smallValuesGrouping || {};
                 var that = this,
-                    smallValuesGrouping = smallValuesGrouping || {},
                     mode = smallValuesGrouping.mode,
                     count = smallValuesGrouping.topCount,
                     threshold = smallValuesGrouping.threshold,
@@ -12984,17 +12959,6 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     others = {},
                     data = that._data.slice(),
                     index;
-                var groupingValues = function(index) {
-                        if (!_isDefined(index) || index < 0)
-                            return;
-                        _each(data.slice(index), function(_, cell) {
-                            if (!_isDefined(cell[valueField]))
-                                return;
-                            others[valueField] += cell[valueField];
-                            cell[valueField] = undefined;
-                            cell["original" + valueField] = undefined
-                        })
-                    };
                 if (!mode || mode === "none")
                     return;
                 others[argumentField] = name + "";
@@ -13014,10 +12978,10 @@ if (!DevExpress.MOD_VIZ_CORE) {
                         if (threshold > cell[valueField])
                             index = i
                     });
-                    groupingValues(index)
+                    groupingValues(data, others, valueField, index)
                 }
                 else if (mode === "topN")
-                    groupingValues(count);
+                    groupingValues(data, others, valueField, count);
                 others[valueField] && that._data.push(others)
             },
             _groupData: function() {
@@ -13032,7 +12996,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     _each(group, function(_, series) {
                         argumentField = series.getArgumentField();
                         valueFields = series.getValueFields();
-                        if (groups.argumentAxisType === axisTypes.DISCRETE)
+                        if (groups.argumentAxisType === DISCRETE)
                             that._groupSameArguments(argumentField, valueFields);
                         that._groupMinSlices(argumentField, valueFields[0], series.getOptions().smallValuesGrouping)
                     })
@@ -13060,21 +13024,21 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 })
             },
             _getType: function _getType(unit, type) {
-                if (type === dataTypes.STRING || utils.isString(unit))
-                    return dataTypes.STRING;
-                if (type === dataTypes.DATETIME || utils.isDate(unit))
-                    return dataTypes.DATETIME;
+                if (type === STRING || utils.isString(unit))
+                    return STRING;
+                if (type === DATETIME || utils.isDate(unit))
+                    return DATETIME;
                 if (utils.isNumber(unit))
-                    return dataTypes.NUMERIC;
+                    return NUMERIC;
                 return type
             },
             _correctAxisType: function _correctAxisType(type, axisType, hasCategories) {
-                if (type === dataTypes.STRING && (axisType === axisTypes.CONTINUOUS || axisType === axisTypes.LOGARITHMIC))
+                if (type === STRING && (axisType === CONTINUOUS || axisType === LOGARITHMIC))
                     this.incidentOccured("E2002");
-                if (axisType === axisTypes.LOGARITHMIC)
-                    return axisTypes.LOGARITHMIC;
-                axisType = (hasCategories || axisType === axisTypes.DISCRETE || type === dataTypes.STRING) && axisTypes.DISCRETE;
-                return axisType || axisTypes.CONTINUOUS
+                if (axisType === LOGARITHMIC)
+                    return LOGARITHMIC;
+                axisType = (hasCategories || axisType === DISCRETE || type === STRING) && DISCRETE;
+                return axisType || CONTINUOUS
             },
             _filterForLogAxis: function(val, field) {
                 if (val <= 0) {
@@ -13111,23 +13075,25 @@ if (!DevExpress.MOD_VIZ_CORE) {
             },
             _sort: function _sort() {
                 var that = this,
+                    sortingMethod = that.options.sortingMethod,
+                    data = that._data,
                     groups = that.groups,
                     hash = {},
                     argumentField = groups.length && groups[0].length && groups[0][0].getArgumentField();
-                if (utils.isFunction(that.options.sortingMethod))
-                    that._data.sort(that.options.sortingMethod);
+                if (utils.isFunction(sortingMethod))
+                    data.sort(sortingMethod);
                 else if (that.userArgumentCategories.length) {
-                    $.each(that.userArgumentCategories, function(index, value) {
+                    _each(that.userArgumentCategories, function(index, value) {
                         hash[value] = index
                     });
-                    that._data.sort(function sortCat(a, b) {
+                    data.sort(function sortCat(a, b) {
                         a = a[argumentField];
                         b = b[argumentField];
                         return hash[a] - hash[b]
                     })
                 }
-                else if (that.options.sortingMethod === true && groups.argumentType !== dataTypes.STRING)
-                    mergeSort(that._data, argumentField)
+                else if (sortingMethod === true && groups.argumentType !== STRING)
+                    mergeSort(data, argumentField)
             },
             _addSkipFields: function _addSkipFields(field) {
                 this._skipFields[field] = (this._skipFields[field] || 0) + 1
@@ -13138,14 +13104,80 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     this.incidentOccured("E2001")
                 }
             }
-        })
+        }
     })(jQuery, DevExpress);
     /*! Module viz-core, file default.js */
-    (function($, DX, undefined) {
-        var fontFamilyDefault = "'Segoe UI', 'Helvetica Neue', 'Trebuchet MS', Verdana",
-            fontFamilyLight = "'Segoe UI Light', 'Helvetica Neue Light', 'Segoe UI', 'Helvetica Neue', 'Trebuchet MS', Verdana",
-            baseChartTheme = {
-                containerBackgroundColor: '#ffffff',
+    (function(DX, undefined) {
+        DX.viz.core.registerTheme({
+            name: "generic.light",
+            font: {
+                color: '#767676',
+                family: "'Segoe UI', 'Helvetica Neue', 'Trebuchet MS', Verdana",
+                weight: 400,
+                size: 12,
+                cursor: 'default'
+            },
+            redrawOnResize: true,
+            backgroundColor: "#ffffff",
+            primaryTitleColor: "#232323",
+            secondaryTitleColor: "#767676",
+            axisColor: "#d3d3d3",
+            axisLabelColor: "#a8a8a8",
+            title: {font: {
+                    family: "'Segoe UI Light', 'Helvetica Neue Light', 'Segoe UI', 'Helvetica Neue', 'Trebuchet MS', Verdana",
+                    weight: 200
+                }},
+            loadingIndicator: {text: "Loading..."},
+            tooltip: {
+                enabled: false,
+                border: {
+                    width: 1,
+                    color: '#d3d3d3',
+                    dashStyle: 'solid',
+                    visible: true
+                },
+                font: {color: '#232323'},
+                color: '#ffffff',
+                arrowLength: 10,
+                paddingLeftRight: 18,
+                paddingTopBottom: 15,
+                shared: false,
+                location: 'center',
+                format: '',
+                argumentFormat: '',
+                precision: 0,
+                argumentPrecision: 0,
+                percentPrecision: 0,
+                shadow: {
+                    opacity: 0.4,
+                    offsetX: 0,
+                    offsetY: 4,
+                    blur: 2,
+                    color: '#000000'
+                }
+            },
+            legend: {
+                hoverMode: 'includePoints',
+                verticalAlignment: 'top',
+                horizontalAlignment: 'right',
+                position: 'outside',
+                visible: true,
+                margin: 10,
+                markerSize: 12,
+                border: {
+                    visible: false,
+                    width: 1,
+                    cornerRadius: 0,
+                    dashStyle: 'solid'
+                },
+                paddingLeftRight: 20,
+                paddingTopBottom: 15,
+                columnCount: 0,
+                rowCount: 0,
+                columnItemSpacing: 20,
+                rowItemSpacing: 8
+            },
+            "chart:common": {
                 animation: {
                     enabled: true,
                     duration: 1000,
@@ -13188,7 +13220,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     valueErrorBar: {
                         displayMode: "auto",
                         value: 1,
-                        color: "#656565",
+                        color: "#000000",
                         lineWidth: 2,
                         edgeLength: 8
                     },
@@ -13221,100 +13253,16 @@ if (!DevExpress.MOD_VIZ_CORE) {
                         }
                     }
                 },
-                redrawOnResize: true,
-                margin: {
-                    left: 0,
-                    top: 0,
-                    right: 0,
-                    bottom: 0
-                },
                 seriesSelectionMode: 'single',
                 pointSelectionMode: 'single',
-                legend: {
-                    hoverMode: 'includePoints',
-                    verticalAlignment: 'top',
-                    horizontalAlignment: 'right',
-                    position: 'outside',
-                    visible: true,
-                    customizeText: undefined,
-                    customizeHint: undefined,
-                    itemTextPosition: undefined,
-                    itemsAlignment: undefined,
-                    margin: 10,
-                    equalColumnWidth: false,
-                    markerSize: 12,
-                    backgroundColor: undefined,
-                    backgroundOpacity: undefined,
-                    border: {
-                        visible: false,
-                        width: 1,
-                        color: '#d3d3d3',
-                        cornerRadius: 0,
-                        dashStyle: 'solid'
-                    },
-                    paddingLeftRight: 20,
-                    paddingTopBottom: 15,
-                    columnCount: 0,
-                    rowCount: 0,
-                    columnItemSpacing: 20,
-                    rowItemSpacing: 8
-                },
-                tooltip: {
-                    enabled: false,
-                    border: {
-                        width: 1,
-                        color: '#d3d3d3',
-                        dashStyle: 'solid',
-                        visible: true
-                    },
-                    font: {
-                        family: fontFamilyDefault,
-                        weight: 400,
-                        size: 12,
-                        color: '#232323'
-                    },
-                    color: '#ffffff',
-                    arrowLength: 10,
-                    paddingLeftRight: 18,
-                    paddingTopBottom: 15,
-                    shared: false,
-                    location: 'center',
-                    format: '',
-                    argumentFormat: '',
-                    precision: 0,
-                    argumentPrecision: 0,
-                    percentPrecision: 0,
-                    customizeText: undefined,
-                    customizeTooltip: undefined,
-                    shadow: {
-                        opacity: 0.4,
-                        offsetX: 0,
-                        offsetY: 4,
-                        blur: 2,
-                        color: '#000000'
-                    }
-                },
-                size: {
-                    width: undefined,
-                    height: undefined
-                },
-                loadingIndicator: {
-                    font: {},
-                    backgroundColor: '#ffffff',
-                    text: 'Loading...'
-                },
+                equalRowHeight: true,
                 dataPrepareSettings: {
                     checkTypeForAllData: false,
                     convertToAxisDataType: true,
                     sortingMethod: true
                 },
                 title: {
-                    font: {
-                        family: fontFamilyLight,
-                        weight: 200,
-                        color: '#232323',
-                        size: 28
-                    },
+                    font: {size: 28},
                     margin: 10
                 },
                 adaptiveLayout: {
@@ -13325,28 +13273,48 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 _rtl: {legend: {itemTextPosition: 'left'}},
                 resolveLabelOverlapping: "none"
             },
-            baseDarkChartTheme = {
-                containerBackgroundColor: '#2b2b2b',
-                commonSeriesSettings: {label: {border: {color: '#494949'}}},
-                legend: {border: {color: '#494949'}},
-                loadingIndicator: {backgroundColor: '#2b2b2b'},
-                title: {font: {color: '#929292'}},
-                tooltip: {
-                    color: '#2b2b2b',
-                    border: {color: '#494949'},
-                    font: {color: '#929292'}
+            "chart:common:axis": {
+                visible: false,
+                setTicksAtUnitBeginning: true,
+                valueMarginsEnabled: true,
+                placeholderSize: null,
+                logarithmBase: 10,
+                discreteAxisDivisionMode: 'betweenLabels',
+                width: 1,
+                label: {
+                    visible: true,
+                    precision: 0,
+                    format: ""
+                },
+                grid: {
+                    visible: false,
+                    width: 1
+                },
+                minorGrid: {
+                    visible: false,
+                    width: 1,
+                    opacity: 0.3
+                },
+                tick: {visible: false},
+                minorTick: {
+                    visible: false,
+                    opacity: 0.3
+                },
+                stripStyle: {
+                    paddingLeftRight: 10,
+                    paddingTopBottom: 5
+                },
+                constantLineStyle: {
+                    width: 1,
+                    color: "#000000",
+                    dashStyle: "solid",
+                    label: {
+                        visible: true,
+                        position: "inside"
+                    }
                 }
-            };
-        DX.viz.core.registerTheme({
-            name: 'desktop',
-            font: {
-                color: '#767676',
-                family: fontFamilyDefault,
-                weight: 400,
-                size: 12,
-                cursor: 'default'
             },
-            chart: $.extend(true, {}, baseChartTheme, {
+            chart: {
                 commonSeriesSettings: {
                     type: 'line',
                     stack: 'default',
@@ -13525,7 +13493,6 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     },
                     candlestick: {
                         width: 1,
-                        innerColor: '#ffffff',
                         reduction: {color: '#ff0000'},
                         hoverStyle: {
                             width: 3,
@@ -13561,71 +13528,25 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     horizontalLine: {visible: true}
                 },
                 commonAxisSettings: {
-                    tickInterval: undefined,
-                    setTicksAtUnitBeginning: true,
-                    valueMarginsEnabled: true,
-                    placeholderSize: null,
-                    logarithmBase: 10,
-                    discreteAxisDivisionMode: 'betweenLabels',
-                    visible: false,
-                    color: '#d3d3d3',
-                    width: 1,
                     multipleAxesSpacing: 5,
                     label: {
-                        visible: true,
                         overlappingBehavior: {
                             mode: 'auto',
                             rotationAngle: 90,
                             staggeringSpacing: 5
                         },
-                        precision: 0,
-                        format: '',
-                        customizeText: undefined,
-                        customizeHint: undefined,
                         indentFromAxis: 10
-                    },
-                    grid: {
-                        visible: false,
-                        color: '#d3d3d3',
-                        width: 1
-                    },
-                    minorGrid: {
-                        visible: false,
-                        color: '#d3d3d3',
-                        width: 1,
-                        opacity: 0.3
-                    },
-                    tick: {
-                        visible: false,
-                        color: '#d3d3d3'
-                    },
-                    minorTick: {
-                        visible: false,
-                        color: '#d3d3d3',
-                        opacity: 0.3
                     },
                     title: {
                         font: {size: 16},
                         margin: 6
                     },
-                    stripStyle: {
-                        paddingLeftRight: 10,
-                        paddingTopBottom: 5
-                    },
                     constantLineStyle: {
                         paddingLeftRight: 10,
-                        paddingTopBottom: 10,
-                        width: 1,
-                        color: '#000000',
-                        dashStyle: 'solid',
-                        label: {
-                            visible: true,
-                            position: 'inside'
-                        }
+                        paddingTopBottom: 10
                     }
                 },
                 horizontalAxis: {
-                    isHorizontal: true,
                     position: 'bottom',
                     axisDivisionFactor: 50,
                     label: {alignment: "center"},
@@ -13640,7 +13561,6 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     constantLines: {}
                 },
                 verticalAxis: {
-                    isHorizontal: false,
                     position: 'left',
                     axisDivisionFactor: 30,
                     label: {
@@ -13687,8 +13607,8 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 equalBarWidth: true,
                 minBubbleSize: 12,
                 maxBubbleSize: 0.2
-            }),
-            pie: $.extend(true, {}, baseChartTheme, {
+            },
+            pie: {
                 commonSeriesSettings: {
                     type: 'pie',
                     pie: {
@@ -13792,7 +13712,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     backgroundColor: "none"
                 },
                 adaptiveLayout: {keepLabels: false}
-            }),
+            },
             pieIE8: {commonSeriesSettings: {
                     pie: {
                         hoverStyle: {border: {
@@ -13826,27 +13746,21 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     }
                 }},
             gauge: {
-                containerBackgroundColor: '#ffffff',
                 scale: {
                     majorTick: {
                         visible: true,
                         length: 5,
                         width: 2,
                         showCalculatedTicks: true,
-                        useTicksAutoArrangement: true,
-                        color: '#ffffff'
+                        useTicksAutoArrangement: true
                     },
                     minorTick: {
                         visible: false,
                         length: 3,
                         width: 1,
-                        showCalculatedTicks: true,
-                        color: '#ffffff'
+                        showCalculatedTicks: true
                     },
-                    label: {
-                        visible: true,
-                        font: {}
-                    }
+                    label: {visible: true}
                 },
                 rangeContainer: {
                     offset: 0,
@@ -13892,19 +13806,9 @@ if (!DevExpress.MOD_VIZ_CORE) {
                         verticalAlignment: 'top',
                         overlay: 0
                     },
-                    font: {
-                        size: 16,
-                        color: '#232323',
-                        family: fontFamilyDefault,
-                        weight: 400
-                    }
+                    font: {size: 16}
                 },
-                subtitle: {font: {
-                        size: 14,
-                        color: '#232323',
-                        family: fontFamilyDefault,
-                        weight: 400
-                    }},
+                subtitle: {font: {size: 14}},
                 indicator: {
                     hasPositiveMeaning: true,
                     layout: {
@@ -13913,38 +13817,6 @@ if (!DevExpress.MOD_VIZ_CORE) {
                         overlay: 0
                     },
                     text: {font: {size: 18}}
-                },
-                tooltip: {
-                    arrowLength: 10,
-                    paddingLeftRight: 18,
-                    paddingTopBottom: 15,
-                    enabled: false,
-                    border: {
-                        width: 1,
-                        color: '#d3d3d3',
-                        dashStyle: 'solid',
-                        visible: true
-                    },
-                    color: '#ffffff',
-                    font: {
-                        color: '#232323',
-                        size: 12,
-                        family: fontFamilyDefault,
-                        weight: 400
-                    },
-                    shadow: {
-                        opacity: 0.4,
-                        offsetX: 0,
-                        offsetY: 4,
-                        blur: 2,
-                        color: '#000000'
-                    }
-                },
-                loadingIndicator: {
-                    show: false,
-                    font: {},
-                    backgroundColor: '#ffffff',
-                    text: 'Loading...'
                 },
                 _circular: {
                     scale: {
@@ -14026,19 +13898,9 @@ if (!DevExpress.MOD_VIZ_CORE) {
                         verticalAlignment: 'top',
                         overlay: 0
                     },
-                    font: {
-                        size: 16,
-                        color: '#232323',
-                        family: fontFamilyDefault,
-                        weight: 400
-                    }
+                    font: {size: 16}
                 },
-                subtitle: {font: {
-                        size: 14,
-                        color: '#232323',
-                        family: fontFamilyDefault,
-                        weight: 400
-                    }},
+                subtitle: {font: {size: 14}},
                 indicator: {
                     hasPositiveMeaning: true,
                     layout: {
@@ -14047,69 +13909,40 @@ if (!DevExpress.MOD_VIZ_CORE) {
                         overlay: 0
                     },
                     text: {font: {size: 18}}
-                },
-                tooltip: {
-                    arrowLength: 10,
-                    paddingLeftRight: 18,
-                    paddingTopBottom: 15,
-                    enabled: false,
-                    border: {
-                        width: 1,
-                        color: '#d3d3d3',
-                        dashStyle: 'solid',
-                        visible: true
-                    },
-                    color: '#ffffff',
-                    font: {
-                        size: 12,
-                        color: '#232323',
-                        family: fontFamilyDefault,
-                        weight: 400
-                    },
-                    shadow: {
-                        opacity: 0.4,
-                        offsetX: 0,
-                        offsetY: 4,
-                        blur: 2,
-                        color: '#000000'
-                    }
-                },
-                loadingIndicator: {
-                    show: false,
-                    font: {},
-                    backgroundColor: '#ffffff',
-                    text: 'Loading...'
                 }
             },
             rangeSelector: {
-                containerBackgroundColor: '#ffffff',
                 scale: {
+                    showCustomBoundaryTicks: true,
+                    showMinorTicks: true,
+                    useTicksAutoArrangement: true,
+                    setTicksAtUnitBeginning: true,
                     label: {
+                        visible: true,
                         topIndent: 7,
                         font: {size: 11}
                     },
                     tick: {
                         width: 1,
-                        color: '#000000',
+                        color: "#000000",
                         opacity: 0.1
                     },
                     marker: {
+                        visible: true,
                         separatorHeight: 33,
                         topIndent: 10,
                         textLeftIndent: 7,
-                        textTopIndent: 11
-                    }
+                        textTopIndent: 11,
+                        label: {}
+                    },
+                    logarithmBase: 10
                 },
-                loadingIndicator: {
-                    show: false,
-                    font: {},
-                    backgroundColor: '#ffffff',
-                    text: 'Loading...'
-                },
+                selectedRangeColor: "#606060",
                 sliderMarker: {
-                    padding: 7,
-                    pointerSize: 6,
-                    color: '#9b9b9b',
+                    visible: true,
+                    paddingTopBottom: 2,
+                    paddingLeftRight: 4,
+                    color: '#606060',
                     invalidRangeColor: '#ff0000',
                     font: {
                         color: '#ffffff',
@@ -14121,94 +13954,22 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     color: '#000000',
                     opacity: 0.2
                 },
-                shutter: {
-                    color: undefined,
-                    opacity: 0.75
+                shutter: {opacity: 0.75},
+                background: {
+                    color: "#c0bae1",
+                    visible: true,
+                    image: {location: 'full'}
                 },
-                background: {color: "#c0bae1"},
+                behavior: {
+                    snapToTicks: true,
+                    animationEnabled: true,
+                    moveSelectedRangeByClick: true,
+                    manualRangeSelectionEnabled: true,
+                    allowSlidersSwap: true,
+                    callSelectedRangeChanged: "onMovingComplete"
+                },
+                redrawOnResize: true,
                 chart: {
-                    containerBackgroundColor: undefined,
-                    commonSeriesSettings: {
-                        label: baseChartTheme.commonSeriesSettings.label,
-                        border: {
-                            visible: false,
-                            width: 1
-                        },
-                        visible: true,
-                        type: 'area',
-                        hoverMode: 'none',
-                        hoverStyle: {border: {}},
-                        selectionStyle: {border: {}},
-                        point: {
-                            visible: false,
-                            symbol: 'circle',
-                            border: {
-                                visible: false,
-                                width: 1
-                            },
-                            size: 12,
-                            hoverStyle: {border: {}},
-                            selectionStyle: {border: {}}
-                        },
-                        line: {width: 2},
-                        stepline: {width: 2},
-                        scatter: {point: {visible: true}},
-                        stackedline: {width: 2},
-                        fullstackedline: {width: 2},
-                        area: {opacity: 0.5},
-                        stackedarea: {opacity: 0.5},
-                        fullstackedarea: {opacity: 0.5},
-                        spline: {width: 2},
-                        splinearea: {opacity: 0.5},
-                        steparea: {
-                            border: {
-                                visible: true,
-                                width: 2
-                            },
-                            opacity: 0.5
-                        },
-                        bubble: {
-                            opacity: 0.5,
-                            point: {visible: true}
-                        },
-                        bar: {
-                            cornerRadius: 0,
-                            point: {visible: true}
-                        },
-                        stackedbar: {
-                            cornerRadius: 0,
-                            point: {visible: true}
-                        },
-                        fullstackedbar: {
-                            cornerRadius: 0,
-                            point: {visible: true}
-                        },
-                        rangebar: {
-                            cornerRadius: 0,
-                            point: {visible: true}
-                        },
-                        rangearea: {opacity: 0.5},
-                        rangesplinearea: {opacity: 0.5},
-                        candlestick: {
-                            width: 1,
-                            innerColor: '#ffffff',
-                            reduction: {color: '#ff0000'}
-                        },
-                        stock: {
-                            width: 1,
-                            reduction: {color: '#ff0000'}
-                        },
-                        valueErrorBar: baseChartTheme.commonSeriesSettings.valueErrorBar,
-                        stackedspline: {width: 2},
-                        fullstackedspline: {width: 2},
-                        stackedsplinearea: {opacity: 0.5},
-                        fullstackedsplinearea: {opacity: 0.5}
-                    },
-                    dataPrepareSettings: {
-                        checkTypeForAllData: false,
-                        convertToAxisDataType: true,
-                        sortingMethod: true
-                    },
                     useAggregation: false,
                     equalBarWidth: true,
                     minBubbleSize: 12,
@@ -14216,18 +13977,19 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     topIndent: 0.1,
                     bottomIndent: 0,
                     valueAxis: {
-                        min: undefined,
-                        max: undefined,
                         inverted: false,
                         logarithmBase: 10
+                    },
+                    commonSeriesSettings: {
+                        type: "area",
+                        point: {visible: false}
                     }
                 }
             },
             map: {
                 background: {
                     borderWidth: 1,
-                    borderColor: '#cacaca',
-                    color: '#ffffff'
+                    borderColor: '#cacaca'
                 },
                 areaSettings: {
                     borderWidth: 1,
@@ -14292,65 +14054,21 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     verticalAlignment: 'bottom',
                     horizontalAlignment: 'right',
                     position: 'inside',
-                    visible: true,
-                    margin: 10,
-                    equalColumnWidth: false,
-                    markerSize: 12,
-                    backgroundColor: '#ffffff',
                     backgroundOpacity: 0.65,
                     border: {
                         visible: true,
-                        width: 1,
-                        color: '#cacaca',
-                        cornerRadius: 0,
-                        dashStyle: 'solid'
+                        color: '#cacaca'
                     },
                     paddingLeftRight: 16,
                     paddingTopBottom: 12,
-                    columnItemSpacing: 20,
-                    rowItemSpacing: 8,
-                    markerColor: '#ba4d51',
-                    font: {
-                        color: '#2b2b2b',
-                        size: 12
-                    }
+                    markerColor: '#ba4d51'
                 },
                 controlBar: {
                     borderColor: '#5d5d5d',
                     borderWidth: 3,
                     color: '#ffffff',
-                    margin: 20
-                },
-                tooltip: {
-                    arrowLength: 10,
-                    paddingLeftRight: 18,
-                    paddingTopBottom: 15,
-                    border: {
-                        width: 1,
-                        color: '#d7d7d7',
-                        dashStyle: 'solid',
-                        visible: true
-                    },
-                    color: '#ffffff',
-                    font: {
-                        color: '#232323',
-                        size: 12,
-                        family: fontFamilyDefault,
-                        weight: 400
-                    },
-                    shadow: {
-                        opacity: 0.4,
-                        offsetX: 0,
-                        offsetY: 4,
-                        blur: 2,
-                        color: '#000000'
-                    }
-                },
-                loadingIndicator: {
-                    show: false,
-                    backgroundColor: '#ffffff',
-                    font: {},
-                    text: 'Loading...'
+                    margin: 20,
+                    opacity: 0.3
                 },
                 _rtl: {legend: {itemTextPosition: 'left'}}
             },
@@ -14368,37 +14086,13 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 pointSymbol: 'circle',
                 pointColor: '#ffffff',
                 pointSize: 4,
-                tooltip: {
-                    enabled: true,
-                    allowContainerResizing: true,
-                    verticalAlignment: 'top',
-                    horizontalAlignment: 'center',
-                    format: '',
-                    paddingLeftRight: 18,
-                    paddingTopBottom: 15,
-                    arrowLength: 10,
-                    precision: 0,
-                    color: '#ffffff',
-                    border: {
-                        width: 1,
-                        color: '#d3d3d3',
-                        dashStyle: 'solid',
-                        visible: true
-                    },
-                    font: {
-                        color: '#232323',
-                        family: fontFamilyDefault,
-                        size: 12,
-                        weight: 400
-                    },
-                    shadow: {
-                        opacity: 0.4,
-                        offsetX: 0,
-                        offsetY: 4,
-                        blur: 2,
-                        color: '#000000'
-                    }
-                }
+                type: "line",
+                argumentField: "arg",
+                valueField: "val",
+                winlossThreshold: 0,
+                showFirstLast: true,
+                showMinMax: false,
+                tooltip: {enabled: true}
             },
             bullet: {
                 color: '#e8c267',
@@ -14406,39 +14100,9 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 targetWidth: 4,
                 showTarget: true,
                 showZeroLevel: true,
-                tooltip: {
-                    enabled: true,
-                    allowContainerResizing: true,
-                    verticalAlignment: 'top',
-                    horizontalAlignment: 'center',
-                    format: '',
-                    precision: 0,
-                    paddingLeftRight: 18,
-                    paddingTopBottom: 15,
-                    arrowLength: 10,
-                    color: '#ffffff',
-                    border: {
-                        width: 1,
-                        color: '#d3d3d3',
-                        dashStyle: 'solid',
-                        visible: true
-                    },
-                    font: {
-                        color: '#232323',
-                        family: fontFamilyDefault,
-                        size: 12,
-                        weight: 400
-                    },
-                    shadow: {
-                        opacity: 0.4,
-                        offsetX: 0,
-                        offsetY: 4,
-                        blur: 2,
-                        color: '#000000'
-                    }
-                }
+                tooltip: {enabled: true}
             },
-            polar: $.extend(true, {}, baseChartTheme, {
+            polar: {
                 commonSeriesSettings: {
                     type: 'scatter',
                     closed: true,
@@ -14492,56 +14156,17 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 },
                 equalBarWidth: true,
                 commonAxisSettings: {
-                    tickInterval: undefined,
-                    valueMarginsEnabled: true,
-                    setTicksAtUnitBeginning: true,
-                    logarithmBase: 10,
-                    discreteAxisDivisionMode: 'betweenLabels',
                     visible: true,
-                    color: '#d3d3d3',
-                    width: 1,
                     label: {
-                        visible: true,
                         overlappingBehavior: {mode: 'enlargeTickInterval'},
-                        precision: 0,
-                        format: '',
-                        customizeText: undefined,
-                        customizeHint: undefined,
                         indentFromAxis: 5
                     },
-                    grid: {
-                        visible: true,
-                        color: '#d3d3d3',
-                        width: 1
-                    },
-                    minorGrid: {
-                        visible: true,
-                        color: '#d3d3d3',
-                        width: 1,
-                        opacity: 0.3
-                    },
-                    tick: {
-                        visible: true,
-                        color: '#d3d3d3'
-                    },
-                    minorTick: {
-                        visible: false,
-                        color: '#d3d3d3',
-                        opacity: 0.3
-                    },
+                    grid: {visible: true},
+                    minorGrid: {visible: true},
+                    tick: {visible: true},
                     title: {
                         font: {size: 16},
                         margin: 10
-                    },
-                    stripStyle: {},
-                    constantLineStyle: {
-                        width: 1,
-                        color: '#000000',
-                        dashStyle: 'solid',
-                        label: {
-                            visible: true,
-                            position: 'inside'
-                        }
                     }
                 },
                 argumentAxis: {
@@ -14551,36 +14176,39 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 },
                 valueAxis: {tick: {visible: false}},
                 horizontalAxis: {
-                    isHorizontal: 1,
                     position: 'top',
                     axisDivisionFactor: 50,
                     label: {alignment: "center"}
                 },
                 verticalAxis: {
-                    isHorizontal: 1,
                     position: 'top',
                     axisDivisionFactor: 30,
                     label: {alignment: "right"}
                 }
-            })
+            }
         });
         DX.viz.core.registerTheme({
-            name: 'desktop.dark',
+            name: "generic.dark",
             font: {color: '#808080'},
-            chart: $.extend(true, {}, baseDarkChartTheme, {
-                commonSeriesSettings: {candlestick: {innerColor: '#2b2b2b'}},
+            backgroundColor: "#303030",
+            primaryTitleColor: "#dbdbdb",
+            secondaryTitleColor: "#a3a3a3",
+            axisColor: "#555555",
+            axisLabelColor: "#707070",
+            tooltip: {
+                color: '#2b2b2b',
+                border: {color: '#494949'},
+                font: {color: '#929292'}
+            },
+            "chart:common": {commonSeriesSettings: {
+                    label: {border: {color: '#494949'}},
+                    valueErrorBar: {color: "#ffffff"}
+                }},
+            "chart:common:axis": {constantLineStyle: {color: '#ffffff'}},
+            chart: {
                 crosshair: {color: '#515151'},
-                commonAxisSettings: {
-                    color: '#494949',
-                    grid: {color: '#494949'},
-                    minorGrid: {color: '#494949'},
-                    tick: {color: '#494949'},
-                    minorTick: {color: '#494949'},
-                    constantLineStyle: {color: '#ffffff'}
-                },
                 commonPaneSettings: {border: {color: '#494949'}}
-            }),
-            pie: $.extend(true, {}, baseDarkChartTheme),
+            },
             pieIE8: {commonSeriesSettings: {
                     pie: {
                         hoverStyle: {border: {color: '#2b2b2b'}},
@@ -14596,11 +14224,6 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     }
                 }},
             gauge: {
-                containerBackgroundColor: '#2b2b2b',
-                scale: {
-                    majorTick: {color: '#303030'},
-                    minorTick: {color: '#303030'}
-                },
                 rangeContainer: {backgroundColor: '#b5b5b5'},
                 valueIndicators: {
                     _default: {color: '#b5b5b5'},
@@ -14608,40 +14231,22 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     twocolorneedle: {secondColor: '#ba544d'},
                     trianglemarker: {color: '#b7918f'},
                     textcloud: {color: '#ba544d'}
-                },
-                title: {font: {color: '#929292'}},
-                subtitle: {font: {color: '#929292'}},
-                loadingIndicator: {backgroundColor: '#2b2b2b'},
-                tooltip: {
-                    color: '#2b2b2b',
-                    border: {color: '#494949'},
-                    font: {color: '#929292'}
                 }
             },
-            barGauge: {
-                title: {font: {color: '#929292'}},
-                subtitle: {font: {color: '#929292'}},
-                tooltip: {
-                    color: '#2b2b2b',
-                    border: {color: '#494949'},
-                    font: {color: '#929292'}
-                },
-                loadingIndicator: {backgroundColor: '#2b2b2b'}
-            },
+            barGauge: {backgroundColor: "#3c3c3c"},
             rangeSelector: {
-                containerBackgroundColor: '#2b2b2b',
+                selectedRangeColor: '#b5b5b5',
                 scale: {tick: {
                         color: '#ffffff',
                         opacity: 0.05
                     }},
-                loadingIndicator: {backgroundColor: '#2b2b2b'},
                 sliderMarker: {
                     color: '#b5b5b5',
                     font: {color: '#303030'}
                 },
                 sliderHandle: {
                     color: '#ffffff',
-                    opacity: 0.35
+                    opacity: 0.2
                 },
                 shutter: {
                     color: '#2b2b2b',
@@ -14649,10 +14254,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 }
             },
             map: {
-                background: {
-                    borderColor: '#3f3f3f',
-                    color: '#303030'
-                },
+                background: {borderColor: '#3f3f3f'},
                 areaSettings: {
                     borderColor: '#303030',
                     color: '#686868',
@@ -14679,19 +14281,12 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 },
                 legend: {
                     border: {color: '#3f3f3f'},
-                    backgroundColor: '#303030',
                     font: {color: '#ffffff'}
                 },
                 controlBar: {
                     borderColor: '#c7c7c7',
                     color: '#303030'
-                },
-                tooltip: {
-                    color: '#2b2b2b',
-                    border: {color: '#494949'},
-                    font: {color: '#929292'}
-                },
-                loadingIndicator: {backgroundColor: '#2b2b2b'}
+                }
             },
             sparkline: {
                 lineColor: '#c7c7c7',
@@ -14700,174 +14295,30 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 barNegativeColor: '#8e8e8e',
                 winColor: '#b8b8b8',
                 lossColor: '#8e8e8e',
-                pointColor: '#303030',
-                tooltip: {
-                    color: '#2b2b2b',
-                    border: {color: '#494949'},
-                    font: {color: '#929292'}
-                }
+                pointColor: '#303030'
             },
-            bullet: {
-                targetColor: '#8e8e8e',
-                tooltip: {
-                    color: '#2b2b2b',
-                    border: {color: '#494949'},
-                    font: {color: '#929292'}
-                }
-            },
-            polar: $.extend(true, {}, baseDarkChartTheme, {commonAxisSettings: {
-                    color: '#494949',
-                    grid: {color: '#494949'},
-                    minorGrid: {color: '#494949'},
-                    tick: {color: '#494949'},
-                    minorTick: {color: '#494949'},
-                    constantLineStyle: {color: '#ffffff'}
-                }})
-        }, 'desktop');
-        DX.viz.themes["desktop-dark"] = DX.viz.themes["desktop.dark"]
-    })(jQuery, DevExpress);
+            bullet: {targetColor: '#8e8e8e'}
+        }, "generic.light");
+        DX.viz.core.currentTheme("generic.light");
+        DX.viz.core.registerThemeAlias("desktop.light", "generic.light");
+        DX.viz.core.registerThemeAlias("desktop.dark", "generic.dark")
+    })(DevExpress);
     /*! Module viz-core, file android.js */
-    (function($, DX, undefined) {
-        var baseChartTheme = {
-                containerBackgroundColor: '#050506',
-                title: {font: {color: '#ffffff'}},
-                commonSeriesSettings: {label: {border: {color: '#4c4c4c'}}},
-                legend: {
-                    font: {
-                        color: '#ffffff',
-                        size: 11
-                    },
-                    border: {color: '#4c4c4c'}
-                },
-                loadingIndicator: {backgroundColor: '#050506'},
-                tooltip: {
-                    color: '#050506',
-                    border: {color: '#4c4c4c'},
-                    font: {color: '#ffffff'}
-                }
-            },
-            baseLightChartTheme = {
-                containerBackgroundColor: '#e8e8e8',
-                title: {font: {color: '#808080'}},
-                legend: {font: {
-                        color: '#000000',
-                        size: 11
-                    }},
-                loadingIndicator: {backgroundColor: '#e8e8e8'},
-                tooltip: {
-                    color: '#e8e8e8',
-                    font: {color: '#808080'}
-                }
-            };
+    (function(DX) {
+        var ANDROID5_LIGHT = "android5.light",
+            registerThemeAlias = DX.viz.core.registerThemeAlias;
         DX.viz.core.registerTheme({
-            name: 'android',
-            chart: $.extend(true, {}, baseChartTheme, {
-                commonSeriesSettings: {candlestick: {innerColor: '#050506'}},
-                commonAxisSettings: {
-                    color: '#4c4c4c',
-                    grid: {color: '#4c4c4c'},
-                    minorGrid: {color: '#4c4c4c'},
-                    tick: {color: '#4c4c4c'},
-                    minorTick: {color: '#4c4c4c'},
-                    title: {font: {color: '#545455'}},
-                    label: {font: {
-                            color: '#ffffff',
-                            size: 11
-                        }}
-                },
-                commonPaneSettings: {border: {color: '#4c4c4c'}}
-            }),
-            polar: $.extend(true, {}, baseChartTheme, {commonAxisSettings: {
-                    color: '#4c4c4c',
-                    grid: {color: '#4c4c4c'},
-                    minorGrid: {color: '#4c4c4c'},
-                    tick: {color: '#4c4c4c'},
-                    minorTick: {color: '#4c4c4c'},
-                    title: {font: {color: '#545455'}},
-                    label: {font: {
-                            color: '#ffffff',
-                            size: 11
-                        }}
-                }}),
-            pie: $.extend(true, {}, baseChartTheme),
-            pieIE8: {commonSeriesSettings: {
-                    pie: {
-                        hoverStyle: {border: {color: '#050506'}},
-                        selectionStyle: {border: {color: '#050506'}}
-                    },
-                    donut: {
-                        hoverStyle: {border: {color: '#050506'}},
-                        selectionStyle: {border: {color: '#050506'}}
-                    },
-                    doughnut: {
-                        hoverStyle: {border: {color: '#050506'}},
-                        selectionStyle: {border: {color: '#050506'}}
-                    }
-                }},
-            gauge: {
-                containerBackgroundColor: '#050506',
-                title: {font: {color: '#ffffff'}},
-                subtitle: {font: {color: '#ffffff'}},
-                loadingIndicator: {backgroundColor: '#050506'},
-                tooltip: {
-                    color: '#050506',
-                    border: {color: '#4c4c4c'},
-                    font: {color: '#ffffff'}
-                }
+            name: ANDROID5_LIGHT,
+            backgroundColor: "#ffffff",
+            primaryTitleColor: "#232323",
+            secondaryTitleColor: "#767676",
+            axisColor: "#d3d3d3",
+            axisLabelColor: "#a8a8a8",
+            tooltip: {
+                color: "#e8e8e8",
+                font: {color: "#808080"}
             },
-            barGauge: {
-                title: {font: {color: '#ffffff'}},
-                subtitle: {font: {color: '#ffffff'}},
-                tooltip: {
-                    color: '#050506',
-                    border: {color: '#4c4c4c'},
-                    font: {color: '#ffffff'}
-                },
-                loadingIndicator: {backgroundColor: '#050506'}
-            },
-            rangeSelector: {
-                containerBackgroundColor: '#050506',
-                loadingIndicator: {backgroundColor: '#050506'}
-            },
-            map: {
-                loadingIndicator: {backgroundColor: '#050506'},
-                tooltip: {
-                    color: '#050506',
-                    border: {color: '#4c4c4c'},
-                    font: {color: '#ffffff'}
-                }
-            },
-            sparkline: {tooltip: {
-                    color: '#050506',
-                    border: {color: '#4c4c4c'},
-                    font: {color: '#ffffff'}
-                }},
-            bullet: {tooltip: {
-                    color: '#050506',
-                    border: {color: '#4c4c4c'},
-                    font: {color: '#ffffff'}
-                }}
-        }, 'desktop.dark');
-        DX.viz.core.registerTheme({
-            name: 'android.holo-light',
-            chart: $.extend(true, {}, baseLightChartTheme, {
-                commonSeriesSettings: {candlestick: {innerColor: '#e8e8e8'}},
-                commonAxisSettings: {
-                    title: {font: {color: '#939393'}},
-                    label: {font: {
-                            color: '#404040',
-                            size: 11
-                        }}
-                }
-            }),
-            polar: $.extend(true, {}, baseLightChartTheme, {commonAxisSettings: {
-                    title: {font: {color: '#939393'}},
-                    label: {font: {
-                            color: '#404040',
-                            size: 11
-                        }}
-                }}),
-            pie: $.extend(true, {}, baseLightChartTheme),
+            legend: {font: {color: "#000000"}},
             pieIE8: {commonSeriesSettings: {
                     pie: {
                         hoverStyle: {border: {color: '#e8e8e8'}},
@@ -14881,240 +14332,52 @@ if (!DevExpress.MOD_VIZ_CORE) {
                         hoverStyle: {border: {color: '#e8e8e8'}},
                         selectionStyle: {border: {color: '#e8e8e8'}}
                     }
-                }},
-            gauge: {
-                containerBackgroundColor: '#e8e8e8',
-                title: {font: {color: '#808080'}},
-                subtitle: {font: {color: '#808080'}},
-                loadingIndicator: {backgroundColor: '#e8e8e8'},
-                tooltip: {
-                    color: '#e8e8e8',
-                    font: {color: '#808080'}
-                }
-            },
-            barGauge: {
-                title: {font: {color: '#808080'}},
-                subtitle: {font: {color: '#808080'}},
-                tooltip: {
-                    color: '#e8e8e8',
-                    font: {color: '#808080'}
-                },
-                loadingIndicator: {backgroundColor: '#e8e8e8'}
-            },
-            rangeSelector: {
-                containerBackgroundColor: '#e8e8e8',
-                loadingIndicator: {backgroundColor: '#e8e8e8'}
-            },
-            map: {
-                loadingIndicator: {backgroundColor: '#e8e8e8'},
-                tooltip: {
-                    color: '#e8e8e8',
-                    font: {color: '#808080'}
-                }
-            },
-            sparkline: {tooltip: {
-                    color: '#e8e8e8',
-                    font: {color: '#808080'}
-                }},
-            bullet: {tooltip: {
-                    color: '#e8e8e8',
-                    font: {color: '#808080'}
                 }}
-        }, 'desktop');
-        DX.viz.themes["android-holo-light"] = DX.viz.themes["android.holo-light"]
-    })(jQuery, DevExpress);
+        }, "generic.light");
+        registerThemeAlias("android", ANDROID5_LIGHT);
+        registerThemeAlias("android.holo-dark", ANDROID5_LIGHT);
+        registerThemeAlias("android.holo-light", ANDROID5_LIGHT);
+        registerThemeAlias("android.dark", ANDROID5_LIGHT);
+        registerThemeAlias("android.light", ANDROID5_LIGHT)
+    })(DevExpress);
     /*! Module viz-core, file ios.js */
-    (function($, DX, undefined) {
-        var baseChartTheme = {
-                containerBackgroundColor: '#cbd0da',
-                title: {font: {color: '#808080'}},
-                commonSeriesSettings: {label: {border: {color: '#b0b3ba'}}},
-                legend: {
-                    font: {
-                        color: '#000000',
-                        size: 11
-                    },
-                    border: {color: '#b0b3ba'}
-                },
-                loadingIndicator: {backgroundColor: '#cbd0da'},
-                tooltip: {font: {color: '#808080'}}
-            },
-            baseIos7ChartTheme = {
-                containerBackgroundColor: '#ffffff',
-                title: {font: {color: '#808080'}},
-                commonSeriesSettings: {label: {border: {color: '#d3d3d3'}}},
-                legend: {
-                    font: {
-                        color: '#000000',
-                        size: 11
-                    },
-                    border: {color: '#d3d3d3'}
-                },
-                loadingIndicator: {backgroundColor: '#ffffff'},
-                tooltip: {font: {color: '#808080'}}
-            };
-        DX.viz.core.registerTheme({
-            name: 'ios',
-            chart: $.extend(true, {}, baseChartTheme, {
-                commonSeriesSettings: {candlestick: {innerColor: '#cbd0da'}},
-                commonAxisSettings: {
-                    color: '#b0b3ba',
-                    grid: {color: '#b0b3ba'},
-                    minorGrid: {color: '#b0b3ba'},
-                    tick: {color: '#b0b3ba'},
-                    minorTick: {color: '#b0b3ba'},
-                    title: {font: {color: '#939393'}},
-                    label: {font: {
-                            color: '#000000',
-                            size: 11
-                        }}
-                },
-                commonPaneSettings: {border: {color: '#b0b3ba'}}
-            }),
-            polar: $.extend(true, {}, baseChartTheme, {commonAxisSettings: {
-                    color: '#b0b3ba',
-                    grid: {color: '#b0b3ba'},
-                    minorGrid: {color: '#b0b3ba'},
-                    tick: {color: '#b0b3ba'},
-                    minorTick: {color: '#b0b3ba'},
-                    title: {font: {color: '#939393'}},
-                    label: {font: {
-                            color: '#000000',
-                            size: 11
-                        }}
-                }}),
-            pie: $.extend(true, {}, baseChartTheme),
-            pieIE8: {commonSeriesSettings: {
-                    pie: {
-                        hoverStyle: {border: {color: '#cbd0da'}},
-                        selectionStyle: {border: {color: '#cbd0da'}}
-                    },
-                    donut: {
-                        hoverStyle: {border: {color: '#cbd0da'}},
-                        selectionStyle: {border: {color: '#cbd0da'}}
-                    },
-                    doughnut: {
-                        hoverStyle: {border: {color: '#cbd0da'}},
-                        selectionStyle: {border: {color: '#cbd0da'}}
-                    }
-                }},
-            gauge: {
-                title: {font: {color: '#808080'}},
-                subtitle: {font: {color: '#808080'}},
-                tooltip: {font: {color: '#808080'}}
-            },
-            barGauge: {
-                title: {font: {color: '#808080'}},
-                subtitle: {font: {color: '#808080'}},
-                tooltip: {font: {color: '#808080'}}
-            },
-            map: {tooltip: {font: {color: '#808080'}}},
-            sparkline: {tooltip: {font: {color: '#808080'}}},
-            bullet: {tooltip: {font: {color: '#808080'}}}
-        }, 'desktop');
-        DX.viz.core.registerTheme({
-            name: 'ios7',
-            chart: $.extend(true, {}, baseIos7ChartTheme, {
-                commonAxisSettings: {
-                    color: '#d3d3d3',
-                    grid: {color: '#d3d3d3'},
-                    minorGrid: {color: '#d3d3d3'},
-                    tick: {color: '#d3d3d3'},
-                    minorTick: {color: '#d3d3d3'},
-                    title: {font: {color: '#939393'}},
-                    label: {font: {
-                            color: '#000000',
-                            size: 11
-                        }}
-                },
-                commonPaneSettings: {border: {color: '#d3d3d3'}}
-            }),
-            polar: {commonAxisSettings: {
-                    color: '#d3d3d3',
-                    grid: {color: '#d3d3d3'},
-                    minorGrid: {color: '#d3d3d3'},
-                    tick: {color: '#d3d3d3'},
-                    minorTick: {color: '#d3d3d3'},
-                    title: {font: {color: '#939393'}},
-                    label: {font: {
-                            color: '#000000',
-                            size: 11
-                        }}
-                }},
-            pie: $.extend(true, {}, baseIos7ChartTheme),
-            gauge: {
-                title: {font: {color: '#808080'}},
-                subtitle: {font: {color: '#808080'}},
-                tooltip: {font: {color: '#808080'}}
-            },
-            barGauge: {
-                title: {font: {color: '#808080'}},
-                subtitle: {font: {color: '#808080'}},
-                tooltip: {font: {color: '#808080'}}
-            },
-            map: {tooltip: {font: {color: '#808080'}}},
-            sparkline: {tooltip: {font: {color: '#808080'}}},
-            bullet: {tooltip: {font: {color: '#808080'}}}
-        }, 'desktop')
-    })(jQuery, DevExpress);
+    (function(DX) {
+        var IOS7_DEFAULT = "ios7.default",
+            core = DX.viz.core;
+        core.registerTheme({
+            name: IOS7_DEFAULT,
+            backgroundColor: "#ffffff",
+            primaryTitleColor: "#000000",
+            secondaryTitleColor: "#767676",
+            axisColor: "#ececec",
+            axisLabelColor: "#b8b8b8",
+            legend: {font: {color: '#000000'}},
+            tooltip: {font: {color: '#808080'}},
+            "chart:common": {commonSeriesSettings: {label: {border: {color: '#d3d3d3'}}}},
+            chart: {commonPaneSettings: {border: {color: '#d3d3d3'}}}
+        }, "generic.light");
+        core.registerThemeAlias("ios", IOS7_DEFAULT)
+    })(DevExpress);
     /*! Module viz-core, file win8.js */
-    (function($, DX) {
-        var baseChartTheme = {
-                containerBackgroundColor: '#000000',
-                title: {font: {color: '#ffffff'}},
-                commonSeriesSettings: {label: {border: {color: '#454545'}}},
-                legend: {
-                    font: {
-                        color: '#ffffff',
-                        size: 11
-                    },
-                    border: {color: '#454545'}
-                },
-                loadingIndicator: {backgroundColor: '#000000'},
-                tooltip: {
-                    color: '#000000',
-                    font: {color: '#ffffff'}
-                }
+    (function(DX) {
+        var core = DX.viz.core,
+            registerTheme = core.registerTheme,
+            registerThemeSchemeAlias = core.registerThemeSchemeAlias;
+        registerTheme({
+            name: "win8.black",
+            backgroundColor: "#000000",
+            primaryTitleColor: "#ffffff",
+            secondaryTitleColor: "#d8d8d8",
+            axisColor: "#4c4c4c",
+            axisLabelColor: "#a0a0a0",
+            title: {font: {color: '#ffffff'}},
+            legend: {font: {color: '#ffffff'}},
+            tooltip: {
+                color: '#000000',
+                font: {color: '#ffffff'}
             },
-            baseWhiteChartTheme = {
-                title: {font: {color: '#808080'}},
-                legend: {font: {
-                        color: '#000000',
-                        size: 11
-                    }},
-                tooltip: {font: {color: '#808080'}}
-            };
-        DX.viz.core.registerTheme({
-            name: 'win8',
-            chart: $.extend(true, {}, baseChartTheme, {
-                commonSeriesSettings: {candlestick: {innerColor: '#000000'}},
-                commonAxisSettings: {
-                    color: '#454545',
-                    grid: {color: '#454545'},
-                    minorGrid: {color: '#454545'},
-                    tick: {color: '#454545'},
-                    minorTick: {color: '#454545'},
-                    title: {font: {color: '#535353'}},
-                    label: {font: {
-                            color: '#ffffff',
-                            size: 11
-                        }}
-                },
-                commonPaneSettings: {border: {color: '#454545'}}
-            }),
-            polar: {commonAxisSettings: {
-                    color: '#454545',
-                    grid: {color: '#454545'},
-                    minorGrid: {color: '#454545'},
-                    tick: {color: '#454545'},
-                    minorTick: {color: '#454545'},
-                    title: {font: {color: '#535353'}},
-                    label: {font: {
-                            color: '#ffffff',
-                            size: 11
-                        }}
-                }},
-            pie: $.extend(true, {}, baseChartTheme),
+            "chart:common": {commonSeriesSettings: {label: {border: {color: '#454545'}}}},
+            chart: {commonPaneSettings: {border: {color: '#454545'}}},
             pieIE8: {commonSeriesSettings: {
                     pie: {
                         hoverStyle: {border: {color: '#000000'}},
@@ -15129,105 +14392,55 @@ if (!DevExpress.MOD_VIZ_CORE) {
                         selectionStyle: {border: {color: '#000000'}}
                     }
                 }},
-            gauge: {
-                containerBackgroundColor: '#000000',
-                title: {font: {color: '#ffffff'}},
-                subtitle: {font: {color: '#ffffff'}},
-                loadingIndicator: {backgroundColor: '#000000'},
-                tooltip: {
-                    color: '#000000',
-                    font: {color: '#ffffff'}
-                }
-            },
-            barGauge: {
-                title: {font: {color: '#ffffff'}},
-                subtitle: {font: {color: '#ffffff'}},
-                tooltip: {
-                    color: '#000000',
-                    font: {color: '#ffffff'}
-                },
-                loadingIndicator: {backgroundColor: '#000000'}
-            },
-            rangeSelector: {
-                containerBackgroundColor: '#000000',
-                loadingIndicator: {backgroundColor: '#000000'}
-            },
-            map: {
-                loadingIndicator: {backgroundColor: '#000000'},
-                tooltip: {
-                    color: '#000000',
-                    font: {color: '#ffffff'}
-                }
-            },
-            sparkline: {tooltip: {
-                    color: '#000000',
-                    font: {color: '#ffffff'}
-                }},
-            bullet: {tooltip: {
-                    color: '#000000',
-                    font: {color: '#ffffff'}
-                }}
-        }, 'desktop.dark');
-        DX.viz.core.registerTheme({
-            name: 'win8.white',
-            chart: $.extend(true, {}, baseWhiteChartTheme, {commonAxisSettings: {
-                    title: {font: {color: '#939393'}},
-                    label: {font: {
-                            color: '#404040',
-                            size: 11
-                        }}
-                }}),
-            pie: $.extend(true, {}, baseWhiteChartTheme),
-            gauge: {
-                title: {font: {color: '#808080'}},
-                subtitle: {font: {color: '#808080'}},
-                tooltip: {font: {color: '#808080'}}
-            },
-            barGauge: {
-                title: {font: {color: '#808080'}},
-                subtitle: {font: {color: '#808080'}},
-                tooltip: {font: {color: '#808080'}}
-            },
-            map: {tooltip: {font: {color: '#808080'}}},
-            sparkline: {tooltip: {font: {color: '#808080'}}},
-            bullet: {tooltip: {font: {color: '#808080'}}}
-        }, 'desktop');
-        DX.viz.themes["win8-white"] = DX.viz.themes["win8.white"]
-    })(jQuery, DevExpress);
-    /*! Module viz-core, file others.js */
-    (function($, DX) {
-        DX.viz.core.registerTheme({name: 'generic'}, 'desktop');
-        DX.viz.core.registerTheme({name: 'generic.dark'}, 'desktop.dark');
-        DX.viz.core.registerTheme({name: 'tizen'}, 'desktop');
-        DX.viz.core.registerTheme({name: 'tizen.black'}, 'desktop.dark')
-    })(jQuery, DevExpress);
+            barGauge: {backgroundColor: "#2b3036"}
+        }, "generic.dark");
+        registerTheme({
+            name: "win8.white",
+            backgroundColor: "#ffffff",
+            primaryTitleColor: "#000000",
+            secondaryTitleColor: "#767676",
+            axisColor: "#ececec",
+            axisLabelColor: "#b8b8b8",
+            title: {font: {color: '#808080'}},
+            legend: {font: {color: '#000000'}},
+            tooltip: {font: {color: '#808080'}}
+        }, "generic.light");
+        registerThemeSchemeAlias("win8.dark", "win8.black");
+        registerThemeSchemeAlias("win8.light", "win8.white")
+    })(DevExpress);
     /*! Module viz-core, file themeManager.js */
     (function($, DX, undefined) {
         var viz = DX.viz,
             Palette = viz.core.Palette,
             utils = DX.utils,
+            _findTheme = DX.viz.core.findTheme,
+            _isString = utils.isString,
+            _isDefined = utils.isDefined,
             HOVER_COLOR_HIGHLIGHTING = 20,
             HIGHLIGHTING_STEP = 50;
         viz.charts = viz.charts || {};
         viz.charts.ThemeManager = viz.core.BaseThemeManager.inherit(function() {
             var ctor = function(options, themeGroupName) {
-                    var that = this;
+                    var that = this,
+                        themeObj;
                     options = options || {};
                     that._userOptions = options;
                     that._mergeAxisTitleOptions = [];
                     themeGroupName && (that._themeSection = themeGroupName);
                     that._IE8 = DX.browser.msie && DX.browser.version < 9;
-                    that.setTheme(options.theme);
+                    themeObj = options.theme && _findTheme(_isString(options.theme) ? options.theme : options.theme.name) || {};
                     that.palette = new Palette(options.palette, {
                         stepHighlight: HIGHLIGHTING_STEP,
-                        theme: that._themeName
-                    })
+                        theme: themeObj.name
+                    });
+                    that._callback = $.noop;
+                    that.setTheme(options.theme, options.rtlEnabled)
                 };
             var dispose = function() {
                     var that = this;
                     that.palette.dispose();
                     that.palette = that._userOptions = that._mergedSettings = null;
-                    that.callBase()
+                    return that.callBase.apply(that, arguments)
                 };
             var initDefaultSeriesTheme = function(that) {
                     var commonSeriesSettings = that._theme.commonSeriesSettings;
@@ -15259,9 +14472,9 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     })
                 };
             var processTitleOptions = function(options) {
-                    return utils.isString(options) ? {text: options} : options
+                    return _isString(options) ? {text: options} : options
                 };
-            var processAxisOptions = function(axisOptions, name) {
+            var processAxisOptions = function(axisOptions) {
                     if (!axisOptions)
                         return;
                     axisOptions = $.extend(true, {}, axisOptions);
@@ -15273,7 +14486,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     if (axisOptions.label) {
                         if (axisOptions.label.alignment)
                             axisOptions.label["userAlignment"] = true;
-                        if (utils.isString(axisOptions.label.overlappingBehavior))
+                        if (_isString(axisOptions.label.overlappingBehavior))
                             axisOptions.label.overlappingBehavior = {mode: axisOptions.label.overlappingBehavior};
                         if (!axisOptions.label.overlappingBehavior || !axisOptions.label.overlappingBehavior.mode)
                             axisOptions.label.overlappingBehavior = axisOptions.label.overlappingBehavior || {}
@@ -15295,7 +14508,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     if ($.isPlainObject(theme) && $.isPlainObject(userOptions))
                         result = $.extend(true, {}, theme, userOptions);
                     else
-                        result = utils.isDefined(userOptions) ? userOptions : theme;
+                        result = _isDefined(userOptions) ? userOptions : theme;
                     this._mergedSettings[name] = result;
                     return result
                 };
@@ -15360,7 +14573,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     },
                     animation: function(name) {
                         var userOptions = this._userOptions[name];
-                        userOptions = $.isPlainObject(userOptions) ? userOptions : utils.isDefined(userOptions) ? {enabled: !!userOptions} : {};
+                        userOptions = $.isPlainObject(userOptions) ? userOptions : _isDefined(userOptions) ? {enabled: !!userOptions} : {};
                         return mergeOptions.call(this, name, userOptions)
                     }
                 };
@@ -15394,11 +14607,9 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     getOptions: function(name) {
                         return (applyParticularTheme[name] || applyParticularTheme.base).apply(this, arguments)
                     },
-                    setTheme: function(theme) {
-                        var that = this;
-                        that._mergedSettings = {};
-                        that.callBase(theme);
-                        that.getOptions("rtlEnabled") && $.extend(true, that._theme, that._theme._rtl)
+                    refresh: function() {
+                        this._mergedSettings = {};
+                        return this.callBase.apply(this, arguments)
                     },
                     resetOptions: function(name) {
                         this._mergedSettings[name] = null
@@ -15419,17 +14630,14 @@ if (!DevExpress.MOD_VIZ_CORE) {
             var createSeriesFamily = function(options) {
                     return new series.SeriesFamily(options)
                 };
-            var createAxis = function(renderSettings, options) {
-                    return new charts.Axis(renderSettings, options)
-                };
             var createThemeManager = function(options, groupName) {
                     return new charts.ThemeManager(options, groupName)
                 };
             var createTracker = function(options, name) {
-                    return name == "dxPieChart" ? new charts.PieTracker(options) : new charts.ChartTracker(options)
+                    return name === "dxPieChart" ? new charts.PieTracker(options) : new charts.ChartTracker(options)
                 };
-            var createTitle = function(renderer, canvas, options, group) {
-                    return new charts.ChartTitle(renderer, canvas, options, group)
+            var createTitle = function(renderer, options, group) {
+                    return new charts.ChartTitle(renderer, options, group)
                 };
             var createChartLayoutManager = function(options) {
                     return new charts.LayoutManager(options)
@@ -15439,7 +14647,6 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 };
             return {
                     createSeriesFamily: createSeriesFamily,
-                    createAxis: createAxis,
                     createThemeManager: createThemeManager,
                     createTracker: createTracker,
                     createChartLayoutManager: createChartLayoutManager,
@@ -15453,11 +14660,13 @@ if (!DevExpress.MOD_VIZ_CORE) {
     })(jQuery, DevExpress);
     /*! Module viz-core, file baseWidget.js */
     (function(DX, $, undefined) {
-        var _windowResizeCallbacks = DX.utils.windowResizeCallbacks,
+        var core = DX.viz.core,
+            _windowResizeCallbacks = DX.utils.windowResizeCallbacks,
             _Number = Number,
             _stringFormat = DX.utils.stringFormat,
             _isFunction = DX.utils.isFunction,
-            _parseScalar = DX.viz.core.utils.parseScalar,
+            _parseScalar = core.utils.parseScalar,
+            OPTION_RTL_ENABLED = "rtlEnabled",
             OPTION_LOADING_INDICATOR = "loadingIndicator";
         function defaultIncidentOccured(options) {
             var args = [options.id];
@@ -15493,8 +14702,8 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 $window.width() === width && $window.height() === height && callback()
             }
         }
-        DX.viz.core.DEBUG_createResizeHandler = createResizeHandler;
-        DX.viz.core.BaseWidget = DX.DOMComponent.inherit({
+        core.DEBUG_createResizeHandler = createResizeHandler;
+        core.BaseWidget = DX.DOMComponent.inherit({
             _eventsMap: {
                 onIncidentOccurred: {
                     name: 'incidentOccured',
@@ -15528,10 +14737,6 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     drawn: {
                         since: '14.2',
                         message: "Use the 'onDrawn' option instead"
-                    },
-                    'tooltip.customizeText': {
-                        since: '14.1',
-                        message: "Use the 'tooltip.customizeTooltip' option instead"
                     }
                 })
             },
@@ -15542,16 +14747,28 @@ if (!DevExpress.MOD_VIZ_CORE) {
             _init: function() {
                 var that = this;
                 that.callBase.apply(that, arguments);
-                that._renderer = new DX.viz.renderers.Renderer(that._getRendererParameters());
-                that._setupResizeHandler();
+                that._themeManager = that._createThemeManager();
+                that._themeManager.setCallback(function() {
+                    that._handleThemeOptions()
+                });
+                that._renderer = new DX.viz.renderers.Renderer({cssClass: that._rootClassPrefix + " " + that._rootClass});
                 that._initIncidentOccured();
                 that._renderVisibilityChange();
                 that._initEventTrigger();
+                that._initTooltip();
                 that._initCore();
+                that._setThemeAndRtl();
                 that._initSize();
+                that._setupResizeHandler();
                 that._initLoadingIndicator()
             },
-            _getRendererParameters: null,
+            _initTooltip: function() {
+                this._tooltip = new core.Tooltip({
+                    cssClass: this._rootClassPrefix + "-tooltip",
+                    eventTrigger: this._eventTrigger
+                })
+            },
+            _getAnimationOptions: $.noop,
             _initSize: function() {
                 var canvas = null;
                 if (this._isContainerVisible()) {
@@ -15628,7 +14845,9 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 that._disposeCore();
                 that._disposeLoadingIndicator();
                 that._renderer.dispose();
-                that._renderer = that._eventTrigger = null
+                that._tooltip && that._tooltip.dispose();
+                that._themeManager.dispose();
+                that._themeManager = that._renderer = that._eventTrigger = that._tooltip = null
             },
             _initEventTrigger: function() {
                 var that = this;
@@ -15641,15 +14860,13 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     return data
                 })
             },
-            _getOption: null,
-            _getDefaultSize: null,
             _isContainerVisible: function() {
                 return this._$element.is(':visible')
             },
             _calculateCanvas: function() {
                 var that = this,
-                    size = that._getOption('size') || {},
-                    margin = that._getOption('margin') || {},
+                    size = that.option('size') || {},
+                    margin = that.option('margin') || {},
                     defaultCanvas = that._getDefaultSize() || {},
                     canvas = {};
                 if (size.width <= 0 || size.height <= 0)
@@ -15670,6 +14887,11 @@ if (!DevExpress.MOD_VIZ_CORE) {
             },
             DEBUG_getEventTrigger: function() {
                 return this._eventTrigger
+            },
+            _getOption: function(name, isScalar) {
+                var theme = this._themeManager.theme(name),
+                    option = this.option(name);
+                return isScalar ? option !== undefined ? option : theme : $.extend(true, {}, theme, option)
             },
             _setupResizeHandler: function() {
                 if (_parseScalar(this._getOption('redrawOnResize', true), true))
@@ -15707,14 +14929,41 @@ if (!DevExpress.MOD_VIZ_CORE) {
                         case OPTION_LOADING_INDICATOR:
                             that._handleLoadingIndicatorOptionChanged();
                             break;
+                        case"theme":
+                        case OPTION_RTL_ENABLED:
+                            that._setThemeAndRtl();
+                            break;
+                        case"encodeHtml":
+                        case"pathModified":
+                            that._handleThemeOptions();
+                            break;
+                        case"tooltip":
+                            that._setTooltipOptions();
+                            break;
                         default:
                             that._invalidate();
                             that.callBase.apply(that, arguments)
                     }
             },
-            _visibilityChanged: function(visible) {
-                if (visible)
-                    this.render()
+            _handleThemeOptions: function() {
+                var that = this,
+                    options = {
+                        rtl: that.option(OPTION_RTL_ENABLED),
+                        encodeHtml: that.option("encodeHtml"),
+                        pathModified: that.option("pathModified"),
+                        animation: that._getAnimationOptions()
+                    };
+                that._renderer.setOptions(options);
+                that._setTooltipRendererOptions(options);
+                that._setTooltipOptions();
+                that._updateLoadingIndicatorOptions();
+                that._handleThemeOptionsCore()
+            },
+            _handleThemeOptionsCore: function() {
+                this._initialized && this._refresh()
+            },
+            _visibilityChanged: function() {
+                this.render()
             },
             _initIncidentOccured: function() {
                 var that = this;
@@ -15728,6 +14977,15 @@ if (!DevExpress.MOD_VIZ_CORE) {
                             version: DX.VERSION
                         }})
                 }
+            },
+            _setThemeAndRtl: function() {
+                this._themeManager.setTheme(this.option("theme"), this.option(OPTION_RTL_ENABLED))
+            },
+            _setTooltipRendererOptions: function(options) {
+                this._tooltip.setRendererOptions(options)
+            },
+            _setTooltipOptions: function() {
+                this._tooltip.update(this._getOption("tooltip"))
             },
             _initLoadingIndicator: function() {
                 if (this._getOption(OPTION_LOADING_INDICATOR).show) {
@@ -15804,18 +15062,22 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     this._skipOptionChanged = false
                 }
             },
+            _handleLoadingIndicatorShown: function() {
+                this._tooltip.hide()
+            },
             showLoadingIndicator: function() {
                 var that = this;
                 if (!that._loadIndicator) {
-                    that._loadIndicator = new DX.viz.core.LoadIndicator({
+                    that._loadIndicator = new core.LoadIndicator({
                         container: that._$element,
                         eventTrigger: that._eventTrigger
                     });
-                    that._updateLoadingIndicatorCanvas()
+                    that._updateLoadingIndicatorCanvas();
+                    that._updateLoadingIndicatorOptions()
                 }
                 that._toggleLoadingIndicatorState(true);
-                that._updateLoadingIndicatorOptions();
-                that._loadIndicator.show()
+                that._loadIndicator.show();
+                that._handleLoadingIndicatorShown()
             },
             hideLoadingIndicator: function() {
                 var that = this;
@@ -15869,7 +15131,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     }
             }
         }
-        DX.viz.core.DEBUG_createEventTrigger = createEventTrigger
+        core.DEBUG_createEventTrigger = createEventTrigger
     })(DevExpress, jQuery);
     /*! Module viz-core, file CoreFactory.js */
     (function(DX, undefined) {

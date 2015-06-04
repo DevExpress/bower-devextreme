@@ -119,9 +119,6 @@
                     that._activeViews = {}
                 })
         },
-        setViewLoadingState: function(viewInfo, direction) {
-            return this._getPaneConfig(viewInfo).controller.setViewLoadingState(viewInfo, direction)
-        },
         showView: function(viewInfo, direction) {
             var that = this,
                 paneConfig = that._getPaneConfig(viewInfo);
@@ -187,13 +184,7 @@
             return this._panesConfig[this._getViewPaneName(viewInfo.viewTemplateInfo)]
         },
         _getViewPaneName: function(viewTemplateInfo) {
-            var paneName = viewTemplateInfo.pane || this._detailPaneName;
-            if (viewTemplateInfo.targetFrame !== undefined) {
-                DX.utils.logger.warn("'targetFrame' option is deprecated, use the 'pane' option instead");
-                if (viewTemplateInfo.targetFrame === "navigation")
-                    paneName = this._masterPaneName
-            }
-            return paneName
+            return viewTemplateInfo.pane || this._detailPaneName
         },
         _raiseEvent: function(callback) {
             callback.fire()
@@ -296,10 +287,6 @@
         _createLayoutModel: function() {
             return {title: ko.observable("")}
         },
-        setViewLoadingState: function(viewInfo, direction) {
-            this._updateLayoutTitle(viewInfo, this.DEFAULT_LOADING_TITLE);
-            return this.callBase(viewInfo, direction)
-        },
         showView: function(viewInfo, direction) {
             var that = this;
             that._updateLayoutTitle(viewInfo);
@@ -333,10 +320,6 @@
             this._eventHelper.init();
             this.headerToolbarController = new DX.framework.html.ToolbarController(this._$mainLayout.find(".header-toolbar"), this._commandManager);
             this.footerToolbarController = new DX.framework.html.ToolbarController(this._$mainLayout.find(".footer-toolbar"), this._commandManager)
-        },
-        setViewLoadingState: function(viewInfo, direction) {
-            this._updateLayoutTitle(viewInfo, this.DEFAULT_LOADING_TITLE);
-            return this.callBase(viewInfo, direction)
         },
         showView: function(viewInfo, direction) {
             var that = this;

@@ -1,9 +1,9 @@
 /*! 
 * DevExtreme (Mobile Widgets)
-* Version: 14.2.7
-* Build date: Apr 17, 2015
+* Version: 15.1.3
+* Build date: Jun 1, 2015
 *
-* Copyright (c) 2011 - 2014 Developer Express Inc. ALL RIGHTS RESERVED
+* Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
 */
 
@@ -82,7 +82,8 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
                     onRollback: null,
                     focusStateEnabled: false,
                     selectionMode: "single",
-                    selectionRequired: true
+                    selectionRequired: true,
+                    swipeEnabled: true
                 })
             },
             _itemClass: function() {
@@ -296,7 +297,7 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
                 this._prepareAction();
                 e.maxLeftOffset = 1;
                 e.maxRightOffset = 1;
-                if (DX.designMode || this.option("disabled") || this._indexBoundary() <= 1)
+                if (DX.designMode || this.option("disabled") || !this.option("swipeEnabled") || this._indexBoundary() <= 1)
                     e.cancel = true;
                 else
                     this._swipeGestureRunning = true
@@ -386,6 +387,8 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
                         this.callBase(args);
                         break;
                     case"onPrepare":
+                    case"swipeEnabled":
+                        break;
                     case"onUpdatePosition":
                     case"onRollback":
                         this._initActions();
@@ -459,6 +462,7 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
                 this.callBase();
                 this.option({
                     selectedIndex: 0,
+                    swipeEnabled: true,
                     titleTemplate: "title",
                     contentTemplate: "content",
                     focusStateEnabled: false,
@@ -528,7 +532,8 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
                     },
                     onSelectionChanged: function(args) {
                         that.option("selectedItem", args.addedItems[0])
-                    }
+                    },
+                    swipeEnabled: this.option("swipeEnabled")
                 })
             },
             _render: function() {
@@ -594,7 +599,7 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
             _swipeStartHandler: function(e) {
                 this._prepareAnimation();
                 this._tabs.prepare();
-                if (DX.designMode || this.option("disabled") || this._indexBoundary() <= 1)
+                if (DX.designMode || this.option("disabled") || !this.option("swipeEnabled") || this._indexBoundary() <= 1)
                     e.cancel = true;
                 else
                     this._swipeGestureRunning = true;
@@ -689,6 +694,9 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
                         break;
                     case"titleTemplate":
                         this._tabs.option("itemTemplate", this._getTemplate(value));
+                        break;
+                    case"swipeEnabled":
+                        this._tabs.option("swipeEnabled", value);
                         break;
                     case"contentTemplate":
                         this._singleContent = null;
@@ -791,7 +799,6 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
             },
             _createPopover: function() {
                 var popover = this._createComponent(this._$popup, "dxPopover", {
-                        rtlEnabled: this.option("rtlEnabled"),
                         showTitle: true,
                         title: this.option("title"),
                         width: this.option("width") || 200,
@@ -805,7 +812,6 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
             },
             _createPopup: function() {
                 var popup = this._createComponent(this._$popup, "dxPopup", {
-                        rtlEnabled: this.option("rtlEnabled"),
                         dragEnabled: false,
                         title: this.option("title"),
                         width: this.option("width") || "100%",
@@ -871,7 +877,8 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
                 if (this.option("showCancelButton")) {
                     var cancelClickAction = this._createActionByOption("onCancelClick") || $.noop,
                         that = this;
-                    this._$cancelButton = $("<div>").addClass(ACTION_SHEET_CANCEL_BUTTON_CLASS).appendTo(this._popup.content()).dxButton({
+                    this._$cancelButton = $("<div>").addClass(ACTION_SHEET_CANCEL_BUTTON_CLASS).appendTo(this._popup.content());
+                    this._createComponent(this._$cancelButton, "dxButton", {
                         text: this.option("cancelText"),
                         onClick: function(e) {
                             var hidingArgs = {
@@ -1649,13 +1656,13 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
                 this._$container.on("MSPointerDown", $.noop)
             },
             _renderShield: function() {
-                this._$shield = $("<div>").addClass(SLIDEOUTVIEW_SHIELD_CLASS);
+                this._$shield = this._$shield || $("<div>").addClass(SLIDEOUTVIEW_SHIELD_CLASS);
                 this._$shield.appendTo(this.content());
-                this._$shield.on("dxclick", $.proxy(this.hideMenu, this));
+                this._$shield.off("dxclick").on("dxclick", $.proxy(this.hideMenu, this));
                 this._toggleShieldVisibility(this.option("menuVisible"))
             },
             _initSwipeHandlers: function() {
-                this.content().dxSwipeable({
+                this._createComponent(this.content(), "dxSwipeable", {
                     disabled: !this.option("swipeEnabled"),
                     elastic: false,
                     itemSizeFunc: $.proxy(this._getMenuWidth, this),
@@ -1670,7 +1677,7 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
                     rtl = this.option("rtlEnabled");
                 event.maxLeftOffset = +(rtl ? !menuVisible : menuVisible);
                 event.maxRightOffset = +(rtl ? menuVisible : !menuVisible);
-                this._toggleShieldVisibility(false)
+                this._toggleShieldVisibility(true)
             },
             _swipeUpdateHandler: function(e) {
                 var event = e.jQueryEvent,
@@ -1689,8 +1696,10 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
             _renderPosition: function(offset, animate) {
                 var pos = this._calculatePixelOffset(offset) * this._getRTLSignCorrection();
                 this._toggleHideMenuCallback(offset);
-                if (animate)
-                    animation.moveTo(this.content(), pos, $.proxy(this._animationCompleteHandler, this));
+                if (animate) {
+                    this._toggleShieldVisibility(true);
+                    animation.moveTo(this.content(), pos, $.proxy(this._animationCompleteHandler, this))
+                }
                 else
                     translator.move(this.content(), {left: pos})
             },
@@ -1782,20 +1791,13 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
     /*! Module widgets-mobile, file ui.slideOut.js */
     (function($, DX, undefined) {
         var ui = DX.ui,
-            events = ui.events,
-            fx = DX.fx,
-            utils = DX.utils,
-            translator = DX.translator;
+            utils = DX.utils;
         var SLIDEOUT_CLASS = "dx-slideout",
             SLIDEOUT_WRAPPER_CLASS = "dx-slideout-wrapper",
             SLIDEOUT_ITEM_CONTAINER_CLASS = "dx-slideout-item-container",
             SLIDEOUT_MENU = "dx-slideout-menu",
-            SLIDEOUT_SHIELD = "dx-slideout-shield",
             SLIDEOUT_ITEM_CLASS = "dx-slideout-item",
-            SLIDEOUT_ITEM_DATA_KEY = "dxSlideoutItemData",
-            INVISIBLE_STATE_CLASS = "dx-state-invisible",
-            CONTENT_OFFSET = 45,
-            ANIMATION_DURATION = 400;
+            SLIDEOUT_ITEM_DATA_KEY = "dxSlideoutItemData";
         DX.registerComponent("dxSlideOut", ui, ui.CollectionWidget.inherit({
             _setDeprecatedOptions: function() {
                 this.callBase();
@@ -1819,6 +1821,8 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
                     menuVisible: false,
                     menuGrouped: false,
                     menuGroupTemplate: "menuGroup",
+                    onMenuItemRendered: null,
+                    onMenuGroupRendered: null,
                     contentTemplate: "content",
                     selectionMode: "single",
                     selectionRequired: true
@@ -1831,16 +1835,12 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
                 return SLIDEOUT_ITEM_DATA_KEY
             },
             _itemContainer: function() {
-                return this._$container
+                return this._slideOutView.content()
             },
             _init: function() {
                 this.callBase();
                 this.element().addClass(SLIDEOUT_CLASS);
-                this._renderWrapper();
-                this._renderItemsContainer();
-                this._initSwipeHandlers();
-                this._deferredAnimate = undefined;
-                this._initHideTopOverlayHandler()
+                this._initSlideOutView()
             },
             _initEditStrategy: function() {
                 if (this.option("menuGrouped")) {
@@ -1854,32 +1854,27 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
                 else
                     this.callBase()
             },
-            _renderWrapper: function() {
-                this._wrapper = $("<div>").addClass(SLIDEOUT_WRAPPER_CLASS);
-                this.element().append(this._wrapper)
+            _initSlideOutView: function() {
+                this._slideOutView = this._createComponent(this.element(), "dxSlideOutView", {
+                    _templates: [],
+                    menuVisible: this.option("menuVisible"),
+                    swipeEnabled: this.option("swipeEnabled"),
+                    onOptionChanged: $.proxy(this._slideOutViewOptionChanged, this)
+                });
+                this._itemContainer().addClass(SLIDEOUT_ITEM_CONTAINER_CLASS)
             },
-            _renderItemsContainer: function() {
-                this._$container = $("<div>").addClass(SLIDEOUT_ITEM_CONTAINER_CLASS).appendTo(this._wrapper);
-                this._$container.on("MSPointerDown", function(e){})
-            },
-            _initHideTopOverlayHandler: function() {
-                this._hideMenuHandler = $.proxy(this.hideMenu, this)
+            _slideOutViewOptionChanged: function(args) {
+                if (args.name === "menuVisible")
+                    this.option(args.name, args.value)
             },
             _render: function() {
-                this._renderShield();
+                this._slideOutView._renderShield();
                 this._renderList();
                 this._renderContentTemplate();
-                this.callBase();
-                this._renderPosition(this.option("menuVisible"), false)
-            },
-            _renderShield: function() {
-                this._$shield = $("<div>").addClass(SLIDEOUT_SHIELD);
-                this._$shield.appendTo(this._$container);
-                this._$shield.on("dxclick", $.proxy(this.hideMenu, this));
-                this._toggleShieldVisibility()
+                this.callBase()
             },
             _renderList: function() {
-                this._$list = this._$list || $("<div>").addClass(SLIDEOUT_MENU).prependTo(this._wrapper);
+                this._$list = this._$list || $("<div>").addClass(SLIDEOUT_MENU).appendTo(this._slideOutView.menuContent());
                 this._renderItemClickAction();
                 this._createComponent(this._$list, "dxList", {
                     itemTemplateProperty: "menuTemplate",
@@ -1889,8 +1884,14 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
                     dataSource: this.option("dataSource"),
                     itemTemplate: this._getTemplateByOption("menuItemTemplate"),
                     grouped: this.option("menuGrouped"),
-                    groupTemplate: this.option("menuGroupTemplate")
+                    groupTemplate: this.option("menuGroupTemplate"),
+                    onItemRendered: this.option("onMenuItemRendered"),
+                    onGroupRendered: this.option("onMenuGroupRendered"),
+                    onContentReady: $.proxy(this._updateSlideOutView, this)
                 })
+            },
+            _updateSlideOutView: function() {
+                this._slideOutView._dimensionChanged()
             },
             _renderItemClickAction: function() {
                 this._itemClickAction = this._createActionByOption("onItemClick")
@@ -1903,16 +1904,8 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
             _renderContentTemplate: function() {
                 if (utils.isDefined(this._singleContent))
                     return;
-                var $result = this._getTemplateByOption("contentTemplate").render(this._$container);
+                var $result = this._getTemplateByOption("contentTemplate").render(this._itemContainer());
                 this._singleContent = !!$result.length || $result.is(":empty")
-            },
-            _renderDimensions: function() {
-                this.callBase();
-                this._dimensionChanged()
-            },
-            _dimensionChanged: function() {
-                this._clearListWidthCache();
-                this._renderPosition(this.option("menuVisible"), false)
             },
             _itemClickHandler: $.noop,
             _renderContentImpl: function(template) {
@@ -1926,8 +1919,8 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
                 }
             },
             _renderItem: function(index, item, container) {
-                this._$container.find("." + SLIDEOUT_ITEM_CLASS).remove();
-                this.callBase(index, item, this._$container)
+                this._itemContainer().find("." + SLIDEOUT_ITEM_CLASS).remove();
+                this.callBase(index, item)
             },
             _selectedItemElement: function(index) {
                 return this._itemElements().eq(0)
@@ -1935,101 +1928,16 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
             _renderSelection: function() {
                 this._renderContent()
             },
-            _initSwipeHandlers: function() {
-                this._$container.dxSwipeable({
-                    elastic: false,
-                    itemSizeFunc: $.proxy(this._getListWidth, this),
-                    onStart: $.proxy(this.option("swipeEnabled") ? this._swipeStartHandler : function(e) {
-                        e.jQueryEvent.cancel = true
-                    }, this),
-                    onUpdated: $.proxy(this._swipeUpdateHandler, this),
-                    onEnd: $.proxy(this._swipeEndHandler, this)
-                })
-            },
-            _swipeStartHandler: function(e) {
-                this._$shield.addClass(INVISIBLE_STATE_CLASS);
-                fx.stop(this._$container);
-                var menuVisible = this.option("menuVisible"),
-                    rtl = this.option("rtlEnabled");
-                e.jQueryEvent.maxLeftOffset = +(rtl ? !menuVisible : menuVisible);
-                e.jQueryEvent.maxRightOffset = +(rtl ? menuVisible : !menuVisible)
-            },
-            _swipeUpdateHandler: function(e) {
-                var offset = this.option("menuVisible") ? e.jQueryEvent.offset + 1 * this._getRTLSignCorrection() : e.jQueryEvent.offset;
-                offset *= this._getRTLSignCorrection();
-                this._renderPosition(offset, false)
-            },
-            _swipeEndHandler: function(e) {
-                var targetOffset = e.jQueryEvent.targetOffset * this._getRTLSignCorrection() + this.option("menuVisible"),
-                    menuVisible = targetOffset !== 0;
-                if (this.option("menuVisible") === menuVisible)
-                    this._renderPosition(this.option("menuVisible"), true);
-                else
-                    this.option("menuVisible", targetOffset !== 0)
-            },
-            _menuButtonClickHandler: function() {
-                this.option("menuVisible", !this.option("menuVisible"))
-            },
-            _toggleMenuVisibility: function(visible, animate) {
-                this.option("menuVisible", visible)
-            },
-            _renderPosition: function(offset, animate) {
-                var pos = this._calculatePixelOffset(offset) * this._getRTLSignCorrection();
-                this._toggleHideMenuCallback(offset);
-                if (animate) {
-                    this._$shield.addClass(INVISIBLE_STATE_CLASS);
-                    fx.animate(this._$container, {
-                        type: "slide",
-                        to: {left: pos},
-                        duration: ANIMATION_DURATION,
-                        complete: $.proxy(this._animationCompleteHandler, this)
-                    })
-                }
-                else
-                    translator.move(this._$container, {left: pos})
-            },
-            _calculatePixelOffset: function(offset) {
-                var offset = offset || 0,
-                    maxOffset = this._getListWidth();
-                return offset * maxOffset
-            },
             _getListWidth: function() {
-                if (!this._listWidth) {
-                    var maxListWidth = this.element().width() - CONTENT_OFFSET;
-                    this._$list.css("max-width", maxListWidth);
-                    var currentListWidth = this._$list.width();
-                    this._listWidth = Math.min(currentListWidth, maxListWidth)
-                }
-                return this._listWidth
-            },
-            _clearListWidthCache: function() {
-                delete this._listWidth
-            },
-            _getRTLSignCorrection: function() {
-                return this.option("rtlEnabled") ? -1 : 1
-            },
-            _toggleHideMenuCallback: function(subscribe) {
-                if (subscribe)
-                    DX.hideTopOverlayCallback.add(this._hideMenuHandler);
-                else
-                    DX.hideTopOverlayCallback.remove(this._hideMenuHandler)
+                return this._slideOutView._getMenuWidth()
             },
             _changeMenuOption: function(name, value) {
                 this._$list.dxList("instance").option(name, value);
-                this._clearListWidthCache()
-            },
-            _visibilityChanged: function(visible) {
-                if (visible)
-                    this._dimensionChanged()
+                this._updateSlideOutView()
             },
             _cleanItemContainer: function() {
                 if (this._singleContent)
                     return;
-                this.callBase()
-            },
-            _dispose: function() {
-                this._toggleHideMenuCallback(false);
-                fx.stop(this._$container);
                 this.callBase()
             },
             _optionChanged: function(args) {
@@ -2037,10 +1945,13 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
                 var value = args.value;
                 switch (name) {
                     case"menuVisible":
-                        this._renderPosition(value, true);
-                        break;
                     case"swipeEnabled":
-                        this._initSwipeHandlers();
+                    case"rtlEnabled":
+                        this._slideOutView.option(name, value);
+                        break;
+                    case"width":
+                        this.callBase(args);
+                        this._updateSlideOutView();
                         break;
                     case"menuItemTemplate":
                         this._changeMenuOption("itemTemplate", this._getTemplate(value));
@@ -2059,12 +1970,14 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
                     case"menuGroupTemplate":
                         this._changeMenuOption("groupTemplate", this._getTemplate(value));
                         break;
+                    case"onMenuItemRendered":
+                        this._changeMenuOption("onItemRendered", value);
+                        break;
+                    case"onMenuGroupRendered":
+                        this._changeMenuOption("onGroupRendered", value);
+                        break;
                     case"onItemClick":
                         this._renderItemClickAction();
-                        break;
-                    case"rtlEnabled":
-                        this.callBase(args);
-                        this._renderPosition(this.option("menuVisible"), false);
                         break;
                     case"contentTemplate":
                         this._singleContent = null;
@@ -2074,25 +1987,14 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
                         this.callBase(args)
                 }
             },
-            _toggleShieldVisibility: function() {
-                this._$shield.toggleClass(INVISIBLE_STATE_CLASS, !this.option("menuVisible"))
-            },
-            _animationCompleteHandler: function() {
-                this._toggleShieldVisibility();
-                if (this._deferredAnimate)
-                    this._deferredAnimate.resolveWith(this)
-            },
             showMenu: function() {
-                return this.toggleMenuVisibility(true)
+                return this._slideOutView.toggleMenuVisibility(true)
             },
             hideMenu: function() {
-                return this.toggleMenuVisibility(false)
+                return this._slideOutView.toggleMenuVisibility(false)
             },
             toggleMenuVisibility: function(showing) {
-                showing = showing === undefined ? !this.option("menuVisible") : showing;
-                this._deferredAnimate = $.Deferred();
-                this.option("menuVisible", showing);
-                return this._deferredAnimate.promise()
+                return this._slideOutView.toggleMenuVisibility(showing)
             }
         }))
     })(jQuery, DevExpress);

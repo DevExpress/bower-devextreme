@@ -1,9 +1,9 @@
 /*! 
 * DevExtreme
-* Version: 14.2.7
-* Build date: Apr 17, 2015
+* Version: 15.1.3
+* Build date: Jun 1, 2015
 *
-* Copyright (c) 2011 - 2014 Developer Express Inc. ALL RIGHTS RESERVED
+* Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
 */
 
@@ -34,7 +34,8 @@ Globalize.addCultureInfo("de", {messages: {
         "validation-pattern": "Der Wert passt nicht zum Muster",
         "validation-pattern-formatted": "{0} passt nicht zum Muster",
         "validation-email": "Die Email-Adresse ist ungültig",
-        "validation-email-formatted": "{0} ist ungültig"
+        "validation-email-formatted": "{0} ist ungültig",
+        "validation-mask": "Der Wert ist ungültig"
     }});
 Globalize.addCultureInfo("de", {messages: {
         "dxLookup-searchPlaceholder": "Minimale Anzahl Zeichen: {0}",
@@ -59,7 +60,15 @@ Globalize.addCultureInfo("de", {messages: {
         "dxFileUploader-bytes": "Bytes",
         "dxFileUploader-kb": "kb",
         "dxFileUploader-Mb": "Mb",
-        "dxFileUploader-Gb": "Gb"
+        "dxFileUploader-Gb": "Gb",
+        "dxFileUploader-upload": "Hochladen",
+        "dxFileUploader-uploaded": "Hochgeladen",
+        "dxFileUploader-readyToUpload": "Bereit zum hochladen",
+        "dxFileUploader-uploadFailedMessage": "Fehler beim hochladen",
+        "dxRangeSlider-ariaFrom": "Von {0}",
+        "dxRangeSlider-ariaTill": "Bis {0}",
+        "dxSwitch-onText": "EIN",
+        "dxSwitch-offText": "AUS"
     }});
 
 Globalize.addCultureInfo("de", {messages: {
@@ -107,7 +116,72 @@ Globalize.addCultureInfo("de", {messages: {
         "dxDataGrid-summarySum": "Summe: {0}",
         "dxDataGrid-summarySumOtherColumn": "Summe von {1} ist {0}",
         "dxDataGrid-summaryCount": "Anzahl: {0}",
+        "dxDataGrid-columnFixingFix": "Fixieren",
+        "dxDataGrid-columnFixingUnfix": "Lösen",
+        "dxDataGrid-columnFixingLeftPosition": "Nach links",
+        "dxDataGrid-columnFixingRightPosition": "Nach rechts",
+        "dxDataGrid-exportTo": "Exportieren nach",
+        "dxDataGrid-exportToExcel": "Exportieren als Excel-Datei",
+        "dxDataGrid-excelFormat": "Excel-Datei",
+        "dxDataGrid-selectedRows": "Ausgewählte Zeilen",
+        "dxDataGrid-headerFilterEmptyValue": "(Leerwerte)",
+        "dxDataGrid-headerFilterOK": "OK",
+        "dxDataGrid-headerFilterCancel": "Abbrechen",
+        "dxDataGrid-ariaColumn": "Spalte",
+        "dxDataGrid-ariaValue": "Wert",
+        "dxDataGrid-ariaFilterCell": "Filterzelle",
+        "dxDataGrid-ariaCollapse": "Zusammesklappen",
+        "dxDataGrid-ariaExpand": "Aufklappen",
+        "dxDataGrid-ariaDataGrid": "Datentabelle",
+        "dxDataGrid-ariaSearchInGrid": "Suchen in der Datentabelle",
+        "dxDataGrid-ariaSelectAll": "Alle auswählen",
+        "dxDataGrid-ariaSelectRow": "Zeile auswählen",
         "dxPager-infoText": "Seite {0} von {1}",
-        "dxSwitch-onText": "EIN",
-        "dxSwitch-offText": "AUS"
+        "dxPivotGrid-grandTotal": "Gesamt",
+        "dxPivotGrid-total": "{0} Gesamt",
+        "dxPivotGrid-fieldChooserTitle": "Feldauswahl",
+        "dxPivotGrid-showFieldChooser": "Feldauswahl anzeigen",
+        "dxPivotGrid-expandAll": "Alle aufklappen",
+        "dxPivotGrid-collapseAll": "Alle zusammenklappen",
+        "dxPivotGrid-sortColumnBySummary": "\"{0}\" nach dieser Spalte sortieren",
+        "dxPivotGrid-sortRowBySummary": "\"{0}\" nach dieser Zeile sortieren",
+        "dxPivotGrid-removeAllSorting": "Sortierungen entfernen",
+        "dxPivotGrid-rowFields": "Zeilenfelder",
+        "dxPivotGrid-columnFields": "Spaltenfelder",
+        "dxPivotGrid-dataFields": "Datenfelder",
+        "dxPivotGrid-filterFields": "Filterfelder",
+        "dxPivotGrid-allFields": "Alle Felder",
+        "dxScheduler-editorLabelTitle": "Betreff",
+        "dxScheduler-editorLabelStartDate": "Anfangszeit",
+        "dxScheduler-editorLabelEndDate": "Endzeit",
+        "dxScheduler-editorLabelDescription": "Beschreibung",
+        "dxScheduler-editorLabelRecurrence": "Wiederholung",
+        "dxScheduler-openAppointment": "Offenen termin",
+        "dxScheduler-recurrenceNever": "Nie",
+        "dxScheduler-recurrenceDaily": "Täglich",
+        "dxScheduler-recurrenceWeekly": "Wöchentlich",
+        "dxScheduler-recurrenceMonthly": "Monatlich",
+        "dxScheduler-recurrenceYearly": "Jährlich",
+        "dxScheduler-recurrenceEvery": "Alle",
+        "dxScheduler-recurrenceEnd": "Wiederholungsende",
+        "dxScheduler-recurrenceAfter": "Nach",
+        "dxScheduler-recurrenceOn": "Am",
+        "dxScheduler-recurrenceRepeatDaily": "Tag(e)",
+        "dxScheduler-recurrenceRepeatWeekly": "Woche(n)",
+        "dxScheduler-recurrenceRepeatMonthly": "Monat(e)",
+        "dxScheduler-recurrenceRepeatYearly": "Jahr(e)",
+        "dxScheduler-switcherDay": "Tag",
+        "dxScheduler-switcherWeek": "Woche",
+        "dxScheduler-switcherWorkWeek": "Arbeitswoche",
+        "dxScheduler-switcherMonth": "Monat",
+        "dxScheduler-recurrenceRepeatOnDate": "am Datum",
+        "dxScheduler-recurrenceRepeatCount": "Ereignisse",
+        "dxScheduler-allDay": "Ganztägig",
+        "dxCalendar-todayButtonText": "Heute",
+        "dxCalendar-ariaWidgetName": "Kalendar",
+        "dxColorView-ariaRed": "Rot",
+        "dxColorView-ariaGreen": "Grün",
+        "dxColorView-ariaBlue": "Blau",
+        "dxColorView-ariaAlpha": "Transparenz",
+        "dxColorView-ariaHex": "Farbwert"
     }});

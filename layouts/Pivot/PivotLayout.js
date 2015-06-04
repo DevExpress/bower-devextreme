@@ -49,20 +49,12 @@
             $result = $result.add(this.$footer);
             return $result
         },
-        _showViewImpl: function(viewInfo, direction) {
+        _showViewImpl: function(viewInfo, direction, previousViewTemplateId) {
             this._showViewElements(viewInfo.renderResult.$markup);
-            this._changeView(viewInfo);
+            this._changeView(viewInfo, previousViewTemplateId);
             this._changeAppbar();
             this._viewsInLayout[viewInfo.key] = viewInfo;
             return $.Deferred().resolve().promise()
-        },
-        _templateContextChangedHandler: function() {
-            $.each(this._visibleViews, $.proxy(function(index, viewInfo) {
-                var previousViewInfo = this._getPreviousViewInfo(viewInfo);
-                if (previousViewInfo)
-                    this._hideView(previousViewInfo)
-            }, this));
-            this.callBase()
         },
         _changeAppbar: function() {
             var $appbar = this.$footer.find(".dx-active-view " + TOOLBAR_BOTTOM_SELECTOR),

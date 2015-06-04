@@ -53,9 +53,6 @@
             });
             return result
         },
-        setViewLoadingState: function(viewInfo, direction) {
-            return this.childController.setViewLoadingState(viewInfo, direction)
-        },
         showView: function(viewInfo, direction) {
             return this.childController.showView(viewInfo, direction)
         }

@@ -11,6 +11,24 @@
             this.swipeEnabled = options.swipeEnabled === undefined ? true : options.swipeEnabled;
             this.callBase(options)
         },
+        init: function(options) {
+            this.callBase(options);
+            this._navigationManager = options.navigationManager;
+            this._navigationCanceledHandler = $.proxy(this._onNavigatingCanceled, this)
+        },
+        activate: function() {
+            var result = this.callBase.apply(this, arguments);
+            this._navigationManager.on("navigationCanceled", this._navigationCanceledHandler);
+            return result
+        },
+        deactivate: function() {
+            this._navigationManager.navigationCanceled.remove(this._navigationCanceledHandler);
+            return this.callBase.apply(this, arguments)
+        },
+        _onNavigatingCanceled: function() {
+            if (this.slideOut.option("menuVisible"))
+                this._toggleNavigation()
+        },
         _createNavigationWidget: function() {
             this.$slideOut = $("<div data-bind='dxSlideOut: {  menuItemTemplate: $(\"#slideOutMenuItemTemplate\") }'></div>").dxCommandContainer({id: 'global-navigation'});
             this._applyTemplate(this.$slideOut, this._layoutModel);
@@ -27,30 +45,15 @@
         _getRootElement: function() {
             return this.$slideOut
         },
-        init: function(options) {
-            this.callBase(options);
-            this._navigationManager = options.navigationManager;
-            this._navigatingHandler = $.proxy(this._onNavigating, this)
-        },
-        activate: function() {
-            var result = this.callBase.apply(this, arguments);
-            this._navigationManager.on("navigating", this._navigatingHandler);
-            return result
-        },
-        deactivate: function() {
-            this._navigationManager.navigating.remove(this._navigatingHandler);
-            return this.callBase.apply(this, arguments)
-        },
-        _onNavigating: function(args) {
-            var that = this;
+        _doTransition: function() {
             if (this.slideOut.option("menuVisible"))
-                args.navigateWhen.push(this._toggleNavigation().done(function() {
-                    that._disableTransitions = true
-                }))
+                return $.Deferred().resolve().promise();
+            return this.callBase.apply(this, arguments)
         },
         _onViewShown: function(viewInfo) {
             this._refreshVisibility();
-            this._disableTransitions = false
+            if (this.slideOut.option("menuVisible"))
+                this._toggleNavigation()
         },
         _refreshVisibility: function() {
             if (DX.devices.real().platform === "android") {
@@ -59,19 +62,19 @@
                 this.$slideOut.css("backface-visibility", "visible")
             }
         },
-        _isPlaceholderEmpty: function(viewInfo) {
-            var $markup = viewInfo.renderResult.$markup;
-            var toolbar = $markup.find(".layout-toolbar").data("dxToolbar");
-            var items = toolbar.option("items");
-            var backCommands = $.grep(items, function(item) {
-                    return (item.behavior === "back" || item.id === "back") && item.visible === true
-                });
-            return !backCommands.length
+        _viewHasBackCommands: function(viewInfo) {
+            var hasBackCommands = false;
+            $.each(viewInfo.commands, function(index, command) {
+                if ((command.option("behavior") === "back" || command.option("id") === "back") && command.option("visible")) {
+                    hasBackCommands = true;
+                    return false
+                }
+            });
+            return hasBackCommands
         },
         _onRenderComplete: function(viewInfo) {
             var that = this;
-            that._initNavigation(viewInfo.renderResult.$markup);
-            if (that._isPlaceholderEmpty(viewInfo))
+            if (!that._viewHasBackCommands(viewInfo))
                 that._initNavigationButton(viewInfo.renderResult.$markup);
             var $content = viewInfo.renderResult.$markup.find(".layout-content"),
                 $appbar = viewInfo.renderResult.$markup.find(".layout-toolbar-bottom"),
@@ -108,9 +111,6 @@
                 initNavButton()
             })
         },
-        _initNavigation: function($markup) {
-            this._isNavigationVisible = false
-        },
         _toggleNavigation: function($markup) {
             return this.slideOut.toggleMenuVisibility()
         }
@@ -123,10 +123,6 @@
     });
     layoutSets["slideout"].push({
         platform: "android",
-        controller: new DX.framework.html.SlideOutController
-    });
-    layoutSets["slideout"].push({
-        platform: "tizen",
         controller: new DX.framework.html.SlideOutController
     });
     layoutSets["slideout"].push({

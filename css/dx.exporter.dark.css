@@ -1,9 +1,9 @@
 /*! 
 * DevExtreme Exporter
-* Version: 14.2.7
-* Build date: Apr 17, 2015
+* Version: 15.1.3
+* Build date: Jun 1, 2015
 *
-* Copyright (c) 2011 - 2014 Developer Express Inc. ALL RIGHTS RESERVED
+* Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
 */
 
@@ -52,9 +52,6 @@
 .dx-menu-base .dx-menu-item .dx-menu-item-content
 {
   white-space: nowrap;
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
   height: 100%;
   width: 100%;
 }
@@ -149,9 +146,6 @@
   bottom: 0;
   left: 0;
   position: absolute;
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
 }
 .dx-context-menu-content-delimiter
 {
@@ -166,6 +160,12 @@
   left: 0;
   z-index: 1000;
 }
+.dx-overlay-wrapper, .dx-overlay-wrapper *, .dx-overlay-wrapper:before, .dx-overlay-wrapper:after, .dx-overlay-wrapper *:before, .dx-overlay-wrapper *:after
+{
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
 .dx-overlay-modal
 {
   width: 100%;
@@ -179,11 +179,8 @@
 {
   position: absolute;
   z-index: 1000;
-  overflow: hidden;
   outline: 0;
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
+  overflow: hidden;
 }
 .dx-overlay-content>.dx-template-wrapper
 {
@@ -216,6 +213,9 @@
   -webkit-touch-callout: none;
   padding: 0;
   outline: 0;
+}
+.dx-widget, .dx-widget:before, .dx-widget:after, .dx-widget *, .dx-widget *:before, .dx-widget *:after
+{
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
@@ -241,12 +241,12 @@
 }
 .dx-menu-item
 {
-  color: #c7c7c7;
+  color: #dbdbdb;
 }
 .dx-menu-item.dx-state-focused, .dx-menu-item.dx-state-active, .dx-menu-item-expanded
 {
   outline: none;
-  background-color: rgba(175,175,175,.15);
+  background-color: rgba(197,197,197,.1);
   color: #dbdbdb;
 }
 .dx-menu-base
@@ -254,21 +254,20 @@
   color: #dbdbdb;
   font-weight: normal;
   font-size: 14px;
-  font-family: 'Helvetica Neue','Segoe UI',Helvetica,Verdana,san-serif;
+  font-family: 'Helvetica Neue','Segoe UI',Helvetica,Verdana,sans-serif;
   line-height: normal;
 }
 .dx-menu-base input, .dx-menu-base textarea
 {
-  font-family: 'Helvetica Neue','Segoe UI',Helvetica,Verdana,san-serif;
+  font-family: 'Helvetica Neue','Segoe UI',Helvetica,Verdana,sans-serif;
 }
 .dx-menu-base .dx-menu-item-selected, .dx-menu-base .dx-menu-item-selected.dx-state-focused, .dx-menu-base .dx-menu-item-selected.dx-state-active
 {
-  background-color: #afafaf;
-  color: #fff;
+  background-color: #c5c5c5;
+  color: #303030;
 }
 .dx-menu-base.dx-state-disabled
 {
-  color: #aaa;
   opacity: .5;
 }
 .dx-menu-base.dx-state-focused
@@ -277,12 +276,16 @@
 }
 .dx-menu-base .dx-icon
 {
-  margin: 0 1px;
-  width: 16px;
-  height: 16px;
-  -webkit-background-size: 100% 100%;
-  -moz-background-size: 100% 100%;
-  background-size: 100% 100%;
+  width: 18px;
+  height: 18px;
+  background-position: 0 0;
+  -webkit-background-size: 18px 18px;
+  -moz-background-size: 18px 18px;
+  background-size: 18px 18px;
+  padding: 0;
+  font-size: 18px;
+  text-align: center;
+  line-height: 18px;
 }
 .dx-menu-base .dx-menu-item-content
 {
@@ -318,7 +321,7 @@
 }
 .dx-context-menu
 {
-  color: #c7c7c7;
+  color: #dbdbdb;
 }
 .dx-context-menu.dx-overlay-content.dx-state-focused
 {
@@ -328,15 +331,15 @@
 }
 .dx-context-menu .dx-submenu>.dx-menu-items-container
 {
-  background-color: #454545;
-  border: 1px solid #4b4b4b;
+  background-color: #303030;
+  border: 1px solid #555;
   -webkit-box-shadow: 0 2px 2px rgba(0,0,0,.15);
   -moz-box-shadow: 0 2px 2px rgba(0,0,0,.15);
   box-shadow: 0 2px 2px rgba(0,0,0,.15);
 }
 .dx-context-menu .dx-menu-item-selected>.dx-menu-item-content, .dx-context-menu .dx-menu-item-selected.dx-state-focused>.dx-menu-item-content, .dx-context-menu .dx-menu-item-selected.dx-state-active>.dx-menu-item-content
 {
-  color: #fff;
+  color: #303030;
 }
 .dx-context-menu .dx-item-selected>.dx-menu-item>.dx-menu-item-content .dx-menu-item-popout
 {
@@ -348,7 +351,7 @@
 }
 .dx-context-menu .dx-menu-separator
 {
-  background-color: #606060;
+  background-color: #555;
 }
 .dx-context-menu.dx-rtl .dx-menu-item-content
 {
@@ -360,24 +363,23 @@
 }
 .dx-context-menu-content-delimiter
 {
-  background-color: #454545;
+  background-color: #303030;
 }
 .dx-context-menu-container-border
 {
   background-color: transparent;
-  border: 1px solid #4b4b4b;
+  border: 1px solid #555;
   -webkit-box-shadow: 0 1px 1px rgba(0,0,0,.15);
   -moz-box-shadow: 0 1px 1px rgba(0,0,0,.15);
   box-shadow: 0 1px 1px rgba(0,0,0,.15);
 }
 .dx-menu
 {
-  color: #c7c7c7;
-  background-color: transparent;
+  color: #dbdbdb;
 }
 .dx-menu .dx-menu-item-expanded
 {
-  background-color: #454545;
+  background-color: #303030;
 }
 .dx-menu .dx-menu-item-has-icon.dx-menu-item-has-submenu .dx-icon
 {

@@ -1,9 +1,9 @@
 /*! 
 * DevExtreme (Vector Map)
-* Version: 14.2.7
-* Build date: Apr 17, 2015
+* Version: 15.1.3
+* Build date: Jun 1, 2015
 *
-* Copyright (c) 2011 - 2014 Developer Express Inc. ALL RIGHTS RESERVED
+* Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
 */
 
@@ -14,12 +14,11 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
     /*! Module viz-vectormap, file map.js */
     (function(DX, $, undefined) {
         DX.viz.map = {};
-        var _Number = Number,
-            _isFunction = DX.utils.isFunction,
-            _getRootOffset = DX.utils.getRootOffset,
+        var _getRootOffset = DX.utils.getRootOffset,
             _parseScalar = DX.viz.core.utils.parseScalar,
             DEFAULT_WIDTH = 800,
             DEFAULT_HEIGHT = 400,
+            TOOLTIP_OFFSET = 12,
             _extend = $.extend,
             nextDataKey = 1;
         function generateDataKey() {
@@ -134,19 +133,16 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                             since: "14.2",
                             message: 'Use the "onMarkerSelectionChanged" option instead'
                         },
-                        "tooltip.borderColor": {
-                            since: "14.1",
-                            message: 'Use the "border.color" option instead'
-                        },
                         "markerSettings.font": {
                             since: "14.2",
                             message: 'Use the "label.font" option instead'
                         }
                     })
                 },
-                _initThemeManager: function() {
-                    this._themeManager = this._factory.createThemeManager();
-                    this._themeManager.setTheme(this.option("theme"), this.option("rtlEnabled"))
+                _rootClassPrefix: "dxm",
+                _rootClass: "dxm-vector-map",
+                _createThemeManager: function() {
+                    return this._factory.createThemeManager()
                 },
                 _initBackground: function(dataKey) {
                     this._background = this._renderer.rect(0, 0, 0, 0).attr({"class": "dxm-background"}).data(dataKey, {type: "background"})
@@ -200,14 +196,6 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                         dataKey: dataKey
                     })
                 },
-                _initTooltip: function() {
-                    var that = this;
-                    that._tooltip = that._factory.createTooltip({
-                        container: that._root,
-                        renderer: that._renderer,
-                        eventTrigger: that._eventTrigger
-                    })
-                },
                 _initElements: function() {
                     var that = this,
                         dataKey = generateDataKey(),
@@ -225,7 +213,6 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                     that._initMarkersManager(dataKey, notifyDirty, notifyReady);
                     that._initLegendsControl();
                     that._initControlBar(dataKey);
-                    that._initTooltip();
                     function notifyDirty() {
                         that._resetIsReady();
                         ++notifyCounter
@@ -237,63 +224,40 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                         }
                     }
                 },
-                _init: function() {
-                    this._initThemeManager();
-                    this.callBase.apply(this, arguments)
-                },
                 _initCore: function() {
                     var that = this;
                     that._root = that._renderer.root;
                     that._root.attr({
-                        'class': 'dxm',
-                        stroke: 'none',
-                        "stroke-width": 0,
-                        fill: 'none',
                         align: 'center',
                         cursor: 'default'
-                    }).css({overflow: 'hidden'});
+                    });
                     that._initElements();
-                    that._setThemeDependentOptions();
-                    that._areasManager.setData(that.option("mapData"));
-                    that._markersManager.setData(that.option("markers"));
                     that._projection.setBounds(that.option("bounds")).setMaxZoom(that.option("maxZoomFactor")).setZoom(that.option("zoomFactor"), true).setCenter(that.option("center"), true);
-                    that._setTrackerOptions();
-                    that._setupInteraction();
                     that._setTrackerCallbacks();
                     that._setControlBarCallbacks();
                     that._setProjectionCallbacks()
                 },
-                _disposeCore: function() {
+                _init: function() {
                     var that = this;
                     that.callBase.apply(that, arguments);
+                    that._areasManager.setData(that.option("mapData"));
+                    that._markersManager.setData(that.option("markers"))
+                },
+                _disposeCore: function() {
+                    var that = this;
                     that._resetProjectionCallbacks();
                     that._resetTrackerCallbacks();
                     that._resetControlBarCallbacks();
-                    that._themeManager.dispose();
                     that._tracker.dispose();
                     that._legendsControl.dispose();
                     that._areasManager.dispose();
                     that._markersManager.dispose();
                     that._controlBar.dispose();
-                    that._tooltip.dispose();
                     that._layoutControl.dispose();
                     that._disposeCenterHandler();
                     that._dataExchanger.dispose();
                     that._projection.dispose();
-                    that._themeManager = that._dataExchanger = that._projection = that._tracker = that._layoutControl = that._root = that._background = that._areasManager = that._markersManager = that._controlBar = that._legendsControl = that._tooltip = null
-                },
-                _getRendererParameters: function() {
-                    return {
-                            width: 1,
-                            height: 1,
-                            pathModified: this.option('pathModified'),
-                            rtl: this._getOption('rtlEnabled', true)
-                        }
-                },
-                _getOption: function(name, isScalar) {
-                    var theme = this._themeManager.theme(name),
-                        option = this.option(name);
-                    return isScalar ? option !== undefined ? option : theme : _extend(true, {}, theme, option)
+                    that._dataExchanger = that._projection = that._tracker = that._layoutControl = that._root = that._background = that._areasManager = that._markersManager = that._controlBar = that._legendsControl = null
                 },
                 _initCenterHandler: function() {
                     var that = this,
@@ -410,23 +374,20 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                         },
                         "focus-on": function(arg, done) {
                             var result = false,
-                                proxy,
-                                offset;
-                            if (tooltip.enabled()) {
+                                proxy;
+                            if (tooltip.isEnabled()) {
                                 proxy = managers[arg.data.type] ? managers[arg.data.type].getProxyItem(arg.data.index) : null;
-                                if (!!proxy && tooltip.prepare(proxy, {offset: 12})) {
-                                    offset = _getRootOffset(renderer);
-                                    tooltip.show({}).move(arg.x - offset.left, arg.y - offset.top);
+                                if (!!proxy && tooltip.show(proxy, {}, {})) {
+                                    tooltip.move(arg.x, arg.y, TOOLTIP_OFFSET);
                                     result = true
                                 }
                             }
                             done(result)
                         },
                         "focus-move": function(arg) {
-                            var offset = _getRootOffset(renderer);
-                            tooltip.move(arg.x - offset.left, arg.y - offset.top)
+                            tooltip.move(arg.x, arg.y, TOOLTIP_OFFSET)
                         },
-                        "focus-off": function(arg) {
+                        "focus-off": function() {
                             tooltip.hide({})
                         }
                     });
@@ -498,7 +459,6 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                         height = that._canvas.height;
                     that._projection.setSize(width, height);
                     that._layoutControl.setSize(width, height);
-                    that._tooltip.setSize(width, height);
                     that._background.attr({
                         x: 0,
                         y: 0,
@@ -515,8 +475,7 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                     that._areasManager.clean();
                     that._markersManager.clean();
                     that._controlBar.clean();
-                    that._legendsControl.clean();
-                    that._tooltip.clean()
+                    that._legendsControl.clean()
                 },
                 _render: function() {
                     var that = this;
@@ -525,17 +484,12 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                     that._markersManager.render();
                     that._controlBar.render();
                     that._legendsControl.render();
-                    that._layoutControl.start();
-                    that._tooltip.render()
+                    that._layoutControl.start()
                 },
                 _optionChanged: function(args) {
                     var that = this,
                         value = args.value;
                     switch (args.name) {
-                        case"theme":
-                            that._themeManager.setTheme(value, that.option("rtlEnabled"));
-                            that._setThemeDependentOptions();
-                            break;
                         case"mapData":
                             that._areasManager.setData(value);
                             break;
@@ -569,9 +523,6 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                         case"legends":
                             that._setLegendsOptions();
                             break;
-                        case"tooltip":
-                            that._setTooltipOptions();
-                            break;
                         case"touchEnabled":
                         case"wheelEnabled":
                             that._setTrackerOptions();
@@ -585,14 +536,15 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                             break
                     }
                 },
-                _setThemeDependentOptions: function() {
+                _handleThemeOptionsCore: function() {
                     var that = this;
                     that._setBackgroundOptions();
                     that._setAreasManagerOptions();
                     that._setMarkersManagerOptions();
                     that._setControlBarOptions();
                     that._setLegendsOptions();
-                    that._setTooltipOptions()
+                    that._setTrackerOptions();
+                    that._setupInteraction()
                 },
                 _setBackgroundOptions: function() {
                     var settings = this._getOption("background");
@@ -617,9 +569,6 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                 },
                 _setLegendsOptions: function() {
                     this._legendsControl.setOptions(this.option("legends"), this._themeManager.theme("legend"))
-                },
-                _setTooltipOptions: function() {
-                    this._tooltip.setOptions(this._getOption("tooltip"))
                 },
                 _setTrackerOptions: function() {
                     this._tracker.setOptions({
@@ -695,9 +644,6 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                 },
                 _factory: {}
             });
-        Map.prototype._factory.createRenderer = function(parameters) {
-            return new DX.viz.renderers.Renderer(parameters)
-        };
         function DataExchanger() {
             this._store = {}
         }
@@ -741,7 +687,6 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
     /*! Module viz-vectormap, file projection.js */
     (function(DX, $, undefined) {
         var _Number = Number,
-            _isFinite = isFinite,
             _isArray = DX.utils.isArray,
             _math = Math,
             _min = _math.min,
@@ -817,8 +762,6 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                 min = [_min(p1[0], p2[0]), _min(p1[1], p2[1])],
                 max = [_max(p1[0], p2[0]), _max(p1[1], p2[1])],
                 quad = bounds;
-            if (quad && quad.minLon)
-                quad = [quad.minLon, quad.minLat, quad.maxLon, quad.maxLat];
             if (quad)
                 quad = truncateQuad(quad, min, max);
             return {
@@ -1028,9 +971,8 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
             },
             setCenter: function(center, _forceEvent) {
                 var that = this,
-                    _center = _isArray(center) ? center : null,
+                    _center = _isArray(center) ? center : [],
                     center__ = that._center;
-                _center = _center || center && (center.lon || center.lat) && [center.lon, center.lat] || [];
                 that._center = [truncate(_center[0], that._minBound[0], that._maxBound[0], that._defaultCenter[0]), truncate(_center[1], that._minBound[1], that._maxBound[1], that._defaultCenter[1])];
                 that._adjustCenter();
                 if (!floatsEqual(center__[0], that._center[0]) || !floatsEqual(center__[1], that._center[1]) || _forceEvent)
@@ -1107,9 +1049,9 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
     /*! Module viz-vectormap, file controlBar.js */
     (function(DX, undefined) {
         var _Number = Number,
-            _String = String,
             _math = Math,
             _round = _math.round,
+            _floor = _math.floor,
             _pow = _math.pow,
             _ln = _math.log,
             _LN2 = _math.LN2,
@@ -1178,30 +1120,38 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                         fill: "#000000",
                         opacity: 0.0001
                     }).css({cursor: "pointer"}).append(that._root);
-                    that._createButtons(renderer, SIZE_OPTIONS, dataKey, buttonsGroups);
-                    that._createTrackers(renderer, SIZE_OPTIONS, dataKey, trackersGroup)
+                    that._createButtons(renderer, dataKey, buttonsGroups);
+                    that._createTrackers(renderer, dataKey, trackersGroup)
                 },
-                _createButtons: function(renderer, options, dataKey, group) {
-                    var size = options.buttonSize / 2,
+                _createButtons: function(renderer, dataKey, group) {
+                    var that = this,
+                        options = SIZE_OPTIONS,
+                        size = options.buttonSize / 2,
                         offset1 = options.arrowButtonOffset - size,
                         offset2 = options.arrowButtonOffset,
-                        incdecButtonSize = options.incdecButtonSize / 2;
+                        incdecButtonSize = options.incdecButtonSize / 2,
+                        directionOptions = {
+                            "stroke-linecap": "square",
+                            fill: "none"
+                        },
+                        line = "line";
                     renderer.circle(0, 0, options.bigCircleSize / 2).append(group);
-                    renderer.circle(0, 0, size).append(group);
-                    renderer.path([-size, -offset1, 0, -offset2, size, -offset1], "line").attr({"stroke-linecap": "square"}).append(group);
-                    renderer.path([offset1, -size, offset2, 0, offset1, size], "line").attr({"stroke-linecap": "square"}).append(group);
-                    renderer.path([size, offset1, 0, offset2, -size, offset1], "line").attr({"stroke-linecap": "square"}).append(group);
-                    renderer.path([-offset1, size, -offset2, 0, -offset1, -size], "line").attr({"stroke-linecap": "square"}).append(group);
+                    renderer.circle(0, 0, size).attr({fill: "none"}).append(group);
+                    renderer.path([-size, -offset1, 0, -offset2, size, -offset1], line).attr(directionOptions).append(group);
+                    renderer.path([offset1, -size, offset2, 0, offset1, size], line).attr(directionOptions).append(group);
+                    renderer.path([size, offset1, 0, offset2, -size, offset1], line).attr(directionOptions).append(group);
+                    renderer.path([-offset1, size, -offset2, 0, -offset1, -size], line).attr(directionOptions).append(group);
                     renderer.circle(0, options.incButtonOffset, options.smallCircleSize / 2).append(group);
                     renderer.path([[-incdecButtonSize, options.incButtonOffset, incdecButtonSize, options.incButtonOffset], [0, options.incButtonOffset - incdecButtonSize, 0, options.incButtonOffset + incdecButtonSize]], "area").append(group);
                     renderer.circle(0, options.decButtonOffset, options.smallCircleSize / 2).append(group);
                     renderer.path([-incdecButtonSize, options.decButtonOffset, incdecButtonSize, options.decButtonOffset], "area").append(group);
-                    renderer.path([0, options.sliderLineStartOffset, 0, options.sliderLineEndOffset], "area").append(group);
-                    this._zoomDrag = renderer.rect(-options.sliderLength / 2, options.sliderLineEndOffset - options.sliderWidth / 2, options.sliderLength, options.sliderWidth).append(group);
-                    this._sliderLineLength = options.sliderLineEndOffset - options.sliderLineStartOffset
+                    that._progressBar = renderer.path([], "area").append(group);
+                    that._zoomDrag = renderer.rect(_floor(-options.sliderLength / 2), _floor(options.sliderLineEndOffset - options.sliderWidth / 2), options.sliderLength, options.sliderWidth).append(group);
+                    that._sliderLineLength = options.sliderLineEndOffset - options.sliderLineStartOffset
                 },
-                _createTrackers: function(renderer, options, dataKey, group) {
-                    var size = _round((options.arrowButtonOffset - options.trackerGap) / 2),
+                _createTrackers: function(renderer, dataKey, group) {
+                    var options = SIZE_OPTIONS,
+                        size = _round((options.arrowButtonOffset - options.trackerGap) / 2),
                         offset1 = options.arrowButtonOffset - size,
                         offset2 = _round(_pow(options.bigCircleSize * options.bigCircleSize / 4 - size * size, 0.5)),
                         size2 = offset2 - offset1;
@@ -1259,7 +1209,7 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                     var that = this;
                     that._params.layoutControl.removeItem(that);
                     that._root.clear();
-                    that._params = that._callbacks = that._root = that._buttonsGroup = that._zoomDrag = that._zoomDragCover = null;
+                    that._params = that._callbacks = that._root = that._buttonsGroup = that._zoomDrag = that._zoomDragCover = that._progressBar = null;
                     return that
                 },
                 resize: function(size) {
@@ -1306,7 +1256,8 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                     that._buttonsGroup.attr({
                         "stroke-width": options.borderWidth,
                         stroke: options.borderColor,
-                        fill: options.color
+                        fill: options.color,
+                        "fill-opacity": options.opacity
                     });
                     that._options = {
                         enabled: !!_parseScalar(options.enabled, true),
@@ -1338,11 +1289,17 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                 },
                 _adjustZoom: function(zoom) {
                     var that = this,
-                        transform;
+                        transform,
+                        y,
+                        start = SIZE_OPTIONS.sliderLineStartOffset,
+                        end = SIZE_OPTIONS.sliderLineEndOffset,
+                        h = SIZE_OPTIONS.sliderWidth;
                     that._zoomFactor = _round(zoom);
                     that._zoomFactor >= 0 || (that._zoomFactor = 0);
                     that._zoomFactor <= that._zoomPartition || (that._zoomFactor = that._zoomPartition);
                     transform = {translateY: -that._zoomFactor * that._sliderUnitLength};
+                    y = end - h / 2 + transform.translateY;
+                    that._progressBar.attr({points: [[0, start, 0, _math.max(start, y)], [0, _math.min(end, y + h), 0, end]]});
                     that._zoomDrag.attr(transform);
                     that._zoomDragCover.attr(transform)
                 },
@@ -1496,8 +1453,6 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
             _abs = _math.abs,
             _sqrt = _math.sqrt,
             _round = _math.round,
-            _max = _math.max,
-            _min = _math.min,
             _addNamespace = DX.ui.events.addNamespace,
             _parseScalar = DX.viz.core.utils.parseScalar,
             _now = $.now,
@@ -1608,7 +1563,7 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                     })
                 }
             },
-            _endDrag: function(event, data) {
+            _endDrag: function() {
                 var state = this._dragState;
                 if (!state)
                     return;
@@ -1670,7 +1625,7 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                     }
                 }
             },
-            _moveZoom: function(event, data) {
+            _moveZoom: function(event) {
                 var state = this._zoomState,
                     coords;
                 if (!state || !isTouchEvent(event))
@@ -1690,7 +1645,7 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                     }
                 }
             },
-            _endZoom: function(event, data) {
+            _endZoom: function(event) {
                 var state = this._zoomState,
                     startDistance,
                     currentDistance;
@@ -1751,7 +1706,7 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                 that._focus.turnOff(isTouch ? FOCUS_OFF_DELAY_TOUCH : FOCUS_OFF_DELAY_MOUSE);
                 data && that._focus.turnOn(data, getEventCoords(event), isTouch ? FOCUS_ON_DELAY_TOUCH : FOCUS_ON_DELAY_MOUSE, isTouch)
             },
-            _endFocus: function(event, data) {
+            _endFocus: function(event) {
                 if (!isTouchEvent(event))
                     return;
                 this._focus.cancelOn()
@@ -2025,7 +1980,6 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
     /*! Module viz-vectormap, file themeManager.js */
     (function(DX, $, undefined) {
         var _Number = Number,
-            _parseScalar = DX.viz.core.utils.parseScalar,
             _extend = $.extend,
             _each = $.each;
         var ThemeManager = DX.viz.core.BaseThemeManager.inherit({
@@ -2110,13 +2064,6 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                         commonSettings._pie._colors = colors
                     }
                     return colors
-                },
-                setTheme: function(theme, rtlEnabledOption) {
-                    var that = this;
-                    that.callBase(theme);
-                    if (_parseScalar(rtlEnabledOption, that._theme.rtlEnabled))
-                        _extend(true, that._theme, that._theme._rtl);
-                    return that
                 }
             });
         DX.viz.map._tests.ThemeManager = ThemeManager;
@@ -2240,7 +2187,7 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                     item,
                     newItems = [],
                     items = this._items;
-                for (ii = optionList.length; i < ii; ++i) {
+                for (; i < ii; ++i) {
                     item = (items[i] || new Legend(this._parameters)).setOptions(_extend(true, {}, theme, optionList[i]));
                     newItems.push(item)
                 }
@@ -2276,39 +2223,6 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
             sourceMap[name] = value
         }
     })(DevExpress, jQuery);
-    /*! Module viz-vectormap, file tooltip.js */
-    (function(DX, undefined) {
-        var Tooltip = DX.viz.core.Tooltip.inherit({
-                ctor: function(parameters) {
-                    var that = this;
-                    that._container = parameters.container;
-                    that._root = parameters.renderer.g().attr({"class": "dxm-tooltip"});
-                    that.callBase($.extend({group: that._root}, parameters))
-                },
-                dispose: function() {
-                    var that = this;
-                    that._container = that._root = null;
-                    return that.callBase.apply(that, arguments)
-                },
-                clean: function() {
-                    this._root.remove();
-                    return this
-                },
-                setOptions: function(options) {
-                    options.border.color = options.borderColor || options.border.color;
-                    this.update(options);
-                    return this
-                },
-                render: function() {
-                    this._root.append(this._container);
-                    return this
-                }
-            });
-        DX.viz.map.dxVectorMap.prototype._factory.createTooltip = function(parameters) {
-            return new Tooltip(parameters)
-        };
-        DX.viz.map._tests.Tooltip = Tooltip
-    })(DevExpress);
     /*! Module viz-vectormap, file layout.js */
     (function(DX, $, undefined) {
         var _round = Math.round,
@@ -2613,12 +2527,23 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                         renderer: that._params.renderer,
                         projection: that._params.projection,
                         dataKey: that._params.dataKey,
-                        getItemSettings: function(proxy, settings) {
-                            return that._getItemSettings(proxy, settings)
-                        }
+                        getItemSettings: that._createItemSettingsBuilder()
                     };
                     that._initRoot();
                     createEventTriggers(that._context, that._params.eventTrigger, that._eventNames)
+                },
+                _createItemSettingsBuilder: function() {
+                    var that = this;
+                    return function(proxy, settings) {
+                            var result = {};
+                            _each(that._grouping, function(settingField, grouping) {
+                                var value,
+                                    index;
+                                if (_isFinite(value = grouping.callback(proxy)) && (index = findGroupPosition(value, grouping.groups)) >= 0)
+                                    result[settingField] = grouping.groups[index][settingField]
+                            });
+                            return that._getItemSettings(proxy, _extend({}, settings, result))
+                        }
                 },
                 _initRoot: function() {
                     this._context.root = this._root = this._params.renderer.g().attr({"class": this._rootClass})
@@ -2626,7 +2551,7 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                 dispose: function() {
                     var that = this;
                     that._destroyHandles();
-                    that._params = that._context = null;
+                    that._params = that._context = that._grouping = null;
                     that._disposeRoot();
                     return that
                 },
@@ -2669,9 +2594,10 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                     selectionMode = selectionMode === SELECTION_MODE_NONE || selectionMode === SELECTION_MODE_SINGLE || selectionMode === SELECTION_MODE_MULTIPLE ? selectionMode : SELECTION_MODE_SINGLE;
                     context.isSelectionEnabled = selectionMode !== SELECTION_MODE_NONE;
                     context.isSingleSelection = selectionMode === SELECTION_MODE_SINGLE;
-                    context.selected = context.isSingleSelection ? null : {}
+                    context.selected = context.isSingleSelection ? null : {};
+                    that._grouping = {};
+                    that._updateGrouping()
                 },
-                _getCommonSettings: null,
                 _appendRoot: function() {
                     this._root.append(this._params.container)
                 },
@@ -2695,12 +2621,6 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                     });
                     this._handles = null
                 },
-                _itemType: null,
-                _initProxy: null,
-                _getItemSettings: null,
-                _createItem: null,
-                _arrangeItems: null,
-                _updateGrouping: null,
                 _createHandles: function(source) {
                     var that = this;
                     if (_isArray(source))
@@ -2719,7 +2639,6 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                     var that = this,
                         selectedItems = [],
                         immediateReady = true;
-                    that._handles && !skipUpdateGrouping && that._updateGrouping();
                     if (that._rendered && that._handles) {
                         _each(that._handles, function(_, handle) {
                             handle.item = that._createItem(handle.proxy).init(that._context, handle.proxy).project().update(handle.settings).locate();
@@ -2748,7 +2667,7 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                     var that = this;
                     that._params.notifyDirty();
                     if (_isString(data))
-                        $.getJSON(data).done(updateSource).fail(function(_0, _1, error) {
+                        $.getJSON(data).done(updateSource).fail(function() {
                             updateSource(null)
                         });
                     else
@@ -2817,18 +2736,20 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                         values;
                     if (groups) {
                         values = valuesCallback(groups.length);
-                        _each(this._handles, function(i, handle) {
-                            var value,
-                                index;
-                            if (_isFinite(value = valueCallback(handle, i)) && (index = findGroupPosition(value, groups)) >= 0)
-                                handle.settings[settingField] = values[index]
-                        });
                         _each(groups, function(i, group) {
                             group.index = i;
                             group[settingField] = values[i]
                         });
-                        this._params.dataExchanger.set(this._dataCategory, settingField, groups)
+                        this._grouping[settingField] = {
+                            callback: valueCallback,
+                            groups: groups
+                        }
                     }
+                    else {
+                        delete this._grouping[settingField];
+                        groups = []
+                    }
+                    this._params.dataExchanger.set(this._dataCategory, settingField, groups)
                 },
                 _groupByColor: function(colorGroups, palette, valueCallback) {
                     this._performGrouping(colorGroups, "color", valueCallback, function(count) {
@@ -2841,6 +2762,11 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                     })
                 }
             });
+        MapItemsManager.prototype.TEST_getContext = function() {
+            return this._context
+        };
+        MapItemsManager.prototype.TEST_performGrouping = MapItemsManager.prototype._performGrouping;
+        MapItemsManager.prototype.TEST_groupByColor = MapItemsManager.prototype._groupByColor;
         DX.viz.map._internal.mapItemBehavior = {
             init: function(ctx, proxy) {
                 var that = this;
@@ -2876,17 +2802,16 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                 return that
             },
             createLabel: function() {
-                var that = this,
-                    root = that._createLabelRoot();
+                var that = this;
                 that._label = {
-                    root: root,
-                    text: that._ctx.renderer.text().append(root),
+                    root: that._createLabelRoot(),
+                    text: that._ctx.renderer.text(),
                     tracker: that._ctx.renderer.rect().attr({
                         stroke: "none",
                         "stroke-width": 0,
                         fill: "#000000",
                         opacity: 0.0001
-                    }).data(that._ctx.dataKey, that._data).append(root)
+                    }).data(that._ctx.dataKey, that._data)
                 };
                 that._updateLabel();
                 return that
@@ -2894,7 +2819,7 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
             _updateLabel: function() {
                 var that = this,
                     settings = that._settings.label;
-                that._label.value = that._getLabelText();
+                that._label.value = _String(this._proxy.text || this._proxy.attribute(this._settings.label.dataField) || "");
                 if (that._label.value) {
                     that._label.text.attr({
                         text: that._label.value,
@@ -2905,7 +2830,8 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                         stroke: settings.stroke,
                         "stroke-width": settings["stroke-width"],
                         "stroke-opacity": settings["stroke-opacity"]
-                    });
+                    }).append(that._label.root);
+                    that._label.tracker.append(that._label.root);
                     that._adjustLabel();
                     that._locateLabel()
                 }
@@ -2936,6 +2862,11 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                     }
                     else
                         return handle._selected
+                },
+                applySettings: function(settings) {
+                    _extend(true, handle.settings, settings);
+                    handle.item && handle.item.update(handle.settings);
+                    return this
                 }
             }
         }
@@ -3014,8 +2945,7 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
             return groups
         }
         function findGroupPosition(value, groups) {
-            var group,
-                i = 0,
+            var i = 0,
                 ii = groups.length;
             for (; i < ii; ++i)
                 if (groups[i].start <= value && value <= groups[i].end)
@@ -3096,10 +3026,9 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                 _updateGrouping: function() {
                     var commonSettings = this._commonSettings,
                         attributeName = commonSettings.colorGroupingField;
-                    if (commonSettings.colorGroups)
-                        this._groupByColor(commonSettings.colorGroups, commonSettings.palette, function(handle) {
-                            return handle.proxy.attribute(attributeName)
-                        })
+                    this._groupByColor(commonSettings.colorGroups, commonSettings.palette, function(proxy) {
+                        return proxy.attribute(attributeName)
+                    })
                 },
                 _arrangeItems: _noop
             });
@@ -3175,9 +3104,6 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
             },
             _createLabelRoot: function() {
                 return this._ctx.renderer.g().attr({"class": "dxm-area-label"}).append(this._ctx.labelRoot)
-            },
-            _getLabelText: function() {
-                return _String(this._proxy.text || this._proxy.attribute(this._settings.label.dataField) || "")
             },
             _adjustLabel: function() {
                 var that = this,
@@ -3310,9 +3236,9 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                 },
                 _processOptions: function(options) {
                     var that = this;
+                    that._commonType = parseMarkerType(options && options.type, DEFAULT_MARKER_TYPE);
                     that.callBase.apply(that, arguments);
-                    that._commonSettings._filter = that._filter.ref;
-                    that._commonType = parseMarkerType(options && options.type, DEFAULT_MARKER_TYPE)
+                    that._commonSettings._filter = that._filter.ref
                 },
                 _arrangeBubbles: function() {
                     var markers = this._handles,
@@ -3362,33 +3288,27 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                 _updateGrouping: function() {
                     var that = this,
                         markerType = that._commonType,
-                        dataField,
+                        colorDataField,
+                        sizeDataField,
                         commonSettings = that._commonSettings["_" + markerType];
-                    if (markerType === DOT || markerType === BUBBLE)
-                        if (commonSettings.colorGroups) {
-                            dataField = commonSettings.colorGroupingField;
-                            that._groupByColor(commonSettings.colorGroups, commonSettings.palette, function(handle) {
-                                var proxy = handle.proxy;
-                                return !proxy._TYPE || proxy._TYPE === markerType ? proxy.attribute(dataField) : NaN
-                            })
-                        }
-                    if (markerType === PIE)
-                        that._updateLegendForPies();
-                    if (commonSettings.sizeGroups) {
-                        dataField = commonSettings.sizeGroupingField;
-                        that._performGrouping(commonSettings.sizeGroups, "size", function(handle) {
-                            var proxy = handle.proxy;
-                            return !proxy._TYPE || proxy._TYPE === markerType ? proxy.value || proxy.attribute(dataField) : NaN
-                        }, function(count) {
-                            var minSize = commonSettings.minSize > 0 ? _Number(commonSettings.minSize) : 0,
-                                maxSize = commonSettings.maxSize >= minSize ? _Number(commonSettings.maxSize) : 0,
-                                i = 0,
-                                sizes = [];
-                            for (i = 0; i < count; ++i)
-                                sizes.push((minSize * (count - i - 1) + maxSize * i) / (count - 1));
-                            return sizes
+                    if (markerType === DOT || markerType === BUBBLE) {
+                        colorDataField = commonSettings.colorGroupingField;
+                        that._groupByColor(commonSettings.colorGroups, commonSettings.palette, function(proxy) {
+                            return !proxy._TYPE || proxy._TYPE === markerType ? proxy.attribute(colorDataField) : NaN
                         })
                     }
+                    sizeDataField = commonSettings.sizeGroupingField;
+                    that._performGrouping(commonSettings.sizeGroups, "size", function(proxy) {
+                        return !proxy._TYPE || proxy._TYPE === markerType ? proxy.value || proxy.attribute(sizeDataField) : NaN
+                    }, function(count) {
+                        var minSize = commonSettings.minSize > 0 ? _Number(commonSettings.minSize) : 0,
+                            maxSize = commonSettings.maxSize >= minSize ? _Number(commonSettings.maxSize) : 0,
+                            i = 0,
+                            sizes = [];
+                        for (i = 0; i < count; ++i)
+                            sizes.push((minSize * (count - i - 1) + maxSize * i) / (count - 1));
+                        return sizes
+                    })
                 },
                 _updateLegendForPies: function() {
                     var count = 0;
@@ -3401,15 +3321,17 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                                 count = values.length
                         }
                     });
-                    this._params.dataExchanger.set(this._dataCategory, "color", $.map(this._context.getPieColors(count).slice(0, count), function(color, i) {
-                        return {
-                                index: i,
-                                color: color
-                            }
-                    }))
+                    if (count > 0)
+                        this._params.dataExchanger.set(this._dataCategory, "color", $.map(this._context.getPieColors(count).slice(0, count), function(color, i) {
+                            return {
+                                    index: i,
+                                    color: color
+                                }
+                        }))
                 },
                 _arrangeItems: function() {
-                    this._arrangeBubbles()
+                    this._arrangeBubbles();
+                    this._updateLegendForPies()
                 }
             });
         var baseMarkerBehavior = _extend({}, DX.viz.map._internal.mapItemBehavior, {
@@ -3451,9 +3373,6 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                 },
                 _createLabelRoot: function() {
                     return this._root
-                },
-                _getLabelText: function() {
-                    return _String(this._proxy.text || "")
                 },
                 _adjustLabel: function() {
                     var bbox = this._label.text.getBBox(),
@@ -3580,7 +3499,8 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                     fill: style.selectedColor,
                     opacity: style.selectedOpacity
                 };
-                that._bubble = renderer.circle(0, 0, (style.size || style.maxSize) / 2).sharp().attr(that._default).data(that._ctx.dataKey, that._data).append(root)
+                that._bubble = renderer.circle(0, 0, 0).sharp().attr(that._default).data(that._ctx.dataKey, that._data).append(root);
+                that.setSize(style.size / that._maxSize || 1)
             },
             _applyDefault: function() {
                 this._bubble.attr(this._default)
