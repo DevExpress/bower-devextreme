@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Mobile Widgets)
-* Version: 15.1.3
-* Build date: Jun 1, 2015
+* Version: 15.1.4
+* Build date: Jun 22, 2015
 *
 * Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -15,7 +15,6 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
     (function($, DX, undefined) {
         var ui = DX.ui,
             fx = DX.fx,
-            utils = DX.utils,
             translator = DX.translator,
             events = ui.events;
         var PIVOT_TABS_CLASS = "dx-pivottabs",
@@ -152,7 +151,7 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
                     $ghostTab.css("opacity", 0)
             },
             _isGhostTabVisible: function() {
-                return this._$ghostTab.css("opacity") == 1
+                return this._$ghostTab.css("opacity") === "1"
             },
             _updateGhostTabContent: function(prevIndex) {
                 prevIndex = prevIndex === undefined ? this._previousIndex() : prevIndex;
@@ -161,9 +160,8 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
                 $ghostTab.html($items.eq(prevIndex).html())
             },
             _updateTabsPositions: function(offset) {
-                var $tabs = this._allTabElements(),
-                    offset = this._applyOffsetBoundaries(offset),
-                    isPrevSwipeHandled = this.option("rtlEnabled") ^ offset > 0 && offset !== 0,
+                offset = this._applyOffsetBoundaries(offset);
+                var isPrevSwipeHandled = this.option("rtlEnabled") ^ offset > 0 && offset !== 0,
                     tabPositions = this._calculateTabPositions(isPrevSwipeHandled ? "replace" : "append");
                 this._moveTabs(tabPositions, offset);
                 this._toggleGhostTab(isPrevSwipeHandled)
@@ -195,11 +193,13 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
                 })
             },
             _animateComplete: function(newIndex, currentIndex) {
-                var that = this,
-                    $tabs = this._itemElements(),
+                var $tabs = this._itemElements(),
                     isPrevSwipeHandled = this._isGhostTabVisible();
                 $tabs.eq(currentIndex).removeClass(PIVOT_TAB_SELECTED_CLASS);
-                var animations = isPrevSwipeHandled ? this._animateIndexDecreasing(newIndex) : this._animateIndexIncreasing(newIndex);
+                if (isPrevSwipeHandled)
+                    this._animateIndexDecreasing(newIndex);
+                else
+                    this._animateIndexIncreasing(newIndex);
                 $tabs.eq(newIndex).addClass(PIVOT_TAB_SELECTED_CLASS)
             },
             _animateIndexDecreasing: function(newIndex) {
@@ -257,7 +257,6 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
             },
             _calculateTabPositionsImpl: function(currentIndex, ghostPosition) {
                 var prevIndex = this._normalizeIndex(currentIndex - 1),
-                    $tabs = this._itemElements(),
                     widths = this._itemWidths();
                 var rtl = this.option("rtlEnabled"),
                     signCorrection = this._getRTLSignCorrection(),
@@ -355,8 +354,7 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
                     this._animateComplete(newIndex, oldIndex)
             },
             _calculateMaxOffsets: function(index) {
-                var $tabs = this._itemElements(),
-                    currentTabWidth = this._itemWidths()[index],
+                var currentTabWidth = this._itemWidths()[index],
                     prevTabWidth = this._itemWidths()[this._previousIndex(index)],
                     rtl = this.option("rtlEnabled");
                 this._maxLeftOffset = rtl ? prevTabWidth : currentTabWidth;
@@ -888,7 +886,8 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
                             cancelClickAction(hidingArgs);
                             if (!hidingArgs.cancel)
                                 that.hide()
-                        }
+                        },
+                        _templates: {}
                     })
                 }
             },
@@ -953,8 +952,7 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
         var ui = DX.ui,
             events = ui.events,
             fx = DX.fx,
-            translator = DX.translator,
-            utils = DX.utils;
+            translator = DX.translator;
         var PANORAMA_CLASS = "dx-panorama",
             PANORAMA_WRAPPER_CLASS = "dx-panorama-wrapper",
             PANORAMA_TITLE_CLASS = "dx-panorama-title",
@@ -963,8 +961,8 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
             PANORAMA_ITEM_CLASS = "dx-panorama-item",
             PANORAMA_GHOST_ITEM_CLASS = "dx-panorama-ghostitem",
             PANORAMA_ITEM_DATA_KEY = "dxPanoramaItemData",
-            PANORAMA_ITEM_MARGIN_SCALE = .02,
-            PANORAMA_TITLE_MARGIN_SCALE = .02,
+            PANORAMA_ITEM_MARGIN_SCALE = 0.02,
+            PANORAMA_TITLE_MARGIN_SCALE = 0.02,
             PANORAMA_BACKGROUND_MOVE_DURATION = 300,
             PANORAMA_BACKGROUND_MOVE_EASING = "cubic-bezier(.40, .80, .60, 1)",
             PANORAMA_TITLE_MOVE_DURATION = 300,
@@ -1102,7 +1100,7 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
                     }
                 },
                 _isGhostItemVisible: function() {
-                    return this._$ghostItem.css("opacity") == 1
+                    return this._$ghostItem.css("opacity") === "1"
                 },
                 _swapGhostWithItem: function($item) {
                     var $ghostItem = this._$ghostItem,
@@ -1159,7 +1157,7 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
                 },
                 animateComplete: function(boundCross, newIndex, currentIndex) {
                     var that = this,
-                        ghostPosition = !boundCross ^ !(currentIndex === 0) ? "prepend" : "append",
+                        ghostPosition = !boundCross ^ currentIndex !== 0 ? "prepend" : "append",
                         $items = this._panorama._itemElements(),
                         positions = this._calculateItemPositions(newIndex, ghostPosition),
                         animations = [];
@@ -1173,7 +1171,6 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
                 },
                 _calculateItemPositions: function(atIndex, ghostPosition) {
                     var positions = [],
-                        $items = this._panorama._itemElements(),
                         itemMargin = this._itemMargin(),
                         itemWidth = this._itemWidth(),
                         itemPositionOffset = (itemWidth + itemMargin) * this._getRTLSignCorrection(),
@@ -1266,7 +1263,6 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
                 },
                 _calculateItemPositions: function(atIndex, movingBack) {
                     var previousIndex = this._normalizeIndex(atIndex - 1),
-                        $items = this._panorama._itemElements(),
                         itemMargin = this._itemMargin(),
                         itemWidth = this._itemWidth(),
                         itemPositionOffset = (itemWidth + itemMargin) * this._getRTLSignCorrection(),
@@ -1596,7 +1592,6 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
             SLIDEOUTVIEW_SHIELD_CLASS = "dx-slideoutview-shield",
             INVISIBLE_STATE_CLASS = "dx-state-invisible",
             ANONYMOUS_TEMPLATE_NAME = "content",
-            CONTENT_OFFSET = 45,
             ANIMATION_DURATION = 400;
         var animation = {
                 moveTo: function($element, position, completeAction) {
@@ -1618,8 +1613,26 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
                     menuVisible: false,
                     swipeEnabled: true,
                     menuTemplate: "menu",
-                    contentTemplate: "content"
+                    contentTemplate: "content",
+                    contentOffset: 45
                 })
+            },
+            _defaultOptionsRules: function() {
+                return this.callBase().concat([{
+                            device: {android: true},
+                            options: {contentOffset: 54}
+                        }, {
+                            device: function(device) {
+                                return device.platform === "generic" && device.deviceType !== "desktop"
+                            },
+                            options: {contentOffset: 56}
+                        }, {
+                            device: {
+                                win8: true,
+                                phone: false
+                            },
+                            options: {contentOffset: 76}
+                        }])
             },
             _getAnonimousTemplateName: function() {
                 return ANONYMOUS_TEMPLATE_NAME
@@ -1704,13 +1717,12 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
                     translator.move(this.content(), {left: pos})
             },
             _calculatePixelOffset: function(offset) {
-                var offset = offset || 0,
-                    maxOffset = this._getMenuWidth();
-                return offset * maxOffset
+                offset = offset || 0;
+                return offset * this._getMenuWidth()
             },
             _getMenuWidth: function() {
                 if (!this._menuWidth) {
-                    var maxMenuWidth = this.element().width() - CONTENT_OFFSET;
+                    var maxMenuWidth = this.element().width() - this.option("contentOffset");
                     this.menuContent().css("max-width", maxMenuWidth);
                     var currentMenuWidth = this.menuContent().width();
                     this._menuWidth = Math.min(currentMenuWidth, maxMenuWidth)
@@ -1753,6 +1765,9 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
                         this.callBase(args);
                         this._dimensionChanged();
                         break;
+                    case"contentOffset":
+                        this._dimensionChanged();
+                        break;
                     case"menuVisible":
                         this._renderPosition(args.value, true);
                         break;
@@ -1793,7 +1808,6 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
         var ui = DX.ui,
             utils = DX.utils;
         var SLIDEOUT_CLASS = "dx-slideout",
-            SLIDEOUT_WRAPPER_CLASS = "dx-slideout-wrapper",
             SLIDEOUT_ITEM_CONTAINER_CLASS = "dx-slideout-item-container",
             SLIDEOUT_MENU = "dx-slideout-menu",
             SLIDEOUT_ITEM_CLASS = "dx-slideout-item",

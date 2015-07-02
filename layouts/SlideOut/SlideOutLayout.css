@@ -52,6 +52,19 @@
     border-radius: 4px 4px 0 0;
 }
 
+.slideout-layout .view-footer {
+    position: static;
+}
+
+.slideout-layout .view-footer .dx-toolbar {
+    background: transparent;
+    border: none;
+    margin-bottom: 10px;
+}
+
+.slideout-layout .view-footer .dx-toolbar .dx-toolbar-center {
+    width: 100%;
+}
 
 /* navigation */
 .slideout-layout .navigation-list {
@@ -92,32 +105,7 @@
 }
 
 
-/* iOS */
-.slideout-layout .view-footer {
-    position: static;
-}
-
 /* iOS7 */
-
-.dx-theme-ios7 .slideout-layout .view-toolbar-bottom.dx-toolbar {
-    background: transparent;
-    border: none;
-}
-
-.dx-theme-ios7 .slideout-layout .view-toolbar-bottom {
-    margin-bottom: 10px;
-}
-
-.dx-theme-ios7 .slideout-layout .view-toolbar-bottom.dx-toolbar .dx-toolbar-before {
-    right: 0;
-}
-
-.dx-theme-ios7 .slideout-layout .view-toolbar-bottom.dx-toolbar .dx-toolbar-before .dx-button {
-    position: absolute;
-    left: 10px;
-    right: 10px;
-}
-
 .dx-theme-ios7 .slideout-layout .layout-header.dx-toolbar-wrapper {
     background: none;
 }
@@ -131,22 +119,6 @@
 
 .dx-theme-ios7 .slideout-layout .view-footer .dx-toolbar {
     height: 57px;
-}
-
-.dx-theme-ios7 .slideout-layout .view-footer .dx-toolbar-center {
-    width: 100%;
-}
-
-.dx-theme-ios7 .slideout-layout .view-footer .dx-button {
-    width: 97%;
-    overflow: visible;
-}
-
-.dx-theme-ios7 .slideout-layout .view-footer .dx-button .dx-button-content {
-    height: 44px;
-    border-radius: 6px;
-    width: 100%;
-    box-sizing: border-box;
 }
 
 .dx-theme-ios7 .slideout-layout .view-footer .dx-button .dx-button-content .dx-button-text {
@@ -199,17 +171,19 @@
 
 /* generic theme */
 .dx-theme-generic .slideout-layout .layout-header {
-    height: 80px;
-}
-
-.dx-theme-generic .slideout-layout .layout-content {
-    top: 80px;
-}
-
-.dx-theme-generic.dx-device-phone .slideout-layout .layout-header {
     height: 56px;
 }
 
-.dx-theme-generic.dx-device-phone .slideout-layout .layout-content {
+.dx-theme-generic .slideout-layout .layout-content {
     top: 56px;
 }
+
+.dx-theme-generic.dx-device-mobile .slideout-layout .layout-header .dx-toolbar {
+    background: none;
+}
+
+.dx-theme-generic .slideout-layout .view-footer .dx-button {
+    width: 97%;
+    overflow: visible;
+}
+

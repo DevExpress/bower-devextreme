@@ -1,13 +1,188 @@
 ﻿/*! 
 * DevExtreme (Vector Map)
-* Version: 15.1.3
-* Build date: Jun 1, 2015
+* Version: 15.1.4
+* Build date: Jun 22, 2015
 *
 * Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
 */
+(function (window, undefined) {
 "use strict";
-(function (global, undefined) {
+
+function noop() { }
+
+function eigen(x) { return x; }
+
+function isFunction(target) {
+    return typeof target === "function";
+}
+
+var SHP = ".shp",
+    DBF = ".dbf";
+
+function parseCore(source, processCoordinates, processAttributes, errors) {
+    var shp = source[SHP] ? parseShp(new Stream(source[SHP])) : {},
+        dbf = source[DBF] ? parseDbf(new Stream(source[DBF])) : {},
+        features;
+    shp.errors && shp.errors.forEach(function (err) {
+        errors.push("SHP: " + err);
+    });
+    dbf.errors && dbf.errors.forEach(function (err) {
+        errors.push("DBF: " + err);
+    });
+    features = buildFeatures(shp.shapes || [], dbf.records || [], processCoordinates, processAttributes);
+    return features.length ? {
+        features: features,
+        bbox: shp.bbox,
+        type: shp.type
+    } : null;
+}
+
+function buildFeatures(shapes, records, processCoordinates, processAttributes) {
+    var features = [],
+        i,
+        ii,
+        shape;
+    features.length = ii = Math.max(shapes.length, records.length);
+    for (i = 0; i < ii; ++i) {
+        shape = shapes[i] || {};
+        features[i] = {
+            coordinates: shape.coordinates ? processCoordinates(shape.coordinates) : null,
+            attributes: records[i] ? processAttributes(records[i]) : null
+        };
+    }
+    return features;
+}
+
+function getData(source, callback) {
+    var count = 1,
+        errors = [],
+        result = {};
+    Object.keys(source).forEach(function (name) {
+        var value = source[name];
+        if (value !== undefined && value !== null) {
+            ++count;
+            if (value.substr) {
+                sendRequest(value, function (e, response) {
+                    e && errors.push(e);
+                    onReady(name, response);
+                });
+            } else {
+                onReady(name, value);
+            }
+        }
+    });
+    onReady();
+
+    function onReady(name, value) {
+        if (name) {
+            result[name] = value;
+        }
+        if (--count === 0) {
+            callback(errors, result);
+        }
+    }
+}
+
+function createCoordinatesRounder(precision) {
+    var factor = Number("1E" + precision);
+    function round(x) {
+        return Math.round(x * factor) / factor;
+    }
+    function process(values) {
+        return values.map(values[0].length ? process : round);
+    }
+    return process;
+}
+
+function createAttributesProcessor(data) {
+    var info,
+        translate;
+    try {
+        info = JSON.parse(data);
+    } catch (_) {
+        info = {};
+        data.split(";").forEach(function (item) {
+            var pair = item.split("=");
+            info[pair[0]] = pair[1] || true;
+        });
+    }
+    if (info["$clear"]) {
+        translate = function () { return null; };
+    } else if (info["$lowercase"]) {
+        translate = function (x) { return x.toLowerCase(); };
+    } else if (info["$uppercase"]) {
+        translate = function (x) { return x.toUpperCase(); };
+    } else {
+        translate = eigen;
+    }
+    return process;
+
+    function process(attrs) {
+        var result = {};
+        Object.keys(attrs).forEach(function (name) {
+            var newName = info[name] || translate(name);
+            if (newName) {
+                result[newName] = attrs[name];
+            }
+        });
+        return result;
+    }
+}
+
+function getCoordinatesProcessor(parameters) {
+    var result;
+    if (isFunction(parameters.processCoordinates)) {
+        result = parameters.processCoordinates;
+    } else if (parameters.precision >= 0) {
+        result = createCoordinatesRounder(parameters.precision);
+    } else {
+        result = eigen;
+    }
+    return result;
+}
+
+function getAttributesProcessor(parameters) {
+    var result;
+    if (isFunction(parameters.processAttributes)) {
+        result = parameters.processAttributes;
+    } else if (parameters.attrsMap) {
+        result = createAttributesProcessor(parameters.attrsMap);
+    } else {
+        result = eigen;
+    }
+    return result;
+}
+
+function parse(source, parameters, callback) {
+    source = source || {};
+    callback = (isFunction(parameters) && parameters) || (isFunction(callback) && callback) || noop,
+    parameters = (!isFunction(parameters) && parameters) || {};
+    var arg = {},
+        result;
+    if (source.substr) {
+        if (source.substr(-SHP.length).toLowerCase() === SHP) {
+            arg[SHP] = source;
+        } else if (source.substr(-DBF.length).toLowerCase() === DBF) {
+            arg[DBF] = source;
+        } else {
+            arg[SHP] = source + SHP;
+            arg[DBF] = source + DBF;
+        }
+    } else {
+        arg[SHP] = source.shp;
+        arg[DBF] = source.dbf;
+    }
+    getData(arg, function (e, data) {
+        var errors = [];
+        e && e.forEach(function (err) {
+            errors.push("URI: " + err);
+        });
+        result = parseCore(data, getCoordinatesProcessor(parameters), getAttributesProcessor(parameters), errors);
+        callback(result, errors.length ? errors : null);
+    });
+    return result;
+}
 
 function parseShp(stream) {
     var timeStart = new Date(),
@@ -81,19 +256,58 @@ function parseShpHeader(stream) {
     };
 }
 
-var SHP_TYPES = {};
-SHP_TYPES[0] = 'Null';
-SHP_TYPES[1] = 'Point';
-SHP_TYPES[3] = 'Polyline';
-SHP_TYPES[5] = 'Polygon';
-SHP_TYPES[8] = 'MultiPoint';
+var SHP_TYPES = {
+    0: "null",
+    1: "point",
+    3: "polyline",
+    5: "polygon",
+    8: "multipoint"
+};
 
-var SHP_RECORD_PARSERS = {};
-SHP_RECORD_PARSERS[0] = parseNull;
-SHP_RECORD_PARSERS[1] = parsePoint;
-SHP_RECORD_PARSERS[8] = parseMultiPoint;
-SHP_RECORD_PARSERS[3] = parsePolygon;
-SHP_RECORD_PARSERS[5] = parsePolygon;
+var SHP_RECORD_PARSERS = {
+    0: noop,
+    1: function (stream, record) {
+        record.coordinates = [stream.float64(), stream.float64()];
+    },
+    3: function (stream, record) {
+        var bbox = [stream.float64(), stream.float64(), stream.float64(), stream.float64()],
+            numParts = stream.uint32(),
+            numPoints = stream.uint32(),
+            parts = [],
+            points = [],
+            i, k, kk,
+            rings = [], ring;
+        for (i = 0; i < numParts; ++i) {
+            parts.push(stream.uint32());
+        }
+        for (i = 0; i < numPoints; ++i) {
+            points.push([stream.float64(), stream.float64()]);
+        }
+        for (i = 0; i < numParts; ++i) {
+            k = parts[i];
+            kk = parts[i + 1] || numPoints;
+            ring = [];
+            for (k = parts[i], kk = parts[i + 1] || numPoints; k < kk; ++k) {
+                ring.push(points[k]);
+            }
+            rings.push(ring);
+        }
+        record.bbox = bbox;
+        record.coordinates = rings;
+    },
+    8: function (stream, record) {
+        var bbox = [stream.float64(), stream.float64(), stream.float64(), stream.float64()],
+            numPoints = stream.uint32(),
+            points = [],
+            i;
+        for (i = 0; i < numPoints; ++i) {
+            points.push([stream.float64(), stream.float64()]);
+        }
+        record.bbox = bbox;
+        record.coordinates = points;
+    }
+};
+SHP_RECORD_PARSERS[5] = SHP_RECORD_PARSERS[3];
 
 function parseShpRecord(stream, shapeType, errors) {
     var record = {};
@@ -115,51 +329,6 @@ function parseShpRecord(stream, shapeType, errors) {
         errors.push('Shape #' + record.number + ' length: ' + length + ' / actual: ' + end - start);
     }
     return record;
-}
-
-function parseNull() { }
-
-function parsePoint(stream, record) {
-    record.coordinates = [stream.float64(), stream.float64()];
-}
-
-function parseMultiPoint(stream, record) {
-    var bbox = [stream.float64(), stream.float64(), stream.float64(), stream.float64()],
-        numPoints = stream.uint32(),
-        points = [],
-        i;
-    for (i = 0; i < numPoints; ++i) {
-        points.push([stream.float64(), stream.float64()]);
-    }
-    record.bbox = bbox;
-    record.coordinates = points;
-}
-
-function parsePolygon(stream, record) {
-    var bbox = [stream.float64(), stream.float64(), stream.float64(), stream.float64()],
-        numParts = stream.uint32(),
-        numPoints = stream.uint32(),
-        parts = [],
-        points = [],
-        i, k, kk,
-        rings = [], ring;
-    for (i = 0; i < numParts; ++i) {
-        parts.push(stream.uint32());
-    }
-    for (i = 0; i < numPoints; ++i) {
-        points.push([stream.float64(), stream.float64()]);
-    }
-    for (i = 0; i < numParts; ++i) {
-        k = parts[i];
-        kk = parts[i + 1] || numPoints;
-        ring = [];
-        for (k = parts[i], kk = parts[i + 1] || numPoints; k < kk; ++k) {
-            ring.push(points[k]);
-        }
-        rings.push(ring);
-    }
-    record.bbox = bbox;
-    record.coordinates = rings;
 }
 
 function parseDbf(stream) {
@@ -205,11 +374,9 @@ function getAsciiString(stream, length) {
     return _fromCharCode.apply(null, stream.uint8array(length));
 }
 
-var RE_TRAILING_ZEROS = /\0*$/gi;
-
 function parseFieldDescriptor(stream) {
     var desc = {
-        name: getAsciiString(stream, 11).replace(RE_TRAILING_ZEROS, ''),
+        name: getAsciiString(stream, 11).replace(/\0*$/gi, ''),
         type: _fromCharCode(stream.uint8()),
         length: stream.skip(4).uint8(),
         count: stream.uint8()
@@ -218,23 +385,25 @@ function parseFieldDescriptor(stream) {
     return desc;
 }
 
-var DBF_FIELD_PARSERS = {};
-DBF_FIELD_PARSERS._default = function (stream, length) {
+var DBF_FIELD_PARSERS = {
+    "C": function (stream, length) {
+        var str = getAsciiString(stream, length);
+        return str.trim();
+    },
+    "N": function (stream, length) {
+        var str = getAsciiString(stream, length);
+        return parseFloat(str, 10);
+    },
+    "D": function (stream, length) {
+        var str = getAsciiString(stream, length);
+        return new Date(str.substring(0, 4), str.substring(4, 6) - 1, str.substring(6, 8));
+    }
+};
+
+function DBF_FIELD_PARSER_DEFAULT(stream, length) {
     stream.skip(length);
     return null;
-};
-DBF_FIELD_PARSERS['C'] = function (stream, length) {
-    var str = getAsciiString(stream, length);
-    return str.trim();
-};
-DBF_FIELD_PARSERS['N'] = function (stream, length) {
-    var str = getAsciiString(stream, length);
-    return parseFloat(str, 10);
-};
-DBF_FIELD_PARSERS['D'] = function (stream, length) {
-    var str = getAsciiString(stream, length);
-    return new Date(str.substring(0, 4), str.substring(4, 6) - 1, str.substring(6, 8));
-};
+}
 
 function prepareDbfRecordParseData(header, errors) {
     var list = [],
@@ -249,7 +418,7 @@ function prepareDbfRecordParseData(header, errors) {
             length: field.length
         };
         if (!item.parser) {
-            item.parser = DBF_FIELD_PARSERS._default;
+            item.parser = DBF_FIELD_PARSER_DEFAULT;
             errors.push('Field ' + field.name + ' type: ' + field.type + ' / unknown');
         }
         totalLength += field.length;
@@ -280,115 +449,6 @@ function parseDbfRecords(stream, recordCount, recordLength, parseData, errors) {
         records.push(record);
     }
     return records;
-}
-
-var _round = Math.round;
-function adjustPrecision(stream, precision) {
-    var _precision = 0 <= precision && precision <= 8 ? _round(precision) : 8,
-        factor = Number('1E' + _precision),
-        _float64 = stream.float64;
-    stream.float64 = function () {
-        var value = _float64.apply(this, arguments);
-        return _round(value * factor) / factor;
-    };
-}
-
-function parseCore(source, parameters) {
-    source = source || {};
-    parameters = parameters || {};
-    var stream, parsedShp = {}, parsedDbf = {};
-    if (source.shp) {
-        stream = new Stream(source.shp);
-        adjustPrecision(stream, parameters.precision || 4);
-        parsedShp = parseShp(stream);
-    }
-    if (source.dbf) {
-        stream = new Stream(source.dbf);
-        parsedDbf = parseDbf(stream);
-    }
-    var errors = [].concat(parsedShp.errors || [], parsedDbf.errors || []);
-    errors.length && (parameters.errors = errors);
-    var shapes = parsedShp.shapes || [],
-        records = parsedDbf.records || [],
-        i = 0, ii = shapes.length >= records.length ? shapes.length : records.length,
-        shape, record, features = [];
-    for (; i < ii; ++i) {
-        shape = shapes[i] || {};
-        record = records[i];
-        features.push({
-            type: shape.shapeName || null,
-            coordinates: shape.coordinates || null,
-            attributes: record || null
-        });
-    }
-    return features.length ? {
-        bbox: parsedShp.bbox || null,
-        type: parsedShp.type || null,
-        features: features
-    } : null;
-}
-
-function loadAndParse(source, parameters, callback) {
-    source = source || {};
-    var shpSource, dbfSource, errors = [],
-        _callback = typeof callback === 'function' ? callback : (typeof parameters === 'function' ? parameters : null),
-        _parameters = (typeof parameters === 'function' ? null : parameters) || {};
-    function checkAndExecute() {
-        if (shpSource !== undefined && dbfSource !== undefined) {
-            var result = parseCore({ shp: shpSource, dbf: dbfSource }, _parameters);
-            _callback && _callback(result, errors.length ? errors : null);
-        }
-    }
-    if (source.shp) {
-        sendRequest(String(source.shp), function (response, error) {
-            shpSource = response;
-            error && errors.push(error);
-            checkAndExecute();
-        });
-    }
-    else {
-        shpSource = null;
-    }
-    if (source.dbf) {
-        sendRequest(String(source.dbf), function (response, error) {
-            dbfSource = response;
-            error && errors.push(error);
-            checkAndExecute();
-        });
-    }
-    else {
-        dbfSource = null;
-    }
-    checkAndExecute();
-}
-
-var RE_SHP_FILE_PATTERN = /\.shp$/i,
-    RE_DBF_FILE_PATTERN = /\.dbf$/i;
-
-function parse(source, parameters, callback) {
-    source = source || {};
-    if (source.shp || source.dbf) {
-        if ((typeof source.shp === 'string') || (typeof source.dbf === 'string')) {
-            loadAndParse(source, parameters, callback);
-        }
-        else {
-            return parseCore(source, parameters);
-        }
-    }
-    else if (typeof source === 'string') {
-        if (RE_SHP_FILE_PATTERN.test(source)) {
-            loadAndParse({ shp: source }, parameters, callback);
-        }
-        else if (RE_DBF_FILE_PATTERN.test(source)) {
-            loadAndParse({ dbf: source }, parameters, callback);
-        }
-        else {
-            loadAndParse({ shp: source + '.shp', dbf: source + '.dbf' }, parameters, callback);
-        }
-    }
-    else {
-        return null;
-    }
 }
 
 function Stream(arrayBuffer) {
@@ -443,8 +503,11 @@ function sendRequest(url, callback) {
     var request = new XMLHttpRequest();
     request.onreadystatechange = function () {
         if (this.readyState === 4) {
-            var error = this.statusText === 'OK' ? null : this.statusText;
-            callback(error ? null : this.response, error);
+            if (this.statusText === "OK") {
+                callback(null, this.response);
+            } else {
+                callback(this.statusText, null);
+            }
         }
     };
     request.open('GET', url);
@@ -453,8 +516,7 @@ function sendRequest(url, callback) {
     request.send(null);
 }
 
-var DX = global.DevExpress = global.DevExpress || {};
+var DX = window.DevExpress = window.DevExpress || {};
 (DX.viz = DX.viz || {}).vectormaputils = { parse: parse };
 
-
-}(this));
+}(window));

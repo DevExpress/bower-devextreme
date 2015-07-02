@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Gauges)
-* Version: 15.1.3
-* Build date: Jun 1, 2015
+* Version: 15.1.4
+* Build date: Jun 22, 2015
 *
 * Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -2541,7 +2541,7 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
                 that._tracker.setCallbacks({
                     'tooltip-show': function(target, info) {
                         var tooltipParameters = target.getTooltipParameters(),
-                            offset = DX.utils.getRootOffset(renderer),
+                            offset = renderer.getRootOffset(),
                             formatObject = _extend({
                                 value: tooltipParameters.value,
                                 valueText: tooltip.formatValue(tooltipParameters.value),
@@ -2551,10 +2551,10 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
                                 x: tooltipParameters.x + offset.left,
                                 y: tooltipParameters.y + offset.top,
                                 offset: tooltipParameters.offset
-                            }, {})
+                            }, {target: info})
                     },
                     'tooltip-hide': function() {
-                        return tooltip.hide({})
+                        return tooltip.hide()
                     }
                 });
                 that._resetTrackerCallbacks = function() {
@@ -3859,29 +3859,29 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
         dxBarGauge.prototype._factory.createThemeManager = function() {
             return new ThemeManager
         };
-        function BarWrapper(index, context) {
-            var that = this;
-            that._context = context;
-            that._background = context.renderer.arc().attr({
-                "stroke-linejoin": "round",
-                fill: context.backgroundColor
-            }).append(context.group);
-            that._bar = context.renderer.arc().attr({"stroke-linejoin": "round"}).append(context.group);
-            if (context.textEnabled) {
-                that._line = context.renderer.path([], "line").attr({"stroke-width": context.lineWidth}).append(context.group);
-                that._text = context.renderer.text("", 0, 0).css(context.fontStyles).attr(context.textOptions).append(context.group)
-            }
-            that._tracker = context.renderer.arc().attr({"stroke-linejoin": "round"});
-            context.tracker.attach(that._tracker, that, {index: index});
-            that._index = index;
-            that._angle = context.baseAngle;
-            that._settings = {
-                x: context.x,
-                y: context.y,
-                startAngle: context.baseAngle,
-                endAngle: context.baseAngle
-            }
-        }
+        var BarWrapper = function(index, context) {
+                var that = this;
+                that._context = context;
+                that._background = context.renderer.arc().attr({
+                    "stroke-linejoin": "round",
+                    fill: context.backgroundColor
+                }).append(context.group);
+                that._bar = context.renderer.arc().attr({"stroke-linejoin": "round"}).append(context.group);
+                if (context.textEnabled) {
+                    that._line = context.renderer.path([], "line").attr({"stroke-width": context.lineWidth}).append(context.group);
+                    that._text = context.renderer.text("", 0, 0).css(context.fontStyles).attr(context.textOptions).append(context.group)
+                }
+                that._tracker = context.renderer.arc().attr({"stroke-linejoin": "round"});
+                context.tracker.attach(that._tracker, that, {index: index});
+                that._index = index;
+                that._angle = context.baseAngle;
+                that._settings = {
+                    x: context.x,
+                    y: context.y,
+                    startAngle: context.baseAngle,
+                    endAngle: context.baseAngle
+                }
+            };
         _extend(BarWrapper.prototype, {
             dispose: function() {
                 var that = this;
@@ -4099,10 +4099,10 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
             setTooltipState: function(state) {
                 var that = this,
                     data;
-                that._element.off(tooltipMouseEvents).off(tooltipTouchEvents);
+                that._element.off(tooltipMouseEvents).off(tooltipTouchEvents).off(tooltipMouseWheelEvents);
                 if (state) {
                     data = {tracker: that};
-                    that._element.on(tooltipMouseEvents, data).on(tooltipTouchEvents, data)
+                    that._element.on(tooltipMouseEvents, data).on(tooltipTouchEvents, data).on(tooltipMouseWheelEvents, data)
                 }
                 return that
             },
@@ -4128,8 +4128,12 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
                 clearTimeout(that._showTooltipTimeout);
                 that._showTooltipTimeout = null;
                 clearTimeout(that._hideTooltipTimeout);
-                ++that._DEBUG_hideTooltipTimeoutSet;
-                that._hideTooltipTimeout = setTimeout(that._hideTooltipCallback, delay)
+                if (delay) {
+                    ++that._DEBUG_hideTooltipTimeoutSet;
+                    that._hideTooltipTimeout = setTimeout(that._hideTooltipCallback, delay)
+                }
+                else
+                    that._hideTooltipCallback()
             }
         });
         var tooltipMouseEvents = {
@@ -4137,6 +4141,7 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
                 'mouseout.gauge-tooltip': handleTooltipMouseOut
             };
         var tooltipMouseMoveEvents = {'mousemove.gauge-tooltip': handleTooltipMouseMove};
+        var tooltipMouseWheelEvents = {'dxmousewheel.gauge-tooltip': handleTooltipMouseWheel};
         var tooltipTouchEvents = {'touchstart.gauge-tooltip': handleTooltipTouchStart};
         function handleTooltipMouseOver(event) {
             var tracker = event.data.tracker;
@@ -4157,6 +4162,9 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
             var tracker = event.data.tracker;
             tracker._element.off(tooltipMouseMoveEvents);
             tracker._hideTooltip(TOOLTIP_HIDE_DELAY)
+        }
+        function handleTooltipMouseWheel(event) {
+            event.data.tracker._hideTooltip()
         }
         var active_touch_tooltip_tracker = null;
         DX.viz.gauges.__internals.Tracker._DEBUG_reset = function() {

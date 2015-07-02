@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Sparklines)
-* Version: 15.1.3
-* Build date: Jun 1, 2015
+* Version: 15.1.4
+* Build date: Jun 22, 2015
 *
 * Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -55,7 +55,7 @@ if (!DevExpress.MOD_VIZ_SPARKLINES) {
                 var that = this;
                 if (that._tooltipShown) {
                     that._tooltipShown = false;
-                    that._tooltip.hide({})
+                    that._tooltip.hide()
                 }
                 that._cleanWidgetElements();
                 that._cleanTranslators()
@@ -108,7 +108,7 @@ if (!DevExpress.MOD_VIZ_SPARKLINES) {
                 that._redrawWidgetElements();
                 if (that._tooltipShown) {
                     that._tooltipShown = false;
-                    that._tooltip.hide({})
+                    that._tooltip.hide()
                 }
                 that._drawn()
             },
@@ -123,7 +123,7 @@ if (!DevExpress.MOD_VIZ_SPARKLINES) {
             },
             _getTooltipCoords: function() {
                 var canvas = this._canvas,
-                    rootOffset = DX.utils.getRootOffset(this._renderer);
+                    rootOffset = this._renderer.getRootOffset();
                 return {
                         x: canvas.width / 2 + rootOffset.left,
                         y: canvas.height / 2 + rootOffset.top
@@ -147,14 +147,14 @@ if (!DevExpress.MOD_VIZ_SPARKLINES) {
                     that._hideTooltipTimeout = null;
                     if (that._tooltipShown) {
                         that._tooltipShown = false;
-                        that._tooltip.hide({})
+                        that._tooltip.hide()
                     }
                     that._DEBUG_hideCallback && that._DEBUG_hideCallback(tooltipWasShown)
                 };
                 that._disposeCallbacks = function() {
                     that = that._showTooltipCallback = that._hideTooltipCallback = that._disposeCallbacks = null
                 };
-                that._tooltipTracker.on(mouseEvents, data).on(touchEvents, data);
+                that._tooltipTracker.on(mouseEvents, data).on(touchEvents, data).on(mouseWheelEvents, data);
                 that._tooltipTracker.on(menuEvents)
             },
             _disposeTooltipEvents: function() {
@@ -210,8 +210,12 @@ if (!DevExpress.MOD_VIZ_SPARKLINES) {
                 clearTimeout(that._showTooltipTimeout);
                 that._showTooltipTimeout = null;
                 clearTimeout(that._hideTooltipTimeout);
-                ++that._DEBUG_hideTooltipTimeoutSet;
-                that._hideTooltipTimeout = setTimeout(that._hideTooltipCallback, delay)
+                if (delay) {
+                    ++that._DEBUG_hideTooltipTimeoutSet;
+                    that._hideTooltipTimeout = setTimeout(that._hideTooltipCallback, delay)
+                }
+                else
+                    that._hideTooltipCallback()
             },
             _initLoadingIndicator: $.noop,
             _disposeLoadingIndicator: $.noop,
@@ -245,6 +249,9 @@ if (!DevExpress.MOD_VIZ_SPARKLINES) {
                     widget._hideTooltip(DEFAULT_EVENTS_DELAY)
                 }
             };
+        var mouseWheelEvents = {"dxmousewheel.sparkline-tooltip": function(event) {
+                    event.data.widget._hideTooltip()
+                }};
         var mouseMoveEvents = {"mousemove.sparkline-tooltip": function(event) {
                     var widget = event.data.widget;
                     if (widget._showTooltipTimeout && (_abs(widget._x - event.pageX) > 3 || _abs(widget._y - event.pageY) > 3)) {
@@ -942,7 +949,7 @@ if (!DevExpress.MOD_VIZ_SPARKLINES) {
             },
             _getTooltipCoords: function() {
                 var canvas = this._canvas,
-                    rootOffset = DX.utils.getRootOffset(this._renderer),
+                    rootOffset = this._renderer.getRootOffset(),
                     bbox = this._barValuePath.getBBox();
                 return {
                         x: bbox.x + bbox.width / 2 + rootOffset.left,

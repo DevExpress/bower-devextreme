@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Common Widgets)
-* Version: 15.1.3
-* Build date: Jun 1, 2015
+* Version: 15.1.4
+* Build date: Jun 22, 2015
 *
 * Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -382,11 +382,12 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     top: location.top - targetLocation.top
                 })
             },
-            scrollToElement: function(element) {
+            scrollToElement: function(element, offset) {
+                offset = offset || {};
                 var $element = $(element);
                 var elementInsideContent = this.content().find(element).length;
-                var elementIsPartOfScrollable = $element.parents("." + SCROLLABLE_CLASS).length - $element.parents("." + SCROLLABLE_CONTENT_CLASS).length !== 0;
-                if (!elementInsideContent || elementIsPartOfScrollable)
+                var elementIsInsideContent = $element.parents("." + SCROLLABLE_CLASS).length - $element.parents("." + SCROLLABLE_CONTENT_CLASS).length === 0;
+                if (!elementInsideContent || !elementIsInsideContent)
                     return;
                 var scrollPosition = {
                         top: 0,
@@ -394,26 +395,28 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     };
                 var direction = this.option("direction");
                 if (direction !== VERTICAL)
-                    scrollPosition.left = this._scrollToElementPosition($element, HORIZONTAL);
+                    scrollPosition.left = this._scrollToElementPosition($element, HORIZONTAL, offset);
                 if (direction !== HORIZONTAL)
-                    scrollPosition.top = this._scrollToElementPosition($element, VERTICAL);
+                    scrollPosition.top = this._scrollToElementPosition($element, VERTICAL, offset);
                 this.scrollTo(scrollPosition)
             },
-            _scrollToElementPosition: function($element, direction) {
+            _scrollToElementPosition: function($element, direction, offset) {
                 var isVertical = direction === VERTICAL;
+                var startOffset = (isVertical ? offset.top : offset.left) || 0;
+                var endOffset = (isVertical ? offset.bottom : offset.right) || 0;
                 var pushBackOffset = isVertical ? this.option("pushBackValue") : 0;
                 var elementPositionRelativeToContent = this._elementPositionRelativeToContent($element, isVertical ? 'top' : 'left');
                 var elementPosition = elementPositionRelativeToContent - pushBackOffset;
                 var elementSize = $element[isVertical ? 'outerHeight' : 'outerWidth']();
                 var elementBottom = elementPositionRelativeToContent + elementSize;
-                var scrollLocation = isVertical ? this.scrollTop() : this.scrollLeft();
-                var clientSize = isVertical ? this.clientHeight() : this.clientWidth();
+                var scrollLocation = (isVertical ? this.scrollTop() : this.scrollLeft()) - startOffset;
+                var clientSize = (isVertical ? this.clientHeight() : this.clientWidth()) - startOffset - endOffset;
                 var scrollBottom = scrollLocation + clientSize;
                 var isEntirelyVisible = scrollLocation <= elementPosition && scrollBottom >= elementBottom;
                 var isEntirelyWithOversizeVisible = scrollLocation >= elementPosition && scrollBottom <= elementBottom;
                 var isAlreadyVisible = isEntirelyVisible || isEntirelyWithOversizeVisible;
-                var isElementBelowScrollLocation = scrollLocation > elementPosition;
-                return isAlreadyVisible ? scrollLocation : elementPosition - (isElementBelowScrollLocation ? 0 : clientSize - elementSize)
+                var isElementAboveScrollLocation = scrollLocation > elementPosition;
+                return isAlreadyVisible ? scrollLocation : elementPosition - (isElementAboveScrollLocation ? 0 : clientSize - elementSize)
             },
             _elementPositionRelativeToContent: function($element, prop) {
                 var result = 0;
@@ -439,9 +442,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             SCROLLABLE_SCROLLBAR_ACTIVE_CLASS = SCROLLABLE_SCROLLBAR_CLASS + "-active",
             SCROLLABLE_SCROLL_CLASS = "dx-scrollable-scroll",
             SCROLLABLE_SCROLL_CONTENT_CLASS = "dx-scrollable-scroll-content",
-            SCROLLABLE_SCROLLBARS_HIDDEN = "dx-scrollable-scrollbars-hidden",
             HOVER_ENABLED_STATE = "dx-scrollbar-hoverable",
-            VERTICAL = "vertical",
             HORIZONTAL = "horizontal",
             THUMB_MIN_SIZE = 15;
         var SCROLLBAR_VISIBLE = {
@@ -610,10 +611,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
     /*! Module widgets-base, file ui.scrollable.native.js */
     (function($, DX, undefined) {
         var ui = DX.ui,
-            events = ui.events,
-            utils = DX.utils,
-            devices = DX.devices,
-            abs = Math.abs;
+            devices = DX.devices;
         var SCROLLABLE_NATIVE = "dxNativeScrollable",
             SCROLLABLE_NATIVE_CLASS = "dx-scrollable-native",
             SCROLLABLE_SCROLLBAR_SIMULATED = "dx-scrollable-scrollbar-simulated",
@@ -641,10 +639,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             },
             render: function() {
                 var device = devices.real(),
-                    deviceType = device.platform,
-                    version = device.version[0];
-                if (deviceType == "android" && version == 5)
-                    deviceType += version;
+                    deviceType = device.platform;
                 this._$element.addClass(SCROLLABLE_NATIVE_CLASS).addClass(SCROLLABLE_NATIVE_CLASS + "-" + deviceType).toggleClass(SCROLLABLE_SCROLLBARS_HIDDEN, !this._showScrollbar);
                 if (this._showScrollbar && this._useSimulatedScrollbar)
                     this._renderScrollbars()
@@ -828,7 +823,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             events = ui.events,
             math = Math,
             translator = DX.translator;
-        var isIE = DX.browser.msie;
         var realDevice = DX.devices.real;
         var isSluggishPlatform = realDevice.platform === "win8" || realDevice.platform === "android";
         var SCROLLABLE_SIMULATED = "dxSimulatedScrollable",
@@ -1570,9 +1564,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             SCROLLVIEW_TOP_POCKET_CLASS = SCROLLVIEW_CLASS + "-top-pocket",
             SCROLLVIEW_BOTTOM_POCKET_CLASS = SCROLLVIEW_CLASS + "-bottom-pocket",
             SCROLLVIEW_PULLDOWN_CLASS = SCROLLVIEW_CLASS + "-pull-down",
-            SCROLLVIEW_PULLDOWN_IMAGE_CLASS = SCROLLVIEW_PULLDOWN_CLASS + "-image",
-            SCROLLVIEW_PULLDOWN_INDICATOR_CLASS = SCROLLVIEW_PULLDOWN_CLASS + "-indicator",
-            SCROLLVIEW_PULLDOWN_TEXT_CLASS = SCROLLVIEW_PULLDOWN_CLASS + "-text",
             SCROLLVIEW_REACHBOTTOM_CLASS = SCROLLVIEW_CLASS + "-scrollbottom",
             SCROLLVIEW_REACHBOTTOM_INDICATOR_CLASS = SCROLLVIEW_REACHBOTTOM_CLASS + "-indicator",
             SCROLLVIEW_REACHBOTTOM_TEXT_CLASS = SCROLLVIEW_REACHBOTTOM_CLASS + "-text",
@@ -1779,8 +1770,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
     })(jQuery, DevExpress);
     /*! Module widgets-base, file ui.scrollView.native.pullDown.js */
     (function($, DX, undefined) {
-        var ui = DX.ui,
-            math = Math;
+        var ui = DX.ui;
         var SCROLLVIEW_PULLDOWN_REFRESHING_CLASS = "dx-scrollview-pull-down-loading",
             SCROLLVIEW_PULLDOWN_READY_CLASS = "dx-scrollview-pull-down-ready",
             SCROLLVIEW_PULLDOWN_IMAGE_CLASS = "dx-scrollview-pull-down-image",
@@ -1948,17 +1938,14 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
     /*! Module widgets-base, file ui.scrollView.native.swipeDown.js */
     (function($, DX, undefined) {
         var ui = DX.ui,
-            events = ui.events,
-            math = Math;
-        var SCROLLVIEW_PULLDOWN_REFRESHING_CLASS = "dx-scrollview-pull-down-loading",
-            SCROLLVIEW_OBSOLETE_ANDROID_CLASS = "dx-scrollview-obsolete-android-browser",
+            events = ui.events;
+        var SCROLLVIEW_PULLDOWN_DOWN_LOADING_CLASS = "dx-scrollview-pull-down-loading",
             SCROLLVIEW_PULLDOWN_INDICATOR_CLASS = "dx-scrollview-pull-down-indicator",
-            SCROLLVIEW_PULLDOWN_IMAGE_CLASS = "dx-scrollview-pull-down-image",
-            PULLDOWN_HEIGHT = 160,
+            SCROLLVIEW_PULLDOWN_REFRESHING_CLASS = "dx-scrollview-pull-down-refreshing",
+            PULLDOWN_ICON_CLASS = "dx-icon-pulldown",
             STATE_RELEASED = 0,
             STATE_READY = 1,
             STATE_REFRESHING = 2,
-            STATE_LOADING = 3,
             STATE_TOUCHED = 4,
             STATE_PULLED = 5;
         var SwipeDownNativeScrollViewStrategy = ui.dxScrollable.NativeStrategy.inherit({
@@ -1984,8 +1971,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 _renderPullDown: function() {
                     var $loadContainer = $("<div>").addClass(SCROLLVIEW_PULLDOWN_INDICATOR_CLASS),
                         $loadIndicator = $("<div>").dxLoadIndicator({});
-                    this._$image = $("<div>").addClass(SCROLLVIEW_PULLDOWN_IMAGE_CLASS);
-                    this._$pullDown.empty().append(this._$image).append($loadContainer.append($loadIndicator))
+                    this._$icon = $("<div>").addClass(PULLDOWN_ICON_CLASS);
+                    this._$pullDown.empty().append(this._$icon).append($loadContainer.append($loadIndicator))
                 },
                 _releaseState: function() {
                     this._state = STATE_RELEASED;
@@ -2027,17 +2014,18 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     }
                 },
                 _movePullDown: function() {
-                    var top = Math.min(this._getPullDownHeight() * 3 - this._getPullDownStartPosition(), this._deltaY + this._getPullDownStartPosition()),
-                        angle = 180 * top / this._getPullDownHeight() / 3;
-                    this._$pullDown.css({opacity: 1});
+                    var pullDownHeight = this._getPullDownHeight(),
+                        top = Math.min(pullDownHeight * 3, this._deltaY + this._getPullDownStartPosition()),
+                        angle = 180 * top / pullDownHeight / 3;
+                    this._$pullDown.css({opacity: 1}).toggleClass(SCROLLVIEW_PULLDOWN_REFRESHING_CLASS, top < pullDownHeight);
                     DX.translator.move(this._$pullDown, {top: top});
-                    this._$image.css({transform: "rotate(" + angle + "deg)"})
+                    this._$icon.css({transform: "rotate(" + angle + "deg)"})
                 },
                 _isPullDown: function() {
                     return this._pullDownEnabled && this._deltaY >= this._getPullDownHeight() - this._getPullDownStartPosition()
                 },
                 _getPullDownHeight: function() {
-                    return Math.round(this._$element.outerHeight() * 0.1)
+                    return Math.round(this._$element.outerHeight() * 0.05)
                 },
                 _getPullDownStartPosition: function() {
                     return -Math.round(this._$pullDown.outerHeight() * 1.5)
@@ -2075,7 +2063,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 _stateReleased: function() {
                     if (this._state === STATE_RELEASED)
                         return;
-                    this._$pullDown.removeClass(SCROLLVIEW_PULLDOWN_REFRESHING_CLASS);
+                    this._$pullDown.removeClass(SCROLLVIEW_PULLDOWN_DOWN_LOADING_CLASS);
                     this._releaseState()
                 },
                 _pullDownRefreshing: function() {
@@ -2087,8 +2075,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     this.pullDownCallbacks.fire()
                 },
                 _refreshPullDown: function() {
-                    this._$pullDown.addClass(SCROLLVIEW_PULLDOWN_REFRESHING_CLASS);
-                    DX.translator.move(this._$pullDown, {top: this._getPullDownHeight() - this._getPullDownStartPosition()})
+                    this._$pullDown.addClass(SCROLLVIEW_PULLDOWN_DOWN_LOADING_CLASS);
+                    DX.translator.move(this._$pullDown, {top: this._getPullDownHeight()})
                 },
                 pullDownEnable: function(enabled) {
                     this._$topPocket.toggle(enabled);
@@ -2123,8 +2111,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
     /*! Module widgets-base, file ui.scrollView.native.slideDown.js */
     (function($, DX, undefined) {
         var ui = DX.ui;
-        var DX_SLIDE_DOWN_NATIVE_SCROLLVIEW_STRATEGY = "dxSlideDownNativeScrollViewStrategy",
-            STATE_RELEASED = 0,
+        var STATE_RELEASED = 0,
             STATE_READY = 1,
             STATE_LOADING = 2,
             LOADING_HEIGHT = 80;
@@ -2616,12 +2603,13 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this._renderedRoutes = routes.slice()
             },
             _renderShield: function() {
+                var $shield;
                 if (DX.designMode || this.option("disabled")) {
-                    var $shield = $("<div/>").addClass(MAP_SHIELD_CLASS);
+                    $shield = $("<div/>").addClass(MAP_SHIELD_CLASS);
                     this.element().append($shield)
                 }
                 else {
-                    var $shield = this.element().find("." + MAP_SHIELD_CLASS);
+                    $shield = this.element().find("." + MAP_SHIELD_CLASS);
                     $shield.remove()
                 }
             },
@@ -2635,7 +2623,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             },
             _optionChanged: function(args) {
                 var value = args.value;
-                var previousValue = args.previousValue;
                 if (this._cancelOptionChange)
                     return;
                 var notificationDeffered = this._notificationDeffered;
@@ -2783,7 +2770,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 return 5
             },
             _defaultRouteOpacity: function() {
-                return .5
+                return 0.5
             },
             _defaultRouteColor: function() {
                 return "#0000FF"
@@ -3031,8 +3018,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
     })(jQuery, DevExpress);
     /*! Module widgets-base, file ui.map.provider.dynamic.js */
     (function($, DX, undefined) {
-        var ui = DX.ui,
-            events = ui.events;
+        var ui = DX.ui;
         ui.dxMap.DynamicProvider = ui.dxMap.Provider.inherit({
             cancelEvents: true,
             _renderImpl: function(markerOptions, routeOptions) {
@@ -3111,7 +3097,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             },
             _destroyMarker: DX.abstract,
             _clearMarkers: function() {
-                for (var i = 0; this._markers.length > 0; )
+                while (this._markers.length > 0)
                     this._removeMarker(this._markers[0].options)
             },
             addRoutes: function(options) {
@@ -3160,7 +3146,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             },
             _destroyRoute: DX.abstract,
             _clearRoutes: function() {
-                for (var i = 0; this._routes.length > 0; )
+                while (this._routes.length > 0)
                     this._removeRoute(this._routes[0].options)
             },
             adjustViewport: function() {
@@ -3258,7 +3244,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 if (msMapsLoaded())
                     this._mapReady();
                 else {
-                    if (!msMapsLoader || msMapsLoader.state() == "resolved" && !msMapsLoaded()) {
+                    if (!msMapsLoader || msMapsLoader.state() === "resolved" && !msMapsLoaded()) {
                         msMapsLoader = $.Deferred();
                         window[BING_MAP_READY] = $.proxy(msMapsLoader.resolve, msMapsLoader);
                         if (winJS)
@@ -3318,7 +3304,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     this._option("zoom", this._map.getZoom())
             },
             _clickActionHandler: function(e) {
-                if (e.targetType == "map") {
+                if (e.targetType === "map") {
                     var point = new Microsoft.Maps.Point(e.getX(), e.getY()),
                         location = e.target.tryPixelToLocation(point);
                     this._fireClickAction({location: this._normalizeLocation(location)})
@@ -3338,7 +3324,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this._map.setView({
                     animate: false,
                     mapTypeId: this._mapType(type),
-                    labelOverlay: type == "satellite" ? labelOverlay.hidden : labelOverlay.visible
+                    labelOverlay: type === "satellite" ? labelOverlay.hidden : labelOverlay.visible
                 });
                 return $.Deferred().resolve().promise()
             },
@@ -3626,7 +3612,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 if (googleMapsLoaded())
                     this._mapReady();
                 else {
-                    if (!googleMapsLoader || googleMapsLoader.state() == "resolved" && !googleMapsLoaded()) {
+                    if (!googleMapsLoader || googleMapsLoader.state() === "resolved" && !googleMapsLoaded()) {
                         googleMapsLoader = $.Deferred();
                         var key = this._keyOption("google");
                         window[GOOGLE_MAP_READY] = $.proxy(googleMapsLoader.resolve, googleMapsLoader);
@@ -4539,51 +4525,62 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     var direction = this._option("direction"),
                         totalRatio = 0,
                         totalWeightedShrink = 0,
-                        totalBaseSize = 0,
-                        boxSize = this._$element[FALLBACK_MAIN_SIZE_MAP[direction]](),
-                        parseSize = function(size) {
-                            return String(size).match(/.+%$/) ? 0.01 * parseFloat(size) * boxSize : size
-                        },
-                        contentSize = function($item) {
-                            return $item[FALLBACK_MAIN_SIZE_MAP[direction]]()
-                        },
-                        baseSize = function($item) {
-                            var item = $item.data(BOX_ITEM_DATA_KEY);
-                            return item.baseSize == null ? 0 : item.baseSize === "auto" ? contentSize($item) : parseSize(item.baseSize)
-                        };
-                    $.each($items, function() {
-                        var $item = $(this);
-                        $item.css("display", "inline-block").css("vertical-align", "top");
+                        totalBaseSize = 0;
+                    $.each($items, $.proxy(function(_, item) {
+                        var $item = $(item);
+                        $item.css({
+                            display: "inline-block",
+                            verticalAlign: "top"
+                        });
                         $item[FALLBACK_MAIN_SIZE_MAP[direction]]("auto");
                         $item.removeClass(FALLBACK_BOX_ITEM);
-                        var item = $item.data(BOX_ITEM_DATA_KEY),
-                            ratio = item.ratio || 0,
-                            size = baseSize($item),
-                            shrink = utils.isDefined(item.shrink) ? item.shrink : SHRINK;
+                        var itemData = $item.data(BOX_ITEM_DATA_KEY),
+                            ratio = itemData.ratio || 0,
+                            size = this._baseSize($item),
+                            shrink = utils.isDefined(itemData.shrink) ? itemData.shrink : SHRINK;
                         totalRatio += ratio;
                         totalWeightedShrink += shrink * size;
                         totalBaseSize += size
-                    });
-                    boxSize = this._$element[FALLBACK_MAIN_SIZE_MAP[direction]]();
-                    var freeSpaceSize = boxSize - totalBaseSize;
-                    var itemSize = function($item) {
-                            var item = $item.data(BOX_ITEM_DATA_KEY),
-                                size = baseSize($item),
-                                factor = freeSpaceSize >= 0 ? item.ratio || 0 : (utils.isDefined(item.shrink) ? item.shrink : SHRINK) * size,
+                    }, this));
+                    var freeSpaceSize = this._boxSize() - totalBaseSize;
+                    var itemSize = $.proxy(function($item) {
+                            var itemData = $item.data(BOX_ITEM_DATA_KEY),
+                                size = this._baseSize($item),
+                                factor = freeSpaceSize >= 0 ? itemData.ratio || 0 : (utils.isDefined(itemData.shrink) ? itemData.shrink : SHRINK) * size,
                                 totalFactor = freeSpaceSize >= 0 ? totalRatio : totalWeightedShrink,
                                 shift = totalFactor ? Math.round(freeSpaceSize * factor / totalFactor) : 0;
                             return size + shift
-                        };
+                        }, this);
                     var totalItemSize = 0;
-                    $.each($items, function() {
-                        var $item = $(this),
-                            item = $item.data(BOX_ITEM_DATA_KEY),
+                    $.each($items, function(_, item) {
+                        var $item = $(item),
+                            itemData = $(item).data(BOX_ITEM_DATA_KEY),
                             size = itemSize($item);
                         totalItemSize += size;
-                        $item.css(MAXSIZE_MAP[direction], item.maxSize || "none").css(MINSIZE_MAP[direction], item.minSize || "0").css(FALLBACK_MAIN_SIZE_MAP[direction], size);
+                        $item.css(MAXSIZE_MAP[direction], itemData.maxSize || "none").css(MINSIZE_MAP[direction], itemData.minSize || "0").css(FALLBACK_MAIN_SIZE_MAP[direction], size);
                         $item.addClass(FALLBACK_BOX_ITEM)
                     });
                     this.totalItemSize = totalItemSize
+                },
+                _baseSize: function(item) {
+                    var itemData = $(item).data(BOX_ITEM_DATA_KEY);
+                    return itemData.baseSize == null ? 0 : itemData.baseSize === "auto" ? this._contentSize(item) : this._parseSize(itemData.baseSize)
+                },
+                _contentSize: function(item) {
+                    return $(item)[FALLBACK_MAIN_SIZE_MAP[this._option("direction")]]()
+                },
+                _parseSize: function(size) {
+                    return String(size).match(/.+%$/) ? 0.01 * parseFloat(size) * this._boxSize() : size
+                },
+                _boxSize: function() {
+                    return this._$element[FALLBACK_MAIN_SIZE_MAP[this._option("direction")]]()
+                },
+                _totalBaseSize: function() {
+                    var result = 0;
+                    $.each(this._$items, $.proxy(function(_, item) {
+                        result += this._baseSize(item)
+                    }, this));
+                    return result
                 },
                 update: function() {
                     if (!this._$items || this._$element.is(":hidden"))
@@ -4616,7 +4613,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                                 var device = DX.devices.real();
                                 var isOldAndroid = device.platform === "android" && (device.version[0] < 4 || device.version[0] === 4 && device.version[1] < 4),
                                     isOldIos = device.platform === "ios" && device.version[0] < 7;
-                                return DX.browser["msie"] || isOldAndroid || isOldIos
+                                return device.platform === "win8" || DX.browser["msie"] || isOldAndroid || isOldIos
                             },
                             options: {_layoutStrategy: "fallback"}
                         }])
@@ -4846,7 +4843,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     }
             },
             _spreadItems: function() {
-                var cols = this.option("cols");
                 $.each(this._screenItems, $.proxy(function(_, itemInfo) {
                     var location = itemInfo.location || {};
                     var itemCol = location.col;
@@ -5094,13 +5090,9 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             utils = DX.utils;
         var BUTTON_CLASS = "dx-button",
             BUTTON_CONTENT_CLASS = "dx-button-content",
-            BUTTON_CONTENT_SELECTOR = ".dx-button-content",
-            BUTTON_TEXT_CLASS = "dx-button-text",
             BUTTON_HAS_TEXT_CLASS = "dx-button-has-text",
             BUTTON_HAS_ICON_CLASS = "dx-button-has-icon",
-            BUTTON_TEXT_SELECTOR = ".dx-button-text",
-            ICON_CLASS = "dx-icon",
-            ICON_SELECTOR = ".dx-icon",
+            TEMPLATE_WRAPPER_CLASS = "dx-template-wrapper",
             BUTTON_FEEDBACK_HIDE_TIMEOUT = 100;
         DX.registerComponent("dxButton", ui, ui.Widget.inherit({
             _supportedKeys: function() {
@@ -5135,7 +5127,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     text: "",
                     icon: "",
                     validationGroup: undefined,
-                    activeStateEnabled: true
+                    activeStateEnabled: true,
+                    template: "content"
                 })
             },
             _defaultOptionsRules: function() {
@@ -5155,13 +5148,39 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             },
             _render: function() {
                 this.callBase();
-                this.element().addClass(BUTTON_CLASS).append($("<div>").addClass(BUTTON_CONTENT_CLASS));
-                this.setAria("role", "button");
-                this._renderClick();
-                this._renderIcon();
+                this.element().addClass(BUTTON_CLASS);
                 this._renderType();
-                this._renderText();
+                this._renderClick();
+                this.setAria("role", "button");
                 this._updateAriaLabel()
+            },
+            _renderContentImpl: function() {
+                var $content = $("<div>").addClass(BUTTON_CONTENT_CLASS),
+                    data = this._getContentData();
+                this.element().empty();
+                this.element().append($content);
+                this.element().toggleClass(BUTTON_HAS_ICON_CLASS, !!data.icon);
+                this.element().toggleClass(BUTTON_HAS_TEXT_CLASS, !!data.text);
+                var template = this._getTemplateByOption("template");
+                var $result = template.render(data, $content);
+                if ($result.hasClass(TEMPLATE_WRAPPER_CLASS)) {
+                    $content.replaceWith($result);
+                    $content = $result;
+                    $content.addClass(BUTTON_CONTENT_CLASS)
+                }
+            },
+            _getContentData: function() {
+                var icon = this.option("icon"),
+                    text = this.option("text"),
+                    back = this.option("type") === "back";
+                if (back && !icon)
+                    icon = "back";
+                if (back && !text)
+                    text = DX.localization.localizeString("@Back");
+                return {
+                        icon: icon,
+                        text: text
+                    }
             },
             _renderClick: function() {
                 var that = this,
@@ -5179,26 +5198,10 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             },
             _updateAriaLabel: function() {
                 var icon = this.option("icon"),
-                    type = this.option("type"),
                     text = this.option("text");
                 icon = utils.getImageSourceType(icon) === "image" ? icon.replace(/.+\/([^\.]+)\..+$/, "$1") : icon;
                 var ariaLabel = text || icon;
-                if (type !== "normal")
-                    ariaLabel = type + " " + ariaLabel;
                 this.setAria("label", $.trim(ariaLabel))
-            },
-            _renderIcon: function() {
-                var contentElement = this.element().find(BUTTON_CONTENT_SELECTOR),
-                    iconElement = contentElement.find(ICON_SELECTOR),
-                    icon = this.option("icon");
-                iconElement.remove();
-                if (this.option("type") === "back" && !icon)
-                    icon = "back";
-                var iconElement = utils.getImageContainer(icon);
-                if (!iconElement)
-                    return;
-                contentElement.prepend(iconElement);
-                this.element().addClass(BUTTON_HAS_ICON_CLASS)
             },
             _renderType: function() {
                 var type = this.option("type");
@@ -5209,21 +5212,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 var type = this.option("type");
                 prevType && this.element().removeClass("dx-button-" + prevType).addClass("dx-button-" + type);
                 if (!this.element().hasClass("dx-button-has-icon") && type === "back")
-                    this._renderIcon()
-            },
-            _renderText: function() {
-                var text = this.option("text"),
-                    contentElement = this.element().find(BUTTON_CONTENT_SELECTOR),
-                    back = this.option("type") === "back";
-                var textElement = contentElement.find(BUTTON_TEXT_SELECTOR);
-                if (!text && !back) {
-                    textElement.remove();
-                    return
-                }
-                if (!textElement.length)
-                    textElement = $('<span>').addClass(BUTTON_TEXT_CLASS).appendTo(contentElement);
-                textElement.text(text || DX.localization.localizeString("@Back"));
-                this.element().addClass(BUTTON_HAS_TEXT_CLASS)
+                    this._renderContentImpl()
             },
             _optionChanged: function(args) {
                 switch (args.name) {
@@ -5231,16 +5220,16 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                         this._renderClick();
                         break;
                     case"icon":
-                        this._renderIcon();
-                        this._updateAriaLabel();
-                        break;
                     case"text":
-                        this._renderText();
+                        this._renderContentImpl();
                         this._updateAriaLabel();
                         break;
                     case"type":
                         this._refreshType(args.previousValue);
                         this._updateAriaLabel();
+                        break;
+                    case"template":
+                        this._renderContentImpl();
                         break;
                     default:
                         this.callBase(args)
@@ -5417,9 +5406,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this._animating = false;
                 this._animationDuration = SWITCH_ANIMATION_DURATION
             },
-            _createValueChangeAction: function() {
-                this._valueChangeAction = this._createActionByOption("onValueChanged")
-            },
             _render: function() {
                 var element = this.element();
                 this._$switchInner = $("<div>").addClass(SWITCH_INNER_CLASS);
@@ -5481,7 +5467,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             _animateValue: function(value) {
                 var startValue = this.option("value"),
                     endValue = value;
-                if (startValue == endValue)
+                if (startValue === endValue)
                     return;
                 this._animating = true;
                 var that = this,
@@ -5804,6 +5790,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             },
             _createClearButton: function() {
                 return $("<span>").addClass(TEXTEDITOR_CLEAR_BUTTON_CLASS).append($("<span>").addClass(TEXTEDITOR_ICON_CLASS).addClass(TEXTEDITOR_CLEAR_ICON_CLASS)).prependTo(this._buttonsContainer()).on(events.addNamespace("dxpointerdown", this.NAME), function(e) {
+                        e.preventDefault();
                         e.dxPreventBlur = true
                     }).on(events.addNamespace("dxclick", this.NAME), $.proxy(this._clearValueHandler, this))
             },
@@ -5835,8 +5822,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this.option("text", this._input().val())
             },
             _renderValueChangeEvent: function() {
-                var that = this,
-                    eventNamespace = this.NAME + "ValueChange";
+                var eventNamespace = this.NAME + "ValueChange";
                 var keyUpNamespace = events.addNamespace(this._renderValueEventName(), this.NAME + "TextChange");
                 this._input().off(keyUpNamespace).on(keyUpNamespace, $.proxy(this._keyUpHandler, this));
                 var valueChangeEventNamespace = events.addNamespace(this.option("valueChangeEvent"), eventNamespace);
@@ -5866,8 +5852,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this._toggleEmptinessEventHandler()
             },
             _toggleEmptinessEventHandler: function(value) {
-                var value = this._input().val(),
-                    isEmpty = (value === "" || value === null) && this._isValueValid();
+                var text = this._input().val(),
+                    isEmpty = (text === "" || text === null) && this._isValueValid();
                 this._toggleEmptiness(isEmpty)
             },
             _valueChangeEventHandler: function(e, formattedValue) {
@@ -6001,6 +5987,14 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 A: /[0-9a-zA-Z]/,
                 a: /[0-9a-zA-Z\s]/
             };
+        var CONTROL_KEYS = {
+                35: "end",
+                36: "home",
+                37: "leftArrow",
+                38: "upArrow",
+                39: "rightArrow",
+                40: "downArrow"
+            };
         DX.registerComponent("dxTextEditor", ui, ui.dxTextEditor.inherit({
             _setDefaultOptions: function() {
                 this.callBase();
@@ -6113,10 +6107,15 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this._adjustCaret()
             },
             _maskKeyPressHandler: function(e) {
+                if (this._isControlKeyFired(e))
+                    return;
                 this._maskKeyHandler(e, function() {
                     this._handleKey(e.which);
                     return true
                 })
+            },
+            _isControlKeyFired: function(e) {
+                return CONTROL_KEYS[e.keyCode] && !e.which || e.metaKey
             },
             _maskBackspaceHandler: function(e) {
                 this._maskKeyHandler(e, function() {
@@ -6511,7 +6510,10 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this.callBase();
                 this.element().addClass(TEXTBOX_CLASS);
                 this.setAria("role", "textbox");
-                this._renderMaxLengthHandlers();
+                this._renderMaxLengthHandlers()
+            },
+            _renderInputType: function() {
+                this.callBase();
                 this._renderSearchMode()
             },
             _renderMaxLengthHandlers: function() {
@@ -6562,8 +6564,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                         this._toggleMaxLengthProp();
                         this._renderMaxLengthHandlers();
                         break;
-                    case"mode":
-                        this._invalidate();
                     default:
                         this.callBase(args)
                 }
@@ -6697,7 +6697,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     deferRendering: true,
                     showDropButton: true,
                     dropPosition: this._getDefaultDropPosition(),
-                    focusStateEnabled: false,
                     applyButtonText: Globalize.localize("OK"),
                     cancelButtonText: Globalize.localize("Cancel"),
                     buttonsLocation: "default",
@@ -6798,7 +6797,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 var $button = $("<div>");
                 this._createComponent($button, "dxButton", {
                     focusStateEnabled: false,
-                    disabled: this.option("readOnly")
+                    disabled: this.option("readOnly"),
+                    _templates: {}
                 });
                 var $buttonIcon = $("<div>").addClass(DROP_DOWN_EDITOR_BUTTON_ICON);
                 $button.append($buttonIcon).removeClass("dx-button").on("mousedown", function(e) {
@@ -6814,7 +6814,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this.element().toggleClass(DROP_DOWN_EDITOR_FIELD_CLICKABLE, openOnFieldClick);
                 if (openOnFieldClick) {
                     $inputWrapper.on(events.addNamespace("mousedown", this.NAME), function(e) {
-                        DX.devices.real().platform != "generic" && e.preventDefault()
+                        DX.devices.real().platform !== "generic" && e.preventDefault()
                     });
                     $inputWrapper.on(CLICK_EVENT_NAME, $.proxy(this._openHandler, this));
                     return
@@ -6829,11 +6829,13 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 return this._input()
             },
             _toggleOpenState: function(isVisible) {
-                isVisible = arguments.length ? isVisible : !this.option("opened");
-                if (this.option("disabled") || this.option("readOnly"))
+                if (this.option("disabled"))
                     return;
                 this._input().focus();
-                this.option("opened", isVisible)
+                if (!this.option("readOnly")) {
+                    isVisible = arguments.length ? isVisible : !this.option("opened");
+                    this.option("opened", isVisible)
+                }
             },
             _renderOpenedState: function() {
                 var opened = this.option("opened");
@@ -6901,16 +6903,22 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             },
             _popupShownHandler: function() {
                 this._openAction();
-                if (this._$validationMessage) {
-                    var myTop = DX.position(this.element()).top,
-                        popupTop = DX.position(this._popup.content()).top;
-                    this._$validationMessage.dxTooltip("option", "position", this._getValidationTooltipPosition(myTop + this.option("dropPosition").offset.v > popupTop ? "below" : "above"))
-                }
+                if (this._$validationMessage)
+                    this._$validationMessage.dxTooltip("option", "position", this._getValidationTooltipPosition())
             },
             _popupHiddenHandler: function() {
                 this._closeAction();
                 if (this._$validationMessage)
-                    this._$validationMessage.dxTooltip("option", "position", this._getValidationTooltipPosition("below"))
+                    this._$validationMessage.dxTooltip("option", "position", this._getValidationTooltipPosition())
+            },
+            _getValidationTooltipPosition: function() {
+                var positionRequest = "below";
+                if (this._popup && this._popup.option("visible")) {
+                    var myTop = DX.position(this.element()).top,
+                        popupTop = DX.position(this._popup.content()).top;
+                    positionRequest = myTop + this.option("dropPosition").offset.v > popupTop ? "below" : "above"
+                }
+                return this.callBase(positionRequest)
             },
             _renderPopupContent: function() {
                 var contentTemplate = this._getTemplateByOption("contentTemplate");
@@ -7053,10 +7061,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
     /*! Module widgets-base, file ui.dropDownList.js */
     (function($, DX, undefined) {
         var ui = DX.ui,
-            events = ui.events,
             utils = DX.utils;
-        var LIST_SELECTOR = ".dx-list",
-            LIST_ITEM_SELECTOR = ".dx-list-item",
+        var LIST_ITEM_SELECTOR = ".dx-list-item",
             LIST_ITEM_DATA_KEY = "dxListItemData",
             DROPDOWNLIST_SELECTED_CLASS = "dx-dropdownlist-selected",
             DROPDOWNLIST_POPUP_WRAPPER_CLASS = "dx-dropdownlist-popup-wrapper",
@@ -7113,7 +7119,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                         },
                         collision: "flip"
                     },
-                    focusStateEnabled: true,
                     popupWidthExtension: 0
                 }))
             },
@@ -7228,7 +7233,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             _validateSearchMode: function() {
                 var searchMode = this.option("searchMode"),
                     normalizedSearchMode = searchMode.toLowerCase();
-                if ($.inArray(normalizedSearchMode, SEARCH_MODES) == -1)
+                if ($.inArray(normalizedSearchMode, SEARCH_MODES) < 0)
                     throw DX.Error("E1019", searchMode);
             },
             _clearSelectedItem: function() {
@@ -7294,7 +7299,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                         indicateLoading: false,
                         tabIndex: -1,
                         onItemClick: $.proxy(this._listItemClickAction, this),
-                        focusStateEnabled: this.option("focusStateEnabled"),
                         dataSource: this._isMinFilterLengthExceeded() ? this._dataSource : null,
                         _keyboardProcessor: this._childKeyboardProcessor,
                         onOptionChanged: $.proxy(function(args) {
@@ -7502,8 +7506,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
         var ui = DX.ui,
             events = ui.events;
         var TEXTAREA_CLASS = "dx-textarea",
-            TEXTEDITOR_INPUT_CLASS = "dx-texteditor-input",
-            TEXTEDITOR_CONTAINER_CLASS = "dx-texteditor-container";
+            TEXTEDITOR_INPUT_CLASS = "dx-texteditor-input";
         DX.registerComponent("dxTextArea", ui, ui.dxTextBox.inherit({
             _setDefaultOptions: function() {
                 this.callBase();
@@ -7555,10 +7558,10 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             SPIN_UP_CLASS = "dx-numberbox-spin-up",
             SPIN_DOWN_CLASS = "dx-numberbox-spin-down",
             SPIN_BUTTON_CLASS = "dx-numberbox-spin-button",
-            SPIN_BUTTON_SELECTOR = "." + SPIN_BUTTON_CLASS,
+            SPIN_BUTTON_SELECTOR = ".dx-numberbox-spin-button",
             SPIN_TOUCH_FRIENDLY_CLASS = "dx-numberbox-spin-touch-friendly",
             SPIN_HOLD_DELAY = 100,
-            CONTROL_KEYS = ["Tab", "Del", "Backspace", "Left", "Right", "Home", "End"],
+            CONTROL_KEYS = ["Tab", "Del", "Delete", "Backspace", "Left", "ArrowLeft", "Right", "ArrowRight", "Home", "End"],
             NUMBER_BOX = 'dxNumberBox',
             MOUSEWHEEL_EVENT_NAME = events.addNamespace("dxmousewheel", NUMBER_BOX),
             POINTERDOWN_EVENT_NAME = events.addNamespace("dxpointerdown", NUMBER_BOX),
@@ -7577,8 +7580,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 },
                 _render: function() {
                     this.callBase();
-                    var that = this,
-                        $element = this.element(),
+                    var $element = this.element(),
                         direction = SPIN_CLASS + "-" + this.option("direction");
                     $element.addClass(SPIN_BUTTON_CLASS).addClass(direction).off(POINTERDOWN_EVENT_NAME).on(POINTERDOWN_EVENT_NAME, $.proxy(this._spinDownHandler, this));
                     this._spinIcon = $("<div>").addClass(direction + "-icon").appendTo(this.element());
@@ -7588,6 +7590,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     e.preventDefault();
                     this._clearTimer();
                     $(document).on("dxhold", $.proxy(function() {
+                        this._feedBackDeferred = $.Deferred();
+                        ui.events.lockFeedback(this._feedBackDeferred);
                         this._spinChangeHandler({jQueryEvent: e});
                         this._holdTimer = setInterval(this._spinChangeHandler, SPIN_HOLD_DELAY, {jQueryEvent: e})
                     }, this)).on(POINTERUP_EVENT_NAME, $.proxy(this._clearTimer, this)).on(POINTERCANCEL_EVENT_NAME, $.proxy(this._clearTimer, this));
@@ -7599,6 +7603,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 },
                 _clearTimer: function(e) {
                     $(document).off(POINTERUP_EVENT_NAME).off(POINTERCANCEL_EVENT_NAME).off("dxhold");
+                    if (this._feedBackDeferred)
+                        this._feedBackDeferred.resolve();
                     if (this._holdTimer)
                         clearInterval(this._holdTimer)
                 },
@@ -7666,7 +7672,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                         validCharRegExp = /[\d.,eE\-+]/,
                         isInputCharValid = validCharRegExp.test(ch);
                     if (!isInputCharValid) {
-                        if (e.key && (e.ctrlKey || $.inArray(e.key, CONTROL_KEYS) >= 0))
+                        if (e.metaKey || e.ctrlKey || e.key && $.inArray(e.key, CONTROL_KEYS) >= 0)
                             return;
                         e.preventDefault();
                         return false
@@ -7698,7 +7704,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 e.stopPropagation()
             },
             _renderValue: function() {
-                if (!this._input().val().length || this._input().val() != this.option("value")) {
+                if (!this._input().val().length || Number(this._input().val()) !== this.option("value")) {
                     this._forceValueRender();
                     this._toggleEmptinessEventHandler()
                 }
@@ -7830,7 +7836,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     valueFormat = this.option("valueFormat");
                 if (this._isIncompleteValue)
                     return;
-                if ($input.val() != value)
+                if (Number($input.val()) !== value)
                     $input.val(valueFormat(this.option("value")), valueFormat(value));
                 this.callBase(e, value)
             },
@@ -7977,8 +7983,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this.setAria("role", "radio")
             },
             _renderIcon: function() {
-                var $icon = $("<div>").addClass(RADIO_BUTTON_ICON_CLASS),
-                    $dot = $("<div>").addClass(RADIO_BUTTON_ICON_DOT_CLASS).appendTo($icon);
+                var $icon = $("<div>").addClass(RADIO_BUTTON_ICON_CLASS);
+                $("<div>").addClass(RADIO_BUTTON_ICON_DOT_CLASS).appendTo($icon);
                 this.element().append($icon)
             },
             _renderCheckedState: function(checked) {
@@ -8011,8 +8017,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
     })(jQuery, DevExpress);
     /*! Module widgets-base, file ui.radioGroup.js */
     (function($, DX, undefined) {
-        var ui = DX.ui,
-            events = ui.events;
+        var ui = DX.ui;
         var RADIO_GROUP_CLASS = "dx-radiogroup",
             RADIO_GROUP_VERTICAL_CLASS = "dx-radiogroup-vertical",
             RADIO_GROUP_HORIZONTAL_CLASS = "dx-radiogroup-horizontal",
@@ -8024,8 +8029,12 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             ITEM_DATA_KEY = "dxItemData",
             RADIO_FEEDBACK_HIDE_TIMEOUT = 100;
         var dxRadioCollection = ui.CollectionWidget.inherit({
-                itemAttributes: function() {
-                    return {role: "radio"}
+                _setDefaultOptions: function() {
+                    this.callBase();
+                    this.option($.extend(this._dataExpressionDefaultOptions(), {_itemAttributes: {role: "radio"}}))
+                },
+                _getAriaTarget: function() {
+                    return this._focusTarget()
                 },
                 _focusTarget: function() {
                     return this.element().parent()
@@ -8103,9 +8112,11 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             _itemRenderedHandler: function(e) {
                 if (e.itemData.html)
                     return;
-                var $radio = $("<div>").addClass(RADIO_BUTTON_ICON_CLASS),
-                    $dot = $("<div>").addClass(RADIO_BUTTON_ICON_DOT_CLASS).appendTo($radio),
-                    $radioContainer = $("<div>").append($radio).addClass(RADIO_VALUE_CONTAINER_CLASS);
+                var $radio,
+                    $radioContainer;
+                $radio = $("<div>").addClass(RADIO_BUTTON_ICON_CLASS);
+                $("<div>").addClass(RADIO_BUTTON_ICON_DOT_CLASS).appendTo($radio);
+                $radioContainer = $("<div>").append($radio).addClass(RADIO_VALUE_CONTAINER_CLASS);
                 e.itemElement.prepend($radioContainer)
             },
             _itemClickHandler: function(e) {
@@ -8150,6 +8161,12 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this._dataExpressionOptionChanged(args);
                 switch (args.name) {
                     case"focusStateEnabled":
+                    case"accessKey":
+                    case"tabIndex":
+                        this._setCollectionWidgetOption(args.name, args.value);
+                        break;
+                    case"disabled":
+                        this.callBase(args);
                         this._setCollectionWidgetOption(args.name, args.value);
                         break;
                     case"dataSource":
@@ -8181,13 +8198,11 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
     (function($, DX, undefined) {
         var ui = DX.ui,
             events = ui.events,
-            fx = DX.fx,
             TABS_CLASS = "dx-tabs",
             TABS_WRAPPER_CLASS = "dx-indent-wrapper",
             TABS_EXPANDED_CLASS = "dx-tabs-expanded",
             TABS_SCROLLABLE_CLASS = "dx-scrollable-wrapper",
             TABS_NAV_BUTTONS_CLASS = "dx-tabs-nav-buttons",
-            TABS_MARGIN = 25,
             TABS_ITEM_CLASS = "dx-tab",
             TABS_ITEM_SELECTOR = ".dx-tab",
             TABS_ITEM_SELECTED_CLASS = "dx-tab-selected",
@@ -8199,7 +8214,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             FEEDBACK_DURATION_INTERVAL = 5,
             FEEDBACK_SCROLL_TIMEOUT = 300,
             ACTIVE_STATE_CLASS = "dx-state-active",
-            SCROLLABLE_CONTENT_CLASS = "dx-scrollable-content",
             TAB_OFFSET = 30;
         DX.registerComponent("dxTabs", ui, ui.CollectionWidget.inherit({
             _activeStateUnit: TABS_ITEM_SELECTOR,
@@ -8305,11 +8319,11 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             _renderNavButtons: function() {
                 this.element().toggleClass(TABS_NAV_BUTTONS_CLASS, this.option("showNavButtons"));
                 if (this.option("showNavButtons")) {
-                    this._leftButton = this._createNavButton(-TAB_OFFSET);
+                    this._leftButton = this._createNavButton(-TAB_OFFSET, "chevronprev");
                     var $leftButton = this._leftButton.element();
                     $leftButton.addClass(TABS_LEFT_NAV_BUTTON_CLASS);
                     this.element().prepend($leftButton);
-                    this._rightButton = this._createNavButton(TAB_OFFSET);
+                    this._rightButton = this._createNavButton(TAB_OFFSET, "chevronnext");
                     var $rightButton = this._rightButton.element();
                     $rightButton.addClass(TABS_RIGHT_NAV_BUTTON_CLASS);
                     this.element().append($rightButton);
@@ -8327,7 +8341,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this._scrollable.update();
                 this._scrollable.scrollBy(offset / duration)
             },
-            _createNavButton: function(offset) {
+            _createNavButton: function(offset, icon) {
                 var that = this;
                 var holdAction = that._createAction(function() {
                         that._holdInterval = setInterval(function() {
@@ -8339,9 +8353,11 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     pointerOutEventName = events.addNamespace('dxpointerout', "dxButton");
                 var navButton = this._createComponent($("<div>").addClass(TABS_NAV_BUTTON_CLASS), "dxButton", {
                         focusStateEnabled: false,
+                        icon: icon,
                         onClick: function() {
                             that._updateScrollPosition(offset, 1)
-                        }
+                        },
+                        _templates: {}
                     });
                 navButton.element().on(holdEventName, {timeout: FEEDBACK_SCROLL_TIMEOUT}, $.proxy(function(e) {
                     holdAction({jQueryEvent: e})
@@ -8376,7 +8392,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this._refresh()
             },
             _itemSelectHandler: function(e) {
-                if (this.option("selectionMode") == "single" && this.isItemSelected(e.currentTarget))
+                if (this.option("selectionMode") === "single" && this.isItemSelected(e.currentTarget))
                     return;
                 this.callBase(e)
             },
@@ -8406,9 +8422,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             NAVBAR_CLASS = "dx-navbar",
             ITEM_CLASS = "dx-item-content",
             NAVBAR_ITEM_CLASS = "dx-nav-item",
-            NAVBAR_ITEM_CONTENT_CLASS = "dx-nav-item-content",
-            NAVBAR_ITEM_BADGE_CLASS = "dx-navbar-item-badge",
-            BADGE_CLASS = "dx-badge";
+            NAVBAR_ITEM_CONTENT_CLASS = "dx-nav-item-content";
         DX.registerComponent("dxNavBar", ui, ui.dxTabs.inherit({
             _setDefaultOptions: function() {
                 this.callBase();
@@ -8433,7 +8447,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
     (function($, DX, undefined) {
         var ui = DX.ui,
             fx = DX.fx,
-            utils = DX.utils,
             translator = DX.translator;
         var TOOLBAR_CLASS = "dx-toolbar",
             TOOLBAR_BOTTOM_CLASS = "dx-toolbar-bottom",
@@ -8588,7 +8601,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     itemClickAction = this._createActionByOption("onItemClick");
                 var options = {
                         itemTemplate: function() {
-                            if (that._menuType == "dxActionSheet")
+                            if (that._menuType === "dxActionSheet")
                                 return that._getTemplate("actionSheetItem");
                             return that._getTemplateByOption("menuItemTemplate")
                         },
@@ -8813,11 +8826,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             LIST_GROUP_COLLAPSED_CLASS = "dx-list-group-collapsed",
             LIST_HAS_NEXT_CLASS = "dx-has-next",
             LIST_NEXT_BUTTON_CLASS = "dx-list-next-button",
-            LIST_ITEM_BADGE_CONTAINER_CLASS = "dx-list-item-badge-container",
-            LIST_ITEM_BADGE_CLASS = "dx-list-item-badge",
-            BADGE_CLASS = "dx-badge",
-            LIST_ITEM_CHEVRON_CONTAINER_CLASS = "dx-list-item-chevron-container",
-            LIST_ITEM_CHEVRON_CLASS = "dx-list-item-chevron",
             LIST_ITEM_DATA_KEY = "dxListItemData",
             LIST_FEEDBACK_SHOW_TIMEOUT = 70;
         var groupItemsGetter = DX.data.utils.compileGetter("items");
@@ -8827,7 +8835,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 var that = this;
                 var moveFocusPerPage = function(direction) {
                         var $item = getEdgeVisibleItem(direction),
-                            isFocusedItem = $item.get(0) == that.option("focusedElement").get(0);
+                            isFocusedItem = $item.is(that.option("focusedElement"));
                         if (isFocusedItem) {
                             scrollListTo($item, direction);
                             $item = getEdgeVisibleItem(direction)
@@ -8930,7 +8938,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     collapsibleGroups: false,
                     groupTemplate: "group",
                     indicateLoading: true,
-                    activeStateEnabled: true
+                    activeStateEnabled: true,
+                    _itemAttributes: {role: "option"}
                 })
             },
             _defaultOptionsRules: function() {
@@ -8985,7 +8994,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this._suppressDeprecatedWarnings();
                 var scrollingEnabled = this.option("scrollingEnabled"),
                     pullRefreshEnabled = scrollingEnabled && this.option("pullRefreshEnabled"),
-                    autoPagingEnabled = scrollingEnabled && utils.ensureDefined(this.option("autoPagingEnabled"), this.option("pageLoadMode") == "scrollBottom") && !!this._dataSource;
+                    autoPagingEnabled = scrollingEnabled && utils.ensureDefined(this.option("autoPagingEnabled"), this.option("pageLoadMode") === "scrollBottom") && !!this._dataSource;
                 this._resumeDeprecatedWarnings();
                 this._scrollView = this._createComponent(this.element(), "dxScrollView", {
                     disabled: this.option("disabled") || !scrollingEnabled,
@@ -9017,7 +9026,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             _updateLoadingState: function(tryLoadMore) {
                 this._suppressDeprecatedWarnings();
                 var isDataLoaded = !tryLoadMore || this._isLastPage(),
-                    autoPagingEnabled = utils.ensureDefined(this.option("autoPagingEnabled"), this.option("pageLoadMode") == "scrollBottom"),
+                    autoPagingEnabled = utils.ensureDefined(this.option("autoPagingEnabled"), this.option("pageLoadMode") === "scrollBottom"),
                     stopLoading = isDataLoaded || !autoPagingEnabled,
                     hideLoadIndicator = stopLoading && !this._isDataSourceLoading();
                 this._resumeDeprecatedWarnings();
@@ -9031,7 +9040,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             },
             _shouldRenderNextButton: function() {
                 this._suppressDeprecatedWarnings();
-                var result = utils.ensureDefined(this.option("showNextButton"), this.option("pageLoadMode") == "nextButton") && this._dataSource && this._dataSource.isLoaded();
+                var result = utils.ensureDefined(this.option("showNextButton"), this.option("pageLoadMode") === "nextButton") && this._dataSource && this._dataSource.isLoaded();
                 this._resumeDeprecatedWarnings();
                 return result
             },
@@ -9071,7 +9080,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             _infiniteDataLoading: function() {
                 if (!this._scrollViewIsFull() && !this._isDataSourceLoading() && !this._isLastPage()) {
                     clearTimeout(this._loadNextPageTimer);
-                    this._loadNextPageTimert = setTimeout($.proxy(this._loadNextPage, this))
+                    this._loadNextPageTimer = setTimeout($.proxy(this._loadNextPage, this))
                 }
             },
             _scrollBottomHandler: function(e) {
@@ -9080,9 +9089,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     this._loadNextPage();
                 else
                     this._updateLoadingState()
-            },
-            itemAttributes: function() {
-                return {role: "option"}
             },
             _renderItems: function(items) {
                 if (this.option("grouped")) {
@@ -9119,9 +9125,10 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     slideMethod = "slideDown";
                 $groupBody[slideMethod]({
                     duration: 200,
-                    complete: function() {
+                    complete: $.proxy(function() {
+                        this.updateDimensions();
                         deferred.resolve()
-                    }
+                    }, this)
                 });
                 return deferred.promise()
             },
@@ -9219,7 +9226,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 var $button = $("<div>").appendTo($result);
                 this._createComponent($button, "dxButton", {
                     text: this.option("nextButtonText"),
-                    onClick: $.proxy(this._nextButtonHandler, this)
+                    onClick: $.proxy(this._nextButtonHandler, this),
+                    _templates: {}
                 });
                 return $result
             },
@@ -9359,13 +9367,9 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
     })(jQuery, DevExpress);
     /*! Module widgets-base, file ui.list.edit.js */
     (function($, DX, undefined) {
-        var ui = DX.ui,
-            utils = DX.utils,
-            removeDublicates = utils.removeDublicates;
+        var ui = DX.ui;
         var LIST_ITEM_SELECTED_CLASS = "dx-list-item-selected",
-            LIST_ITEM_RESPONSE_WAIT_CLASS = "dx-list-item-response-wait",
-            STATIC_DELETE_BUTTON_CONTAINER_CLASS = "dx-list-static-delete-button-container",
-            STATIC_DELETE_BUTTON_CLASS = "dx-list-static-delete-button";
+            LIST_ITEM_RESPONSE_WAIT_CLASS = "dx-list-item-response-wait";
         DX.registerComponent("dxList", ui, ui.dxList.inherit({
             _supportedKeys: function() {
                 var that = this,
@@ -9824,8 +9828,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
     (function($, DX, undefined) {
         var ui = DX.ui;
         var STATIC_DELETE_BUTTON_CONTAINER_CLASS = "dx-list-static-delete-button-container",
-            STATIC_DELETE_BUTTON_CLASS = "dx-list-static-delete-button",
-            STATIC_DELETE_BUTTON_MARGIN = 5;
+            STATIC_DELETE_BUTTON_CLASS = "dx-list-static-delete-button";
         ui.dxList.registerEditDecorator("delete", "static", ui.dxList.EditDecorator.inherit({
             afterBag: function(config) {
                 var $itemElement = config.$itemElement,
@@ -9836,7 +9839,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     type: "danger",
                     onClick: $.proxy(function(e) {
                         this._deleteItem($itemElement)
-                    }, this)
+                    }, this),
+                    _templates: {}
                 });
                 $container.addClass(STATIC_DELETE_BUTTON_CONTAINER_CLASS).append($button)
             },
@@ -9893,7 +9897,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 return $itemElement.hasClass(SWITCHABLE_DELETE_READY_CLASS)
             },
             _toggleShields: function($itemElement, enabled) {
-                this._list.element().toggleClass(SWITCHABLE_MENU_SHIELD_POSITIONING_CLASS);
+                this._list.element().toggleClass(SWITCHABLE_MENU_SHIELD_POSITIONING_CLASS, enabled);
                 this._$topShield.toggle(enabled);
                 this._$bottomShield.toggle(enabled);
                 if (enabled)
@@ -9983,7 +9987,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             SWITCHABLE_DELETE_BUTTON_WRAPPER_CLASS = "dx-list-switchable-delete-button-wrapper",
             SWITCHABLE_DELETE_BUTTON_INNER_WRAPPER_CLASS = "dx-list-switchable-delete-button-inner-wrapper",
             SWITCHABLE_DELETE_BUTTON_CLASS = "dx-list-switchable-delete-button",
-            SWITCHABLE_DELETE_MENU_CLASS = "dx-list-switchable-delete-menu",
             SWITCHABLE_DELETE_BUTTON_ANIMATION_DURATION = 200;
         ui.dxList.SwitchableButtonEditDecorator = ui.dxList.SwitchableEditDecorator.inherit({
             _init: function() {
@@ -9998,7 +10001,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     onClick: $.proxy(function(e) {
                         this._deleteItem();
                         e.jQueryEvent.stopPropagation()
-                    }, this)
+                    }, this),
+                    _templates: {}
                 });
                 $buttonContainer.append($buttonWrapper);
                 $buttonWrapper.append($buttonInnerWrapper);
@@ -10062,7 +10066,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     onClick: $.proxy(function(e) {
                         this._toggleDeleteReady($itemElement);
                         e.jQueryEvent.stopPropagation()
-                    }, this)
+                    }, this),
+                    _templates: {}
                 });
                 $container.addClass(TOGGLE_DELETE_SWITCH_CONTAINER_CLASS);
                 $container.append($toggle)
@@ -10189,7 +10194,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this._cacheItemData($itemElement);
                 var signCorrection = this._isRtlEnabled() ? 1 : -1,
                     offset = this._cachedItemWidth * args.offset,
-                    endedAtReadyToDelete = !this._isReadyToDelete($itemElement) && offset * signCorrection > this._cachedButtonWidth * .2,
+                    endedAtReadyToDelete = !this._isReadyToDelete($itemElement) && offset * signCorrection > this._cachedButtonWidth * 0.2,
                     readyToDelete = args.targetOffset === signCorrection || endedAtReadyToDelete;
                 this._toggleDeleteReady($itemElement, readyToDelete);
                 return true
@@ -10454,7 +10459,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             _renderSelectAll: function() {
                 var $selectAll = this._$selectAll = $("<div>").addClass(SELECT_DECORATOR_SELECT_ALL_CLASS);
                 this._selectAllCheckBox = this._list._createComponent($("<div>").addClass(SELECT_DECORATOR_SELECT_ALL_CHECKBOX_CLASS).appendTo($selectAll), "dxCheckBox");
-                var $label = $("<div>").addClass(SELECT_DECORATOR_SELECT_ALL_LABEL_CLASS).text(this._list.option("selectAllText")).appendTo($selectAll);
+                $("<div>").addClass(SELECT_DECORATOR_SELECT_ALL_LABEL_CLASS).text(this._list.option("selectAllText")).appendTo($selectAll);
                 this._list.itemsContainer().prepend($selectAll);
                 this._updateSelectAllState();
                 this._attachSelectAllHandler()
@@ -10629,7 +10634,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             _toggleScroll: function(pointerPosition) {
                 if (this._scrollHeight <= this._clientHeight)
                     return;
-                var minOffset = this._elementHeight * .7,
+                var minOffset = this._elementHeight * 0.7,
                     topOffset = this._clientHeight - (pointerPosition - this._scrollTop()),
                     topOffsetRatio = topOffset / minOffset,
                     bottomOffset = pointerPosition - this._scrollTop(),
@@ -10751,9 +10756,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
     })(jQuery, DevExpress);
     /*! Module widgets-base, file ui.list.edit.provider.js */
     (function($, DX, undefined) {
-        var ui = DX.ui,
-            events = ui.events,
-            utils = DX.utils;
+        var ui = DX.ui;
         var editOptionsRegistry = [];
         var registerOption = function(enabledFunc, decoratorTypeFunc, decoratorSubTypeFunc) {
                 editOptionsRegistry.push({
@@ -10783,7 +10786,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             return mode
         });
         registerOption(function() {
-            return this.option("selectionMode") != "none" && this.option("showSelectionControls")
+            return this.option("selectionMode") !== "none" && this.option("showSelectionControls")
         }, function() {
             return "selection"
         }, function() {
@@ -10904,8 +10907,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
     })(jQuery, DevExpress);
     /*! Module widgets-base, file ui.tileView.js */
     (function($, DX, undefined) {
-        var ui = DX.ui,
-            utils = DX.utils;
+        var ui = DX.ui;
         var TILEVIEW_CLASS = "dx-tileview",
             TILEVIEW_CONTAINER_CLASS = "dx-tileview-wrapper",
             TILEVIEW_ITEM_CLASS = "dx-tile",
@@ -11270,8 +11272,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
     })(jQuery, DevExpress);
     /*! Module widgets-base, file ui.progressBar.js */
     (function($, DX, undefined) {
-        var ui = DX.ui,
-            fx = DX.fx;
+        var ui = DX.ui;
         var PROGRESSBAR_CLASS = "dx-progressbar",
             PROGRESSBAR_CONTAINER_CLASS = "dx-progressbar-container",
             PROGRESSBAR_RANGE_CONTAINER_CLASS = "dx-progressbar-range-container",
@@ -11316,7 +11317,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this.setAria("role", "progressbar");
                 this._$wrapper.addClass(PROGRESSBAR_WRAPPER_CLASS);
                 this._$bar.addClass(PROGRESSBAR_CONTAINER_CLASS);
-                var $rangeContainer = $("<div>").addClass(PROGRESSBAR_RANGE_CONTAINER_CLASS).appendTo(this._$wrapper).append(this._$bar);
+                $("<div>").addClass(PROGRESSBAR_RANGE_CONTAINER_CLASS).appendTo(this._$wrapper).append(this._$bar);
                 this._$range.addClass(PROGRESSBAR_RANGE_CLASS);
                 this._toggleStatus(this.option("showStatus"))
             },
@@ -11336,7 +11337,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             _toggleStatus: function(value) {
                 var splittedPosition = this.option("statusPosition").split(" ");
                 if (value)
-                    if (splittedPosition[0] == "top" || splittedPosition[0] == "left")
+                    if (splittedPosition[0] === "top" || splittedPosition[0] === "left")
                         this._$status.prependTo(this._$wrapper);
                     else
                         this._$status.appendTo(this._$wrapper);
@@ -11373,7 +11374,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 }
                 if (this._$segmentContainer)
                     this._toggleIndeterminateState(false);
-                if (val == max)
+                if (val === max)
                     this._completeAction();
                 this.callBase();
                 this._setStatus()
@@ -11419,8 +11420,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
     (function($, DX, undefined) {
         var ui = DX.ui,
             events = ui.events,
-            fx = DX.fx,
-            utils = DX.utils,
             translator = DX.translator,
             transionEndEventName = DX.support.transitionEndEventName;
         var SLIDER_CLASS = "dx-slider",
@@ -11432,7 +11431,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             SLIDER_RANGE_VISIBLE_CLASS = "dx-slider-range-visible",
             SLIDER_LABEL_CLASS = "dx-slider-label",
             SLIDER_LABEL_POSITION_CLASS_PREFIX = "dx-slider-label-position-",
-            SLIDER_TOOLTIP_CLASS = "dx-slider-tooltip",
             SLIDER_TOOLTIP_POSITION_CLASS_PREFIX = "dx-slider-tooltip-position-";
         var dxSliderHandle = ui.Widget.inherit({
                 _setDefaultOptions: function() {
@@ -11455,8 +11453,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     this._renderTooltip();
                     this.setAria({
                         role: "slider",
-                        valuenow: this.option("value"),
-                        label: this.option("value")
+                        valuenow: this.option("value")
                     })
                 },
                 _renderTooltip: function() {
@@ -11767,9 +11764,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     };
                 return format
             },
-            _updateHandleAriaLabel: function() {
-                this.setAria("label", this.option("value"), this._$handle)
-            },
             _renderDimensions: function() {
                 this.callBase();
                 if (this._$bar) {
@@ -11784,9 +11778,11 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this.element().off(pointerDownEventName).on(pointerDownEventName, function(e) {
                     if (events.isMouseEvent(e))
                         startAction({jQueryEvent: e})
-                }).off(clickEventName).on(clickEventName, function(e) {
+                }).off(clickEventName).on(clickEventName, $.proxy(function(e) {
+                    var handle = this._activeHandle();
+                    handle && handle.focusin() && handle.focus();
                     startAction({jQueryEvent: e})
-                })
+                }, this))
             },
             _itemWidthFunc: function() {
                 return this.element().width() / this._swipePixelRatio()
@@ -11797,6 +11793,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     endOffset;
                 if (events.isTouchEvent(e.jQueryEvent))
                     this._createAction($.proxy(this._startHandler, this))({jQueryEvent: e.jQueryEvent});
+                this._feedbackDeferred = $.Deferred();
+                ui.events.lockFeedback(this._feedbackDeferred);
                 this._toggleActiveState(this._activeHandle(), true);
                 this._startOffset = this._currentRatio;
                 startOffset = this._startOffset * this._swipePixelRatio();
@@ -11806,12 +11804,13 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this._needPreventAnimation = true
             },
             _swipeEndHandler: function(e) {
+                this._feedbackDeferred.resolve();
+                this._toggleActiveState(this._activeHandle(), false);
                 var offsetDirection = this.option("rtlEnabled") ? -1 : 1;
                 delete this._needPreventAnimation;
                 this._changeValueOnSwipe(this._startOffset + offsetDirection * e.jQueryEvent.targetOffset / this._swipePixelRatio());
                 delete this._startOffset;
-                this._renderValue();
-                this._toggleActiveState(this._activeHandle(), false)
+                this._renderValue()
             },
             _activeHandle: function() {
                 return this._$handle
@@ -11851,9 +11850,11 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 if (newValue === max || newValue === min)
                     this.option("value", newValue);
                 else {
-                    var stepChunks = (step + "").split('.'),
-                        exponent = stepChunks.length > 1 ? stepChunks[1].length : exponent;
-                    newValue = Number((Math.round(newChange / step) * step + min).toFixed(exponent));
+                    var stepExponent = (step + "").split(".")[1];
+                    var minExponent = (min + "").split(".")[1];
+                    var exponentLength = Math.max(stepExponent && stepExponent.length || 0, minExponent && minExponent.length || 0);
+                    var stepCount = Math.round((newValue - min) / step);
+                    newValue = Number((stepCount * step + min).toFixed(exponentLength));
                     this.option("value", Math.max(Math.min(newValue, max), min))
                 }
             },
@@ -11898,10 +11899,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                         break;
                     case"keyStep":
                         break;
-                    case"value":
-                        this._updateHandleAriaLabel();
-                        this.callBase(args);
-                        break;
                     case"showRange":
                         this._renderRangeVisibility();
                         break;
@@ -11933,8 +11930,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
         var ui = DX.ui,
             utils = DX.utils,
             events = ui.events;
-        var SLIDER_HANDLE_CLASS = "dx-slider-handle",
-            RANGE_SLIDER_CLASS = "dx-rangeslider",
+        var RANGE_SLIDER_CLASS = "dx-rangeslider",
             RANGE_SLIDER_START_HANDLE_CLASS = RANGE_SLIDER_CLASS + "-start-handle",
             RANGE_SLIDER_END_HANDLE_CLASS = RANGE_SLIDER_CLASS + "-end-handle";
         DX.registerComponent("dxRangeSlider", ui, ui.dxSlider.inherit({
@@ -11942,7 +11938,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 var isRTL = this.option("rtlEnabled");
                 var that = this,
                     _changeHandle = function(e, capturedHandle) {
-                        if (that.option("start") == that.option("end")) {
+                        if (that.option("start") === that.option("end")) {
                             that._capturedHandle = capturedHandle;
                             e.target = that._capturedHandle;
                             that._capturedHandle.focus()
@@ -11951,8 +11947,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     _setHandleValue = function(e, step, sign) {
                         var isStart = $(e.target).hasClass(RANGE_SLIDER_START_HANDLE_CLASS),
                             valueOption = isStart ? "start" : "end",
-                            val = that.option(valueOption),
-                            step = that._valueStep(step);
+                            val = that.option(valueOption);
+                        step = that._valueStep(step);
                         val += sign * (isRTL ? -step : step);
                         that.option(valueOption, val)
                     },
@@ -12045,9 +12041,9 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     offsetDirection = rtlEnabled ? -1 : 1,
                     max = this.option("max"),
                     min = this.option("min");
-                var newRatio = this._startOffset + offsetDirection * e.jQueryEvent.offset / this._swipePixelRatio(),
-                    newRatio = newRatio.toPrecision(12),
-                    newValue = newRatio * (max - min) + min;
+                var newRatio = this._startOffset + offsetDirection * e.jQueryEvent.offset / this._swipePixelRatio();
+                newRatio = newRatio.toPrecision(12);
+                var newValue = newRatio * (max - min) + min;
                 this._updateSelectedRangePosition(newRatio, newRatio);
                 this._changeValueOnSwipe(newRatio);
                 var startValue = this.option("start"),
@@ -12151,7 +12147,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
     /*! Module widgets-base, file ui.gallery.js */
     (function($, DX, undefined) {
         var ui = DX.ui,
-            utils = DX.utils,
             events = ui.events,
             fx = DX.fx,
             translator = DX.translator,
@@ -12223,6 +12218,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     wrapAround: false,
                     initialItemWidth: undefined,
                     stretchImages: false,
+                    _itemAttributes: {role: "option"},
                     loopItemFocus: false,
                     selectOnFocus: true,
                     selectionMode: "single",
@@ -12304,9 +12300,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     label: "gallery"
                 })
             },
-            itemAttributes: function() {
-                return {role: "option"}
-            },
             _dimensionChanged: function() {
                 var selectedIndex = this.option("selectedIndex") || 0;
                 this._clearItemWidthCache();
@@ -12341,14 +12334,15 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     return;
                 var items = this.option("items") || [],
                     itemsCount = items.length,
-                    lastItemIndex = itemsCount - 1;
+                    lastItemIndex = itemsCount - 1,
+                    i;
                 if (!itemsCount)
                     return;
                 this.element().find("." + GALLERY_LOOP_ITEM_CLASS).remove();
                 var duplicateCount = Math.min(this._itemsPerPage(), itemsCount);
-                for (var i = 0; i < duplicateCount; i++)
+                for (i = 0; i < duplicateCount; i++)
                     this._renderItem(0, items[i]).addClass(GALLERY_LOOP_ITEM_CLASS);
-                for (var i = 0; i < duplicateCount; i++)
+                for (i = 0; i < duplicateCount; i++)
                     this._renderItem(0, items[lastItemIndex - i]).addClass(GALLERY_LOOP_ITEM_CLASS)
             },
             _renderItemSizes: function(startIndex) {
@@ -12433,13 +12427,16 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 return animationComplete
             },
             _needMoveContainerForward: function() {
-                return this._$container.position().left * this._offsetDirection() <= -this._actualItemWidth() * this._itemsCount()
+                return this._$container.position().left * this._offsetDirection() <= -this._maxItemWidth() * this._itemsCount()
             },
             _needMoveContainerBack: function() {
                 return this._$container.position().left * this._offsetDirection() >= this._actualItemWidth()
             },
             _maxContainerOffset: function() {
-                return -(this._actualItemWidth() + this._itemFreeSpace()) * (this._itemsCount() - this._itemsPerPage()) * this._offsetDirection()
+                return -this._maxItemWidth() * (this._itemsCount() - this._itemsPerPage()) * this._offsetDirection()
+            },
+            _maxItemWidth: function() {
+                return this._actualItemWidth() + this._itemFreeSpace()
             },
             _reviseDimensions: function() {
                 var that = this,
@@ -12481,8 +12478,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             _renderUserInteraction: function() {
                 var that = this,
                     rootElement = that.element(),
-                    swipeEnabled = that.option("swipeEnabled") && this._itemsCount() > 1,
-                    cursor = swipeEnabled ? "pointer" : "default";
+                    swipeEnabled = that.option("swipeEnabled") && this._itemsCount() > 1;
                 this._createComponent(rootElement, "dxSwipeable", {
                     disabled: this.option("disabled") || !swipeEnabled,
                     onStart: $.proxy(that._swipeStartHandler, that),
@@ -12507,8 +12503,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 instance._loadNextPageIfNeeded(itemIndex)
             },
             _renderNavButtons: function() {
-                var that = this,
-                    selectedIndex;
+                var that = this;
                 if (!that.option("showNavButtons")) {
                     that._cleanNavButtons();
                     return
@@ -12546,7 +12541,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     return this.goToItem(this._fitPaginatedIndex(newSelectedIndex)).done(this._loadNextPageIfNeeded)
             },
             _loadNextPageIfNeeded: function(selectedIndex) {
-                var selectedIndex = selectedIndex === undefined ? this.option("selectedIndex") : selectedIndex;
+                selectedIndex = selectedIndex === undefined ? this.option("selectedIndex") : selectedIndex;
                 if (this._dataSource && this._dataSource.paginate() && this._shouldLoadNextPage(selectedIndex) && !this._isDataSourceLoading() && !this._isLastPage())
                     this._loadNextPage().done($.proxy(function() {
                         this._renderIndicator();
@@ -12643,7 +12638,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 fx.stop(this._$container, true)
             },
             _swipeUpdateHandler: function(e) {
-                var offset = this._offsetDirection() * e.jQueryEvent.offset * this._itemsPerPage() - this.option("selectedIndex");
+                var wrapAroundRatio = this.option("wrapAround") ? 1 : 0;
+                var offset = this._offsetDirection() * e.jQueryEvent.offset * (this._itemsPerPage() + wrapAroundRatio) - this.option("selectedIndex");
                 if (offset < 0)
                     this._loadNextPageIfNeeded(Math.ceil(Math.abs(offset)));
                 this._renderContainerPosition(offset)
@@ -12657,7 +12653,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     this._relocateItems(selectedIndex);
                     return
                 }
-                if (this._itemsPerPage() == this._itemsCount()) {
+                if (this._itemsPerPage() === this._itemsCount()) {
                     if (targetOffset > 0)
                         this._relocateItems(-targetOffset);
                     else
@@ -12744,7 +12740,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             _calculateIndexOffset: function(newIndex, lastIndex) {
                 if (lastIndex === undefined)
                     lastIndex = newIndex;
-                var maxIndex = this._itemsCount() - 1;
                 var indexOffset = lastIndex - newIndex;
                 if (this.option("loop") && !this._needLongMove && this._goToGhostItem) {
                     if (this._isItemOnFirstPage(newIndex) && this._isItemOnLastPage(lastIndex))
@@ -12847,8 +12842,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             TAB_KEY = 9;
         var realDevice = DX.devices.real(),
             realVersion = realDevice.version,
-            iOS7_0andBelow = realDevice.platform === "ios" && (realVersion[0] < 7 || realVersion[0] == 7 && realVersion[1] == 0),
-            android4_0nativeBrowser = realDevice.platform === "android" && realVersion[0] == 4 && realVersion[1] == 0 && navigator.userAgent.indexOf("Chrome") === -1;
+            iOS7_0andBelow = realDevice.platform === "ios" && DX.compareVersions(realVersion, [7, 1]) < 0,
+            android4_0nativeBrowser = realDevice.platform === "android" && DX.compareVersions(realVersion, [4, 0], 2) === 0 && navigator.userAgent.indexOf("Chrome") === -1;
         var forceRepaint = function($element) {
                 if (iOS7_0andBelow)
                     $element.width();
@@ -12868,7 +12863,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
         DX.registerComponent("dxOverlay", ui, ui.Widget.inherit({
             _supportedKeys: function() {
                 var offsetSize = 5,
-                    parent = this.callBase(),
                     move = function(top, left, e) {
                         if (!this.option("dragEnabled"))
                             return;
@@ -12974,7 +12968,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                                 var realDevice = DX.devices.real(),
                                     realPlatform = realDevice.platform,
                                     realVersion = realDevice.version;
-                                return realPlatform === "android" && (realVersion[0] < 4 || realVersion[0] == 4 && realVersion[1] <= 1)
+                                return realPlatform === "android" && DX.compareVersions(realVersion, [4, 2]) < 0
                             },
                             options: {animation: {
                                     show: {
@@ -13030,7 +13024,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     var pathParts = path.split(".");
                     var option = options;
                     while (option)
-                        if (pathParts.length == 1) {
+                        if (pathParts.length === 1) {
                             if ($.isPlainObject(option))
                                 option[pathParts.shift()] = target;
                             break
@@ -13282,7 +13276,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     target = that._position.of || $(),
                     closeOnScroll = this.option("closeOnTargetScroll"),
                     $parents = getElement(target).parents();
-                if (DX.devices.real().platform == "generic")
+                if (DX.devices.real().platform === "generic")
                     $parents = $parents.add(window);
                 $().add(this._$prevTargetParents).off(events.addNamespace("scroll dxscroll", that.NAME));
                 if (subscribe && closeOnScroll) {
@@ -13447,7 +13441,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             },
             _attachWrapperToContainer: function() {
                 var $element = this.element();
-                if (this._$container && !(this._$container[0] === $element.parent()[0]))
+                if (this._$container && this._$container[0] !== $element.parent()[0])
                     this._$wrapper.appendTo(this._$container);
                 else
                     this._$wrapper.appendTo($element)
@@ -13512,10 +13506,14 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     this._$content.outerWidth(this.option("width")).outerHeight(this.option("height"))
             },
             _renderPosition: function() {
+                var position,
+                    containerPosition,
+                    allowedOffsets,
+                    $content;
                 if (this._geometryChangeHandled) {
-                    var $content = this._$content,
-                        position = translator.locate($content),
-                        allowedOffsets = this._allowedOffsets();
+                    $content = this._$content;
+                    position = translator.locate($content);
+                    allowedOffsets = this._allowedOffsets();
                     translator.move($content, {
                         top: utils.fitIntoRange(position.top, -allowedOffsets.top, allowedOffsets.bottom),
                         left: utils.fitIntoRange(position.left, -allowedOffsets.left, allowedOffsets.right)
@@ -13524,8 +13522,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 else {
                     translator.resetPosition(this._$content);
                     this._renderOverlayBoundaryOffset();
-                    var position = this._position,
-                        containerPosition = DX.calculatePosition(this._$content, position);
+                    position = this._position;
+                    containerPosition = DX.calculatePosition(this._$content, position);
                     this._actions.onPositioning({position: containerPosition});
                     var resultPosition = DX.position(this._$content, containerPosition);
                     this._actions.onPositioned({position: resultPosition});
@@ -13764,7 +13762,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                             }
                         }, {
                             device: function(device) {
-                                return device.platform == "android"
+                                return device.platform === "android"
                             },
                             options: {
                                 closeOnOutsideClick: true,
@@ -13777,7 +13775,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                             }
                         }, {
                             device: function(device) {
-                                return device.deviceType == "phone" && device.platform == "android"
+                                return device.deviceType === "phone" && device.platform === "android"
                             },
                             options: {
                                 width: function() {
@@ -13887,11 +13885,12 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             POPUP_CLASS = "dx-popup",
             POPUP_WRAPPER_CLASS = "dx-popup-wrapper",
             POPUP_FULL_SCREEN_CLASS = "dx-popup-fullscreen",
+            POPUP_FULL_SCREEN_WIDTH_CLASS = "dx-popup-fullscreen-width",
+            POPUP_NORMAL_CLASS = "dx-popup-normal",
             POPUP_CONTENT_CLASS = "dx-popup-content",
             POPUP_DRAGGABLE_CLASS = "dx-popup-draggable",
             POPUP_TITLE_CLASS = "dx-popup-title",
             POPUP_TITLE_CLOSEBUTTON_CLASS = "dx-closebutton",
-            POPUP_TITLE_HAS_BUTTON_CLASS = "dx-popup-title-has-button",
             POPUP_BOTTOM_CLASS = "dx-popup-bottom",
             TEMPLATE_WRAPPER_CLASS = "dx-template-wrapper",
             ALLOWED_BUTTON_ALIASES = ["cancel", "clear", "done"];
@@ -14019,7 +14018,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this._$popupContent = this._$content.wrapInner($("<div>").addClass(POPUP_CONTENT_CLASS)).children().eq(0)
             },
             _render: function() {
-                this._$content.toggleClass(POPUP_DRAGGABLE_CLASS, this.option("dragEnabled")).toggleClass(POPUP_FULL_SCREEN_CLASS, this.option("fullScreen"));
+                var isFullscreen = this.option("fullScreen");
+                this._$content.toggleClass(POPUP_DRAGGABLE_CLASS, this.option("dragEnabled")).toggleClass(POPUP_FULL_SCREEN_CLASS, isFullscreen).toggleClass(POPUP_NORMAL_CLASS, !isFullscreen);
                 this.callBase()
             },
             _renderContentImpl: function() {
@@ -14048,14 +14048,15 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             },
             _renderTemplateByType: function(optionName, data, $container) {
                 var template = this._getTemplateByOption(optionName),
-                    toolbarTemplate = template.owner() === this.option("templateProvider");
+                    toolbarTemplate = template.owner() === this.option("templateProvider"),
+                    $result;
                 if (toolbarTemplate) {
-                    var $result = template.render(data, $container);
+                    $result = template.render(data, $container);
                     $container.replaceWith($result);
                     return $result
                 }
                 else {
-                    var $result = template.render($container);
+                    $result = template.render($container);
                     if ($result.hasClass(TEMPLATE_WRAPPER_CLASS)) {
                         $container.replaceWith($result);
                         $container = $result
@@ -14087,7 +14088,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                         var $button = $("<div>").addClass(POPUP_TITLE_CLOSEBUTTON_CLASS);
                         this._createComponent($button, "dxButton", {
                             icon: 'close',
-                            onClick: this._createButtonAction(undefined)
+                            onClick: this._createButtonAction(undefined),
+                            _templates: {}
                         });
                         $container.append($button)
                     }, this)
@@ -14126,7 +14128,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     return false;
                 var buttonConfig = $.extend({
                         text: Globalize.localize(DX.inflector.camelize(buttonType, true)),
-                        onClick: this._createButtonAction(data.onClick)
+                        onClick: this._createButtonAction(data.onClick),
+                        _templates: {}
                     }, data.options || {});
                 var buttonClass = POPUP_CLASS + "-" + buttonType;
                 this._buttonsClasses.push(buttonClass);
@@ -14185,7 +14188,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this._$content.dxResizable("option", "onResize", $.proxy(this._setContentHeight, this))
             },
             _setContentHeight: function() {
-                if (!this._$popupContent)
+                if (this.option("height") === "auto")
                     return;
                 var contentHeight = this._$content.height();
                 if (this._$title)
@@ -14204,7 +14207,11 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                         height: "100%"
                     });
                 else
-                    this.callBase.apply(this, arguments)
+                    this.callBase.apply(this, arguments);
+                this._renderFullscreenWidthClass()
+            },
+            _renderFullscreenWidthClass: function() {
+                this.overlayContent().toggleClass(POPUP_FULL_SCREEN_WIDTH_CLASS, this.overlayContent().outerWidth() === $(window).width())
             },
             _renderShadingDimensions: function() {
                 if (this.option("fullScreen"))
@@ -14230,11 +14237,11 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     case"title":
                     case"titleTemplate":
                         this._renderTitle();
-                        this._setContentHeight();
+                        this._renderGeometry();
                         break;
                     case"bottomTemplate":
                         this._renderBottom();
-                        this._setContentHeight();
+                        this._renderGeometry();
                         break;
                     case"onTitleRendered":
                         this._createTitleRenderAction(args.value);
@@ -14242,14 +14249,10 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     case"buttons":
                         this._renderTitle();
                         this._renderBottom();
-                        this._setContentHeight();
+                        this._renderGeometry();
                         break;
                     case"dragEnabled":
                         this._renderDrag();
-                        break;
-                    case"height":
-                        this.callBase(args);
-                        this._setContentHeight();
                         break;
                     case"fullScreen":
                         this._$content.toggleClass(POPUP_FULL_SCREEN_CLASS, args.value);
@@ -14271,17 +14274,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             overlayContent: function() {
                 return this._$content
             }
-        }));
-        ui.dxPopup.__internals = {
-            POPUP_CLASS: POPUP_CLASS,
-            POPUP_WRAPPER_CLASS: POPUP_WRAPPER_CLASS,
-            POPUP_CONTENT_CLASS: POPUP_CONTENT_CLASS,
-            POPUP_FULL_SCREEN_CLASS: POPUP_FULL_SCREEN_CLASS,
-            POPUP_TITLE_CLASS: POPUP_TITLE_CLASS,
-            POPUP_BOTTOM_CLASS: POPUP_BOTTOM_CLASS,
-            POPUP_TITLE_CLOSEBUTTON_CLASS: POPUP_TITLE_CLOSEBUTTON_CLASS,
-            POPUP_TITLE_HAS_BUTTON_CLASS: POPUP_TITLE_HAS_BUTTON_CLASS
-        }
+        }))
     })(jQuery, DevExpress);
     /*! Module widgets-base, file ui.popover.js */
     (function($, DX, undefined) {
@@ -14295,7 +14288,15 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 left: "right",
                 top: "bottom",
                 right: "left",
-                bottom: "top"
+                bottom: "top",
+                center: "center"
+            },
+            WEIGHT_OF_SIDES = {
+                left: -1,
+                top: -1,
+                center: 0,
+                right: 1,
+                bottom: 1
             },
             POSITION_ALIASES = {
                 top: {
@@ -14442,13 +14443,25 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this._updateContentSize(containerLocation);
                 if (this._position.collision === "flip")
                     contentPosition.collision = "fit";
-                var positionClass = "dx-position-" + (isFlippedByVertical || isFlippedByHorizontal ? POSITION_FLIP_MAP[this._positionSide] : this._positionSide);
+                var positionClass = "dx-position-" + (isFlippedByVertical || isFlippedByHorizontal || this._isPopoverInside() ? POSITION_FLIP_MAP[this._positionSide] : this._positionSide);
                 this._togglePositionClass(positionClass);
                 this._toggleFlippedClass(isFlippedByVertical, isFlippedByHorizontal);
                 $.extend(contentPosition, this._applyFlip(contentPosition, isFlippedByVertical, isFlippedByHorizontal));
                 contentPosition.offset = this._updateContentOffset(isFlippedByVertical, isFlippedByHorizontal, contentPosition.offset);
                 DX.position(this._$content, contentPosition);
                 this._contentPosition = contentPosition
+            },
+            _isPopoverInside: function() {
+                var position = this._getPosition();
+                var my = DX.position.normalizeAlign(position.my);
+                var at = DX.position.normalizeAlign(position.at);
+                return my.h === at.h && my.v === at.v
+            },
+            _getPosition: function() {
+                var position = this.option("position");
+                if (DX.utils.isString(position))
+                    position = $.extend({}, POSITION_ALIASES[position]);
+                return position
             },
             _setContentHeight: function(fullUpdate) {
                 if (fullUpdate)
@@ -14474,18 +14487,19 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     offset = this._getOffsetObject(offsetString),
                     signCorrectionH = isFlippedByHorizontal ? -1 : 1,
                     signCorrectionV = isFlippedByVertical ? -1 : 1;
+                var offsetSignCorrection = this._isPopoverInside() ? -1 : 1;
                 var isTopPosition = position === "top" && !isFlippedByVertical || position === "bottom" && isFlippedByVertical,
                     isBottomPosition = position === "bottom" && !isFlippedByVertical || position === "top" && isFlippedByVertical,
                     isLeftPosition = position === "left" && !isFlippedByHorizontal || position === "right" && isFlippedByHorizontal,
                     isRightPosition = position === "right" && !isFlippedByHorizontal || position === "left" && isFlippedByHorizontal;
                 if (isTopPosition)
-                    return offset.h + " " + (offset.v * signCorrectionV - (this._$arrow.height() - 1));
+                    return offset.h + " " + (offset.v * signCorrectionV - offsetSignCorrection * (this._$arrow.height() - 1));
                 if (isBottomPosition)
-                    return offset.h + " " + (offset.v * signCorrectionV + (this._$arrow.height() - 1));
+                    return offset.h + " " + (offset.v * signCorrectionV + offsetSignCorrection * (this._$arrow.height() - 1));
                 if (isLeftPosition)
-                    return offset.h * signCorrectionH - (this._$arrow.width() - 1) + " " + offset.v;
+                    return offset.h * signCorrectionH - offsetSignCorrection * (this._$arrow.width() - 1) + " " + offset.v;
                 if (isRightPosition)
-                    return offset.h * signCorrectionH + (this._$arrow.width() - 1) + " " + offset.v
+                    return offset.h * signCorrectionH + offsetSignCorrection * (this._$arrow.width() - 1) + " " + offset.v
             },
             _getContainerPosition: function() {
                 var offset = this._getOffsetObject(this._position.offset || "");
@@ -14540,31 +14554,22 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     }
             },
             _getDefaultArrowPosition: function() {
-                var popoverSide = this._getDisplaySide(this._contentPosition);
+                var popoverSide = this._getDisplaySide(this._contentPosition),
+                    flippedSide = POSITION_FLIP_MAP[popoverSide],
+                    that = this;
+                var flipIfInside = function(side) {
+                        return that._isPopoverInside() ? POSITION_FLIP_MAP[side] : side
+                    };
                 return this._isPopoverLargerThanTarget() ? {
-                        my: this._opositeSide(popoverSide),
+                        my: flipIfInside(flippedSide),
                         at: popoverSide,
                         of: $(this.option("target"))
                     } : {
-                        my: popoverSide,
-                        at: this._opositeSide(popoverSide),
+                        my: flipIfInside(popoverSide),
+                        at: flipIfInside(flippedSide),
                         of: this._$content,
-                        offset: ARROW_OFFSET_CORRECTION[popoverSide]
+                        offset: ARROW_OFFSET_CORRECTION[flipIfInside(popoverSide)]
                     }
-            },
-            _opositeSide: function(side) {
-                switch (side) {
-                    case"left":
-                        return "right";
-                    case"right":
-                        return "left";
-                    case"top":
-                        return "bottom";
-                    case"bottom":
-                        return "top";
-                    default:
-                        return "center"
-                }
             },
             _isPopoverLargerThanTarget: function() {
                 if (this._$content.is(':hidden'))
@@ -14617,9 +14622,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this._$wrapper.toggleClass("dx-popover-flipped-vertical", isFlippedVertical).toggleClass("dx-popover-flipped-horizontal", isFlippedHorizontal)
             },
             _normalizePosition: function() {
-                var position = this.option("position");
-                if (DX.utils.isString(position))
-                    position = $.extend({}, POSITION_ALIASES[position]);
+                var position = this._getPosition();
                 if (!position.of)
                     position.of = this.option("target");
                 if (!position.collision)
@@ -14630,21 +14633,12 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this._position = position
             },
             _getDisplaySide: function(position) {
-                var my = DX.position.normalizeAlign(position.my);
-                var at = DX.position.normalizeAlign(position.at);
-                var myHorizontalWeight = this._weightOfSide(my.h);
-                var myVerticalWeight = this._weightOfSide(my.v);
-                var atHorizontalWeight = this._weightOfSide(at.h);
-                var atVerticalWeight = this._weightOfSide(at.v);
-                return Math.abs(myHorizontalWeight - atHorizontalWeight) > Math.abs(myVerticalWeight - atVerticalWeight) ? at.h : at.v
-            },
-            _weightOfSide: function(side) {
-                if (side === "left" || side === "top")
-                    return -1;
-                if (side === "center" || side === "center")
-                    return 0;
-                if (side === "right" || side === "bottom")
-                    return 1
+                var my = DX.position.normalizeAlign(position.my),
+                    at = DX.position.normalizeAlign(position.at);
+                var weightSign = WEIGHT_OF_SIDES[my.h] === WEIGHT_OF_SIDES[at.h] && WEIGHT_OF_SIDES[my.v] === WEIGHT_OF_SIDES[at.v] ? -1 : 1,
+                    horizontalWeight = Math.abs(WEIGHT_OF_SIDES[my.h] - weightSign * WEIGHT_OF_SIDES[at.h]),
+                    verticalWeight = Math.abs(WEIGHT_OF_SIDES[my.v] - weightSign * WEIGHT_OF_SIDES[at.v]);
+                return horizontalWeight > verticalWeight ? at.h : at.v
             },
             _getOffsetObject: function(offset) {
                 return DX.utils.stringPairToObject(offset)
@@ -14733,8 +14727,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
     })(jQuery, DevExpress);
     /*! Module widgets-base, file ui.dropDownMenu.js */
     (function($, DX, undefined) {
-        var ui = DX.ui,
-            events = ui.events;
+        var ui = DX.ui;
         var DROP_DOWN_MENU_CLASS = "dx-dropdownmenu",
             DROP_DOWN_MENU_POPUP_CLASS = "dx-dropdownmenu-popup",
             DROP_DOWN_MENU_POPUP_WRAPPER_CLASS = DROP_DOWN_MENU_POPUP_CLASS + "-wrapper",
@@ -14871,7 +14864,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     onClick: function(e) {
                         that.option("opened", !that.option("opened"));
                         that._buttonClickAction(e)
-                    }
+                    },
+                    _templates: {}
                 });
                 var keys = this._supportedKeys(),
                     buttonKeys = this._button._supportedKeys();
@@ -14892,7 +14886,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                         position: this.option("popupPosition"),
                         animation: this.option("popupAnimation"),
                         onOptionChanged: $.proxy(function(args) {
-                            if (args.name == "visible")
+                            if (args.name === "visible")
                                 this.option("opened", args.value)
                         }, this)
                     };
@@ -14926,13 +14920,11 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                         that._itemClickAction(e)
                     },
                     tabIndex: -1,
-                    focusStateEnabled: this.option("focusStateEnabled")
+                    focusStateEnabled: this.option("focusStateEnabled"),
+                    _itemAttributes: {role: "menuitem"}
                 });
                 that._list._getAriaTarget = function() {
                     return that.element()
-                };
-                that._list.itemAttributes = function() {
-                    return {role: "menuitem"}
                 };
                 that._setListDataSource();
                 var listMaxHeight = $(window).height() * 0.5;
@@ -15206,7 +15198,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
     (function($, DX, undefined) {
         var ui = DX.ui,
             fx = DX.fx,
-            events = ui.events,
             utils = DX.utils,
             CALENDAR_CLASS = "dx-calendar",
             CALENDAR_BODY_CLASS = "dx-calendar-body",
@@ -15239,33 +15230,45 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     offset = utils.getDifferenceInMonth(this.option("zoomLevel"));
                 return $.extend(this.callBase(), {
                         rightArrow: function(e) {
-                            if (e.ctrlKey)
-                                this._waitRenderView(offset, isRTL ? -1 : 1);
+                            if (e.ctrlKey) {
+                                e.preventDefault();
+                                this._waitRenderView(offset, isRTL ? -1 : 1)
+                            }
                             else {
                                 this._change = "key";
                                 return true
                             }
                         },
                         leftArrow: function(e) {
-                            if (e.ctrlKey)
-                                this._waitRenderView(offset, isRTL ? 1 : -1);
+                            if (e.ctrlKey) {
+                                e.preventDefault();
+                                this._waitRenderView(offset, isRTL ? 1 : -1)
+                            }
                             else {
                                 this._change = "key";
                                 return true
                             }
                         },
                         upArrow: function(e) {
-                            if (e.ctrlKey)
-                                this._navigateUp();
+                            if (e.ctrlKey) {
+                                e.preventDefault();
+                                this._navigateUp()
+                            }
                             else {
+                                if (fx.isAnimating(this._view.element()))
+                                    return;
                                 this._change = "upDownArrow";
                                 return true
                             }
                         },
                         downArrow: function(e) {
-                            if (e.ctrlKey)
-                                this._navigateDown();
+                            if (e.ctrlKey) {
+                                e.preventDefault();
+                                this._navigateDown()
+                            }
                             else {
+                                if (fx.isAnimating(this._view.element()))
+                                    return;
                                 this._change = "upDownArrow";
                                 return true
                             }
@@ -15291,8 +15294,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this.callBase();
                 this.option({
                     currentDate: new Date,
-                    min: undefined,
-                    max: undefined,
+                    min: new Date(1000, 0),
+                    max: new Date(3000, 0),
                     firstDayOfWeek: undefined,
                     zoomLevel: "month",
                     maxZoomLevel: "month",
@@ -15321,10 +15324,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this._initActions()
             },
             _initActions: function() {
-                this._cellClickOptionAction = this._createActionByOption("onCellClick");
-                var cellClickAction = this._createAction($.proxy(function(e) {
-                        this._cellClickHandler(e.jQueryEvent)
-                    }, this))
+                this._cellClickOptionAction = this._createActionByOption("onCellClick")
             },
             _correctZoomLevel: function() {
                 var maxZoomLevel = this.option("maxZoomLevel"),
@@ -15446,8 +15446,9 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     this._renderViews(this._viewsOnRight, SWIPE_POSITION.left)
             },
             _setOffset: function(offset) {
-                var swipeDirection = offset > 0 ? SWIPE_POSITION.right : SWIPE_POSITION.left;
-                if (!(swipeDirection * (offset - this._swipeOffset) > 1))
+                var swipeDirection = offset > 0 ? SWIPE_POSITION.right : SWIPE_POSITION.left,
+                    prevOffset = this._swipeOffset || 0;
+                if (swipeDirection * (offset - prevOffset) <= 1)
                     this._swipeOffset = offset
             },
             _renderViews: function(viewsArray, swipePosition) {
@@ -15478,9 +15479,10 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this._renderNavigator()
             },
             _normalizeViewsPosition: function() {
-                for (var i = 0; i < this._viewsOnLeft.length; i++)
+                var i;
+                for (i = 0; i < this._viewsOnLeft.length; i++)
                     DX.translator.move(this._viewsOnLeft[i].element(), {left: -this._correctionMovement * this._viewWidth});
-                for (var i = 0; i < this._viewsOnRight.length; i++)
+                for (i = 0; i < this._viewsOnRight.length; i++)
                     DX.translator.move(this._viewsOnRight[i].element(), {left: this._correctionMovement * this._viewWidth})
             },
             _isDateInInvalidRange: function() {
@@ -15627,11 +15629,11 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 return point > left && point <= left + $element.width()
             },
             _disposeViews: function() {
-                var that = this;
-                for (var i = 0; i < this._viewsOnLeft.length; i++)
+                var i;
+                for (i = 0; i < this._viewsOnLeft.length; i++)
                     if (this._viewsOnLeft[i] !== this._view)
                         this._viewsOnLeft[i].element().remove();
-                for (var i = 0; i < this._viewsOnRight.length; i++)
+                for (i = 0; i < this._viewsOnRight.length; i++)
                     if (this._viewsOnRight[i] !== this._view)
                         this._viewsOnRight[i].element().remove();
                 this._viewsOnLeft = [];
@@ -15646,7 +15648,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                             text: Globalize.localize("dxCalendar-todayButtonText"),
                             onClick: function() {
                                 that._toTodayView()
-                            }
+                            },
+                            _templates: {}
                         }).element().addClass(CALENDAR_TODAY_BUTTON_CLASS);
                     this._$footer = $("<div>").addClass(CALENDAR_FOOTER_CLASS).append($todayButton);
                     this.element().append(this._$footer)
@@ -15833,12 +15836,12 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 }
             },
             _normalizedCircledDate: function(date) {
+                var $cell;
                 if (this._view.isBoundary(date)) {
                     var zoomLevel = this.option("zoomLevel"),
                         $cells = this._view.$body.find("." + CALENDAR_CELL_CLASS).not("." + CALENDAR_EMPTY_CELL_CLASS);
                     var min = this.option("min"),
-                        max = this.option("max"),
-                        $cell;
+                        max = this.option("max");
                     if (utils.sameView(zoomLevel, min, max))
                         $cell = Math.abs(min - date) > Math.abs(max - date) ? $cells.last() : $cells.first();
                     else if (utils.sameView(zoomLevel, date, min))
@@ -15849,8 +15852,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     this._view.option("contouredDate", date);
                     return
                 }
-                var currentDate = this.option("currentDate"),
-                    $cell = this._view._getCellByDate(utils.getShortDate(date));
+                var currentDate = this.option("currentDate");
+                $cell = this._view._getCellByDate(utils.getShortDate(date));
                 if (!$cell.length && !utils.dateInRange(date, this.option("min"), this.option("max"))) {
                     this._view.option("contouredDate", currentDate);
                     return
@@ -15984,10 +15987,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
     /*! Module widgets-base, file ui.calendar.views.js */
     (function($, DX, undefined) {
         var ui = DX.ui,
-            fx = DX.fx,
             events = ui.events,
             utils = DX.utils,
-            CALENDAR_CLASS = "dx-calendar",
             CALENDAR_OTHER_MONTH_CLASS = "dx-calendar-other-month",
             CALENDAR_OTHER_VIEW_CLASS = "dx-calendar-other-view",
             CALENDAR_CELL_CLASS = "dx-calendar-cell",
@@ -16055,20 +16056,21 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this.$body = $("<tbody>").appendTo(this._$table);
                 var that = this,
                     cellTemplate = this.option("cellTemplate");
+                function renderCell(cellIndex) {
+                    var cellDate = that._getCellData(indexRow, cellIndex);
+                    var $cell = $("<td>").appendTo($row).addClass(CALENDAR_CELL_CLASS).toggleClass(CALENDAR_TODAY_CLASS, that._isTodayCell(cellDate)).toggleClass(CALENDAR_EMPTY_CELL_CLASS, that._isDateOutOfRange(cellDate)).toggleClass(CALENDAR_OTHER_VIEW_CLASS, that._isOtherView(cellDate)).attr("data-value", utils.getShortDate(cellDate)).data(CALENDAR_DATE_VALUE_KEY, cellDate);
+                    that.setAria({
+                        role: "option",
+                        label: that._getCellAriaLabel(cellDate)
+                    }, $cell);
+                    if (cellTemplate)
+                        cellTemplate.render({text: that._getCellText(cellDate)}, $cell, cellIndex);
+                    else
+                        $cell.text(that._getCellText(cellDate))
+                }
                 for (var indexRow = 0, len = this.option("rowCount"); indexRow < len; indexRow++) {
                     var $row = $("<tr>").appendTo(this.$body);
-                    this._iterateCells(function(cellIndex) {
-                        var cellDate = that._getCellData(indexRow, cellIndex);
-                        var $cell = $("<td>").appendTo($row).addClass(CALENDAR_CELL_CLASS).toggleClass(CALENDAR_TODAY_CLASS, that._isTodayCell(cellDate)).toggleClass(CALENDAR_EMPTY_CELL_CLASS, that._isDateOutOfRange(cellDate)).toggleClass(CALENDAR_OTHER_VIEW_CLASS, that._isOtherView(cellDate)).attr("data-value", utils.getShortDate(cellDate)).data(CALENDAR_DATE_VALUE_KEY, cellDate);
-                        that.setAria({
-                            role: "option",
-                            label: that._getCellAriaLabel(cellDate)
-                        }, $cell);
-                        if (cellTemplate)
-                            cellTemplate.render({text: that._getCellText(cellDate)}, $cell, cellIndex);
-                        else
-                            $cell.text(that._getCellText(cellDate))
-                    })
+                    this._iterateCells(renderCell)
                 }
             },
             _iterateCells: function(delegate) {
@@ -16327,7 +16329,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     return this.option("firstDayOfWeek") || Globalize.culture().calendar.firstDay
                 },
                 moveContouredDate: function(difference) {
-                    var contouredDate = this._calculateContouredDate(this.option("contouredDate")),
+                    var circledDate = this.option("contouredDate"),
+                        contouredDate = circledDate || this._calculateContouredDate(circledDate),
                         newContouredDate = new Date(contouredDate.getFullYear(), contouredDate.getMonth(), contouredDate.getDate() + difference);
                     utils.fixTimezoneGap(contouredDate, newContouredDate);
                     this.option("contouredDate", newContouredDate)
@@ -16577,8 +16580,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
     /*! Module widgets-base, file ui.calendar.navigator.js */
     (function($, DX, undefined) {
         var ui = DX.ui,
-            utils = DX.utils,
-            events = ui.events,
             CALENDAR_NAVIGATOR_CLASS = "dx-calendar-navigator",
             CALENDAR_NAVIGATOR_PREVIOUS_MONTH_CLASS = "dx-calendar-navigator-previous-month",
             CALENDAR_NAVIGATOR_NEXT_MONTH_CLASS = "dx-calendar-navigator-next-month",
@@ -16620,7 +16621,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                             direction: -direction,
                             jQueryEvent: e
                         })
-                    }
+                    },
+                    _templates: {}
                 });
                 var $prevButton = this._prevButton.element().addClass(CALENDAR_NAVIGATOR_PREVIOUS_VIEW_CLASS).addClass(CALENDAR_NAVIGATOR_PREVIOUS_MONTH_CLASS);
                 this._nextButton = this._createComponent($("<a>"), "dxButton", {
@@ -16631,14 +16633,16 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                             direction: direction,
                             jQueryEvent: e
                         })
-                    }
+                    },
+                    _templates: {}
                 });
                 var $nextButton = this._nextButton.element().addClass(CALENDAR_NAVIGATOR_NEXT_VIEW_CLASS).addClass(CALENDAR_NAVIGATOR_NEXT_MONTH_CLASS);
                 this._caption = this._createComponent($("<a>").addClass(CALENDAR_NAVIGATOR_CAPTION_BUTTON_CLASS), "dxButton", {
                     focusStateEnabled: false,
                     onClick: function(e) {
                         that._captionClickAction({jQueryEvent: e})
-                    }
+                    },
+                    _templates: {}
                 });
                 var $caption = this._caption.element();
                 this.element().append($prevButton, $caption, $nextButton)
@@ -16646,8 +16650,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             _renderCaption: function(caption) {
                 this._caption.option("text", this.option("text"))
             },
-            toggleButton: function(button, value) {
-                var buttonName = "_" + button + "Button",
+            toggleButton: function(buttonPrefix, value) {
+                var buttonName = "_" + buttonPrefix + "Button",
                     button = this[buttonName];
                 if (button) {
                     button.option("disabled", value);
@@ -16670,7 +16674,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
     (function($, DX, undefined) {
         var ui = DX.ui,
             browser = DX.browser,
-            isBuggyIE = browser.msie && browser.version.split(".")[0] == 8;
+            isBuggyIE = browser.msie && DX.compareVersions(browser.version, 9) < 0;
         var TIMEVIEW_CLASS = "dx-timeview",
             TIMEVIEW_CLOCK_CLASS = "dx-timeview-clock",
             TIMEVIEW_FIELD_CLASS = "dx-timeview-field",
@@ -16737,10 +16741,12 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     direction: "col",
                     items: [{
                             ratio: 1,
+                            shrink: 0,
                             baseSize: "auto",
                             template: $.proxy(this._renderClock, this)
                         }, {
                             ratio: 0,
+                            shrink: 0,
                             baseSize: 50,
                             template: $.proxy(this._renderField, this)
                         }]
@@ -16768,16 +16774,19 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                         crossAlign: "center",
                         items: [{
                                 ratio: 0,
+                                shrink: 0,
                                 baseSize: "auto",
                                 template: $.proxy(function() {
                                     return this._hourBox.element()
                                 }, this)
                             }, {
                                 ratio: 0,
+                                shrink: 0,
                                 baseSize: "auto",
                                 template: Globalize.culture().calendar[":"]
                             }, {
                                 ratio: 0,
+                                shrink: 0,
                                 baseSize: "auto",
                                 template: $.proxy(function() {
                                     return this._minuteBox.element()
@@ -16917,8 +16926,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             _renderContainerClick: function() {
                 if (!this.option("showOnClick"))
                     return;
-                var that = this,
-                    eventName = events.addNamespace("dxclick", this.NAME);
+                var eventName = events.addNamespace("dxclick", this.NAME);
                 var clickAction = this._createActionByOption("onClick");
                 this._$container.off(eventName).on(eventName, function(e) {
                     clickAction({jQueryEvent: e})
@@ -16947,8 +16955,14 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 $("<div>").addClass(DATEVIEW_ROLLER_ITEM_SELECTED_FRAME_CLASS).append($("<div>").addClass(DATEVIEW_ROLLER_ITEM_SELECTED_BORDER_CLASS)).appendTo(this._$container)
             },
             _renderControlButtons: function() {
-                this._createComponent($("<div>").addClass(DATEVIEW_ROLLER_BUTTON_UP_CLASS).insertAfter(this._$container), "dxButton", {onClick: $.proxy(this._upButtonClickHandler, this)});
-                this._createComponent($("<div>").addClass(DATEVIEW_ROLLER_BUTTON_DOWN_CLASS).insertAfter(this._$container), "dxButton", {onClick: $.proxy(this._downButtonClickHandler, this)})
+                this._createComponent($("<div>").addClass(DATEVIEW_ROLLER_BUTTON_UP_CLASS).insertAfter(this._$container), "dxButton", {
+                    onClick: $.proxy(this._upButtonClickHandler, this),
+                    _templates: {}
+                });
+                this._createComponent($("<div>").addClass(DATEVIEW_ROLLER_BUTTON_DOWN_CLASS).insertAfter(this._$container), "dxButton", {
+                    onClick: $.proxy(this._downButtonClickHandler, this),
+                    _templates: {}
+                })
             },
             _renderSelectedValue: function(selectedIndex) {
                 if (selectedIndex === undefined)
@@ -17079,13 +17093,13 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
         }), ui);
         DX.registerComponent("dxDateView", ui, ui.Editor.inherit({
             _valueOption: function() {
-                return new Date(this.option("value")) == "Invalid Date" ? new Date : new Date(this.option("value"))
+                return new Date(this.option("value")) === "Invalid Date" ? new Date : new Date(this.option("value"))
             },
             _setDefaultOptions: function() {
                 this.callBase();
                 this.option({
                     minDate: new Date(1),
-                    maxDate: new Date($.now() + dateUtils.TEN_YEARS),
+                    maxDate: new Date((new Date).setHours(23, 59, 59) + dateUtils.TEN_YEARS),
                     format: "date",
                     value: new Date,
                     culture: Globalize.culture().name,
@@ -17346,7 +17360,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             DATEBOX_CLASS = "dx-datebox",
             DATEBOX_NATIVE_CLASS = "dx-datebox-native",
             DATEBOX_OVERLAY_CLASS = "dx-datebox-overlay",
-            IE_ROUNDING_ERROR = 10;
+            IE_ROUNDING_ERROR = 10,
+            NATIVE_BUTTONS_WIDTH = 48;
         var realWidthSetted = function($element) {
                 var explicitWidth = $element[0].style.width;
                 if (explicitWidth && explicitWidth !== "auto" && explicitWidth !== "inherit")
@@ -17370,7 +17385,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                         float: "left"
                     });
                 $longestValueElement.appendTo($element);
-                var width = $longestValueElement.outerWidth() + IE_ROUNDING_ERROR;
+                var width = $longestValueElement.outerWidth() + IE_ROUNDING_ERROR + ($input.prop("type") !== "text" ? NATIVE_BUTTONS_WIDTH : 0);
                 $longestValueElement.remove();
                 return width
             };
@@ -17408,6 +17423,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     max: undefined,
                     useCalendar: false,
                     maxZoomLevel: "month",
+                    minZoomLevel: "century",
                     useNative: true,
                     pickerType: "native"
                 })
@@ -17429,14 +17445,9 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                                 var realDevice = DX.devices.real(),
                                     platform = realDevice.platform,
                                     version = realDevice.version;
-                                return platform === "generic" || platform === "win8" || platform === "android" && (version[0] < 4 || version[0] == 4 && version[1] < 4)
+                                return platform === "generic" || platform === "win8" || platform === "android" && DX.compareVersions(version, [4, 4]) < 0
                             },
                             options: {pickerType: "rollers"}
-                        }, {
-                            device: function(device) {
-                                return DX.devices.real().generic && !DX.devices.isSimulator()
-                            },
-                            options: {focusStateEnabled: true}
                         }, {
                             device: {platform: "generic"},
                             options: {
@@ -17456,16 +17467,17 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this.option(this._getPickerOptions())
             },
             _getPickerOptions: function() {
-                var result = {};
+                var result = {},
+                    pickerType;
                 if (this._hasPickerTypePriority) {
-                    var pickerType = this.option("pickerType");
+                    pickerType = this.option("pickerType");
                     this.option().useNative = pickerType === "native";
                     this.option().useCalendar = pickerType === "calendar" || pickerType === "list"
                 }
                 else {
                     var userOptions = this._userOptions;
                     if (userOptions) {
-                        var pickerType = this.option("pickerType");
+                        pickerType = this.option("pickerType");
                         if (userOptions.useNative === undefined)
                             this.option("useNative", pickerType === "native");
                         if (userOptions.useCalendar === undefined)
@@ -17508,10 +17520,9 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     case"list":
                         if (format === "date")
                             return "Calendar";
-                        else if (format === "datetime")
+                        if (format === "datetime")
                             return "CalendarWithTime";
-                        else
-                            return "List";
+                        return "List";
                     case"rollers":
                     case"native":
                         return this.option().useCalendar ? "Calendar" : "DateView"
@@ -17588,25 +17599,25 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             },
             _updateSize: function() {
                 var $element = this.element(),
-                    widthSetted = this.option("width") || realWidthSetted($element),
+                    widthOption = this.option("width"),
+                    isWidthSet = utils.isDefined(widthOption) || realWidthSetted($element) && !this._isSizeUpdatable,
                     isElementVisible = $element.is(":visible"),
                     pickerType = this.option("pickerType"),
                     shouldCalculateWidth = pickerType !== "rollers" && devices.current().platform === "generic";
-                if (widthSetted || !(shouldCalculateWidth && isElementVisible))
+                if (isWidthSet || !(shouldCalculateWidth && isElementVisible))
                     return;
                 var $input = this._input(),
                     calendar = Globalize.culture().calendar,
                     format = this.option("formatString"),
                     longestValue = Globalize.format(dateUtils.getLongestDate(format, calendar.months.names, calendar.days.names), format);
-                $element.width(calculateWidth(longestValue, $input, this.element()))
+                $element.width(calculateWidth(longestValue, $input, this.element()));
+                this._isSizeUpdatable = true
             },
             _usingNativeDatePicker: function() {
                 return support.inputType(this.option("mode")) && this.option("pickerType") === "native"
             },
             _readOnlyPropValue: function() {
-                if (this._usingNativeDatePicker())
-                    return this.callBase();
-                return this.option("readOnly") || this.option("pickerType") === "rollers"
+                return this.callBase() || this.option("pickerType") === "rollers"
             },
             _checkIfClearButtonShouldBeRendered: function() {
                 return !this._isNativeView() && this.callBase()
@@ -17674,9 +17685,11 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this._input().attr("autocomplete", "off")
             },
             _renderOpenedState: function() {
+                this._openedStateRendering = true;
                 if (!this._isNativeView())
                     this.callBase();
-                this._strategy.renderOpenedState()
+                this._strategy.renderOpenedState();
+                this._openedStateRendering = false
             },
             _isNativeView: function() {
                 return this.option("pickerType") === "native"
@@ -17694,10 +17707,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                             result = Globalize.localize("dxDateBox-simulatedDataPickerTitleTime");
                             break;
                         case"date":
-                            result = Globalize.localize("dxDateBox-simulatedDataPickerTitleDate");
-                            break;
                         case"datetime":
-                            result = Globalize.localize("dxDateBox-simulatedDataPickerTitleDateTime");
+                            result = Globalize.localize("dxDateBox-simulatedDataPickerTitleDate");
                             break
                     }
                 }
@@ -17719,12 +17730,20 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this.option("value", this._strategy.getValue());
                 this.callBase()
             },
+            _dispose: function() {
+                this._strategy && this._strategy.dispose();
+                this.callBase()
+            },
             _optionChanged: function(args) {
                 switch (args.name) {
                     case"useCalendar":
                     case"useNative":
                         this._hasPickerTypePriority = false;
                         this._updatePickerOptions();
+                        break;
+                    case"showClearButton":
+                        this.callBase.apply(this, arguments);
+                        this._updateSize();
                         break;
                     case"pickerType":
                         this._hasPickerTypePriority = true;
@@ -17735,6 +17754,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     case"format":
                         this._updatePickerOptions();
                         this._refreshStrategy();
+                        this._updateSize();
                         break;
                     case"placeholder":
                         this._renderPlaceholder();
@@ -17743,12 +17763,12 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     case"min":
                     case"max":
                     case"interval":
+                    case"minZoomLevel":
                     case"maxZoomLevel":
                         this._invalidate();
                         break;
                     case"type":
                         throw DX.Error("E1020");
-                        break;
                     case"formatString":
                     case"formatWidthCalculator":
                         break;
@@ -17765,6 +17785,10 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     case"text":
                         this._strategy.textChangedHandler(args.value);
                         this.callBase.apply(this, arguments);
+                        break;
+                    case"isValid":
+                        this.callBase.apply(this, arguments);
+                        this._updateSize();
                         break;
                     default:
                         this.callBase.apply(this, arguments)
@@ -17864,12 +17888,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
         var ui = DX.ui,
             utils = DX.utils,
             DATEBOX_WITH_CALENDAR_CLASS = "dx-datebox-with-calendar",
-            DATEBOX_CALENDAR_OVERLAY_CLASS = "dx-datebox-calendar-overlay",
-            DATEBOX_CELL_CLASS = "dx-datebox-container-cell",
-            DATEBOX_BUTTON_CLASS = "dx-datebox-button-cell",
-            DATEBOX_BUTTONS_CONTAINER_CLASS = "dx-datebox-buttons-container",
-            DATEBOX_APPLY_BUTTON_CLASS = "dx-datebox-apply-button",
-            DATEBOX_CANCEL_BUTTON_CLASS = "dx-datebox-cancel-button";
+            DATEBOX_CALENDAR_OVERLAY_CLASS = "dx-datebox-calendar-overlay";
         ui.dxDateBox.renderingStrategies["Calendar"] = ui.dxDateBox.strategy.inherit({
             NAME: "Calendar",
             supportedKeys: function() {
@@ -17925,6 +17944,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                         onCellClick: $.proxy(this._cellClickHandler, this),
                         tabIndex: null,
                         maxZoomLevel: this.dateBox.option("maxZoomLevel"),
+                        minZoomLevel: this.dateBox.option("minZoomLevel"),
                         onContouredChanged: $.proxy(this._refreshActiveDescendant, this)
                     })
             },
@@ -17948,33 +17968,51 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                             onClick: $.proxy(function() {
                                 this._widget._toTodayView()
                             }, this),
-                            text: "Today",
+                            text: Globalize.localize("dxCalendar-todayButtonText"),
                             type: "today"
                         }
                     });
                 return $.extend(popupConfig, {buttons: buttons})
             },
             _valueChangedHandler: function(e) {
-                var dateBox = this.dateBox;
+                if (this.dateBox._openedStateRendering)
+                    return;
+                var dateBox = this.dateBox,
+                    value = e.value,
+                    prevValue = e.previousValue;
+                var isSameDate = utils.sameMonthAndYear(value, prevValue) && value.getDate() === prevValue.getDate();
+                if (isSameDate)
+                    return;
                 if (dateBox.option("applyValueMode") === "instantly")
                     dateBox.option("value", this.getValue())
             },
-            _updateValue: function() {
-                var parsedValue = this.getParsedText(this.dateBox.option("text"), this.dateBox.option("formatString"));
-                if (this._widget)
-                    this._widget.option("value", parsedValue)
+            _getParsedValue: function() {
+                return this.getParsedText(this.dateBox.option("text"), this.dateBox.option("formatString"))
             },
-            textChangedHandler: function(text) {
-                if (this.dateBox.option("opened")) {
-                    var value = this.getParsedText(text, this.dateBox.option("formatString"));
-                    if (value)
-                        this._widget && this._widget.option("value", value)
+            _updateValue: function(preventDefaultValue) {
+                var parsedValue = this._getParsedValue();
+                if (!parsedValue && !preventDefaultValue)
+                    parsedValue = new Date;
+                if (this._widget) {
+                    var value = this.dateBox.option("value");
+                    if (parsedValue) {
+                        if (value)
+                            parsedValue.setHours(value.getHours(), value.getMinutes(), value.getSeconds());
+                        this._widget.option("value", parsedValue)
+                    }
                 }
+            },
+            textChangedHandler: function() {
+                if (this.dateBox.option("opened") && this._widget)
+                    this._updateValue(true)
             },
             _cellClickHandler: function() {
                 var dateBox = this.dateBox;
                 if (dateBox.option("applyValueMode") === "instantly")
-                    dateBox.option("opened", dateBox._textHasBeenChanged)
+                    dateBox.option({
+                        opened: dateBox._textHasBeenChanged,
+                        value: this.getValue()
+                    })
             },
             dispose: function() {
                 this.dateBox.off("optionChanged");
@@ -18012,37 +18050,44 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     onValueChanged: $.proxy(this._valueChangedHandler, this)
                 })
             },
-            _updateValue: function() {
-                var date = this._getDateBoxValue() || new Date(1970, 0, 1, 0, 0, 0);
-                this.callBase();
-                this._timeView && this._timeView.option("value", date)
+            _updateValue: function(preventDefaultValue) {
+                var date = this._getParsedValue();
+                if (!date && !preventDefaultValue)
+                    date = new Date;
+                this.callBase.apply(this, arguments);
+                if (this._timeView && date)
+                    this._timeView.option("value", date)
             },
             renderPopupContent: function() {
                 this.callBase();
                 var $popupContent = this._getPopup().content().addClass(CALENDAR_WITH_TIME_PICKER_CONTAINER_CLASS);
-                this.dateBox._createComponent($("<div>").appendTo($popupContent), "dxBox", {
-                    direction: "row",
-                    crossAlign: "start",
-                    items: [{
-                            ratio: 0,
-                            baseSize: "auto",
-                            name: "calendar"
-                        }, {
-                            ratio: 0,
-                            baseSize: "auto",
-                            name: "time"
-                        }],
-                    itemTemplate: $.proxy(function(data) {
-                        switch (data.name) {
-                            case"calendar":
-                                return $("<div>").append(this._widget.element());
-                                break;
-                            case"time":
-                                return $("<div>").append(this._timeView.element());
-                                break
-                        }
-                    }, this)
-                });
+                var box = this.dateBox._createComponent($("<div>").appendTo($popupContent), "dxBox", {
+                        direction: "row",
+                        crossAlign: "start",
+                        items: [{
+                                ratio: 0,
+                                shrink: 0,
+                                baseSize: "auto",
+                                name: "calendar"
+                            }, {
+                                ratio: 0,
+                                shrink: 0,
+                                baseSize: "auto",
+                                name: "time"
+                            }],
+                        itemTemplate: $.proxy(function(data) {
+                            switch (data.name) {
+                                case"calendar":
+                                    return $("<div>").append(this._widget.element());
+                                case"time":
+                                    return $("<div>").append(this._timeView.element())
+                            }
+                        }, this)
+                    });
+                this._removeMinWidthTimer = setTimeout(function() {
+                    if (box.option("_layoutStrategy") === "fallback")
+                        $popupContent.find(".dx-timeview-clock").css("minWidth", 0)
+                }, 0);
                 this._attachTabHandler()
             },
             _attachTabHandler: function() {
@@ -18063,9 +18108,10 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 }
             },
             getValue: function() {
-                var date = new Date(this._widget.option("value")),
-                    value = this._timeView.option("value");
-                date.setHours(value.getHours(), value.getMinutes(), value.getSeconds());
+                var date = this._widget.option("value"),
+                    time = this._timeView.option("value");
+                date = date ? new Date(date) : new Date(1970, 0, 1, 0, 0, 0);
+                date.setHours(time.getHours(), time.getMinutes(), time.getSeconds());
                 return date
             },
             render: function() {
@@ -18073,6 +18119,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this.callBase()
             },
             dispose: function() {
+                clearTimeout(this._removeMinWidthTimer);
                 this.dateBox.element().removeClass(CALENDAR_WITH_TIME_PICKER_CLASS);
                 this.callBase();
                 var popup = this._getPopup();
@@ -18262,7 +18309,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                         _keyboardProcessor: keyboardProcessor ? keyboardProcessor.attachChildProcessor() : null,
                         itemTemplate: $.proxy(this._timeListItemTemplate, this),
                         onItemClick: $.proxy(this._listItemClickHandler, this),
-                        focusStateEnabled: this.dateBox.option("focusStateEnabled"),
                         tabIndex: -1,
                         onFocusedItemChanged: $.proxy(this._refreshActiveDescendant, this)
                     }
@@ -18397,7 +18443,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this._$content.append(this._$indicator);
                 for (var i = this.option("_animatingSegmentCount"); i >= 0; --i) {
                     var $segment = $("<div>").addClass(LOADINDICATOR_SEGMENT_CLASS).addClass(LOADINDICATOR_SEGMENT_CLASS + i);
-                    if (currentDevice.platform == "android")
+                    if (currentDevice.platform === "android")
                         $segment.append($("<div>").addClass(LOADINDICATOR_SEGMENT_INNER_CLASS));
                     this._$indicator.append($segment)
                 }
@@ -18415,8 +18461,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             _updateContentSizeForAnimation: function() {
                 if (!this._$indicator)
                     return;
-                var $element = this.element(),
-                    width = this.option("width"),
+                var width = this.option("width"),
                     height = this.option("height");
                 if (width || height) {
                     width = this.element().width();
@@ -18584,6 +18629,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             LOOKUP_SEARCH_CLASS = "dx-lookup-search",
             LOOKUP_SEARCH_WRAPPER_CLASS = "dx-lookup-search-wrapper",
             LOOKUP_FIELD_CLASS = "dx-lookup-field",
+            LOOKUP_ARROW_CLASS = "dx-lookup-arrow",
             LOOKUP_FIELD_WRAPPER_CLASS = "dx-lookup-field-wrapper",
             LOOKUP_POPUP_CLASS = "dx-lookup-popup",
             LOOKUP_POPUP_WRAPPER_CLASS = "dx-lookup-popup-wrapper",
@@ -18591,9 +18637,9 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             LOOKUP_POPOVER_MODE = "dx-lookup-popover-mode",
             LOOKUP_EMPTY_CLASS = "dx-lookup-empty",
             LOOKUP_POPUP_VALIDATION_MESSAGE = "dx-lookup-validation-message",
+            LOOKUP_POPUP_INVALID_CLASS = "dx-lookup-invalid",
             LIST_ITEM_SELECTOR = ".dx-list-item",
-            LIST_ITEM_DATA_KEY = "dxListItemData",
-            POPUP_HIDE_TIMEOUT = 200;
+            LIST_ITEM_DATA_KEY = "dxListItemData";
         var POPUP_OPTION_MAP = {
                 popupWidth: "width",
                 popupHeight: "height"
@@ -18704,7 +18750,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     groupTemplate: "group",
                     usePopover: false,
                     showDropButton: false,
-                    focusStateEnabled: false,
                     showPopupTitle: true
                 })
             },
@@ -18722,6 +18767,12 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                                 pageLoadMode: "nextButton",
                                 usePopover: true
                             }
+                        }, {
+                            device: function(device) {
+                                var browser = DX.browser;
+                                return browser.msie && DX.compareVersions(browser.version, 9) < 0
+                            },
+                            options: {usePopover: false}
                         }, {
                             device: {
                                 platform: "win8",
@@ -18760,11 +18811,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                                 usePopover: true
                             }
                         }, {
-                            device: function(device) {
-                                return DX.devices.real().generic && !DX.devices.isSimulator()
-                            },
-                            options: {focusStateEnabled: true}
-                        }, {
                             device: {platform: "generic"},
                             options: {buttonsLocation: "bottom center"}
                         }])
@@ -18781,7 +18827,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             },
             _dataSourceOptions: function() {
                 this._suppressDeprecatedWarnings();
-                var pagingEnabled = this.option("pagingEnabled");
+                var pagingEnabled = utils.ensureDefined(this.option("pagingEnabled"), true);
                 pagingEnabled = utils.isDefined(this.option("showNextButton")) ? pagingEnabled || this.option("showNextButton") : pagingEnabled;
                 this._resumeDeprecatedWarnings();
                 return $.extend(this.callBase(), {paginate: pagingEnabled})
@@ -18804,7 +18850,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this._$field = $("<div>").addClass(LOOKUP_FIELD_CLASS).on(events.addNamespace("dxclick", this.NAME), function(e) {
                     fieldClickAction({jQueryEvent: e})
                 });
-                this._$fieldWrapper = $("<div>").addClass(LOOKUP_FIELD_WRAPPER_CLASS).append(this._$field).appendTo(this.element())
+                var $arrow = $("<div>").addClass(LOOKUP_ARROW_CLASS);
+                this._$fieldWrapper = $("<div>").addClass(LOOKUP_FIELD_WRAPPER_CLASS).append(this._$field).append($arrow).appendTo(this.element())
             },
             _popupShowingHandler: function() {
                 var validationError;
@@ -18812,14 +18859,18 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     validationError = this.option("validationError");
                     if (validationError && validationError.message) {
                         this._$popupValidationMessage.text(validationError.message);
-                        this._$popupValidationMessage.show()
+                        this._popup.content().addClass(LOOKUP_POPUP_INVALID_CLASS)
                     }
                     else
-                        this._$popupValidationMessage.hide()
+                        this._popup.content().removeClass(LOOKUP_POPUP_INVALID_CLASS)
                 }
                 this.callBase.apply(this, arguments);
                 if (this.option("cleanSearchOnOpening")) {
-                    this.option("searchEnabled") && this._searchBox.option("value", "");
+                    if (this.option("searchEnabled") && this._searchBox.option("value")) {
+                        this._searchBox.option("value", "");
+                        this._searchCanceled();
+                        this._searchDataSource()
+                    }
                     this._list && this._list.option("focusedElement", null)
                 }
             },
@@ -18951,7 +19002,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             },
             _renderPopupContent: function() {
                 if (this._popup.NAME === "dxPopup")
-                    this._$popupValidationMessage = $("<div/>").addClass(LOOKUP_POPUP_VALIDATION_MESSAGE).appendTo(this._popup.content());
+                    this._$popupValidationMessage = $("<div>").addClass(LOOKUP_POPUP_VALIDATION_MESSAGE).appendTo(this._popup.content());
                 this._renderSearch();
                 this.callBase()
             },
@@ -19156,12 +19207,9 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
     })(jQuery, DevExpress);
     /*! Module widgets-base, file ui.autocomplete.js */
     (function($, DX, undefined) {
-        var ui = DX.ui,
-            events = ui.events,
-            utils = DX.utils;
+        var ui = DX.ui;
         var AUTOCOMPLETE_CLASS = "dx-autocomplete",
             AUTOCOMPLETE_POPUP_WRAPPER_CLASS = "dx-autocomplete-popup-wrapper",
-            LIST_ITEM_DATA_KEY = "dxListItemData",
             CONTROL_KEY = {
                 "9": "tab",
                 "13": "enter",
@@ -19658,17 +19706,26 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     values: [],
                     onValuesChanged: null,
                     showDropButton: false,
-                    tagTemplate: 'tag',
+                    tagTemplate: "tag",
                     selectAllText: Globalize.localize("dxList-selectAll")
                 })
             },
             _init: function() {
                 this.callBase();
-                this._initValuesChangedAction()
+                this._initValuesChangedAction();
+                this._initDynamicTagTemplate()
             },
             _initValuesChangedAction: function() {
                 this._valuesChangedAction = this._createActionByOption("onValuesChanged");
                 this._removeTagAction = this._createAction($.proxy(this._removeTagHandler, this))
+            },
+            _initDynamicTagTemplate: function() {
+                if (this._displayGetterExpr())
+                    this._dynamicTemplates["tag"] = new ui.DefaultTemplate($.proxy(function(data) {
+                        return this._displayGetter(data)
+                    }, this));
+                else
+                    delete this._dynamicTemplates["tag"]
             },
             _render: function() {
                 this.callBase();
@@ -19755,11 +19812,12 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     return $.Deferred().resolve();
                 var $tag = $("<div>").addClass(TAGBOX_TAG_CLASS).data(TAGBOX_TAG_DATA_KEY, value).appendTo($container),
                     tagTemplate = this._getTemplateByOption("tagTemplate");
+                var $tagContent = $("<div>").addClass(TAGBOX_TAG_CONTENT_CLASS).appendTo($tag);
                 $("<div>").dxTagRemoveButton().appendTo($tag);
                 return this._loadItem(value).always($.proxy(function(item) {
-                        var data = DX.utils.isDefined(item) ? this._displayGetter(item) : value;
-                        tagTemplate.render(data, $tag);
-                        this._selectedItems.push(DX.utils.isDefined(item) ? item : value)
+                        item = DX.utils.isDefined(item) ? item : value;
+                        tagTemplate.render(item, $tagContent);
+                        this._selectedItems.push(item)
                     }, this))
             },
             _isTagRendered: function(value) {
@@ -19872,9 +19930,11 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 switch (args.name) {
                     case"displayExpr":
                         this.callBase(args);
+                        this._initDynamicTagTemplate();
                         this._invalidate();
                         break;
                     case"tagTemplate":
+                        this._initDynamicTagTemplate();
                         this._invalidate();
                         break;
                     case"values":
@@ -19900,7 +19960,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             fx = DX.fx,
             translator = DX.translator;
         var MULTIVIEW_CLASS = "dx-multiview",
-            MULTIVIEW_AUTOHEIGHT_CLASS = "dx-multiview-autoheight",
             MULTIVIEW_WRAPPER_CLASS = "dx-multiview-wrapper",
             MULTIVIEW_ITEM_CONTAINER_CLASS = "dx-multiview-item-container",
             MULTIVIEW_ITEM_CLASS = "dx-multiview-item",
@@ -19944,6 +20003,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     swipeEnabled: true,
                     animationEnabled: true,
                     loop: false,
+                    _itemAttributes: {role: "tabpanel"},
                     deferRendering: true,
                     loopItemFocus: false,
                     selectOnFocus: true,
@@ -20001,9 +20061,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this._$itemContainer.appendTo(this._$wrapper);
                 this.option("loopItemFocus", this.option("loop"));
                 this._initSwipeable()
-            },
-            itemAttributes: function() {
-                return {role: "tabpanel"}
             },
             _render: function() {
                 this._deferredItems = [];
@@ -20166,7 +20223,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
     /*! Module widgets-base, file ui.validator.js */
     (function($, DX, undefined) {
         var ui = DX.ui,
-            events = ui.events,
             validationEngine = DX.validationEngine;
         var VALIDATOR_CLASS = "dx-validator";
         DevExpress.ui.validation.defaultAdapter = DX.Class.inherit({
@@ -20295,7 +20351,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 reset: function() {
                     var that = this,
                         adapter = that.option("adapter"),
-                        name = that.option("name"),
                         result = {
                             isValid: true,
                             brokenRule: null
@@ -20319,8 +20374,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
     })(jQuery, DevExpress);
     /*! Module widgets-base, file ui.validationGroup.js */
     (function($, DX, undefined) {
-        var ui = DX.ui,
-            events = ui.events;
+        var ui = DX.ui;
         var VALIDATION_ENGINE_CLASS = "dx-validationgroup";
         DX.registerComponent("dxValidationGroup", ui, DX.DOMComponent.inherit({
             _setDefaultOptions: function() {
@@ -20362,8 +20416,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
     })(jQuery, DevExpress);
     /*! Module widgets-base, file ui.validationSummary.js */
     (function($, DX, undefined) {
-        var ui = DX.ui,
-            events = ui.events;
+        var ui = DX.ui;
         var VALIDATION_SUMMARY_CLASS = "dx-validationsummary",
             ITEM_CLASS = VALIDATION_SUMMARY_CLASS + "-item",
             ITEM_DATA_KEY = VALIDATION_SUMMARY_CLASS + "-item-data";
@@ -20565,7 +20618,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     allowCanceling: true,
                     showFileList: true,
                     progress: 0,
-                    deleteUrl: "",
                     readyToUploadMessage: Globalize.localize("dxFileUploader-readyToUpload"),
                     uploadedMessage: Globalize.localize("dxFileUploader-uploaded"),
                     uploadFailedMessage: Globalize.localize("dxFileUploader-uploadFailedMessage"),
@@ -20594,7 +20646,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 if (!this._$fileInput) {
                     this._$fileInput = $(FILEUPLOADER_FILEINPUT_TAG);
                     this._$fileInput.on("change", $.proxy(this._inputChangeHandler, this));
-                    this._$fileInput.on("click", $.proxy(function(e) {
+                    this._$fileInput.on("click", $.proxy(function() {
                         var isCustomEvent = this._isCustomEvent || false;
                         this._isCustomEvent = false;
                         return isCustomEvent
@@ -20612,6 +20664,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 var fileName = this._$fileInput.val().replace(/^.*\\/, ''),
                     files = this._$fileInput.prop("files"),
                     values = [];
+                if (files && !files.length)
+                    return;
                 if (files)
                     $.each(files, function(_, value) {
                         values.push(value)
@@ -20693,8 +20747,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this._updateFileNameMaxWidth()
             },
             _renderFile: function(file) {
-                var that = this,
-                    value = file.value;
+                var value = file.value;
                 var $fileContainer = $("<div>").addClass(FILEUPLOADER_FILE_CONTAINER_CLASS).appendTo(this._$filesContainer);
                 this._renderFileButtons(file, $fileContainer);
                 file.$file = $("<div>").addClass(FILEUPLOADER_FILE_CLASS).appendTo($fileContainer);
@@ -20723,7 +20776,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                         this._removeFile(file)
                     }, this),
                     icon: "close",
-                    visible: this.option("allowCanceling")
+                    visible: this.option("allowCanceling"),
+                    _templates: {}
                 });
                 $("<div>").addClass(FILEUPLOADER_BUTTON_CONTAINER_CLASS).append(file.cancelButton.element()).appendTo($container);
                 if (this.option("uploadMode") === "useButtons") {
@@ -20765,7 +20819,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 $button.off("click").on("click", $.proxy(this._selectButtonClickHandler, this));
                 this._selectButton = this._createComponent($button, "dxButton", {
                     text: this.option("selectButtonText"),
-                    focusStateEnabled: false
+                    focusStateEnabled: false,
+                    _templates: {}
                 })
             },
             _selectButtonClickHandler: function() {
@@ -20780,7 +20835,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 var $uploadButton = $("<div>").addClass(FILEUPLOADER_BUTTON_CLASS).addClass(FILEUPLOADER_UPLOAD_BUTTON_CLASS).appendTo(this._$content);
                 this._uploadButton = this._createComponent($uploadButton, "dxButton", {
                     text: this.option("uploadButtonText"),
-                    onClick: $.proxy(this._uploadButtonClickHandler, this)
+                    onClick: $.proxy(this._uploadButtonClickHandler, this),
+                    _templates: {}
                 })
             },
             _uploadButtonClickHandler: function() {
@@ -20809,7 +20865,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             _uploadFiles: function() {
                 if (!isFormDataSupported())
                     return;
-                var files = this.option("values");
                 $.each(this._files, $.proxy(function(_, file) {
                     this._uploadFile(file)
                 }, this))
@@ -20817,23 +20872,34 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             _uploadFile: function(file) {
                 if (file.progressBar)
                     return;
-                var $file = file.$file;
-                var value = file.value;
+                var $file = file.$file,
+                    value = file.value;
                 this._initUploadRequest(file);
                 if ($file) {
                     file.progressBar = this._createProgressBar(value.size);
                     file.progressBar.element().appendTo($file);
                     this._initStatusMessage(file);
-                    this._initCancelButton(file)
+                    this._initCancelButton(file);
+                    file.onError.add($.proxy(this._onErrorHandler, this, file))
                 }
-                file.onError.add($.proxy(this._onErrorHandler, this, file));
                 file.onProgress.add($.proxy(this._onProgressHandler, this, file));
                 file.request.send(this._createFormData(this.option("name"), value))
             },
             _onErrorHandler: function(file) {
-                file.progressBar.element().remove();
-                file.$statusMessage.text(this.option("uploadFailedMessage"));
-                file.$statusMessage.css("display", "")
+                var that = this;
+                setTimeout(function() {
+                    file.$statusMessage.text(that.option("uploadFailedMessage"));
+                    file.$statusMessage.css("display", "");
+                    file.progressBar.element().remove()
+                }, FILEUPLOADER_AFTER_LOAD_DELAY)
+            },
+            _onLoadedHandler: function(file) {
+                var that = this;
+                setTimeout(function() {
+                    file.$statusMessage.text(that.option("uploadedMessage"));
+                    file.$statusMessage.css("display", "");
+                    file.progressBar.element().remove()
+                }, FILEUPLOADER_AFTER_LOAD_DELAY)
             },
             _onProgressHandler: function(file, e) {
                 var totalSize = this._getTotalSize(),
@@ -20855,49 +20921,35 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this._setLoadedSize(loadedSize)
             },
             _initStatusMessage: function(file) {
-                var that = this;
                 file.$statusMessage.css("display", "none");
-                file.onLoad.add(function() {
-                    setTimeout(function() {
-                        file.$statusMessage.text(that.option("uploadedMessage"));
-                        file.$statusMessage.css("display", "");
-                        file.progressBar.element().remove()
-                    }, FILEUPLOADER_AFTER_LOAD_DELAY)
-                })
+                file.onLoad.add($.proxy(this._onLoadedHandler, this, file))
             },
             _initCancelButton: function(file) {
-                var that = this;
                 var cancelClickHandler = $.proxy(function() {
                         file.request.abort();
                         this._removeFile(file)
                     }, this);
                 file.cancelButton.option("onClick", cancelClickHandler);
-                var deleteClickHandler = function() {
-                        var request = this._createRequest(this.option("deleteUrl")),
-                            formData = this._createFormData(this.option("name"), file.value.name);
-                        request.send(formData);
-                        this._removeFile(file)
+                var hideCancelButton = function() {
+                        setTimeout(function() {
+                            file.cancelButton.option({visible: false})
+                        }, FILEUPLOADER_AFTER_LOAD_DELAY)
                     };
-                file.onLoad.add(function() {
-                    setTimeout(function() {
-                        file.cancelButton.option({
-                            visible: !!that.option("deleteUrl"),
-                            onClick: $.proxy(deleteClickHandler, that)
-                        })
-                    }, FILEUPLOADER_AFTER_LOAD_DELAY)
-                })
+                file.onLoad.add(hideCancelButton);
+                file.onError.add(hideCancelButton)
             },
             _initUploadRequest: function(file) {
                 file.request = this._createRequest(this.option("uploadUrl"));
                 file.loadedSize = 0;
-                file.request.upload.onload = $.proxy(function(e) {
-                    this.onLoad.fire(e)
+                file.request.onreadystatechange = $.proxy(function(e) {
+                    if (e.currentTarget.readyState === 4)
+                        if (e.currentTarget.status === 200)
+                            this.onLoad.fire(e);
+                        else
+                            this.onError.fire(e)
                 }, file);
                 file.request.upload.onprogress = $.proxy(function(e) {
                     this.onProgress.fire(e)
-                }, file);
-                file.request.upload.onerror = $.proxy(function(e) {
-                    this.onError.fire(e)
                 }, file);
                 file.request.upload.onloadstart = $.proxy(function(e) {
                     this.onLoadStart.fire(e)
@@ -21008,7 +21060,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                         this._renderFiles();
                         break;
                     case"uploadUrl":
-                    case"deleteUrl":
                     case"progress":
                         break;
                     case"allowCanceling":

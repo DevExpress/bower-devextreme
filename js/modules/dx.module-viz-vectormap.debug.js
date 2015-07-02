@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Vector Map)
-* Version: 15.1.3
-* Build date: Jun 1, 2015
+* Version: 15.1.4
+* Build date: Jun 22, 2015
 *
 * Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -14,8 +14,7 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
     /*! Module viz-vectormap, file map.js */
     (function(DX, $, undefined) {
         DX.viz.map = {};
-        var _getRootOffset = DX.utils.getRootOffset,
-            _parseScalar = DX.viz.core.utils.parseScalar,
+        var _parseScalar = DX.viz.core.utils.parseScalar,
             DEFAULT_WIDTH = 800,
             DEFAULT_HEIGHT = 400,
             TOOLTIP_OFFSET = 12,
@@ -205,6 +204,7 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                     that._projection = that._factory.createProjection();
                     that._tracker = that._factory.createTracker({
                         root: that._root,
+                        projection: that._projection,
                         dataKey: dataKey
                     });
                     that._layoutControl = that._factory.createLayoutControl();
@@ -323,7 +323,7 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                         isControlDrag = false;
                     that._tracker.setCallbacks({
                         click: function(arg) {
-                            var offset = _getRootOffset(renderer),
+                            var offset = renderer.getRootOffset(),
                                 manager;
                             arg.$event.x = arg.x - offset.left;
                             arg.$event.y = arg.y - offset.top;
@@ -377,7 +377,11 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                                 proxy;
                             if (tooltip.isEnabled()) {
                                 proxy = managers[arg.data.type] ? managers[arg.data.type].getProxyItem(arg.data.index) : null;
-                                if (!!proxy && tooltip.show(proxy, {}, {})) {
+                                if (proxy && tooltip.show(proxy, {
+                                    x: 0,
+                                    y: 0,
+                                    offset: 0
+                                }, {target: proxy})) {
                                     tooltip.move(arg.x, arg.y, TOOLTIP_OFFSET);
                                     result = true
                                 }
@@ -388,7 +392,7 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                             tooltip.move(arg.x, arg.y, TOOLTIP_OFFSET)
                         },
                         "focus-off": function() {
-                            tooltip.hide({})
+                            tooltip.hide()
                         }
                     });
                     that._resetTrackerCallbacks = function() {
@@ -423,7 +427,7 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                             var coords,
                                 screenPosition;
                             if (center) {
-                                screenPosition = _getRootOffset(that._renderer);
+                                screenPosition = that._renderer.getRootOffset();
                                 screenPosition = [center[0] - screenPosition.left, center[1] - screenPosition.top];
                                 coords = projection.fromScreenPoint(screenPosition[0], screenPosition[1])
                             }
@@ -640,13 +644,13 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                     }
                 },
                 convertCoordinates: function(x, y) {
-                    return this._projection.fromScreenPointStrict(x, y)
+                    return this._projection.fromScreenPoint(x, y)
                 },
                 _factory: {}
             });
-        function DataExchanger() {
-            this._store = {}
-        }
+        var DataExchanger = function() {
+                this._store = {}
+            };
         DataExchanger.prototype = {
             constructor: DataExchanger,
             dispose: function() {
@@ -765,8 +769,6 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
             if (quad)
                 quad = truncateQuad(quad, min, max);
             return {
-                    minBase: min,
-                    maxBase: max,
                     min: quad ? [_min(quad.lt[0], quad.rb[0]), _min(quad.lt[1], quad.rb[1])] : min,
                     max: quad ? [_max(quad.lt[0], quad.rb[0]), _max(quad.lt[1], quad.rb[1])] : max
                 }
@@ -822,11 +824,7 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                     p1,
                     p2,
                     delta,
-                    methods,
-                    minv,
-                    maxv;
-                that._minBase = _bounds.minBase;
-                that._maxBase = _bounds.maxBase;
+                    methods;
                 that._minBound = _bounds.min;
                 that._maxBound = _bounds.max;
                 p1 = mercator.project(_bounds.min);
@@ -836,10 +834,6 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                 methods = delta < 2 ? createProjectUnprojectMethods(p1, p2, delta) : mercator;
                 that._project = methods.project;
                 that._unproject = methods.unproject;
-                minv = that._project(_bounds.minBase);
-                maxv = that._project(_bounds.maxBase);
-                that._minv = [_min(minv[0], maxv[0]), _min(minv[1], maxv[1])];
-                that._maxv = [_max(minv[0], maxv[0]), _max(minv[1], maxv[1])];
                 that._defaultCenter = that._unproject([0, 0]);
                 that.setCenter(that._defaultCenter);
                 that._events.project.fire();
@@ -1000,7 +994,7 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                 var that = this;
                 if (!_isArray(viewport))
                     return that.setZoom(that._minZoom).setCenter(that._defaultCenter);
-                var _viewport = truncateQuad(viewport, that._minBase, that._maxBase),
+                var _viewport = truncateQuad(viewport, that._minBound, that._maxBound),
                     lt = that._project(_viewport.lt),
                     rb = that._project(_viewport.rb),
                     l = _min(lt[0], rb[0]),
@@ -1020,12 +1014,6 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
             },
             fromScreenPoint: function(x, y) {
                 return this._unproject(this._fromTransformed(this._fromScreen([x, y])))
-            },
-            fromScreenPointStrict: function(x, y) {
-                var that = this,
-                    p = that._fromTransformed(that._fromScreen([x, y])),
-                    q = that._unproject(p);
-                return [p[0] >= that._minv[0] && p[0] <= that._maxv[0] ? q[0] : NaN, p[1] >= that._minv[1] && p[1] <= that._maxv[1] ? q[1] : NaN]
             },
             on: function(obj) {
                 $.each(this._events, function(name, list) {
@@ -1183,7 +1171,7 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                         index: COMMAND_ZOOM_OUT,
                         type: EVENT_TARGET_TYPE
                     }).append(group);
-                    renderer.rect(-2, options.sliderLineStartOffset - 2, 4, options.sliderLineEndOffset - options.sliderLineStartOffset + 4).data(dataKey, {
+                    renderer.rect(-2, options.sliderLineStartOffset - 2, 4, options.sliderLineEndOffset - options.sliderLineStartOffset + 4).css({cursor: "default"}).data(dataKey, {
                         index: COMMAND_ZOOM_DRAG_LINE,
                         type: EVENT_TARGET_TYPE
                     }).append(group);
@@ -1381,7 +1369,7 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
             this._stop = function() {
                 clearTimeout(timeout);
                 owner._callbacks.endMove();
-                this._stop = owner = callback = null;
+                this._stop = owner = null;
                 return this
             };
             arg = null;
@@ -1407,7 +1395,7 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
             }
             this._stop = function() {
                 clearTimeout(timeout);
-                this._stop = owner = callback = null;
+                this._stop = owner = null;
                 return this
             };
             arg = null;
@@ -1486,6 +1474,7 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
             that._root = parameters.root;
             that._callbacks = {};
             that._createEventHandlers(parameters.dataKey);
+            that._createProjectionHandlers(parameters.projection);
             that._focus = new Focus(that._callbacks);
             that._attachHandlers()
         }
@@ -1495,7 +1484,7 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                 var that = this;
                 that._detachHandlers();
                 that._focus.dispose();
-                that._root = that._callbacks = that._focus = that._handlers = null;
+                that._root = that._callbacks = that._focus = that._docHandlers = that._rootHandlers = null;
                 return that
             },
             _startClick: function(event, data) {
@@ -1716,8 +1705,9 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
             },
             _createEventHandlers: function(DATA_KEY) {
                 var that = this;
-                that._handlers = {};
-                that._handlers[EVENTS.start] = function(event) {
+                that._docHandlers = {};
+                that._rootHandlers = {};
+                that._docHandlers[EVENTS.start] = function(event) {
                     var isTouch = isTouchEvent(event),
                         data = $(event.target).data(DATA_KEY);
                     if (isTouch && !that._isTouchEnabled)
@@ -1729,7 +1719,7 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                     that._startHover(event, data);
                     that._startFocus(event, data)
                 };
-                that._handlers[EVENTS.move] = function(event) {
+                that._docHandlers[EVENTS.move] = function(event) {
                     var isTouch = isTouchEvent(event),
                         data = $(event.target).data(DATA_KEY);
                     if (isTouch && !that._isTouchEnabled)
@@ -1739,7 +1729,7 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                     that._moveHover(event, data);
                     that._moveFocus(event, data)
                 };
-                that._handlers[EVENTS.end] = function(event) {
+                that._docHandlers[EVENTS.end] = function(event) {
                     var isTouch = isTouchEvent(event),
                         data = $(event.target).data(DATA_KEY);
                     if (isTouch && !that._isTouchEnabled)
@@ -1749,14 +1739,28 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                     that._endZoom(event, data);
                     that._endFocus(event, data)
                 };
-                that._handlers[EVENTS.wheel] = function(event) {
+                that._rootHandlers[EVENTS.wheel] = function(event) {
+                    that._cancelFocus();
                     if (!that._isWheelEnabled)
                         return;
                     var data = $(event.target).data(DATA_KEY);
-                    data && event.preventDefault();
-                    that._wheelZoom(event, data)
+                    if (data) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        that._wheelZoom(event, data)
+                    }
                 };
                 that._wheelLock = {dir: 0}
+            },
+            _createProjectionHandlers: function(projection) {
+                var that = this;
+                projection.on({
+                    center: handler,
+                    zoom: handler
+                });
+                function handler() {
+                    that._cancelFocus()
+                }
             },
             reset: function() {
                 var that = this;
@@ -1780,118 +1784,118 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                 return that
             },
             _detachHandlers: function() {
-                if (this._isTouchEnabled) {
-                    this._root.css({
+                var that = this;
+                if (that._isTouchEnabled)
+                    that._root.css({
                         "touch-action": "",
                         "-ms-touch-action": "",
                         "-webkit-user-select": ""
-                    });
-                    this._root.off(_addNamespace("MSHoldVisual", _NAME)).off(_addNamespace("contextmenu", _NAME))
-                }
-                $(document).off(this._handlers)
+                    }).off(_addNamespace("MSHoldVisual", _NAME)).off(_addNamespace("contextmenu", _NAME));
+                $(document).off(that._docHandlers);
+                that._root.off(that._rootHandlers)
             },
             _attachHandlers: function() {
-                if (this._isTouchEnabled) {
-                    this._root.css({
+                var that = this;
+                if (that._isTouchEnabled)
+                    that._root.css({
                         "touch-action": "none",
                         "-ms-touch-action": "none",
                         "-webkit-user-select": "none"
-                    });
-                    this._root.on(_addNamespace("MSHoldVisual", _NAME), function(event) {
+                    }).on(_addNamespace("MSHoldVisual", _NAME), function(event) {
                         event.preventDefault()
                     }).on(_addNamespace("contextmenu", _NAME), function(event) {
                         isTouchEvent(event) && event.preventDefault()
-                    })
-                }
-                $(document).on(this._handlers)
+                    });
+                $(document).on(that._docHandlers);
+                that._root.on(that._rootHandlers)
             }
         };
-        function Focus(callbacks) {
-            var that = this,
-                _activeData = null,
-                _data = null,
-                _disabled = false,
-                _onTimer = null,
-                _offTimer = null,
-                _x,
-                _y;
-            that.dispose = function() {
-                clearTimeout(_onTimer);
-                clearTimeout(_offTimer);
-                that.turnOn = that.turnOff = that.cancel = that.cancelOn = that.dispose = that = callbacks = _activeData = _data = _onTimer = _offTimer = null
-            };
-            that.turnOn = function(data, coords, timeout, forceTimeout) {
-                if (data === _data && _disabled)
-                    return;
-                _disabled = false;
-                _data = data;
-                if (_activeData) {
-                    _x = coords.x;
-                    _y = coords.y;
+        var Focus = function(callbacks) {
+                var that = this,
+                    _activeData = null,
+                    _data = null,
+                    _disabled = false,
+                    _onTimer = null,
+                    _offTimer = null,
+                    _x,
+                    _y;
+                that.dispose = function() {
                     clearTimeout(_onTimer);
-                    _onTimer = setTimeout(function() {
-                        _onTimer = null;
-                        if (_data === _activeData) {
-                            callbacks[EVENT_FOCUS_MOVE]({
-                                data: _data,
-                                x: _x,
-                                y: _y
-                            });
-                            onCheck(true)
-                        }
-                        else
+                    clearTimeout(_offTimer);
+                    that.turnOn = that.turnOff = that.cancel = that.cancelOn = that.dispose = that = callbacks = _activeData = _data = _onTimer = _offTimer = null
+                };
+                that.turnOn = function(data, coords, timeout, forceTimeout) {
+                    if (data === _data && _disabled)
+                        return;
+                    _disabled = false;
+                    _data = data;
+                    if (_activeData) {
+                        _x = coords.x;
+                        _y = coords.y;
+                        clearTimeout(_onTimer);
+                        _onTimer = setTimeout(function() {
+                            _onTimer = null;
+                            if (_data === _activeData) {
+                                callbacks[EVENT_FOCUS_MOVE]({
+                                    data: _data,
+                                    x: _x,
+                                    y: _y
+                                });
+                                onCheck(true)
+                            }
+                            else
+                                callbacks[EVENT_FOCUS_ON]({
+                                    data: _data,
+                                    x: _x,
+                                    y: _y
+                                }, onCheck)
+                        }, forceTimeout ? timeout : 0)
+                    }
+                    else if (!_onTimer || _abs(coords.x - _x) > FOCUS_COORD_THRESHOLD_MOUSE || _abs(coords.y - _y) > FOCUS_COORD_THRESHOLD_MOUSE || forceTimeout) {
+                        _x = coords.x;
+                        _y = coords.y;
+                        clearTimeout(_onTimer);
+                        _onTimer = setTimeout(function() {
+                            _onTimer = null;
                             callbacks[EVENT_FOCUS_ON]({
                                 data: _data,
                                 x: _x,
                                 y: _y
                             }, onCheck)
-                    }, forceTimeout ? timeout : 0)
-                }
-                else if (!_onTimer || _abs(coords.x - _x) > FOCUS_COORD_THRESHOLD_MOUSE || _abs(coords.y - _y) > FOCUS_COORD_THRESHOLD_MOUSE || forceTimeout) {
-                    _x = coords.x;
-                    _y = coords.y;
-                    clearTimeout(_onTimer);
-                    _onTimer = setTimeout(function() {
-                        _onTimer = null;
-                        callbacks[EVENT_FOCUS_ON]({
-                            data: _data,
-                            x: _x,
-                            y: _y
-                        }, onCheck)
-                    }, timeout)
-                }
-                function onCheck(result) {
-                    _disabled = !result;
-                    if (result) {
-                        _activeData = _data;
-                        clearTimeout(_offTimer);
-                        _offTimer = null
+                        }, timeout)
                     }
+                    function onCheck(result) {
+                        _disabled = !result;
+                        if (result) {
+                            _activeData = _data;
+                            clearTimeout(_offTimer);
+                            _offTimer = null
+                        }
+                    }
+                };
+                that.turnOff = function(timeout) {
+                    clearTimeout(_onTimer);
+                    _onTimer = null;
+                    _data = null;
+                    if (_activeData && !_disabled)
+                        _offTimer = _offTimer || setTimeout(function() {
+                            _offTimer = null;
+                            callbacks[EVENT_FOCUS_OFF]({data: _activeData});
+                            _activeData = null
+                        }, timeout)
+                };
+                that.cancel = function() {
+                    clearTimeout(_onTimer);
+                    clearTimeout(_offTimer);
+                    if (_activeData)
+                        callbacks[EVENT_FOCUS_OFF]({data: _activeData});
+                    _activeData = _data = _onTimer = _offTimer = null
+                };
+                that.cancelOn = function() {
+                    clearTimeout(_onTimer);
+                    _onTimer = null
                 }
             };
-            that.turnOff = function(timeout) {
-                clearTimeout(_onTimer);
-                _onTimer = null;
-                _data = null;
-                if (_activeData && !_disabled)
-                    _offTimer = _offTimer || setTimeout(function() {
-                        _offTimer = null;
-                        callbacks[EVENT_FOCUS_OFF]({data: _activeData});
-                        _activeData = null
-                    }, timeout)
-            };
-            that.cancel = function() {
-                clearTimeout(_onTimer);
-                clearTimeout(_offTimer);
-                if (_activeData)
-                    callbacks[EVENT_FOCUS_OFF]({data: _activeData});
-                _activeData = _data = _onTimer = _offTimer = null
-            };
-            that.cancelOn = function() {
-                clearTimeout(_onTimer);
-                _onTimer = null
-            }
-        }
         DX.viz.map._tests.Tracker = Tracker;
         DX.viz.map._tests._DEBUG_forceEventMode = function(mode) {
             setupEvents(mode)
@@ -2473,20 +2477,32 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
     })(DevExpress, jQuery);
     /*! Module viz-vectormap, file mapItemsManager.js */
     (function(DX, $, undefined) {
-        var _Number = Number,
-            _String = String,
-            _isFinite = isFinite,
-            _isString = DX.utils.isString,
-            _isArray = DX.utils.isArray,
-            _isFunction = DX.utils.isFunction,
-            _patchFontOptions = DX.viz.core.utils.patchFontOptions,
+        var _isFinite = isFinite,
+            _utils = DX.utils,
+            _coreUtils = DX.viz.core.utils,
+            _isString = _utils.isString,
+            _isArray = _utils.isArray,
+            _isFunction = _utils.isFunction,
+            _patchFontOptions = _coreUtils.patchFontOptions,
+            _parseScalar = _coreUtils.parseScalar,
             _extend = $.extend,
             _each = $.each,
-            _map = $.map,
-            _noop = $.noop,
-            SELECTION_MODE_NONE = "none",
-            SELECTION_MODE_SINGLE = "single",
-            SELECTION_MODE_MULTIPLE = "multiple";
+            _map = $.map;
+        var SELECTIONS = {
+                none: null,
+                single: -1,
+                multiple: NaN
+            };
+        function getSelection(selectionMode) {
+            var selection = String(selectionMode).toLowerCase();
+            selection = selection in SELECTIONS ? SELECTIONS[selection] : SELECTIONS.single;
+            if (selection !== null)
+                selection = {
+                    state: {},
+                    single: selection || null
+                };
+            return selection
+        }
         function createEventTriggers(context, trigger, names) {
             context.raiseHoverChanged = function(handle, state) {
                 trigger(names.hoverChanged, {
@@ -2527,6 +2543,7 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                         renderer: that._params.renderer,
                         projection: that._params.projection,
                         dataKey: that._params.dataKey,
+                        selection: null,
                         getItemSettings: that._createItemSettingsBuilder()
                     };
                     that._initRoot();
@@ -2587,14 +2604,14 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                 _processOptions: function(options) {
                     var that = this,
                         settings = that._commonSettings = that._getCommonSettings(options),
-                        context = that._context,
-                        selectionMode = _String(settings.selectionMode).toLowerCase();
-                    that._customizeCallback = _isFunction(settings.customize) ? settings.customize : _noop;
-                    context.isHoverEnabled = "hoverEnabled" in settings ? !!settings.hoverEnabled : true;
-                    selectionMode = selectionMode === SELECTION_MODE_NONE || selectionMode === SELECTION_MODE_SINGLE || selectionMode === SELECTION_MODE_MULTIPLE ? selectionMode : SELECTION_MODE_SINGLE;
-                    context.isSelectionEnabled = selectionMode !== SELECTION_MODE_NONE;
-                    context.isSingleSelection = selectionMode === SELECTION_MODE_SINGLE;
-                    context.selected = context.isSingleSelection ? null : {};
+                        context = that._context;
+                    that._customizeCallback = _isFunction(settings.customize) ? settings.customize : $.noop;
+                    context.hover = !!_parseScalar(settings.hoverEnabled, true);
+                    if (context.selection)
+                        _each(context.selection.state, function(_, handle) {
+                            handle && handle.resetSelected()
+                        });
+                    context.selection = getSelection(settings.selectionMode);
                     that._grouping = {};
                     that._updateGrouping()
                 },
@@ -2635,7 +2652,7 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                             return handle
                         })
                 },
-                _createItems: function(notifyReady, skipUpdateGrouping) {
+                _createItems: function(notifyReady) {
                     var that = this,
                         selectedItems = [],
                         immediateReady = true;
@@ -2704,16 +2721,11 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                     return this
                 },
                 clearSelection: function() {
-                    var context = this._context;
-                    if (context.isSelectionEnabled)
-                        if (context.isSingleSelection)
-                            context.selected && context.selected.setSelected(false);
-                        else {
-                            _each(context.selected, function(_, handle) {
-                                handle && handle.setSelected(false)
-                            });
-                            context.selected = {}
-                        }
+                    var selection = this._context.selection;
+                    if (selection)
+                        _each(selection.state, function(_, handle) {
+                            handle && handle.setSelected(false)
+                        });
                     return this
                 },
                 raiseClick: function(index, $event) {
@@ -2819,7 +2831,7 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
             _updateLabel: function() {
                 var that = this,
                     settings = that._settings.label;
-                that._label.value = _String(this._proxy.text || this._proxy.attribute(this._settings.label.dataField) || "");
+                that._label.value = String(this._proxy.text || this._proxy.attribute(this._settings.label.dataField) || "");
                 if (that._label.value) {
                     that._label.text.attr({
                         text: that._label.value,
@@ -2837,87 +2849,83 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                 }
             }
         };
-        function MapItemHandle(context, coordinates, attributes, index, type) {
-            var handle = this;
-            handle._ctx = context;
-            attributes = _extend({}, attributes);
-            handle.proxy = {
-                index: index,
-                type: type,
-                coordinates: function() {
-                    return coordinates
-                },
-                attribute: function(name, value) {
-                    if (arguments.length > 1) {
-                        attributes[name] = value;
+        var MapItemHandle = function(context, coordinates, attributes, index, type) {
+                var handle = this;
+                handle._ctx = context;
+                handle._idx = index;
+                handle._hovered = handle._selected = false;
+                attributes = _extend({}, attributes);
+                handle.proxy = {
+                    index: index,
+                    type: type,
+                    coordinates: function() {
+                        return coordinates
+                    },
+                    attribute: function(name, value) {
+                        if (arguments.length > 1) {
+                            attributes[name] = value;
+                            return this
+                        }
+                        else
+                            return arguments.length > 0 ? attributes[name] : attributes
+                    },
+                    selected: function(state, _noEvent) {
+                        if (arguments.length > 0) {
+                            handle.setSelected(!!state, _noEvent);
+                            return this
+                        }
+                        else
+                            return handle._selected
+                    },
+                    applySettings: function(settings) {
+                        _extend(true, handle.settings, settings);
+                        handle.item && handle.item.update(handle.settings);
                         return this
                     }
-                    else
-                        return arguments.length > 0 ? attributes[name] : attributes
-                },
-                selected: function(state, _noEvent) {
-                    if (arguments.length > 0) {
-                        handle.setSelected(!!state, _noEvent);
-                        return this
-                    }
-                    else
-                        return handle._selected
-                },
-                applySettings: function(settings) {
-                    _extend(true, handle.settings, settings);
-                    handle.item && handle.item.update(handle.settings);
-                    return this
                 }
-            }
-        }
+            };
         MapItemHandle.prototype = {
             constructor: MapItemHandle,
-            _hovered: false,
-            _selected: false,
             dispose: function() {
                 disposeItem(this.proxy);
                 disposeItem(this);
                 return this
             },
             setHovered: function(state) {
+                state = !!state;
                 var that = this;
-                if (!that._ctx.isHoverEnabled)
-                    return that;
-                if (that._hovered !== !!state) {
-                    that._hovered = !!state;
-                    var item = that.item;
-                    if (item) {
+                if (that._ctx.hover && that._hovered !== state) {
+                    that._hovered = state;
+                    if (that.item) {
                         if (that._hovered)
-                            item.onHover();
+                            that.item.onHover();
                         if (!that._selected) {
-                            item[that._hovered ? "setHoveredState" : "setDefaultState"]();
+                            that.item[that._hovered ? "setHoveredState" : "setDefaultState"]();
                             that._ctx.raiseHoverChanged(that, that._hovered)
                         }
                     }
                 }
                 return that
             },
+            resetSelected: function() {
+                this._selected = false;
+                return this
+            },
             setSelected: function(state, _noEvent) {
+                state = !!state;
                 var that = this,
                     context = that._ctx,
-                    selected;
-                if (!context.isSelectionEnabled)
-                    return that;
-                if (that._selected !== !!state) {
-                    that._selected = !!state;
-                    selected = context.selected;
-                    if (context.isSingleSelection) {
-                        context.selected = null;
-                        if (selected)
-                            selected.setSelected(false);
-                        if (that._selected)
-                            context.selected = that
-                    }
-                    else
-                        context.selected[that.proxy.index] = that._selected ? that : null;
-                    var item = that.item;
-                    if (item) {
-                        item[that._selected ? "setSelectedState" : that._hovered ? "setHoveredState" : "setDefaultState"]();
+                    selection = that._ctx.selection,
+                    tmp;
+                if (selection && that._selected !== state) {
+                    that._selected = state;
+                    tmp = selection.state[selection.single];
+                    selection.state[selection.single] = null;
+                    if (tmp)
+                        tmp.setSelected(false);
+                    selection.state[selection.single || that._idx] = state ? that : null;
+                    if (that.item) {
+                        that.item[state ? "setSelectedState" : that._hovered ? "setHoveredState" : "setDefaultState"]();
                         if (!_noEvent)
                             context.raiseSelectionChanged(that)
                     }
@@ -2938,8 +2946,8 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                 groups = [];
                 for (i = 0, ii = partition.length - 1; i < ii; ++i)
                     groups.push({
-                        start: _Number(partition[i]),
-                        end: _Number(partition[i + 1])
+                        start: Number(partition[i]),
+                        end: Number(partition[i + 1])
                     })
             }
             return groups
@@ -2966,8 +2974,7 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
     })(DevExpress, jQuery);
     /*! Module viz-vectormap, file areasManager.js */
     (function(DX, $, undefined) {
-        var _String = String,
-            _abs = Math.abs,
+        var _abs = Math.abs,
             _sqrt = Math.sqrt,
             _noop = $.noop,
             TOLERANCE = 1;

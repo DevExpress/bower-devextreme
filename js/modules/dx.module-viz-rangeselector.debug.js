@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Range Selector)
-* Version: 15.1.3
-* Build date: Jun 1, 2015
+* Version: 15.1.4
+* Build date: Jun 22, 2015
 *
 * Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -61,9 +61,6 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
                 }
                 return value
             };
-        var getRootOffsetLeft = function(renderer) {
-                return dxUtils.getRootOffset(renderer).left || 0
-            };
         var getEventPageX = function(eventArgs) {
                 var result = 0;
                 if (eventArgs.pageX)
@@ -102,7 +99,6 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
             findLessOrEqualValue: findLessOrEqualValue,
             findNearValue: findNearValue,
             findGreaterOrEqualValue: findGreaterOrEqualValue,
-            getRootOffsetLeft: getRootOffsetLeft,
             getEventPageX: getEventPageX,
             truncateSelectedRange: truncateSelectedRange,
             trackerSettings: {
@@ -128,7 +124,7 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
             redraw: function(group) {
                 var that = this;
                 if (!that._isDrawn) {
-                    that._isDrawn = !(that._draw(group || that._group) === false);
+                    that._isDrawn = that._draw(group || that._group) !== false;
                     if (group)
                         that._group = group
                 }
@@ -152,7 +148,6 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
     (function($, DX, undefined) {
         var rangeSelector = DX.viz.rangeSelector,
             utils = DX.utils,
-            rangeSelectorUtils = rangeSelector.utils,
             core = DX.viz.core,
             patchFontOptions = core.utils.patchFontOptions,
             ParseUtils = core.ParseUtils,
@@ -175,6 +170,8 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
             SELECTED_RANGE_CHANGED = SELECTED_RANGE + 'Changed',
             CONTAINER_BACKGROUND_COLOR = "containerBackgroundColor",
             SLIDER_MARKER = "sliderMarker",
+            BACKGROUND = "background",
+            LOGARITHMIC = "logarithmic",
             INVISIBLE_POS = -1000,
             logarithmBase = 10;
         rangeSelector.consts = {
@@ -239,7 +236,7 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
         var parseSliderMarkersPlaceholderSize = function(placeholderSize) {
                 var placeholderWidthLeft,
                     placeholderWidthRight,
-                    placeholderHeight = 0;
+                    placeholderHeight;
                 if (_isNumber(placeholderSize))
                     placeholderWidthLeft = placeholderWidthRight = placeholderHeight = placeholderSize;
                 else if (placeholderSize) {
@@ -324,14 +321,16 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
         var createRange = function(options) {
                 return new core.Range(options)
             };
-        var checkLogarithmicOptions = function(options, logarithmBase, incidentOccured) {
+        var checkLogarithmicOptions = function(options, defaultLogarithmBase, incidentOccured) {
+                var logarithmBase;
                 if (!options)
                     return;
-                if (options.type === 'logarithmic' && options.logarithmBase <= 0 || options.logarithmBase && !_isNumber(options.logarithmBase)) {
-                    options.logarithmBase = logarithmBase;
+                logarithmBase = options.logarithmBase;
+                if (options.type === LOGARITHMIC && logarithmBase <= 0 || logarithmBase && !_isNumber(logarithmBase)) {
+                    options.logarithmBase = defaultLogarithmBase;
                     incidentOccured('E2104')
                 }
-                else if (options.type !== 'logarithmic')
+                else if (options.type !== LOGARITHMIC)
                     options.logarithmBase = undefined
             };
         var calculateScaleAreaHeight = function(renderer, scaleOptions, visibleMarkers) {
@@ -449,6 +448,21 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
             var textBBox = textElement.getBBox();
             textElement.remove();
             return textBBox
+        }
+        function processValue(selectedRangeOptions, scaleOptions, entity, incidentOccured) {
+            var parsedValue,
+                value = selectedRangeOptions[entity],
+                parser = scaleOptions.parser || function() {
+                    return null
+                },
+                resultValue = scaleOptions[entity];
+            if (_isDefined(value))
+                parsedValue = parser(value);
+            if (!_isDefined(parsedValue))
+                incidentOccured("E2203", [entity]);
+            else
+                resultValue = parsedValue;
+            return rangeSelector.utils.truncateSelectedRange(resultValue, scaleOptions)
         }
         DX.registerComponent("dxRangeSelector", rangeSelector, core.BaseWidget.inherit({
             _eventsMap: $.extend({}, core.BaseWidget.prototype._eventsMap, {
@@ -581,9 +595,9 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
                     indents,
                     sliderMarkerOptions,
                     selectedRange,
-                    chartOptions = that._getOption('chart'),
+                    chartOptions = that.option('chart'),
                     shutterOptions = that._getOption("shutter"),
-                    background = that._getOption('background'),
+                    background = that._getOption(BACKGROUND),
                     isCompactMode,
                     scaleOptions,
                     chartThemeManager;
@@ -592,7 +606,7 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
                 isCompactMode = !(seriesDataSource && seriesDataSource.isShowChart() || background && background.image && background.image.url);
                 if (seriesDataSource) {
                     chartThemeManager = seriesDataSource.getThemeManager();
-                    checkLogarithmicOptions(chartOptions.valueAxis, chartThemeManager.getOptions("valueAxis").logarithmBase, that._incidentOccured)
+                    checkLogarithmicOptions(chartOptions && chartOptions.valueAxis, chartThemeManager.getOptions("valueAxis").logarithmBase, that._incidentOccured)
                 }
                 scaleOptions = that._scaleOptions = that._prepareScaleOptions(seriesDataSource);
                 translatorRange = calculateTranslatorRange(seriesDataSource, scaleOptions);
@@ -642,44 +656,26 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
                 var that = this,
                     scaleOptions = that._scaleOptions,
                     selectedRangeOptions = that.option(SELECTED_RANGE),
-                    startValue,
-                    endValue,
-                    parser = scaleOptions.parser || function() {
-                        return null
-                    },
-                    parseValue = function(value, entity) {
-                        var parsedValue,
-                            result = scaleOptions[entity];
-                        if (_isDefined(value))
-                            parsedValue = parser(value);
-                        if (!_isDefined(parsedValue))
-                            that._incidentOccured("E2203", [entity]);
-                        else
-                            result = parsedValue;
-                        return result
-                    };
+                    incidentOccured = that._incidentOccured;
                 if (!selectedRangeOptions)
                     return cloneSelectedRange(scaleOptions);
-                else {
-                    startValue = parseValue(selectedRangeOptions.startValue, START_VALUE);
-                    startValue = rangeSelectorUtils.truncateSelectedRange(startValue, scaleOptions);
-                    endValue = parseValue(selectedRangeOptions.endValue, END_VALUE);
-                    endValue = rangeSelectorUtils.truncateSelectedRange(endValue, scaleOptions);
+                else
                     return {
-                            startValue: startValue,
-                            endValue: endValue
+                            startValue: processValue(selectedRangeOptions, scaleOptions, START_VALUE, incidentOccured),
+                            endValue: processValue(selectedRangeOptions, scaleOptions, END_VALUE, incidentOccured)
                         }
-                }
             },
             _createSeriesDataSource: function(chartOptions) {
                 var that = this,
                     seriesDataSource,
                     dataSource = that._dataSource && that._dataSource.items(),
                     scaleOptions = that._getOption('scale'),
-                    valueType = scaleOptions.valueType;
+                    valueType = scaleOptions.valueType,
+                    backgroundOption = that.option(BACKGROUND);
                 if (!valueType)
                     valueType = calculateValueType(scaleOptions.startValue, scaleOptions.endValue);
-                if (dataSource || chartOptions.series)
+                if (dataSource || chartOptions && chartOptions.series) {
+                    chartOptions = $.extend({}, chartOptions, {theme: that.option("theme")});
                     seriesDataSource = new rangeSelector.SeriesDataSource({
                         renderer: that._renderer,
                         dataSource: dataSource,
@@ -687,15 +683,16 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
                         axisType: scaleOptions.type,
                         chart: chartOptions,
                         dataSourceField: that.option('dataSourceField'),
-                        backgroundColor: that.option("background") && that.option("background").color,
+                        backgroundColor: backgroundOption && backgroundOption.color,
                         incidentOccured: that._incidentOccured,
                         categories: scaleOptions.categories
-                    });
+                    })
+                }
                 return seriesDataSource
             },
             _prepareScaleOptions: function(seriesDataSource) {
                 var that = this,
-                    scaleOptions = $.extend(true, {}, that._getOption('scale')),
+                    scaleOptions = that._getOption('scale'),
                     parsedValue = 0,
                     parseUtils = new ParseUtils,
                     valueType = parseUtils.correctValueType((scaleOptions.valueType || '').toLowerCase()),
@@ -1084,30 +1081,35 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
             selectedRange.endValue = selectedRange.endValue || scaleOptions.endValue;
             return selectedRange
         }
+        var dateSetters = {};
+        dateSetters.millisecond = function(date) {
+            date.setMilliseconds(0)
+        };
+        dateSetters.second = function(date) {
+            date.setSeconds(0, 0)
+        };
+        dateSetters.minute = function(date) {
+            date.setMinutes(0, 0, 0)
+        };
+        dateSetters.hour = function(date) {
+            date.setHours(0, 0, 0, 0)
+        };
+        dateSetters.week = dateSetters.day = function(date) {
+            date.setDate(1);
+            dateSetters.hour(date)
+        };
+        dateSetters.month = function(date) {
+            date.setMonth(0);
+            dateSetters.day(date)
+        };
+        dateSetters.quarter = function(date) {
+            date.setMonth(formatHelper.getFirstQuarterMonth(date.getMonth()));
+            dateSetters.day(date)
+        };
         function getMarkerDate(date, tickInterval) {
             var markerDate = new Date(date.getTime()),
-                month = 0;
-            switch (tickInterval) {
-                case'quarter':
-                    month = formatHelper.getFirstQuarterMonth(date.getMonth());
-                case'month':
-                    markerDate.setMonth(month);
-                case'week':
-                case'day':
-                    markerDate.setDate(1);
-                case'hour':
-                    markerDate.setHours(0, 0, 0, 0);
-                    break;
-                case'millisecond':
-                    markerDate.setMilliseconds(0);
-                    break;
-                case'second':
-                    markerDate.setSeconds(0, 0);
-                    break;
-                case'minute':
-                    markerDate.setMinutes(0, 0, 0);
-                    break
-            }
+                setter = dateSetters[tickInterval];
+            setter && setter(markerDate);
             return markerDate
         }
         function prepareDatesDifferences(datesDifferences, tickInterval) {
@@ -1160,58 +1162,78 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
                     this.dateUnitInterval = utils.getDateUnitInterval(majorTickInterval)
                 }
             },
-            _drawDateMarker: function(date, options) {
+            _getDrawnDateMarker: function(date, options) {
                 var that = this,
                     labelPosX,
                     labelPosY,
-                    dateFormated,
-                    scaleOptions,
-                    textElement;
+                    scaleOptions = that._options.scale,
+                    textElement,
+                    textElementWidth,
+                    textIndent,
+                    pathElement;
                 if (options.x === null)
                     return;
-                scaleOptions = that._options.scale;
-                that._renderer.path([options.x, options.y, options.x, options.y + scaleOptions.marker.separatorHeight], "line").attr(that._majorTickStyle).append(options.group);
-                dateFormated = getLabel(date, options.label);
-                labelPosX = options.x + scaleOptions.tick.width + scaleOptions.marker.textLeftIndent;
+                that.textOptions.align = "left";
+                pathElement = that._renderer.path([options.x, options.y, options.x, options.y + scaleOptions.marker.separatorHeight], "line").attr(that._majorTickStyle).append(options.group);
+                textElement = that._renderer.text(getLabel(date, options.label), 0, 0).attr(that.textOptions).css(that.fontOptions).append(options.group);
+                textElementWidth = textElement.getBBox().width;
+                textIndent = scaleOptions.tick.width + scaleOptions.marker.textLeftIndent;
+                labelPosX = scaleOptions.inverted ? options.x - textIndent - textElementWidth : options.x + textIndent;
                 labelPosY = options.y + scaleOptions.marker.textTopIndent + that.fontOptions["font-size"];
-                that.textOptions.align = 'left';
-                textElement = that._renderer.text(dateFormated, labelPosX, labelPosY).attr(that.textOptions).css(that.fontOptions).append(options.group);
-                return labelPosX + textElement.getBBox().width
+                textElement.move(labelPosX, labelPosY);
+                return {
+                        x1: labelPosX,
+                        x2: labelPosX + textElementWidth,
+                        path: pathElement,
+                        text: textElement
+                    }
+            },
+            _deleteDrawnDateMarker: function(marker) {
+                marker.path.dispose();
+                marker.path = null;
+                marker.text.dispose();
+                marker.text = null
             },
             _drawDateMarkers: function(dates, group) {
-                var i,
-                    options = this._options,
+                var that = this,
+                    i,
+                    options = that._options,
+                    datesLength = dates.length,
                     datesDifferences,
                     markerDate,
                     posX,
-                    prevMarkerRightX = -1,
-                    markerDatePositions = [];
-                if (this._options.scale.valueType !== 'datetime' || !this.visibleMarkers)
+                    markerDatePositions = [],
+                    prevDateMarker,
+                    dateMarker;
+                if (options.scale.valueType !== 'datetime' || !that.visibleMarkers)
                     return;
                 if (dates.length > 1) {
-                    for (i = 1; i < dates.length; i++) {
+                    for (i = 1; i < datesLength; i++) {
                         datesDifferences = utils.getDatesDifferences(dates[i - 1], dates[i]);
-                        prepareDatesDifferences(datesDifferences, this.dateUnitInterval);
+                        prepareDatesDifferences(datesDifferences, that.dateUnitInterval);
                         if (datesDifferences.count > 0) {
-                            markerDate = getMarkerDate(dates[i], this.dateUnitInterval);
-                            this.markerDates = this.markerDates || [];
-                            this.markerDates.push(markerDate);
-                            posX = this.translator.translate(markerDate);
-                            if (posX > prevMarkerRightX) {
+                            markerDate = getMarkerDate(dates[i], that.dateUnitInterval);
+                            that.markerDates = that.markerDates || [];
+                            that.markerDates.push(markerDate);
+                            posX = that.translator.translate(markerDate);
+                            dateMarker = that._getDrawnDateMarker(markerDate, {
+                                group: group,
+                                y: options.canvas.top + options.canvas.height - that.markersAreaHeight + options.scale.marker.topIndent,
+                                x: posX,
+                                label: that._getLabelFormatOptions(formatHelper.getDateFormatByDifferences(datesDifferences))
+                            });
+                            if (prevDateMarker === undefined || dateMarker.x1 > prevDateMarker.x2 || dateMarker.x2 < prevDateMarker.x1) {
                                 posX !== null && markerDatePositions.push({
                                     date: markerDate,
                                     posX: posX
                                 });
-                                prevMarkerRightX = this._drawDateMarker(markerDate, {
-                                    group: group,
-                                    y: options.canvas.top + options.canvas.height - this.markersAreaHeight + options.scale.marker.topIndent,
-                                    x: posX,
-                                    label: this._getLabelFormatOptions(formatHelper.getDateFormatByDifferences(datesDifferences))
-                                })
+                                prevDateMarker = dateMarker
                             }
+                            else
+                                that._deleteDrawnDateMarker(dateMarker)
                         }
                     }
-                    this._initializeMarkersEvents(markerDatePositions, group)
+                    that._initializeMarkersEvents(markerDatePositions, group)
                 }
             },
             _getLabelFormatOptions: function(formatString) {
@@ -1230,7 +1252,7 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
                 if (markerDatePositions.length > 0) {
                     markersTracker = that._renderer.rect(options.canvas.left, markersAreaTop, options.canvas.width, options.scale.marker.separatorHeight).attr(rangeSelectorUtils.trackerSettings).append(group);
                     markersTracker.on(rangeSelector.events.start, function(e) {
-                        svgOffsetLeft = rangeSelectorUtils.getRootOffsetLeft(that._renderer);
+                        svgOffsetLeft = that._renderer.getRootOffset().left;
                         posX = rangeSelectorUtils.getEventPageX(e) - svgOffsetLeft;
                         selectedRange = calculateRangeByMarkerPosition(posX, markerDatePositions, options.scale);
                         options.setSelectedRange(selectedRange)
@@ -1809,7 +1831,6 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
             _SlidersEventManager,
             rangeSelectorUtils = rangeSelector.utils,
             getEventPageX = rangeSelectorUtils.getEventPageX,
-            getRootOffsetLeft = rangeSelectorUtils.getRootOffsetLeft,
             rangeSelectorCount = 0;
         rangeSelector.events = {
             start: "dxpointerdown",
@@ -1873,7 +1894,7 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
                     sliderMoveHandler = function(e) {
                         var pageX,
                             offsetPosition,
-                            svgOffsetLeft = getRootOffsetLeft(that._renderer),
+                            svgOffsetLeft = that._renderer.getRootOffset().left,
                             position,
                             sliderIndex = slider.getIndex();
                         if (isTouchEvent !== isTouchEventArgs(e))
@@ -1905,7 +1926,7 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
                     fastSwap = this === slider.getSliderTracker().element;
                     splitterMoving = true;
                     isTouchEvent = isTouchEventArgs(e);
-                    startOffsetPosition = getEventPageX(e) - slider.getPosition() - getRootOffsetLeft(that._renderer);
+                    startOffsetPosition = getEventPageX(e) - slider.getPosition() - that._renderer.getRootOffset().left;
                     if (!isMultiTouches(e)) {
                         this.preventedDefault = true;
                         e.stopPropagation();
@@ -1932,7 +1953,7 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
                         if (unselectedAreaProcessing) {
                             pageX = getEventPageX(e);
                             if (that._options.behavior.moveSelectedRangeByClick && Math.abs(startPageX - pageX) < MIN_MANUAL_SELECTING_WIDTH)
-                                slidersController.applySelectedAreaCenterPosition(pageX - getRootOffsetLeft(that._renderer));
+                                slidersController.applySelectedAreaCenterPosition(pageX - that._renderer.getRootOffset().left);
                             unselectedAreaProcessing = false;
                             slidersController.endSelection();
                             processSelectionChanged(false)
@@ -1942,7 +1963,7 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
                         var pageX,
                             startPosition,
                             endPosition,
-                            svgOffsetLeft = getRootOffsetLeft(that._renderer);
+                            svgOffsetLeft = that._renderer.getRootOffset().left;
                         if (isTouchEvent !== isTouchEventArgs(e))
                             return;
                         if (unselectedAreaProcessing && !isLeftButtonPressed(e)) {
@@ -2308,23 +2329,26 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
             },
             _applySliderPosition: function(position, disableAnimation) {
                 var that = this,
-                    isAnimation = that._options.behavior.animationEnabled && !disableAnimation,
+                    options = that._options,
+                    isAnimation = options.behavior.animationEnabled && !disableAnimation,
                     slider = that._slider,
+                    sliderTracker = that._sliderTracker,
                     attrs = {
                         translateX: position,
-                        translateY: that._options.canvas.top
-                    };
+                        translateY: options.canvas.top
+                    },
+                    animationSettings = rangeSelectorUtils.animationSettings;
                 that._marker && that._marker.setPosition(position);
                 if (isAnimation) {
-                    slider.animate(attrs, rangeSelectorUtils.animationSettings);
-                    that._sliderTracker.animate(attrs, rangeSelectorUtils.animationSettings)
+                    slider.animate(attrs, animationSettings);
+                    sliderTracker.animate(attrs, animationSettings)
                 }
                 else {
-                    that._slider.stopAnimation().attr(attrs);
-                    that._sliderTracker.stopAnimation().attr(attrs)
+                    slider.stopAnimation().attr(attrs);
+                    sliderTracker.stopAnimation().attr(attrs)
                 }
-                that._sliderTracker.updateHeight();
-                that._slider.updateHeight()
+                sliderTracker.updateHeight();
+                slider.updateHeight()
             },
             _applyShutterPosition: function(position, disableAnimation) {
                 var that = this,
@@ -2508,8 +2532,7 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
                 var that = this;
                 that._position = that._valuePosition;
                 that.applyPosition(false);
-                that._setValid(true);
-                that._marker && that._marker.update()
+                that._setValid(true)
             },
             applyPosition: function(disableAnimation) {
                 var that = this,
@@ -2704,17 +2727,14 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
                 }
                 updateSliderMarker(textSize)
             },
-            update: function() {
-                this._update()
-            },
             setText: function(value) {
                 var that = this;
                 if (that._text !== value)
-                    that._text = value;
-                that._update()
+                    that._text = value
             },
             setPosition: function(position) {
-                this._position = position
+                this._position = position;
+                this._update()
             },
             changeLocation: function() {
                 var that = this;
@@ -2870,6 +2890,15 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
                 });
                 return stickType
             };
+        function setTemplateFields(data, templateData, series) {
+            $.each(data, function(_, data) {
+                $.each(series.getTeamplatedFields(), function(_, field) {
+                    data[field.teamplateField] = data[field.originalField]
+                });
+                templateData.push(data)
+            });
+            series.updateTeamplateFieldNames()
+        }
         _SeriesDatasource = rangeSelector.SeriesDataSource = function(options) {
             var that = this,
                 templatedSeries,
@@ -2877,6 +2906,7 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
                 themeManager = that._themeManager = createThemeManager(options.chart),
                 topIndent,
                 bottomIndent;
+            themeManager._fontFields = ["commonSeriesSettings.label.font"];
             themeManager.setTheme(options.chart.theme);
             topIndent = themeManager.getOptions('topIndent');
             bottomIndent = themeManager.getOptions('bottomIndent');
@@ -2933,15 +2963,8 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
                         newSeries = coreFactory.createSeries({renderer: options.renderer}, seriesTheme);
                         series.push(newSeries)
                     }
-                    if (hasSeriesTemplate) {
-                        $.each(data, function(_, data) {
-                            $.each(newSeries.getTeamplatedFields(), function(_, field) {
-                                data[field.teamplateField] = data[field.originalField]
-                            });
-                            that.teamplateData.push(data)
-                        });
-                        newSeries.updateTeamplateFieldNames()
-                    }
+                    if (hasSeriesTemplate)
+                        setTemplateFields(data, that.teamplateData, newSeries)
                 }
                 data = hasSeriesTemplate ? that.teamplateData : data;
                 groupSeries = [series];

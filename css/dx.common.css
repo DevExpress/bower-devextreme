@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme
-* Version: 15.1.3
-* Build date: Jun 1, 2015
+* Version: 15.1.4
+* Build date: Jun 22, 2015
 *
 * Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -773,10 +773,6 @@
 {
   height: auto;
 }
-.dx-scrollable-native.dx-scrollable-native-android
-{
-  overflow: hidden;
-}
 .dx-scrollable-native.dx-scrollable-native-android .dx-scrollable-content
 {
   -webkit-transform: none;
@@ -926,169 +922,20 @@
   position: absolute;
   display: none;
 }
-.dx-scrollable-native.dx-scrollable-native-android .dx-scrollview-content
-{
-  -webkit-transform: none;
-  -moz-transform: none;
-  -ms-transform: none;
-  -o-transform: none;
-  transform: none;
-}
-.dx-scrollable-native.dx-scrollable-native-android .dx-scrollview-scrollbottom
-{
-  -webkit-transform: none;
-  -moz-transform: none;
-  -ms-transform: none;
-  -o-transform: none;
-  transform: none;
-}
-.dx-scrollable-native.dx-scrollable-native-android .dx-scrollview-pull-down-image
-{
-  -webkit-transform: none;
-  -moz-transform: none;
-  -ms-transform: none;
-  -o-transform: none;
-  transform: none;
-}
 .dx-scrollable-native.dx-scrollable-native-android .dx-scrollview-top-pocket
 {
-  height: 3px;
+  width: 44px;
+  height: 44px;
+  left: 50%;
+  position: absolute;
+  z-index: 1;
 }
 .dx-scrollable-native.dx-scrollable-native-android .dx-scrollview-pull-down
 {
-  -webkit-transform: none;
-  -moz-transform: none;
-  -ms-transform: none;
-  -o-transform: none;
-  transform: none;
-  position: relative;
-  height: 3px;
+  background-image: none;
+  position: static;
+  height: 100%;
   width: 100%;
-  top: 0;
-  padding: 0;
-  margin: 0 auto -2px;
-  -webkit-transition: width 100ms linear 0;
-  -moz-transition: width 100ms linear 0;
-  -o-transition: width 100ms linear 0;
-  transition: width 100ms linear 0;
-  -webkit-transition: width 100ms linear 0,none 1s linear 0;
-  -moz-transition: width 100ms linear 0,none 1s linear 0;
-  -o-transition: width 100ms linear 0,none 1s linear 0;
-  transition: width 100ms linear 0,none 1s linear 0;
-  -webkit-transition: width 100ms linear 0,none 1s linear 0,none 1s linear 0;
-  -moz-transition: width 100ms linear 0,none 1s linear 0,none 1s linear 0;
-  -o-transition: width 100ms linear 0,none 1s linear 0,none 1s linear 0;
-  transition: width 100ms linear 0,none 1s linear 0,none 1s linear 0;
-  -webkit-transition: width 100ms linear 0,none 1s linear 0,none 1s linear 0,none 1s linear 0;
-  -moz-transition: width 100ms linear 0,none 1s linear 0,none 1s linear 0,none 1s linear 0;
-  -o-transition: width 100ms linear 0,none 1s linear 0,none 1s linear 0,none 1s linear 0;
-  transition: width 100ms linear 0,none 1s linear 0,none 1s linear 0,none 1s linear 0;
-  overflow: hidden;
-}
-.dx-scrollable-native.dx-scrollable-native-android .dx-scrollview-pull-down div
-{
-  position: absolute;
-  width: 3px;
-  height: 3px;
-  top: 0;
-  left: 0;
-  opacity: 0;
-}
-.dx-scrollable-native.dx-scrollable-native-android .dx-scrollview-pull-down-loading
-{
-  width: 100%;
-}
-.dx-scrollable-native.dx-scrollable-native-android .dx-scrollview-pull-down-loading .dx-scrollview-pulldown-pointer1
-{
-  -webkit-animation: dx-pulldown-animation 2s ease-in infinite 0;
-  -moz-animation: dx-pulldown-animation 2s ease-in infinite 0;
-  -o-animation: dx-pulldown-animation 2s ease-in infinite 0;
-  animation: dx-pulldown-animation 2s ease-in infinite 0;
-}
-.dx-scrollable-native.dx-scrollable-native-android .dx-scrollview-pull-down-loading .dx-scrollview-pulldown-pointer2
-{
-  -webkit-animation: dx-pulldown-animation 2s ease-in infinite .5s;
-  -moz-animation: dx-pulldown-animation 2s ease-in infinite .5s;
-  -o-animation: dx-pulldown-animation 2s ease-in infinite .5s;
-  animation: dx-pulldown-animation 2s ease-in infinite .5s;
-}
-.dx-scrollable-native.dx-scrollable-native-android .dx-scrollview-pull-down-loading .dx-scrollview-pulldown-pointer3
-{
-  -webkit-animation: dx-pulldown-animation 2s ease-in infinite 1s;
-  -moz-animation: dx-pulldown-animation 2s ease-in infinite 1s;
-  -o-animation: dx-pulldown-animation 2s ease-in infinite 1s;
-  animation: dx-pulldown-animation 2s ease-in infinite 1s;
-}
-.dx-scrollable-native.dx-scrollable-native-android .dx-scrollview-pull-down-loading .dx-scrollview-pulldown-pointer4
-{
-  -webkit-animation: dx-pulldown-animation 2s ease-in infinite 1.5s;
-  -moz-animation: dx-pulldown-animation 2s ease-in infinite 1.5s;
-  -o-animation: dx-pulldown-animation 2s ease-in infinite 1.5s;
-  animation: dx-pulldown-animation 2s ease-in infinite 1.5s;
-}
-@-webkit-keyframes dx-pulldown-animation
-{
-  0%
-  {
-    left: 0;
-    opacity: .9;
-  }
-  100%
-  {
-    left: 100%;
-    opacity: .6;
-  }
-}
-@-moz-keyframes dx-pulldown-animation
-{
-  0%
-  {
-    left: 0;
-    opacity: .9;
-  }
-  100%
-  {
-    left: 100%;
-    opacity: .6;
-  }
-}
-@-ms-keyframes dx-pulldown-animation
-{
-  0%
-  {
-    left: 0;
-    opacity: .9;
-  }
-  100%
-  {
-    left: 100%;
-    opacity: .6;
-  }
-}
-@-o-keyframes dx-pulldown-animation{0%{left:0;opacity:.9;}100%{left:100%;opacity:.6;}}
-@keyframes dx-pulldown-animation
-{
-  0%
-  {
-    left: 0;
-    opacity: .9;
-  }
-  100%
-  {
-    left: 100%;
-    opacity: .6;
-  }
-}
-.dx-scrollable-native.dx-scrollable-native-android5 .dx-scrollview-top-pocket
-{
-  left: 50%;
-  position: fixed;
-}
-.dx-scrollable-native.dx-scrollable-native-android5 .dx-scrollview-pull-down
-{
-  position: relative;
-  height: auto;
-  width: auto;
   left: -50%;
   padding: 0;
   -webkit-border-radius: 50%;
@@ -1097,20 +944,57 @@
   -o-border-radius: 50%;
   border-radius: 50%;
 }
-.dx-scrollable-native.dx-scrollable-native-android5 .dx-scrollview-pull-down .dx-scrollview-pull-down-indicator
+.dx-scrollable-native.dx-scrollable-native-android .dx-scrollview-pull-down.dx-scrollview-pull-down-loading
+{
+  -webkit-transition: -webkit-transform 100ms linear;
+  -moz-transition: -moz-transform 100ms linear;
+  -o-transition: -o-transform 100ms linear;
+  transition: transform 100ms linear;
+}
+.dx-scrollable-native.dx-scrollable-native-android .dx-scrollview-pull-down .dx-scrollview-pull-down-indicator
 {
   position: relative;
-  padding: 5px;
+  top: 0;
+  padding: 6px;
   margin: 0;
-  height: auto;
-  width: auto;
+  height: 100%;
+  width: 100%;
   float: left;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
 }
-.dx-scrollable-native.dx-scrollable-native-android5 .dx-scrollview-pull-down .dx-scrollview-pull-down-indicator .dx-loadindicator
+.dx-scrollable-native.dx-scrollable-native-android .dx-scrollview-pull-down .dx-scrollview-pull-down-indicator .dx-loadindicator
 {
   float: left;
 }
-.dx-scrollable-native.dx-scrollable-native-android5 .dx-scrollview-pull-down-loading.dx-scrollview-pull-down
+.dx-scrollable-native.dx-scrollable-native-android .dx-icon-pulldown
+{
+  width: 100%;
+  height: 100%;
+  padding: 8px;
+  font-size: 28px;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  -webkit-transition: color 200ms linear 0;
+  -moz-transition: color 200ms linear 0;
+  -o-transition: color 200ms linear 0;
+  transition: color 200ms linear 0;
+  -webkit-transition: color 200ms linear 0,none 1s linear 0;
+  -moz-transition: color 200ms linear 0,none 1s linear 0;
+  -o-transition: color 200ms linear 0,none 1s linear 0;
+  transition: color 200ms linear 0,none 1s linear 0;
+  -webkit-transition: color 200ms linear 0,none 1s linear 0,none 1s linear 0;
+  -moz-transition: color 200ms linear 0,none 1s linear 0,none 1s linear 0;
+  -o-transition: color 200ms linear 0,none 1s linear 0,none 1s linear 0;
+  transition: color 200ms linear 0,none 1s linear 0,none 1s linear 0;
+  -webkit-transition: color 200ms linear 0,none 1s linear 0,none 1s linear 0,none 1s linear 0;
+  -moz-transition: color 200ms linear 0,none 1s linear 0,none 1s linear 0,none 1s linear 0;
+  -o-transition: color 200ms linear 0,none 1s linear 0,none 1s linear 0,none 1s linear 0;
+  transition: color 200ms linear 0,none 1s linear 0,none 1s linear 0,none 1s linear 0;
+}
+.dx-scrollable-native.dx-scrollable-native-android .dx-scrollview-pull-down-loading.dx-scrollview-pull-down
 {
   -webkit-transition: top 200ms ease-out 0;
   -moz-transition: top 200ms ease-out 0;
@@ -1145,7 +1029,7 @@
   -o-transition: 200ms ease-out 0 0,none 1s linear 0,none 1s linear 0,none 1s linear 0;
   transition: 200ms ease-out 0 0,none 1s linear 0,none 1s linear 0,none 1s linear 0;
 }
-.dx-scrollable-native.dx-scrollable-native-android5 .dx-scrollview-pull-down-image
+.dx-scrollable-native.dx-scrollable-native-android .dx-scrollview-pull-down-image
 {
   position: absolute;
   margin: 0;
@@ -1170,6 +1054,10 @@
   -moz-transition: opacity 200ms ease 0,none 1s linear 0,none 1s linear 0,none 1s linear 0;
   -o-transition: opacity 200ms ease 0,none 1s linear 0,none 1s linear 0,none 1s linear 0;
   transition: opacity 200ms ease 0,none 1s linear 0,none 1s linear 0,none 1s linear 0;
+}
+.dx-scrollable-native.dx-scrollable-native-android .dx-scrollview-pull-down-loading .dx-icon-pulldown
+{
+  display: none;
 }
 .dx-scrollable-native.dx-scrollable-native-ios .dx-scrollview-top-pocket
 {
@@ -1224,6 +1112,10 @@
 {
   width: 100%;
   text-align: center;
+}
+.dx-device-android-4 .dx-scrollable-native.dx-scrollable-native-android .dx-scrollview-pull-down-loading .dx-icon-pulldown
+{
+  display: block;
 }
 .dx-scrollview-content
 {
@@ -1384,92 +1276,6 @@
 .dx-scrollview-scrollbottom-end
 {
   opacity: 0;
-}
-.dx-rtl .dx-scrollable-native.dx-scrollable-native-android .dx-scrollview-pull-down div, .dx-scrollable-native.dx-rtl.dx-scrollable-native-android .dx-scrollview-pull-down div
-{
-  left: auto;
-  right: 0;
-}
-.dx-rtl .dx-scrollable-native.dx-scrollable-native-android .dx-scrollview-pull-down-loading .dx-scrollview-pulldown-pointer1, .dx-scrollable-native.dx-rtl.dx-scrollable-native-android .dx-scrollview-pull-down-loading .dx-scrollview-pulldown-pointer1
-{
-  -webkit-animation: dx-pulldown-animation-rtl 2s ease-in infinite 0;
-  -moz-animation: dx-pulldown-animation-rtl 2s ease-in infinite 0;
-  -o-animation: dx-pulldown-animation-rtl 2s ease-in infinite 0;
-  animation: dx-pulldown-animation-rtl 2s ease-in infinite 0;
-}
-.dx-rtl .dx-scrollable-native.dx-scrollable-native-android .dx-scrollview-pull-down-loading .dx-scrollview-pulldown-pointer2, .dx-scrollable-native.dx-rtl.dx-scrollable-native-android .dx-scrollview-pull-down-loading .dx-scrollview-pulldown-pointer2
-{
-  -webkit-animation: dx-pulldown-animation-rtl 2s ease-in infinite .5s;
-  -moz-animation: dx-pulldown-animation-rtl 2s ease-in infinite .5s;
-  -o-animation: dx-pulldown-animation-rtl 2s ease-in infinite .5s;
-  animation: dx-pulldown-animation-rtl 2s ease-in infinite .5s;
-}
-.dx-rtl .dx-scrollable-native.dx-scrollable-native-android .dx-scrollview-pull-down-loading .dx-scrollview-pulldown-pointer3, .dx-scrollable-native.dx-rtl.dx-scrollable-native-android .dx-scrollview-pull-down-loading .dx-scrollview-pulldown-pointer3
-{
-  -webkit-animation: dx-pulldown-animation-rtl 2s ease-in infinite 1s;
-  -moz-animation: dx-pulldown-animation-rtl 2s ease-in infinite 1s;
-  -o-animation: dx-pulldown-animation-rtl 2s ease-in infinite 1s;
-  animation: dx-pulldown-animation-rtl 2s ease-in infinite 1s;
-}
-.dx-rtl .dx-scrollable-native.dx-scrollable-native-android .dx-scrollview-pull-down-loading .dx-scrollview-pulldown-pointer4, .dx-scrollable-native.dx-rtl.dx-scrollable-native-android .dx-scrollview-pull-down-loading .dx-scrollview-pulldown-pointer4
-{
-  -webkit-animation: dx-pulldown-animation-rtl 2s ease-in infinite 1.5s;
-  -moz-animation: dx-pulldown-animation-rtl 2s ease-in infinite 1.5s;
-  -o-animation: dx-pulldown-animation-rtl 2s ease-in infinite 1.5s;
-  animation: dx-pulldown-animation-rtl 2s ease-in infinite 1.5s;
-}
-@-webkit-keyframes dx-pulldown-animation-rtl
-{
-  0%
-  {
-    right: 0;
-    opacity: .9;
-  }
-  100%
-  {
-    right: 100%;
-    opacity: .6;
-  }
-}
-@-moz-keyframes dx-pulldown-animation-rtl
-{
-  0%
-  {
-    right: 0;
-    opacity: .9;
-  }
-  100%
-  {
-    right: 100%;
-    opacity: .6;
-  }
-}
-@-ms-keyframes dx-pulldown-animation-rtl
-{
-  0%
-  {
-    right: 0;
-    opacity: .9;
-  }
-  100%
-  {
-    right: 100%;
-    opacity: .6;
-  }
-}
-@-o-keyframes dx-pulldown-animation-rtl{0%{right:0;opacity:.9;}100%{right:100%;opacity:.6;}}
-@keyframes dx-pulldown-animation-rtl
-{
-  0%
-  {
-    right: 0;
-    opacity: .9;
-  }
-  100%
-  {
-    right: 100%;
-    opacity: .6;
-  }
 }
 .dx-rtl .dx-scrollable-native.dx-scrollable-native-ios .dx-scrollview-top-pocket, .dx-scrollable-native.dx-rtl.dx-scrollable-native-ios .dx-scrollview-top-pocket
 {
@@ -1748,7 +1554,7 @@
   top: -100%;
   left: 0;
   background: rgba(0,0,0,.01);
-  filter: alpha(opacity=100);
+  filter: alpha(opacity=1);
   -khtml-opacity: .01;
   -moz-opacity: .01;
   opacity: .01;
@@ -1771,6 +1577,10 @@
   margin: 0 auto;
   width: 31px;
   height: 31px;
+}
+.dx-rtl.dx-tabs.dx-navbar .dx-icon, .dx-rtl .dx-tabs.dx-navbar .dx-icon
+{
+  margin: 0 auto;
 }
 .dx-tabs.dx-navbar .dx-tab-text
 {
@@ -1878,6 +1688,7 @@
   height: 100%;
   width: 34px;
   position: relative;
+  cursor: pointer;
 }
 .dx-clear-button-area .dx-icon-clear
 {
@@ -1970,7 +1781,7 @@
 }
 .dx-dropdowneditor-active .dx-dropdowneditor-icon
 {
-  filter: alpha(opacity=100);
+  filter: alpha(opacity=35);
   -khtml-opacity: .35;
   -moz-opacity: .35;
   opacity: .35;
@@ -2003,7 +1814,7 @@
 }
 .dx-state-disabled .dx-dropdowneditor-icon
 {
-  filter: alpha(opacity=100);
+  filter: alpha(opacity=20);
   -khtml-opacity: .2;
   -moz-opacity: .2;
   opacity: .2;
@@ -2031,6 +1842,10 @@
   border-style: solid;
   border-color: transparent;
   border-width: 5px 5px 0 5px;
+}
+.dx-list-collapsible-groups .dx-list-group-header
+{
+  cursor: pointer;
 }
 .dx-list-collapsible-groups .dx-list-group-header:before
 {
@@ -2111,10 +1926,20 @@
   transform: rotate(135deg);
   border-width: 2px 0 0 2px;
   border-style: solid;
-  filter: alpha(opacity=100);
+  filter: alpha(opacity=30);
   -khtml-opacity: .3;
   -moz-opacity: .3;
   opacity: .3;
+}
+.dx-rtl .dx-list-item-chevron
+{
+  margin-left: auto;
+  margin-right: -6px;
+  -webkit-transform: rotate(-45deg);
+  -moz-transform: rotate(-45deg);
+  -ms-transform: rotate(-45deg);
+  -o-transform: rotate(-45deg);
+  transform: rotate(-45deg);
 }
 .dx-list-item-response-wait
 {
@@ -2320,7 +2145,7 @@
 }
 .dx-list-item-reordering
 {
-  filter: alpha(opacity=100);
+  filter: alpha(opacity=0);
   -khtml-opacity: 0;
   -moz-opacity: 0;
   opacity: 0;
@@ -2358,16 +2183,6 @@
 .dx-rtl .dx-list .dx-list-item-badge, .dx-rtl.dx-list .dx-list-item-badge
 {
   float: left;
-}
-.dx-rtl .dx-list .dx-list-item-chevron, .dx-rtl.dx-list .dx-list-item-chevron
-{
-  margin-left: auto;
-  margin-right: -6px;
-  -webkit-transform: rotate(-45deg);
-  -moz-transform: rotate(-45deg);
-  -ms-transform: rotate(-45deg);
-  -o-transform: rotate(-45deg);
-  transform: rotate(-45deg);
 }
 .dx-rtl .dx-list .dx-list-item-before-bag .dx-list-toggle-delete-switch, .dx-rtl.dx-list .dx-list-item-before-bag .dx-list-toggle-delete-switch
 {
@@ -2410,6 +2225,7 @@
   font-family: inherit;
   display: block;
   overflow: auto;
+  white-space: pre-wrap;
 }
 .dx-numberbox
 {
@@ -2469,7 +2285,7 @@
 }
 .dx-state-disabled .dx-numberbox-spin-container
 {
-  filter: alpha(opacity=100);
+  filter: alpha(opacity=20);
   -khtml-opacity: .2;
   -moz-opacity: .2;
   opacity: .2;
@@ -3262,7 +3078,7 @@
 {
   position: absolute;
   overflow: hidden;
-  width: auto;
+  width: 100%;
   height: 100%;
   text-align: center;
 }
@@ -3422,9 +3238,20 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.dx-lookup-field:before
+.dx-lookup-arrow
 {
-  margin-top: -6px;
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: auto;
+  height: 100%;
+}
+.dx-rtl .dx-lookup-arrow
+{
+  right: auto;
+  left: 0;
 }
 .dx-state-disabled .dx-lookup-field, .dx-state-disabled .dx-lookup-field
 {
@@ -3460,6 +3287,14 @@
 .dx-lookup-popup-search .dx-list
 {
   top: 45px;
+}
+.dx-popup-content .dx-lookup-validation-message
+{
+  display: none;
+}
+.dx-popup-content.dx-lookup-invalid .dx-lookup-validation-message
+{
+  display: block;
 }
 .dx-actionsheet-popup-wrapper .dx-overlay-content
 {
@@ -3707,7 +3542,7 @@
 .dx-tagbox.dx-tagbox-only-select .dx-texteditor-input
 {
   min-width: 0;
-  width: 0;
+  width: 1px;
   margin-left: 0;
   margin-right: 0;
   padding-left: 0;
@@ -3719,7 +3554,7 @@
 }
 .dx-tagbox.dx-state-disabled .dx-tag
 {
-  filter: alpha(opacity=100);
+  filter: alpha(opacity=50);
   -khtml-opacity: .5;
   -moz-opacity: .5;
   opacity: .5;
@@ -3816,7 +3651,7 @@
   display: table-cell;
   padding-right: 10px;
   padding-left: 5px;
-  vertical-align: top;
+  vertical-align: middle;
 }
 .dx-radiogroup-horizontal:before, .dx-radiogroup-horizontal:after
 {
@@ -3980,11 +3815,8 @@
 .dx-accordion-item-title:before
 {
   content: '';
-  position: absolute;
-  height: 100%;
-  top: 0;
-  background-repeat: no-repeat;
   background-position: center;
+  float: right;
 }
 .dx-accordion-item-body
 {
@@ -4006,6 +3838,10 @@
 .dx-state-disabled .dx-accordion-item-title
 {
   cursor: default;
+}
+.dx-rtl .dx-accordion-item-title:before
+{
+  float: left;
 }
 .dx-slideoutview
 {
@@ -4054,6 +3890,7 @@
 .dx-slideout-menu
 {
   min-width: 280px;
+  max-width: 350px;
 }
 .dx-slideout-menu .dx-list-item .dx-icon
 {
@@ -4113,7 +3950,7 @@
 {
   display: inline-block;
   margin-right: 9px;
-  filter: alpha(opacity=100);
+  filter: alpha(opacity=60);
   -khtml-opacity: .6;
   -moz-opacity: .6;
   opacity: .6;
@@ -4132,7 +3969,7 @@
 }
 .dx-pager .dx-pages .dx-navigate-button.dx-button-disable
 {
-  filter: alpha(opacity=100);
+  filter: alpha(opacity=30);
   -khtml-opacity: .3;
   -moz-opacity: .3;
   opacity: .3;
@@ -4548,14 +4385,6 @@
   min-width: 16px;
   height: 16px;
 }
-.dx-datagrid .dx-menu-item-content .dx-icon
-{
-  -webkit-background-size: 15px 15px;
-  -moz-background-size: 15px 15px;
-  background-size: 15px 15px;
-  height: 15px;
-  width: 15px;
-}
 .dx-datagrid .dx-menu-subitem ul li
 {
   padding-top: 0;
@@ -4571,50 +4400,6 @@
 .dx-datagrid .dx-menu-subitem .dx-menu-item .dx-menu-image
 {
   background-position-x: left;
-}
-.dx-datagrid .dx-icon-filter-operation-equals
-{
-  background-position: 0 50%;
-}
-.dx-datagrid .dx-icon-filter-operation-default
-{
-  background-position: 0 50%;
-}
-.dx-datagrid .dx-icon-filter-operation-not-equals
-{
-  background-position: 0 50%;
-}
-.dx-datagrid .dx-icon-filter-operation-less
-{
-  background-position: 0 50%;
-}
-.dx-datagrid .dx-icon-filter-operation-less-equal
-{
-  background-position: 0 50%;
-}
-.dx-datagrid .dx-icon-filter-operation-greater
-{
-  background-position: 0 50%;
-}
-.dx-datagrid .dx-icon-filter-operation-greater-equal
-{
-  background-position: 0 50%;
-}
-.dx-datagrid .dx-icon-filter-operation-contains
-{
-  background-position: 0 50%;
-}
-.dx-datagrid .dx-icon-filter-operation-not-contains
-{
-  background-position: 0 50%;
-}
-.dx-datagrid .dx-icon-filter-operation-starts-with
-{
-  background-position: 0 50%;
-}
-.dx-datagrid .dx-icon-filter-operation-ends-with
-{
-  background-position: 0 50%;
 }
 @-webkit-keyframes dx-loadpanel-opacity
 {
@@ -4659,7 +4444,7 @@
 }
 .dx-datagrid .dx-header-filter-empty
 {
-  filter: alpha(opacity=100);
+  filter: alpha(opacity=50);
   -khtml-opacity: .5;
   -moz-opacity: .5;
   opacity: .5;
@@ -4717,7 +4502,7 @@
 .dx-datagrid-columns-separator
 {
   position: absolute;
-  z-index: 2;
+  z-index: 3;
   width: 3px;
 }
 .dx-datagrid-columns-separator-transparent
@@ -4730,7 +4515,7 @@
   width: 100%;
   position: absolute;
   top: 0;
-  z-index: 1;
+  z-index: 3;
   cursor: col-resize;
 }
 .dx-datagrid-table-content
@@ -4798,6 +4583,7 @@
 .dx-datagrid-content .dx-datagrid-table .dx-row>td.dx-datagrid-group-space
 {
   border-right: none;
+  vertical-align: middle;
 }
 .dx-datagrid-content .dx-datagrid-table .dx-row>td.dx-datagrid-group-space+td
 {
@@ -5053,6 +4839,10 @@
 {
   position: relative;
 }
+.dx-datagrid-rowsview.dx-scrollable .dx-scrollable-content
+{
+  z-index: 2;
+}
 .dx-datagrid-rowsview .dx-scrollable-scrollbar
 {
   z-index: 3;
@@ -5131,6 +4921,14 @@
 .dx-datagrid-group-opened, .dx-datagrid-group-closed
 {
   cursor: pointer;
+  position: relative;
+}
+.dx-datagrid-group-opened:before, .dx-datagrid-group-closed:before
+{
+  position: absolute;
+  display: block;
+  right: 0;
+  left: 0;
 }
 .dx-datagrid-nodata
 {
@@ -5167,12 +4965,6 @@
   white-space: nowrap;
   -ms-word-break: normal;
   word-break: normal;
-}
-.dx-datagrid-export-menu .dx-menu-item .dx-icon-export-excel
-{
-  width: 16px;
-  height: 16px;
-  background-size: 16px 16px;
 }
 .dx-rtl .dx-datagrid .dx-menu-subitem .dx-menu-item, .dx-datagrid.dx-rtl .dx-menu-subitem .dx-menu-item
 {
@@ -5263,10 +5055,15 @@
 {
   float: left;
 }
-.dx-rtl .dx-datagrid-group-panel .dx-group-panel-item
+.dx-rtl .dx-datagrid-group-panel .dx-group-panel-item, .dx-rtl .dx-datagrid-group-panel .dx-block-separator
 {
   margin-right: 0;
   margin-left: 10px;
+}
+.dx-rtl .dx-datagrid-group-panel .dx-sort
+{
+  margin-left: 0;
+  margin-right: 6px;
 }
 .dx-rtl .dx-datagrid-search-panel
 {
@@ -5303,6 +5100,11 @@
 {
   display: inline-block;
   vertical-align: top;
+}
+.dx-pivotgridfieldchooser .dx-area-field-content
+{
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .dx-menu-base
 {
@@ -5525,6 +5327,10 @@
 {
   left: 0;
 }
+.dx-rtl.dx-calendar .dx-calendar-body .dx-widget
+{
+  direction: ltr;
+}
 .dx-state-disabled .dx-calendar .dx-calendar-navigator-previous-month, .dx-state-disabled.dx-calendar .dx-calendar-navigator-previous-month, .dx-state-disabled .dx-calendar .dx-calendar-navigator-next-month, .dx-state-disabled.dx-calendar .dx-calendar-navigator-next-month
 {
   cursor: default;
@@ -5639,12 +5445,10 @@
   -moz-background-size: 24px 24px;
   background-size: 24px 24px;
 }
-.dx-treeview .dx-treeview-item .dx-treeview-item-content
+.dx-treeview .dx-treeview-item .dx-treeview-item-content::before
 {
-  line-height: 1.15;
-}
-.dx-treeview .dx-treeview-item .dx-treeview-item-content *
-{
+  display: inline-block;
+  height: 100%;
   vertical-align: middle;
 }
 .dx-treeview .dx-treeview-item.dx-state-disabled
@@ -5850,7 +5654,7 @@
 }
 .dx-fileuploader-input
 {
-  filter: alpha(opacity=100);
+  filter: alpha(opacity=0);
   -khtml-opacity: 0;
   -moz-opacity: 0;
   opacity: 0;

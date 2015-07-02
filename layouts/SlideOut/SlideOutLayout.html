@@ -8,7 +8,7 @@
 </script>
 
 <div class="slideout-layout" data-options="dxLayout : { name: 'slideout', platform: 'ios' } ">
-    <div class="layout-header dx-toolbar-wrapper" data-options="dxContentPlaceholder : { name: 'header', animation: 'view-header-toolbar' }">
+    <div class="layout-header dx-toolbar-wrapper dx-toolbar-background" data-options="dxContentPlaceholder : { name: 'header', animation: 'view-header-toolbar' }">
         <div class="layout-toolbar" data-bind="dxToolbar: { items: [{ location: 'before', template: 'nav-button', visible: false }, { location: 'center', text: title }] }"
              data-options="dxCommandContainer : { id: 'ios-header-toolbar' }">
             <div class="nav-button-item" data-options="dxTemplate : { name: 'nav-button' } ">
@@ -42,7 +42,7 @@
 </div>
 
 <div class="slideout-layout" data-options="dxLayout : { name: 'slideout', platform: 'generic' } ">
-    <div class="layout-header dx-toolbar-wrapper" data-options="dxContentPlaceholder : { name: 'header', animation: 'view-header-toolbar' }">
+    <div class="layout-header dx-toolbar-wrapper dx-toolbar-background" data-options="dxContentPlaceholder : { name: 'header', animation: 'view-header-toolbar' }">
         <div class="layout-toolbar" data-bind="dxToolbar: { items: [{ location: 'before', template: 'nav-button', visible: false }, { location: 'center', text: title }] }"
              data-options="dxCommandContainer : { id: 'generic-header-toolbar' }">
             <div class="nav-button-item" data-options="dxTemplate : { name: 'nav-button' } ">

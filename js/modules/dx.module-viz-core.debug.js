@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Visualization Core Library)
-* Version: 15.1.3
-* Build date: Jun 1, 2015
+* Version: 15.1.4
+* Build date: Jun 22, 2015
 *
 * Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -2328,24 +2328,28 @@ if (!DevExpress.MOD_VIZ_CORE) {
         var _ceil = Math.ceil,
             _min = Math.min,
             _round = Math.round;
+        function selectByKeys(object, keys) {
+            return $.map(keys, function(key) {
+                    return object[key] ? object[key] : null
+                })
+        }
+        function decreaseFields(object, keys, eachDecrease, decrease) {
+            var dec = decrease;
+            $.each(keys, function(_, key) {
+                if (object[key]) {
+                    object[key] -= eachDecrease;
+                    dec -= eachDecrease
+                }
+            });
+            return dec
+        }
         DX.viz.core.utils = {
             decreaseGaps: function(object, keys, decrease) {
-                var arrayGaps,
-                    eachDecrease,
-                    middleValue;
+                var arrayGaps;
                 do {
-                    arrayGaps = $.map(keys, function(key) {
-                        return object[key] ? object[key] : null
-                    });
-                    middleValue = _ceil(decrease / arrayGaps.length);
-                    arrayGaps.push(middleValue);
-                    eachDecrease = _min.apply(null, arrayGaps);
-                    $.each(keys, function(_, key) {
-                        if (object[key]) {
-                            object[key] -= eachDecrease;
-                            decrease -= eachDecrease
-                        }
-                    })
+                    arrayGaps = selectByKeys(object, keys);
+                    arrayGaps.push(_ceil(decrease / arrayGaps.length));
+                    decrease = decreaseFields(object, keys, _min.apply(null, arrayGaps), decrease)
                 } while (decrease > 0 && arrayGaps.length > 1);
                 return decrease
             },
@@ -2734,6 +2738,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     });
                 that._textFontStyles = DX.viz.core.utils.patchFontOptions(options.font);
                 that._textFontStyles.color = options.font.color;
+                that._wrapper.css({"z-index": options.zIndex});
                 that._customizeTooltip = $.isFunction(options.customizeTooltip) ? options.customizeTooltip : null;
                 return that
             },
@@ -2750,19 +2755,17 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 that._textGroupHtml.css(that._textFontStyles);
                 that._textGroup.css(that._textFontStyles);
                 that._text.css(that._textFontStyles);
+                that._eventData = null;
                 return that
             },
             update: function(options) {
                 return this.setOptions(options).render()
             },
-            _prepare: function(formatObject) {
-                var that = this,
-                    options = that._options,
-                    defaultText = formatObject.valueText || "",
-                    state = that._state,
+            _prepare: function(formatObject, state) {
+                var options = this._options,
                     customize = {};
-                if (that._customizeTooltip) {
-                    customize = that._customizeTooltip.call(formatObject, formatObject);
+                if (this._customizeTooltip) {
+                    customize = this._customizeTooltip.call(formatObject, formatObject);
                     customize = $.isPlainObject(customize) ? customize : {};
                     if ("text" in customize)
                         state.text = DX.utils.isDefined(customize.text) ? String(customize.text) : "";
@@ -2770,7 +2773,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                         state.html = DX.utils.isDefined(customize.html) ? String(customize.html) : ""
                 }
                 if (!("text" in state) && !("html" in state))
-                    state.text = defaultText;
+                    state.text = formatObject.valueText || "";
                 state.color = customize.color || options.color;
                 state.borderColor = customize.borderColor || (options.border || {}).color;
                 state.textColor = customize.fontColor || (options.font || {}).color;
@@ -2778,29 +2781,23 @@ if (!DevExpress.MOD_VIZ_CORE) {
             },
             show: function(formatObject, params, eventData) {
                 var that = this,
-                    state,
+                    state = {},
                     options = that._options,
                     plr = options.paddingLeftRight,
                     ptb = options.paddingTopBottom,
                     textGroupHtml = that._textGroupHtml,
                     textHtml = that._textHtml,
-                    preprationResult,
                     bBox,
                     contentSize,
                     ss = that._shadowSettigns,
                     xOff = ss.offsetX,
                     yOff = ss.offsetY,
                     blur = ss.blur * 2 + 1;
-                state = that._state = {
-                    x: -9999,
-                    y: -9999,
-                    offset: 0,
-                    tc: {}
-                };
-                if (!(preprationResult = that._prepare(formatObject)))
-                    return preprationResult;
+                if (!that._prepare(formatObject, state))
+                    return false;
+                that._state = state;
+                state.tc = {};
                 that._wrapper.appendTo($("body"));
-                $.extend(state, params);
                 that._cloud.attr({
                     fill: state.color,
                     stroke: state.borderColor
@@ -2839,13 +2836,17 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 };
                 contentSize.fullWidth = contentSize.width + contentSize.lm + contentSize.rm;
                 contentSize.fullHeight = contentSize.height + contentSize.tm + contentSize.bm + options.arrowLength;
-                that.move(state.x, state.y, state.offset);
-                eventData && that._eventTrigger("tooltipShown", eventData);
-                return preprationResult
+                that.move(params.x, params.y, params.offset);
+                that._eventData && that._eventTrigger("tooltipHidden", that._eventData);
+                that._eventData = eventData;
+                that._eventTrigger("tooltipShown", that._eventData);
+                return true
             },
-            hide: function(eventData) {
-                hideElement(this._wrapper);
-                eventData && this._eventTrigger("tooltipHidden", eventData)
+            hide: function() {
+                var that = this;
+                hideElement(that._wrapper);
+                that._eventData && that._eventTrigger("tooltipHidden", that._eventData);
+                that._eventData = null
             },
             move: function(x, y, offset) {
                 offset = offset || 0;
@@ -3210,7 +3211,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
             var lineLength = getLineLength(line, layoutOptions),
                 initPosition;
             switch (layoutOptions.itemsAlignment) {
-                case LEFT:
+                case RIGHT:
                     initPosition = maxLineLength - lineLength;
                     break;
                 case CENTER:
@@ -3235,7 +3236,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
         }
         function getLines(lines, layoutOptions, itemIndex) {
             var tableLine = {};
-            if (!(itemIndex % layoutOptions.countItem))
+            if (itemIndex % layoutOptions.countItem === 0)
                 if (layoutOptions.markerOffset)
                     lines.push([], []);
                 else
@@ -3322,9 +3323,9 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     renderer = that._renderer,
                     items = that._data;
                 size && that.setSize(size);
+                that.erase();
                 if (!(options && options.visible && items && items.length))
                     return that;
-                that.erase();
                 that._insideLegendGroup = renderer.g().append(that._legendGroup);
                 that._createBackground();
                 that._createItems(that._getItemData());
@@ -3414,8 +3415,9 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 this._setBoundingRect(options.margin)
             },
             erase: function() {
-                var that = this;
-                that._insideLegendGroup && that._insideLegendGroup.dispose();
+                var that = this,
+                    insideLegendGroup = that._insideLegendGroup;
+                insideLegendGroup && insideLegendGroup.dispose();
                 that._insideLegendGroup = that._x1 = that._x2 = that._y2 = that._y2 = null;
                 return that
             },
@@ -3523,20 +3525,20 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 })
             },
             _alignLines: function(lines, layoutOptions) {
-                $.each(lines, function(_, line) {
-                    setMaxInLine(line, layoutOptions.ortMeasure)
-                });
+                var i,
+                    measure = layoutOptions.ortMeasure;
+                _each(lines, processLine);
+                measure = layoutOptions.measure;
                 if (layoutOptions.itemsAlignment) {
                     if (layoutOptions.markerOffset)
-                        for (var i = 0; i < lines.length; i += 2)
-                            $.each(transpose(lines.slice(i, i + 2)), function(_, line) {
-                                setMaxInLine(line, layoutOptions.measure)
-                            })
+                        for (i = 0; i < lines.length; )
+                            _each(transpose([lines[i++], lines[i++]]), processLine)
                 }
                 else
-                    $.each(transpose(lines), function(_, line) {
-                        setMaxInLine(line, layoutOptions.measure)
-                    })
+                    _each(transpose(lines), processLine);
+                function processLine(_, line) {
+                    setMaxInLine(line, measure)
+                }
             },
             _applyItemPosition: function(lines, layoutOptions) {
                 var that = this,
@@ -3601,7 +3603,8 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     layoutOptions.ortMeasure = HEIGHT;
                     layoutOptions.ortDirection = "y";
                     layoutOptions.ortSpacing = options.rowItemSpacing;
-                    layoutOptions.countItem = options.columnCount || that._items.length;
+                    layoutOptions.countItem = options.columnCount;
+                    layoutOptions.ortCountItem = options.rowCount;
                     layoutOptions.marginTextLabel = 4;
                     layoutOptions.labelOffset = 7;
                     if (options.itemTextPosition === BOTTOM || options.itemTextPosition === TOP) {
@@ -3618,7 +3621,8 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     layoutOptions.ortMeasure = WIDTH;
                     layoutOptions.ortDirection = "x";
                     layoutOptions.ortSpacing = options.columnItemSpacing;
-                    layoutOptions.countItem = options.rowCount || that._items.length;
+                    layoutOptions.countItem = options.rowCount;
+                    layoutOptions.ortCountItem = options.columnCount;
                     layoutOptions.marginTextLabel = 7;
                     layoutOptions.labelOffset = 4;
                     if (options.itemTextPosition === RIGHT || options.itemTextPosition === LEFT) {
@@ -3626,10 +3630,15 @@ if (!DevExpress.MOD_VIZ_CORE) {
                         layoutOptions.markerOffset = true
                     }
                 }
+                if (!layoutOptions.countItem)
+                    if (layoutOptions.ortCountItem)
+                        layoutOptions.countItem = _ceil(that._items.length / layoutOptions.ortCountItem);
+                    else
+                        layoutOptions.countItem = that._items.length;
                 if (options.itemTextPosition === TOP || options.itemTextPosition === LEFT)
                     layoutOptions.inverseLabelPosition = true;
                 layoutOptions.itemTextPosition = options.itemTextPosition;
-                layoutOptions.ortCountItem = _ceil(that._items.length / layoutOptions.countItem);
+                layoutOptions.ortCountItem = layoutOptions.ortCountItem || _ceil(that._items.length / layoutOptions.countItem);
                 return layoutOptions
             },
             _adjustBackgroundSettings: function(locationOptions) {
@@ -4056,7 +4065,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     startAngle = 0;
                     endAngle = 360;
                     isCircle = true;
-                    endAngle -= 0.0001
+                    endAngle -= 0.01
                 }
                 if (startAngle > 360)
                     startAngle = startAngle % 360;
@@ -4070,9 +4079,9 @@ if (!DevExpress.MOD_VIZ_CORE) {
             endAngle = endAngle * PI_DIV_180;
             return [x, y, mathMin(outerR, innerR), mathMax(outerR, innerR), mathCos(startAngle), mathSin(startAngle), mathCos(endAngle), mathSin(endAngle), isCircle, mathFloor(mathAbs(endAngle - startAngle) / mathPI) % 2 ? "1" : "0", noArc]
         };
-        function buildArcPath(x, y, innerR, outerR, startAngleCos, startAngleSin, endAngleCos, endAngleSin, isCircle, longFlag) {
-            return ["M", (x + outerR * startAngleCos).toFixed(ARC_COORD_PREC), (y - outerR * startAngleSin).toFixed(ARC_COORD_PREC), "A", outerR.toFixed(ARC_COORD_PREC), outerR.toFixed(ARC_COORD_PREC), 0, longFlag, 0, (x + outerR * endAngleCos).toFixed(ARC_COORD_PREC), (y - outerR * endAngleSin).toFixed(ARC_COORD_PREC), isCircle ? "M" : "L", (x + innerR * endAngleCos).toFixed(5), (y - innerR * endAngleSin).toFixed(ARC_COORD_PREC), "A", innerR.toFixed(ARC_COORD_PREC), innerR.toFixed(ARC_COORD_PREC), 0, longFlag, 1, (x + innerR * startAngleCos).toFixed(ARC_COORD_PREC), (y - innerR * startAngleSin).toFixed(ARC_COORD_PREC), "Z"].join(" ")
-        }
+        var buildArcPath = function(x, y, innerR, outerR, startAngleCos, startAngleSin, endAngleCos, endAngleSin, isCircle, longFlag) {
+                return ["M", (x + outerR * startAngleCos).toFixed(ARC_COORD_PREC), (y - outerR * startAngleSin).toFixed(ARC_COORD_PREC), "A", outerR.toFixed(ARC_COORD_PREC), outerR.toFixed(ARC_COORD_PREC), 0, longFlag, 0, (x + outerR * endAngleCos).toFixed(ARC_COORD_PREC), (y - outerR * endAngleSin).toFixed(ARC_COORD_PREC), isCircle ? "M" : "L", (x + innerR * endAngleCos).toFixed(5), (y - innerR * endAngleSin).toFixed(ARC_COORD_PREC), "A", innerR.toFixed(ARC_COORD_PREC), innerR.toFixed(ARC_COORD_PREC), 0, longFlag, 1, (x + innerR * startAngleCos).toFixed(ARC_COORD_PREC), (y - innerR * startAngleSin).toFixed(ARC_COORD_PREC), "Z"].join(" ")
+            };
         function buildPathSegments(points, type) {
             var list = [["M", 0, 0]];
             switch (type) {
@@ -4882,6 +4891,9 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 temp.appendChild(node);
                 return temp.innerHTML
             },
+            getOffset: function() {
+                return this._$element.offset()
+            },
             animate: baseAnimate,
             stopAnimation: function(disableComplete) {
                 var animation = this.animation;
@@ -5004,6 +5016,9 @@ if (!DevExpress.MOD_VIZ_CORE) {
             },
             svg: function() {
                 return this.root.markup()
+            },
+            getRootOffset: function() {
+                return this.root.getOffset()
             },
             onEndAnimation: function(endAnimation) {
                 this._animationController.onEndAnimation(endAnimation)
@@ -6330,6 +6345,48 @@ if (!DevExpress.MOD_VIZ_CORE) {
                             that.series.push(singleSeries)
                     }
                 };
+            function correctPointCoordinates(points, width, offset) {
+                _each(points, function(_, point) {
+                    point.correctCoordinates({
+                        width: width,
+                        offset: offset
+                    })
+                })
+            }
+            function getStacksWithArgument(stackKeepers, argument) {
+                var stacksWithArgument = [];
+                _each(stackKeepers, function(stackName, seriesInStack) {
+                    _each(seriesInStack, function(_, singleSeries) {
+                        var points = singleSeries.getPointsByArg(argument),
+                            pointsLength = points.length,
+                            i;
+                        for (i = 0; i < pointsLength; ++i)
+                            if (points[i] && points[i].value) {
+                                stacksWithArgument.push(stackName);
+                                return false
+                            }
+                    })
+                });
+                return stacksWithArgument
+            }
+            function correctPointCoordinatesForStacks(stackKeepers, stacksWithArgument, argument, middleIndex, width, spacing) {
+                _each(stackKeepers, function(stackName, seriesInStack) {
+                    var stackIndex = $.inArray(stackName, stacksWithArgument),
+                        offset;
+                    if (stackIndex === -1)
+                        return;
+                    offset = (stackIndex - middleIndex + 0.5) * width - (middleIndex - stackIndex - 0.5) * spacing;
+                    _each(seriesInStack, function(_, singleSeries) {
+                        _each(singleSeries.getPointsByArg(argument) || [], function(_, point) {
+                            if (point && point.value)
+                                point.correctCoordinates({
+                                    width: width,
+                                    offset: offset
+                                })
+                        })
+                    })
+                })
+            }
             var adjustBarSeriesDimensionsCore = function(series, interval, stackCount, equalBarWidth, seriesStackIndexCallback) {
                     var spacing,
                         width,
@@ -6347,27 +6404,15 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     if (equalBarWidth) {
                         width = equalBarWidth.width && equalBarWidth.width < 0 ? 0 : equalBarWidth.width;
                         spacing = equalBarWidth.spacing && equalBarWidth.spacing < 0 ? 0 : equalBarWidth.spacing;
-                        if (width && !spacing)
+                        if (!spacing)
                             if (stackCount > 1) {
-                                spacing = _round((interval * 0.7 - width * stackCount) / (stackCount - 1));
+                                spacing = width ? _round((interval * 0.7 - width * stackCount) / (stackCount - 1)) : _round(interval * 0.7 / stackCount * 0.2);
                                 if (spacing < 1)
                                     spacing = 1
                             }
                             else
                                 spacing = 0;
-                        else if (spacing && !width) {
-                            width = _round((interval * 0.7 - spacing * (stackCount - 1)) / stackCount);
-                            if (width < 2)
-                                width = 2
-                        }
-                        else if (!spacing && !width) {
-                            if (stackCount > 1) {
-                                spacing = _round(interval * 0.7 / stackCount * 0.2);
-                                if (spacing < 1)
-                                    spacing = 1
-                            }
-                            else
-                                spacing = 0;
+                        if (!width) {
                             width = _round((interval * 0.7 - spacing * (stackCount - 1)) / stackCount);
                             if (width < 2)
                                 width = 2
@@ -6384,12 +6429,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                             stackIndex = seriesStackIndexCallback(i);
                             points = series[i].getPoints();
                             seriesOffset = (stackIndex - middleIndex + 0.5) * (maxWidth || width) - (middleIndex - stackIndex - 0.5) * spacing;
-                            _each(points, function(_, point) {
-                                point.correctCoordinates({
-                                    width: width,
-                                    offset: seriesOffset
-                                })
-                            })
+                            correctPointCoordinates(points, width, seriesOffset)
                         }
                     }
                     else {
@@ -6410,18 +6450,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                         for (var argument in argumentsKeeper) {
                             if (!argumentsKeeper.hasOwnProperty(argument))
                                 continue;
-                            stacksWithArgument = [];
-                            _each(stackKeepers, function(stackName, seriesInStack) {
-                                _each(seriesInStack, function(i, singleSeries) {
-                                    var points = singleSeries.getPointsByArg(argument),
-                                        pointsLength = points.length;
-                                    for (i = 0; i < pointsLength; i++)
-                                        if (points[i] && points[i].value) {
-                                            stacksWithArgument.push(stackName);
-                                            return false
-                                        }
-                                })
-                            });
+                            stacksWithArgument = getStacksWithArgument(stackKeepers, argument);
                             count = stacksWithArgument.length;
                             spacing = _round(interval * 0.7 / count * 0.2);
                             if (spacing < 1)
@@ -6430,21 +6459,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                             if (width < 2)
                                 width = 2;
                             middleIndex = count / 2;
-                            _each(stackKeepers, function(stackName, seriesInStack) {
-                                stackIndex = $.inArray(stackName, stacksWithArgument);
-                                if (stackIndex === -1)
-                                    return;
-                                seriesOffset = (stackIndex - middleIndex + 0.5) * width - (middleIndex - stackIndex - 0.5) * spacing;
-                                _each(seriesInStack, function(i, singleSeries) {
-                                    _each(singleSeries.getPointsByArg(argument) || [], function(_, point) {
-                                        if (point && point.value)
-                                            point.correctCoordinates({
-                                                width: width,
-                                                offset: seriesOffset
-                                            })
-                                    })
-                                })
-                            })
+                            correctPointCoordinatesForStacks(stackKeepers, stacksWithArgument, argument, middleIndex, width, spacing)
                         }
                     }
                 };
@@ -6645,8 +6660,6 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     debug.assert(translators, "translator was not passed or empty");
                     var that = this,
                         series = getVisibleSeries(that),
-                        points,
-                        i,
                         visibleAreaX = translators.arg.getCanvasVisibleArea(),
                         visibleAreaY = translators.val.getCanvasVisibleArea(),
                         min = Math.min(visibleAreaX.max - visibleAreaX.min, visibleAreaY.max - visibleAreaY.min),
@@ -6660,19 +6673,17 @@ if (!DevExpress.MOD_VIZ_CORE) {
                         sizeProportion,
                         sizeDispersion,
                         areaDispersion;
-                    for (i = 0; i < series.length; i++) {
-                        points = series[i].getPoints();
-                        _each(points, function(_, point) {
+                    _each(series, function(_, seriesItem) {
+                        _each(seriesItem.getPoints(), function(_, point) {
                             maxPointSize = maxPointSize > point.size ? maxPointSize : point.size;
                             minPointSize = minPointSize < point.size ? minPointSize : point.size
                         })
-                    }
+                    });
                     sizeDispersion = maxPointSize - minPointSize;
                     areaDispersion = _abs(maxBubbleArea - minBubbleArea);
                     minPointSize = minPointSize < 0 ? 0 : minPointSize;
-                    for (i = 0; i < series.length; i++) {
-                        points = series[i].getPoints();
-                        _each(points, function(_, point) {
+                    _each(series, function(_, seriesItem) {
+                        _each(seriesItem.getPoints(), function(_, point) {
                             if (maxPointSize === minPointSize)
                                 pointSize = _round(equalBubbleSize);
                             else {
@@ -6682,7 +6693,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                             }
                             point.correctCoordinates(pointSize)
                         })
-                    }
+                    })
                 };
             return {
                     ctor: ctor,
@@ -8646,20 +8657,30 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     return chartSeries.line._prepareSegment.apply(this, arguments);
                 return {line: preparedPoints}
             },
+            _getRemainingAngle: function(angle) {
+                var normAngle = utils.normalizeAngle(angle);
+                return angle >= 0 ? 360 - normAngle : -normAngle
+            },
             _closeSegment: function(points) {
-                var point;
+                var point,
+                    differenceAngle;
                 if (this._segments.length)
                     point = this._segments[0].line[0];
                 else
                     point = clonePoint(points[0], points[0].x, points[0].y, points[0].angle);
                 if (points[points.length - 1].angle !== point.angle) {
-                    point.angle = points[points.length - 1].angle - utils.normalizeAngle(points[points.length - 1].angle) + utils.normalizeAngle(point.angle);
+                    if (utils.normalizeAngle(Math.round(points[points.length - 1].angle)) === utils.normalizeAngle(Math.round(point.angle)))
+                        point.angle = points[points.length - 1].angle;
+                    else {
+                        differenceAngle = points[points.length - 1].angle - point.angle;
+                        point.angle = points[points.length - 1].angle + this._getRemainingAngle(differenceAngle)
+                    }
                     points.push(point)
                 }
             },
             _getTangentPoints: function(point, prevPoint, centerPoint) {
                 var tangentPoints = [],
-                    betweenAngle = prevPoint.angle - point.angle,
+                    betweenAngle = Math.round(prevPoint.angle - point.angle),
                     tan = (prevPoint.radius - point.radius) / betweenAngle,
                     i;
                 if (betweenAngle === 0)
@@ -8857,7 +8878,6 @@ if (!DevExpress.MOD_VIZ_CORE) {
             areaSeries = chartSeries.area,
             _extend = $.extend,
             _each = $.each,
-            CANVAS_POSITION_START = "canvas_position_start",
             DEFAULT_BAR_POINT_SIZE = 3;
         var baseBarSeriesMethods = {
                 _getSpecialColor: areaSeries._getSpecialColor,
@@ -9028,7 +9048,6 @@ if (!DevExpress.MOD_VIZ_CORE) {
             series = core.series.mixins.chart,
             _extend = $.extend,
             _isDefined = DX.utils.isDefined,
-            _map = $.map,
             _noop = $.noop,
             rangeCalculator = core.series.helpers.rangeDataCalculator,
             areaSeries = series.area;
@@ -11321,7 +11340,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                         translateX: that.x,
                         translateY: that.y
                     }, that._getStyle());
-                that.graphic = renderer.circle(0, 0, animationEnabled ? 0 : that.bubbleSize).attr(attr).data({series: that.series}).append(group)
+                that.graphic = renderer.circle(0, 0, animationEnabled ? 0 : that.bubbleSize).attr(attr).data({point: that}).append(group)
             },
             getTooltipParams: function(location) {
                 var that = this,
@@ -11350,8 +11369,8 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 return that._getSymbolBbox(that.x, that.y, that.bubbleSize)
             },
             _updateMarker: function(animationEnabled, style) {
-                var that = this,
-                    style = style || that._getStyle();
+                var that = this;
+                style = style || that._getStyle();
                 if (!animationEnabled)
                     style = $.extend({
                         r: that.bubbleSize,
@@ -11698,14 +11717,13 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     r = _sqrt(lx * lx + ly * ly),
                     fromAngle = that.fromAngle % 360,
                     toAngle = that.toAngle % 360,
-                    isArc = !!(that.toAngle - that.fromAngle),
                     angle;
                 if (r < that.radiusInner || r > that.radiusOuter || r === 0)
                     return false;
                 angle = _acos(lx / r) * DEG * (ly > 0 ? -1 : 1);
                 if (angle < 0)
                     angle += 360;
-                if (fromAngle === toAngle && isArc)
+                if (fromAngle === toAngle && _abs(that.toAngle - that.fromAngle) > 1E-4)
                     return true;
                 else
                     return fromAngle >= toAngle ? angle <= fromAngle && angle >= toAngle : !(angle >= fromAngle && angle <= toAngle)
@@ -12240,7 +12258,6 @@ if (!DevExpress.MOD_VIZ_CORE) {
     (function($, DX) {
         var viz = DX.viz,
             points = viz.core.series.points.mixins,
-            rendererNS = viz.renderers,
             _isNumeric = $.isNumeric,
             _extend = $.extend,
             _math = Math,
@@ -12317,12 +12334,14 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     that._styles = styles
             },
             _getMinTrackerWidth: function() {
-                return 1 + 2 * this._styles.normal['stroke-width']
+                return 2 + 2 * this._styles.normal['stroke-width']
             },
             correctCoordinates: function(correctOptions) {
                 var minWidth = this._getMinTrackerWidth(),
-                    maxWidth = 10;
-                this.width = correctOptions.width < minWidth ? minWidth : correctOptions.width > maxWidth ? maxWidth : correctOptions.width;
+                    maxWidth = 10,
+                    width = correctOptions.width;
+                width = width < minWidth ? minWidth : width > maxWidth ? maxWidth : width;
+                this.width = width + width % 2;
                 this.xCorrection = correctOptions.offset
             },
             _getMarkerGroup: function(group) {
@@ -12546,7 +12565,8 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 this.graphic = renderer.path(this._getPoints(), "line").attr({"stroke-linecap": "square"}).attr(attributes).data({point: this}).sharp().append(group)
             },
             _getMinTrackerWidth: function() {
-                return 2 + this._styles.normal['stroke-width']
+                var width = 2 + this._styles.normal['stroke-width'];
+                return width + width % 2
             }
         })
     })(jQuery, DevExpress);
@@ -13108,6 +13128,11 @@ if (!DevExpress.MOD_VIZ_CORE) {
     })(jQuery, DevExpress);
     /*! Module viz-core, file default.js */
     (function(DX, undefined) {
+        var WHITE = "#ffffff",
+            BLACK = "#000000",
+            LIGHT_GREY = "#d3d3d3",
+            GREY_GREEN = "#303030",
+            RED = "#ff0000";
         DX.viz.core.registerTheme({
             name: "generic.light",
             font: {
@@ -13118,10 +13143,10 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 cursor: 'default'
             },
             redrawOnResize: true,
-            backgroundColor: "#ffffff",
+            backgroundColor: WHITE,
             primaryTitleColor: "#232323",
             secondaryTitleColor: "#767676",
-            axisColor: "#d3d3d3",
+            axisColor: LIGHT_GREY,
             axisLabelColor: "#a8a8a8",
             title: {font: {
                     family: "'Segoe UI Light', 'Helvetica Neue Light', 'Segoe UI', 'Helvetica Neue', 'Trebuchet MS', Verdana",
@@ -13132,12 +13157,12 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 enabled: false,
                 border: {
                     width: 1,
-                    color: '#d3d3d3',
+                    color: LIGHT_GREY,
                     dashStyle: 'solid',
                     visible: true
                 },
                 font: {color: '#232323'},
-                color: '#ffffff',
+                color: WHITE,
                 arrowLength: 10,
                 paddingLeftRight: 18,
                 paddingTopBottom: 15,
@@ -13153,7 +13178,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     offsetX: 0,
                     offsetY: 4,
                     blur: 2,
-                    color: '#000000'
+                    color: BLACK
                 }
             },
             legend: {
@@ -13220,7 +13245,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     valueErrorBar: {
                         displayMode: "auto",
                         value: 1,
-                        color: "#000000",
+                        color: BLACK,
                         lineWidth: 2,
                         edgeLength: 8
                     },
@@ -13240,11 +13265,11 @@ if (!DevExpress.MOD_VIZ_CORE) {
                         customizeText: undefined,
                         maxLabelCount: undefined,
                         position: 'outside',
-                        font: {color: '#ffffff'},
+                        font: {color: WHITE},
                         border: {
                             visible: false,
                             width: 1,
-                            color: '#d3d3d3',
+                            color: LIGHT_GREY,
                             dashStyle: 'solid'
                         },
                         connector: {
@@ -13306,7 +13331,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 },
                 constantLineStyle: {
                     width: 1,
-                    color: "#000000",
+                    color: BLACK,
                     dashStyle: "solid",
                     label: {
                         visible: true,
@@ -13493,7 +13518,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     },
                     candlestick: {
                         width: 1,
-                        reduction: {color: '#ff0000'},
+                        reduction: {color: RED},
                         hoverStyle: {
                             width: 3,
                             hatching: {direction: 'none'}
@@ -13503,7 +13528,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     },
                     stock: {
                         width: 1,
-                        reduction: {color: '#ff0000'},
+                        reduction: {color: RED},
                         hoverStyle: {
                             width: 3,
                             hatching: {direction: 'none'}
@@ -13520,7 +13545,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     label: {
                         visible: false,
                         font: {
-                            color: "#ffffff",
+                            color: WHITE,
                             size: 12
                         }
                     },
@@ -13582,7 +13607,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 commonPaneSettings: {
                     backgroundColor: 'none',
                     border: {
-                        color: '#d3d3d3',
+                        color: LIGHT_GREY,
                         width: 1,
                         visible: false,
                         top: true,
@@ -13615,7 +13640,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                         border: {
                             visible: false,
                             width: 2,
-                            color: '#ffffff'
+                            color: WHITE
                         },
                         hoverStyle: {
                             hatching: {
@@ -13647,7 +13672,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                         border: {
                             visible: false,
                             width: 2,
-                            color: '#ffffff'
+                            color: WHITE
                         },
                         hoverStyle: {
                             hatching: {
@@ -13679,7 +13704,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                         border: {
                             visible: false,
                             width: 2,
-                            color: '#ffffff'
+                            color: WHITE
                         },
                         hoverStyle: {
                             hatching: {
@@ -13717,31 +13742,31 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     pie: {
                         hoverStyle: {border: {
                                 visible: true,
-                                color: '#ffffff'
+                                color: WHITE
                             }},
                         selectionStyle: {border: {
                                 visible: true,
-                                color: '#ffffff'
+                                color: WHITE
                             }}
                     },
                     donut: {
                         hoverStyle: {border: {
                                 visible: true,
-                                color: '#ffffff'
+                                color: WHITE
                             }},
                         selectionStyle: {border: {
                                 visible: true,
-                                color: '#ffffff'
+                                color: WHITE
                             }}
                     },
                     doughnut: {
                         hoverStyle: {border: {
                                 visible: true,
-                                color: '#ffffff'
+                                color: WHITE
                             }},
                         selectionStyle: {border: {
                                 visible: true,
-                                color: '#ffffff'
+                                color: WHITE
                             }}
                     }
                 }},
@@ -13795,7 +13820,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                         verticalOffset: 3,
                         color: '#679ec5',
                         text: {font: {
-                                color: '#ffffff',
+                                color: WHITE,
                                 size: 18
                             }}
                     }
@@ -13924,7 +13949,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     },
                     tick: {
                         width: 1,
-                        color: "#000000",
+                        color: BLACK,
                         opacity: 0.1
                     },
                     marker: {
@@ -13943,15 +13968,15 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     paddingTopBottom: 2,
                     paddingLeftRight: 4,
                     color: '#606060',
-                    invalidRangeColor: '#ff0000',
+                    invalidRangeColor: RED,
                     font: {
-                        color: '#ffffff',
+                        color: WHITE,
                         size: 11
                     }
                 },
                 sliderHandle: {
                     width: 1,
-                    color: '#000000',
+                    color: BLACK,
                     opacity: 0.2
                 },
                 shutter: {opacity: 0.75},
@@ -13993,14 +14018,14 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 },
                 areaSettings: {
                     borderWidth: 1,
-                    borderColor: '#ffffff',
+                    borderColor: WHITE,
                     color: '#d2d2d2',
-                    hoveredBorderColor: '#303030',
+                    hoveredBorderColor: GREY_GREEN,
                     selectedBorderWidth: 2,
-                    selectedBorderColor: '#303030',
+                    selectedBorderColor: GREY_GREEN,
                     label: {
                         enabled: false,
-                        stroke: '#ffffff',
+                        stroke: WHITE,
                         'stroke-width': 2,
                         'stroke-opacity': 0.5,
                         font: {
@@ -14013,7 +14038,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 markerSettings: {
                     label: {
                         enabled: true,
-                        stroke: '#ffffff',
+                        stroke: WHITE,
                         'stroke-width': 1,
                         'stroke-opacity': 0.5,
                         font: {
@@ -14023,12 +14048,12 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     },
                     _dot: {
                         borderWidth: 2,
-                        borderColor: '#ffffff',
+                        borderColor: WHITE,
                         color: '#ba4d51',
                         size: 8,
                         selectedStep: 2,
                         backStep: 18,
-                        backColor: '#ffffff',
+                        backColor: WHITE,
                         backOpacity: 0.32,
                         shadow: true
                     },
@@ -14037,16 +14062,16 @@ if (!DevExpress.MOD_VIZ_CORE) {
                         maxSize: 50,
                         color: '#ba4d51',
                         hoveredBorderWidth: 1,
-                        hoveredBorderColor: '#303030',
+                        hoveredBorderColor: GREY_GREEN,
                         selectedBorderWidth: 2,
-                        selectedBorderColor: '#303030'
+                        selectedBorderColor: GREY_GREEN
                     },
                     _pie: {
                         size: 50,
                         hoveredBorderWidth: 1,
-                        hoveredBorderColor: '#303030',
+                        hoveredBorderColor: GREY_GREEN,
                         selectedBorderWidth: 2,
-                        selectedBorderColor: '#303030'
+                        selectedBorderColor: GREY_GREEN
                     },
                     _image: {size: 20}
                 },
@@ -14066,7 +14091,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 controlBar: {
                     borderColor: '#5d5d5d',
                     borderWidth: 3,
-                    color: '#ffffff',
+                    color: WHITE,
                     margin: 20,
                     opacity: 0.3
                 },
@@ -14084,7 +14109,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 lossColor: '#d7d7d7',
                 firstLastColor: '#666666',
                 pointSymbol: 'circle',
-                pointColor: '#ffffff',
+                pointColor: WHITE,
                 pointSize: 4,
                 type: "line",
                 argumentField: "arg",
@@ -14190,7 +14215,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
         DX.viz.core.registerTheme({
             name: "generic.dark",
             font: {color: '#808080'},
-            backgroundColor: "#303030",
+            backgroundColor: GREY_GREEN,
             primaryTitleColor: "#dbdbdb",
             secondaryTitleColor: "#a3a3a3",
             axisColor: "#555555",
@@ -14202,9 +14227,9 @@ if (!DevExpress.MOD_VIZ_CORE) {
             },
             "chart:common": {commonSeriesSettings: {
                     label: {border: {color: '#494949'}},
-                    valueErrorBar: {color: "#ffffff"}
+                    valueErrorBar: {color: WHITE}
                 }},
-            "chart:common:axis": {constantLineStyle: {color: '#ffffff'}},
+            "chart:common:axis": {constantLineStyle: {color: WHITE}},
             chart: {
                 crosshair: {color: '#515151'},
                 commonPaneSettings: {border: {color: '#494949'}}
@@ -14237,15 +14262,15 @@ if (!DevExpress.MOD_VIZ_CORE) {
             rangeSelector: {
                 selectedRangeColor: '#b5b5b5',
                 scale: {tick: {
-                        color: '#ffffff',
+                        color: WHITE,
                         opacity: 0.05
                     }},
                 sliderMarker: {
                     color: '#b5b5b5',
-                    font: {color: '#303030'}
+                    font: {color: GREY_GREEN}
                 },
                 sliderHandle: {
-                    color: '#ffffff',
+                    color: WHITE,
                     opacity: 0.2
                 },
                 shutter: {
@@ -14256,36 +14281,36 @@ if (!DevExpress.MOD_VIZ_CORE) {
             map: {
                 background: {borderColor: '#3f3f3f'},
                 areaSettings: {
-                    borderColor: '#303030',
+                    borderColor: GREY_GREEN,
                     color: '#686868',
-                    hoveredBorderColor: '#ffffff',
-                    selectedBorderColor: '#ffffff',
+                    hoveredBorderColor: WHITE,
+                    selectedBorderColor: WHITE,
                     label: {
-                        stroke: '#000000',
-                        font: {color: '#ffffff'}
+                        stroke: BLACK,
+                        font: {color: WHITE}
                     }
                 },
                 markerSettings: {
                     label: {
-                        stroke: '#000000',
-                        font: {color: '#ffffff'}
+                        stroke: BLACK,
+                        font: {color: WHITE}
                     },
                     _bubble: {
-                        hoveredBorderColor: '#ffffff',
-                        selectedBorderColor: '#ffffff'
+                        hoveredBorderColor: WHITE,
+                        selectedBorderColor: WHITE
                     },
                     _pie: {
-                        hoveredBorderColor: '#ffffff',
-                        selectedBorderColor: '#ffffff'
+                        hoveredBorderColor: WHITE,
+                        selectedBorderColor: WHITE
                     }
                 },
                 legend: {
                     border: {color: '#3f3f3f'},
-                    font: {color: '#ffffff'}
+                    font: {color: WHITE}
                 },
                 controlBar: {
                     borderColor: '#c7c7c7',
-                    color: '#303030'
+                    color: GREY_GREEN
                 }
             },
             sparkline: {
@@ -14295,7 +14320,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 barNegativeColor: '#8e8e8e',
                 winColor: '#b8b8b8',
                 lossColor: '#8e8e8e',
-                pointColor: '#303030'
+                pointColor: GREY_GREEN
             },
             bullet: {targetColor: '#8e8e8e'}
         }, "generic.light");
@@ -14362,47 +14387,50 @@ if (!DevExpress.MOD_VIZ_CORE) {
     (function(DX) {
         var core = DX.viz.core,
             registerTheme = core.registerTheme,
-            registerThemeSchemeAlias = core.registerThemeSchemeAlias;
+            registerThemeSchemeAlias = core.registerThemeSchemeAlias,
+            BLACK = "#000000",
+            WHITE = "#ffffff";
         registerTheme({
             name: "win8.black",
-            backgroundColor: "#000000",
-            primaryTitleColor: "#ffffff",
+            backgroundColor: BLACK,
+            primaryTitleColor: WHITE,
             secondaryTitleColor: "#d8d8d8",
             axisColor: "#4c4c4c",
             axisLabelColor: "#a0a0a0",
-            title: {font: {color: '#ffffff'}},
-            legend: {font: {color: '#ffffff'}},
+            title: {font: {color: WHITE}},
+            legend: {font: {color: WHITE}},
             tooltip: {
-                color: '#000000',
-                font: {color: '#ffffff'}
+                color: BLACK,
+                font: {color: WHITE}
             },
             "chart:common": {commonSeriesSettings: {label: {border: {color: '#454545'}}}},
             chart: {commonPaneSettings: {border: {color: '#454545'}}},
             pieIE8: {commonSeriesSettings: {
                     pie: {
-                        hoverStyle: {border: {color: '#000000'}},
-                        selectionStyle: {border: {color: '#000000'}}
+                        hoverStyle: {border: {color: BLACK}},
+                        selectionStyle: {border: {color: BLACK}}
                     },
                     donut: {
-                        hoverStyle: {border: {color: '#000000'}},
-                        selectionStyle: {border: {color: '#000000'}}
+                        hoverStyle: {border: {color: BLACK}},
+                        selectionStyle: {border: {color: BLACK}}
                     },
                     doughnut: {
-                        hoverStyle: {border: {color: '#000000'}},
-                        selectionStyle: {border: {color: '#000000'}}
+                        hoverStyle: {border: {color: BLACK}},
+                        selectionStyle: {border: {color: BLACK}}
                     }
                 }},
-            barGauge: {backgroundColor: "#2b3036"}
+            barGauge: {backgroundColor: "#2b3036"},
+            rangeSelector: {scale: {tick: {opacity: 0.15}}}
         }, "generic.dark");
         registerTheme({
             name: "win8.white",
-            backgroundColor: "#ffffff",
-            primaryTitleColor: "#000000",
+            backgroundColor: WHITE,
+            primaryTitleColor: BLACK,
             secondaryTitleColor: "#767676",
             axisColor: "#ececec",
             axisLabelColor: "#b8b8b8",
             title: {font: {color: '#808080'}},
-            legend: {font: {color: '#000000'}},
+            legend: {font: {color: BLACK}},
             tooltip: {font: {color: '#808080'}}
         }, "generic.light");
         registerThemeSchemeAlias("win8.dark", "win8.black");
@@ -14417,50 +14445,41 @@ if (!DevExpress.MOD_VIZ_CORE) {
             _isString = utils.isString,
             _isDefined = utils.isDefined,
             HOVER_COLOR_HIGHLIGHTING = 20,
-            HIGHLIGHTING_STEP = 50;
+            HIGHLIGHTING_STEP = 50,
+            FONT = "font",
+            COMMON_AXIS_SETTINGS = "commonAxisSettings",
+            PIE_FONT_FIELDS = ["legend." + FONT, "title." + FONT, "tooltip." + FONT, "loadingIndicator." + FONT, "commonSeriesSettings.label." + FONT],
+            POLAR_FONT_FIELDS = PIE_FONT_FIELDS.concat([COMMON_AXIS_SETTINGS + ".label." + FONT, COMMON_AXIS_SETTINGS + ".title." + FONT]),
+            CHART_FONT_FIELDS = POLAR_FONT_FIELDS.concat(["crosshair.label." + FONT]),
+            chartToFontFieldsMap = {
+                pie: PIE_FONT_FIELDS,
+                chart: CHART_FONT_FIELDS,
+                polar: POLAR_FONT_FIELDS
+            };
         viz.charts = viz.charts || {};
         viz.charts.ThemeManager = viz.core.BaseThemeManager.inherit(function() {
             var ctor = function(options, themeGroupName) {
                     var that = this,
                         themeObj;
+                    that.callBase.apply(that, arguments);
                     options = options || {};
                     that._userOptions = options;
                     that._mergeAxisTitleOptions = [];
-                    themeGroupName && (that._themeSection = themeGroupName);
+                    that._themeSection = themeGroupName;
+                    that._fontFields = chartToFontFieldsMap[themeGroupName];
                     that._IE8 = DX.browser.msie && DX.browser.version < 9;
                     themeObj = options.theme && _findTheme(_isString(options.theme) ? options.theme : options.theme.name) || {};
                     that.palette = new Palette(options.palette, {
                         stepHighlight: HIGHLIGHTING_STEP,
                         theme: themeObj.name
                     });
-                    that._callback = $.noop;
-                    that.setTheme(options.theme, options.rtlEnabled)
+                    that._callback = $.noop
                 };
             var dispose = function() {
                     var that = this;
                     that.palette.dispose();
                     that.palette = that._userOptions = that._mergedSettings = null;
                     return that.callBase.apply(that, arguments)
-                };
-            var initDefaultSeriesTheme = function(that) {
-                    var commonSeriesSettings = that._theme.commonSeriesSettings;
-                    commonSeriesSettings.point = commonSeriesSettings.point || {};
-                    commonSeriesSettings.label = commonSeriesSettings.label || {};
-                    that._initializeFont(commonSeriesSettings.label.font)
-                };
-            var initAxisTheme = function(that) {
-                    var axisTheme = that._theme.commonAxisSettings;
-                    if (axisTheme) {
-                        axisTheme.label = axisTheme.label || {};
-                        axisTheme.grid = axisTheme.grid || {};
-                        axisTheme.ticks = axisTheme.ticks || {};
-                        axisTheme.line = axisTheme.line || {};
-                        axisTheme.title = axisTheme.title || {};
-                        axisTheme.label.font = axisTheme.label.font || {};
-                        that._initializeFont(axisTheme.label.font);
-                        axisTheme.title.font = axisTheme.title.font || {};
-                        that._initializeFont(axisTheme.title.font)
-                    }
                 };
             var resetPalette = function() {
                     this.palette.reset()
@@ -14531,6 +14550,8 @@ if (!DevExpress.MOD_VIZ_CORE) {
                             settings,
                             palette = this.palette,
                             isBar = ~type.indexOf("bar"),
+                            isLine = ~type.indexOf("line"),
+                            isArea = ~type.indexOf("area"),
                             isBubble = type === "bubble",
                             mainSeriesColor,
                             resolveLabelsOverlapping = this.getOptions("resolveLabelsOverlapping"),
@@ -14558,6 +14579,8 @@ if (!DevExpress.MOD_VIZ_CORE) {
                         settings._IE8 = this._IE8;
                         settings.resolveLabelOverlapping = resolveLabelOverlapping;
                         settings.resolveLabelsOverlapping = resolveLabelsOverlapping;
+                        if (settings.label && (isLine || isArea && type !== "rangearea" || type === "scatter"))
+                            settings.label.position = "outside";
                         return settings
                     },
                     pieSegment: function(name, seriesSettings, segmentSettings) {
@@ -14581,28 +14604,6 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     _themeSection: "chart",
                     ctor: ctor,
                     dispose: dispose,
-                    _initializeTheme: function() {
-                        var that = this,
-                            theme = this._theme;
-                        theme.legend = theme.legend || {};
-                        theme.legend.font = theme.legend.font || {};
-                        that._initializeFont(theme.legend.font);
-                        initDefaultSeriesTheme(that);
-                        initAxisTheme(that);
-                        theme.title = theme.title || {};
-                        theme.title.font = theme.title.font || {};
-                        that._initializeFont(theme.title.font);
-                        theme.tooltip = theme.tooltip || {};
-                        theme.tooltip.font = theme.tooltip.font || {};
-                        that._initializeFont(theme.tooltip.font);
-                        theme.loadingIndicator = theme.loadingIndicator || {};
-                        theme.loadingIndicator.font = theme.loadingIndicator.font || {};
-                        that._initializeFont(theme.loadingIndicator.font);
-                        theme.crosshair = theme.crosshair || {};
-                        theme.crosshair.label = theme.crosshair.label || {};
-                        theme.crosshair.label.font = theme.crosshair.label.font || {};
-                        that._initializeFont(theme.crosshair.label.font)
-                    },
                     resetPalette: resetPalette,
                     getOptions: function(name) {
                         return (applyParticularTheme[name] || applyParticularTheme.base).apply(this, arguments)
@@ -15056,7 +15057,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 that._eventTrigger('drawn', {})
             },
             _toggleLoadingIndicatorState: function(state) {
-                if (!!this._getOption(OPTION_LOADING_INDICATOR).show !== state) {
+                if (Boolean(this._getOption(OPTION_LOADING_INDICATOR).show) !== state) {
                     this._skipOptionChanged = true;
                     this.option(OPTION_LOADING_INDICATOR, {show: state});
                     this._skipOptionChanged = false

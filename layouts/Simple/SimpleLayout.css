@@ -20,15 +20,23 @@
 
 .simple-layout .layout-content > div,
 .simple-layout .transition-frame {
-    -position: absolute;
     height: 100%;
     width: 100%;
 }
 
-/*.simple-layout .layout-footer {
+.simple-layout .view-footer {
+    position: static;
+}
+
+.simple-layout .view-footer .dx-toolbar {
+    background: transparent;
+    border: none;
+    margin-bottom: 10px;
+}
+
+.simple-layout .view-footer .dx-toolbar .dx-toolbar-center {
     width: 100%;
-    position: absolute;
-}*/
+}
 
 /* ios7 */
 
@@ -42,38 +50,8 @@
     bottom: 0;
 }
 
-.dx-theme-ios7 .simple-layout .view-footer {
-    position: static;
-}
-
-.dx-theme-ios7 .simple-layout .view-toolbar-bottom.dx-toolbar {
-    background: transparent;
-    border: none;
-    margin-bottom: 10px;
-}
-
-.dx-theme-ios7 .simple-layout .view-toolbar-bottom.dx-toolbar .dx-toolbar-center {
-    width: 100%;
-}
-
 .dx-theme-ios7 .simple-layout .view-footer .dx-toolbar {
     height: 57px;
-}
-
-.dx-theme-ios7 .slideout-layout .view-footer .dx-toolbar-center {
-    width: 100%;
-}
-
-.dx-theme-ios7 .simple-layout .view-footer .dx-button {
-    width: 97%;
-    overflow: visible;
-}
-
-.dx-theme-ios7 .simple-layout .view-footer .dx-button .dx-button-content {
-    height: 44px;
-    border-radius: 6px;
-    width: 100%;
-    box-sizing: border-box;
 }
 
 .dx-theme-ios7 .simple-layout .view-footer .dx-button .dx-button-content .dx-button-text {
@@ -91,22 +69,22 @@
 /* generic */
 
 .dx-theme-generic .simple-layout .layout-content {
-    top: 80px;
+    top: 56px;
     bottom: 0;
 }
 
-.dx-theme-generic.dx-device-phone .simple-layout .layout-content {
-    top: 56px;
+.dx-theme-generic.dx-device-mobile .simple-layout .layout-header {
+    height: 56px;
 }
 
-.dx-theme-generic .simple-layout .view-footer {
-    position: static;
+.dx-theme-generic.dx-device-mobile .simple-layout .layout-header .dx-toolbar {
+    background: none;
 }
 
-.dx-theme-generic .simple-layout .view-footer .view-toolbar-bottom {
-    position: static;
+.dx-theme-generic .simple-layout .view-footer .dx-button {
+    width: 97%;
+    overflow: visible;
 }
-
 
 /* Windows Phone 8*/
 .win8phone-layout {

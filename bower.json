@@ -1,6 +1,6 @@
 {
   "name": "devextreme",
-  "version": "15.1.3",
+  "version": "15.1.4",
   "description": "A blazing-fast HTML5 Data Grid and rich libraries of high-performance touch-enabled data vizualization and UI widgets",
   "moduleType": [
     "globals"
@@ -13,7 +13,7 @@
   "homepage": "https://js.devexpress.com",
   "keywords": [ "grid", "datagrid", "widgets", "charts", "gauge", "sparkline", "vector map", "viz", "visualization", "SPA" ],
   "dependencies": {
-    "jquery": "~1.11.0",
+    "jquery": "1.11.3",
     "globalize": "0.1.1",
     "jszip": "^2.4.0"
   }

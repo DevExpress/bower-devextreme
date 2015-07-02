@@ -29,6 +29,20 @@
     position: absolute;
 }
 
+.navbar-layout .view-footer {
+    position: static;
+}
+
+.navbar-layout .view-footer .dx-toolbar {
+    background: transparent;
+    border: none;
+    margin-bottom: 10px;
+}
+
+.navbar-layout .view-footer .dx-toolbar .dx-toolbar-center {
+    width: 100%;
+}
+
 /* ios7 */
 
 .dx-theme-ios7 .navbar-layout .layout-header {
@@ -50,38 +64,8 @@
     bottom: 0;
 }
 
-.dx-theme-ios7 .navbar-layout .view-footer {
-    position: static;
-}
-
-.dx-theme-ios7 .navbar-layout .view-toolbar-bottom.dx-toolbar {
-    background: transparent;
-    border: none;
-    margin-bottom: 10px;
-}
-
-.dx-theme-ios7 .navbar-layout .view-toolbar-bottom.dx-toolbar .dx-toolbar-center {
-    width: 100%;
-}
-
 .dx-theme-ios7 .navbar-layout .view-footer .dx-toolbar {
     height: 57px;
-}
-
-.dx-theme-ios7 .navbar-layout .view-footer .dx-toolbar-center {
-    width: 100%;
-}
-
-.dx-theme-ios7 .navbar-layout .view-footer .dx-button {
-    width: 97%;
-    overflow: visible;
-}
-
-.dx-theme-ios7 .navbar-layout .view-footer .dx-button .dx-button-content {
-    height: 44px;
-    border-radius: 6px;
-    width: 100%;
-    box-sizing: border-box;
 }
 
 .dx-theme-ios7 .navbar-layout .view-footer .dx-button .dx-button-content .dx-button-text {
@@ -165,12 +149,16 @@
 /* generic */
 
 .dx-theme-generic .navbar-layout .layout-content {
-    top: 80px;
+    top: 56px;
     bottom: 0px;
 }
 
-.dx-theme-generic.dx-device-phone .navbar-layout .layout-content {
-    top: 56px;
+.dx-theme-generic.dx-device-mobile .navbar-layout .layout-header {
+    height: 56px;
+}
+
+.dx-theme-generic.dx-device-mobile .navbar-layout .layout-header .dx-toolbar {
+    background: none;
 }
 
 .dx-theme-generic .navbar-layout.has-navbar .layout-content {
@@ -190,6 +178,8 @@
     padding: 0;
 }
 
-.dx-theme-generic .navbar-layout .view-footer {
-    position: static;
+.dx-theme-generic .navbar-layout .view-footer .dx-button {
+    width: 97%;
+    overflow: visible;
 }
+

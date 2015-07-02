@@ -37,8 +37,8 @@
 }
 
 .desktop-layout .toolbar {
-    box-sizing: content-box;
-    height: 80px;
+    box-sizing: border-box;
+    height: 56px;
     margin-bottom: 35px;
     border-bottom-width: 1px;
     border-bottom-style: solid;
@@ -95,7 +95,8 @@
 }
 
 .desktop-layout .dx-toolbar {
-    box-sizing: content-box;
+    padding: 0;
+    box-sizing: border-box;
     box-shadow: none;
     background-color: transparent;
 }
@@ -106,10 +107,6 @@
 
 .desktop-layout .dx-toolbar .dx-toolbar-after .dx-toolbar-item {
     margin: 0 0 0 8px;
-}
-
-.desktop-layout .dx-toolbar .dx-toolbar-label {
-    padding: 15px 0;
 }
 
 .desktop-layout .dx-popup-title.dx-toolbar .dx-toolbar-label {

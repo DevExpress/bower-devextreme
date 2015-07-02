@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Single Page App Framework)
-* Version: 15.1.3
-* Build date: Jun 1, 2015
+* Version: 15.1.4
+* Build date: Jun 22, 2015
 *
 * Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -508,14 +508,23 @@ if (!DevExpress.MOD_FRAMEWORK) {
                         id: "back",
                         showIcon: false,
                         location: "before"
-                    }, "create", "edit", "save", {
-                        id: "cancel",
+                    }, "create", {
+                        id: "save",
                         showText: true,
-                        location: "menu"
+                        showIcon: false,
+                        location: "after"
+                    }, {
+                        id: "edit",
+                        showText: false,
+                        location: "after"
+                    }, {
+                        id: "cancel",
+                        showText: false,
+                        location: "before"
                     }, {
                         id: "delete",
-                        showText: true,
-                        location: "menu"
+                        showText: false,
+                        location: "after"
                     }]
             },
             "android-simple-toolbar": {
@@ -531,19 +540,20 @@ if (!DevExpress.MOD_FRAMEWORK) {
                     }, {id: "create"}, {
                         id: "save",
                         showText: true,
-                        location: "before"
+                        showIcon: false,
+                        location: "after"
                     }, {
                         id: "edit",
-                        showText: true,
-                        location: "menu"
+                        showText: false,
+                        location: "after"
                     }, {
                         id: "cancel",
-                        showText: true,
-                        location: "menu"
+                        showText: false,
+                        location: "before"
                     }, {
                         id: "delete",
-                        showText: true,
-                        location: "menu"
+                        showText: false,
+                        location: "after"
                     }]
             },
             "android-footer-toolbar": {
@@ -738,7 +748,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
             },
             setView: function(key, viewInfo) {
                 if (!this.hasView(key)) {
-                    if (this._keys.length == this._size)
+                    if (this._keys.length === this._size)
                         this.removeView(this._keys[0]);
                     this._keys.push(key)
                 }
@@ -1141,7 +1151,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
             },
             _syncUriWithCurrentNavigationItem: function() {
                 var currentUri = this._currentItem && this._currentItem.uri;
-                this._navigationDevice.setUri(currentUri)
+                this._navigationDevice.setUri(currentUri, true)
             },
             _cancelNavigation: function(args) {
                 this._syncUriWithCurrentNavigationItem();
@@ -1159,7 +1169,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
                     uri: uri,
                     key: uri
                 };
-                this._navigationDevice.setUri(uri, options.target == NAVIGATION_TARGETS.current)
+                this._navigationDevice.setUri(uri, options.target === NAVIGATION_TARGETS.current)
             },
             _setCurrentItem: function(item) {
                 this._currentItem = item
@@ -1167,6 +1177,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
             navigate: function(uri, options) {
                 options = options || {};
                 var that = this,
+                    isFirstNavigate = !that._currentItem,
                     currentItem = that._currentItem || {},
                     targetItem = options.item || {},
                     currentUri = currentItem.uri,
@@ -1180,6 +1191,8 @@ if (!DevExpress.MOD_FRAMEWORK) {
                     return
                 }
                 options = $.extend(that._getDefaultOptions(), options || {});
+                if (isFirstNavigate)
+                    options.target = NAVIGATION_TARGETS.current;
                 args = {
                     currentUri: currentUri,
                     uri: uri,
@@ -1296,11 +1309,28 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 this.currentStack = stack;
                 this.currentStackKey = stackKey
             },
+            _getViewTargetStackKey: function(uri, isRoot) {
+                var result;
+                if (isRoot)
+                    if (this.navigationStacks[uri] !== undefined)
+                        result = uri;
+                    else {
+                        for (var stackKey in this.navigationStacks)
+                            if (this.navigationStacks[stackKey].items[0].uri === uri) {
+                                result = stackKey;
+                                break
+                            }
+                        result = result || uri
+                    }
+                else
+                    result = this.currentStackKey || uri;
+                return result
+            },
             _updateHistory: function(uri, options) {
                 var isRoot = options.root,
                     forceIsRoot = isRoot,
                     forceToRoot = false,
-                    stackKey = options.stack || (isRoot ? uri : this.currentStackKey || uri),
+                    stackKey = options.stack || this._getViewTargetStackKey(uri, isRoot),
                     previousStack = this.currentStack,
                     keepPositionInStack = options.keepPositionInStack !== undefined ? options.keepPositionInStack : this._keepPositionInStack;
                 this._setCurrentStack(stackKey);
@@ -1439,7 +1469,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 return this.currentStack.currentIndex
             },
             previousItem: function(stackKey) {
-                var stack = stackKey ? this.navigationStacks[stackKey] : this.currentStack;
+                var stack = this.navigationStacks[stackKey] || this.currentStack;
                 return stack.previousItem()
             },
             getItemByIndex: function(index) {
@@ -2277,7 +2307,8 @@ if (!DevExpress.MOD_FRAMEWORK) {
                     this.widget.beginUpdate()
                 },
                 endUpdate: function() {
-                    this.widget.endUpdate()
+                    this.widget.endUpdate();
+                    return this.animationDeferred
                 },
                 _onWidgetItemRendered: function(e) {
                     if (e.itemData.isJustAdded && e.itemElement.is(":visible")) {
@@ -2286,7 +2317,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
                     }
                 },
                 _onWidgetContentReady: function(e) {
-                    this._transitionExecutor.start()
+                    this.animationDeferred = this._transitionExecutor.start()
                 },
                 _onWidgetDisposing: function() {
                     this.dispose(true)
@@ -2354,7 +2385,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 },
                 endUpdate: function($container) {
                     var widgetAdapter = this._getWidgetAdapter($container);
-                    widgetAdapter.endUpdate()
+                    return widgetAdapter.endUpdate()
                 }
             });
         var dxToolbarItemWrapper = WidgetItemWrapperBase.inherit({_updateItem: function() {
@@ -2659,7 +2690,8 @@ if (!DevExpress.MOD_FRAMEWORK) {
             renderCommandsToContainers: function(commands, containers) {
                 var that = this,
                     commandHash = {},
-                    commandIds = [];
+                    commandIds = [],
+                    deferreds = [];
                 $.each(commands, function(i, command) {
                     var id = command.option("id");
                     that._checkCommandId(id, command);
@@ -2678,9 +2710,13 @@ if (!DevExpress.MOD_FRAMEWORK) {
                                 options: commandOptions
                             })
                     });
-                    if (commandInfos.length)
-                        that._attachCommandsToContainer(container.element(), commandInfos)
-                })
+                    if (commandInfos.length) {
+                        var deferred = that._attachCommandsToContainer(container.element(), commandInfos);
+                        if (deferred)
+                            deferreds.push(deferred)
+                    }
+                });
+                return $.when.apply($, deferreds)
             },
             clearContainer: function(container) {
                 var $container = container.element(),
@@ -2692,15 +2728,16 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 this.renderCommandsToContainers(commands, containers)
             },
             _attachCommandsToContainer: function($container, commandInfos) {
-                var adapter = this._getContainerAdapter($container);
+                var adapter = this._getContainerAdapter($container),
+                    result;
                 if (adapter.beginUpdate)
                     adapter.beginUpdate($container);
                 $.each(commandInfos, function(index, commandInfo) {
                     adapter.addCommand($container, commandInfo.command, commandInfo.options)
                 });
                 if (adapter.endUpdate)
-                    adapter.endUpdate($container);
-                return true
+                    result = adapter.endUpdate($container);
+                return result
             }
         })
     })(jQuery, DevExpress);
