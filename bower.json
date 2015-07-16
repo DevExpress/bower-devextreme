@@ -5,7 +5,7 @@
   "moduleType": [
     "globals"
   ],
-  "main": "js/dx.all.js",
+  "main": ["js/dx.all.js","css/dx.common.css", "css/dx.spa.css", "css/dx.light.css"],
   "authors": [
     { "name": "Developer Express Inc.", "email": "support@devexpress.com", "homepage": "https://www.devexpress.com" }
   ],
