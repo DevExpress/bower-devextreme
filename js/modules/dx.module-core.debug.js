@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Core Library)
-* Version: 15.1.4
-* Build date: Jun 22, 2015
+* Version: 15.1.5
+* Build date: Jul 15, 2015
 *
 * Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -13,7 +13,7 @@ if (!window.DevExpress) {
     (function($, global, undefined) {
         global.DevExpress = global.DevExpress || {};
         $.extend(global.DevExpress, {
-            VERSION: "15.1.4",
+            VERSION: "15.1.5",
             abstract: function() {
                 throw global.DevExpress.Error("E0001");
             },
@@ -514,20 +514,13 @@ if (!window.DevExpress) {
                 return isDefined(value) ? value : defaultValue
             };
         var getImageSourceType = function(source) {
-                if (!isDefined(source))
+                if (!source || typeof source !== "string")
                     return false;
-                if (/^fa fa-|^fa-.* fa/.test(source))
-                    return "faIcon";
-                else if (/^ion-.*|ion.*ion-.*/.test(source))
-                    return "ionIcon";
-                else if (/^glyphicon glyphicon-|^glyphicon-.* glyphicon/.test(source))
-                    return "glyphIcon";
-                else if (/data:.*base64|\.|\//.test(source))
+                if (/data:.*base64|\.|\//.test(source))
                     return "image";
-                else if (/^[\w-_]+$/.test(source))
+                if (/^[\w-_]+$/.test(source))
                     return "dxIcon";
-                else
-                    return false
+                return "fontIcon"
             };
         var getImageContainer = function(source) {
                 var imageType = getImageSourceType(source),
@@ -535,14 +528,8 @@ if (!window.DevExpress) {
                 switch (imageType) {
                     case"image":
                         return $("<img>", {src: source}).addClass(ICON_CLASS);
-                    case"faIcon":
-                    case"glyphIcon":
+                    case"fontIcon":
                         return $("<i>", {"class": ICON_CLASS + " " + source});
-                    case"ionIcon":
-                        var result = $("<i>", {"class": ICON_CLASS + " " + source});
-                        if (!result.hasClass("ion") && !result.hasClass("ionicons"))
-                            result.addClass("ion");
-                        return result;
                     case"dxIcon":
                         return $("<i>", {"class": ICON_CLASS + " " + ICON_CLASS + "-" + source});
                     default:
@@ -634,6 +621,18 @@ if (!window.DevExpress) {
                         return raw
                 }
             };
+        var splitQuad = function(raw) {
+                switch (typeof raw) {
+                    case"string":
+                        return raw.split(/\s+/, 4);
+                    case"object":
+                        return [raw.left || raw.x || raw.h, raw.top || raw.y || raw.v, raw.right || raw.x || raw.h, raw.bottom || raw.y || raw.v];
+                    case"number":
+                        return [raw];
+                    default:
+                        return raw
+                }
+            };
         var stringPairToObject = function(raw) {
                 var pair = splitPair(raw),
                     h = parseInt(pair && pair[0], 10),
@@ -645,6 +644,27 @@ if (!window.DevExpress) {
                 return {
                         h: h,
                         v: v
+                    }
+            };
+        var stringQuadToObject = function(raw) {
+                var quad = splitQuad(raw),
+                    left = parseInt(quad && quad[0], 10),
+                    top = parseInt(quad && quad[1], 10),
+                    right = parseInt(quad && quad[2], 10),
+                    bottom = parseInt(quad && quad[3], 10);
+                if (!isFinite(left))
+                    left = 0;
+                if (!isFinite(top))
+                    top = left;
+                if (!isFinite(right))
+                    right = left;
+                if (!isFinite(bottom))
+                    bottom = top;
+                return {
+                        top: top,
+                        right: right,
+                        bottom: bottom,
+                        left: left
                     }
             };
         var orderEach = function(map, func) {
@@ -753,6 +773,7 @@ if (!window.DevExpress) {
             deepExtendArraySafe: deepExtendArraySafe,
             splitPair: splitPair,
             stringPairToObject: stringPairToObject,
+            stringQuadToObject: stringQuadToObject,
             normalizeIndexes: normalizeIndexes,
             orderEach: orderEach,
             unwrapObservable: unwrapObservable,
@@ -1304,7 +1325,11 @@ if (!window.DevExpress) {
                 result.setDate(date.getDate() - delta);
                 return result
             };
-        var dateInRange = function(date, min, max) {
+        var dateInRange = function(date, min, max, format) {
+                if (format === "date") {
+                    min = min && new Date(min.getFullYear(), min.getMonth(), min.getDate());
+                    max = max && new Date(max.getFullYear(), max.getMonth(), max.getDate())
+                }
                 return normalizeDate(date, min, max) === date
             };
         var normalizeDate = function(date, min, max) {
@@ -2195,14 +2220,13 @@ if (!window.DevExpress) {
     /*! Module core, file browser.js */
     (function($, DX, global, undefined) {
         var webkitRegExp = /(webkit)[ \/]([\w.]+)/,
-            operaRegExp = /(opera)(?:.*version)?[ \/]([\w.]+)/,
             ieRegExp = /(msie) (\d{1,2}\.\d)/,
             ie11RegExp = /(trident).*rv:(\d{1,2}\.\d)/,
-            mozillaRegExp = /(mozilla)(?:.*? rv:([\w.]+))?/;
-        var ua = navigator.userAgent.toLowerCase();
-        var browser = function() {
+            mozillaRegExp = /(mozilla)(?:.*? rv:([\w.]+))/;
+        var browserFromUA = function(ua) {
+                ua = ua.toLowerCase();
                 var result = {},
-                    matches = webkitRegExp.exec(ua) || operaRegExp.exec(ua) || ieRegExp.exec(ua) || ie11RegExp.exec(ua) || ua.indexOf("compatible") < 0 && mozillaRegExp.exec(ua) || [],
+                    matches = ieRegExp.exec(ua) || ie11RegExp.exec(ua) || ua.indexOf("compatible") < 0 && mozillaRegExp.exec(ua) || webkitRegExp.exec(ua) || [],
                     browserName = matches[1],
                     browserVersion = matches[2];
                 if (browserName === "trident")
@@ -2212,8 +2236,8 @@ if (!window.DevExpress) {
                     result.version = browserVersion
                 }
                 return result
-            }();
-        DX.browser = browser
+            };
+        DX.browser = $.extend({_fromUA: browserFromUA}, browserFromUA(navigator.userAgent))
     })(jQuery, DevExpress, this);
     /*! Module core, file support.js */
     (function($, DX, window) {
@@ -2385,11 +2409,12 @@ if (!window.DevExpress) {
                         data.myLocation = bounds.min;
                         result = true
                     }
-                    return result
+                    data.fit = result
                 },
                 flip: function(data, bounds) {
+                    data.flip = false;
                     if (data.myAlign === "center" && data.atAlign === "center")
-                        return false;
+                        return;
                     if (data.myLocation < bounds.min || data.myLocation > bounds.max) {
                         var inverseData = $.extend({}, data, {
                                 myAlign: inverseAlign(data.myAlign),
@@ -2398,13 +2423,19 @@ if (!window.DevExpress) {
                             });
                         initMyLocation(inverseData);
                         inverseData.oversize = calculateOversize(inverseData, bounds);
-                        if (inverseData.myLocation >= bounds.min && inverseData.myLocation <= bounds.max || inverseData.myLocation > data.myLocation || inverseData.oversize < data.oversize) {
+                        if (inverseData.myLocation >= bounds.min && inverseData.myLocation <= bounds.max) {
                             data.myLocation = inverseData.myLocation;
                             data.oversize = inverseData.oversize;
-                            return true
+                            data.flip = true
                         }
                     }
-                    return false
+                },
+                flipfit: function(data, bounds) {
+                    this.flip(data, bounds);
+                    this.fit(data, bounds)
+                },
+                none: function(data, bounds) {
+                    data.oversize = 0
                 }
             };
         var scrollbarWidth;
@@ -2520,20 +2551,24 @@ if (!window.DevExpress) {
                 h.oversize = calculateOversize(h, bounds.h);
                 v.oversize = calculateOversize(v, bounds.v);
                 if (decolliders[h.collision])
-                    result.h[h.collision] = decolliders[h.collision](h, bounds.h);
+                    decolliders[h.collision](h, bounds.h);
                 if (decolliders[v.collision])
-                    result.v[v.collision] = decolliders[v.collision](v, bounds.v);
+                    decolliders[v.collision](v, bounds.v);
                 var preciser = function(number) {
                         return options.precise ? number : Math.round(number)
                     };
                 $.extend(true, result, {
                     h: {
                         location: preciser(h.myLocation),
-                        oversize: preciser(h.oversize)
+                        oversize: preciser(h.oversize),
+                        fit: h.fit,
+                        flip: h.flip
                     },
                     v: {
                         location: preciser(v.myLocation),
-                        oversize: preciser(v.oversize)
+                        oversize: preciser(v.oversize),
+                        fit: v.fit,
+                        flip: v.flip
                     },
                     precise: options.precise
                 });
@@ -2904,13 +2939,13 @@ if (!window.DevExpress) {
                     if (typeof config.from === "string")
                         $element.addClass(config.from);
                     else
-                        setProps($element, config.from)
-                },
-                animate: function($element, config) {
+                        setProps($element, config.from);
                     var that = this,
                         deferred = $.Deferred(),
                         cleanupWhen = config.cleanupWhen;
-                    config.transitionAnimation = {finish: function() {
+                    config.transitionAnimation = {
+                        deferred: deferred,
+                        finish: function() {
                             that._finishTransition($element, config);
                             if (cleanupWhen)
                                 $.when(deferred, cleanupWhen).always(function() {
@@ -2919,14 +2954,24 @@ if (!window.DevExpress) {
                             else
                                 that._cleanup($element, config);
                             deferred.resolveWith($element, [config, $element])
-                        }};
-                    this._startAnimation($element, config);
+                        }
+                    };
                     this._completeAnimationCallback($element, config).done(function() {
                         config.transitionAnimation.finish()
                     });
                     if (!config.duration)
                         config.transitionAnimation.finish();
-                    return deferred.promise()
+                    $element.css("transform");
+                    $element.css({
+                        transitionProperty: "all",
+                        transitionDelay: config.delay + "ms",
+                        transitionDuration: config.duration + "ms",
+                        transitionTimingFunction: config.easing
+                    })
+                },
+                animate: function($element, config) {
+                    this._startAnimation($element, config);
+                    return config.transitionAnimation.deferred.promise()
                 },
                 _completeAnimationCallback: function($element, config) {
                     var startTime = $.now() + config.delay,
@@ -2956,15 +3001,8 @@ if (!window.DevExpress) {
                     return deferred.promise()
                 },
                 _startAnimation: function($element, config) {
-                    $element.css("transform");
-                    $element.css({
-                        transitionProperty: "all",
-                        transitionDelay: config.delay + "ms",
-                        transitionDuration: config.duration + "ms",
-                        transitionTimingFunction: config.easing
-                    });
                     if (typeof config.to === "string")
-                        $element.addClass(config.to);
+                        $element[0].className += " " + config.to;
                     else if (config.to)
                         setProps($element, config.to)
                 },
@@ -3117,7 +3155,9 @@ if (!window.DevExpress) {
                 initAnimation: function($element, config){},
                 animate: function($element, config) {
                     return $.Deferred().resolve().promise()
-                }
+                },
+                stop: $.noop,
+                isSynchronous: true
             };
         var animationStrategies = {
                 transition: support.transition ? TransitionAnimationStrategy : FrameAnimationStrategy,
@@ -3376,16 +3416,31 @@ if (!window.DevExpress) {
                 if (config.start)
                     config.start.apply(this, [$element, config])
             };
+        var onElementAnimationComplete = function(animation) {
+                var $element = animation.$element,
+                    config = animation.config;
+                $element.removeData(ANIM_DATA_KEY);
+                if (config.complete)
+                    config.complete.apply(this, [$element, config]);
+                animation.deferred.resolveWith(this, [$element, config])
+            };
         var startAnimationOnElement = function() {
                 var animation = this,
                     $element = animation.$element,
                     config = animation.config;
+                animation.isStarted = true;
                 return animation.strategy.animate($element, config).done(function() {
-                        $element.removeData(ANIM_DATA_KEY);
-                        if (config.complete)
-                            config.complete.apply(this, [$element, config]);
-                        animation.deferred.resolveWith(this, [$element, config])
+                        onElementAnimationComplete(animation)
                     })
+            };
+        var stopAnimationOnElement = function(jumpToEnd) {
+                var animation = this,
+                    $element = animation.$element,
+                    config = animation.config;
+                clearTimeout(animation.startTimeout);
+                if (!animation.isStarted)
+                    animation.start();
+                animation.strategy.stop($element, config, jumpToEnd)
             };
         var createAnimation = function($element, initialConfig) {
                 var defaultConfig = initialConfig.type === "css" ? defaultCssConfig : defaultJSConfig,
@@ -3397,8 +3452,10 @@ if (!window.DevExpress) {
                         config: config,
                         configurator: configurator,
                         strategy: strategy,
+                        isSynchronous: strategy.isSynchronous,
                         setup: setupAnimationOnElement,
                         start: startAnimationOnElement,
+                        stop: stopAnimationOnElement,
                         deferred: $.Deferred()
                     };
                 if ($.isFunction(configurator.validateConfig))
@@ -3445,7 +3502,17 @@ if (!window.DevExpress) {
             };
         var executeAnimation = function(animation) {
                 animation.setup();
-                return animation.start()
+                if (DX.fx.off || animation.isSynchronous)
+                    animation.start();
+                else {
+                    animation.startTimeout = setTimeout(function() {
+                        animation.start()
+                    });
+                    animation.$element.off("dxremove.dxFXStartAnimation").on("dxremove.dxFXStartAnimation", function() {
+                        clearTimeout(animation.startTimeout)
+                    })
+                }
+                return animation.deferred.promise()
             };
         var setupPosition = function($element, config) {
                 if (!config || !config.position)
@@ -3468,13 +3535,14 @@ if (!window.DevExpress) {
                 var $element = $(element),
                     queueData = getAnimQueueData($element);
                 $.each(queueData, function(_, animation) {
-                    animation.config.duration = 0
+                    animation.config.duration = 0;
+                    animation.isSynchronous = true
                 });
                 if (!isAnimating($element))
                     shiftFromAnimationQueue($element, queueData);
                 var animation = $element.data(ANIM_DATA_KEY);
                 if (animation)
-                    animation.strategy.stop($element, animation.config, jumpToEnd);
+                    animation.stop(jumpToEnd);
                 $element.removeData(ANIM_DATA_KEY);
                 destroyAnimQueueData($element)
             };
@@ -3597,6 +3665,7 @@ if (!window.DevExpress) {
         };
         DX.formatHelper = {
             defaultQuarterFormat: 'Q{0}',
+            defaultLargeNumberFormatPostfixes: DX.LargeNumberFormatPostfixes,
             romanDigits: ['I', 'II', 'III', 'IV'],
             _addFormatSeparator: function(format1, format2) {
                 var separator = ' ';
@@ -3704,7 +3773,7 @@ if (!window.DevExpress) {
                     formatObject.power = this._calculateNumberPower(value, 1000, 0, MAX_LARGE_NUMBER_POWER);
                 if (formatObject.power)
                     value = this._getNumberByPower(value, formatObject.power, 1000);
-                powerPostfix = DX.LargeNumberFormatPostfixes[formatObject.power] || '';
+                powerPostfix = this.defaultLargeNumberFormatPostfixes[formatObject.power] || '';
                 return this._formatNumberCore(value, formatObject.formatType, precision) + powerPostfix
             },
             _formatNumberExponential: function(value, precision) {
@@ -3765,7 +3834,7 @@ if (!window.DevExpress) {
                     currencyFormat = formatInfo.currencyCulture && Globalize.cultures[formatInfo.currencyCulture] ? Globalize.cultures[formatInfo.currencyCulture].numberFormat.currency : numberFormat.currency,
                     percentFormat = numberFormat.percent,
                     formatSettings = that._getUnitFormatSettings(value, formatInfo),
-                    unit = formatSettings.unit,
+                    unitPower = formatSettings.unitPower,
                     precision = formatSettings.precision,
                     showTrailingZeros = formatSettings.showTrailingZeros,
                     includeGroupSeparator = formatSettings.includeGroupSeparator,
@@ -3779,7 +3848,7 @@ if (!window.DevExpress) {
                     result = "";
                 if (!utils.isDefined(value))
                     return '';
-                value = that._applyUnitToValue(value, unit);
+                value = this._getNumberByPower(value, unitPower, 1000);
                 number = Math.abs(value);
                 isNegative = value < 0;
                 switch (numericFormatType) {
@@ -3830,7 +3899,7 @@ if (!window.DevExpress) {
                                 result += percentFormat.symbol;
                                 break;
                             case"n":
-                                result += number + unit;
+                                result += number + (unitPower > 0 ? this.defaultLargeNumberFormatPostfixes[unitPower] : "");
                                 break
                         }
                     else
@@ -3850,31 +3919,31 @@ if (!window.DevExpress) {
                 return strValue.substring(0, stopIndex)
             },
             _getUnitFormatSettings: function(value, formatInfo) {
-                var unit = formatInfo.unit || '',
+                var unitPower = formatInfo.unitPower || '',
                     precision = formatInfo.precision || 0,
                     includeGroupSeparator = formatInfo.includeGroupSeparator || false,
                     showTrailingZeros = formatInfo.showTrailingZeros === undefined ? true : formatInfo.showTrailingZeros,
                     significantDigits = formatInfo.significantDigits || 1,
                     absValue;
-                if (unit.toLowerCase() === 'auto') {
+                if (unitPower.toString().toLowerCase() === 'auto') {
                     showTrailingZeros = false;
                     absValue = Math.abs(value);
                     if (significantDigits < 1)
                         significantDigits = 1;
                     if (absValue >= 1000000000) {
-                        unit = 'B';
+                        unitPower = 3;
                         absValue /= 1000000000
                     }
                     else if (absValue >= 1000000) {
-                        unit = 'M';
+                        unitPower = 2;
                         absValue /= 1000000
                     }
                     else if (absValue >= 1000) {
-                        unit = 'K';
+                        unitPower = 1;
                         absValue /= 1000
                     }
                     else
-                        unit = '';
+                        unitPower = 0;
                     if (absValue === 0)
                         precision = 0;
                     else if (absValue < 1) {
@@ -3895,20 +3964,11 @@ if (!window.DevExpress) {
                 if (precision < 0)
                     precision = 0;
                 return {
-                        unit: unit,
+                        unitPower: unitPower,
                         precision: precision,
                         showTrailingZeros: showTrailingZeros,
                         includeGroupSeparator: includeGroupSeparator
                     }
-            },
-            _applyUnitToValue: function(value, unit) {
-                if (unit === 'B')
-                    return value.toFixed(1) / 1000000000;
-                if (unit === 'M')
-                    return value / 1000000;
-                if (unit === 'K')
-                    return value / 1000;
-                return value
             },
             _formatDateEx: function(value, formatInfo) {
                 var that = this,
@@ -5155,14 +5215,14 @@ if (!window.DevExpress) {
                 return function(obj, options) {
                         options = prepareOptions(options);
                         var current = unwrap(obj, options);
-                        $.each(path, function() {
+                        for (var i = 0; i < path.length; i++) {
                             if (!current)
-                                return false;
-                            var next = unwrap(current[this], options);
+                                break;
+                            var next = unwrap(current[path[i]], options);
                             if ($.isFunction(next) && !options.functionsAsIs)
                                 next = next.call(current);
                             current = next
-                        });
+                        }
                         return current
                     }
             };
@@ -5641,12 +5701,15 @@ if (!window.DevExpress) {
                     return this.iter.count()
                 },
                 _ensureSorted: function() {
-                    if (this.sortedIter)
+                    var that = this;
+                    if (that.sortedIter)
                         return;
-                    $.each(this.rules, function() {
+                    $.each(that.rules, function() {
                         this.getter = compileGetter(this.getter)
                     });
-                    this.sortedIter = new MapIterator(new ArrayIterator(this.iter.toArray().sort($.proxy(this._compare, this))), this._unwrap)
+                    that.sortedIter = new MapIterator(new ArrayIterator(this.iter.toArray().sort(function(x, y) {
+                        return that._compare(x, y)
+                    })), that._unwrap)
                 },
                 _wrap: function(record, index) {
                     return {
@@ -7625,7 +7688,7 @@ if (!window.DevExpress) {
                         if (data === null || typeof data === "undefined" || $.isArray(data) && data.length < 1)
                             d.reject();
                         else
-                            d.resolve(that._transformLoadedData(data)[0])
+                            d.resolve(that._applyMapFunction($.makeArray(data))[0])
                     }
                     if (arguments.length < 2) {
                         propValue = propName;
@@ -7760,7 +7823,7 @@ if (!window.DevExpress) {
                 },
                 _processStoreLoadResult: function(loadResult, pendingDeferred) {
                     var that = this;
-                    var data = loadResult.data,
+                    var data = $.makeArray(loadResult.data),
                         extra = loadResult.extra,
                         storeLoadOptions = loadResult.storeLoadOptions;
                     function resolvePendingDeferred() {
@@ -7778,7 +7841,7 @@ if (!window.DevExpress) {
                     }
                     if (that._disposed)
                         return;
-                    data = that._transformLoadedData(data);
+                    data = that._applyPostProcessFunction(that._applyMapFunction(data));
                     if (!$.isPlainObject(extra))
                         extra = {};
                     that._items = data;
@@ -7789,13 +7852,15 @@ if (!window.DevExpress) {
                     else
                         resolvePendingDeferred()
                 },
-                _transformLoadedData: function(data) {
-                    var result = $.makeArray(data);
+                _applyMapFunction: function(data) {
                     if (this._mapFunc)
-                        result = mapDataRespectingGrouping(result, this._mapFunc, this.group());
+                        return mapDataRespectingGrouping(data, this._mapFunc, this.group());
+                    return data
+                },
+                _applyPostProcessFunction: function(data) {
                     if (this._postProcessFunc)
-                        result = this._postProcessFunc(result);
-                    return result
+                        return this._postProcessFunc(data);
+                    return data
                 }
             }).include(DX.EventsMixin);
         $.extend(true, data, {
@@ -7822,6 +7887,8 @@ if (!window.DevExpress) {
         var utils = DX.utils,
             dataUtils = DX.data.utils,
             inflector = DX.inflector;
+        var cachedGetters = {};
+        var cachedSetters = {};
         var Component = DX.Class.inherit({
                 NAME: "Component",
                 _setDeprecatedOptions: function() {
@@ -7900,7 +7967,6 @@ if (!window.DevExpress) {
                         throw DX.Error("E0004");
                     options = options || {};
                     this._options = {};
-                    this._cachedGetters = {};
                     this._updateLockCount = 0;
                     this._optionChangedCallbacks = options._optionChangedCallbacks || $.Callbacks();
                     this._disposingCallbacks = options._disposingCallbacks || $.Callbacks();
@@ -7948,7 +8014,6 @@ if (!window.DevExpress) {
                 },
                 _init: function() {
                     this._createOptionChangedAction();
-                    this._createDisposingAction();
                     this.on("optionChanged", function(args) {
                         this._optionChangedCallbacks.fireWith(this, [args])
                     });
@@ -7964,13 +8029,11 @@ if (!window.DevExpress) {
                 },
                 _optionChanged: function(args) {
                     switch (args.name) {
+                        case"onDisposing":
                         case"onInitialized":
                             break;
                         case"onOptionChanged":
                             this._createOptionChangedAction();
-                            break;
-                        case"onDisposing":
-                            this._createDisposingAction();
                             break;
                         case"defaultOptionsRules":
                             break
@@ -7979,6 +8042,7 @@ if (!window.DevExpress) {
                 _dispose: function() {
                     this.optionChanged.empty();
                     this.disposing.fireWith(this).empty();
+                    this._createDisposingAction();
                     this._disposingAction();
                     this._disposeEvents();
                     this._disposed = true
@@ -8106,11 +8170,20 @@ if (!window.DevExpress) {
                             return name
                         };
                     var getOptionValue = function(name, unwrapObservables) {
-                            if (!that._cachedGetters[name])
-                                that._cachedGetters[name] = dataUtils.compileGetter(name);
-                            return that._cachedGetters[name](that._options, {
+                            if (!cachedGetters[name])
+                                cachedGetters[name] = dataUtils.compileGetter(name);
+                            return cachedGetters[name](that._options, {
                                     functionsAsIs: true,
                                     unwrapObservables: unwrapObservables
+                                })
+                        };
+                    var setOptionValue = function(name, value) {
+                            if (!cachedSetters[name])
+                                cachedSetters[name] = dataUtils.compileSetter(name);
+                            return cachedSetters[name](that._options, value, {
+                                    functionsAsIs: true,
+                                    merge: !that._getOptionsByReference()[name],
+                                    unwrapObservables: false
                                 })
                         };
                     if (arguments.length < 2 && $.type(name) !== "object") {
@@ -8128,11 +8201,7 @@ if (!window.DevExpress) {
                             var prevValue = getOptionValue(name, false);
                             if (that._optionValuesEqual(name, prevValue, value))
                                 return;
-                            dataUtils.compileSetter(name)(that._options, value, {
-                                functionsAsIs: true,
-                                merge: !that._getOptionsByReference()[name],
-                                unwrapObservables: false
-                            });
+                            setOptionValue(name, value);
                             that._notifyOptionChanged(name, value, prevValue)
                         })
                     }
@@ -8427,7 +8496,7 @@ if (!window.DevExpress) {
         var RTL_DIRECTION_CLASS = "dx-rtl",
             COMPONENT_NAMES_DATA_KEY = "dxComponents",
             VISIBILITY_CHANGE_CLASS = "dx-visibility-change-handler",
-            VISIBILITY_CHANGE_EVENTNAMESPACE = "dxVisibilityChange";
+            VISIBILITY_CHANGE_EVENTNAMESPACE = "VisibilityChange";
         var DOMComponent = DX.Component.inherit({
                 NAME: "DOMComponent",
                 _setDefaultOptions: function() {
@@ -8435,7 +8504,8 @@ if (!window.DevExpress) {
                     this.option({
                         width: undefined,
                         height: undefined,
-                        rtlEnabled: DX.rtlEnabled
+                        rtlEnabled: DX.rtlEnabled,
+                        disabled: false
                     })
                 },
                 ctor: function(element, options) {
@@ -8480,9 +8550,11 @@ if (!window.DevExpress) {
                 },
                 _attachVisiblityChangeHandlers: function() {
                     var that = this;
-                    that.element().off("." + VISIBILITY_CHANGE_EVENTNAMESPACE).on("dxhiding." + VISIBILITY_CHANGE_EVENTNAMESPACE, function() {
+                    var hiddingEventName = "dxhiding." + this.NAME + VISIBILITY_CHANGE_EVENTNAMESPACE;
+                    var shownEventName = "dxshown." + this.NAME + VISIBILITY_CHANGE_EVENTNAMESPACE;
+                    that.element().off(hiddingEventName).on(hiddingEventName, function() {
                         that._visibilityChanged(false)
-                    }).on("dxshown." + VISIBILITY_CHANGE_EVENTNAMESPACE, function() {
+                    }).off(shownEventName).on(shownEventName, function() {
                         that._visibilityChanged(true)
                     })
                 },
@@ -8514,7 +8586,10 @@ if (!window.DevExpress) {
                 },
                 _createComponent: function(element, name, config) {
                     config = config || {};
-                    this._extendConfig(config, {rtlEnabled: this.option("rtlEnabled")});
+                    this._extendConfig(config, {
+                        rtlEnabled: this.option("rtlEnabled"),
+                        disabled: this.option("disabled")
+                    });
                     var $element = $(element)[name](config);
                     return $element[name]("instance")
                 },
@@ -8542,6 +8617,8 @@ if (!window.DevExpress) {
                             break;
                         case"rtlEnabled":
                             this._invalidate();
+                            break;
+                        case"disabled":
                             break;
                         default:
                             this.callBase(args);
@@ -8587,7 +8664,7 @@ if (!window.DevExpress) {
                         var memberName = options,
                             memberArgs = $.makeArray(arguments).slice(1);
                         this.each(function() {
-                            var instance = $(this).data(name);
+                            var instance = $.data(this, name);
                             if (!instance)
                                 throw DX.Error("E0009", name);
                             var member = instance[memberName],
@@ -8598,7 +8675,7 @@ if (!window.DevExpress) {
                     }
                     else {
                         this.each(function() {
-                            var instance = $(this).data(name);
+                            var instance = $.data(this, name);
                             if (instance)
                                 instance.option(options);
                             else
@@ -8610,12 +8687,13 @@ if (!window.DevExpress) {
                 }
             };
         var getComponents = function(element) {
-                element = $(element);
-                var names = element.data(COMPONENT_NAMES_DATA_KEY);
+                if (!element)
+                    return [];
+                var names = $.data(element, COMPONENT_NAMES_DATA_KEY);
                 if (!names)
                     return [];
                 return $.map(names, function(name) {
-                        return element.data(name)
+                        return $.data(element, name)
                     })
             };
         var disposeComponents = function() {
@@ -8628,7 +8706,7 @@ if (!window.DevExpress) {
             $.each(element, disposeComponents);
             return originalCleanData.apply(this, arguments)
         };
-        registerComponent("DOMComponent", DOMComponent);
+        DX.DOMComponent = DOMComponent;
         DX.registerComponent = registerComponent
     })(jQuery, DevExpress);
     /*! Module core, file ui.js */
@@ -8972,12 +9050,14 @@ if (!window.DevExpress) {
         TEMPLATE_GENERATORS.dxActionSheet = {item: function(itemData) {
                 return $("<div>").append($("<div>").dxButton($.extend({onClick: itemData.click}, itemData)))
             }};
+        var GALLERY_IMAGE_CLASS = "dx-gallery-item-image";
         TEMPLATE_GENERATORS.dxGallery = {item: function(itemData) {
-                var $itemContent = $("<div>");
+                var $itemContent = $("<div>"),
+                    $img = $('<img>').addClass(GALLERY_IMAGE_CLASS);
                 if (itemData.imageSrc)
-                    $('<img>').attr('src', itemData.imageSrc).appendTo($itemContent);
+                    $img.attr('src', itemData.imageSrc).appendTo($itemContent);
                 else
-                    $('<img>').attr('src', String(itemData)).appendTo($itemContent);
+                    $img.attr('src', String(itemData)).appendTo($itemContent);
                 return $itemContent
             }};
         var DX_MENU_ITEM_CAPTION_CLASS = 'dx-menu-item-text',
@@ -9208,24 +9288,27 @@ if (!window.DevExpress) {
                                 $element.data(CREATED_WITH_KO_DATA_KEY, true).data(LOCKS_DATA_KEY, new Locks)[componentName](ctorOptions);
                                 ctorOptions = null
                             };
-                        var unwrapModelValue = function(option, model) {
-                                var modelUnwrapped;
+                        var unwrapModelValue = function(currentModel, propertyName, propertyPath) {
+                                var unwrappedPropertyValue;
                                 ko.computed(function() {
-                                    applyModelValueToOption(option, model);
-                                    modelUnwrapped = ko.unwrap(model)
+                                    var propertyValue = currentModel[propertyName];
+                                    applyModelValueToOption(propertyPath, propertyValue);
+                                    unwrappedPropertyValue = ko.unwrap(propertyValue)
                                 }, null, {disposeWhenNodeIsRemoved: domNode});
-                                if ($.isPlainObject(modelUnwrapped))
-                                    $.each(modelUnwrapped, function(optionName, modelValue) {
-                                        unwrapModelValue(option + "." + optionName, modelValue)
-                                    })
+                                if ($.isPlainObject(unwrappedPropertyValue))
+                                    unwrapModel(unwrappedPropertyValue, propertyPath)
+                            };
+                        var unwrapModel = function(model, propertyPath) {
+                                for (var propertyName in model)
+                                    if (model.hasOwnProperty(propertyName))
+                                        unwrapModelValue(model, propertyName, propertyPath ? [propertyPath, propertyName].join(".") : propertyName)
                             };
                         ko.computed(function() {
-                            var component = $element.data(componentName);
+                            var component = $element.data(componentName),
+                                model = ko.unwrap(valueAccessor());
                             if (component)
                                 component.beginUpdate();
-                            $.each(ko.unwrap(valueAccessor()), function(optionName, modelValue) {
-                                unwrapModelValue(optionName, modelValue)
-                            });
+                            unwrapModel(model);
                             if (component)
                                 component.endUpdate();
                             else
@@ -9557,7 +9640,7 @@ if (!window.DevExpress) {
                     return function(data, index) {
                             var $resultMarkup = $(template).clone(),
                                 templateScope;
-                            if (data !== undefined) {
+                            if (DX.utils.isDefined(data)) {
                                 var dataIsScope = data.$id;
                                 templateScope = dataIsScope ? data : that._createScopeWithData(data);
                                 $resultMarkup.on("$destroy", function() {
@@ -9785,7 +9868,7 @@ if (!window.DevExpress) {
                     }
             }]);
         DX.registerComponent = registerNgComponent;
-        registerNgComponent("DOMComponent", NgComponent)
+        DX.DOMComponent = NgComponent
     })(jQuery, DevExpress);
     /*! Module core, file ko.templates.js */
     (function($, DX, undefined) {
@@ -9966,7 +10049,7 @@ if (!window.DevExpress) {
                 $.each(["button", "tabs", "dropDownMenu"], function() {
                     var bindingName = DX.inflector.camelize(["dx", "-", this].join("")),
                         bindingObj = {};
-                    bindingObj[bindingName] = "$data.options";
+                    bindingObj[bindingName] = "$data.options || {}";
                     template.push("<!-- ko if: $data.widget === '", this, "' -->", createElementWithBindAttr("div", bindingObj), "<!-- /ko -->")
                 });
                 template.push("<!-- /ko -->");
@@ -9975,11 +10058,12 @@ if (!window.DevExpress) {
             menuItem: TEMPLATE_GENERATORS.dxList.item,
             actionSheetItem: TEMPLATE_GENERATORS.dxActionSheet.item
         };
+        var GALLERY_IMAGE_CLASS = "dx-gallery-item-image";
         TEMPLATE_GENERATORS.dxGallery = {item: function() {
                 var template = TEMPLATE_GENERATORS.CollectionWidget.item(),
                     primitiveBinding = createElementWithBindAttr("div", {text: "String($data)"}),
-                    imgBinding = createElementWithBindAttr("img", {attr: "{ src: String($data) }"}, false);
-                template = [template.substring(0, template.length - 6).replace(primitiveBinding, imgBinding), "<!-- ko if: $data.imageSrc -->", createElementWithBindAttr("img", {attr: "{ src: $data.imageSrc }"}, false), "<!-- /ko -->"].join("");
+                    imgBinding = createElementWithBindAttr("img", {attr: "{ src: String($data) }"}, false, 'class="' + GALLERY_IMAGE_CLASS + '"');
+                template = [template.substring(0, template.length - 6).replace(primitiveBinding, imgBinding), "<!-- ko if: $data.imageSrc -->", createElementWithBindAttr("img", {attr: "{ src: $data.imageSrc }"}, false, 'class="' + GALLERY_IMAGE_CLASS + '"'), "<!-- /ko -->"].join("");
                 return template
             }};
         TEMPLATE_GENERATORS.dxTabs = {
@@ -10220,15 +10304,16 @@ if (!window.DevExpress) {
                 var template = TEMPLATE_GENERATORS.CollectionWidget.item();
                 $.each(["button", "tabs", "dropDownMenu"], function(i, widgetName) {
                     var bindingName = "dx-" + DX.inflector.dasherize(this);
-                    $("<div>").attr("ng-if", "widget === '" + widgetName + "'").attr(bindingName, "options").appendTo(template)
+                    $("<div>").attr("ng-if", "widget === '" + widgetName + "'").attr(bindingName, "options || {}").appendTo(template)
                 });
                 return template
             },
             menuItem: TEMPLATE_GENERATORS.dxList.item,
             actionSheetItem: TEMPLATE_GENERATORS.dxActionSheet.item
         };
+        var GALLERY_IMAGE_CLASS = "dx-gallery-item-image";
         TEMPLATE_GENERATORS.dxGallery = {item: function() {
-                return baseElements.container().append(baseElements.html()).append(baseElements.text()).append($("<img>").attr("ng-if", "scopeValue").attr("ng-src", "{{'' + scopeValue}}")).append($("<img>").attr("ng-if", "imageSrc").attr("ng-src", "{{imageSrc}}"))
+                return baseElements.container().append(baseElements.html()).append(baseElements.text()).append($("<img>").addClass(GALLERY_IMAGE_CLASS).attr("ng-if", "scopeValue").attr("ng-src", "{{'' + scopeValue}}")).append($("<img>").addClass(GALLERY_IMAGE_CLASS).attr("ng-if", "imageSrc").attr("ng-src", "{{imageSrc}}"))
             }};
         var TABS_ITEM_TEXT_CLASS = "dx-tab-text";
         TEMPLATE_GENERATORS.dxTabs = {
@@ -10921,7 +11006,11 @@ if (!window.DevExpress) {
                             args.component.content().addClass(DX_DIALOG_CONTENT_CLASSNAME).append($message)
                         },
                         onShowing: function(e) {
-                            e.component.bottomToolbar().addClass(DX_DIALOG_BUTTONS_CLASSNAME).find(".dx-button").addClass(DX_DIALOG_BUTTON_CLASSNAME).first().focus()
+                            e.component.bottomToolbar().addClass(DX_DIALOG_BUTTONS_CLASSNAME).find(".dx-button").addClass(DX_DIALOG_BUTTON_CLASSNAME);
+                            utils.resetActiveElement()
+                        },
+                        onShown: function(e) {
+                            e.component.bottomToolbar().find(".dx-button").first().focus()
                         },
                         buttons: popupButtons,
                         animation: {
@@ -10954,7 +11043,6 @@ if (!window.DevExpress) {
                 popupInstance._wrapper().addClass(DX_DIALOG_ROOT_CLASSNAME);
                 function show() {
                     popupInstance.show();
-                    utils.resetActiveElement();
                     return deferred.promise()
                 }
                 function hide(value) {
@@ -11301,7 +11389,7 @@ if (!window.DevExpress) {
                 ctor: function(eventName, originalEvents) {
                     this._eventName = eventName;
                     this._eventNamespace = [POINTER_EVENTS_NAMESPACE, ".", this._eventName].join("");
-                    this._originalEvents = originalEvents;
+                    this._originalEvents = events.addNamespace(originalEvents || "", this._eventNamespace);
                     this._handlerCount = 0;
                     this.noBubble = this._isNoBubble()
                 },
@@ -11334,7 +11422,10 @@ if (!window.DevExpress) {
                     if (this._handlerCount <= 0 || this.noBubble) {
                         this._selector = handleObj.selector;
                         element = this.noBubble ? element : document;
-                        $(element).on(events.addNamespace(this._originalEvents, this._eventNamespace), this._selector, $.proxy(this._handler, this))
+                        var that = this;
+                        $(element).on(this._originalEvents, this._selector, function(e) {
+                            that._handler(e)
+                        })
                     }
                     if (!this.noBubble)
                         this._handlerCount++
@@ -11347,11 +11438,11 @@ if (!window.DevExpress) {
                     if (this._handlerCount && !this.noBubble)
                         return;
                     element = this.noBubble ? element : document;
-                    $(element).off("." + this._eventNamespace, this._selector)
+                    $(element).off(this._originalEvents, this._selector)
                 },
                 dispose: function(element) {
                     element = this.noBubble ? element : document;
-                    $(element).off("." + this._eventNamespace)
+                    $(element).off(this._originalEvents)
                 }
             });
         events.pointer = {};
@@ -11467,9 +11558,10 @@ if (!window.DevExpress) {
                         this._skipNextEvents = false;
                         this._mouseLocked = true;
                         clearTimeout(this._unlockMouseTimer);
-                        this._unlockMouseTimer = setTimeout($.proxy(function() {
-                            this._mouseLocked = false
-                        }, this), this.EVENT_LOCK_TIMEOUT);
+                        var that = this;
+                        this._unlockMouseTimer = setTimeout(function() {
+                            that._mouseLocked = false
+                        }, this.EVENT_LOCK_TIMEOUT);
                         return
                     }
                     return this.callBase(e)
@@ -11630,8 +11722,11 @@ if (!window.DevExpress) {
         var Hover = DX.Class.inherit({
                 noBubble: true,
                 add: function(element, handleObj) {
-                    var $element = $(element);
-                    $element.off("." + this._namespace).on(this._originalEventName, handleObj.selector, $.proxy(this._handler, this))
+                    var that = this,
+                        $element = $(element);
+                    $element.off(this._originalEventName).on(this._originalEventName, handleObj.selector, function(e) {
+                        that._handler(e)
+                    })
                 },
                 _handler: function(e) {
                     if (events.isTouchEvent(e))
@@ -11643,39 +11738,38 @@ if (!window.DevExpress) {
                     })
                 },
                 teardown: function(element) {
-                    $(element).off("." + this._namespace)
+                    $(element).off(this._originalEventName)
                 }
             });
         var HoverStart = Hover.inherit({
                 ctor: function() {
                     this._eventName = HOVERSTART;
                     this._originalEventName = POINTERENTER_NAMESPACED_EVENT_NAME;
-                    this._namespace = HOVERSTART_NAMESPACE;
                     this._isMouseDown = false;
                     this._eventsAttached = 0
                 },
                 _handler: function(e) {
                     if (!this._isMouseDown)
-                        this.callBase.apply(this, arguments)
+                        this.callBase(e)
                 },
                 setup: function() {
-                    $(document).off("." + HOVERSTART_NAMESPACE).on(POINTERDOWN_NAMESPACED_EVENT_NAME, $.proxy(function() {
-                        this._isMouseDown = true
-                    }, this)).on(POINTERUP_NAMESPACED_EVENT_NAME, $.proxy(function() {
-                        this._isMouseDown = false
-                    }, this));
+                    var that = this;
+                    $(document).off(POINTERDOWN_NAMESPACED_EVENT_NAME + " " + POINTERUP_NAMESPACED_EVENT_NAME).on(POINTERDOWN_NAMESPACED_EVENT_NAME, function() {
+                        that._isMouseDown = true
+                    }).on(POINTERUP_NAMESPACED_EVENT_NAME, function() {
+                        that._isMouseDown = false
+                    });
                     this._eventsAttached++
                 },
                 teardown: function() {
                     this._eventsAttached--;
                     if (this._eventsAttached === 0)
-                        $(document).off("." + HOVERSTART_NAMESPACE)
+                        $(document).off(POINTERDOWN_NAMESPACED_EVENT_NAME + " " + POINTERUP_NAMESPACED_EVENT_NAME)
                 }
             });
         var HoverEnd = Hover.inherit({ctor: function() {
                     this._eventName = HOVEREND;
-                    this._originalEventName = POINTERLEAVE_NAMESPACED_EVENT_NAME;
-                    this._namespace = HOVEREND_NAMESPACE
+                    this._originalEventName = POINTERLEAVE_NAMESPACED_EVENT_NAME
                 }});
         events.registerEvent(HOVERSTART, new HoverStart);
         events.registerEvent(HOVEREND, new HoverEnd)
@@ -12387,7 +12481,7 @@ if (!window.DevExpress) {
             VELOCITY_CALC_TIMEOUT = 200,
             FRAME_DURATION = Math.round(1000 / 60),
             GESTURE_LOCK_KEY = "dxGestureLock",
-            GESTURE_LOCK_TIMEOUT = 200,
+            GESTURE_UNLOCK_TIMEOUT = 400,
             NAMESPACED_SCROLL_EVENT = events.addNamespace("scroll", "dxScrollEmitter");
         var ScrollEmitter = events.GestureEmitter.inherit({
                 ctor: function(element) {
@@ -12417,7 +12511,7 @@ if (!window.DevExpress) {
                     this._gestureEndTimer = setTimeout(function() {
                         $.data(that._domElement(), GESTURE_LOCK_KEY, false);
                         that._gestureEndTimer = null
-                    }, GESTURE_LOCK_TIMEOUT)
+                    }, GESTURE_UNLOCK_TIMEOUT)
                 },
                 _init: function(e) {
                     if ($.data(this._domElement(), GESTURE_LOCK_KEY))
@@ -13326,7 +13420,7 @@ if (!window.DevExpress) {
                 var focusInEvent = events.addNamespace("focusin", this.NAME + FOCUS_NAMESPACE);
                 var focusOutEvent = events.addNamespace("focusout", this.NAME + FOCUS_NAMESPACE);
                 var beforeactivateEventNamespace = events.addNamespace("beforeactivate", this.NAME + FOCUS_NAMESPACE);
-                this._focusTarget().off("." + this.NAME + FOCUS_NAMESPACE).on(focusInEvent, $.proxy(function(e) {
+                this._focusTarget().off(focusInEvent + " " + focusOutEvent + " " + beforeactivateEventNamespace).on(focusInEvent, $.proxy(function(e) {
                     this._focusInAction({jQueryEvent: e})
                 }, this)).on(focusOutEvent, $.proxy(function(e) {
                     this._focusOutAction({jQueryEvent: e})
@@ -13372,7 +13466,10 @@ if (!window.DevExpress) {
             },
             _cleanFocusState: function() {
                 var $element = this._focusTarget();
-                $element.off("." + this.NAME + FOCUS_NAMESPACE);
+                var focusInEvent = events.addNamespace("focusin", this.NAME + FOCUS_NAMESPACE);
+                var focusOutEvent = events.addNamespace("focusout", this.NAME + FOCUS_NAMESPACE);
+                var beforeactivateEventNamespace = events.addNamespace("beforeactivate", this.NAME + FOCUS_NAMESPACE);
+                $element.off(focusInEvent + " " + focusOutEvent + " " + beforeactivateEventNamespace);
                 $element.removeClass(FOCUSED_STATE_CLASS);
                 $element.removeAttr("tabindex");
                 if (this._keyboardProcessor)
@@ -13793,13 +13890,17 @@ if (!window.DevExpress) {
             CONTENT_CLASS_POSTFIX = "-content",
             ITEM_CONTENT_PLACEHOLDER_CLASS = "dx-item-content-placeholder",
             ITEM_DATA_KEY = "dxItemData",
+            ITEM_INDEX_KEY = "dxItemIndex",
             ITEM_TEMPLATE_ID_PREFIX = "tmpl-",
             ITEMS_SELECTOR = "[data-options*='dxItem']",
             SELECTED_ITEM_CLASS = "dx-item-selected",
-            FOCUSED_STATE_CLASS = "dx-state-focused",
             ITEM_RESPONSE_WAIT_CLASS = "dx-item-response-wait",
             EMPTY_COLLECTION = "dx-empty-collection",
-            TEMPLATE_WRAPPER_CLASS = "dx-template-wrapper";
+            TEMPLATE_WRAPPER_CLASS = "dx-template-wrapper",
+            FOCUSED_STATE_CLASS = "dx-state-focused",
+            DISABLED_STATE_CLASS = "dx-state-disabled",
+            INVISIBLE_STATE_CLASS = "dx-state-invisible",
+            ITEM_PATH_REGEX = /^items[\[\.](\d+)[\.\]].(\w+)/;
         var FOCUS_UP = "up",
             FOCUS_DOWN = "down",
             FOCUS_LEFT = "left",
@@ -14027,7 +14128,46 @@ if (!window.DevExpress) {
                     if (this.option("selectOnFocus"))
                         this._selectFocusedItem($target)
                 },
+                _findItemElementByIndex: function(index) {
+                    var result = $();
+                    this.itemElements().each(function() {
+                        var $item = $(this);
+                        if ($item.data(ITEM_INDEX_KEY) === index) {
+                            result = $item;
+                            return false
+                        }
+                    });
+                    return result
+                },
+                _itemOptionChanged: function(index, property, value) {
+                    var itemData = this.option("items")[index],
+                        $item = this._findItemElementByIndex(index);
+                    switch (property) {
+                        case"visible":
+                            this._renderItemVisibleState($item, value);
+                            break;
+                        case"disabled":
+                            this._renderItemDisableState($item, value);
+                            break;
+                        default:
+                            this._renderItem(index, itemData, null, $item);
+                            break
+                    }
+                },
+                _renderItemVisibleState: function($item, value) {
+                    $item.toggleClass(INVISIBLE_STATE_CLASS, !value)
+                },
+                _renderItemDisableState: function($item, value) {
+                    $item.toggleClass(DISABLED_STATE_CLASS, !!value)
+                },
                 _optionChanged: function(args) {
+                    if (args.name === "items") {
+                        var matches = args.fullName.match(ITEM_PATH_REGEX);
+                        if (matches && matches.length) {
+                            this._itemOptionChanged(parseInt(matches[1], 10), matches[2], args.value);
+                            return
+                        }
+                    }
                     switch (args.name) {
                         case"items":
                         case"_itemAttributes":
@@ -14144,6 +14284,9 @@ if (!window.DevExpress) {
                 _itemDataKey: function() {
                     return ITEM_DATA_KEY
                 },
+                _itemIndexKey: function() {
+                    return ITEM_INDEX_KEY
+                },
                 _itemElements: function() {
                     return this._itemContainer().find(this._itemSelector())
                 },
@@ -14225,22 +14368,26 @@ if (!window.DevExpress) {
                         $.each(items, $.proxy(this._renderItem, this));
                     this._renderEmptyMessage()
                 },
-                _renderItem: function(index, itemData, $container) {
+                _renderItem: function(index, itemData, $container, $itemToReplace) {
                     $container = $container || this._itemContainer();
-                    var $itemFrame = this._renderItemFrame(index, itemData, $container);
-                    this._setElementData($itemFrame, itemData);
+                    var $itemFrame = this._renderItemFrame(index, itemData, $container, $itemToReplace);
+                    this._setElementData($itemFrame, itemData, index);
+                    $itemFrame.attr(this.option("_itemAttributes"));
+                    this._attachItemClickEvent(itemData, $itemFrame);
                     var $itemContent = $itemFrame.find("." + ITEM_CONTENT_PLACEHOLDER_CLASS);
                     $itemContent.removeClass(ITEM_CONTENT_PLACEHOLDER_CLASS);
-                    $itemContent = this._renderItemContent(index, itemData, $itemContent);
-                    this._postprocessRenderItem({
-                        itemElement: $itemFrame,
-                        itemContent: $itemContent,
-                        itemData: itemData,
-                        itemIndex: index
+                    var renderContentPromise = this._renderItemContent(index, itemData, $itemContent);
+                    var that = this;
+                    $.when(renderContentPromise).done(function($itemContent) {
+                        that._postprocessRenderItem({
+                            itemElement: $itemFrame,
+                            itemContent: $itemContent,
+                            itemData: itemData,
+                            itemIndex: index
+                        });
+                        that._executeItemRenderAction(index, itemData, $itemFrame)
                     });
-                    this._executeItemRenderAction(index, itemData, $itemFrame);
-                    this._attachItemClickEvent(itemData, $itemFrame);
-                    return $itemFrame.attr(this.option("_itemAttributes"))
+                    return $itemFrame
                 },
                 _attachItemClickEvent: function(itemData, $itemElement) {
                     if (!itemData || !itemData.onClick)
@@ -14277,10 +14424,13 @@ if (!window.DevExpress) {
                 _addItemContentClasses: function($container) {
                     $container.addClass([ITEM_CLASS + CONTENT_CLASS_POSTFIX, this._itemContentClass()].join(" "))
                 },
-                _renderItemFrame: function(index, itemData, $container) {
+                _renderItemFrame: function(index, itemData, $container, $itemToReplace) {
                     var itemFrameTemplate = this.option("templateProvider").getTemplates(this)["itemFrame"],
                         $itemFrame = itemFrameTemplate.render(utils.isDefined(itemData) ? itemData : {}, $container, index);
-                    $itemFrame.appendTo($container);
+                    if ($itemToReplace && $itemToReplace.length)
+                        $itemToReplace.replaceWith($itemFrame);
+                    else
+                        $itemFrame.appendTo($container);
                     return $itemFrame
                 },
                 _postprocessRenderItem: $.noop,
@@ -14291,8 +14441,8 @@ if (!window.DevExpress) {
                         itemData: itemData
                     })
                 },
-                _setElementData: function(element, data) {
-                    element.addClass([ITEM_CLASS, this._itemClass()].join(" ")).data(this._itemDataKey(), data)
+                _setElementData: function(element, data, index) {
+                    element.addClass([ITEM_CLASS, this._itemClass()].join(" ")).data(this._itemDataKey(), data).data(this._itemIndexKey(), index)
                 },
                 _createItemRenderAction: function() {
                     return this._itemRenderAction = this._createActionByOption("onItemRendered", {

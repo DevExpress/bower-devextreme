@@ -41,7 +41,7 @@
     z-index: 200;
 }
 
-.dx-slideout .dx-slideout-item-container .dx-slideout-shield {
+.dx-slideout .dx-slideout-item-container .dx-slideoutview-shield {
     z-index: 201;
     top: 42px;
 }
@@ -132,7 +132,7 @@
 }
 
 .dx-theme-android5 .slideout-layout .layout-content,
-.dx-theme-android5 .dx-slideout .dx-slideout-item-container .dx-slideout-shield {
+.dx-theme-android5 .dx-slideout .dx-slideout-item-container .dx-slideoutview-shield {
     top: 56px;    
 }
 
@@ -145,12 +145,12 @@
 /* Windows phone 8 */
 
 .dx-theme-win8 .slideout-layout .layout-header {
-    height: 60px;    
+    height: 88px;
 }
 
 .dx-theme-win8 .slideout-layout .layout-content,
-.dx-theme-win8 .dx-slideout .dx-slideout-item-container .dx-slideout-shield {
-    top: 60px;    
+.dx-theme-win8 .dx-slideout .dx-slideout-item-container .dx-slideoutview-shield {
+    top: 88px;
 }
 
 .dx-theme-win8 .slideout-layout .layout-content.has-toolbar-bottom {
@@ -165,8 +165,16 @@
 }
 
 .dx-theme-win8 .slideout-layout .layout-header .dx-toolbar {
-    height: 60px;
     opacity: 1;
+}
+
+.dx-device-phone.dx-theme-win8 .slideout-layout .layout-header {
+    height: 60px;
+}
+
+.dx-device-phone.dx-theme-win8 .slideout-layout .layout-content,
+.dx-device-phone.dx-theme-win8 .dx-slideout .dx-slideout-item-container .dx-slideoutview-shield {
+    top: 60px;
 }
 
 /* generic theme */

@@ -3,14 +3,32 @@
         APPBAR_TOUCH_THRESHOLD = 50,
         EVENTS_NAMESPACE = ".dxSplitLayout",
         KEYCODE_WIN = 91,
-        KEYCODE_Z = 90;
+        KEYCODE_Z = 90,
+        POINTER_DOWN_EVENT_NAME,
+        POINTER_UP_EVENT_NAME,
+        POINTER_MOVE_EVENT_NAME;
+    if (window.PointerEvent) {
+        POINTER_DOWN_EVENT_NAME = "pointerdown";
+        POINTER_UP_EVENT_NAME = "pointerup";
+        POINTER_MOVE_EVENT_NAME = "pointermove"
+    }
+    else if (window.MSPointerEvent) {
+        POINTER_DOWN_EVENT_NAME = "MSPointerDown";
+        POINTER_UP_EVENT_NAME = "MSPointerUp";
+        POINTER_MOVE_EVENT_NAME = "MSPointerMove"
+    }
+    else {
+        POINTER_DOWN_EVENT_NAME = "mousedown";
+        POINTER_UP_EVENT_NAME = "mouseup";
+        POINTER_MOVE_EVENT_NAME = "mousemove"
+    }
     var SplitLayoutEventHelper = DX.Class.inherit({
             ctor: function(splitLayout) {
                 this.root = splitLayout
             },
             init: function() {
-                this.root._$viewPort.on("MSPointerUp" + EVENTS_NAMESPACE, $.proxy(this._pointerUpHandler, this));
-                this.root._$viewPort.on("MSPointerDown" + EVENTS_NAMESPACE, $.proxy(this._pointerDownHandler, this));
+                this.root._$viewPort.on(POINTER_UP_EVENT_NAME + EVENTS_NAMESPACE, $.proxy(this._pointerUpHandler, this));
+                this.root._$viewPort.on(POINTER_DOWN_EVENT_NAME + EVENTS_NAMESPACE, $.proxy(this._pointerDownHandler, this));
                 $(document).on("keydown" + EVENTS_NAMESPACE, $.proxy(this._keyDownHandler, this));
                 $(document).on("keyup" + EVENTS_NAMESPACE, $.proxy(this._keyUpHandler, this));
                 this._startTouchPoint = false;
@@ -25,20 +43,20 @@
                         x: originalEvent.clientX,
                         y: originalEvent.clientY
                     };
-                    this.root._$viewPort.on("MSPointerMove" + EVENTS_NAMESPACE, $.proxy(this._pointerMoveHandler, this))
+                    this.root._$viewPort.on(POINTER_MOVE_EVENT_NAME + EVENTS_NAMESPACE, $.proxy(this._pointerMoveHandler, this))
                 }
             },
             _pointerMoveHandler: function(e) {
                 var originalEvent = e.originalEvent;
                 if (this._tresholdExceeded(originalEvent)) {
                     this._moveEvent = true;
-                    this.root._$viewPort.off("MSPointerMove" + EVENTS_NAMESPACE);
+                    this.root._$viewPort.off(POINTER_MOVE_EVENT_NAME + EVENTS_NAMESPACE);
                     if (this._isVericalDirection(originalEvent.clientX, originalEvent.clientY))
                         this._toggleAppBarState(true)
                 }
             },
             _pointerUpHandler: function(e) {
-                this.root._$viewPort.off("MSPointerMove" + EVENTS_NAMESPACE);
+                this.root._$viewPort.off(POINTER_MOVE_EVENT_NAME + EVENTS_NAMESPACE);
                 var $appBar = this.root._$viewPort.find(".dx-app-bar");
                 if (e.originalEvent.button === 2)
                     this._toggleAppBarState();
@@ -151,7 +169,7 @@
             $.each(that._panesConfig, function(_, paneConfig) {
                 var controller = paneConfig.controller;
                 controller.init($.extend({}, options, {$viewPort: that._$mainLayout.find(paneConfig.selector)}));
-                $.each(["viewRendered", "viewReleased"], function(_, callbacksPropertyName) {
+                $.each(["viewRendered", "viewShowing", "viewReleased"], function(_, callbacksPropertyName) {
                     controller.on(callbacksPropertyName, function(args) {
                         that.fireEvent(callbacksPropertyName, [args])
                     })

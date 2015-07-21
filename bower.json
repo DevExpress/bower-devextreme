@@ -1,11 +1,11 @@
 {
   "name": "devextreme",
-  "version": "15.1.4",
+  "version": "15.1.5",
   "description": "A blazing-fast HTML5 Data Grid and rich libraries of high-performance touch-enabled data vizualization and UI widgets",
   "moduleType": [
     "globals"
   ],
-  "main": ["js/dx.all.js","css/dx.common.css", "css/dx.spa.css", "css/dx.light.css"],
+  "main": ["js/dx.all.js", "css/dx.spa.css", "css/dx.common.css", "css/dx.light.css"],
   "authors": [
     { "name": "Developer Express Inc.", "email": "support@devexpress.com", "homepage": "https://www.devexpress.com" }
   ],

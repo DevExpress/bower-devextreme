@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Vector Map)
-* Version: 15.1.4
-* Build date: Jun 22, 2015
+* Version: 15.1.5
+* Build date: Jul 15, 2015
 *
 * Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -220,7 +220,7 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                     function notifyReady() {
                         if (--notifyCounter === 0) {
                             that._drawn();
-                            that.hideLoadingIndicator()
+                            that._checkLoadingIndicatorHiding(true)
                         }
                     }
                 },
@@ -483,16 +483,19 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                 },
                 _render: function() {
                     var that = this;
+                    that._scheduleLoadingIndicatorHiding();
                     that._background.append(that._root);
                     that._areasManager.render();
                     that._markersManager.render();
                     that._controlBar.render();
                     that._legendsControl.render();
-                    that._layoutControl.start()
+                    that._layoutControl.start();
+                    that._repairLoadIndicator()
                 },
                 _optionChanged: function(args) {
                     var that = this,
                         value = args.value;
+                    that._scheduleLoadingIndicatorHiding();
                     switch (args.name) {
                         case"mapData":
                             that._areasManager.setData(value);
@@ -542,6 +545,7 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                 },
                 _handleThemeOptionsCore: function() {
                     var that = this;
+                    that._scheduleLoadingIndicatorHiding();
                     that._setBackgroundOptions();
                     that._setAreasManagerOptions();
                     that._setMarkersManagerOptions();
@@ -585,13 +589,6 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                 },
                 _raiseZoomFactorChanged: function() {
                     !this._noZoomFactorChanged && this._eventTrigger("zoomFactorChanged", {zoomFactor: this._projection.getZoom()})
-                },
-                _refresh: function() {
-                    var that = this,
-                        callBase = that.callBase;
-                    that._endLoading(function() {
-                        callBase.call(that)
-                    })
                 },
                 getAreas: function() {
                     return this._areasManager.getProxyItems()

@@ -45,15 +45,21 @@
         _getRootElement: function() {
             return this.$slideOut
         },
-        _doTransition: function() {
+        _showViewImpl: function(viewInfo, direction, previousViewTemplateId) {
+            this._fxOffSaved = DX.fx.off;
             if (this.slideOut.option("menuVisible"))
-                return $.Deferred().resolve().promise();
+                DX.fx.off = true;
             return this.callBase.apply(this, arguments)
         },
-        _onViewShown: function(viewInfo) {
-            this._refreshVisibility();
+        _getReadyForRenderDeferredItems: function(viewInfo) {
+            var result = this.callBase(viewInfo);
+            DX.fx.off = this._fxOffSaved;
             if (this.slideOut.option("menuVisible"))
-                this._toggleNavigation()
+                result = $.when(this._toggleNavigation(), result);
+            return result
+        },
+        _onViewShown: function(viewInfo) {
+            this._refreshVisibility()
         },
         _refreshVisibility: function() {
             if (DX.devices.real().platform === "android") {
@@ -131,7 +137,6 @@
     });
     layoutSets["slideout"].push({
         platform: "win8",
-        phone: true,
         controller: new DX.framework.html.SlideOutController
     })
 })(jQuery, DevExpress);

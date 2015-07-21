@@ -40,9 +40,12 @@
             this.callBase.apply(this, arguments)
         },
         _changeView: function(viewInfo) {
-            this.callBase.apply(this, arguments);
-            if (!viewInfo.isLoadingStateView)
-                this._refreshHasToolbarClass()
+            var that = this,
+                result = this.callBase.apply(this, arguments);
+            result.done(function() {
+                that._refreshHasToolbarClass()
+            });
+            return result
         },
         _refreshAppbarVisibility: function(appbar) {
             var isAppbarNotEmpty = false;

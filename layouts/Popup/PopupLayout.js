@@ -15,7 +15,7 @@
             var that = this,
                 $targetViewPort = that._$mainLayout.find(this.contentContainerSelector);
             that.childController.init($.extend({}, options, {$viewPort: $targetViewPort}));
-            $.each(["viewRendered", "viewReleased"], function(_, callbacksPropertyName) {
+            $.each(["viewRendered", "viewShowing", "viewReleased"], function(_, callbacksPropertyName) {
                 that.childController.on(callbacksPropertyName, function(args) {
                     that.fireEvent(callbacksPropertyName, [args])
                 })

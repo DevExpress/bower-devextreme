@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Range Selector)
-* Version: 15.1.4
-* Build date: Jun 22, 2015
+* Version: 15.1.5
+* Build date: Jul 15, 2015
 *
 * Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -161,6 +161,7 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
             _isDate = utils.isDate,
             _max = Math.max,
             _ceil = Math.ceil,
+            _noop = $.noop,
             START_VALUE = 'startValue',
             END_VALUE = 'endValue',
             DATETIME = 'datetime',
@@ -192,9 +193,6 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
                         valueText: formatHelper.format(value, formatOptions.format, formatOptions.precision)
                     };
                 return String(utils.isFunction(formatOptions.customizeText) ? formatOptions.customizeText.call(formatObject, formatObject) : formatObject.valueText)
-            };
-        var createRangeContainer = function(rangeContainerOptions) {
-                return rangeSelector.rangeSelectorFactory.createRangeContainer(rangeContainerOptions)
             };
         var createTranslator = function(range, canvas) {
                 return {
@@ -503,25 +501,24 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
             _dataIsReady: function() {
                 return this._isDataSourceReady()
             },
+            _init: function() {
+                this.callBase();
+                this._reinitDataSource()
+            },
             _initCore: function() {
-                var that = this;
-                that.rangeContainer = createRangeContainer(that._renderer);
-                that._reinitDataSource();
-                that._renderer.root.css({
+                var renderer = this._renderer;
+                this.rangeContainer = rangeSelector.rangeSelectorFactory.createRangeContainer(renderer);
+                renderer.root.css({
                     "touch-action": "pan-y",
                     "-ms-touch-action": "pan-y"
                 })
             },
-            _initTooltip: $.noop,
-            _setTooltipRendererOptions: $.noop,
-            _setTooltipOptions: $.noop,
             _getDefaultSize: function() {
                 return {
                         width: 400,
                         height: 160
                     }
             },
-            _handleLoadingIndicatorShown: $.noop,
             _reinitDataSource: function() {
                 this._refreshDataSource()
             },
@@ -539,18 +536,12 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
             _createThemeManager: function() {
                 return rangeSelector.rangeSelectorFactory.createThemeManager()
             },
-            _refresh: function() {
-                var that = this,
-                    callBase = that.callBase;
-                that._endLoading(function() {
-                    callBase.call(that)
-                })
-            },
             _render: function(isResizing) {
                 var that = this,
                     currentAnimationEnabled,
                     renderer = that._renderer;
                 isResizing = isResizing || that.__isResizing;
+                !isResizing && that._scheduleLoadingIndicatorHiding();
                 that._applyOptions();
                 if (isResizing) {
                     currentAnimationEnabled = renderer.animationEnabled();
@@ -560,13 +551,14 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
                 }
                 else
                     that.rangeContainer.redraw();
-                !isResizing && (!that._dataSource || that._dataSource && that._dataSource.isLoaded()) && that.hideLoadingIndicator();
+                that._checkLoadingIndicatorHiding(!that._dataSource || that._dataSource.isLoaded());
                 that._drawn();
                 that.__rendered && that.__rendered()
             },
             _optionChanged: function(args) {
                 var that = this,
                     name = args.name;
+                that._scheduleLoadingIndicatorHiding();
                 if (name === "dataSource")
                     that._reinitDataSource();
                 else if (name === SELECTED_RANGE)
@@ -574,7 +566,6 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
                 else
                     that.callBase(args)
             },
-            _applySize: $.noop,
             _resize: function() {
                 this._render(true)
             },
@@ -901,7 +892,12 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
                 that.callBase.apply(that, arguments);
                 that.__isResizing = null;
                 return that
-            }
+            },
+            _applySize: _noop,
+            _handleLoadingIndicatorShown: _noop,
+            _initTooltip: _noop,
+            _setTooltipRendererOptions: _noop,
+            _setTooltipOptions: _noop
         }).include(DX.ui.DataHelperMixin))
     })(jQuery, DevExpress);
     /*! Module viz-rangeselector, file rangeContainer.js */
@@ -909,14 +905,14 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
         var rangeSelector = DX.viz.rangeSelector,
             baseVisualElementMethods = rangeSelector.baseVisualElementMethods,
             RangeContainer;
-        var createSlidersContainer = function(options) {
-                return rangeSelector.rangeSelectorFactory.createSlidersContainer(options)
+        var createSlidersContainer = function(renderer) {
+                return rangeSelector.rangeSelectorFactory.createSlidersContainer(renderer)
             };
-        var createScale = function(options) {
-                return rangeSelector.rangeSelectorFactory.createScale(options)
+        var createScale = function(renderer) {
+                return rangeSelector.rangeSelectorFactory.createScale(renderer)
             };
-        var createRangeView = function(options) {
-                return rangeSelector.rangeSelectorFactory.createRangeView(options)
+        var createRangeView = function(renderer) {
+                return rangeSelector.rangeSelectorFactory.createRangeView(renderer)
             };
         var _createClipRectCanvas = function(canvas, indents) {
                 return {
@@ -1356,20 +1352,20 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
         var rangeSelector = DX.viz.rangeSelector;
         rangeSelector.rangeSelectorFactory = function() {
             return {
-                    createRangeContainer: function(rangeContainerOptions) {
-                        return new rangeSelector.RangeContainer(rangeContainerOptions)
+                    createRangeContainer: function(renderer) {
+                        return new rangeSelector.RangeContainer(renderer)
                     },
-                    createSlidersContainer: function(options) {
-                        return new rangeSelector.SlidersContainer(options)
+                    createSlidersContainer: function(renderer) {
+                        return new rangeSelector.SlidersContainer(renderer)
                     },
-                    createScale: function(options) {
-                        return new rangeSelector.Scale(options)
+                    createScale: function(renderer) {
+                        return new rangeSelector.Scale(renderer)
                     },
                     createSliderMarker: function(options) {
                         return new rangeSelector.SliderMarker(options)
                     },
-                    createRangeView: function(options) {
-                        return new rangeSelector.RangeView(options)
+                    createRangeView: function(renderer) {
+                        return new rangeSelector.RangeView(renderer)
                     },
                     createThemeManager: function(options) {
                         return new rangeSelector.ThemeManager(options)
@@ -2070,7 +2066,6 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
         var rangeSelector = DX.viz.rangeSelector,
             utils = DX.utils,
             rangeSelectorUtils = rangeSelector.utils,
-            _inArray = $.inArray,
             dxSupport = DX.support,
             touchSupport = dxSupport.touchEvents,
             msPointerEnabled = dxSupport.pointer,
@@ -2082,12 +2077,6 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
             baseVisualElementMethods = rangeSelector.baseVisualElementMethods;
         function checkItemsSpacing(firstSliderPosition, secondSliderPosition, distance) {
             return Math.abs(secondSliderPosition - firstSliderPosition) < distance
-        }
-        function getValidCategories(categories, curValue, anotherSliderValue, offset) {
-            var curValueindex = _inArray(curValue, categories);
-            if (curValueindex === 0 || curValueindex === categories.length - 1)
-                return anotherSliderValue;
-            return categories[curValueindex - offset]
         }
         function Slider(renderer, index) {
             baseVisualElementMethods.init.apply(this, arguments);
@@ -2252,7 +2241,8 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
             _correctByMinMaxRange: function(businessValue) {
                 var that = this,
                     result = businessValue,
-                    scale = that._options.scale,
+                    options = that._options,
+                    scale = options.scale,
                     values = that._values,
                     sliderIndex = that.getIndex(),
                     anotherSlider = that.getAnotherSlider(),
@@ -2262,27 +2252,19 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
                     maxValue,
                     maxRange = scale.maxRange,
                     minRange = scale.minRange,
-                    categoriesInfo;
+                    isNegative;
                 if (scale.type === DISCRETE) {
-                    categoriesInfo = scale._categoriesInfo;
-                    if (checkItemsSpacing(that.getPosition(), anotherSlider.getPosition(), that._options.translator.getInterval() / 2)) {
+                    if (checkItemsSpacing(that.getPosition(), anotherSlider.getPosition(), options.translator.getInterval())) {
                         isValid = false;
-                        result = getValidCategories(categoriesInfo.categories, businessValue, anotherSlider.getValue(), sliderIndex === START_VALUE_INDEX ? 1 : -1)
+                        result = anotherBusinessValue
                     }
                 }
                 else {
-                    if (!scale.inverted && sliderIndex === START_VALUE_INDEX || scale.inverted && sliderIndex === END_VALUE_INDEX) {
-                        if (maxRange)
-                            minValue = that._addInterval(anotherBusinessValue, maxRange, true);
-                        if (minRange)
-                            maxValue = that._addInterval(anotherBusinessValue, minRange, true)
-                    }
-                    else {
-                        if (maxRange)
-                            maxValue = that._addInterval(anotherBusinessValue, maxRange);
-                        if (minRange)
-                            minValue = that._addInterval(anotherBusinessValue, minRange)
-                    }
+                    isNegative = !scale.inverted && sliderIndex === START_VALUE_INDEX || scale.inverted && sliderIndex === END_VALUE_INDEX;
+                    if (maxRange)
+                        minValue = that._addInterval(anotherBusinessValue, isNegative ? maxRange : minRange, isNegative);
+                    if (minRange)
+                        maxValue = that._addInterval(anotherBusinessValue, isNegative ? minRange : maxRange, isNegative);
                     if (maxValue !== undefined && result > maxValue) {
                         result = values ? rangeSelectorUtils.findLessOrEqualValue(values, maxValue) : maxValue;
                         isValid = false

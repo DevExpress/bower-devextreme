@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Charts)
-* Version: 15.1.4
-* Build date: Jun 22, 2015
+* Version: 15.1.5
+* Build date: Jul 15, 2015
 *
 * Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -1109,6 +1109,7 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
             constants = viz.charts.axes.constants,
             _isDefined = utils.isDefined,
             _isNumber = utils.isNumber,
+            _isString = utils.isString,
             _getSignificantDigitPosition = utils.getSignificantDigitPosition,
             _roundValue = utils.roundValue,
             _math = Math,
@@ -1275,12 +1276,9 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                     axisPosition = that._axisPosition;
                 return position === constants.top || position === constants.left ? axisPosition - labelOffset : axisPosition + labelOffset
             },
-            getUntranslatedValue: function(pos) {
-                var that = this,
-                    translator = that._translator,
-                    value = translator.untranslate(pos);
+            getFormattedValue: function(value) {
                 if (_isDefined(value))
-                    return constants.formatLabel(_isNumber(value) ? _roundValue(value, _getSignificantDigitPosition(translator.getBusinessRange().interval)) : value, that._options.label);
+                    return constants.formatLabel(_isNumber(value) && !_isString(value) ? _roundValue(value, _getSignificantDigitPosition(this._translator.getBusinessRange().interval)) : value, this._options.label);
                 return null
             },
             _drawAxis: function() {
@@ -2681,29 +2679,29 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
             _render: function(_options) {
                 var that = this,
                     drawOptions,
-                    originalCanvas;
+                    originalCanvas,
+                    recreateCanvas;
                 if (!that._initialized)
                     return;
                 if (!that._canvas)
                     return;
                 that._resetIsReady();
                 drawOptions = that._prepareDrawOptions(_options);
+                recreateCanvas = drawOptions.recreateCanvas;
                 clearTimeout(that._delayedRedraw);
                 originalCanvas = that._canvas;
                 that._canvas = $.extend({}, that._canvas);
-                if (drawOptions.recreateCanvas)
+                if (recreateCanvas)
                     that.__currentCanvas = that._canvas;
                 else
                     that._canvas = that.__currentCanvas;
                 that.DEBUG_canvas = that._canvas;
-                if (drawOptions.recreateCanvas) {
-                    that._reappendLoadingIndicator();
-                    that._updateCanvasClipRect()
-                }
+                recreateCanvas && that._updateCanvasClipRect();
                 that._renderer.stopAllAnimations(true);
                 charts._setCanvasValues(that._canvas);
                 that._cleanGroups(drawOptions);
                 that._renderElements(drawOptions);
+                that._checkLoadingIndicatorHiding(that._dataSource && that._dataSource.isLoaded());
                 that._canvas = originalCanvas
             },
             _renderElements: function(drawOptions) {
@@ -2785,8 +2783,6 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                 resolveLabelOverlapping !== "none" && that._resolveLabelOverlapping(resolveLabelOverlapping);
                 that._adjustSeries();
                 that._renderTrackers(isLegendInside);
-                if (that._dataSource && that._dataSource.isLoaded())
-                    that._fulfillLoadingIndicatorHiding();
                 that.tracker.repairTooltip();
                 that._drawn();
                 that._renderCompleteHandler()
@@ -3246,9 +3242,9 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
         function prepareVisibleArea(visibleArea, axisRange, useAggregation, aggregationRange) {
             visibleArea.minVal = axisRange.min;
             visibleArea.maxVal = axisRange.max;
-            if (useAggregation && !visibleArea.adjustOnZoom) {
-                visibleArea.minVal = _isDefined(visibleArea.minVal) ? visibleArea.minVal : aggregationRange.val.min;
-                visibleArea.maxVal = _isDefined(visibleArea.maxVal) ? visibleArea.maxVal : aggregationRange.val.max
+            if (useAggregation) {
+                visibleArea.minArg = visibleArea.minArg === undefined ? aggregationRange.arg.min : visibleArea.minArg;
+                visibleArea.maxArg = visibleArea.maxArg === undefined ? aggregationRange.arg.max : visibleArea.maxArg
             }
         }
         function setTemplateFields(data, templateData, series) {
@@ -3545,7 +3541,7 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                         groupAxisRange = group.valueAxis.getRangeData();
                     groupRange.addRange(groupAxisRange);
                     _each(group, function(_, series) {
-                        visibleArea && prepareVisibleArea(visibleArea, groupAxisRange, useAggregation, series._originalBusinessRange);
+                        visibleArea && prepareVisibleArea(visibleArea, groupAxisRange, useAggregation, series.getRangeData());
                         var seriesRange = series.getRangeData(visibleArea, calcInterval);
                         groupRange.addRange(seriesRange.val);
                         argRange.addRange(seriesRange.arg)
@@ -4043,18 +4039,17 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                 that._transformed && that._resetTransform();
                 that._createTranslators(drawOptions);
                 that._options.useAggregation && _each(that.series, function(_, series) {
-                    series._originalBusinessRange = series._originalBusinessRange || series.getRangeData();
                     series.resamplePoints(that._getTranslator(series.pane, series.axis).arg, that._zoomMinArg, that._zoomMaxArg)
                 });
-                if (_isDefined(that._zoomMinArg) || _isDefined(that._zoomMaxArg))
+                if (that._options.useAggregation || _isDefined(that._zoomMinArg) || _isDefined(that._zoomMaxArg)) {
                     that._populateBusinessRange({
                         adjustOnZoom: that._themeManager.getOptions("adjustOnZoom"),
                         minArg: that._zoomMinArg,
                         maxArg: that._zoomMaxArg,
                         notApplyMargins: that._notApplyMargins
                     });
-                if (that._options.useAggregation || _isDefined(that._zoomMinArg) || _isDefined(that._zoomMaxArg))
-                    that._updateTranslators();
+                    that._updateTranslators()
+                }
                 return panesBorderOptions
             },
             _isLegendInside: function() {
@@ -6054,11 +6049,8 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                 this._crosshair && this._crosshair.hide()
             },
             _moveCrosshair: function(point, x, y) {
-                if (point && this._crosshair && point.isVisible()) {
-                    var coords = point.getCrosshairCoords(x, y),
-                        r = point.getPointRadius();
-                    this._crosshair.shift(coords.x, coords.y, r)
-                }
+                if (point && this._crosshair && point.isVisible())
+                    this._crosshair.show(point.getCrosshairData(x, y), point.getPointRadius())
             },
             _prepare: function(root) {
                 var that = this,
@@ -6204,7 +6196,7 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                         point && points.push(point)
                     });
                     _each(points, function(_, p) {
-                        var coords = p.getCrosshairCoords(x, y),
+                        var coords = p.getCrosshairData(x, y),
                             d = math.sqrt((x - coords.x) * (x - coords.x) + (y - coords.y) * (y - coords.y));
                         if (d < distance) {
                             point = p;
@@ -6437,11 +6429,11 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
     })(jQuery, DevExpress, Math);
     /*! Module viz-charts, file crosshair.js */
     (function($, DX, undefined) {
-        var _math = Math,
-            mathAbs = _math.abs,
-            mathMin = _math.min,
-            mathMax = _math.max,
-            _round = _math.round,
+        var math = Math,
+            mathAbs = math.abs,
+            mathMin = math.min,
+            mathMax = math.max,
+            mathFloor = math.floor,
             HORIZONTAL = "horizontal",
             VERTICAL = "vertical",
             LABEL_BACKGROUND_PADDING_X = 8,
@@ -6450,38 +6442,18 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
             RIGHT = "right",
             LEFT = "left",
             TOP = "top",
-            BOTTOM = "bottom",
-            _isDefined = DX.utils.isDefined;
-        function Crosshair() {
-            this.ctor.apply(this, arguments)
+            BOTTOM = "bottom";
+        function Crosshair(renderer, options, params, group) {
+            var that = this;
+            that._renderer = renderer;
+            that._crosshairGroup = group;
+            that._options = {};
+            that.update(options, params)
         }
         DX.viz.charts.Crosshair = Crosshair;
         Crosshair.prototype = {
-            ctor: function(renderer, options, params, group) {
-                var that = this;
-                that._renderer = renderer;
-                that._crosshairGroup = group;
-                that._options = {};
-                that._init(options, params)
-            },
+            constructor: Crosshair,
             update: function(options, params) {
-                this._init(options, params)
-            },
-            dispose: function() {
-                var that = this;
-                that._renderer = null;
-                that._crosshairGroup = null;
-                that._options = null;
-                that._axes = null;
-                that._canvas = null;
-                that._horizontalGroup = null;
-                that._verticalGroup = null;
-                that._horizontal = null;
-                that._vertical = null;
-                that._circle = null;
-                that._panes = null
-            },
-            _init: function(options, params) {
                 var that = this,
                     canvas = params.canvas;
                 that._canvas = {
@@ -6496,6 +6468,20 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                 that._panes = params.panes;
                 that._prepareOptions(options, HORIZONTAL);
                 that._prepareOptions(options, VERTICAL)
+            },
+            dispose: function() {
+                var that = this;
+                that._renderer = null;
+                that._crosshairGroup = null;
+                that._options = null;
+                that._axes = null;
+                that._canvas = null;
+                that._horizontalGroup = null;
+                that._verticalGroup = null;
+                that._horizontal = null;
+                that._vertical = null;
+                that._circle = null;
+                that._panes = null
             },
             _prepareOptions: function(options, direction) {
                 this._options[direction] = {
@@ -6589,7 +6575,7 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                 });
                 return labels
             },
-            _updateText: function(coord, labels) {
+            _updateText: function(value, labels, axis) {
                 var that = this,
                     bbox,
                     text,
@@ -6598,12 +6584,14 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                 if (!labels)
                     return;
                 $.each(labels, function(i, label) {
+                    text = "";
                     textElement = label.text;
                     backgroundElement = label.background;
                     if (!textElement)
                         return;
-                    text = label.axis.getUntranslatedValue(coord);
-                    if (_isDefined(text)) {
+                    if (!label.axis.name || label.axis.name === axis)
+                        text = label.axis.getFormattedValue(value);
+                    if (text) {
                         textElement.attr({text: text});
                         bbox = textElement.getBBox();
                         that._updateLinesCanvas(label.pos.side, label.pos.coord);
@@ -6624,9 +6612,6 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                         })
                     }
                 })
-            },
-            show: function() {
-                this._crosshairGroup.attr({visibility: "visible"})
             },
             hide: function() {
                 this._crosshairGroup.attr({visibility: "hidden"})
@@ -6663,17 +6648,17 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                 }
                 return {id: null}
             },
-            shift: function(x, y, r) {
+            show: function(data, r) {
                 var that = this,
                     horizontal = that._horizontal,
                     vertical = that._vertical,
                     clipRect,
                     rad = !r ? 0 : r + 3,
-                    canvas = that._canvas;
-                x = _round(x);
-                y = _round(y);
+                    canvas = that._canvas,
+                    x = mathFloor(data.x),
+                    y = mathFloor(data.y);
                 if (x >= canvas.left && x <= canvas.right && y >= canvas.top && y <= canvas.bottom) {
-                    that.show();
+                    that._crosshairGroup.attr({visibility: "visible"});
                     that._resetLinesCanvas();
                     clipRect = that._getClipRectForPane(x, y);
                     that._circle.attr({
@@ -6683,12 +6668,12 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                         clipId: clipRect.id
                     });
                     if (horizontal.lines) {
-                        that._updateText(y, horizontal.labels);
+                        that._updateText(data.yValue, horizontal.labels, data.axis);
                         that._updateLines(horizontal.lines, x, y, rad, true);
                         that._horizontalGroup.attr({translateY: y - canvas.top})
                     }
                     if (vertical.lines) {
-                        that._updateText(x, vertical.labels);
+                        that._updateText(data.xValue, vertical.labels, data.axis);
                         that._updateLines(vertical.lines, x, y, rad, false);
                         that._verticalGroup.attr({translateX: x - canvas.left})
                     }

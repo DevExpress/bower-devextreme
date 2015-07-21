@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Gauges)
-* Version: 15.1.4
-* Build date: Jun 22, 2015
+* Version: 15.1.5
+* Build date: Jul 15, 2015
 *
 * Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -2583,18 +2583,12 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
                 that._deltaIndicator && that._deltaIndicator.dispose();
                 that._root = that._translator = that._notifiers = that._tracker = that._layoutManager = that._title = null
             },
-            _refresh: function() {
-                var that = this,
-                    callBase = that.callBase;
-                that._endLoading(function() {
-                    callBase.call(that)
-                })
-            },
             _clean: function() {
                 this._cleanCore()
             },
             _render: function() {
                 var that = this;
+                that._scheduleLoadingIndicatorHiding();
                 that._setupCodomain();
                 that._setupAnimationSettings();
                 that._setupDefaultFormat();
@@ -2687,19 +2681,6 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
                 that._cleanCore();
                 that._renderCore();
                 that._resizing = null
-            },
-            _optionChanged: function(args) {
-                var that = this;
-                switch (args.name) {
-                    case"startValue":
-                    case"endValue":
-                        that._setupDomain();
-                        that._invalidate();
-                        break;
-                    default:
-                        that.callBase(args);
-                        break
-                }
             },
             _setupDomain: function() {
                 var that = this;
@@ -2937,12 +2918,15 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
             _updateValueIndicator: function() {
                 var that = this;
                 that._valueIndicator && that._valueIndicator.value(that.__value, that._noAnimation);
-                that._resizing || that.hideLoadingIndicator()
+                that._checkLoadingIndicatorHiding()
             },
             _updateSubvalueIndicators: function() {
                 var that = this;
                 that._subvalueIndicatorsSet && that._subvalueIndicatorsSet.values(that.__subvalues, that._noAnimation);
-                that._resizing || that.hideLoadingIndicator()
+                that._checkLoadingIndicatorHiding()
+            },
+            _checkLoadingIndicatorHiding: function() {
+                this.callBase(!this._resizing)
             },
             value: function(arg) {
                 var that = this;
@@ -2988,6 +2972,7 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
             },
             _optionChanged: function(args) {
                 var that = this;
+                that._scheduleLoadingIndicatorHiding();
                 if (that._valueChangedHandler(args.name, args.value, args.previousValue))
                     return;
                 if (args.name === "scale") {
@@ -3093,7 +3078,7 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
             _each(that._valueIndicators, function(_, valueIndicator) {
                 valueIndicator.value(that._indicatorValues[valueIndicator.index], that._noAnimation)
             });
-            that._resizing || that.hideLoadingIndicator()
+            that._checkLoadingIndicatorHiding()
         }
         function prepareValueIndicators_hardMode() {
             var that = this,
@@ -3148,7 +3133,7 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
                 if (values[index] !== undefined) {
                     values[index] = processValue(value, values[index]);
                     pointers[index] && pointers[index].value(values[index]);
-                    that._resizing || that.hideLoadingIndicator()
+                    that._checkLoadingIndicatorHiding()
                 }
                 return that
             }
@@ -3824,10 +3809,8 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
                             that._updateBars(barValues)
                     }
                     immediateReady && that._notifiers.ready();
-                    if (!that._resizing) {
-                        that.option(OPTION_VALUES, that._values);
-                        that.hideLoadingIndicator()
-                    }
+                    !that._resizing && that.option(OPTION_VALUES, that._values);
+                    that._checkLoadingIndicatorHiding(!that._resizing)
                 },
                 values: function(arg) {
                     if (arg !== undefined) {
@@ -3838,10 +3821,21 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
                         return this._values.slice(0)
                 },
                 _optionChanged: function(args) {
-                    if (args.name === OPTION_VALUES)
-                        this._updateValues(args.value);
-                    else
-                        this.callBase.apply(this, arguments)
+                    var that = this;
+                    that._scheduleLoadingIndicatorHiding();
+                    switch (args.name) {
+                        case"startValue":
+                        case"endValue":
+                            that._setupDomain();
+                            that._invalidate();
+                            break;
+                        case OPTION_VALUES:
+                            this._updateValues(args.value);
+                            break;
+                        default:
+                            that.callBase(args);
+                            break
+                    }
                 },
                 _optionValuesEqual: function(name, oldValue, newValue) {
                     if (name === OPTION_VALUES)

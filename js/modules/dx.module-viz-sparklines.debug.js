@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Sparklines)
-* Version: 15.1.4
-* Build date: Jun 22, 2015
+* Version: 15.1.5
+* Build date: Jul 15, 2015
 *
 * Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -18,7 +18,8 @@ if (!DevExpress.MOD_VIZ_SPARKLINES) {
             TOUCH_EVENTS_DELAY = 1000,
             _extend = $.extend,
             _abs = Math.abs,
-            core = DX.viz.core;
+            core = DX.viz.core,
+            _noop = $.noop;
         function generateDefaultCustomizeTooltipCallback(fontOptions, rtlEnabled) {
             var lineSpacing = fontOptions.lineSpacing,
                 lineHeight = (lineSpacing !== undefined && lineSpacing !== null ? lineSpacing : DEFAULT_LINE_SPACING) + fontOptions.size;
@@ -102,7 +103,7 @@ if (!DevExpress.MOD_VIZ_SPARKLINES) {
                 this._translatorX = null;
                 this._translatorY = null
             },
-            _setupResizeHandler: $.noop,
+            _setupResizeHandler: _noop,
             _resize: function() {
                 var that = this;
                 that._redrawWidgetElements();
@@ -217,11 +218,16 @@ if (!DevExpress.MOD_VIZ_SPARKLINES) {
                 else
                     that._hideTooltipCallback()
             },
-            _initLoadingIndicator: $.noop,
-            _disposeLoadingIndicator: $.noop,
-            _handleLoadingIndicatorOptionChanged: $.noop,
-            showLoadingIndicator: $.noop,
-            hideLoadingIndicator: $.noop
+            _endLoading: function(complete) {
+                complete()
+            },
+            _initLoadingIndicator: _noop,
+            _disposeLoadingIndicator: _noop,
+            _handleLoadingIndicatorOptionChanged: _noop,
+            _updateLoadingIndicatorOptions: _noop,
+            _updateLoadingIndicatorCanvas: _noop,
+            showLoadingIndicator: _noop,
+            hideLoadingIndicator: _noop
         });
         var menuEvents = {
                 "contextmenu.sparkline-tooltip": function(event) {

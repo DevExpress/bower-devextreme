@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme
-* Version: 15.1.4
-* Build date: Jun 22, 2015
+* Version: 15.1.5
+* Build date: Jul 15, 2015
 *
 * Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -67,30 +67,16 @@
 }
 .dx-datagrid.dx-filter-menu .dx-menu-item-content .dx-icon
 {
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
   background-position: 0 0;
-  -webkit-background-size: 16px 16px;
-  -moz-background-size: 16px 16px;
-  background-size: 16px 16px;
+  -webkit-background-size: 14px 14px;
+  -moz-background-size: 14px 14px;
+  background-size: 14px 14px;
   padding: 0;
-  font-size: 16px;
+  font-size: 14px;
   text-align: center;
-  line-height: 16px;
-}
-.dx-datagrid.dx-filter-menu .dx-menu-item-content .dx-icon.dx-icon-filter-operation-default
-{
-  margin-left: 3px;
-  width: 13px;
-  height: 13px;
-  background-position: 0 0;
-  -webkit-background-size: 13px 13px;
-  -moz-background-size: 13px 13px;
-  background-size: 13px 13px;
-  padding: 0;
-  font-size: 13px;
-  text-align: center;
-  line-height: 13px;
+  line-height: 14px;
 }
 .dx-datagrid.dx-filter-menu .dx-icon-filter-operation-default+.dx-menu-item-text
 {
@@ -217,10 +203,6 @@
 {
   border-left: 1px solid #ccc;
 }
-.dx-pivotgrid .dx-pivotgrid-horizontal-headers table
-{
-  width: 100%;
-}
 .dx-pivotgrid .dx-pivotgrid-horizontal-headers td
 {
   text-align: center;
@@ -268,8 +250,10 @@
 }
 .dx-pivotgrid .dx-pivotgrid-collapsed .dx-expand::before, .dx-pivotgrid .dx-pivotgrid-expanded .dx-expand::before
 {
-  display: inline-block;
-  content: '';
+  display: block;
+  content: '.';
+  width: 0;
+  visibility: hidden;
 }
 .dx-pivotgrid .dx-pivotgrid-expanded .dx-expand
 {
@@ -283,8 +267,10 @@
 }
 .dx-pivotgrid .dx-icon-sorted::before
 {
-  display: inline-block;
-  content: '';
+  display: block;
+  content: '.';
+  width: 0;
+  visibility: hidden;
 }
 .dx-pivotgrid .dx-menu-item .dx-icon
 {
@@ -1098,12 +1084,12 @@
 {
   float: right;
 }
-.dx-recurrence-numberbox-interval, .dx-recurrence-numberbox-day-of-month, .dx-recurrence-selectbox-month-of-year, .dx-recurrence-numberbox-repeat-count, .dx-recurrence-datebox-until-date, .dx-sheduler-appointment-popup-start-date, .dx-sheduler-appointment-popup-end-date, .dx-sheduler-appointment-popup-allday, .dx-recurrence-switch-repeat-end
+.dx-numberbox.dx-recurrence-numberbox-interval, .dx-numberbox.dx-recurrence-numberbox-day-of-month, .dx-selectbox.dx-recurrence-selectbox-month-of-year, .dx-numberbox.dx-recurrence-numberbox-repeat-count, .dx-datebox.dx-recurrence-datebox-until-date, .dx-datebox.dx-sheduler-appointment-popup-start-date, .dx-datebox.dx-sheduler-appointment-popup-end-date, .dx-switch.dx-sheduler-appointment-popup-allday, .dx-switch.dx-recurrence-switch-repeat-end
 {
   float: left;
   position: relative !important;
 }
-.dx-recurrence-numberbox-interval.dx-rtl, .dx-recurrence-numberbox-day-of-month.dx-rtl, .dx-recurrence-selectbox-month-of-year.dx-rtl, .dx-recurrence-numberbox-repeat-count.dx-rtl, .dx-recurrence-datebox-until-date.dx-rtl, .dx-sheduler-appointment-popup-start-date.dx-rtl, .dx-sheduler-appointment-popup-end-date.dx-rtl, .dx-sheduler-appointment-popup-allday.dx-rtl, .dx-recurrence-switch-repeat-end.dx-rtl
+.dx-numberbox.dx-recurrence-numberbox-interval.dx-rtl, .dx-numberbox.dx-recurrence-numberbox-day-of-month.dx-rtl, .dx-selectbox.dx-recurrence-selectbox-month-of-year.dx-rtl, .dx-numberbox.dx-recurrence-numberbox-repeat-count.dx-rtl, .dx-datebox.dx-recurrence-datebox-until-date.dx-rtl, .dx-datebox.dx-sheduler-appointment-popup-start-date.dx-rtl, .dx-datebox.dx-sheduler-appointment-popup-end-date.dx-rtl, .dx-switch.dx-sheduler-appointment-popup-allday.dx-rtl, .dx-switch.dx-recurrence-switch-repeat-end.dx-rtl
 {
   float: right;
 }
@@ -1111,9 +1097,9 @@
 {
   width: 70px !important;
 }
-.dx-recurrence-datebox-until-date, .dx-sheduler-appointment-popup-start-date, .dx-sheduler-appointment-popup-end-date
+.dx-datebox.dx-recurrence-datebox-until-date, .dx-datebox.dx-sheduler-appointment-popup-start-date, .dx-datebox.dx-sheduler-appointment-popup-end-date
 {
-  width: 160px !important;
+  width: inherit !important;
 }
 .dx-recurrence-radiogroup-repeat-type-label, .dx-recurrence-repeat-end-label
 {
@@ -1139,9 +1125,13 @@
 {
   margin: 0;
 }
-.dx-recurrence-radiogroup-repeat-type .dx-item
+.dx-recurrence-radiogroup-repeat-type .dx-item:first-child
 {
-  margin-bottom: 10px;
+  padding-bottom: 10px;
+}
+.dx-recurrence-radiogroup-repeat-type.dx-rtl .dx-recurrence-repeat-end-label
+{
+  float: right;
 }
 .dx-rtl .dx-scheduler-navigator
 {
@@ -2462,6 +2452,16 @@
   -o-border-radius: 3px;
   border-radius: 3px;
 }
+.dx-checkbox-text
+{
+  margin-left: -25px;
+  padding-left: 30px;
+}
+.dx-rtl .dx-checkbox-text, .dx-rtl.dx-checkbox-text
+{
+  margin-right: -25px;
+  padding-right: 30px;
+}
 .dx-checkbox-indeterminate .dx-checkbox-icon, .dx-checkbox-checked .dx-checkbox-icon
 {
   background-color: #6fd865;
@@ -3747,19 +3747,19 @@
 {
   padding-left: 56px;
 }
-.dx-datebox-overlay .dx-popup-title
+.dx-datebox-wrapper .dx-popup-title
 {
   font-size: 1.3em;
 }
-.dx-datebox-overlay .dx-popup-content
+.dx-datebox-wrapper .dx-popup-content
 {
   padding: 10px;
 }
-.dx-datebox-overlay.dx-datebox-calendar-overlay .dx-popup-content
+.dx-datebox-wrapper.dx-datebox-wrapper-calendar .dx-popup-content
 {
   padding: 0;
 }
-.dx-datebox-overlay .dx-popup-bottom.dx-toolbar
+.dx-datebox-wrapper .dx-popup-bottom.dx-toolbar
 {
   height: 50px;
 }
@@ -3778,7 +3778,7 @@
 {
   width: 0;
 }
-.dx-datebox-calendar-overlay .dx-overlay-content
+.dx-datebox-wrapper-calendar .dx-overlay-content
 {
   -webkit-border-radius: .5em;
   -moz-border-radius: .5em;
@@ -3791,7 +3791,7 @@
   background-color: #fff;
   border: 1px solid #d1d1d1;
 }
-.dx-datebox-calendar-overlay .dx-datebox-container-cell
+.dx-datebox-wrapper-calendar .dx-datebox-container-cell
 {
   margin-right: 20px;
   margin-bottom: 20px;
@@ -3800,25 +3800,25 @@
 {
   margin: 20px;
 }
-.dx-calendar-with-time-picker-container .dx-datebox-calendar-container
+.dx-datebox-wrapper-calendar.dx-datebox-wrapper-datetime .dx-datebox-calendar-container
 {
   margin-right: 6px;
 }
-.dx-calendar-with-time-picker-container .dx-timeview
+.dx-datebox-wrapper-calendar.dx-datebox-wrapper-datetime .dx-timeview
 {
   margin-top: 72px;
 }
-.dx-calendar-with-time-picker-container .dx-timeview-field
+.dx-datebox-wrapper-calendar.dx-datebox-wrapper-datetime .dx-timeview-field
 {
   margin-top: 30px;
 }
-.dx-calendar-with-time-picker-container .dx-datebox-container-cell
+.dx-datebox-wrapper-calendar.dx-datebox-wrapper-datetime .dx-datebox-container-cell
 {
   margin-right: 40px;
   margin-top: -32px;
   margin-bottom: 20px;
 }
-.dx-rtl .dx-calendar-with-time-picker-container .dx-datebox-calendar-container
+.dx-rtl .dx-datebox-wrapper-calendar.dx-datebox-wrapper-datetime .dx-datebox-calendar-container
 {
   margin-left: 6px;
   margin-right: 20px;
@@ -4035,6 +4035,14 @@
   -o-border-radius: 6px;
   border-radius: 6px;
 }
+.dx-popup-wrapper .dx-popup-content
+{
+  -webkit-border-radius: 6px;
+  -moz-border-radius: 6px;
+  -ms-border-radius: 6px;
+  -o-border-radius: 6px;
+  border-radius: 6px;
+}
 .dx-popup-wrapper .dx-toolbar-item .dx-button .dx-icon
 {
   margin: 0;
@@ -4078,6 +4086,10 @@
 {
   padding: 10px;
 }
+.dx-popup-content.dx-dialog-content:first-child
+{
+  padding-top: 12px;
+}
 .dx-popup-bottom
 {
   bottom: 5px;
@@ -4089,7 +4101,7 @@
   height: 28px;
   border: none;
 }
-.dx-dialog-root .dx-overlay-content
+.dx-dialog-root .dx-overlay-content, .dx-dialog-root .dx-popup-content
 {
   -webkit-border-radius: 10px;
   -moz-border-radius: 10px;
@@ -4238,6 +4250,10 @@
 .dx-invalid-message .dx-tooltip-wrapper .dx-overlay-content .dx-popup-content
 {
   background-color: #ff392c;
+}
+.dx-tooltip-wrapper .dx-overlay-content .dx-popup-content
+{
+  padding: 13px 17px 11px;
 }
 .dx-slider-wrapper
 {
@@ -4484,7 +4500,7 @@
 }
 .dx-invalid.dx-lookup .dx-lookup-field:after
 {
-  right: 4px;
+  right: 25px;
   pointer-events: none;
   font-weight: bold;
   background-color: #fff;
@@ -4528,20 +4544,9 @@
   padding-right: 0;
   padding-left: 17px;
 }
-.dx-rtl .dx-lookup-field:after
-{
-  right: auto;
-  left: -10px;
-  -webkit-transform: rotate(180deg);
-  -moz-transform: rotate(180deg);
-  -ms-transform: rotate(180deg);
-  -o-transform: rotate(180deg);
-  transform: rotate(180deg);
-  margin-top: -20px;
-}
 .dx-rtl.dx-invalid.dx-lookup .dx-lookup-field:after
 {
-  left: 4px;
+  left: 25px;
   right: auto;
 }
 .dx-actionsheet-without-title .dx-actionsheet-container
@@ -4615,6 +4620,10 @@
   -moz-border-radius: 0 0 6px 6px;
   border-radius: 0 0 6px 6px;
   margin-bottom: 8px;
+}
+.dx-popover-wrapper .dx-actionsheet-container
+{
+  margin: 0;
 }
 .dx-actionsheet-container .dx-button
 {
@@ -5031,6 +5040,15 @@
 .dx-selectbox-selected
 {
   background-color: #f4f4f4;
+}
+.dx-tagbox:not(.dx-texteditor-empty) .dx-texteditor-input
+{
+  padding-left: 5px;
+}
+.dx-rtl .dx-tagbox:not(.dx-texteditor-empty) .dx-texteditor-input, .dx-rtl.dx-tagbox:not(.dx-texteditor-empty) .dx-texteditor-input
+{
+  padding-left: 6px;
+  padding-right: 5px;
 }
 .dx-tag-container
 {
@@ -5561,6 +5579,10 @@
 {
   content: "\f054 ";
 }
+.dx-datagrid .dx-menu .dx-menu-item.dx-state-focused, .dx-datagrid .dx-menu .dx-menu-item.dx-state-active
+{
+  background-color: transparent;
+}
 .dx-datagrid .dx-menu .dx-menu-item-content
 {
   padding: 8px 0 7px 7px;
@@ -5843,13 +5865,13 @@
   user-select: none;
   -webkit-touch-callout: none;
 }
-.dx-datagrid-headers .dx-datagrid-table .dx-row
-{
-  border-bottom: 1px solid #c8c8c8;
-}
 .dx-datagrid-headers .dx-datagrid-table .dx-row:first-child>td
 {
   background-color: #e5e5e5;
+}
+.dx-datagrid-headers .dx-datagrid-table .dx-row>td
+{
+  border-bottom: 1px solid #c8c8c8;
 }
 .dx-datagrid-headers .dx-datagrid-drop-highlight.dx-row>td
 {
@@ -6095,19 +6117,21 @@
 {
   border-color: rgba(154,228,147,.7);
 }
-.dx-datagrid-rowsview .dx-row-removed
+.dx-datagrid-rowsview .dx-row-removed>td
 {
   background-color: rgba(154,228,147,.7);
+  border-top: 1px solid rgba(154,228,147,.7);
+  border-bottom: 1px solid rgba(154,228,147,.7);
 }
-.dx-datagrid-rowsview .dx-group-row
+.dx-datagrid-rowsview .dx-row.dx-group-row
 {
   color: #6fd865;
   font-weight: bold;
 }
-.dx-datagrid-rowsview .dx-group-row td
+.dx-datagrid-rowsview .dx-row.dx-group-row td
 {
   border-top-color: #c8c8c8;
-  border-bottom: 1px solid #c8c8c8;
+  border-bottom-color: #c8c8c8;
 }
 .dx-datagrid-rowsview .dx-selection>td, .dx-datagrid-rowsview .dx-selection.dx-row:hover>td
 {
@@ -6145,6 +6169,10 @@
 {
   border-top: 1px solid #c8c8c8;
   border-bottom: 1px solid #c8c8c8;
+}
+.dx-datagrid-rowsview .dx-master-detail-row>.dx-datagrid-group-space, .dx-datagrid-rowsview .dx-master-detail-row .dx-master-detail-cell
+{
+  background-color: #fafafa;
 }
 .dx-datagrid-group-opened
 {
@@ -6265,6 +6293,14 @@
 {
   margin-bottom: 10px;
 }
+.dx-datagrid-table-fixed .dx-row.dx-group-row
+{
+  background-color: #fff;
+}
+.dx-datagrid-table-fixed .dx-row.dx-group-row td
+{
+  background-color: #fff;
+}
 .dx-menu-base
 {
   color: #000;
@@ -6285,6 +6321,14 @@
 {
   color: #fff;
   opacity: .7;
+}
+.dx-menu-base .dx-menu-item-selected, .dx-menu-base .dx-menu-item-selected.dx-state-focused
+{
+  background-color: #9ae493;
+}
+.dx-menu-base .dx-menu-item.dx-state-focused, .dx-menu-base .dx-menu-item.dx-state-active
+{
+  background-color: #6fd865;
 }
 .dx-menu-base .dx-menu-item-popout
 {
@@ -6332,7 +6376,7 @@
 }
 .dx-menu .dx-menu-vertical .dx-menu-item-content
 {
-  padding: 5px 0 4px 11px;
+  padding: 5px 11px;
 }
 .dx-menu .dx-menu-vertical .dx-menu-item-content .dx-menu-item-text
 {
@@ -6354,6 +6398,10 @@
 {
   background-color: #f3f3f3;
   border: 1px solid #aaa;
+  -webkit-border-radius: 7px;
+  -moz-border-radius: 7px;
+  -ms-border-radius: 7px;
+  -o-border-radius: 7px;
   border-radius: 7px;
   -webkit-box-shadow: 0 1px 11px 1px rgba(0,0,0,.15);
   -moz-box-shadow: 0 1px 11px 1px rgba(0,0,0,.15);
@@ -6368,15 +6416,23 @@
 {
   border-bottom: none;
 }
-.dx-context-menu .dx-menu-item-wrapper:first-child .dx-menu-item
+.dx-context-menu .dx-menu-item-wrapper:first-child>.dx-menu-item
 {
+  -webkit-border-top-left-radius: 7px;
+  -moz-border-top-left-radius: 7px;
   border-top-left-radius: 7px;
+  -webkit-border-top-right-radius: 7px;
+  -moz-border-top-right-radius: 7px;
   border-top-right-radius: 7px;
 }
-.dx-context-menu .dx-menu-item-wrapper:last-child .dx-menu-item
+.dx-context-menu .dx-menu-item-wrapper:last-child>.dx-menu-item
 {
   border-bottom: none;
+  -webkit-border-bottom-left-radius: 7px;
+  -moz-border-bottom-left-radius: 7px;
   border-bottom-left-radius: 7px;
+  -webkit-border-bottom-right-radius: 7px;
+  -moz-border-bottom-right-radius: 7px;
   border-bottom-right-radius: 7px;
 }
 .dx-context-menu .dx-menu-separator
@@ -6386,14 +6442,6 @@
 .dx-context-menu .dx-menu-item.dx-state-focused, .dx-context-menu .dx-menu-item.dx-menu-item-expanded, .dx-context-menu .dx-menu-item.dx-state-active
 {
   background-color: #6fd865;
-}
-.dx-context-menu .dx-menu-item.dx-state-focused>.dx-menu-item-content .dx-menu-item-popout, .dx-context-menu .dx-menu-item.dx-menu-item-expanded>.dx-menu-item-content .dx-menu-item-popout, .dx-context-menu .dx-menu-item.dx-state-active>.dx-menu-item-content .dx-menu-item-popout
-{
-  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAATCAQAAAAHF4RYAAAAhUlEQVQoz1XQvQnCABDF8Qcp/BhBDEkZESewcAJJ4QhBxC61YOEKotkghb1Eq5jCvf6WvuOq+xV3706cOKJ/iYQnKwcxY2DqILY0EcSVXYQRPZmDKHiTOIiKSwTRsomQ843wYO3tgbPPWNL5lgkf5p7jRulJS+5+S8rA2P/xYuH/qNl7lh92tahDrJ5aGAAAAABJRU5ErkJggg==);
-}
-.dx-context-menu .dx-menu-item-selected, .dx-context-menu .dx-menu-item-selected.dx-state-focused
-{
-  background-color: #9ae493;
 }
 .dx-context-menu .dx-menu-item-content
 {
@@ -6701,6 +6749,13 @@
   padding-left: 7px;
   padding-top: 7px;
 }
+.dx-treeview .dx-loadindicator
+{
+  top: 8px;
+  left: 4px;
+  width: 18px;
+  height: 18px;
+}
 .dx-treeview .dx-treeview-select-all-item
 {
   margin: 0 0 7px 0;
@@ -6726,7 +6781,6 @@
 }
 .dx-treeview .dx-treeview-node-container:first-child>.dx-treeview-node>.dx-loadindicator
 {
-  top: 8px;
   left: -1px;
 }
 .dx-treeview .dx-treeview-node
@@ -6780,11 +6834,6 @@
 {
   background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA8AAAAGCAQAAAC20AwJAAAAcElEQVQYV2OwO2Drb8tgB4Qg0hZKgvm+dgcYbDlsp9pOseMESUAgWBG77SS7aXZcEAF/u/122jD9QKxhu88uGCQDE5Kx3WaXDpVMtt1hJw8xCaGD2bbWdqWtgu1Su0ZbZpgr4A4B09a2R2ztIWwIBADnFSK8mMwZRAAAAABJRU5ErkJggg==);
   background-position: 6px 50%;
-}
-.dx-treeview .dx-loadindicator
-{
-  top: 9px;
-  left: 4px;
 }
 .dx-treeview.dx-rtl.dx-treeview-border-visible .dx-treeview-node-container:first-child
 {
@@ -6986,10 +7035,6 @@
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
   box-shadow: none;
-}
-.dx-field-value .dx-texteditor-input
-{
-  color: #000;
 }
 .dx-field-value.dx-textarea
 {

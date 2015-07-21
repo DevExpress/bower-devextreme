@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Visualization Core Library)
-* Version: 15.1.4
-* Build date: Jun 22, 2015
+* Version: 15.1.5
+* Build date: Jul 15, 2015
 *
 * Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -2514,27 +2514,15 @@ if (!DevExpress.MOD_VIZ_CORE) {
         var _patchFontOptions = DX.viz.core.utils.patchFontOptions;
         var STATE_HIDE = 0,
             STATE_SHOW = 1,
-            STATE_ENDLOADING = 2;
+            STATE_ENDLOADING = 2,
+            LOADING_INDICATOR_READY = "loadingIndicatorReady";
         function LoadIndicator(parameters) {
-            var that = this;
-            that._$widgetContainer = parameters.container;
-            that._$container = $("<div>", {css: {
-                    position: "relative",
-                    height: 0,
-                    padding: 0,
-                    margin: 0,
-                    border: 0
-                }}).appendTo(that._$widgetContainer).hide();
-            that._renderer = new DX.viz.renderers.Renderer({animation: {
-                    easing: "linear",
-                    duration: 150
-                }});
-            that._renderer.draw(that._$container[0]);
-            that._rect = that._renderer.rect().attr({opacity: 0}).append(that._renderer.root);
-            that._text = that._renderer.text().attr({
-                align: "center",
-                visibility: "hidden"
-            }).append(that._renderer.root);
+            var that = this,
+                renderer = parameters.renderer,
+                group = that._group = renderer.g().attr({"class": "dx-l-i"});
+            that._renderer = renderer;
+            that._rect = renderer.rect().attr({opacity: 0}).append(group);
+            that._text = renderer.text().attr({align: "center"}).append(group);
             that._createStates(parameters.eventTrigger)
         }
         LoadIndicator.prototype = {
@@ -2545,14 +2533,15 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 that._states[STATE_HIDE] = {
                     o: 0,
                     c: function() {
-                        that._$container.hide();
-                        eventTrigger("loadingIndicatorReady")
+                        that._group.remove();
+                        that._renderer.root.attr({"pointer-events": null});
+                        eventTrigger(LOADING_INDICATOR_READY)
                     }
                 };
                 that._states[STATE_SHOW] = {
                     o: 0.85,
                     c: function() {
-                        eventTrigger("loadingIndicatorReady")
+                        eventTrigger(LOADING_INDICATOR_READY)
                     }
                 };
                 that._states[STATE_ENDLOADING] = {
@@ -2567,10 +2556,12 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     }
                 }
             },
+            append: function() {
+                this._visible && this._group.append(this._renderer.root)
+            },
             applyCanvas: function(canvas) {
                 var width = canvas.width,
                     height = canvas.height;
-                this._renderer.resize(width, height);
                 this._rect.attr({
                     width: width,
                     height: height
@@ -2586,19 +2577,20 @@ if (!DevExpress.MOD_VIZ_CORE) {
             },
             dispose: function() {
                 var that = this;
-                that._$container.remove();
-                that._renderer.dispose();
-                that._$widgetContainer = that._$container = that._renderer = that._rect = that._text = that._states = null
-            },
-            toForeground: function() {
-                this._$container.appendTo(this._$widgetContainer)
+                that._group.remove();
+                that._group = that._renderer = that._rect = that._text = that._states = null
             },
             forceShow: function() {
                 this._rect.stopAnimation(false).attr({opacity: 1})
             },
             _transit: function(stateId) {
                 var state = this._states[stateId];
-                this._rect.stopAnimation(true).animate({opacity: state.o}, {complete: state.c})
+                this._rect.stopAnimation(true).animate({opacity: state.o}, {
+                    complete: state.c,
+                    easing: "linear",
+                    duration: 150,
+                    unstoppable: true
+                })
             },
             show: function() {
                 var that = this;
@@ -2609,13 +2601,8 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     that._onCompleteAction = null;
                     if (!that._visible) {
                         that._visible = true;
-                        that._$container.show();
-                        that._renderer.root.css({
-                            position: "absolute",
-                            left: 0,
-                            top: that._$widgetContainer.offset().top - that._$container.offset().top
-                        });
-                        that._text.attr({visibility: "visible"})
+                        that._renderer.root.attr({"pointer-events": "none"});
+                        that.append()
                     }
                     that._transit(STATE_SHOW)
                 }
@@ -2628,7 +2615,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                         that._transit(STATE_ENDLOADING)
                     }
                     else
-                        complete && complete()
+                        complete()
             },
             hide: function() {
                 var that = this;
@@ -2639,7 +2626,6 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     that._onCompleteAction = null;
                     if (that._visible) {
                         that._visible = false;
-                        that._text.attr({visibility: "hidden"});
                         that._transit(STATE_HIDE)
                     }
                 }
@@ -2680,7 +2666,8 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 position: "absolute",
                 overflow: "visible",
                 width: 0,
-                height: 0
+                height: 0,
+                "pointer-events": "none"
             }).addClass(params.cssClass);
             that._renderer = renderer = new DX.viz.renderers.Renderer({});
             root = renderer.root;
@@ -4897,7 +4884,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
             animate: baseAnimate,
             stopAnimation: function(disableComplete) {
                 var animation = this.animation;
-                animation && animation.stop(true, disableComplete);
+                animation && animation.stop(disableComplete);
                 return this
             },
             setTitle: function(text) {
@@ -5215,21 +5202,23 @@ if (!DevExpress.MOD_VIZ_CORE) {
             mathCos = math.cos,
             baseElementPrototype = rendererNS.SvgElement.prototype,
             documentFragment = doc.createDocumentFragment(),
+            STROKEWIDTH = "stroke-width",
+            XMLNS = "urn:schemas-microsoft-com:vml",
             DEFAULT_STYLE = {
                 behavior: "url(#default#VML)",
                 display: "inline-block",
                 position: "absolute"
             },
-            DEFAULT_ATTRS = {xmlns: 'urn:schemas-microsoft-com:vml'},
+            DEFAULT_ATTRS = {xmlns: XMLNS},
             INHERITABLE_PROPERTIES = {
                 stroke: true,
                 fill: true,
                 opacity: true,
-                'stroke-width': true,
+                "stroke-width": true,
                 align: true,
                 dashStyle: true,
                 "stroke-opacity": true,
-                'fill-opacity': true,
+                "fill-opacity": true,
                 rotate: true,
                 rotateX: true,
                 rotateY: true
@@ -5276,7 +5265,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 yInnerStart = y - innerR * endAngleSin,
                 xInnerEnd = x + innerR * startAngleCos,
                 yInnerEnd = y - innerR * startAngleSin;
-            return !noArc ? ['wr', mathFloor(x - innerR), mathFloor(y - innerR), mathFloor(x + innerR), mathFloor(y + innerR), mathFloor(xInnerStart), mathFloor(yInnerStart), mathFloor(xInnerEnd), mathFloor(yInnerEnd), isCircle ? 'wr ' : 'at ', mathFloor(x - outerR), mathFloor(y - outerR), mathFloor(x + outerR), mathFloor(y + outerR), mathFloor(xOuterStart), mathFloor(yOuterStart), mathFloor(xOuterEnd), mathFloor(yOuterEnd), 'x e'].join(" ") : "m 0 0 x e"
+            return !noArc ? ["wr", mathFloor(x - innerR), mathFloor(y - innerR), mathFloor(x + innerR), mathFloor(y + innerR), mathFloor(xInnerStart), mathFloor(yInnerStart), mathFloor(xInnerEnd), mathFloor(yInnerEnd), isCircle ? "wr " : "at ", mathFloor(x - outerR), mathFloor(y - outerR), mathFloor(x + outerR), mathFloor(y + outerR), mathFloor(xOuterStart), mathFloor(yOuterStart), mathFloor(xOuterEnd), mathFloor(yOuterEnd), "x e"].join(" ") : "m 0 0 x e"
         }
         function getInheritSettings(settings) {
             var result = {},
@@ -5318,7 +5307,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
             resultRect.top = resultRect.top || 0;
             resultRect.right = resultRect.right || 0;
             resultRect.bottom = resultRect.bottom || 0;
-            return correctBoundingRectWithStrokeWidth(resultRect, this._fullSettings["stroke-width"])
+            return correctBoundingRectWithStrokeWidth(resultRect, this._fullSettings[STROKEWIDTH])
         }
         function baseAttr(attrs, inh) {
             var element = this.element,
@@ -5336,6 +5325,8 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     return DEFAULTS[attrs];
                 return 0
             }
+            if (attrs && attrs.fill === "transparent")
+                attrs.fill = "none";
             for (key in attrs) {
                 value = attrs[key];
                 if (value === undefined)
@@ -5355,13 +5346,18 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 elem._applyStyleSheet()
             }
             !inh && this._applyStyleSheet();
+            if (element)
+                if (element.strokecolor && element.strokecolor.value !== "none" && element.strokeweight)
+                    element.stroked = "t";
+                else
+                    element.stroked = "f";
             return this
         }
         function vmlAttr() {
             var elem = this.element,
                 result = baseAttr.apply(this, arguments);
             for (var i = 0; i < elem.childNodes.length; i++) {
-                elem.childNodes[i].xmlns = 'urn:schemas-microsoft-com:vml';
+                elem.childNodes[i].xmlns = XMLNS;
                 elem.childNodes[i].style.behavior = "url(#default#VML)";
                 elem.childNodes[i].style.display = "inline-block"
             }
@@ -5371,17 +5367,16 @@ if (!DevExpress.MOD_VIZ_CORE) {
             switch (attr) {
                 case"stroke":
                     value = value || "none";
-                    element.stroked = value === 'none' ? 'f' : 't';
                     attr += "color";
                     break;
                 case"fill":
                     value = value || "none";
-                    element.filled = value === 'none' ? 'f' : 't';
+                    element.filled = value === "none" ? "f" : "t";
                     attr += "color";
                     break;
-                case"stroke-width":
+                case STROKEWIDTH:
                     attr = "strokeweight";
-                    value = value + 'px';
+                    value = value + "px";
                     break;
                 case"stroke-linejoin":
                     element.stroke.joinstyle = value;
@@ -5414,7 +5409,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     return;
                 case"d":
                     attr = "path";
-                    value = (value + '').toLowerCase().replace("z", "x e").replace(/([.]\d+)/g, "");
+                    value = (value + "").toLowerCase().replace("z", "x e").replace(/([.]\d+)/g, "");
                     break;
                 case"href":
                     attr = "src";
@@ -5558,14 +5553,14 @@ if (!DevExpress.MOD_VIZ_CORE) {
                                 top: y - r,
                                 right: x + r,
                                 bottom: y + r
-                            }, settings["stroke-width"] || 1)
+                            }, settings[STROKEWIDTH] || 1)
                     }
                 },
                 span: {
                     defaultAttrs: {},
                     defaultStyle: {
-                        position: 'absolute',
-                        whiteSpace: 'nowrap'
+                        position: "absolute",
+                        whiteSpace: "nowrap"
                     },
                     processAttr: function(element, attr, value, params) {
                         if (attr === "text") {
@@ -5612,7 +5607,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                                 sin = mathSin(radianAngle);
                                 marginLeft = (x - rotateX) * cos - (y - rotateY) * sin + rotateX - x;
                                 marginTop = (x - rotateX) * sin + (y - rotateY) * cos + rotateY - y;
-                                filter = 'progid:DXImageTransform.Microsoft.Matrix(sizingMethod="auto expand", M11 = ' + cos.toFixed(5) + ', M12 = ' + (-sin).toFixed(5) + ', M21 = ' + sin.toFixed(5) + ', M22 = ' + cos.toFixed(5) + ')'
+                                filter = "progid:DXImageTransform.Microsoft.Matrix(sizingMethod='auto expand', M11 = " + cos.toFixed(5) + ", M12 = " + (-sin).toFixed(5) + ", M21 = " + sin.toFixed(5) + ", M22 = " + cos.toFixed(5) + ")"
                             }
                             if (rotateAngle < 90) {
                                 marginTop -= fontHeightOffset * cos;
@@ -5668,7 +5663,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
             defaultAttrs: DEFAULT_ATTRS,
             ctor: function(renderer, tagName, type) {
                 var that = this,
-                    tagPrefix = '<';
+                    tagPrefix = "<";
                 that.renderer = renderer;
                 that.type = type;
                 that._children = [];
@@ -5838,14 +5833,14 @@ if (!DevExpress.MOD_VIZ_CORE) {
                         top: y,
                         right: x + width,
                         bottom: y + height
-                    }, settings["stroke-width"] || 1)
+                    }, settings[STROKEWIDTH] || 1)
             },
             _applyStyleSheet: function() {
                 if (this._useCSSTheme)
                     this.attr(getInheritSettings(this.element.currentStyle), true)
             },
             setTitle: function(text) {
-                this.element.setAttribute('title', text)
+                this.element.setAttribute("title", text)
             }
         });
         var ClipRect = function() {
@@ -6057,6 +6052,25 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 element.attr(currentSettings)
             }
         };
+        function step(now) {
+            var that = this,
+                animateStep = that._animateStep,
+                attrName;
+            that._progress = that._calcProgress(now);
+            for (attrName in that.params) {
+                var anim = animateStep[attrName] || animateStep.base;
+                anim(that.element, that.params[attrName], that._progress, that._easing, that._currentParams, attrName)
+            }
+            that.options.step && that.options.step(that._easing(that._progress, 0, 1), that._progress);
+            if (that._progress === 1)
+                return that.stop();
+            return true
+        }
+        function start(now) {
+            this._startTime = now;
+            this.tick = step;
+            return true
+        }
         function Animation(element, params, options) {
             var that = this;
             that._progress = 0;
@@ -6067,50 +6081,19 @@ if (!DevExpress.MOD_VIZ_CORE) {
             that._animateStep = options.animateStep || rendererNS.animationSvgStep;
             that._easing = easingFunctions[options.easing] || easingFunctions["easeOutCubic"];
             that._currentParams = {};
-            that.tick = that._start
+            that.tick = start
         }
         Animation.prototype = {
             _calcProgress: function(now) {
                 return Math.min(1, (now - this._startTime) / this.duration)
             },
-            _step: function(now) {
+            stop: function(disableComplete) {
                 var that = this,
-                    animateStep = that._animateStep,
-                    attrName;
-                that._progress = that._calcProgress(now);
-                for (attrName in that.params) {
-                    var anim = animateStep[attrName] || animateStep.base;
-                    anim(that.element, that.params[attrName], that._progress, that._easing, that._currentParams, attrName)
-                }
-                that.options.step && that.options.step(that._easing(that._progress, 0, 1), that._progress);
-                if (that._progress === 1)
-                    return that.stop();
-                return true
-            },
-            _start: function(now) {
-                this._startTime = now;
-                this.tick = this._step;
-                return true
-            },
-            _end: function(disableComplete) {
-                var that = this;
-                that.stop = noop;
-                that.tick = noop;
-                that._animateStep.complete && that._animateStep.complete(that.element, that._currentParams);
-                that.options.complete && !disableComplete && that.options.complete()
-            },
-            tick: function() {
-                return true
-            },
-            stop: function(breakAnimation, disableComplete) {
-                var that = this,
-                    options = that.options;
-                if (!breakAnimation && options.repeatCount && --options.repeatCount > 0) {
-                    that.tick = that._start;
-                    return true
-                }
-                else
-                    that._end(disableComplete)
+                    options = that.options,
+                    animateStep = that._animateStep;
+                that.stop = that.tick = noop;
+                animateStep.complete && animateStep.complete(that.element, that._currentParams);
+                options.complete && !disableComplete && options.complete()
             }
         };
         function AnimationController(element) {
@@ -6162,7 +6145,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
             },
             animateElement: function(elem, params, options) {
                 if (elem && params && options) {
-                    elem.animation && elem.animation.stop(true);
+                    elem.animation && elem.animation.stop();
                     this.addAnimation(elem.animation = new Animation(elem, params, options))
                 }
             },
@@ -6184,10 +6167,18 @@ if (!DevExpress.MOD_VIZ_CORE) {
             },
             lock: function() {
                 var an,
-                    animations = this._animations;
-                for (an in animations)
-                    animations[an].stop(true, true);
-                this.stop()
+                    animations = this._animations,
+                    unstoppable,
+                    hasUnstoppableInAnimations;
+                for (an in animations) {
+                    unstoppable = animations[an].options.unstoppable;
+                    hasUnstoppableInAnimations = hasUnstoppableInAnimations || unstoppable;
+                    if (!unstoppable) {
+                        animations[an].stop(true);
+                        delete animations[an]
+                    }
+                }
+                !hasUnstoppableInAnimations && this.stop()
             }
         };
         rendererNS.Animation = Animation;
@@ -7282,16 +7273,9 @@ if (!DevExpress.MOD_VIZ_CORE) {
             },
             _getLabelOptions: function(labelOptions, defaultColor) {
                 var opt = labelOptions || {},
-                    labelFont = opt.font || {},
+                    labelFont = _extend({}, opt.font) || {},
                     labelBorder = opt.border || {},
                     labelConnector = opt.connector || {},
-                    labelAttributes = {font: {
-                            color: opt.backgroundColor === "none" && labelFont.color.toLowerCase() === "#ffffff" && opt.position !== "inside" ? defaultColor : labelFont.color,
-                            family: labelFont.family,
-                            weight: labelFont.weight,
-                            size: labelFont.size,
-                            opacity: labelFont.opacity
-                        }},
                     backgroundAttr = {
                         fill: opt.backgroundColor || defaultColor,
                         "stroke-width": labelBorder.visible ? labelBorder.width || 0 : 0,
@@ -7302,6 +7286,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                         stroke: labelConnector.visible && labelConnector.width ? labelConnector.color || defaultColor : "none",
                         "stroke-width": labelConnector.visible ? labelConnector.width || 0 : 0
                     };
+                labelFont.color = opt.backgroundColor === "none" && labelFont.color.toLowerCase() === "#ffffff" && opt.position !== "inside" ? defaultColor : labelFont.color;
                 return {
                         alignment: opt.alignment,
                         format: opt.format,
@@ -7310,7 +7295,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                         argumentPrecision: opt.argumentPrecision,
                         percentPrecision: opt.percentPrecision,
                         customizeText: $.isFunction(opt.customizeText) ? opt.customizeText : undefined,
-                        attributes: labelAttributes,
+                        attributes: {font: labelFont},
                         visible: labelFont.size !== 0 ? opt.visible : false,
                         showForZeroValues: opt.showForZeroValues,
                         horizontalOffset: opt.horizontalOffset,
@@ -10149,7 +10134,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
             getBoundaryCoords: function() {
                 return this.getBoundingRect()
             },
-            getCrosshairCoords: _noop,
+            getCrosshairData: _noop,
             getPointRadius: _noop,
             _populatePointShape: _noop,
             _checkSymbol: _noop,
@@ -10468,7 +10453,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     lineLength,
                     requiredLineLength;
                 if (textSize > requiredTextSize) {
-                    lines = text.split("<br/>");
+                    lines = text.split(/\r\n|\n|<br\s*\/?>/g);
                     for (i = 0, ii = lines.length, lineLength = 0; i < ii; ++i) {
                         line = lines[i] = lines[i].replace(/<[^>]+>/g, '');
                         lineLength = _max(lineLength, line.length)
@@ -10983,10 +10968,17 @@ if (!DevExpress.MOD_VIZ_CORE) {
                         height: image.height || DEFAULT_IMAGE_HEIGHT
                     }
             },
-            getCrosshairCoords: function() {
+            getCrosshairData: function() {
+                var that = this,
+                    r = that._options.rotated,
+                    value = that.value,
+                    argument = that.argument;
                 return {
-                        x: this.vx,
-                        y: this.vy
+                        x: that.vx,
+                        y: that.vy,
+                        xValue: r ? value : argument,
+                        yValue: r ? argument : value,
+                        axis: that.series.axis
                     }
             },
             getPointRadius: function() {
@@ -12118,18 +12110,36 @@ if (!DevExpress.MOD_VIZ_CORE) {
                         translateY: settings.translateY
                     }
             },
-            getCrosshairCoords: function(x, y) {
-                var coords;
-                if (this._options.rotated)
+            getCrosshairData: function(x, y) {
+                var that = this,
+                    rotated = that._options.rotated,
+                    minX = that.minX,
+                    minY = that.minY,
+                    vx = that.vx,
+                    vy = that.vy,
+                    value = that.value,
+                    minValue = that.minValue,
+                    argument = that.argument,
                     coords = {
-                        y: this.vy,
-                        x: Math.abs(this.vx - x) < Math.abs(this.minX - x) ? this.vx : this.minX
+                        axis: that.series.axis,
+                        x: vx,
+                        y: vy,
+                        yValue: value,
+                        xValue: argument
                     };
-                else
-                    coords = {
-                        x: this.vx,
-                        y: Math.abs(this.vy - y) < Math.abs(this.minY - y) ? this.vy : this.minY
-                    };
+                if (rotated) {
+                    coords.yValue = argument;
+                    if (_abs(vx - x) < _abs(minX - x))
+                        coords.xValue = value;
+                    else {
+                        coords.x = minX;
+                        coords.xValue = minValue
+                    }
+                }
+                else if (_abs(vy - y) >= _abs(minY - y)) {
+                    coords.y = minY;
+                    coords.yValue = minValue
+                }
                 return coords
             },
             _updateOneMarker: function(markerType, settings) {
@@ -12229,7 +12239,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
             _getLabelMinFormatObject: rangeSymbolPointMethods._getLabelMinFormatObject,
             _updateLabelData: rangeSymbolPointMethods._updateLabelData,
             _updateLabelOptions: rangeSymbolPointMethods._updateLabelOptions,
-            getCrosshairCoords: rangeSymbolPointMethods.getCrosshairCoords,
+            getCrosshairData: rangeSymbolPointMethods.getCrosshairData,
             _createLabel: rangeSymbolPointMethods._createLabel,
             _checkOverlay: rangeSymbolPointMethods._checkOverlay,
             _checkLabelsOverlay: rangeSymbolPointMethods._checkLabelsOverlay,
@@ -12457,22 +12467,43 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 centerValue = _min(that.lowY, that.highY) + _abs(that.lowY - that.highY) / 2;
                 that._calculateVisibility(!rotated ? that.x : centerValue, !rotated ? centerValue : that.x)
             },
-            getCrosshairCoords: function(x, y) {
-                var coords,
-                    valueCoord = this._options.rotated ? x : y,
-                    value = Math.abs(this.lowY - valueCoord) < Math.abs(this.closeY - valueCoord) ? this.lowY : this.closeY;
-                value = Math.abs(value - valueCoord) < Math.abs(this.openY - valueCoord) ? value : this.openY;
-                value = Math.abs(value - valueCoord) < Math.abs(this.highY - valueCoord) ? value : this.highY;
-                if (this._options.rotated)
+            getCrosshairData: function(x, y) {
+                var that = this,
+                    rotated = that._options.rotated,
+                    origY = rotated ? x : y,
+                    yValue,
+                    argument = that.argument,
+                    coords,
+                    coord = "low";
+                if (_abs(that.lowY - origY) < _abs(that.closeY - origY))
+                    yValue = that.lowY;
+                else {
+                    yValue = that.closeY;
+                    coord = "close"
+                }
+                if (_abs(yValue - origY) >= _abs(that.openY - origY)) {
+                    yValue = that.openY;
+                    coord = "open"
+                }
+                if (_abs(yValue - origY) >= _abs(that.highY - origY)) {
+                    yValue = that.highY;
+                    coord = "high"
+                }
+                if (rotated)
                     coords = {
-                        y: this.vy,
-                        x: value
+                        y: that.vy,
+                        x: yValue,
+                        xValue: that[coord + "Value"],
+                        yValue: argument
                     };
                 else
                     coords = {
-                        x: this.vx,
-                        y: value
+                        x: that.vx,
+                        y: yValue,
+                        xValue: argument,
+                        yValue: that[coord + "Value"]
                     };
+                coords.axis = that.series.axis;
                 return coords
             },
             _updateData: function(data) {
@@ -13896,7 +13927,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                             verticalOrientation: 'bottom'
                         },
                         trianglemarker: {
-                            offset: -1,
+                            offset: 10,
                             horizontalOrientation: 'left',
                             verticalOrientation: 'top'
                         },
@@ -14668,7 +14699,8 @@ if (!DevExpress.MOD_VIZ_CORE) {
             _isFunction = DX.utils.isFunction,
             _parseScalar = core.utils.parseScalar,
             OPTION_RTL_ENABLED = "rtlEnabled",
-            OPTION_LOADING_INDICATOR = "loadingIndicator";
+            OPTION_LOADING_INDICATOR = "loadingIndicator",
+            INCIDENTOCCURED = "incidentOccured";
         function defaultIncidentOccured(options) {
             var args = [options.id];
             args.push.apply(args, options.args || []);
@@ -14707,8 +14739,8 @@ if (!DevExpress.MOD_VIZ_CORE) {
         core.BaseWidget = DX.DOMComponent.inherit({
             _eventsMap: {
                 onIncidentOccurred: {
-                    name: 'incidentOccured',
-                    deprecated: 'incidentOccured',
+                    name: INCIDENTOCCURED,
+                    deprecated: INCIDENTOCCURED,
                     deprecatedContext: $.noop,
                     deprecatedArgs: function(arg) {
                         return [arg.target]
@@ -14758,10 +14790,11 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 that._initEventTrigger();
                 that._initTooltip();
                 that._initCore();
+                that._initLoadingIndicator();
                 that._setThemeAndRtl();
                 that._initSize();
                 that._setupResizeHandler();
-                that._initLoadingIndicator()
+                that._initialShowLoadingIndicator()
             },
             _initTooltip: function() {
                 this._tooltip = new core.Tooltip({
@@ -14969,7 +15002,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
             _initIncidentOccured: function() {
                 var that = this;
                 that._incidentOccured = function(errorOrWarningId, options) {
-                    that._eventTrigger('incidentOccured', {target: {
+                    that._eventTrigger(INCIDENTOCCURED, {target: {
                             id: errorOrWarningId,
                             type: errorOrWarningId[0] === 'E' ? 'error' : 'warning',
                             args: options,
@@ -14989,9 +15022,16 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 this._tooltip.update(this._getOption("tooltip"))
             },
             _initLoadingIndicator: function() {
-                if (this._getOption(OPTION_LOADING_INDICATOR).show) {
+                this._loadIndicator = new core.LoadIndicator({
+                    eventTrigger: this._eventTrigger,
+                    renderer: this._renderer
+                })
+            },
+            _initialShowLoadingIndicator: function() {
+                var loadingIndicator = this._loadIndicator;
+                if (loadingIndicator && this._getOption(OPTION_LOADING_INDICATOR).show) {
                     this.showLoadingIndicator();
-                    this._loadIndicator.forceShow()
+                    loadingIndicator.forceShow()
                 }
             },
             _handleLoadingIndicatorOptionChanged: function() {
@@ -15005,33 +15045,27 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 }
             },
             _updateLoadingIndicatorCanvas: function() {
-                this._loadIndicator && this._canvas && this._loadIndicator.applyCanvas(this._canvas)
+                this._loadIndicator.applyCanvas(this._canvas)
             },
             _updateLoadingIndicatorOptions: function() {
-                this._loadIndicator && this._loadIndicator.applyOptions(this._getOption(OPTION_LOADING_INDICATOR))
+                this._loadIndicator.applyOptions(this._getOption(OPTION_LOADING_INDICATOR))
             },
             _endLoading: function(complete) {
-                if (this._loadIndicator) {
-                    this._resetIsReady();
-                    this._loadIndicator.endLoading(complete)
-                }
-                else
-                    complete && complete()
+                this._resetIsReady();
+                this._loadIndicator.endLoading(complete)
             },
-            _reappendLoadingIndicator: function() {
-                this._loadIndicator && this._loadIndicator.toForeground()
+            _repairLoadIndicator: function() {
+                this._loadIndicator.append()
             },
             _disposeLoadingIndicator: function() {
-                if (this._loadIndicator) {
-                    this._loadIndicator.dispose();
-                    this._loadIndicator = null
-                }
+                this._loadIndicator.dispose();
+                this._loadIndicator = null
             },
             _scheduleLoadingIndicatorHiding: function() {
-                this._loadIndicator && this._loadIndicator.scheduleHiding()
+                this._loadIndicator.scheduleHiding()
             },
             _fulfillLoadingIndicatorHiding: function() {
-                this._loadIndicator && this._loadIndicator.fulfillHiding() && this._toggleLoadingIndicatorState(false)
+                this._loadIndicator.fulfillHiding() && this._toggleLoadingIndicatorState(false)
             },
             _normalizeHtml: function(html) {
                 var re = /xmlns="[\s\S]*?"/gi,
@@ -15043,6 +15077,18 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     return match
                 });
                 return html.replace(/xmlns:NS1="[\s\S]*?"/gi, "").replace(/NS1:xmlns:xlink="([\s\S]*?)"/gi, 'xmlns:xlink="$1"')
+            },
+            _checkLoadingIndicatorHiding: function(bool) {
+                this._repairLoadIndicator();
+                if (bool)
+                    this._fulfillLoadingIndicatorHiding()
+            },
+            _refresh: function() {
+                var that = this,
+                    callBase = that.callBase;
+                that._endLoading(function() {
+                    callBase.call(that)
+                })
             },
             _dataIsReady: getTrue,
             _resetIsReady: function() {
@@ -15067,25 +15113,13 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 this._tooltip.hide()
             },
             showLoadingIndicator: function() {
-                var that = this;
-                if (!that._loadIndicator) {
-                    that._loadIndicator = new core.LoadIndicator({
-                        container: that._$element,
-                        eventTrigger: that._eventTrigger
-                    });
-                    that._updateLoadingIndicatorCanvas();
-                    that._updateLoadingIndicatorOptions()
-                }
-                that._toggleLoadingIndicatorState(true);
-                that._loadIndicator.show();
-                that._handleLoadingIndicatorShown()
+                this._toggleLoadingIndicatorState(true);
+                this._loadIndicator.show();
+                this._handleLoadingIndicatorShown()
             },
             hideLoadingIndicator: function() {
-                var that = this;
-                if (that._loadIndicator) {
-                    that._toggleLoadingIndicatorState(false);
-                    that._loadIndicator.hide()
-                }
+                this._toggleLoadingIndicatorState(false);
+                this._loadIndicator.hide()
             },
             svg: function() {
                 return this._normalizeHtml(this._renderer.svg())
@@ -15093,8 +15127,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
             isReady: getFalse
         });
         function createEventTrigger(eventsMap, callbackGetter) {
-            var triggers = {},
-                timers = {};
+            var triggers = {};
             $.each(eventsMap, function(name, info) {
                 if (info.name)
                     createItem(name)
@@ -15106,10 +15139,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 return !!eventInfo
             };
             trigger.dispose = function() {
-                $.each(timers, function(timer) {
-                    clearTimeout(timer)
-                });
-                eventsMap = callbackGetter = triggers = timers = null
+                eventsMap = callbackGetter = triggers = null
             };
             return trigger;
             function trigger(eventName, arg, complete) {
@@ -15122,13 +15152,9 @@ if (!DevExpress.MOD_VIZ_CORE) {
             }
             function createCallback(callback, deprectatedCallback, deprecatedContext, deprecatedArgs) {
                 return function(arg, complete) {
-                        var timer = setTimeout(function() {
-                                callback(arg);
-                                deprectatedCallback && deprectatedCallback.apply(deprecatedContext(arg), deprecatedArgs(arg));
-                                complete && complete();
-                                delete timers[timer]
-                            });
-                        timers[timer] = 1
+                        callback(arg);
+                        deprectatedCallback && deprectatedCallback.apply(deprecatedContext(arg), deprecatedArgs(arg));
+                        complete && complete()
                     }
             }
         }

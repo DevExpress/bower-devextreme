@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Single Page App Framework)
-* Version: 15.1.4
-* Build date: Jun 22, 2015
+* Version: 15.1.5
+* Build date: Jul 15, 2015
 *
 * Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -51,20 +51,16 @@ if (!DevExpress.MOD_FRAMEWORK) {
                     titleValue = resolvePropertyValue(command, containerOptions, "title", "");
                 return showText || !hasIcon ? titleValue : ""
             };
-        var resolveIconValue = function(command, containerOptions, propertyName) {
+        var resolveIconValue = function(command, containerOptions) {
                 var showIcon = resolvePropertyValue(command, containerOptions, "showIcon"),
                     hasText = !!command.option("title"),
-                    iconValue = resolvePropertyValue(command, containerOptions, propertyName, "");
+                    iconValue = resolvePropertyValue(command, containerOptions, "icon", "");
                 return showIcon || !hasText ? iconValue : ""
-            };
-        var resolveTypeValue = function(command, containerOptions) {
-                return resolvePropertyValue(command, containerOptions, "type")
             };
         DX.framework = {
             utils: {
                 mergeCommands: mergeCommands,
                 commandToContainer: {
-                    resolveTypeValue: resolveTypeValue,
                     resolveIconValue: resolveIconValue,
                     resolveTextValue: resolveTextValue,
                     resolvePropertyValue: resolvePropertyValue
@@ -2252,37 +2248,33 @@ if (!DevExpress.MOD_FRAMEWORK) {
         var WidgetItemWrapperBase = DX.Class.inherit({
                 ctor: function(command, containerOptions) {
                     this.command = command;
-                    this.containerOptions = containerOptions;
-                    this._createWidgetItem(command, containerOptions);
-                    this._commandChangedHandler = $.proxy(this._onCommandChanged, this);
-                    command.on("optionChanged", this._commandChangedHandler)
+                    this.widgetItem = this._createWidgetItem(command, containerOptions)
                 },
                 _createWidgetItem: function(command, containerOptions) {
-                    this.widgetItem = $.extend({
-                        command: command,
-                        containerOptions: containerOptions
-                    }, containerOptions, command.option());
-                    this._updateItem()
+                    var itemOptions = $.extend({}, containerOptions, command.option()),
+                        executeCommandCallback = function(e) {
+                            command.execute(e)
+                        },
+                        result;
+                    itemOptions.text = commandToContainer.resolveTextValue(command, containerOptions);
+                    itemOptions.icon = commandToContainer.resolveIconValue(command, containerOptions);
+                    itemOptions.type = commandToContainer.resolvePropertyValue(command, containerOptions, "type");
+                    itemOptions.location = commandToContainer.resolvePropertyValue(command, containerOptions, "location");
+                    result = this._createWidgetItemCore(itemOptions, executeCommandCallback);
+                    result.command = command;
+                    return result
                 },
-                _onCommandChanged: function(args) {
-                    var optionName = args.name,
-                        newValue = args.value,
-                        oldValue = args.previousValue;
-                    this.widgetItem[optionName] = newValue;
-                    this._updateItem(optionName, newValue, oldValue)
+                _createWidgetItemCore: function(itemOptions, executeCommandCallback) {
+                    return itemOptions
                 },
-                _updateItem: function(optionName, newValue, oldValue){},
                 dispose: function() {
-                    if (this.command)
-                        this.command.off("optionChanged", this._commandChangedHandler);
                     delete this.command;
-                    delete this.containerOptions;
-                    delete this.widgetItem;
-                    delete this.updateItemHandler
+                    delete this.widgetItem
                 }
             });
         var WidgetAdapterBase = DX.Class.inherit({
                 ctor: function($widgetElement) {
+                    this._commandToWidgetItemOptionNames = {};
                     this.$widgetElement = $widgetElement;
                     this.$widgetElement.data(DX_COMMAND_TO_WIDGET_ADAPTER, this);
                     this.widget = this._getWidgetByElement($widgetElement);
@@ -2299,7 +2291,6 @@ if (!DevExpress.MOD_FRAMEWORK) {
                     var itemWrapper = this._createItemWrapper(command, containerOptions);
                     this.itemWrappers.push(itemWrapper);
                     this._addItemToWidget(itemWrapper);
-                    this.refresh();
                     this._commandChangedHandler = $.proxy(this._onCommandChanged, this);
                     itemWrapper.command.on("optionChanged", this._commandChangedHandler)
                 },
@@ -2322,15 +2313,30 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 _onWidgetDisposing: function() {
                     this.dispose(true)
                 },
+                _setWidgetItemOption: function(optionName, optionValue, itemCommand) {
+                    var items = this.widget.option("items"),
+                        itemIndex = $.inArray(itemCommand, $.map(items, function(item) {
+                            return item.command || {}
+                        }));
+                    if (itemIndex > -1) {
+                        var optionPath = "items[" + itemIndex + "].";
+                        if (optionName !== "visible" && optionName !== "location" && this.widget.option("items[" + itemIndex + "]").options)
+                            optionPath += "options.";
+                        optionPath += this._commandToWidgetItemOptionNames[optionName] || optionName;
+                        this.widget.option(optionPath, optionValue)
+                    }
+                },
                 _onCommandChanged: function(args) {
-                    if (args.name !== "highlighted")
-                        this.refresh()
+                    if (args.name === "highlighted")
+                        return;
+                    this._setWidgetItemOption(args.name, args.value, args.component)
                 },
                 _addItemToWidget: function(itemWrapper) {
                     var items = this.widget.option("items");
                     items.push(itemWrapper.widgetItem);
                     if (this.widget.element().is(":visible"))
-                        itemWrapper.widgetItem.isJustAdded = true
+                        itemWrapper.widgetItem.isJustAdded = true;
+                    this.widget.option("items", items)
                 },
                 refresh: function() {
                     var items = this.widget.option("items");
@@ -2388,31 +2394,27 @@ if (!DevExpress.MOD_FRAMEWORK) {
                     return widgetAdapter.endUpdate()
                 }
             });
-        var dxToolbarItemWrapper = WidgetItemWrapperBase.inherit({_updateItem: function() {
-                    var widgetItem = this.widgetItem,
-                        command = this.command,
-                        containerOptions = this.containerOptions,
-                        location = commandToContainer.resolvePropertyValue(command, containerOptions, "location"),
-                        optionsTarget;
-                    widgetItem.location = location;
-                    if (location === "menu")
-                        optionsTarget = widgetItem;
+        var dxToolbarItemWrapper = WidgetItemWrapperBase.inherit({_createWidgetItemCore: function(itemOptions, executeCommandCallback) {
+                    var widgetItem;
+                    itemOptions.onClick = executeCommandCallback;
+                    if (itemOptions.location === "menu")
+                        widgetItem = itemOptions;
                     else {
-                        optionsTarget = $.extend({}, widgetItem);
-                        widgetItem.options = optionsTarget;
-                        widgetItem.widget = "button"
+                        widgetItem = {
+                            location: itemOptions.location,
+                            visible: itemOptions.visible,
+                            options: itemOptions,
+                            widget: "button"
+                        };
+                        itemOptions.visible = true;
+                        delete itemOptions.location
                     }
-                    optionsTarget.onClick = function(e) {
-                        command.execute(e)
-                    };
-                    optionsTarget.text = commandToContainer.resolveTextValue(command, containerOptions);
-                    optionsTarget.disabled = command.option("disabled");
-                    optionsTarget.icon = commandToContainer.resolveIconValue(command, containerOptions, "icon");
-                    optionsTarget.type = commandToContainer.resolveTypeValue(command, containerOptions)
+                    return widgetItem
                 }});
         var dxToolbarAdapter = WidgetAdapterBase.inherit({
                 ctor: function($widgetElement) {
-                    this.callBase($widgetElement)
+                    this.callBase($widgetElement);
+                    this._commandToWidgetItemOptionNames = {title: "text"}
                 },
                 _getWidgetByElement: function($element) {
                     return $element.dxToolbar("instance")
@@ -2425,37 +2427,11 @@ if (!DevExpress.MOD_FRAMEWORK) {
                     this.widget.option("visible", true)
                 }
             });
-        var dxActionSheetItemWrapper = WidgetItemWrapperBase.inherit({_updateItem: function() {
-                    var widgetItem = this.widgetItem,
-                        command = this.command,
-                        containerOptions = this.containerOptions;
-                    widgetItem.text = commandToContainer.resolveTextValue(command, containerOptions);
-                    widgetItem.icon = commandToContainer.resolveIconValue(command, containerOptions, "icon")
+        var dxListItemWrapper = WidgetItemWrapperBase.inherit({_createWidgetItemCore: function(itemOptions, executeCommandCallback) {
+                    itemOptions.title = itemOptions.text;
+                    itemOptions.onClick = executeCommandCallback;
+                    return itemOptions
                 }});
-        var dxActionSheetAdapter = WidgetAdapterBase.inherit({
-                _createItemWrapper: function(command, containerOptions) {
-                    return new dxActionSheetItemWrapper(command, containerOptions)
-                },
-                _getWidgetByElement: function($element) {
-                    return $element.dxActionSheet("instance")
-                }
-            });
-        var dxListItemWrapper = WidgetItemWrapperBase.inherit({
-                _createWidgetItem: function(command, containerOptions) {
-                    this.callBase(command, containerOptions);
-                    this.widgetItem.onClick = $.proxy(this._itemClick, this)
-                },
-                _updateItem: function() {
-                    var widgetItem = this.widgetItem,
-                        command = this.command,
-                        containerOptions = this.containerOptions;
-                    widgetItem.title = commandToContainer.resolveTextValue(command, containerOptions);
-                    widgetItem.icon = commandToContainer.resolveIconValue(command, containerOptions, "icon")
-                },
-                _itemClick: function(e) {
-                    this.command.execute(e)
-                }
-            });
         var dxListAdapter = WidgetAdapterBase.inherit({
                 _createItemWrapper: function(command, containerOptions) {
                     return new dxListItemWrapper(command, containerOptions)
@@ -2464,17 +2440,11 @@ if (!DevExpress.MOD_FRAMEWORK) {
                     return $element.dxList("instance")
                 }
             });
-        var dxNavBarItemWrapper = WidgetItemWrapperBase.inherit({_updateItem: function(optionName, newValue, oldValue) {
-                    var command = this.command,
-                        containerOptions = this.containerOptions;
-                    if (optionName !== "highlighted") {
-                        this.widgetItem.text = commandToContainer.resolveTextValue(command, containerOptions);
-                        this.widgetItem.icon = commandToContainer.resolveIconValue(command, containerOptions, "icon")
-                    }
-                }});
+        var dxNavBarItemWrapper = WidgetItemWrapperBase.inherit({});
         var dxNavBarAdapter = WidgetAdapterBase.inherit({
                 ctor: function($widgetElement) {
                     this.callBase($widgetElement);
+                    this._commandToWidgetItemOptionNames = {title: "text"};
                     this.widget.option("onItemClick", $.proxy(this._onNavBarItemClick, this))
                 },
                 _onNavBarItemClick: function(e) {
@@ -2496,19 +2466,25 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 _onCommandChanged: function(args) {
                     var optionName = args.name,
                         newValue = args.value;
-                    if (optionName !== "highlighted" || newValue)
+                    if (optionName === "highlighted" && newValue)
                         this._updateSelectedIndex();
                     this.callBase(args)
                 },
                 _updateSelectedIndex: function() {
                     var items = this.widget.option("items");
-                    for (var i = 0, itemsCount = items.length; i < itemsCount; i++)
-                        if (items[i].highlighted) {
+                    for (var i = 0, itemsCount = items.length; i < itemsCount; i++) {
+                        var command = items[i].command;
+                        if (command && command.option("highlighted")) {
                             this.widget.option("selectedIndex", i);
                             break
                         }
+                    }
                 }
             });
+        var dxPivotItemWrapper = WidgetItemWrapperBase.inherit({_createWidgetItemCore: function(itemOptions, executeCommandCallback) {
+                    itemOptions.title = itemOptions.text;
+                    return itemOptions
+                }});
         var dxPivotAdapter = WidgetAdapterBase.inherit({
                 ctor: function($widgetElement) {
                     this.callBase($widgetElement);
@@ -2522,7 +2498,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
                     return $element.dxPivot("instance")
                 },
                 _createItemWrapper: function(command, containerOptions) {
-                    return new dxToolbarItemWrapper(command, containerOptions)
+                    return new dxPivotItemWrapper(command, containerOptions)
                 },
                 addCommand: function(command, containerOptions) {
                     this.callBase(command, containerOptions);
@@ -2533,8 +2509,9 @@ if (!DevExpress.MOD_FRAMEWORK) {
                         newValue = args.value;
                     if (optionName === "visible")
                         this._rerenderPivot();
-                    else if (optionName !== "highlighted" || newValue)
-                        this._updateSelectedIndex()
+                    else if (optionName === "highlighted" && newValue)
+                        this._updateSelectedIndex();
+                    this.callBase(args)
                 },
                 _addItemToWidget: function(itemWrapper) {
                     if (itemWrapper.command.option("visible"))
@@ -2544,11 +2521,13 @@ if (!DevExpress.MOD_FRAMEWORK) {
                     var pivot = this.widget,
                         items = pivot.option("items") || [];
                     DX.fx.off = true;
-                    for (var i = 0, itemsCount = items.length; i < itemsCount; i++)
-                        if (items[i].highlighted) {
+                    for (var i = 0, itemsCount = items.length; i < itemsCount; i++) {
+                        var command = items[i].command;
+                        if (command && command.option("highlighted")) {
                             pivot.option("selectedIndex", i);
                             break
                         }
+                    }
                     DX.fx.off = false
                 },
                 _rerenderPivot: function() {
@@ -2562,18 +2541,11 @@ if (!DevExpress.MOD_FRAMEWORK) {
                     that._updateSelectedIndex()
                 }
             });
-        var dxSlideOutItemWrapper = WidgetItemWrapperBase.inherit({_updateItem: function(optionName, newValue, oldValue) {
-                    var widgetItem = this.widgetItem,
-                        command = this.command,
-                        containerOptions = this.containerOptions;
-                    if (name !== "highlighted") {
-                        widgetItem.title = commandToContainer.resolveTextValue(command, containerOptions);
-                        widgetItem.icon = commandToContainer.resolveIconValue(command, containerOptions, "icon")
-                    }
-                }});
+        var dxSlideOutItemWrapper = WidgetItemWrapperBase.inherit({});
         var dxSlideOutAdapter = WidgetAdapterBase.inherit({
                 ctor: function($widgetElement) {
                     this.callBase($widgetElement);
+                    this._commandToWidgetItemOptionNames = {title: "text"};
                     this.widget.option("onItemClick", $.proxy(this._onSlideOutItemClick, this))
                 },
                 _onSlideOutItemClick: function(e) {
@@ -2587,11 +2559,13 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 },
                 _updateSelectedIndex: function() {
                     var items = this.widget.option("items") || [];
-                    for (var i = 0, itemsCount = items.length; i < itemsCount; i++)
-                        if (items[i].highlighted) {
+                    for (var i = 0, itemsCount = items.length; i < itemsCount; i++) {
+                        var command = items[i].command;
+                        if (command && command.option("highlighted")) {
                             this.widget.option("selectedIndex", i);
                             break
                         }
+                    }
                 },
                 addCommand: function(command, containerOptions) {
                     this.callBase(command, containerOptions);
@@ -2600,7 +2574,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 _onCommandChanged: function(args) {
                     var optionName = args.name,
                         newValue = args.value;
-                    if (optionName !== "highlighted" || newValue)
+                    if (optionName === "highlighted" && newValue)
                         this._updateSelectedIndex();
                     this.callBase(args)
                 }
@@ -2608,9 +2582,6 @@ if (!DevExpress.MOD_FRAMEWORK) {
         var adapters = DX.framework.html.commandToDXWidgetAdapters = {};
         adapters.dxToolbar = new CommandToWidgetAdapter(function($widgetElement) {
             return new dxToolbarAdapter($widgetElement)
-        });
-        adapters.dxActionSheet = new CommandToWidgetAdapter(function($widgetElement) {
-            return new dxActionSheetAdapter($widgetElement)
         });
         adapters.dxList = new CommandToWidgetAdapter(function($widgetElement) {
             return new dxListAdapter($widgetElement)
@@ -2893,7 +2864,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 if (previousViewTemplateId && previousViewTemplateId === viewInfo.currentViewTemplateId && viewInfo === previousViewInfo)
                     return $.Deferred().resolve().promise();
                 that._ensureViewRendered(viewInfo);
-                this.fireEvent("viewShowing", [viewInfo]);
+                this.fireEvent("viewShowing", [viewInfo, direction]);
                 return this._showViewImpl(viewInfo, direction, previousViewTemplateId).done(function() {
                         that._onViewShown(viewInfo)
                     })
@@ -2937,7 +2908,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
             },
             _renderCommands: function($markup, commands) {
                 var commandContainers = this._findCommandContainers($markup);
-                this._commandManager.renderCommandsToContainers(commands, commandContainers)
+                return this._commandManager.renderCommandsToContainers(commands, commandContainers)
             },
             _prepareViewCommands: function(viewInfo) {
                 var $viewItems = viewInfo.renderResult.$viewItems,
@@ -2954,11 +2925,15 @@ if (!DevExpress.MOD_FRAMEWORK) {
             _applyViewCommands: function(viewInfo, renderStage) {
                 renderStage = renderStage || DEFAULT_COMMAND_RENDER_STAGE;
                 var commandsToRender = viewInfo.commandsToRenderMap[renderStage],
-                    $markup = viewInfo.renderResult.$markup;
+                    $markup = viewInfo.renderResult.$markup,
+                    result;
                 if (commandsToRender) {
-                    this._renderCommands($markup, commandsToRender);
+                    result = this._renderCommands($markup, commandsToRender);
                     delete viewInfo.commandsToRenderMap[renderStage]
                 }
+                else
+                    result = $.Deferred().resolve().promise();
+                return result
             },
             _findCommandContainers: function($markup) {
                 return DX.utils.createComponents($markup, ["dxCommandContainer"])
@@ -3042,18 +3017,19 @@ if (!DevExpress.MOD_FRAMEWORK) {
                     result,
                     previousViewInfo = this._getPreviousViewInfo(viewInfo);
                 this._showView(viewInfo);
-                if (!previousViewInfo || previousViewInfo === viewInfo) {
-                    that._changeView(viewInfo, previousViewTemplateId);
-                    result = $.Deferred().resolve().promise()
-                }
+                if (!previousViewInfo || previousViewInfo === viewInfo || DX.fx.off)
+                    result = that._changeView(viewInfo, previousViewTemplateId);
                 else
-                    result = that._doTransition(previousViewInfo, viewInfo, direction).done(function() {
-                        that._changeView(viewInfo)
+                    result = that._doTransition(previousViewInfo, viewInfo, direction).then(function() {
+                        return that._changeView(viewInfo)
                     });
                 return result
             },
             _releaseView: function(viewInfo) {
                 this.viewReleased.fireWith(this, [viewInfo])
+            },
+            _getReadyForRenderDeferredItems: function(viewInfo) {
+                return $.Deferred().resolve().promise()
             },
             _changeView: function(viewInfo, previousViewTemplateId) {
                 var that = this;
@@ -3067,9 +3043,12 @@ if (!DevExpress.MOD_FRAMEWORK) {
                     }
                     this._visibleViews[this._getViewPaneName(viewInfo.viewTemplateInfo)] = viewInfo
                 }
-                this._applyViewCommands(viewInfo);
                 this._subscribeToDeferredItems(viewInfo);
-                this._renderDeferredItems(viewInfo.renderResult.$markup)
+                return this._getReadyForRenderDeferredItems(viewInfo).then(function() {
+                        return that._applyViewCommands(viewInfo)
+                    }).then(function() {
+                        return that._renderDeferredItems(viewInfo.renderResult.$markup)
+                    })
             },
             _subscribeToDeferredItems: function(viewInfo) {
                 var that = this,
@@ -3085,15 +3064,21 @@ if (!DevExpress.MOD_FRAMEWORK) {
             },
             _renderDeferredItems: function($items) {
                 var that = this,
-                    $pendingItem = $items.find(".dx-pending-rendering-manual").add($items.filter(".dx-pending-rendering-manual")).first();
+                    result = $.Deferred();
+                var $pendingItem = $items.find(".dx-pending-rendering-manual").add($items.filter(".dx-pending-rendering-manual")).first();
                 if ($pendingItem.length) {
                     var render = $pendingItem.data("dx-render-delegate");
                     setTimeout(function() {
-                        render().done(function() {
-                            that._renderDeferredItems($items)
+                        render().then(function() {
+                            return that._renderDeferredItems($items)
+                        }).then(function() {
+                            result.resolve()
                         })
                     })
                 }
+                else
+                    result.resolve();
+                return result.promise()
             },
             _getViewPaneName: function(viewTemplateInfo) {
                 return this._defaultPaneName
@@ -3335,11 +3320,13 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 if (!component)
                     throw DX.Error("E3013", role, name);
                 var $template = component.element(),
-                    $result = $template.clone().removeClass("dx-hidden");
+                    $result;
+                if (!component._isStaticComponentsCreated) {
+                    DX.utils.createComponents($template, ["dxContent", "dxContentPlaceholder", "dxTransition"]);
+                    component._isStaticComponentsCreated = true
+                }
+                $result = $template.clone().removeClass("dx-hidden");
                 return $result
-            },
-            _extendModelFromViewData: function($view, model) {
-                DX.utils.extendFromObject(model, $view.data(_VIEW_ROLE).option())
             },
             _loadTemplatesFromMarkupCore: function($markup) {
                 var that = this;
@@ -3351,7 +3338,6 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 $.each(components, function(index, component) {
                     var $element = component.element();
                     $element.addClass("dx-hidden");
-                    DX.utils.createComponents($markup, ["dxContent", "dxContentPlaceholder", "dxTransition"]);
                     that._registerTemplateComponent(component);
                     component.element().detach()
                 })
@@ -3456,9 +3442,6 @@ if (!DevExpress.MOD_FRAMEWORK) {
                     throw DX.Error("E3020", message, JSON.stringify(this.device));
                 }
             },
-            _extendModelFormViewTemplate: function($viewTemplate, model) {
-                this._extendModelFromViewData($viewTemplate, model)
-            },
             _wrapViewDefaultContent: function($viewTemplate) {
                 $viewTemplate.wrapInner("<div class=\"dx-full-height\"></div>");
                 $viewTemplate.children().eq(0).dxContent({targetPlaceholder: 'content'})
@@ -3468,8 +3451,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 DX.utils.createComponents(this._$defaultLayoutTemplate)
             },
             _getDefaultLayoutTemplate: function() {
-                var $result = this._$defaultLayoutTemplate.clone();
-                return $result
+                return this._$defaultLayoutTemplate.clone()
             },
             applyLayout: function($view, $layout) {
                 if ($layout === undefined || $layout.length === 0)
@@ -3734,11 +3716,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
             },
             _createViewModel: function(viewInfo) {
                 this.callBase(viewInfo);
-                var templateInfo = viewInfo.viewTemplateInfo,
-                    model = viewInfo.model;
-                for (var name in templateInfo)
-                    if (!(name in model))
-                        model[name] = templateInfo[name]
+                DX.utils.extendFromObject(viewInfo.model, viewInfo.viewTemplateInfo)
             },
             _initLayoutControllers: function() {
                 var that = this;
@@ -3763,8 +3741,11 @@ if (!DevExpress.MOD_FRAMEWORK) {
                             controller.on("viewRendered", function(viewInfo) {
                                 that._processEvent("viewRendered", {viewInfo: viewInfo}, viewInfo.model)
                             });
-                            controller.on("viewShowing", function(viewInfo) {
-                                that._processEvent("viewShowing", {viewInfo: viewInfo}, viewInfo.model)
+                            controller.on("viewShowing", function(viewInfo, direction) {
+                                that._processEvent("viewShowing", {
+                                    viewInfo: viewInfo,
+                                    direction: direction
+                                }, viewInfo.model)
                             })
                         }
                     }

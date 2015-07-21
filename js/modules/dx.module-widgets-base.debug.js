@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Common Widgets)
-* Version: 15.1.4
-* Build date: Jun 22, 2015
+* Version: 15.1.5
+* Build date: Jul 15, 2015
 *
 * Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -486,7 +486,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 return !!this.element().find($element).length
             },
             _isHoverMode: function() {
-                return this.option("visibilityMode") === SCROLLBAR_VISIBLE.onHover && this.option("expandable")
+                var visibilityMode = this.option("visibilityMode");
+                return (visibilityMode === SCROLLBAR_VISIBLE.onHover || visibilityMode === SCROLLBAR_VISIBLE.always) && this.option("expandable")
             },
             _renderDirection: function() {
                 var direction = this.option("direction");
@@ -661,7 +662,9 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this._scrollbars[direction] = $scrollbar.dxScrollbar("instance")
             },
             handleInit: $.noop,
-            handleStart: $.noop,
+            handleStart: function() {
+                this._disablePushBack = true
+            },
             handleMove: function(e) {
                 if (this._isLocked()) {
                     e.cancel = true;
@@ -670,7 +673,9 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 if (this._allowedDirection())
                     e.originalEvent.isScrollingEvent = true
             },
-            handleEnd: $.noop,
+            handleEnd: function() {
+                this._disablePushBack = false
+            },
             handleStop: $.noop,
             _eachScrollbar: function(callback) {
                 callback = $.proxy(callback, this);
@@ -709,7 +714,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             },
             _pushBackFromBoundary: function() {
                 var pushBackValue = this.option("pushBackValue");
-                if (!pushBackValue)
+                if (!pushBackValue || this._disablePushBack)
                     return;
                 var scrollOffset = this._containerSize.height - this._contentSize.height,
                     scrollTopPos = this._$container.scrollTop(),
@@ -1036,8 +1041,12 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     if (scrollbarClicked)
                         this._moveToMouseLocation(e);
                     this._thumbScrolling = scrollbarClicked || this._isThumb($target);
+                    this._crossThumbScrolling = !this._thumbScrolling && this._isAnyThumbScrolling($target);
                     if (this._thumbScrolling)
                         this._scrollbar.feedbackOn()
+                },
+                _isThumbScrollingHandler: function($target) {
+                    return this._isThumb($target)
                 },
                 _moveToMouseLocation: function(e) {
                     var mouseLocation = e["page" + this._axis.toUpperCase()] - this._$element.offset()[this._prop];
@@ -1052,6 +1061,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     this._showScrollbar()
                 },
                 _moveHandler: function(delta) {
+                    if (this._crossThumbScrolling)
+                        return;
                     delta = delta[this._axis];
                     if (this._thumbScrolling)
                         delta = -delta / this._containerToContentRatio();
@@ -1221,8 +1232,16 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                         scrollByThumb: this.option("scrollByThumb"),
                         scrollbarVisible: this.option("showScrollbar"),
                         bounceEnabled: this.option("bounceEnabled"),
-                        inertiaEnabled: this.option("inertiaEnabled")
+                        inertiaEnabled: this.option("inertiaEnabled"),
+                        isAnyThumbScrolling: $.proxy(this._isAnyThumbScrolling, this)
                     }
+            },
+            _isAnyThumbScrolling: function($target) {
+                var result = false;
+                this._eventHandler("isThumbScrolling", $target).done(function(isThumbScrollingVertical, isThumbScrollingHorizontal) {
+                    result = isThumbScrollingVertical || isThumbScrollingHorizontal
+                });
+                return result
             },
             handleInit: function(e) {
                 this._supressDirections(e);
@@ -2229,7 +2248,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     this._topPocketSize = considerPockets ? this._$topPocket[this._dimension]() : 0;
                     this._bottomPocketSize = considerPockets ? this._$bottomPocket[this._dimension]() : 0;
                     this.callBase();
-                    this._bottomBound = this._minOffset
+                    this._bottomBound = this._minOffset + this._bottomPocketSize
                 },
                 _updateScrollbar: function() {
                     this._scrollbar.option({
@@ -3972,6 +3991,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this._attachEventHandlers()
             },
             _attachEventHandlers: function() {
+                if (this.option("disabled"))
+                    return;
                 var $element = this.element().css("position", "absolute"),
                     eventHandlers = {},
                     allowMoveByClick = this.option("allowMoveByClick");
@@ -3995,11 +4016,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 translator.move(this.element(), position)
             },
             _pointerDownHandler: function(e) {
-                var $area = $(e.currentTarget),
-                    areaOffset = $.isWindow($area.get(0)) ? {
-                        left: 0,
-                        top: 0
-                    } : $area.offset(),
+                var areaOffset = this._getAreaOffset($(e.currentTarget)),
                     direction = this.option("direction"),
                     position = {};
                 if (direction === "horizontal" || direction === "both")
@@ -4012,18 +4029,30 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             _dragStartHandler: function(e) {
                 var $element = this.element(),
                     $area = this._getArea(),
+                    areaOffset = this._getAreaOffset($area),
                     boundOffset = this._getBoundOffset(),
                     areaWidth = $area.outerWidth(),
                     areaHeight = $area.outerHeight(),
                     elementWidth = $element.width(),
                     elementHeight = $element.height();
                 this._toggleDraggingClass(true);
+                var startOffset = {
+                        left: $element.offset().left - areaOffset.left,
+                        top: $element.offset().top - areaOffset.top
+                    };
                 this._startPosition = translator.locate($element);
-                e.maxLeftOffset = this._startPosition.left - boundOffset.h;
-                e.maxRightOffset = areaWidth - this._startPosition.left - elementWidth - boundOffset.h;
-                e.maxTopOffset = this._startPosition.top - boundOffset.v;
-                e.maxBottomOffset = areaHeight - this._startPosition.top - elementHeight - boundOffset.v;
+                e.maxLeftOffset = startOffset.left - boundOffset.left;
+                e.maxRightOffset = areaWidth - startOffset.left - elementWidth - boundOffset.right;
+                e.maxTopOffset = startOffset.top - boundOffset.top;
+                e.maxBottomOffset = areaHeight - startOffset.top - elementHeight - boundOffset.bottom;
                 this._getAction("onDragStart")({jQueryEvent: e})
+            },
+            _getAreaOffset: function($area) {
+                var offset = $area && $area.offset();
+                return offset ? offset : {
+                        left: 0,
+                        top: 0
+                    }
             },
             _toggleDraggingClass: function(value) {
                 this.element().toggleClass(DRAGGABLE_DRAGGING_CLASS, value)
@@ -4032,7 +4061,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 var boundOffset = this.option("boundOffset");
                 if ($.isFunction(boundOffset))
                     boundOffset = boundOffset.call(this);
-                return DX.utils.stringPairToObject(boundOffset)
+                return DX.utils.stringQuadToObject(boundOffset)
             },
             _getArea: function() {
                 var area = this.option("area");
@@ -4151,6 +4180,11 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 var $element = this.element(),
                     $handle = $("<div>");
                 $handle.addClass(RESIZABLE_HANDLE_CLASS).addClass(RESIZABLE_HANDLE_CLASS + "-" + handleName).appendTo($element);
+                this._attachEventHandlers($handle, handleName)
+            },
+            _attachEventHandlers: function($handle, handleName) {
+                if (this.option("disabled"))
+                    return;
                 var handlers = {};
                 handlers[DRAGSTART_START_EVENT_NAME] = $.proxy(this._dragStartHandler, this);
                 handlers[DRAGSTART_EVENT_NAME] = $.proxy(this._dragHandler, this);
@@ -4194,27 +4228,18 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this.element().toggleClass(RESIZABLE_RESIZING_CLASS, value)
             },
             _renderDragOffsets: function(e) {
-                var $area = this._getArea(),
-                    $handle = $(e.target).closest("." + RESIZABLE_HANDLE_CLASS);
-                if (!$area.length)
+                var area = this._getArea();
+                if (!area)
                     return;
-                var areaWidth = $area.innerWidth(),
-                    areaHeight = $area.innerHeight(),
+                var $handle = $(e.target).closest("." + RESIZABLE_HANDLE_CLASS),
                     handleWidth = $handle.outerWidth(),
-                    handleHeight = $handle.outerHeight();
-                var handleOffset = $handle.offset(),
-                    areaOffset = $area.offset() || {
-                        top: 0,
-                        left: 0
-                    };
-                areaOffset.left += this._getBorderWidth($area, "left") + this._getBorderWidth(this.element(), "left");
-                areaOffset.top += this._getBorderWidth($area, "top") + this._getBorderWidth(this.element(), "top");
-                areaWidth -= this.element().outerWidth() - this.element().innerWidth();
-                areaHeight -= this.element().outerHeight() - this.element().innerHeight();
+                    handleHeight = $handle.outerHeight(),
+                    handleOffset = $handle.offset(),
+                    areaOffset = area.offset;
                 e.maxLeftOffset = handleOffset.left - areaOffset.left;
-                e.maxRightOffset = areaOffset.left + areaWidth - handleOffset.left - handleWidth;
+                e.maxRightOffset = areaOffset.left + area.width - handleOffset.left - handleWidth;
                 e.maxTopOffset = handleOffset.top - areaOffset.top;
-                e.maxBottomOffset = areaOffset.top + areaHeight - handleOffset.top - handleHeight
+                e.maxBottomOffset = areaOffset.top + area.height - handleOffset.top - handleHeight
             },
             _getBorderWidth: function($element, direction) {
                 var borderWidth = $element.css("border-" + direction + "-width");
@@ -4263,7 +4288,41 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 var area = this.option("area");
                 if ($.isFunction(area))
                     area = area.call(this);
-                return $(area)
+                if ($.isPlainObject(area))
+                    return this._getAreaFromObject(area);
+                return this._getAreaFromElement(area)
+            },
+            _getAreaFromObject: function(area) {
+                var result = {
+                        width: area.right - area.left,
+                        height: area.bottom - area.top,
+                        offset: {
+                            left: area.left,
+                            top: area.top
+                        }
+                    };
+                this._correctAreaGeometry(result);
+                return result
+            },
+            _getAreaFromElement: function(area) {
+                var $area = $(area),
+                    result;
+                if ($area.length) {
+                    result = {};
+                    result.width = $area.innerWidth();
+                    result.height = $area.innerHeight();
+                    result.offset = $area.offset();
+                    this._correctAreaGeometry(result, $area)
+                }
+                return result
+            },
+            _correctAreaGeometry: function(result, $area) {
+                var areaBorderLeft = $area ? this._getBorderWidth($area, "left") : 0,
+                    areaBorderTop = $area ? this._getBorderWidth($area, "top") : 0;
+                result.offset.left += areaBorderLeft + this._getBorderWidth(this.element(), "left");
+                result.offset.top += areaBorderTop + this._getBorderWidth(this.element(), "top");
+                result.width -= this.element().outerWidth() - this.element().innerWidth();
+                result.height -= this.element().outerHeight() - this.element().innerHeight()
             },
             _dragEndHandler: function(e) {
                 var $element = this.element();
@@ -4613,7 +4672,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                                 var device = DX.devices.real();
                                 var isOldAndroid = device.platform === "android" && (device.version[0] < 4 || device.version[0] === 4 && device.version[1] < 4),
                                     isOldIos = device.platform === "ios" && device.version[0] < 7;
-                                return device.platform === "win8" || DX.browser["msie"] || isOldAndroid || isOldIos
+                                return DX.browser["msie"] || isOldAndroid || isOldIos
                             },
                             options: {_layoutStrategy: "fallback"}
                         }])
@@ -5052,7 +5111,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             _update: function() {
                 var $existingRoot = this._$root;
                 this._renderItems();
-                $existingRoot.remove()
+                $existingRoot && $existingRoot.remove()
             },
             _dispose: function() {
                 clearTimeout(this._updateTimer);
@@ -5246,7 +5305,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             CHECKBOX_ICON_CLASS = "dx-checkbox-icon",
             CHECKBOX_CHECKED_CLASS = "dx-checkbox-checked",
             CHECKBOX_CONTAINER_CLASS = "dx-checkbox-container",
-            CHECKBOX_CONTAINER_SELECTOR = ".dx-checkbox-container",
             CHECKBOX_TEXT_CLASS = "dx-checkbox-text",
             CHECKBOX_TEXT_SELECTOR = ".dx-checkbox-text",
             CHECKBOX_HAS_TEXT_CLASS = "dx-checkbox-has-text",
@@ -5285,9 +5343,9 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             },
             _render: function() {
                 this.callBase();
-                this.element().addClass(CHECKBOX_CLASS).append($("<div>").addClass(CHECKBOX_CONTAINER_CLASS));
+                this._$container = $("<div>").addClass(CHECKBOX_CONTAINER_CLASS);
+                this.element().addClass(CHECKBOX_CLASS).append(this._$container);
                 this.setAria("role", "checkbox");
-                this._$container = this.element().find(CHECKBOX_CONTAINER_SELECTOR);
                 this._renderClick();
                 this._renderValue();
                 this._renderIcon();
@@ -5797,13 +5855,9 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             _clearValueHandler: function(e) {
                 var $input = this._input();
                 e.stopPropagation();
+                this._valueChangeEventHandler();
                 this.reset();
-                if ($input.is(":focus")) {
-                    $input.val("");
-                    this._toggleEmptinessEventHandler()
-                }
-                else
-                    $input.focus()
+                !$input.is(":focus") && $input.focus()
             },
             _renderEvents: function() {
                 var that = this,
@@ -5988,6 +6042,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 a: /[0-9a-zA-Z\s]/
             };
         var CONTROL_KEYS = {
+                9: "tab",
                 35: "end",
                 36: "home",
                 37: "leftArrow",
@@ -6095,12 +6150,13 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this.callBase()
             },
             _valueChangeEventHandler: function(e) {
-                if (this._maskRulesChain) {
-                    this._saveValueChangeEvent(e);
-                    this.option("value", (this._value || "").replace(/\s+$/, ""));
+                if (!this._maskRulesChain) {
+                    this.callBase.apply(this, arguments);
                     return
                 }
-                this.callBase.apply(this, arguments)
+                this._saveValueChangeEvent(e);
+                this.option("value", (this._value || "").replace(/\s+$/, ""));
+                this._validateMask()
             },
             _maskFocusHandler: function() {
                 this._direction(FORWARD_DIRECTION);
@@ -6282,7 +6338,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                         break;
                     case"value":
                         this._renderMaskedValue();
-                        this._validateMask();
                         this.callBase(args);
                         break;
                     case"maskInvalidMessage":
@@ -6843,7 +6898,10 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     this._createPopup();
                 this.element().toggleClass(DROP_DOWN_EDITOR_ACTIVE, opened);
                 this._setPopupOption("visible", opened);
-                this.setAria("expanded", opened)
+                this.setAria({
+                    expanded: opened,
+                    owns: (opened || undefined) && this._popupContentId
+                })
             },
             _createPopup: function() {
                 if (this._$popup)
@@ -6861,7 +6919,9 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     hidden: $.proxy(this._popupHiddenHandler, this)
                 });
                 this._popup.option("onContentReady", $.proxy(this._contentReadyHandler, this));
-                this._contentReadyHandler()
+                this._contentReadyHandler();
+                this._popupContentId = new DevExpress.data.Guid;
+                this.setAria("id", this._popupContentId, this._popup.content())
             },
             _contentReadyHandler: $.noop,
             _popupConfig: function() {
@@ -7241,7 +7301,11 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             },
             _processDataSourceChanging: function() {
                 this._setListDataSource();
-                this._renderInputValue().fail($.proxy(this.reset, this))
+                this._renderInputValue().fail($.proxy(function() {
+                    if (this.option("displayCustomValue"))
+                        return;
+                    this.reset()
+                }, this))
             },
             reset: function() {
                 this.option("value", null);
@@ -7268,14 +7332,19 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             },
             _fireContentReadyAction: $.noop,
             _renderList: function() {
-                var listId = (new DevExpress.data.Guid)._value,
-                    $list = this._$list = $("<div>", {id: listId}).appendTo(this._popup.content());
+                this._listId = (new DevExpress.data.Guid)._value;
+                var $list = this._$list = $("<div>", {id: this._listId}).appendTo(this._popup.content());
                 this._list = this._createComponent($list, "dxList", this._listConfig());
+                this._refreshList();
+                this._list._getAriaTarget = $.proxy(this._getAriaTarget, this)
+            },
+            _renderOpenedState: function() {
+                this.callBase();
+                var opened = this.option("opened") || undefined;
                 this.setAria({
-                    activedescendant: this._list.getFocusedItemId(),
-                    owns: listId
-                });
-                this._refreshList()
+                    activedescendant: opened && this._list.getFocusedItemId(),
+                    owns: opened && this._listId
+                })
             },
             _refreshList: function() {
                 if (this._list && this._shouldRefreshDataSource())
@@ -7284,10 +7353,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             _shouldRefreshDataSource: function() {
                 var dataSourceProvided = !!this._list.option("dataSource");
                 return dataSourceProvided !== this._isMinFilterLengthExceeded()
-            },
-            _refreshActiveDescendant: function() {
-                this.setAria("activedescendant", "");
-                this.setAria("activedescendant", this._list.getFocusedItemId())
             },
             _listConfig: function() {
                 return {
@@ -7300,11 +7365,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                         tabIndex: -1,
                         onItemClick: $.proxy(this._listItemClickAction, this),
                         dataSource: this._isMinFilterLengthExceeded() ? this._dataSource : null,
-                        _keyboardProcessor: this._childKeyboardProcessor,
-                        onOptionChanged: $.proxy(function(args) {
-                            if (args.name === "focusedElement")
-                                this._refreshActiveDescendant()
-                        }, this)
+                        _keyboardProcessor: this._childKeyboardProcessor
                     }
             },
             _dataSourceOptions: function() {
@@ -8559,11 +8620,11 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 });
                 $label.css("max-width", maxLabelWidth)
             },
-            _renderItem: function(index, item) {
+            _renderItem: function(index, item, _, $after) {
                 var location = item.location || "center",
                     container = this._$toolbarItemsContainer.find(".dx-toolbar-" + location),
                     itemHasTest = Boolean(item.text),
-                    itemElement = this.callBase(index, item, container);
+                    itemElement = this.callBase(index, item, container, $after);
                 itemElement.toggleClass(TOOLBAR_BUTTON_CLASS, !itemHasTest).toggleClass(TOOLBAR_LABEL_CLASS, itemHasTest);
                 return itemElement
             },
@@ -8964,6 +9025,10 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             _getOptionAliases: function() {
                 return $.extend(this.callBase(), {useNative: "useNativeScrolling"})
             },
+            _visibilityChanged: function(visible) {
+                if (visible)
+                    this._updateLoadingState(true)
+            },
             _itemClass: function() {
                 return LIST_ITEM_CLASS
             },
@@ -9049,11 +9114,17 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     return;
                 if (isLoading && this.option("indicateLoading"))
                     this._showLoadingIndicatorTimer = setTimeout($.proxy(function() {
-                        this._scrollView && this._scrollView.startLoading()
+                        var isEmpty = !this._itemElements().length;
+                        if (this._scrollView && !isEmpty)
+                            this._scrollView.startLoading()
                     }, this));
                 else {
                     clearTimeout(this._showLoadingIndicatorTimer);
-                    this._scrollView && this._scrollView.finishLoading()
+                    if (this._scrollView) {
+                        this._scrollView.finishLoading();
+                        !this._preventScrollTop && this.scrollTo(0)
+                    }
+                    delete this._preventScrollTop
                 }
             },
             _hideLoadingIfLoadIndicationOff: function() {
@@ -9078,12 +9149,14 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     this._updateLoadingState()
             },
             _infiniteDataLoading: function() {
-                if (!this._scrollViewIsFull() && !this._isDataSourceLoading() && !this._isLastPage()) {
+                var isElementVisible = this.element().is(":visible");
+                if (isElementVisible && !this._scrollViewIsFull() && !this._isDataSourceLoading() && !this._isLastPage()) {
                     clearTimeout(this._loadNextPageTimer);
                     this._loadNextPageTimer = setTimeout($.proxy(this._loadNextPage, this))
                 }
             },
             _scrollBottomHandler: function(e) {
+                this._preventScrollTop = true;
                 this._pageLoadingAction(e);
                 if (!this._isDataSourceLoading())
                     this._loadNextPage();
@@ -9837,7 +9910,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this._list._createComponent($button, "dxButton", {
                     icon: "remove",
                     type: "danger",
-                    onClick: $.proxy(function(e) {
+                    onClick: $.proxy(function(args) {
+                        args.jQueryEvent.stopPropagation();
                         this._deleteItem($itemElement)
                     }, this),
                     _templates: {}
@@ -10089,6 +10163,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             fx = DX.fx;
         var LIST_EDIT_DECORATOR = "dxListEditDecorator",
             CLICK_EVENT_NAME = events.addNamespace("dxclick", LIST_EDIT_DECORATOR),
+            ACTIVE_EVENT_NAME = events.addNamespace("dxactive", LIST_EDIT_DECORATOR),
             SLIDE_MENU_CLASS = "dx-list-slide-menu",
             SLIDE_MENU_WRAPPER_CLASS = "dx-list-slide-menu-wrapper",
             SLIDE_MENU_CONTENT_CLASS = "dx-list-slide-menu-content",
@@ -10101,7 +10176,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             _shouldHandleSwipe: true,
             _init: function() {
                 this.callBase.apply(this, arguments);
-                this._$buttonsContainer = $("<div/>").addClass(SLIDE_MENU_BUTTONS_CONTAINER_CLASS);
+                this._$buttonsContainer = $("<div/>").addClass(SLIDE_MENU_BUTTONS_CONTAINER_CLASS).on(ACTIVE_EVENT_NAME, $.noop);
                 this._$buttons = $("<div/>").addClass(SLIDE_MENU_BUTTONS_CLASS).appendTo(this._$buttonsContainer);
                 this._renderMenu();
                 this._renderDeleteButton()
@@ -10112,7 +10187,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 var menuItems = this._menuItems();
                 if (menuItems.length === 1) {
                     var menuItem = menuItems[0];
-                    this._renderMenuButton(menuItem.text, $.proxy(function() {
+                    this._renderMenuButton(menuItem.text, $.proxy(function(e) {
+                        e.stopPropagation();
                         this._fireAction(menuItem)
                     }, this))
                 }
@@ -10127,7 +10203,10 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                         _templates: {}
                     });
                     $menu.appendTo(this._list.element());
-                    var $menuButton = this._renderMenuButton(Globalize.localize("dxListEditDecorator-more"), $.proxy(this._menu.show, this._menu));
+                    var $menuButton = this._renderMenuButton(Globalize.localize("dxListEditDecorator-more"), $.proxy(function(e) {
+                            e.stopPropagation();
+                            this._menu.show()
+                        }, this));
                     this._menu.option("target", $menuButton)
                 }
             },
@@ -10141,7 +10220,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 if (!this._deleteEnabled())
                     return;
                 var $deleteButton = $("<div/>").addClass(SLIDE_MENU_BUTTON_CLASS).addClass(SLIDE_MENU_BUTTON_DELETE_CLASS).text(Globalize.localize("dxListEditDecorator-delete"));
-                $deleteButton.on(CLICK_EVENT_NAME, $.proxy(function() {
+                $deleteButton.on(CLICK_EVENT_NAME, $.proxy(function(e) {
+                    e.stopPropagation();
                     this._deleteItem()
                 }, this));
                 this._$buttons.append($deleteButton)
@@ -10200,6 +10280,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 return true
             },
             _enablePositioning: function($itemElement) {
+                fx.stop(this._$cachedContent, true);
+                fx.stop(this._$buttonsContainer, true);
                 this.callBase.apply(this, arguments);
                 this._$buttonsContainer.appendTo($itemElement)
             },
@@ -11420,7 +11502,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
     (function($, DX, undefined) {
         var ui = DX.ui,
             events = ui.events,
-            translator = DX.translator,
             transionEndEventName = DX.support.transitionEndEventName;
         var SLIDER_CLASS = "dx-slider",
             SLIDER_WRAPPER_CLASS = "dx-slider-wrapper",
@@ -11432,6 +11513,28 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             SLIDER_LABEL_CLASS = "dx-slider-label",
             SLIDER_LABEL_POSITION_CLASS_PREFIX = "dx-slider-label-position-",
             SLIDER_TOOLTIP_POSITION_CLASS_PREFIX = "dx-slider-tooltip-position-";
+        var POSITION_ALIASES = {
+                top: {
+                    my: "bottom center",
+                    at: "top center",
+                    collision: "fit none"
+                },
+                bottom: {
+                    my: "top center",
+                    at: "bottom center",
+                    collision: "fit none"
+                },
+                right: {
+                    my: "left center",
+                    at: "right center",
+                    collision: "none fit"
+                },
+                left: {
+                    my: "right center",
+                    at: "left center",
+                    collision: "none fit"
+                }
+            };
         var dxSliderHandle = ui.Widget.inherit({
                 _setDefaultOptions: function() {
                     this.callBase();
@@ -11462,7 +11565,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                             this._$tooltip = $("<div>").appendTo(this.element());
                             this._tooltip = this._createComponent(this._$tooltip, "dxTooltip", {
                                 visible: true,
-                                height: undefined,
                                 target: this.element(),
                                 closeOnOutsideClick: false,
                                 container: this.element(),
@@ -11497,7 +11599,13 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                         return;
                     var position = this.option("tooltipPosition");
                     if ($.type(position) === "string")
-                        position = position + "None";
+                        position = $.extend({
+                            boundary: this.element().closest(".dx-slider"),
+                            boundaryOffset: {
+                                h: 1,
+                                v: 1
+                            }
+                        }, POSITION_ALIASES[position]);
                     this._tooltip.option("position", position)
                 },
                 _repaintTooltip: function() {
@@ -11510,29 +11618,10 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     var format = this.option("tooltipFormat"),
                         value = format(this.option("value"));
                     this._tooltip.content().html(value);
-                    this._fitTooltipPosition()
+                    this._repaintTooltip()
                 },
                 _renderTooltipShowMode: function() {
                     this.element().toggleClass("dx-slider-tooltip-on-hover", /^onhover$/i.test(this.option("tooltipShowMode")))
-                },
-                _fitTooltipPosition: function() {
-                    if (!this._$tooltip)
-                        return;
-                    var $tooltipContent = this._tooltip.content().parent(),
-                        tooltipWidth = $tooltipContent.outerWidth(),
-                        $boundElement = this.option("tooltipFitIn"),
-                        boundElementWidth = $boundElement.outerWidth(),
-                        boundElementLeft = $boundElement.offset().left,
-                        boundElementRight = boundElementLeft + boundElementWidth,
-                        $element = this.element(),
-                        elementWidth = $element.outerWidth(),
-                        elementLeft = $element.offset().left,
-                        elementRight = elementLeft + elementWidth,
-                        idealOffset = Math.round(elementWidth / 2 - tooltipWidth / 2),
-                        minOffset = Math.ceil(boundElementLeft - elementLeft),
-                        maxOffset = Math.floor(boundElementRight - elementRight) + idealOffset * 2,
-                        newOffset = Math.min(Math.max(minOffset, idealOffset), maxOffset);
-                    translator.move($tooltipContent, {left: newOffset})
                 },
                 _clean: function() {
                     this.callBase();
@@ -11558,7 +11647,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                             this._renderTooltipShowMode();
                             break;
                         case"tooltipFitIn":
-                            this._fitTooltipPosition();
+                            this._repaintTooltip();
                             break;
                         case"_templates":
                         case"templateProvider":
@@ -11568,12 +11657,12 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     }
                 },
                 fitTooltipPosition: function() {
-                    this._fitTooltipPosition()
+                    this._repaintTooltip()
                 },
                 repaint: function() {
-                    this._repaintTooltip();
                     this._renderTooltipPosition();
-                    this._fitTooltipPosition()
+                    this._repaintTooltip();
+                    DX.utils.triggerShownEvent(this.element())
                 }
             });
         DX.registerComponent("dxSlider", ui, ui.dxTrackBar.inherit({
@@ -12120,7 +12209,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     right: rtlEnabled ? startOffset : endOffset,
                     left: rtlEnabled ? endOffset : startOffset
                 });
-                this._renderHandle()
+                this._$handleStart.dxSliderHandle("option", "value", valStart);
+                this._$handleEnd.dxSliderHandle("option", "value", valEnd)
             },
             _repaintHandle: function() {
                 this._$handleStart.dxSliderHandle("repaint");
@@ -12367,7 +12457,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     var realIndex = index;
                     if (index > itemsCount + itemsPerPage - 1)
                         realIndex = lastItemDuplicateIndex - realIndex - itemsPerPage;
-                    var itemPosition = offsetDirection * itemWidth * (realIndex + offsetRatio) + freeSpace * (realIndex + 1 - offsetRatio);
+                    var itemPosition = offsetDirection * (itemWidth * (realIndex + offsetRatio) + freeSpace * (realIndex + 1 - offsetRatio));
                     translator.move($(this), {left: itemPosition})
                 });
                 this._relocateItems(this.option("selectedIndex"), this.option("selectedIndex"), true)
@@ -13577,7 +13667,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             },
             _toggleDisabledState: function(value) {
                 this.callBase.apply(this, arguments);
-                this._$content.toggleClass(DISABLED_STATE_CLASS, value)
+                this._$content.toggleClass(DISABLED_STATE_CLASS, Boolean(value))
             },
             _toggleRTLDirection: function(rtl) {
                 this._$content.toggleClass(RTL_DIRECTION_CLASS, rtl)
@@ -14038,7 +14128,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     });
                 if (showTitle || items.length > 0) {
                     this._$title && this._$title.remove();
-                    var $title = $("<div>").addClass(POPUP_TITLE_CLASS).prependTo(this._$content);
+                    var $title = $("<div>").addClass(POPUP_TITLE_CLASS).insertBefore(this.content());
                     this._$title = this._renderTemplateByType("titleTemplate", items, $title).addClass(POPUP_TITLE_CLASS);
                     this._renderDrag();
                     this._executeTitleRenderAction(this._$title)
@@ -14118,7 +14208,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                             toolbarsItems.push(item)
                     }
                 }, this));
-                if (toolbar === "top" && this.option("showCloseButton"))
+                if (toolbar === "top" && this.option("showCloseButton") && this.option("showTitle"))
                     toolbarsItems.push(this._getCloseButton());
                 return toolbarsItems
             },
@@ -14148,7 +14238,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 var items = this._getToolbarItems("bottom");
                 if (items.length) {
                     this._$bottom && this._$bottom.remove();
-                    var $bottom = $("<div>").addClass(POPUP_BOTTOM_CLASS).appendTo(this._$content);
+                    var $bottom = $("<div>").addClass(POPUP_BOTTOM_CLASS).insertAfter(this.content());
                     this._$bottom = this._renderTemplateByType("bottomTemplate", items, $bottom).addClass(POPUP_BOTTOM_CLASS);
                     this._toggleClasses()
                 }
@@ -14278,8 +14368,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
     })(jQuery, DevExpress);
     /*! Module widgets-base, file ui.popover.js */
     (function($, DX, undefined) {
-        var ui = DX.ui,
-            fx = DX.fx;
+        var ui = DX.ui;
         var POPOVER_CLASS = "dx-popover",
             POPOVER_WRAPPER_CLASS = "dx-popover-wrapper",
             POPOVER_ARROW_CLASS = "dx-popover-arrow",
@@ -14301,46 +14390,24 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             POSITION_ALIASES = {
                 top: {
                     my: "bottom center",
-                    at: "top center"
+                    at: "top center",
+                    collision: "fit flip"
                 },
                 bottom: {
                     my: "top center",
-                    at: "bottom center"
+                    at: "bottom center",
+                    collision: "fit flip"
                 },
                 right: {
                     my: "left center",
-                    at: "right center"
+                    at: "right center",
+                    collision: "flip fit"
                 },
                 left: {
                     my: "right center",
-                    at: "left center"
-                },
-                topNone: {
-                    my: "bottom center",
-                    at: "top center",
-                    collision: "none"
-                },
-                bottomNone: {
-                    my: "top center",
-                    at: "bottom center",
-                    collision: "none"
-                },
-                rightNone: {
-                    my: "left center",
-                    at: "right center",
-                    collision: "none"
-                },
-                leftNone: {
-                    my: "right center",
                     at: "left center",
-                    collision: "none"
+                    collision: "flip fit"
                 }
-            },
-            ARROW_OFFSET_CORRECTION = {
-                top: "0 -1",
-                bottom: "0 1",
-                left: "-1 0",
-                right: "1 0"
             };
         DX.registerComponent("dxPopover", ui, ui.dxPopup.inherit({
             _setDefaultOptions: function() {
@@ -14368,7 +14435,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     resizeEnabled: false,
                     fullScreen: false,
                     closeOnTargetScroll: true,
-                    arrowPosition: null,
+                    arrowPosition: "",
+                    arrowOffset: 0,
                     boundaryOffset: {
                         h: 10,
                         v: 10
@@ -14394,7 +14462,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this._wrapper().addClass(POPOVER_WRAPPER_CLASS)
             },
             _renderArrow: function() {
-                this._$arrow = $("<div>").addClass(POPOVER_ARROW_CLASS).appendTo(this._wrapper())
+                this._$arrow = $("<div>").addClass(POPOVER_ARROW_CLASS).prependTo(this.overlayContent())
             },
             _documentDownHandler: function(e) {
                 if (this._isOutsideClick(e))
@@ -14404,19 +14472,12 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 return !$(e.target).closest(this.option("target")).length
             },
             _animate: function(animation) {
-                this._animateArrow(animation);
                 if (animation && animation.to)
                     $.extend(animation.to, {position: this._contentPosition});
                 this.callBase.apply(this, arguments)
             },
-            _animateArrow: function(animation) {
-                if (!animation)
-                    return;
-                DX.fx.animate(this._$arrow, $.extend({}, animation, {complete: $.noop}))
-            },
             _stopAnimation: function() {
-                this.callBase.apply(this, arguments);
-                fx.stop(this._$arrow)
+                this.callBase.apply(this, arguments)
             },
             _renderTitle: function() {
                 this._wrapper().toggleClass(POPOVER_WITHOUT_TITLE_CLASS, !this.option("showTitle"));
@@ -14424,32 +14485,101 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             },
             _renderPosition: function() {
                 this.callBase();
-                this._renderOverlayPosition();
-                this._renderArrowPosition()
+                this._renderOverlayPosition()
             },
             _renderOverlayBoundaryOffset: $.noop,
             _renderOverlayPosition: function() {
+                this._resetOverlayPosition();
+                this._updateContentSize();
+                var contentPosition = this._getContainerPosition();
+                var resultLocation = DX.position(this._$content, contentPosition);
+                var positionSide = this._getSideByLocation(resultLocation);
+                this._togglePositionClass("dx-position-" + positionSide);
+                this._toggleFlippedClass(resultLocation.h.flip, resultLocation.v.flip);
+                this._renderArrowPosition(positionSide)
+            },
+            _resetOverlayPosition: function() {
                 this._setContentHeight(true);
                 this._togglePositionClass("dx-position-" + this._positionSide);
                 DX.translator.move(this._$content, {
                     left: 0,
                     top: 0
                 });
-                var contentPosition = $.extend({}, this._position);
-                var containerPosition = this._getContainerPosition();
-                var containerLocation = DX.calculatePosition(this._$content, containerPosition);
-                var isFlippedByVertical = containerLocation.v.flip;
-                var isFlippedByHorizontal = containerLocation.h.flip;
-                this._updateContentSize(containerLocation);
-                if (this._position.collision === "flip")
-                    contentPosition.collision = "fit";
-                var positionClass = "dx-position-" + (isFlippedByVertical || isFlippedByHorizontal || this._isPopoverInside() ? POSITION_FLIP_MAP[this._positionSide] : this._positionSide);
-                this._togglePositionClass(positionClass);
-                this._toggleFlippedClass(isFlippedByVertical, isFlippedByHorizontal);
-                $.extend(contentPosition, this._applyFlip(contentPosition, isFlippedByVertical, isFlippedByHorizontal));
-                contentPosition.offset = this._updateContentOffset(isFlippedByVertical, isFlippedByHorizontal, contentPosition.offset);
-                DX.position(this._$content, contentPosition);
-                this._contentPosition = contentPosition
+                this._$arrow.css({
+                    top: 'auto',
+                    right: 'auto',
+                    bottom: 'auto',
+                    left: 'auto'
+                })
+            },
+            _updateContentSize: function() {
+                if (!this._$popupContent)
+                    return;
+                var containerLocation = DX.calculatePosition(this._$content, this._getContainerPosition());
+                if (containerLocation.h.oversize > 0 && this._isHorizontalSide() && !containerLocation.h.fit) {
+                    var newContainerWidth = this._$content.width() - containerLocation.h.oversize;
+                    this._$content.width(newContainerWidth)
+                }
+                if (containerLocation.v.oversize > 0 && this._isVerticalSide() && !containerLocation.v.fit) {
+                    var newOverlayContentHeight = this._$content.height() - containerLocation.v.oversize,
+                        newPopupContentHeight = this._$popupContent.height() - containerLocation.v.oversize;
+                    this._$content.height(newOverlayContentHeight);
+                    this._$popupContent.height(newPopupContentHeight)
+                }
+            },
+            _getContainerPosition: function() {
+                var offset = DX.utils.stringPairToObject(this._position.offset || "");
+                var hOffset = offset.h;
+                var vOffset = offset.v;
+                var isPopoverInside = this._isPopoverInside();
+                var sign = (isPopoverInside ? -1 : 1) * WEIGHT_OF_SIDES[this._positionSide];
+                var arrowSizeCorrection = this._getContentBorderWidth(this._positionSide);
+                if (this._isVerticalSide())
+                    vOffset += sign * (this._$arrow.height() - arrowSizeCorrection);
+                else if (this._isHorizontalSide())
+                    hOffset += sign * (this._$arrow.width() - arrowSizeCorrection);
+                return $.extend({}, this._position, {offset: hOffset + " " + vOffset})
+            },
+            _getContentBorderWidth: function(side) {
+                var borderWidth = this._$content.css("border-" + side + "-width");
+                return parseInt(borderWidth) || 0
+            },
+            _getSideByLocation: function(location) {
+                var isFlippedByVertical = location.v.flip;
+                var isFlippedByHorizontal = location.h.flip;
+                return this._isVerticalSide() && isFlippedByVertical || this._isHorizontalSide() && isFlippedByHorizontal || this._isPopoverInside() ? POSITION_FLIP_MAP[this._positionSide] : this._positionSide
+            },
+            _togglePositionClass: function(positionClass) {
+                this._$wrapper.removeClass("dx-position-left dx-position-right dx-position-top dx-position-bottom").addClass(positionClass)
+            },
+            _toggleFlippedClass: function(isFlippedHorizontal, isFlippedVertical) {
+                this._$wrapper.toggleClass("dx-popover-flipped-horizontal", isFlippedHorizontal).toggleClass("dx-popover-flipped-vertical", isFlippedVertical)
+            },
+            _renderArrowPosition: function(side) {
+                this._$arrow.css(POSITION_FLIP_MAP[side], -(this._isVerticalSide(side) ? this._$arrow.height() : this._$arrow.width()));
+                var axis = this._isVerticalSide(side) ? "left" : "top";
+                var sizeProperty = this._isVerticalSide(side) ? "outerWidth" : "outerHeight";
+                var $target = $(this._position.of);
+                var targetOffset = $target.offset() || {
+                        top: 0,
+                        left: 0
+                    };
+                var contentOffset = this._$content.offset();
+                var arrowSize = this._$arrow[sizeProperty]();
+                var contentLocation = contentOffset[axis];
+                var contentSize = this._$content[sizeProperty]();
+                var targetLocation = targetOffset[axis];
+                var targetSize = $target.get(0).preventDefault ? 0 : $target[sizeProperty]();
+                var min = Math.max(contentLocation, targetLocation);
+                var max = Math.min(contentLocation + contentSize, targetLocation + targetSize);
+                var arrowLocation;
+                if (this.option("arrowPosition") === "start")
+                    arrowLocation = min - contentLocation;
+                else if (this.option("arrowPosition") === "end")
+                    arrowLocation = max - contentLocation - arrowSize;
+                else
+                    arrowLocation = (min + max) / 2 - contentLocation - arrowSize / 2;
+                this._$arrow.css(axis, arrowLocation - this._getContentBorderWidth(side) + this.option("arrowOffset"))
             },
             _isPopoverInside: function() {
                 var position = this._getPosition();
@@ -14467,140 +14597,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 if (fullUpdate)
                     this.callBase()
             },
-            _updateContentSize: function(containerLocation) {
-                if (!this._$popupContent)
-                    return;
-                var positionAt = this._positionSide;
-                if (containerLocation.h.oversize > 0 && (positionAt === "left" || positionAt === "right")) {
-                    var newContainerWidth = this._$content.width() - containerLocation.h.oversize;
-                    this._$content.width(newContainerWidth)
-                }
-                if (containerLocation.v.oversize > 0 && (positionAt === "top" || positionAt === "bottom")) {
-                    var newOverlayContentHeight = this._$content.height() - containerLocation.v.oversize,
-                        newPopupContentHeight = this._$popupContent.height() - containerLocation.v.oversize;
-                    this._$content.height(newOverlayContentHeight);
-                    this._$popupContent.height(newPopupContentHeight)
-                }
-            },
-            _updateContentOffset: function(isFlippedByVertical, isFlippedByHorizontal, offsetString) {
-                var position = this._positionSide,
-                    offset = this._getOffsetObject(offsetString),
-                    signCorrectionH = isFlippedByHorizontal ? -1 : 1,
-                    signCorrectionV = isFlippedByVertical ? -1 : 1;
-                var offsetSignCorrection = this._isPopoverInside() ? -1 : 1;
-                var isTopPosition = position === "top" && !isFlippedByVertical || position === "bottom" && isFlippedByVertical,
-                    isBottomPosition = position === "bottom" && !isFlippedByVertical || position === "top" && isFlippedByVertical,
-                    isLeftPosition = position === "left" && !isFlippedByHorizontal || position === "right" && isFlippedByHorizontal,
-                    isRightPosition = position === "right" && !isFlippedByHorizontal || position === "left" && isFlippedByHorizontal;
-                if (isTopPosition)
-                    return offset.h + " " + (offset.v * signCorrectionV - offsetSignCorrection * (this._$arrow.height() - 1));
-                if (isBottomPosition)
-                    return offset.h + " " + (offset.v * signCorrectionV + offsetSignCorrection * (this._$arrow.height() - 1));
-                if (isLeftPosition)
-                    return offset.h * signCorrectionH - offsetSignCorrection * (this._$arrow.width() - 1) + " " + offset.v;
-                if (isRightPosition)
-                    return offset.h * signCorrectionH + offsetSignCorrection * (this._$arrow.width() - 1) + " " + offset.v
-            },
-            _getContainerPosition: function() {
-                var offset = this._getOffsetObject(this._position.offset || "");
-                var arrowConsideredOffset = this._$arrow.width() + offset.h + " " + (this._$arrow.height() + offset.v);
-                return $.extend({}, this._position, {offset: arrowConsideredOffset})
-            },
-            _applyFlip: function(position, isFlippedByVertical, isFlippedByHorizontal) {
-                var pairMy = DX.utils.splitPair(position.my),
-                    pairAt = DX.utils.splitPair(position.at);
-                var isVertical = function(location) {
-                        return location === "bottom" || location === "top"
-                    };
-                var isHorizontal = function(location) {
-                        return location === "left" || location === "right"
-                    };
-                var flipIfNeeded = function(location) {
-                        return isFlippedByVertical && isVertical(location) || isFlippedByHorizontal && isHorizontal(location) ? DX.position.inverseAlign(location) : location
-                    };
-                return {
-                        my: flipIfNeeded(pairMy[0]) + " " + flipIfNeeded(pairMy[1]),
-                        at: flipIfNeeded(pairAt[0]) + " " + flipIfNeeded(pairAt[1])
-                    }
-            },
-            _renderArrowPosition: function() {
-                DX.translator.move(this._$arrow, {
-                    left: 0,
-                    top: 0
-                });
-                var arrowPosition = this.option("arrowPosition"),
-                    position = $.extend({}, this._getDefaultArrowPosition(), arrowPosition);
-                var customPositionSpecified = arrowPosition && DX.utils.isDefined(arrowPosition.at) && DX.utils.isDefined(arrowPosition.my);
-                if (customPositionSpecified)
-                    $.extend(position, this._getCustomArrowPosition(arrowPosition));
-                DX.position(this._$arrow, position)
-            },
-            _getCustomArrowPosition: function(arrowPosition) {
-                var contentPositionAt = this._contentPosition.at.split(" ")[0],
-                    arrowPositionAt = arrowPosition.at,
-                    arrowPositionMy = arrowPosition.my,
-                    isFlipped = arrowPositionAt && arrowPositionAt.split(" ")[0] === contentPositionAt;
-                if (isFlipped) {
-                    var at = arrowPositionAt;
-                    arrowPositionAt = arrowPositionMy;
-                    arrowPositionMy = at
-                }
-                var correctedOffset = this._mergeOffsets(ARROW_OFFSET_CORRECTION[contentPositionAt], arrowPosition.offset);
-                return {
-                        my: arrowPositionMy,
-                        at: arrowPositionAt,
-                        of: this._$content,
-                        offset: correctedOffset
-                    }
-            },
-            _getDefaultArrowPosition: function() {
-                var popoverSide = this._getDisplaySide(this._contentPosition),
-                    flippedSide = POSITION_FLIP_MAP[popoverSide],
-                    that = this;
-                var flipIfInside = function(side) {
-                        return that._isPopoverInside() ? POSITION_FLIP_MAP[side] : side
-                    };
-                return this._isPopoverLargerThanTarget() ? {
-                        my: flipIfInside(flippedSide),
-                        at: popoverSide,
-                        of: $(this.option("target"))
-                    } : {
-                        my: flipIfInside(popoverSide),
-                        at: flipIfInside(flippedSide),
-                        of: this._$content,
-                        offset: ARROW_OFFSET_CORRECTION[flipIfInside(popoverSide)]
-                    }
-            },
-            _isPopoverLargerThanTarget: function() {
-                if (this._$content.is(':hidden'))
-                    return true;
-                if (this._position.of.target)
-                    return false;
-                var position = this._positionSide,
-                    $target = $(this._position.of),
-                    popoverSize,
-                    targetSize;
-                switch (position) {
-                    case"top":
-                    case"bottom":
-                        popoverSize = this._$content.width();
-                        targetSize = $target.outerWidth() + this._$arrow.width();
-                        break;
-                    case"left":
-                    case"right":
-                        popoverSize = this._$content.height();
-                        targetSize = $target.outerHeight() + this._$arrow.height();
-                        break
-                }
-                return popoverSize > targetSize
-            },
-            _mergeOffsets: function(baseOffset, additionalOffset) {
-                if (!additionalOffset)
-                    return baseOffset;
-                var base = this._getOffsetObject(baseOffset),
-                    addition = this._getOffsetObject(additionalOffset);
-                return base.h + addition.h + " " + (base.v + addition.v)
-            },
             _renderShadingPosition: function() {
                 if (this.option("shading"))
                     this._$wrapper.css({
@@ -14614,12 +14610,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                         width: "100%",
                         height: "100%"
                     })
-            },
-            _togglePositionClass: function(positionClass) {
-                this._$wrapper.removeClass("dx-position-left dx-position-right dx-position-top dx-position-bottom").addClass(positionClass)
-            },
-            _toggleFlippedClass: function(isFlippedVertical, isFlippedHorizontal) {
-                this._$wrapper.toggleClass("dx-popover-flipped-vertical", isFlippedVertical).toggleClass("dx-popover-flipped-horizontal", isFlippedHorizontal)
             },
             _normalizePosition: function() {
                 var position = this._getPosition();
@@ -14640,8 +14630,13 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     verticalWeight = Math.abs(WEIGHT_OF_SIDES[my.v] - weightSign * WEIGHT_OF_SIDES[at.v]);
                 return horizontalWeight > verticalWeight ? at.h : at.v
             },
-            _getOffsetObject: function(offset) {
-                return DX.utils.stringPairToObject(offset)
+            _isVerticalSide: function(side) {
+                side = side || this._positionSide;
+                return side === "top" || side === "bottom"
+            },
+            _isHorizontalSide: function(side) {
+                side = side || this._positionSide;
+                return side === "left" || side === "right"
             },
             _optionChanged: function(args) {
                 switch (args.name) {
@@ -14654,6 +14649,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     case"target":
                     case"boundaryOffset":
                     case"arrowPosition":
+                    case"arrowOffset":
                         this._renderGeometry();
                         break;
                     case"fullScreen":
@@ -14797,9 +14793,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                             },
                             options: {focusStateEnabled: true}
                         }, {
-                            device: function(device) {
-                                return device.android && (device.version[0] >= 4 && device.version[1] >= 1 || device.version[0] >= 5)
-                            },
+                            device: [{platform: "android"}],
                             options: {
                                 popupPosition: {
                                     my: "top " + (this.option("rtlEnabled") ? "left" : "right"),
@@ -14855,23 +14849,26 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this._renderPopup()
             },
             _renderButton: function() {
-                var that = this;
-                var $button = this.element().addClass(DROP_DOWN_MENU_BUTTON_CLASS);
-                this._button = this._createComponent($button, "dxButton", {
-                    text: this.option("buttonText"),
-                    icon: this.option("buttonIcon"),
-                    focusStateEnabled: false,
-                    onClick: function(e) {
-                        that.option("opened", !that.option("opened"));
-                        that._buttonClickAction(e)
-                    },
-                    _templates: {}
-                });
+                var $button = this.element().addClass(DROP_DOWN_MENU_BUTTON_CLASS),
+                    config = this._buttonOptions();
+                this._button = this._createComponent($button, "dxButton", config);
                 var keys = this._supportedKeys(),
                     buttonKeys = this._button._supportedKeys();
                 this._supportedKeys = function() {
                     return $.extend(keys, buttonKeys)
                 }
+            },
+            _buttonOptions: function() {
+                return {
+                        text: this.option("buttonText"),
+                        icon: this.option("buttonIcon"),
+                        focusStateEnabled: false,
+                        onClick: $.proxy(function(e) {
+                            this.option("opened", !this.option("opened"));
+                            this._buttonClickAction(e)
+                        }, this),
+                        _templates: {}
+                    }
             },
             _toggleMenuVisibility: function(opened) {
                 var state = opened === undefined ? !this._popup.option("visible") : opened;
@@ -14879,8 +14876,17 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this.setAria("expanded", state)
             },
             _renderPopup: function() {
-                var $popup = this._$popup = $("<div>").appendTo(this.element());
-                var popupOptions = {
+                var $popup = this._$popup = $("<div>").appendTo(this.element()),
+                    config = this._popupOptions(),
+                    usePopup = !this.option("usePopover");
+                if (usePopup)
+                    config.boundaryOffset = "0 0";
+                this._popup = this._createComponent($popup, "dxPopover", config);
+                this._popup._wrapper().addClass(DROP_DOWN_MENU_POPUP_WRAPPER_CLASS);
+                this._popup._wrapper().toggleClass(DROP_DOWN_MENU_POPUP_CLASS, usePopup)
+            },
+            _popupOptions: function() {
+                return {
                         onContentReady: $.proxy(this._popupContentReadyHandler, this),
                         deferRendering: false,
                         position: this.option("popupPosition"),
@@ -14888,48 +14894,44 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                         onOptionChanged: $.proxy(function(args) {
                             if (args.name === "visible")
                                 this.option("opened", args.value)
-                        }, this)
-                    };
-                this._popup = this._createPopover($popup, popupOptions);
-                this._popup._wrapper().addClass(DROP_DOWN_MENU_POPUP_WRAPPER_CLASS);
-                this._popup._wrapper().toggleClass(DROP_DOWN_MENU_POPUP_CLASS, !this.option("usePopover"))
+                        }, this),
+                        target: this.element(),
+                        height: this.option("popupHeight"),
+                        width: this.option("popupWidth")
+                    }
             },
             _popupContentReadyHandler: function() {
                 var popup = this._$popup.dxPopover("instance");
                 this._renderList(popup)
             },
-            _createPopover: function($element, popupOptions) {
-                return this._createComponent($element, "dxPopover", $.extend(popupOptions, {
-                        target: this.element(),
-                        height: this.option("popupHeight"),
-                        width: this.option("popupWidth")
-                    }))
-            },
             _renderList: function(instance) {
                 var $content = instance.content(),
-                    that = this;
+                    listConfig = this._listOptions();
                 $content.addClass(DROP_DOWN_MENU_LIST_CLASS);
-                that._list = that._createComponent($content, "dxList", {
-                    _keyboardProcessor: that._listProcessor,
-                    pageLoadMode: "scrollBottom",
-                    indicateLoading: false,
-                    noDataText: "",
-                    itemTemplate: that._getTemplateByOption("itemTemplate"),
-                    onItemClick: function(e) {
-                        that.option("opened", false);
-                        that._itemClickAction(e)
-                    },
-                    tabIndex: -1,
-                    focusStateEnabled: this.option("focusStateEnabled"),
-                    _itemAttributes: {role: "menuitem"}
-                });
-                that._list._getAriaTarget = function() {
-                    return that.element()
-                };
-                that._setListDataSource();
+                this._list = this._createComponent($content, "dxList", listConfig);
+                this._list._getAriaTarget = $.proxy(function() {
+                    return this.element()
+                }, this);
+                this._setListDataSource();
                 var listMaxHeight = $(window).height() * 0.5;
                 if ($content.height() > listMaxHeight)
                     $content.height(listMaxHeight)
+            },
+            _listOptions: function() {
+                return {
+                        _keyboardProcessor: this._listProcessor,
+                        pageLoadMode: "scrollBottom",
+                        indicateLoading: false,
+                        noDataText: "",
+                        itemTemplate: this._getTemplateByOption("itemTemplate"),
+                        onItemClick: $.proxy(function(e) {
+                            this.option("opened", false);
+                            this._itemClickAction(e)
+                        }, this),
+                        tabIndex: -1,
+                        focusStateEnabled: this.option("focusStateEnabled"),
+                        _itemAttributes: {role: "menuitem"}
+                    }
             },
             _setListDataSource: function() {
                 if (this._list)
@@ -15006,6 +15008,9 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
         var dateCopmotents = function() {
                 return ["year", "day", "month", "day"]
             };
+        var ONE_MINUTE = 1000 * 60;
+        var ONE_DAY = ONE_MINUTE * 60 * 24;
+        var ONE_YEAR = ONE_DAY * 365;
         var dateUtils = DX.ui.dateUtils = {
                 SUPPORTED_FORMATS: ["date", "time", "datetime"],
                 DEFAULT_FORMATTER: function(value) {
@@ -15017,9 +15022,11 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     $("<span>").text(name).addClass("dx-dateview-name-formatter").appendTo($container);
                     return $container
                 },
-                ONE_MINUTE: 1000 * 60,
-                ONE_DAY: 1000 * 60 * 60 * 24,
-                TEN_YEARS: 1000 * 60 * 60 * 24 * 365 * 10,
+                ONE_MINUTE: ONE_MINUTE,
+                ONE_DAY: ONE_DAY,
+                ONE_YEAR: ONE_YEAR,
+                MIN_DATEVIEW_DEFAULT_DATE: new Date(1900, 1, 1),
+                MAX_DATEVIEW_DEFAULT_DATE: new Date((new Date).setHours(23, 59, 59) + 50 * ONE_YEAR),
                 FORMATS_INFO: {
                     date: {
                         standardPattern: "yyyy-MM-dd",
@@ -15365,7 +15372,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this.element().addClass(CALENDAR_CLASS);
                 this._renderView();
                 this._renderFooter();
-                this.onContouredChanged = this._createActionByOption("onContouredChanged");
+                this._onContouredChanged = this._createActionByOption("onContouredChanged");
                 this.setAria({
                     role: "listbox",
                     label: Globalize.localize("dxCalendar-ariaWidgetName")
@@ -15827,7 +15834,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     zoomLevel = this.option("zoomLevel"),
                     isSameView = utils.sameView(zoomLevel, currentDate, date);
                 this.setAria("activedescendant", e.ariaId);
-                this.onContouredChanged && this.onContouredChanged(e.ariaId);
+                this._onContouredChanged && this._onContouredChanged(e.ariaId);
                 if (date && !isSameView && !this._isAlreadyNavigated && (this._isMaxZoomLevel() || this._change === "key" || this._change === "upDownArrow")) {
                     var dir = utils.getFirstMonthDate(date) > currentDate ? 1 : -1,
                         difference = utils.getDifferenceInMonth(zoomLevel) * dir;
@@ -15858,10 +15865,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     this._view.option("contouredDate", currentDate);
                     return
                 }
-                if (!$cell.hasClass(CALENDAR_EMPTY_CELL_CLASS)) {
-                    this._view.option("contouredDate", date);
-                    return
-                }
                 this._view.option("contouredDate", date)
             },
             _initalizeViewDimensions: function() {
@@ -15882,21 +15885,20 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                         var zoomLevel = this.option("zoomLevel");
                         circledDate = difference < 0 ? utils.getLastDateView(zoomLevel, newDate) : utils.getFirstDateView(zoomLevel, newDate)
                     }
-                    this._changeView(newDate, difference);
-                    this._normalizedCircledDate(circledDate)
+                    this._changeView(newDate, difference).done($.proxy(function() {
+                        this._clearPrevView();
+                        this._normalizedCircledDate(circledDate);
+                        this._isAlreadyNavigated = false
+                    }, this))
                 }
             },
             _changeView: function(newDate, difference) {
-                var that = this;
                 if (fx.isAnimating(this._view.element())) {
                     this._stopCurrentAnimation();
                     this._prevView && this._prevView.element().remove()
                 }
                 this._addPrevView(newDate);
-                this._animateNavigation(difference).done(function() {
-                    that._clearPrevView();
-                    that._isAlreadyNavigated = false
-                })
+                return this._animateNavigation(difference)
             },
             _clearPrevView: function() {
                 this._prevView.element().remove();
@@ -15973,7 +15975,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                         this._view.option("onCellClick", value);
                         break;
                     case"onContouredChanged":
-                        this.onContouredChanged = this._createActionByOption("onContouredChanged");
+                        this._onContouredChanged = this._createActionByOption("onContouredChanged");
                         break;
                     case"cellTemplate":
                         this._invalidate();
@@ -16304,7 +16306,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 _isDateOutOfRange: function(cellDate) {
                     var minDate = this.option("min"),
                         maxDate = this.option("max");
-                    return !utils.dateInRange(cellDate, minDate, maxDate)
+                    return !utils.dateInRange(cellDate, minDate, maxDate, "date")
                 },
                 _isOtherView: function(cellDate) {
                     return cellDate.getMonth() !== this.option("date").getMonth()
@@ -16884,23 +16886,20 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             _setDefaultOptions: function() {
                 this.callBase();
                 this.option({
-                    clickableItems: false,
                     showScrollbar: false,
                     useNative: false,
                     selectedIndex: 0,
                     bounceEnabled: false,
                     items: [],
+                    showOnClick: false,
                     onClick: null,
-                    showOnClick: false
+                    onSelectedIndexChanged: null
                 })
             },
             _defaultOptionsRules: function() {
                 return this.callBase().concat([{
                             device: {platform: "win8"},
-                            options: {
-                                clickableItems: true,
-                                showOnClick: true
-                            }
+                            options: {showOnClick: true}
                         }, {
                             device: {platform: "generic"},
                             options: {scrollByContent: true}
@@ -16921,7 +16920,11 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this._renderItems();
                 this._renderSelectedValue();
                 this._renderItemsClick();
-                this._wrapAction("_endAction", $.proxy(this._endActionHandler, this))
+                this._wrapAction("_endAction", $.proxy(this._endActionHandler, this));
+                this._renderSelectedIndexChanged()
+            },
+            _renderSelectedIndexChanged: function() {
+                this._selectedIndexChanged = this._createActionByOption("onSelectedIndexChanged")
             },
             _renderContainerClick: function() {
                 if (!this.option("showOnClick"))
@@ -16969,7 +16972,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     selectedIndex = this.option("selectedIndex");
                 selectedIndex = this._fitIndex(selectedIndex);
                 var correctedPosition = this._getItemPosition(selectedIndex);
-                this.option().selectedIndex = selectedIndex;
                 this._moveTo({top: correctedPosition});
                 this._renderActiveStateItem()
             },
@@ -16986,11 +16988,10 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 var itemSelector = "." + DATEVIEW_ROLLER_ITEM_CLASS,
                     eventName = events.addNamespace("dxclick", this.NAME);
                 this.element().off(eventName, itemSelector);
-                if (this.option("clickableItems"))
-                    this.element().on(eventName, itemSelector, $.proxy(this._itemClickHandler, this))
+                this.element().on(eventName, itemSelector, $.proxy(this._itemClickHandler, this))
             },
             _itemClickHandler: function(e) {
-                this._renderSelectedValue(this._itemElementIndex(this._closestItemElement(e)))
+                this.option("selectedIndex", this._itemElementIndex(this._closestItemElement(e)))
             },
             _itemElementIndex: function(itemElement) {
                 return this._itemElements().index(itemElement)
@@ -17044,15 +17045,14 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 return this._strategy.validate(e)
             },
             _endActionHandler: function() {
-                if (this._changedByIndex) {
-                    this._changedByIndex = false;
-                    this._renderSelectedValue();
-                    return
-                }
-                var ratio = -this._location().top / this._itemHeight(),
-                    selectedIndex = Math.round(ratio);
+                var currentSelectedIndex = this.option("selectedIndex"),
+                    ratio = -this._location().top / this._itemHeight(),
+                    newSelectedIndex = Math.round(ratio);
                 this._animation = true;
-                this._renderSelectedValue(selectedIndex)
+                if (newSelectedIndex === currentSelectedIndex)
+                    this._renderSelectedValue(newSelectedIndex);
+                else
+                    this.option("selectedIndex", newSelectedIndex)
             },
             _itemHeight: function() {
                 var $item = this._$items.first(),
@@ -17065,26 +17065,29 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             _isVisible: function() {
                 return this._$container.is(":visible")
             },
+            _fireSelectedIndexChanged: function(value, previousValue) {
+                this._selectedIndexChanged({
+                    value: value,
+                    previousValue: previousValue,
+                    jQueryEvent: undefined
+                })
+            },
             _optionChanged: function(args) {
                 switch (args.name) {
                     case"selectedIndex":
-                        this._renderSelectedValue();
-                        this._changedByIndex = true;
-                        this._strategy.handleEnd({velocity: {
-                                x: 0,
-                                y: 0
-                            }});
+                        this._renderSelectedValue(args.value);
+                        this._fireSelectedIndexChanged(args.value, args.previousValue);
                         break;
                     case"items":
                         this._renderItems();
-                        this._renderSelectedValue();
-                        break;
-                    case"clickableItems":
-                        this._renderItemsClick();
+                        this.option("selectedIndex", this._fitIndex(this.option("selectedIndex")));
                         break;
                     case"onClick":
                     case"showOnClick":
                         this._renderContainerClick();
+                        break;
+                    case"onSelectedIndexChanged":
+                        this._renderSelectedIndexChanged();
                         break;
                     default:
                         this.callBase(args)
@@ -17098,8 +17101,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             _setDefaultOptions: function() {
                 this.callBase();
                 this.option({
-                    minDate: new Date(1),
-                    maxDate: new Date((new Date).setHours(23, 59, 59) + dateUtils.TEN_YEARS),
+                    minDate: dateUtils.MIN_DATEVIEW_DEFAULT_DATE,
+                    maxDate: dateUtils.MAX_DATEVIEW_DEFAULT_DATE,
                     format: "date",
                     value: new Date,
                     culture: Globalize.culture().name,
@@ -17149,7 +17152,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                         },
                         onEnd: function(e) {
                             var roller = e.component;
-                            that._setRollerState(that._rollerConfigs[name], roller.option("selectedIndex"));
                             roller._toggleActive(false)
                         },
                         onClick: function(e) {
@@ -17158,6 +17160,10 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                             that._setActiveRoller(that._rollerConfigs[name], roller.option("selectedIndex"));
                             that._setRollerState(that._rollerConfigs[name], roller.option("selectedIndex"));
                             roller._toggleActive(false)
+                        },
+                        onSelectedIndexChanged: function(e) {
+                            var roller = e.component;
+                            that._setRollerState(that._rollerConfigs[name], roller.option("selectedIndex"))
                         }
                     })
                 })
@@ -17172,8 +17178,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 var that = this;
                 $.each(this._rollers, function(type) {
                     var correctIndex = that._rollerConfigs[type].getIndex(that._getCurrentDate());
-                    this.update();
-                    this._renderSelectedValue(correctIndex)
+                    this.option("selectedIndex", correctIndex)
                 })
             },
             _setRollerState: function(roller, selectedIndex) {
@@ -17358,10 +17363,20 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             dateUtils = ui.dateUtils,
             utils = DX.utils,
             DATEBOX_CLASS = "dx-datebox",
-            DATEBOX_NATIVE_CLASS = "dx-datebox-native",
-            DATEBOX_OVERLAY_CLASS = "dx-datebox-overlay",
+            DATEBOX_WRAPPER_CLASS = "dx-datebox-wrapper",
             IE_ROUNDING_ERROR = 10,
             NATIVE_BUTTONS_WIDTH = 48;
+        var PICKER_TYPE = {
+                calendar: "calendar",
+                rollers: "rollers",
+                list: "list",
+                native: "native"
+            };
+        var FORMAT = {
+                date: "date",
+                datetime: "datetime",
+                time: "time"
+            };
         var realWidthSetted = function($element) {
                 var explicitWidth = $element[0].style.width;
                 if (explicitWidth && explicitWidth !== "auto" && explicitWidth !== "inherit")
@@ -17516,16 +17531,18 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             },
             _getStrategyName: function(format) {
                 switch (this.option("pickerType")) {
+                    case"rollers":
+                        return this.option().useCalendar ? "Calendar" : "DateView";
+                    case"native":
+                        return "Native";
                     case"calendar":
                     case"list":
                         if (format === "date")
                             return "Calendar";
-                        if (format === "datetime")
+                        else if (format === "datetime")
                             return "CalendarWithTime";
-                        return "List";
-                    case"rollers":
-                    case"native":
-                        return this.option().useCalendar ? "Calendar" : "DateView"
+                        else
+                            return "List"
                 }
             },
             _parseFormat: function(format) {
@@ -17555,6 +17572,9 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             _setFormatString: function(formatString) {
                 this._formatString = formatString
             },
+            _getFormatString: function() {
+                return this.option("formatString") || this._formatString
+            },
             _setFormatType: function(formatType) {
                 this._formatType = formatType
             },
@@ -17562,13 +17582,24 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this._strategy.attachKeyboardEvents(this._keyboardProcessor)
             },
             _render: function() {
-                this.element().addClass(DATEBOX_CLASS).addClass(DATEBOX_CLASS + "-" + this.option("format"));
+                var pickerTypeClass = this.option("pickerType"),
+                    format = this.option("format");
+                if (pickerTypeClass === "calendar" && format === "time")
+                    pickerTypeClass = "list";
+                if (pickerTypeClass === "list" && format !== "time")
+                    pickerTypeClass = "calendar";
+                this.element().addClass(DATEBOX_CLASS).addClass(DATEBOX_CLASS + "-" + pickerTypeClass);
+                this._renderFormat();
                 this.callBase();
-                this._strategy.render();
-                if (this._isNativeView())
-                    this.element().addClass(DATEBOX_NATIVE_CLASS);
                 this._updateSize();
-                this._updateDropButtonVisibility()
+                this._updateDropButtonVisibility();
+                this._strategy.renderInputMinMax(this._input())
+            },
+            _renderFormat: function() {
+                $.each(FORMAT, $.proxy(function(_, item) {
+                    this.element().removeClass(DATEBOX_CLASS + "-" + item)
+                }, this));
+                this.element().addClass(DATEBOX_CLASS + "-" + this.option("format"))
             },
             _popupShowingHandler: function() {
                 this.callBase();
@@ -17576,14 +17607,23 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             },
             _popupConfig: function() {
                 var popupConfig = this.callBase();
-                return $.extend(this._strategy.popupConfig(popupConfig), {
+                return $.extend(true, this._strategy.popupConfig(popupConfig), {
                         title: this._getPopupTitle(),
                         dragEnabled: false
                     })
             },
             _renderPopup: function() {
                 this.callBase();
-                this._popup._$wrapper.addClass(DATEBOX_OVERLAY_CLASS)
+                this._popup._$wrapper.addClass(DATEBOX_WRAPPER_CLASS);
+                this._renderPopupWrapper()
+            },
+            _renderPopupWrapper: function() {
+                if (!this._popup)
+                    return;
+                $.each($.extend({}, FORMAT, PICKER_TYPE), $.proxy(function(_, item) {
+                    this.element().removeClass(DATEBOX_WRAPPER_CLASS + "-" + item)
+                }, this));
+                this._popup._$wrapper.addClass(DATEBOX_WRAPPER_CLASS + "-" + this.option("format")).addClass(DATEBOX_WRAPPER_CLASS + "-" + this.option("pickerType"))
             },
             _renderPopupContent: function() {
                 this.callBase();
@@ -17608,7 +17648,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     return;
                 var $input = this._input(),
                     calendar = Globalize.culture().calendar,
-                    format = this.option("formatString"),
+                    format = this._getFormatString(),
                     longestValue = Globalize.format(dateUtils.getLongestDate(format, calendar.months.names, calendar.days.names), format);
                 $element.width(calculateWidth(longestValue, $input, this.element()));
                 this._isSizeUpdatable = true
@@ -17631,7 +17671,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 if (mode !== "text")
                     this.option("text", dateUtils.toStandardDateFormat(value, mode, pattern));
                 else
-                    this.option("text", Globalize.format(value, this.option("formatString")));
+                    this.option("text", Globalize.format(value, this._getFormatString()));
                 this._strategy.renderValue();
                 this.callBase();
                 this._textHasBeenChanged = false
@@ -17641,7 +17681,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             },
             _valueChangeEventHandler: function(e) {
                 var text = this.option("text"),
-                    date = this._strategy.getParsedText(text, this.option("formatString")),
+                    date = this._strategy.getParsedText(text, this._getFormatString()),
                     value = this.option("value"),
                     modelValue = new Date(value && value.valueOf()),
                     mode = this.option("mode"),
@@ -17661,7 +17701,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 var text = this.option("text"),
                     hasText = !!text,
                     isDate = !!value,
-                    isDateInRange = isDate && utils.dateInRange(value, this.option("min"), this.option("max")),
+                    isDateInRange = isDate && utils.dateInRange(value, this.option("min"), this.option("max"), this.option("format")),
                     isValid = this._textHasBeenChanged && !hasText || !hasText && !value || isDateInRange,
                     validationMessage = "";
                 if (!isDate)
@@ -17754,6 +17794,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     case"format":
                         this._updatePickerOptions();
                         this._refreshStrategy();
+                        this._renderFormat();
+                        this._renderPopupWrapper();
                         this._updateSize();
                         break;
                     case"placeholder":
@@ -17828,7 +17870,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 return Globalize.parseDate(text, format)
             },
             getDefaultOptions: DX.abstract,
-            _getDateBoxClass: DX.abstract,
+            renderInputMinMax: $.noop,
             renderOpenedState: function() {
                 if (this.dateBox.option("opened"))
                     this._updateValue()
@@ -17836,7 +17878,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             popupConfig: DX.abstract,
             renderPopupContent: function() {
                 var popup = this._getPopup();
-                popup._wrapper().addClass(this._getPopupWrapperClass());
                 this._renderWidget();
                 popup.content().parent().off("mousedown").on("mousedown", $.proxy(this._preventFocusOnPopup, this))
             },
@@ -17849,7 +17890,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             _getPopup: function() {
                 return this.dateBox._popup
             },
-            _getPopupWrapperClass: DX.abstract,
             popupShowingHandler: $.noop,
             popupHiddenHandler: $.noop,
             _getDateBoxValue: function() {
@@ -17870,25 +17910,17 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             getValue: function() {
                 return this._widget.option("value")
             },
-            render: function() {
-                this.dateBox.element().addClass(this._getDateBoxClass())
-            },
             dispose: function() {
-                this.dateBox.element().removeClass(this._getDateBoxClass());
                 var popup = this._getPopup();
-                if (popup) {
-                    popup._wrapper().removeClass(this._getPopupWrapperClass());
+                if (popup)
                     popup.content().empty()
-                }
             }
         })
     })(jQuery, DevExpress);
     /*! Module widgets-base, file ui.dateBox.strategy.calendar.js */
     (function($, DX, undefined) {
         var ui = DX.ui,
-            utils = DX.utils,
-            DATEBOX_WITH_CALENDAR_CLASS = "dx-datebox-with-calendar",
-            DATEBOX_CALENDAR_OVERLAY_CLASS = "dx-datebox-calendar-overlay";
+            utils = DX.utils;
         ui.dxDateBox.renderingStrategies["Calendar"] = ui.dxDateBox.strategy.inherit({
             NAME: "Calendar",
             supportedKeys: function() {
@@ -17906,6 +17938,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                         },
                         enter: $.proxy(function(e) {
                             if (this.dateBox.option("opened")) {
+                                e.preventDefault();
                                 if (this.dateBox._text !== e.target.value) {
                                     this.dateBox._valueChangeEventHandler(e);
                                     return false
@@ -17924,12 +17957,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             },
             getDefaultOptions: function() {
                 return {formatString: Globalize.culture().calendar.patterns["d"]}
-            },
-            _getDateBoxClass: function() {
-                return DATEBOX_WITH_CALENDAR_CLASS
-            },
-            _getPopupWrapperClass: function() {
-                return DATEBOX_CALENDAR_OVERLAY_CLASS
             },
             _getWidgetName: function() {
                 return "dxCalendar"
@@ -18022,9 +18049,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
     })(jQuery, DevExpress);
     /*! Module widgets-base, file ui.dateBox.strategy.calendarWithTime.js */
     (function($, DX, undefined) {
-        var ui = DX.ui,
-            CALENDAR_WITH_TIME_PICKER_CLASS = "dx-calendar-with-time-picker",
-            CALENDAR_WITH_TIME_PICKER_CONTAINER_CLASS = "dx-calendar-with-time-picker-container";
+        var ui = DX.ui;
         ui.dxDateBox.renderingStrategies["CalendarWithTime"] = ui.dxDateBox.renderingStrategies["Calendar"].inherit({
             NAME: "CalendarWithTime",
             supportedKeys: function() {
@@ -18060,7 +18085,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             },
             renderPopupContent: function() {
                 this.callBase();
-                var $popupContent = this._getPopup().content().addClass(CALENDAR_WITH_TIME_PICKER_CONTAINER_CLASS);
+                var $popupContent = this._getPopup().content();
                 var box = this.dateBox._createComponent($("<div>").appendTo($popupContent), "dxBox", {
                         direction: "row",
                         crossAlign: "start",
@@ -18114,26 +18139,16 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 date.setHours(time.getHours(), time.getMinutes(), time.getSeconds());
                 return date
             },
-            render: function() {
-                this.dateBox.element().addClass(CALENDAR_WITH_TIME_PICKER_CLASS);
-                this.callBase()
-            },
             dispose: function() {
                 clearTimeout(this._removeMinWidthTimer);
-                this.dateBox.element().removeClass(CALENDAR_WITH_TIME_PICKER_CLASS);
-                this.callBase();
-                var popup = this._getPopup();
-                popup && popup._wrapper().removeClass(this._getPopupWrapperClass())
+                this.callBase()
             }
         })
     })(jQuery, DevExpress);
     /*! Module widgets-base, file ui.dateBox.strategy.dateView.js */
-    var DATEVIEW_PICKER_OVERLAY_CLASS = "dx-dateview-picker-overlay";
     (function($, DX, undefined) {
         var ui = DX.ui,
-            support = DX.support,
-            dateUtils = ui.dateUtils,
-            DATEBOX_DATEVIEW_CLASS = "dx-datebox-dateview";
+            dateUtils = ui.dateUtils;
         ui.dxDateBox.renderingStrategies["DateView"] = ui.dxDateBox.strategy.inherit({
             NAME: "DateView",
             popupShowingHandler: function() {
@@ -18147,9 +18162,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                         openOnFieldClick: true,
                         applyButtonText: Globalize.localize("Done")
                     }
-            },
-            _getDateBoxClass: function() {
-                return DATEBOX_DATEVIEW_CLASS
             },
             popupConfig: function() {
                 return {
@@ -18203,9 +18215,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                             }]
                     }
             },
-            getParsedText: function(text) {
-                return dateUtils.fromStandardDateFormat(text)
-            },
             _renderWidget: function() {
                 if (this.dateBox._usingNativeDatePicker() || this.dateBox.option("readOnly")) {
                     if (this._widget) {
@@ -18221,8 +18230,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     var element = $("<div>").appendTo(popup.content());
                     this._widget = this._createWidget(element)
                 }
-                this._widget.element().appendTo(this._getWidgetContainer());
-                popup._$wrapper.addClass(DATEVIEW_PICKER_OVERLAY_CLASS)
+                this._widget.element().appendTo(this._getWidgetContainer())
             },
             _getWidgetName: function() {
                 return "dxDateView"
@@ -18234,17 +18242,31 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 return {
                         value: this._getDateBoxValue(),
                         format: this.dateBox.option("format"),
-                        minDate: this.dateBox.option("min") || new Date(1),
-                        maxDate: this.dateBox.option("max") || new Date($.now() + dateUtils.TEN_YEARS),
+                        minDate: this.dateBox.option("min") || new Date(1900, 1, 1),
+                        maxDate: this.dateBox.option("max") || new Date($.now() + 50 * dateUtils.ONE_YEAR),
                         visible: false,
                         onDisposing: $.proxy(function() {
                             this._widget = null
                         }, this)
                     }
+            }
+        })
+    })(jQuery, DevExpress);
+    /*! Module widgets-base, file ui.dateBox.strategy.native.js */
+    (function($, DX, undefined) {
+        var ui = DX.ui,
+            support = DX.support,
+            dateUtils = ui.dateUtils;
+        ui.dxDateBox.renderingStrategies["Native"] = ui.dxDateBox.strategy.inherit({
+            NAME: "Native",
+            getDefaultOptions: $.noop,
+            popupConfig: $.noop,
+            getParsedText: function(text) {
+                return dateUtils.fromStandardDateFormat(text)
             },
-            _getPopupWrapperClass: function() {
-                return ""
-            },
+            renderPopupContent: $.noop,
+            _getWidgetName: $.noop,
+            _getWidgetOptions: $.noop,
             initFormat: function() {
                 var format = this.dateBox.option("format");
                 if ($.inArray(format, dateUtils.SUPPORTED_FORMATS) === -1)
@@ -18255,15 +18277,19 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     mode: format,
                     formatString: dateUtils.FORMATS_MAP[format]
                 })
+            },
+            renderInputMinMax: function($input) {
+                $input.attr({
+                    min: Globalize.format(this.dateBox.option("min"), "yyyy-MM-dd"),
+                    max: Globalize.format(this.dateBox.option("max"), "yyyy-MM-dd")
+                })
             }
         })
     })(jQuery, DevExpress);
     /*! Module widgets-base, file ui.dateBox.strategy.list.js */
     (function($, DX, undefined) {
         var ui = DX.ui,
-            dateUtils = ui.dateUtils,
-            DATEBOX_LIST_CLASS = "dx-datebox-list",
-            DATEBOX_LIST_POPUP_WRAPPER = "dx-datebox-list-popup-wrapper";
+            dateUtils = ui.dateUtils;
         ui.dxDateBox.renderingStrategies["List"] = ui.dxDateBox.strategy.inherit({
             NAME: "List",
             supportedKeys: function() {
@@ -18284,14 +18310,22 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                         interval: 30
                     }
             },
-            _getDateBoxClass: function() {
-                return DATEBOX_LIST_CLASS
-            },
-            _getPopupWrapperClass: function() {
-                return DATEBOX_LIST_POPUP_WRAPPER
-            },
             popupConfig: function(popupConfig) {
-                return $.extend(popupConfig, {width: this.dateBox.element().outerWidth()})
+                var device = DX.devices.current(),
+                    result = $.extend(true, popupConfig, {width: this._getPopupWidth()});
+                if (device.platform === "android")
+                    $.extend(true, result, {position: {offset: {
+                                h: -16,
+                                v: -10
+                            }}});
+                return result
+            },
+            _getPopupWidth: function() {
+                var device = DX.devices.current(),
+                    result = this.dateBox.element().outerWidth();
+                if (device.platform === "android")
+                    result += 32;
+                return result
             },
             popupShowingHandler: function() {
                 this._dimensionChanged()
@@ -18310,7 +18344,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                         itemTemplate: $.proxy(this._timeListItemTemplate, this),
                         onItemClick: $.proxy(this._listItemClickHandler, this),
                         tabIndex: -1,
-                        onFocusedItemChanged: $.proxy(this._refreshActiveDescendant, this)
+                        onFocusedItemChanged: $.proxy(this._refreshActiveDescendant, this),
+                        selectionMode: "single"
                     }
             },
             _refreshActiveDescendant: function(e) {
@@ -18318,8 +18353,31 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this.dateBox.setAria("activedescendant", e.actionValue)
             },
             _refreshItems: function() {
-                var items = this._getTimeListItems();
-                this._widget.option("items", items)
+                this._widgetItems = this._getTimeListItems();
+                this._widget.option("items", this._widgetItems)
+            },
+            renderOpenedState: function() {
+                this.callBase();
+                this._widget && this._widget.option("focusedElement", null)
+            },
+            _updateValue: function() {
+                if (!this._widget)
+                    return;
+                var value = this._getDateBoxValue(),
+                    dateIndex = this._getDateIndex(value);
+                this._widget.option("selectedIndex", dateIndex)
+            },
+            _getDateIndex: function(date) {
+                var result = -1;
+                for (var i = 0, n = this._widgetItems.length; i < n; i++)
+                    if (this._areDatesEqual(date, this._widgetItems[i])) {
+                        result = i;
+                        break
+                    }
+                return result
+            },
+            _areDatesEqual: function(first, second) {
+                return first.getHours() === second.getHours() && first.getMinutes() === second.getMinutes()
             },
             _getTimeListItems: function() {
                 var min = this.dateBox.option("min") || new Date(0, 0, 0, 0, 0),
@@ -18358,7 +18416,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this._updatePopupHeight()
             },
             _updatePopupWidth: function() {
-                this.dateBox._setPopupOption("width", this.dateBox.element().outerWidth())
+                this.dateBox._setPopupOption("width", this._getPopupWidth())
             },
             _updatePopupHeight: function() {
                 this.dateBox._setPopupOption("height", "auto");
@@ -18750,7 +18808,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     groupTemplate: "group",
                     usePopover: false,
                     showDropButton: false,
-                    showPopupTitle: true
+                    showPopupTitle: true,
+                    focusStateEnabled: false
                 })
             },
             _defaultOptionsRules: function() {
@@ -18813,6 +18872,11 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                         }, {
                             device: {platform: "generic"},
                             options: {buttonsLocation: "bottom center"}
+                        }, {
+                            device: function(device) {
+                                return DX.devices.real().generic && !DX.devices.isSimulator()
+                            },
+                            options: {focusStateEnabled: true}
                         }])
             },
             _initOptions: function(options) {
@@ -18873,6 +18937,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     }
                     this._list && this._list.option("focusedElement", null)
                 }
+                this._attachSearchChildProcessor()
             },
             _popupPositionedHandler: function() {
                 if (this.option("usePopover"))
@@ -19004,7 +19069,16 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 if (this._popup.NAME === "dxPopup")
                     this._$popupValidationMessage = $("<div>").addClass(LOOKUP_POPUP_VALIDATION_MESSAGE).appendTo(this._popup.content());
                 this._renderSearch();
-                this.callBase()
+                this.callBase();
+                this._attachSearchChildProcessor()
+            },
+            _attachSearchChildProcessor: function() {
+                if (this.option("searchEnabled") && this._searchBox) {
+                    this._listKeyboardProcessor = this._searchBox._keyboardProcessor.attachChildProcessor();
+                    this._setListOption("_keyboardProcessor", this._listKeyboardProcessor)
+                }
+                else
+                    this._setListOption("_keyboardProcessor", undefined)
             },
             _renderSearch: function() {
                 var $searchWrapper = this._$searchWrapper = $("<div>").addClass(LOOKUP_SEARCH_WRAPPER_CLASS);
@@ -19017,12 +19091,28 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     valueChangeEvent: this.option("valueChangeEvent"),
                     onValueChanged: $.proxy(this._search, this)
                 });
-                this._searchBox.registerKeyHandler("escape", $.proxy(function(e) {
-                    this.close()
-                }, this));
+                this._registerSearchKeyHandlers();
                 $searchWrapper.appendTo(this._popup.content());
                 this._renderSearchVisibility();
                 this._setSearchPlaceholder()
+            },
+            _registerSearchKeyHandlers: function() {
+                var that = this;
+                var selectListItem = function(e) {
+                        var $itemElement = that._list.option("focusedElement");
+                        if (!$itemElement)
+                            return;
+                        that._selectListItem(e.itemData, $itemElement)
+                    };
+                this._searchBox.registerKeyHandler("escape", $.proxy(function(e) {
+                    this.close()
+                }, this));
+                this._searchBox.registerKeyHandler("enter", $.proxy(function(e) {
+                    selectListItem(e)
+                }, this));
+                this._searchBox.registerKeyHandler("space", $.proxy(function(e) {
+                    selectListItem(e)
+                }, this))
             },
             _renderSearchVisibility: function() {
                 if (this._popup) {
@@ -19061,8 +19151,13 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                         onPullRefresh: this.option("onPullRefresh"),
                         onPageLoading: this.option("onPageLoading"),
                         pageLoadMode: this._getPageLoadMode(),
-                        nextButtonText: this.option("nextButtonText")
+                        nextButtonText: this.option("nextButtonText"),
+                        _keyboardProcessor: this._listKeyboardProcessor,
+                        onFocusIn: $.proxy(this._onFocusInHandler, this)
                     })
+            },
+            _onFocusInHandler: function() {
+                this._setListOption("_keyboardProcessor", undefined)
             },
             _listContentReadyHandler: function() {
                 if (this.option("usePopover"))
@@ -19094,9 +19189,12 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 return LOOKUP_SELECTED_CLASS
             },
             _listItemClickHandler: function(e) {
-                if (this._currentSelectedItem() === e.itemData)
+                this._selectListItem(e.itemData, e.jQueryEvent.target)
+            },
+            _selectListItem: function(itemData, target) {
+                if (this._currentSelectedItem() === itemData)
                     this._applyButtonHandler();
-                this._setCurrentSelectedClass(e.jQueryEvent.target);
+                this._setCurrentSelectedClass(target);
                 if (this.option("applyValueMode") === "instantly")
                     this._applyButtonHandler()
             },
@@ -19134,6 +19232,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 switch (name) {
                     case"searchEnabled":
                         this._renderSearchVisibility();
+                        this._attachSearchChildProcessor();
                         break;
                     case"searchPlaceholder":
                         this._setSearchPlaceholder();
@@ -19395,7 +19494,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             _supportedKeys: function() {
                 var parent = this.callBase(),
                     clearSelectBox = function(e) {
-                        if (this.option("showClearButton")) {
+                        if (this.option("showClearButton") && !this._isEditable()) {
                             e.preventDefault();
                             this.reset()
                         }
@@ -19494,7 +19593,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             _updatePopupPosition: function() {
                 if (!this.option("_isAdaptableDropPosition") || this.option("dropPosition") !== this.initialOption("dropPosition"))
                     return;
-                if (this.option("fieldEditEnabled") || this.option("searchEnabled")) {
+                if (this._isEditable()) {
                     var adaptablePopupPosition = $.extend(this._getDefaultDropPosition(), {offset: {
                                 h: this.option("dropPosition").offset.h,
                                 v: -4
@@ -19564,7 +19663,9 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             },
             _toggleOpenState: function() {
                 this.callBase.apply(this, arguments);
-                if (this.option("opened") && this._isEditable())
+                var searchValue = this._searchValue(),
+                    shouldSearch = searchValue.length && this._dataSource.searchValue() !== searchValue;
+                if (this.option("opened") && this._isEditable() && shouldSearch)
                     this._filterDataSource("")
             },
             _renderTooltip: function() {
@@ -19917,7 +20018,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             },
             _valueChangeEventHandler: function(e) {
                 this._renderInputSize();
-                if (this.option("fieldEditEnabled"))
+                if (this.option("fieldEditEnabled") || !this._searchValue().length && !this._dataSource.searchValue())
                     return;
                 this.callBase(e)
             },
@@ -20067,12 +20168,17 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this.callBase()
             },
             _renderItemContent: function(index, itemData, $container) {
-                this._deferredItems.push($.Deferred());
-                this._deferredItems[index].done($.proxy(function(itemContentRenderer, args) {
-                    itemContentRenderer.apply(this, args)
-                }, this, this.callBase, arguments));
-                if (!this.option("deferRendering"))
-                    this._deferredItems[index].resolve()
+                var renderContentDeferred = $.Deferred();
+                var that = this,
+                    callBase = this.callBase;
+                var deferred = $.Deferred();
+                deferred.done(function() {
+                    var $itemContent = callBase.call(that, index, itemData, $container);
+                    renderContentDeferred.resolve($itemContent)
+                });
+                this._deferredItems.push(deferred);
+                this.option("deferRendering") || deferred.resolve();
+                return renderContentDeferred.promise()
             },
             _renderSelection: function(addedSelection) {
                 this._updateItems(addedSelection[0])
@@ -20080,11 +20186,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             _updateItems: function(selectedIndex, newIndex) {
                 this._updateItemsPosition(selectedIndex, newIndex);
                 this._updateItemsVisibility(selectedIndex, newIndex)
-            },
-            _renderSpecificItem: function(index) {
-                var hasItemContent = this._itemElements().eq(index).find(this._itemContentClass()).length > 0;
-                if (DX.utils.isDefined(index) && !hasItemContent)
-                    this._deferredItems[index].resolve()
             },
             _updateItemsPosition: function(selectedIndex, newIndex) {
                 var $itemElements = this._itemElements(),
@@ -20103,6 +20204,11 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     $item.toggleClass(MULTIVIEW_ITEM_HIDDEN_CLASS, isHidden);
                     this.setAria("hidden", isHidden || undefined, $item)
                 }, this))
+            },
+            _renderSpecificItem: function(index) {
+                var hasItemContent = this._itemElements().eq(index).find(this._itemContentClass()).length > 0;
+                if (DX.utils.isDefined(index) && !hasItemContent)
+                    this._deferredItems[index].resolve()
             },
             _setAriaSelected: $.noop,
             _updateSelection: function(addedSelection, removedSelection) {
@@ -21127,7 +21233,9 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
     /*! Module widgets-base, file ui.tabPanel.js */
     (function($, DX, undefined) {
         var ui = DX.ui;
-        var TABPANEL_CLASS = "dx-tabpanel";
+        var TABPANEL_CLASS = "dx-tabpanel",
+            TABPANEL_TABS_CLASS = "dx-tabpanel-tabs",
+            TABPANEL_CONTAINER_CLASS = "dx-tabpanel-container";
         DX.registerComponent("dxTabPanel", ui, ui.dxMultiView.inherit({
             _setDeprecatedOptions: function() {
                 this.callBase();
@@ -21165,33 +21273,18 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this.callBase();
                 this.element().addClass(TABPANEL_CLASS);
                 this.setAria("role", "tabpanel");
-                this._renderBox()
+                this._renderLayout()
             },
-            _renderBox: function() {
-                var $box = $("<div>").appendTo(this.element());
-                this._box = this._createComponent($box, "dxBox", {
-                    direction: "col",
-                    align: "flex-start",
-                    crossAlign: "stretch",
-                    items: [{
-                            ratio: 0,
-                            shrink: 0,
-                            baseSize: "auto",
-                            template: $.proxy(function() {
-                                var $tabs = $("<div>");
-                                this._tabs = this._createComponent($tabs, "dxTabs", this._tabConfig());
-                                return $tabs
-                            }, this)
-                        }, {
-                            ratio: 1,
-                            shrink: 1,
-                            baseSize: "auto",
-                            template: $.proxy(function(_, __, $content) {
-                                this._$wrapper.addClass($content.attr("class"));
-                                $content.replaceWith(this._$wrapper)
-                            }, this)
-                        }],
-                    height: "100%"
+            _renderLayout: function() {
+                var $element = this.element();
+                var $tabs = $("<div>").addClass(TABPANEL_TABS_CLASS).appendTo($element);
+                this._tabs = this._createComponent($tabs, "dxTabs", this._tabConfig());
+                var $container = $("<div>").addClass(TABPANEL_CONTAINER_CLASS).appendTo($element);
+                $container.append(this._$wrapper);
+                var tabsHeight = $tabs.outerHeight();
+                $container.css({
+                    "margin-top": -tabsHeight,
+                    "padding-top": tabsHeight
                 })
             },
             _refreshActiveDescendant: function() {
@@ -21242,10 +21335,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 if (this._tabs)
                     this._tabs.option(name, value)
             },
-            _updateSelection: function() {
-                this.callBase.apply(this, arguments);
-                this._box.repaint()
-            },
             _optionChanged: function(args) {
                 var name = args.name,
                     value = args.value;
@@ -21285,6 +21374,941 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 }
             }
         }))
+    })(jQuery, DevExpress);
+    /*! Module widgets-base, file ui.colorView.js */
+    (function($, DX, undefined) {
+        var ui = DX.ui,
+            translator = DX.translator;
+        var COLOR_VIEW_CLASS = "dx-colorview",
+            COLOR_VIEW_CONTAINER_CLASS = "dx-colorview-container",
+            COLOR_VIEW_ROW_CLASS = "dx-colorview-container-row",
+            COLOR_VIEW_CELL_CLASS = "dx-colorview-container-cell",
+            COLOR_VIEW_PALETTE_CLASS = "dx-colorview-palette",
+            COLOR_VIEW_PALETTE_CELL_CLASS = "dx-colorview-palette-cell",
+            COLOR_VIEW_PALETTE_HANDLE_CLASS = "dx-colorview-palette-handle",
+            COLOR_VIEW_PALETTE_GRADIENT_CLASS = "dx-colorview-palette-gradient",
+            COLOR_VIEW_PALETTE_GRADIENT_WHITE_CLASS = "dx-colorview-palette-gradient-white",
+            COLOR_VIEW_PALETTE_GRADIENT_BLACK_CLASS = "dx-colorview-palette-gradient-black",
+            COLOR_VIEW_HUE_SCALE_CLASS = "dx-colorview-hue-scale",
+            COLOR_VIEW_HUE_SCALE_CELL_CLASS = "dx-colorview-hue-scale-cell",
+            COLOR_VIEW_HUE_SCALE_HANDLE_CLASS = "dx-colorview-hue-scale-handle",
+            COLOR_VIEW_HUE_SCALE_WRAPPER_CLASS = "dx-colorview-hue-scale-wrapper",
+            COLOR_VIEW_CONTROLS_CONTAINER_CLASS = "dx-colorview-controls-container",
+            COLOR_VIEW_RED_LABEL_CLASS = "dx-colorview-label-red",
+            COLOR_VIEW_GREEN_LABEL_CLASS = "dx-colorview-label-green",
+            COLOR_VIEW_BLUE_LABEL_CLASS = "dx-colorview-label-blue",
+            COLOR_VIEW_HEX_LABEL_CLASS = "dx-colorview-label-hex",
+            COLOR_VIEW_ALPHA_CHANNEL_SCALE_CLASS = "dx-colorview-alpha-channel-scale",
+            COLOR_VIEW_APLHA_CHANNEL_ROW_CLASS = "dx-colorview-alpha-channel-row",
+            COLOR_VIEW_ALPHA_CHANNEL_SCALE_WRAPPER_CLASS = "dx-colorview-alpha-channel-wrapper",
+            COLOR_VIEW_ALPHA_CHANNEL_LABEL_CLASS = "dx-colorview-alpha-channel-label",
+            COLOR_VIEW_ALPHA_CHANNEL_HANDLE_CLASS = "dx-colorview-alpha-channel-handle",
+            COLOR_VIEW_ALPHA_CHANNEL_CELL_CLASS = "dx-colorview-alpha-channel-cell",
+            COLOR_VIEW_ALPHA_CHANNEL_BORDER_CLASS = "dx-colorview-alpha-channel-border",
+            COLOR_VIEW_COLOR_PREVIEW = "dx-colorview-color-preview",
+            COLOR_VIEW_COLOR_PREVIEW_CONTAINER_CLASS = "dx-colorview-color-preview-container",
+            COLOR_VIEW_COLOR_PREVIEW_CONTAINER_INNER_CLASS = "dx-colorview-color-preview-container-inner",
+            COLOR_VIEW_COLOR_PREVIEW_COLOR_CURRENT = "dx-colorview-color-preview-color-current",
+            COLOR_VIEW_COLOR_PREVIEW_COLOR_NEW = "dx-colorview-color-preview-color-new";
+        DX.registerComponent("dxColorView", ui, ui.Editor.inherit({
+            _supportedKeys: function() {
+                var isRTL = this.option("rtlEnabled");
+                var that = this,
+                    getHorizontalPaletteStep = function(e) {
+                        var step = 100 / that._paletteWidth;
+                        if (e.shiftKey)
+                            step = step * that.option("keyStep");
+                        step = step > 1 ? step : 1;
+                        return Math.round(step)
+                    },
+                    updateHorizontalPaletteValue = function(step) {
+                        var value = that._currentColor.hsv.s + step;
+                        if (value > 100)
+                            value = 100;
+                        else if (value < 0)
+                            value = 0;
+                        that._currentColor.hsv.s = value;
+                        updatePaletteValue()
+                    },
+                    getVerticalPaletteStep = function(e) {
+                        var step = 100 / that._paletteHeight;
+                        if (e.shiftKey)
+                            step = step * that.option("keyStep");
+                        step = step > 1 ? step : 1;
+                        return Math.round(step)
+                    },
+                    updateVerticalPaletteValue = function(step) {
+                        var value = that._currentColor.hsv.v + step;
+                        if (value > 100)
+                            value = 100;
+                        else if (value < 0)
+                            value = 0;
+                        that._currentColor.hsv.v = value;
+                        updatePaletteValue()
+                    },
+                    updatePaletteValue = function() {
+                        that._placePaletteHandle();
+                        that._updateColorFromHsv(that._currentColor.hsv.h, that._currentColor.hsv.s, that._currentColor.hsv.v)
+                    },
+                    getHueScaleStep = function(e) {
+                        var step = 360 / (that._hueScaleWrapperHeight - that._hueScaleHandleHeight);
+                        if (e.shiftKey)
+                            step = step * that.option("keyStep");
+                        step = step > 1 ? step : 1;
+                        return step
+                    },
+                    updateHueScaleValue = function(step) {
+                        that._currentColor.hsv.h += step;
+                        that._placeHueScaleHandle();
+                        var handleLocation = translator.locate(that._$hueScaleHandle);
+                        that._updateColorHue(handleLocation.top + that._hueScaleHandleHeight / 2)
+                    },
+                    getAlphaScaleStep = function(e) {
+                        var step = 1 / that._alphaChannelScaleWorkWidth;
+                        if (e.shiftKey)
+                            step = step * that.option("keyStep");
+                        step = step > 0.01 ? step : 0.01;
+                        step = isRTL ? -step : step;
+                        return step
+                    },
+                    updateAlphaScaleValue = function(step) {
+                        that._currentColor.a += step;
+                        that._placeAlphaChannelHandle();
+                        var handleLocation = translator.locate(that._$alphaChannelHandle);
+                        that._calculateColorTransparenceByScaleWidth(handleLocation.left + that._alphaChannelHandleWidth / 2)
+                    };
+                return $.extend(this.callBase(), {
+                        upArrow: function(e) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            if (e.ctrlKey) {
+                                if (this._currentColor.hsv.h <= 360 && !this._isTopColorHue)
+                                    updateHueScaleValue(getHueScaleStep(e))
+                            }
+                            else if (this._currentColor.hsv.v < 100)
+                                updateVerticalPaletteValue(getVerticalPaletteStep(e))
+                        },
+                        downArrow: function(e) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            if (e.ctrlKey) {
+                                if (this._currentColor.hsv.h >= 0) {
+                                    if (this._isTopColorHue)
+                                        this._currentColor.hsv.h = 360;
+                                    updateHueScaleValue(-getHueScaleStep(e))
+                                }
+                            }
+                            else if (this._currentColor.hsv.v > 0)
+                                updateVerticalPaletteValue(-getVerticalPaletteStep(e))
+                        },
+                        rightArrow: function(e) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            if (e.ctrlKey) {
+                                if (isRTL ? this._currentColor.a < 1 : this._currentColor.a > 0 && this.option("editAlphaChannel"))
+                                    updateAlphaScaleValue(-getAlphaScaleStep(e))
+                            }
+                            else if (this._currentColor.hsv.s < 100)
+                                updateHorizontalPaletteValue(getHorizontalPaletteStep(e))
+                        },
+                        leftArrow: function(e) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            if (e.ctrlKey) {
+                                if (isRTL ? this._currentColor.a > 0 : this._currentColor.a < 1 && this.option("editAlphaChannel"))
+                                    updateAlphaScaleValue(getAlphaScaleStep(e))
+                            }
+                            else if (this._currentColor.hsv.s > 0)
+                                updateHorizontalPaletteValue(-getHorizontalPaletteStep(e))
+                        },
+                        enter: function(e) {
+                            if (this.option("applyValueMode") === "useButtons")
+                                this.applyColor()
+                        }
+                    })
+            },
+            _setDefaultOptions: function() {
+                this.callBase();
+                this.option({
+                    value: null,
+                    editAlphaChannel: false,
+                    applyValueMode: "useButtons",
+                    keyStep: 1
+                })
+            },
+            _defaultOptionsRules: function() {
+                return this.callBase().concat([{
+                            device: function(device) {
+                                return DX.devices.real().generic && !DX.devices.isSimulator()
+                            },
+                            options: {focusStateEnabled: true}
+                        }])
+            },
+            _init: function() {
+                this.callBase();
+                this._initColorAndOpacity()
+            },
+            _initColorAndOpacity: function() {
+                this._setCurrentColor(this.option("value"))
+            },
+            _setCurrentColor: function(value) {
+                value = value || "#000000";
+                var newColor = new DX.Color(value);
+                if (!newColor.colorIsInvalid) {
+                    if (!this._currentColor || this._makeRgba(this._currentColor) !== this._makeRgba(newColor)) {
+                        this._currentColor = newColor;
+                        if (this._$currentColor)
+                            this._makeTransparentBackground(this._$currentColor, newColor)
+                    }
+                }
+                else
+                    this.option("value", this._currentColor.baseColor)
+            },
+            _render: function() {
+                this.callBase();
+                this.element().addClass(COLOR_VIEW_CLASS);
+                this._renderColorPickerContainer()
+            },
+            _enterKeyHandler: function() {
+                if (this.option("applyValueMode") === "useButtons")
+                    this.applyColor()
+            },
+            _makeTransparentBackground: function($el, color) {
+                if (!(color instanceof DX.Color))
+                    color = new DX.Color(color);
+                if (DX.browser.msie && DX.browser.version === "8.0")
+                    $el.css({
+                        background: color.toHex(),
+                        filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=" + color.a * 100 + ")"
+                    });
+                else
+                    $el.css("backgroundColor", this._makeRgba(color))
+            },
+            _makeRgba: function(color) {
+                if (!(color instanceof DX.Color))
+                    color = new DX.Color(color);
+                return "rgba(" + [color.r, color.g, color.b, color.a].join(", ") + ")"
+            },
+            _renderValue: function() {
+                this.callBase(this.option("editAlphaChannel") ? this._makeRgba(this._currentColor) : this.option("value"))
+            },
+            _renderColorPickerContainer: function() {
+                var $parent = this.element();
+                this._$colorPickerContainer = $("<div>", {
+                    "class": COLOR_VIEW_CONTAINER_CLASS,
+                    appendTo: $parent
+                });
+                this._renderHtmlRows();
+                this._renderPalette();
+                this._renderHueScale();
+                this._renderControlsContainer();
+                this._renderControls();
+                this._renderAlphaChannelElements()
+            },
+            _renderHtmlRows: function(updatedOption) {
+                var $renderedRows = this._$colorPickerContainer.find("." + COLOR_VIEW_ROW_CLASS),
+                    renderedRowsCount = $renderedRows.length,
+                    rowCount = this._calculateRowsCount(),
+                    delta = renderedRowsCount - rowCount;
+                if (delta > 0) {
+                    var index = this._calculateRemovedHtmlRowIndex(renderedRowsCount, updatedOption);
+                    $renderedRows.eq(index).remove()
+                }
+                if (delta < 0) {
+                    delta = Math.abs(delta);
+                    var rows = [];
+                    for (var i = 0; i < delta; i++)
+                        rows.push($("<div>", {"class": COLOR_VIEW_ROW_CLASS}));
+                    if (renderedRowsCount) {
+                        var previousRowIndex = this._calculateHtmlRowIndex(renderedRowsCount, updatedOption);
+                        $renderedRows.eq(previousRowIndex).after(rows)
+                    }
+                    else
+                        this._$colorPickerContainer.append(rows)
+                }
+            },
+            _renderHtmlCellInsideRow: function(rowSelector, $rowParent, additionalClass) {
+                return $("<div>", {
+                        "class": COLOR_VIEW_CELL_CLASS,
+                        addClass: additionalClass,
+                        appendTo: $rowParent.find("." + COLOR_VIEW_ROW_CLASS + rowSelector)
+                    })
+            },
+            _calculateRowsCount: function() {
+                if (this.option("editAlphaChannel"))
+                    return this.option("applyValueMode") === "instantly" ? 2 : 3;
+                return this.option("applyValueMode") === "instantly" ? 1 : 2
+            },
+            _calculateRemovedHtmlRowIndex: function(renderedRowsCount, updatedOption) {
+                var index = -1;
+                if (renderedRowsCount === 3) {
+                    if (updatedOption === "editAlphaChannel")
+                        index = -2;
+                    if (updatedOption === "applyValueMode")
+                        index = -1
+                }
+                return index
+            },
+            _calculateHtmlRowIndex: function(renderedRowsCount, updatedOption) {
+                var index = 0;
+                if (renderedRowsCount === 2)
+                    if (updatedOption === "applyValueMode")
+                        index = 1;
+                return index
+            },
+            _renderPalette: function() {
+                var $paletteCell = this._renderHtmlCellInsideRow(":first", this._$colorPickerContainer, COLOR_VIEW_PALETTE_CELL_CLASS),
+                    $paletteGradientWhite = $("<div>", {"class": [COLOR_VIEW_PALETTE_GRADIENT_CLASS, COLOR_VIEW_PALETTE_GRADIENT_WHITE_CLASS].join(" ")}),
+                    $paletteGradientBlack = $("<div>", {"class": [COLOR_VIEW_PALETTE_GRADIENT_CLASS, COLOR_VIEW_PALETTE_GRADIENT_BLACK_CLASS].join(" ")});
+                this._$palette = $("<div>", {
+                    "class": COLOR_VIEW_PALETTE_CLASS,
+                    css: {backgroundColor: this._currentColor.getPureColor().toHex()},
+                    appendTo: $paletteCell
+                });
+                this._paletteHeight = this._$palette.height();
+                this._paletteWidth = this._$palette.width();
+                this._renderPaletteHandle();
+                this._$palette.append([$paletteGradientWhite, $paletteGradientBlack])
+            },
+            _renderPaletteHandle: function() {
+                this._createComponent(this._$paletteHandle = $("<div>", {
+                    "class": COLOR_VIEW_PALETTE_HANDLE_CLASS,
+                    appendTo: this._$palette
+                }), "dxDraggable", {
+                    area: this._$palette,
+                    allowMoveByClick: true,
+                    boundOffset: $.proxy(function() {
+                        return -this._paletteHandleHeight / 2
+                    }, this),
+                    onDrag: $.proxy(function(e) {
+                        var paletteHandlePosition = translator.locate(this._$paletteHandle);
+                        this._updateByDrag = true;
+                        this._updateColorFromHsv(this._currentColor.hsv.h, this._calculateColorSaturation(paletteHandlePosition), this._calculateColorValue(paletteHandlePosition))
+                    }, this)
+                });
+                this._paletteHandleWidth = this._$paletteHandle.width();
+                this._paletteHandleHeight = this._$paletteHandle.height();
+                this._placePaletteHandle()
+            },
+            _placePaletteHandle: function() {
+                translator.move(this._$paletteHandle, {
+                    left: Math.round(this._paletteWidth * this._currentColor.hsv.s / 100 - this._paletteHandleWidth / 2),
+                    top: Math.round(this._paletteHeight - this._paletteHeight * this._currentColor.hsv.v / 100 - this._paletteHandleHeight / 2)
+                })
+            },
+            _calculateColorValue: function(paletteHandlePosition) {
+                var value = Math.floor(paletteHandlePosition.top + this._paletteHandleHeight / 2);
+                return 100 - Math.round(value * 100 / this._paletteHeight)
+            },
+            _calculateColorSaturation: function(paletteHandlePosition) {
+                var saturation = Math.floor(paletteHandlePosition.left + this._paletteHandleWidth / 2);
+                return Math.round(saturation * 100 / this._paletteWidth)
+            },
+            _updateColorFromHsv: function(hue, saturation, value) {
+                var a = this._currentColor.a;
+                this._currentColor = new DX.Color("hsv(" + [hue, saturation, value].join(",") + ")");
+                this._currentColor.a = a;
+                this._updateColorParamsAndColorPreview();
+                if (this.option("applyValueMode") === "instantly")
+                    this.applyColor()
+            },
+            _renderHueScale: function() {
+                var $hueScaleCell = this._renderHtmlCellInsideRow(":first", this._$colorPickerContainer, COLOR_VIEW_HUE_SCALE_CELL_CLASS);
+                this._$hueScaleWrapper = $("<div>", {
+                    "class": COLOR_VIEW_HUE_SCALE_WRAPPER_CLASS,
+                    appendTo: $hueScaleCell
+                });
+                this._$hueScale = $("<div>", {
+                    "class": COLOR_VIEW_HUE_SCALE_CLASS,
+                    appendTo: this._$hueScaleWrapper
+                });
+                this._hueScaleHeight = this._$hueScale.height();
+                this._hueScaleWrapperHeight = this._$hueScaleWrapper.outerHeight();
+                this._renderHueScaleHandle()
+            },
+            _renderHueScaleHandle: function() {
+                this._createComponent(this._$hueScaleHandle = $("<div>", {
+                    "class": COLOR_VIEW_HUE_SCALE_HANDLE_CLASS,
+                    appendTo: this._$hueScaleWrapper
+                }), "dxDraggable", {
+                    area: this._$hueScaleWrapper,
+                    allowMoveByClick: true,
+                    direction: "vertical",
+                    onDrag: $.proxy(function(e) {
+                        this._updateByDrag = true;
+                        this._updateColorHue(translator.locate(this._$hueScaleHandle).top + this._hueScaleHandleHeight / 2)
+                    }, this)
+                });
+                this._hueScaleHandleHeight = this._$hueScaleHandle.height();
+                this._placeHueScaleHandle()
+            },
+            _placeHueScaleHandle: function() {
+                var hueScaleHeight = this._hueScaleWrapperHeight,
+                    handleHeight = this._hueScaleHandleHeight,
+                    top = (hueScaleHeight - handleHeight) * (360 - this._currentColor.hsv.h) / 360;
+                if (hueScaleHeight < top + handleHeight)
+                    top = hueScaleHeight - handleHeight;
+                if (top < 0)
+                    top = 0;
+                translator.move(this._$hueScaleHandle, {top: Math.round(top)})
+            },
+            _updateColorHue: function(handlePosition) {
+                var hue = 360 - Math.round((handlePosition - this._hueScaleHandleHeight / 2) * 360 / (this._hueScaleWrapperHeight - this._hueScaleHandleHeight)),
+                    saturation = this._currentColor.hsv.s,
+                    value = this._currentColor.hsv.v;
+                this._isTopColorHue = false;
+                hue = hue < 0 ? 0 : hue;
+                if (hue >= 360) {
+                    this._isTopColorHue = true;
+                    hue = 0
+                }
+                this._updateColorFromHsv(hue, saturation, value);
+                this._$palette.css("backgroundColor", this._currentColor.getPureColor().toHex())
+            },
+            _renderControlsContainer: function() {
+                var $controlsContainerCell = this._renderHtmlCellInsideRow(":first", this._$colorPickerContainer);
+                this._$controlsContainer = $("<div>", {
+                    "class": COLOR_VIEW_CONTROLS_CONTAINER_CLASS,
+                    appendTo: $controlsContainerCell
+                })
+            },
+            _renderControls: function() {
+                this._renderColorsPreview();
+                this._renderRgbInputs();
+                this._renderHexInput()
+            },
+            _renderColorsPreview: function() {
+                var $colorsPreviewContainer = $("<div>", {
+                        "class": COLOR_VIEW_COLOR_PREVIEW_CONTAINER_CLASS,
+                        appendTo: this._$controlsContainer
+                    }),
+                    $colorsPreviewContainerInner = $("<div>", {
+                        "class": COLOR_VIEW_COLOR_PREVIEW_CONTAINER_INNER_CLASS,
+                        appendTo: $colorsPreviewContainer
+                    });
+                this._$currentColor = $("<div>", {"class": [COLOR_VIEW_COLOR_PREVIEW, COLOR_VIEW_COLOR_PREVIEW_COLOR_CURRENT].join(" ")});
+                this._$newColor = $("<div>", {"class": [COLOR_VIEW_COLOR_PREVIEW, COLOR_VIEW_COLOR_PREVIEW_COLOR_NEW].join(" ")});
+                this._makeTransparentBackground(this._$currentColor, this._currentColor);
+                this._makeTransparentBackground(this._$newColor, this._currentColor);
+                $colorsPreviewContainerInner.append([this._$currentColor, this._$newColor])
+            },
+            _renderAlphaChannelElements: function() {
+                if (this.option("editAlphaChannel")) {
+                    this._$colorPickerContainer.find("." + COLOR_VIEW_ROW_CLASS).eq(1).addClass(COLOR_VIEW_APLHA_CHANNEL_ROW_CLASS);
+                    this._renderAlphaChannelScale();
+                    this._renderAlphaChannelInput()
+                }
+            },
+            _renderRgbInputs: function() {
+                this._rgbInputsWithLabels = [this._renderEditorWithLabel({
+                        editorType: "dxNumberBox",
+                        value: this._currentColor.r,
+                        onValueChanged: $.proxy(this._updateColor, this, false),
+                        labelText: "R",
+                        labelAriaText: Globalize.localize("dxColorView-ariaRed"),
+                        labelClass: COLOR_VIEW_RED_LABEL_CLASS
+                    }), this._renderEditorWithLabel({
+                        editorType: "dxNumberBox",
+                        value: this._currentColor.g,
+                        onValueChanged: $.proxy(this._updateColor, this, false),
+                        labelText: "G",
+                        labelAriaText: Globalize.localize("dxColorView-ariaGreen"),
+                        labelClass: COLOR_VIEW_GREEN_LABEL_CLASS
+                    }), this._renderEditorWithLabel({
+                        editorType: "dxNumberBox",
+                        value: this._currentColor.b,
+                        onValueChanged: $.proxy(this._updateColor, this, false),
+                        labelText: "B",
+                        labelAriaText: Globalize.localize("dxColorView-ariaBlue"),
+                        labelClass: COLOR_VIEW_BLUE_LABEL_CLASS
+                    })];
+                this._$controlsContainer.append(this._rgbInputsWithLabels);
+                this._rgbInputs = [this._rgbInputsWithLabels[0].find(".dx-numberbox").dxNumberBox("instance"), this._rgbInputsWithLabels[1].find(".dx-numberbox").dxNumberBox("instance"), this._rgbInputsWithLabels[2].find(".dx-numberbox").dxNumberBox("instance")];
+                $.each(this._rgbInputs, $.proxy(function(_, instance) {
+                    this._attachEnterKeyHandler(instance)
+                }, this))
+            },
+            _renderEditorWithLabel: function(options) {
+                var $editor = $("<div>"),
+                    $label = $("<label>", {
+                        "class": options.labelClass,
+                        text: options.labelText + ":",
+                        append: $editor
+                    }).off("dxclick").on("dxclick", function(e) {
+                        e.preventDefault()
+                    }),
+                    editorType = options.editorType,
+                    editorOptions = {
+                        value: options.value,
+                        onValueChanged: options.onValueChanged
+                    };
+                if (editorType === "dxNumberBox") {
+                    editorOptions.min = options.min || 0;
+                    editorOptions.max = options.max || 255;
+                    editorOptions.step = options.step || 1
+                }
+                $editor[editorType](editorOptions);
+                this.setAria("label", options.labelAriaText, $editor);
+                return $label
+            },
+            _renderHexInput: function() {
+                this._hexInput = this._renderEditorWithLabel({
+                    editorType: "dxTextBox",
+                    value: this._currentColor.toHex().replace("#", ""),
+                    onValueChanged: $.proxy(this._updateColor, this, true),
+                    labelClass: COLOR_VIEW_HEX_LABEL_CLASS,
+                    labelText: "#",
+                    labelAriaText: Globalize.localize("dxColorView-ariaHex")
+                }).appendTo(this._$controlsContainer).find(".dx-textbox").dxTextBox("instance");
+                this._attachEnterKeyHandler(this._hexInput)
+            },
+            _attachEnterKeyHandler: function(instance) {
+                instance.registerKeyHandler("enter", $.proxy(function(e) {
+                    this._enterKeyHandler(e)
+                }, this))
+            },
+            _renderAlphaChannelScale: function() {
+                var $alphaChannelScaleCell = this._renderHtmlCellInsideRow(":eq(1)", this._$colorPickerContainer, COLOR_VIEW_ALPHA_CHANNEL_CELL_CLASS),
+                    $alphaChannelBorder = $("<div>", {
+                        "class": COLOR_VIEW_ALPHA_CHANNEL_BORDER_CLASS,
+                        appendTo: $alphaChannelScaleCell
+                    }),
+                    $alphaChannelScaleWrapper = $("<div>", {
+                        "class": COLOR_VIEW_ALPHA_CHANNEL_SCALE_WRAPPER_CLASS,
+                        appendTo: $alphaChannelBorder
+                    });
+                this._$alphaChannelScale = $("<div>", {
+                    "class": COLOR_VIEW_ALPHA_CHANNEL_SCALE_CLASS,
+                    appendTo: $alphaChannelScaleWrapper
+                });
+                this._makeCSSLinearGradient(this._$alphaChannelScale);
+                this._renderAlphaChannelHandle($alphaChannelScaleCell)
+            },
+            _makeCSSLinearGradient: function($el) {
+                var color = this._currentColor,
+                    colorAsRgb = [color.r, color.g, color.b].join(","),
+                    colorAsHex = color.toHex().replace("#", "");
+                var combineGradientString = function(colorAsRgb, colorAsHex) {
+                        var rtlEnabled = this.option("rtlEnabled"),
+                            startColor = "rgba(" + colorAsRgb + ", " + (rtlEnabled ? "1" : "0") + ")",
+                            finishColor = "rgba(" + colorAsRgb + ", " + (rtlEnabled ? "0" : "1") + ")",
+                            startColorIE = "'#" + (rtlEnabled ? "00" : "") + colorAsHex + "'",
+                            finishColorIE = "'#" + (rtlEnabled ? "" : "00") + colorAsHex + "'";
+                        return ["background-image: -webkit-linear-gradient(180deg, " + startColor + ", " + finishColor + ")", "background-image: -moz-linear-gradient(-90deg, " + startColor + ", " + finishColor + ")", "background-image: -ms-linear-gradient(-90deg, " + startColor + ", " + finishColor + ")", "background-image: -o-linear-gradient(-90deg, " + startColor + ", " + finishColor + ")", "background-image: linear-gradient(-90deg, " + startColor + ", " + finishColor + ")", "filter: progid:DXImageTransform.Microsoft.gradient(GradientType=1,startColorstr=" + startColorIE + ", endColorstr=" + finishColorIE + ")", "-ms-filter: progid:DXImageTransform.Microsoft.gradient(GradientType=1,startColorstr=" + startColorIE + ", endColorstr=" + finishColorIE + ")"].join(";")
+                    };
+                $el.attr("style", combineGradientString.call(this, colorAsRgb, colorAsHex))
+            },
+            _renderAlphaChannelInput: function() {
+                var that = this,
+                    $alphaChannelInputCell = this._renderHtmlCellInsideRow(":eq(1)", this._$colorPickerContainer);
+                that._alphaChannelInput = this._renderEditorWithLabel({
+                    editorType: "dxNumberBox",
+                    value: this._currentColor.a,
+                    max: 1,
+                    step: 0.1,
+                    onValueChanged: function(e) {
+                        var value = e.value;
+                        value = that._currentColor.isValidAlpha(value) ? value : that._currentColor.a;
+                        that._updateColorTransparence(value);
+                        that._placeAlphaChannelHandle()
+                    },
+                    labelClass: COLOR_VIEW_ALPHA_CHANNEL_LABEL_CLASS,
+                    labelText: "Alpha",
+                    labelAriaText: Globalize.localize("dxColorView-ariaAlpha")
+                }).appendTo($alphaChannelInputCell).find(".dx-numberbox").dxNumberBox("instance");
+                this._attachEnterKeyHandler(that._alphaChannelInput)
+            },
+            _updateColorTransparence: function(transparence) {
+                this._currentColor.a = transparence;
+                this._makeTransparentBackground(this._$newColor, this._currentColor);
+                if (this.option("applyValueMode") === "instantly")
+                    this.applyColor()
+            },
+            _renderAlphaChannelHandle: function($parent) {
+                this._createComponent(this._$alphaChannelHandle = $("<div>", {
+                    "class": COLOR_VIEW_ALPHA_CHANNEL_HANDLE_CLASS,
+                    appendTo: $parent
+                }), "dxDraggable", {
+                    area: $parent,
+                    allowMoveByClick: true,
+                    direction: "horizontal",
+                    onDrag: $.proxy(function(e) {
+                        this._updateByDrag = true;
+                        var $alphaChannelHandle = this._$alphaChannelHandle,
+                            alphaChannelHandlePosition = translator.locate($alphaChannelHandle).left + this._alphaChannelHandleWidth / 2;
+                        this._calculateColorTransparenceByScaleWidth(alphaChannelHandlePosition)
+                    }, this)
+                });
+                this._alphaChannelHandleWidth = this._$alphaChannelHandle.width();
+                this._alphaChannelScaleWorkWidth = $parent.width() - this._alphaChannelHandleWidth;
+                this._placeAlphaChannelHandle()
+            },
+            _calculateColorTransparenceByScaleWidth: function(handlePosition) {
+                var transparence = (handlePosition - this._alphaChannelHandleWidth / 2) / this._alphaChannelScaleWorkWidth,
+                    rtlEnabled = this.option("rtlEnabled");
+                transparence = rtlEnabled ? transparence : 1 - transparence;
+                if (handlePosition >= this._alphaChannelScaleWorkWidth + this._alphaChannelHandleWidth / 2)
+                    transparence = rtlEnabled ? 1 : 0;
+                else if (transparence < 1)
+                    transparence = transparence.toFixed(2);
+                this._alphaChannelInput.option("value", transparence)
+            },
+            _placeAlphaChannelHandle: function() {
+                var left = this._alphaChannelScaleWorkWidth * (1 - this._currentColor.a);
+                if (left < 0)
+                    left = 0;
+                if (this._alphaChannelScaleWorkWidth < left)
+                    left = this._alphaChannelScaleWorkWidth;
+                translator.move(this._$alphaChannelHandle, {left: this.option("rtlEnabled") ? this._alphaChannelScaleWorkWidth - left : left})
+            },
+            applyColor: function() {
+                var colorValue = this.option("editAlphaChannel") ? this._makeRgba(this._currentColor) : this._currentColor.toHex();
+                this._makeTransparentBackground(this._$currentColor, this._currentColor);
+                this.option("value", colorValue)
+            },
+            cancelColor: function() {
+                this._initColorAndOpacity();
+                this._refreshMarkup()
+            },
+            _updateColor: function(isHex) {
+                var rgba,
+                    newColor;
+                if (isHex)
+                    newColor = this._validateHex("#" + this._hexInput.option("value"));
+                else {
+                    rgba = this._validateRgb();
+                    if (this._alphaChannelInput) {
+                        rgba.push(this._alphaChannelInput.option("value"));
+                        newColor = "rgba(" + rgba.join(", ") + ")"
+                    }
+                    else
+                        newColor = "rgb(" + rgba.join(", ") + ")"
+                }
+                if (!this._suppressEditorsValueUpdating) {
+                    this._currentColor = new DX.Color(newColor);
+                    this._refreshMarkup();
+                    if (this.option("applyValueMode") === "instantly")
+                        this.applyColor()
+                }
+            },
+            _validateHex: function(hex) {
+                return this._currentColor.isValidHex(hex) ? hex : this._currentColor.toHex()
+            },
+            _validateRgb: function() {
+                var r = this._rgbInputs[0].option("value"),
+                    g = this._rgbInputs[1].option("value"),
+                    b = this._rgbInputs[2].option("value");
+                if (!this._currentColor.isValidRGB(r, g, b)) {
+                    r = this._currentColor.r;
+                    g = this._currentColor.g;
+                    b = this._currentColor.b
+                }
+                return [r, g, b]
+            },
+            _refreshMarkup: function() {
+                this._placeHueScaleHandle();
+                this._placePaletteHandle();
+                this._updateColorParamsAndColorPreview();
+                this._$palette.css("backgroundColor", this._currentColor.getPureColor().toHex());
+                if (this._$alphaChannelHandle) {
+                    this._updateColorTransparence(this._currentColor.a);
+                    this._placeAlphaChannelHandle()
+                }
+            },
+            _updateColorParamsAndColorPreview: function() {
+                this._suppressEditorsValueUpdating = true;
+                this._hexInput.option("value", this._currentColor.toHex().replace("#", ""));
+                this._rgbInputs[0].option("value", this._currentColor.r);
+                this._rgbInputs[1].option("value", this._currentColor.g);
+                this._rgbInputs[2].option("value", this._currentColor.b);
+                this._suppressEditorsValueUpdating = false;
+                this._makeTransparentBackground(this._$newColor, this._currentColor);
+                if (this.option("editAlphaChannel")) {
+                    this._makeCSSLinearGradient.call(this, this._$alphaChannelScale);
+                    this._alphaChannelInput.option("value", this._currentColor.a)
+                }
+            },
+            _optionChanged: function(args) {
+                var value = args.value;
+                switch (args.name) {
+                    case"value":
+                        this._setCurrentColor(value);
+                        if (!this._updateByDrag)
+                            this._refreshMarkup();
+                        this._updateByDrag = false;
+                        this.callBase(args);
+                        break;
+                    case"editAlphaChannel":
+                        if (this._$colorPickerContainer) {
+                            this._renderHtmlRows("editAlphaChannel");
+                            this._renderAlphaChannelElements()
+                        }
+                        break;
+                    case"applyValueMode":
+                        if (this._$colorPickerContainer)
+                            this._renderHtmlRows("applyValueMode");
+                        break;
+                    case"keyStep":
+                        break;
+                    default:
+                        this.callBase(args)
+                }
+            }
+        }))
+    })(jQuery, DevExpress);
+    /*! Module widgets-base, file ui.colorBox.js */
+    (function($, DX, undefined) {
+        var ui = DX.ui;
+        var COLOR_BOX_CLASS = "dx-colorbox",
+            COLOR_BOX_INPUT_CLASS = COLOR_BOX_CLASS + "-input",
+            COLOR_BOX_INPUT_CONTAINER_CLASS = COLOR_BOX_INPUT_CLASS + "-container",
+            COLOR_BOX_COLOR_RESULT_PREVIEW_CLASS = COLOR_BOX_CLASS + "-color-result-preview",
+            COLOR_BOX_COLOR_IS_NOT_DEFINED = COLOR_BOX_CLASS + "-color-is-not-defined",
+            COLOR_BOX_OVERLAY_CLASS = COLOR_BOX_CLASS + "-overlay",
+            COLOR_BOX_CONTAINER_CELL_CLASS = "dx-colorview-container-cell",
+            COLOR_BOX_BUTTON_CELL_CLASS = "dx-colorview-button-cell",
+            COLOR_BOX_BUTTONS_CONTAINER_CLASS = "dx-colorview-buttons-container",
+            COLOR_BOX_APPLY_BUTTON_CLASS = "dx-colorview-apply-button",
+            COLOR_BOX_CANCEL_BUTTON_CLASS = "dx-colorview-cancel-button";
+        var colorEditorPrototype = ui.dxColorView.prototype,
+            colorUtils = {
+                makeTransparentBackground: $.proxy(colorEditorPrototype._makeTransparentBackground, colorEditorPrototype),
+                makeRgba: $.proxy(colorEditorPrototype._makeRgba, colorEditorPrototype)
+            };
+        DX.registerComponent("dxColorBox", ui, ui.dxDropDownEditor.inherit({
+            _supportedKeys: function() {
+                var arrowHandler = function(e) {
+                        e.stopPropagation();
+                        if (this.option("opened")) {
+                            e.preventDefault();
+                            return true
+                        }
+                    };
+                var upArrowHandler = function(e) {
+                        if (!this.option("opened")) {
+                            e.preventDefault();
+                            return false
+                        }
+                        if (e.altKey) {
+                            this.close();
+                            return false
+                        }
+                        return true
+                    };
+                var downArrowHandler = function(e) {
+                        if (!this.option("opened") && !e.altKey) {
+                            e.preventDefault();
+                            return false
+                        }
+                        if (!this.option("opened") && e.altKey) {
+                            this._validatedOpening();
+                            return false
+                        }
+                        return true
+                    };
+                return $.extend(this.callBase(), {
+                        tab: function(e) {
+                            if (this.option("opened")) {
+                                e.preventDefault();
+                                this._colorView._rgbInputs[0].focus()
+                            }
+                        },
+                        enter: this._enterKeyHandler,
+                        leftArrow: arrowHandler,
+                        rightArrow: arrowHandler,
+                        upArrow: upArrowHandler,
+                        downArrow: downArrowHandler
+                    })
+            },
+            _setDefaultOptions: function() {
+                this.callBase();
+                this.option({
+                    editAlphaChannel: false,
+                    applyButtonText: Globalize.localize("OK"),
+                    cancelButtonText: Globalize.localize("Cancel"),
+                    applyValueMode: "useButtons",
+                    keyStep: 1,
+                    onApplyButtonClick: null,
+                    onCancelButtonClick: null,
+                    buttonsLocation: "bottom after"
+                })
+            },
+            _popupConfig: function() {
+                return $.extend(this.callBase(), {
+                        height: "auto",
+                        width: ""
+                    })
+            },
+            _contentReadyHandler: function() {
+                this._createColorView();
+                this._addPopupBottomClasses()
+            },
+            _addPopupBottomClasses: function() {
+                var $popupBottom = this._popup.bottomToolbar();
+                if ($popupBottom) {
+                    $popupBottom.addClass(COLOR_BOX_CONTAINER_CELL_CLASS).addClass(COLOR_BOX_BUTTON_CELL_CLASS).find(".dx-toolbar-items-container").addClass(COLOR_BOX_BUTTONS_CONTAINER_CLASS);
+                    $popupBottom.find(".dx-popup-done").addClass(COLOR_BOX_APPLY_BUTTON_CLASS);
+                    $popupBottom.find(".dx-popup-cancel").addClass(COLOR_BOX_CANCEL_BUTTON_CLASS)
+                }
+            },
+            _createColorView: function() {
+                this._popup.overlayContent().addClass(COLOR_BOX_OVERLAY_CLASS);
+                var $colorView = $("<div>").appendTo(this._popup.content());
+                this._colorView = this._createComponent($colorView, "dxColorView", this._colorViewConfig());
+                this._colorView._enterKeyHandler = $.proxy(this._enterKeyHandler, this);
+                $colorView.on("focus", $.proxy(function() {
+                    this.focus()
+                }, this))
+            },
+            _colorViewConfig: function() {
+                var that = this;
+                return {
+                        value: that.option("value"),
+                        editAlphaChannel: that.option("editAlphaChannel"),
+                        applyValueMode: that.option("applyValueMode"),
+                        focusStateEnabled: that.option("focusStateEnabled"),
+                        onValueChanged: function(args) {
+                            var value = args.value;
+                            that.option("value", value);
+                            if (value)
+                                colorUtils.makeTransparentBackground(that._$colorResultPreview, value)
+                        },
+                        _keyboardProcessor: that._colorViewProccessor
+                    }
+            },
+            _enterKeyHandler: function(e) {
+                var newValue = this._input().val(),
+                    oldValue = this.option("editAlphaChannel") ? colorUtils.makeRgba(this.option("value")) : this.option("value");
+                if (newValue && newValue !== oldValue) {
+                    this._applyColorFromInput(newValue);
+                    this.option("value", this.option("editAlphaChannel") ? colorUtils.makeRgba(newValue) : newValue);
+                    return false
+                }
+                if (this._colorView && this.option("applyValueMode") === "useButtons")
+                    this._colorView.applyColor();
+                if (this.option("opened")) {
+                    e.preventDefault();
+                    this.close()
+                }
+                return false
+            },
+            _applyButtonHandler: function() {
+                this._colorView.applyColor();
+                if ($.isFunction(this.option("onApplyButtonClick")))
+                    this.option("onApplyButtonClick")();
+                this.callBase()
+            },
+            _cancelButtonHandler: function() {
+                this._colorView.cancelColor();
+                if ($.isFunction(this.option("onCancelButtonClick")))
+                    this.option("onCancelButtonClick")();
+                this.callBase()
+            },
+            _attachChildKeyboardEvents: function() {
+                this._colorViewProccessor = this._keyboardProcessor.attachChildProcessor();
+                if (this._colorView) {
+                    this._colorView.option("_keyboardProcessor", this._colorViewProccessor);
+                    return
+                }
+            },
+            _init: function() {
+                this.callBase()
+            },
+            _render: function() {
+                this.callBase();
+                this.element().addClass(COLOR_BOX_CLASS)
+            },
+            _renderInput: function() {
+                this.callBase();
+                this.element().wrapInner($("<div/>").addClass(COLOR_BOX_INPUT_CONTAINER_CLASS));
+                this._$colorBoxInputContainer = this.element().children().eq(0);
+                this._$colorResultPreview = $("<div>", {
+                    "class": COLOR_BOX_COLOR_RESULT_PREVIEW_CLASS,
+                    appendTo: this._$colorBoxInputContainer
+                });
+                if (!this.option("value"))
+                    this._$colorBoxInputContainer.addClass(COLOR_BOX_COLOR_IS_NOT_DEFINED);
+                else
+                    colorUtils.makeTransparentBackground(this._$colorResultPreview, this.option("value"));
+                this._input().addClass(COLOR_BOX_INPUT_CLASS)
+            },
+            _renderValue: function() {
+                var value = this.option("value");
+                this.option("text", this.option("editAlphaChannel") ? colorUtils.makeRgba(value) : value);
+                this.callBase()
+            },
+            _valueChangeEventHandler: function(e) {
+                var value = this._input().val();
+                if (value) {
+                    value = this._applyColorFromInput(value);
+                    if (this._colorView) {
+                        this._colorView._setCurrentColor(value);
+                        this._colorView._refreshMarkup()
+                    }
+                }
+                this.callBase(e, value)
+            },
+            _applyColorFromInput: function(value) {
+                var newColor = new DX.Color(value);
+                if (newColor.colorIsInvalid) {
+                    value = this.option("value");
+                    this._input().val(value)
+                }
+                return value
+            },
+            _optionChanged: function(args) {
+                var value = args.value,
+                    name = args.name;
+                switch (name) {
+                    case"value":
+                        this._$colorBoxInputContainer.toggleClass(COLOR_BOX_COLOR_IS_NOT_DEFINED, !value);
+                        if (value)
+                            colorUtils.makeTransparentBackground(this._$colorResultPreview, value);
+                        else
+                            this._$colorResultPreview.removeAttr("style");
+                        if (this._colorView)
+                            this._colorView.option("value", value);
+                        this.callBase(args);
+                        break;
+                    case"applyButtonText":
+                    case"cancelButtonText":
+                        this.callBase(args);
+                        this._popup && this._addPopupBottomClasses();
+                        break;
+                    case"editAlphaChannel":
+                    case"onCancelButtonClick":
+                    case"onApplyButtonClick":
+                    case"keyStep":
+                        if (this._colorView)
+                            this._colorView.option(name, value);
+                        break;
+                    case"applyValueMode":
+                        if (this._colorView)
+                            this._colorView.option(name, value);
+                        this.callBase(args);
+                        break;
+                    case"rtlEnabled":
+                        if (this._colorView)
+                            this._colorView.option(name, value);
+                        this.callBase(args);
+                        break;
+                    default:
+                        this.callBase(args)
+                }
+            }
+        }));
+        DX.registerComponent("dxColorPicker", ui, ui.dxColorBox.inherit({ctor: function() {
+                DX.log("W0000", this.NAME, "14.2", "Use 'dxColorBox' instead");
+                this.callBase.apply(this, arguments)
+            }}));
+        ui.dxColorBox.__internals = {
+            COLOR_BOX_CLASS: COLOR_BOX_CLASS,
+            COLOR_BOX_INPUT_CLASS: COLOR_BOX_INPUT_CLASS,
+            COLOR_BOX_INPUT_CONTAINER_CLASS: COLOR_BOX_INPUT_CONTAINER_CLASS,
+            COLOR_BOX_COLOR_RESULT_PREVIEW_CLASS: COLOR_BOX_COLOR_RESULT_PREVIEW_CLASS,
+            COLOR_BOX_COLOR_IS_NOT_DEFINED: COLOR_BOX_COLOR_IS_NOT_DEFINED,
+            COLOR_BOX_OVERLAY_CLASS: COLOR_BOX_OVERLAY_CLASS
+        }
     })(jQuery, DevExpress);
     DevExpress.MOD_WIDGETS_BASE = true
 }
