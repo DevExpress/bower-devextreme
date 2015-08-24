@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Visualization Core Library)
-* Version: 15.1.5
-* Build date: Jul 15, 2015
+* Version: 15.1.6
+* Build date: Aug 14, 2015
 *
 * Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -19,6 +19,168 @@ if (!DevExpress.MOD_VIZ_CORE) {
     (function(DevExpress) {
         DevExpress.viz.core = {}
     })(DevExpress);
+    /*! Module viz-core, file utils.js */
+    (function(DX, $, undefined) {
+        var _utils = DX.utils,
+            _isDefined = _utils.isDefined,
+            _inArray = $.inArray,
+            _each = $.each,
+            _math = Math,
+            _round = _math.round;
+        function map(array, callback) {
+            var i = 0,
+                len = array.length,
+                ret = [],
+                value;
+            while (i < len) {
+                value = callback(array[i], i);
+                if (value !== null)
+                    ret.push(value);
+                i++
+            }
+            return ret
+        }
+        function selectByKeys(object, keys) {
+            return map(keys, function(key) {
+                    return object[key] ? object[key] : null
+                })
+        }
+        function decreaseFields(object, keys, eachDecrease, decrease) {
+            var dec = decrease;
+            _each(keys, function(_, key) {
+                if (object[key]) {
+                    object[key] -= eachDecrease;
+                    dec -= eachDecrease
+                }
+            });
+            return dec
+        }
+        DX.viz.core.utils = {
+            decreaseGaps: function(object, keys, decrease) {
+                var arrayGaps;
+                do {
+                    arrayGaps = selectByKeys(object, keys);
+                    arrayGaps.push(_math.ceil(decrease / arrayGaps.length));
+                    decrease = decreaseFields(object, keys, _math.min.apply(null, arrayGaps), decrease)
+                } while (decrease > 0 && arrayGaps.length > 1);
+                return decrease
+            },
+            parseScalar: function(value, defaultValue) {
+                return value !== undefined ? value : defaultValue
+            },
+            enumParser: function(values) {
+                var stored = {},
+                    i,
+                    ii;
+                for (i = 0, ii = values.length; i < ii; ++i)
+                    stored[String(values[i]).toLowerCase()] = 1;
+                return function(value, defaultValue) {
+                        var _value = String(value).toLowerCase();
+                        return stored[_value] ? _value : defaultValue
+                    }
+            },
+            patchFontOptions: function(options) {
+                var fontOptions = {};
+                _each(options || {}, function(key, value) {
+                    if (/^(cursor|opacity)$/i.test(key));
+                    else if (key === "color")
+                        key = "fill";
+                    else
+                        key = "font-" + key;
+                    fontOptions[key] = value
+                });
+                return fontOptions
+            },
+            convertPolarToXY: function(centerCoords, startAngle, angle, radius) {
+                var shiftAngle = 90,
+                    cossin;
+                angle = _isDefined(angle) ? angle + startAngle - shiftAngle : 0;
+                cossin = _utils.getCosAndSin(angle);
+                return {
+                        x: _round(centerCoords.x + radius * cossin.cos),
+                        y: _round(centerCoords.y + radius * cossin.sin)
+                    }
+            },
+            convertXYToPolar: function(centerCoords, x, y) {
+                var radius = _utils.getDistance(centerCoords.x, centerCoords.y, x, y),
+                    angle = _math.atan2(y - centerCoords.y, x - centerCoords.x);
+                return {
+                        phi: _round(_utils.normalizeAngle(angle * 180 / _math.PI)),
+                        r: _round(radius)
+                    }
+            },
+            processSeriesTemplate: function(seriesTemplate, items) {
+                var customizeSeries = _utils.isFunction(seriesTemplate.customizeSeries) ? seriesTemplate.customizeSeries : $.noop,
+                    nameField = seriesTemplate.nameField || 'series',
+                    generatedSeries = {},
+                    seriesOrder = [],
+                    series,
+                    i = 0,
+                    length,
+                    data;
+                for (length = items.length; i < length; i++) {
+                    data = items[i];
+                    if (nameField in data) {
+                        series = generatedSeries[data[nameField]];
+                        if (!series) {
+                            series = generatedSeries[data[nameField]] = {
+                                name: data[nameField],
+                                data: []
+                            };
+                            seriesOrder.push(series.name)
+                        }
+                        series.data.push(data)
+                    }
+                }
+                return map(seriesOrder, function(orderedName) {
+                        var group = generatedSeries[orderedName];
+                        return $.extend(group, customizeSeries.call(null, group.name))
+                    })
+            },
+            getCategoriesInfo: function(categories, startValue, endValue) {
+                if (!(categories && categories.length > 0))
+                    return {};
+                startValue = _isDefined(startValue) ? startValue : categories[0];
+                endValue = _isDefined(endValue) ? endValue : categories[categories.length - 1];
+                var categoriesValue = map(categories, function(category) {
+                        return _isDefined(category) ? category.valueOf() : null
+                    }),
+                    visibleCategories = [],
+                    indexStartValue = _isDefined(startValue) ? _inArray(startValue.valueOf(), categoriesValue) : 0,
+                    indexEndValue = _isDefined(endValue) ? _inArray(endValue.valueOf(), categoriesValue) : categories.length - 1,
+                    swapBuf,
+                    hasVisibleCategories,
+                    inverted = false,
+                    visibleCategoriesLen;
+                indexStartValue < 0 && (indexStartValue = 0);
+                indexEndValue < 0 && (indexEndValue = categories.length - 1);
+                if (indexEndValue < indexStartValue) {
+                    swapBuf = indexEndValue;
+                    indexEndValue = indexStartValue;
+                    indexStartValue = swapBuf;
+                    inverted = true
+                }
+                visibleCategories = categories.slice(indexStartValue, indexEndValue + 1);
+                visibleCategoriesLen = visibleCategories.length;
+                hasVisibleCategories = visibleCategoriesLen > 0;
+                return {
+                        categories: hasVisibleCategories ? visibleCategories : null,
+                        start: hasVisibleCategories ? visibleCategories[inverted ? visibleCategoriesLen - 1 : 0] : null,
+                        end: hasVisibleCategories ? visibleCategories[inverted ? 0 : visibleCategoriesLen - 1] : null,
+                        inverted: inverted
+                    }
+            },
+            unique: function(array) {
+                var values = {};
+                return map(array, function(item) {
+                        var result = !values[item] ? item : null;
+                        values[item] = true;
+                        return result
+                    })
+            },
+            map: map
+        }
+    })(DevExpress, jQuery);
     /*! Module viz-core, file errorsWarnings.js */
     (function($, DX) {
         $.extend(DX.ERROR_MESSAGES, {
@@ -34,7 +196,6 @@ if (!DevExpress.MOD_VIZ_CORE) {
             E2106: "Invalid visible range",
             E2202: "Invalid scale {0} value",
             E2203: "The \"{0}\" field of the \"selectedRange\" configuration object is not valid",
-            W2001: "{0} cannot be drawn because its container is invisible",
             W2002: "The {0} data field is absent",
             W2003: "Tick interval is too small",
             W2101: "\"{0}\" pane does not exist; \"{1}\" pane is used instead",
@@ -401,7 +562,6 @@ if (!DevExpress.MOD_VIZ_CORE) {
             _atan = _math.atan,
             _max = _math.max,
             _each = $.each,
-            _map = $.map,
             _noop = $.noop,
             _isFunction = $.isFunction,
             SCREEN_DELTA_KOEF = 4,
@@ -688,7 +848,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     joinNeeded = !isRotate && options.isHorizontal;
                 if (ticks.length === 0)
                     return 0;
-                ticksString = joinNeeded ? _map(ticks, function(tick) {
+                ticksString = joinNeeded ? core.utils.map(ticks, function(tick) {
                     return getText(tick, options.labelOptions)
                 }).join("\n") : getText(ticks[0], options.labelOptions);
                 bBox = that._getTextElementBbox(ticksString, ticksString);
@@ -706,8 +866,8 @@ if (!DevExpress.MOD_VIZ_CORE) {
             _isNumber = utils.isNumber,
             _addInterval = utils.addInterval,
             _adjustValue = utils.adjustValue,
+            _map = core.utils.map,
             _each = $.each,
-            _map = $.map,
             _inArray = $.inArray,
             _noop = $.noop,
             DEFAULT_GRID_SPACING_FACTOR = 30,
@@ -1510,7 +1670,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     categories = range.categories || [],
                     script = {},
                     canvasOptions = that._prepareCanvasOptions(),
-                    visibleCategories = utils.getCategoriesInfo(categories, range.minVisible, range.maxVisible).categories,
+                    visibleCategories = core.utils.getCategoriesInfo(categories, range.minVisible, range.maxVisible).categories,
                     categoriesLength = (visibleCategories || categories).length;
                 switch (range.axisType) {
                     case"logarithmic":
@@ -1942,7 +2102,8 @@ if (!DevExpress.MOD_VIZ_CORE) {
     })(jQuery, DevExpress);
     /*! Module viz-core, file themes.js */
     (function(DX, $, undefined) {
-        var themes = {},
+        var viz = DX.viz,
+            themes = {},
             themesMapping = {},
             themesSchemeMapping = {},
             _extend = $.extend,
@@ -2107,7 +2268,9 @@ if (!DevExpress.MOD_VIZ_CORE) {
             });
             return this
         }
-        _extend(DX.viz.core, {
+        viz.currentTheme = currentTheme;
+        viz.registerTheme = registerTheme;
+        _extend(viz.core, {
             findTheme: findTheme,
             currentTheme: currentTheme,
             registerTheme: registerTheme,
@@ -2117,7 +2280,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
             addCacheItem: addCacheItem,
             removeCacheItem: removeCacheItem
         });
-        _extend(DX.viz.core, {
+        _extend(viz.core, {
             themes: themes,
             themesMapping: themesMapping,
             themesSchemeMapping: themesSchemeMapping,
@@ -2126,7 +2289,8 @@ if (!DevExpress.MOD_VIZ_CORE) {
     })(DevExpress, jQuery);
     /*! Module viz-core, file palette.js */
     (function(DX, $, undefined) {
-        var _String = window.String,
+        var viz = DX.viz,
+            _String = window.String,
             _floor = Math.floor,
             _ceil = Math.ceil,
             _Color = DX.Color,
@@ -2314,90 +2478,17 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 gradient.push(colors[kl].blend(colors[kr], k - kl).toHex())
             }
         }
-        _extend(DX.viz.core, {
-            registerPalette: registerPalette,
-            getPalette: getPalette,
+        viz.registerPalette = registerPalette;
+        viz.getPalette = getPalette;
+        viz.currentPalette = currentPalette;
+        _extend(viz.core, {
             Palette: Palette,
             GradientPalette: GradientPalette,
+            registerPalette: registerPalette,
+            getPalette: getPalette,
             currentPalette: currentPalette
         });
-        DX.viz.core._DEBUG_palettes = palettes
-    })(DevExpress, jQuery);
-    /*! Module viz-core, file utils.js */
-    (function(DX, $, undefined) {
-        var _ceil = Math.ceil,
-            _min = Math.min,
-            _round = Math.round;
-        function selectByKeys(object, keys) {
-            return $.map(keys, function(key) {
-                    return object[key] ? object[key] : null
-                })
-        }
-        function decreaseFields(object, keys, eachDecrease, decrease) {
-            var dec = decrease;
-            $.each(keys, function(_, key) {
-                if (object[key]) {
-                    object[key] -= eachDecrease;
-                    dec -= eachDecrease
-                }
-            });
-            return dec
-        }
-        DX.viz.core.utils = {
-            decreaseGaps: function(object, keys, decrease) {
-                var arrayGaps;
-                do {
-                    arrayGaps = selectByKeys(object, keys);
-                    arrayGaps.push(_ceil(decrease / arrayGaps.length));
-                    decrease = decreaseFields(object, keys, _min.apply(null, arrayGaps), decrease)
-                } while (decrease > 0 && arrayGaps.length > 1);
-                return decrease
-            },
-            parseScalar: function(value, defaultValue) {
-                return value !== undefined ? value : defaultValue
-            },
-            enumParser: function(values) {
-                var stored = {},
-                    i,
-                    ii;
-                for (i = 0, ii = values.length; i < ii; ++i)
-                    stored[String(values[i]).toLowerCase()] = 1;
-                return function(value, defaultValue) {
-                        var _value = String(value).toLowerCase();
-                        return stored[_value] ? _value : defaultValue
-                    }
-            },
-            patchFontOptions: function(options) {
-                var fontOptions = {};
-                $.each(options || {}, function(key, value) {
-                    if (/^(cursor|opacity)$/i.test(key));
-                    else if (key === "color")
-                        key = "fill";
-                    else
-                        key = "font-" + key;
-                    fontOptions[key] = value
-                });
-                return fontOptions
-            },
-            convertPolarToXY: function(centerCoords, startAngle, angle, radius) {
-                var shiftAngle = 90,
-                    cossin;
-                angle = DX.utils.isDefined(angle) ? angle + startAngle - shiftAngle : 0;
-                cossin = DX.utils.getCosAndSin(angle);
-                return {
-                        x: _round(centerCoords.x + radius * cossin.cos),
-                        y: _round(centerCoords.y + radius * cossin.sin)
-                    }
-            },
-            convertXYToPolar: function(centerCoords, x, y) {
-                var radius = DX.utils.getDistance(centerCoords.x, centerCoords.y, x, y),
-                    angle = Math.atan2(y - centerCoords.y, x - centerCoords.x);
-                return {
-                        phi: _round(DX.utils.normalizeAngle(angle * 180 / Math.PI)),
-                        r: _round(radius)
-                    }
-            }
-        }
+        viz.core._DEBUG_palettes = palettes
     })(DevExpress, jQuery);
     /*! Module viz-core, file baseThemeManager.js */
     (function(DX, $, undefined) {
@@ -2518,11 +2609,10 @@ if (!DevExpress.MOD_VIZ_CORE) {
             LOADING_INDICATOR_READY = "loadingIndicatorReady";
         function LoadIndicator(parameters) {
             var that = this,
-                renderer = parameters.renderer,
-                group = that._group = renderer.g().attr({"class": "dx-l-i"});
-            that._renderer = renderer;
-            that._rect = renderer.rect().attr({opacity: 0}).append(group);
-            that._text = renderer.text().attr({align: "center"}).append(group);
+                renderer = that._renderer = parameters.renderer;
+            that._group = renderer.g().attr({"class": "dx-l-i"}).linkOn(renderer.root, "loading-indicator");
+            that._rect = renderer.rect().attr({opacity: 0}).append(that._group);
+            that._text = renderer.text().attr({align: "center"}).append(that._group);
             that._createStates(parameters.eventTrigger)
         }
         LoadIndicator.prototype = {
@@ -2533,7 +2623,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 that._states[STATE_HIDE] = {
                     o: 0,
                     c: function() {
-                        that._group.remove();
+                        that._group.linkRemove();
                         that._renderer.root.attr({"pointer-events": null});
                         eventTrigger(LOADING_INDICATOR_READY)
                     }
@@ -2556,9 +2646,6 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     }
                 }
             },
-            append: function() {
-                this._visible && this._group.append(this._renderer.root)
-            },
             applyCanvas: function(canvas) {
                 var width = canvas.width,
                     height = canvas.height;
@@ -2577,7 +2664,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
             },
             dispose: function() {
                 var that = this;
-                that._group.remove();
+                that._group.linkRemove().linkOff();
                 that._group = that._renderer = that._rect = that._text = that._states = null
             },
             forceShow: function() {
@@ -2602,7 +2689,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     if (!that._visible) {
                         that._visible = true;
                         that._renderer.root.attr({"pointer-events": "none"});
-                        that.append()
+                        that._group.linkAppend()
                     }
                     that._transit(STATE_SHOW)
                 }
@@ -2669,7 +2756,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 height: 0,
                 "pointer-events": "none"
             }).addClass(params.cssClass);
-            that._renderer = renderer = new DX.viz.renderers.Renderer({});
+            that._renderer = renderer = new DX.viz.renderers.Renderer({pathModified: params.pathModified});
             root = renderer.root;
             root.attr({"pointer-events": "none"});
             renderer.draw(that._wrapper.get(0));
@@ -2842,7 +2929,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     state = that._state,
                     coords = state.tc,
                     contentSize = state.contentSize;
-                if (that._calculatePosition(x, y, offset)) {
+                if (that._calculatePosition(x, y, offset, canvas)) {
                     that._cloud.attr({points: coords.cloudPoints}).move(contentSize.lm, contentSize.tm);
                     if (state.html)
                         that._textGroupHtml.css({
@@ -2853,9 +2940,13 @@ if (!DevExpress.MOD_VIZ_CORE) {
                         that._textGroup.move(-contentSize.x + contentSize.lm, -contentSize.y + contentSize.tm + coords.correction);
                     that._renderer.resize(coords.hp === "out" ? canvas.fullWidth - canvas.left : contentSize.fullWidth, coords.vp === "out" ? canvas.fullHeight - canvas.top : contentSize.fullHeight)
                 }
+                offset = that._wrapper.css({
+                    left: 0,
+                    top: 0
+                }).offset();
                 that._wrapper.css({
-                    left: coords.x,
-                    top: coords.y
+                    left: coords.x - offset.left,
+                    top: coords.y - offset.top
                 })
             },
             formatValue: function(value, specialFormat) {
@@ -2872,9 +2963,8 @@ if (!DevExpress.MOD_VIZ_CORE) {
             isShared: function() {
                 return !!this._options.shared
             },
-            _calculatePosition: function(x, y, offset) {
+            _calculatePosition: function(x, y, offset, canvas) {
                 var that = this,
-                    canvas = that._getCanvas(),
                     options = that._options,
                     arrowLength = options.arrowLength,
                     state = that._state,
@@ -3019,7 +3109,6 @@ if (!DevExpress.MOD_VIZ_CORE) {
             _enumParser = coreUtils.enumParser,
             _extend = $.extend,
             _each = $.each,
-            _map = $.map,
             DEFAULT_MARGIN = 10,
             DEFAULT_MARKER_HATCHING_WIDTH = 2,
             DEFAULT_MARKER_HATCHING_STEP = 5,
@@ -3339,7 +3428,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 for (; i < that._patterns.length; i++)
                     that._patterns[i].dispose();
                 that._patterns = [];
-                that._items = _map(items, function(dataItem, i) {
+                that._items = coreUtils.map(items, function(dataItem, i) {
                     var group = that._insideLegendGroup,
                         markerSize = _Number(dataItem.size > 0 ? dataItem.size : initMarkerSize),
                         stateOfDataItem = dataItem.states,
@@ -3930,6 +4019,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
             mathCos = math.cos,
             mathAbs = math.abs,
             mathPI = math.PI,
+            _each = $.each,
             PI_DIV_180 = mathPI / 180,
             _parseInt = parseInt,
             MAX_PIXEL_COUNT = 1E10,
@@ -4526,6 +4616,63 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 element.appendChild(item[fieldName])
             }
         }
+        function applyTextEllipsis(maxWidth) {
+            var element = this.element,
+                lines = [],
+                bbox = this.getBBox(),
+                maxLength = 0,
+                requiredLength,
+                hasEllipsis = false;
+            if (maxWidth > 0 && bbox.width > maxWidth) {
+                if (this._texts)
+                    _each(this._texts, function(i, text) {
+                        if (!lines[text.line] || text.line === undefined) {
+                            text.startIndex = 0;
+                            text.endIndex = text.value.length;
+                            lines.push({
+                                commonLength: text.value.length,
+                                parts: [text]
+                            })
+                        }
+                        else {
+                            text.startIndex = lines[text.line].commonLength + 1;
+                            text.endIndex = lines[text.line].commonLength + text.value.length;
+                            lines[text.line].parts.push(text);
+                            lines[text.line].commonLength += text.value.length
+                        }
+                    });
+                else
+                    lines = [{
+                            commonLength: element.textContent.length,
+                            parts: [{
+                                    value: element.textContent,
+                                    tspan: element,
+                                    startIndex: 0,
+                                    endIndex: element.textContent.length
+                                }]
+                        }];
+                _each(lines, function(_, line) {
+                    maxLength = mathMax(maxLength, line.commonLength)
+                });
+                requiredLength = mathCeil(maxLength * maxWidth / bbox.width);
+                _each(lines, function(_, line) {
+                    _each(line.parts, function(i, text) {
+                        var newText;
+                        if (text.startIndex < requiredLength && text.endIndex > requiredLength) {
+                            newText = text.value.substr(0, requiredLength - text.startIndex - 4) + "...";
+                            text.tspan.textContent = newText;
+                            text.stroke && (text.stroke.textContent = newText);
+                            hasEllipsis = true
+                        }
+                        else if (text.startIndex > requiredLength) {
+                            text.tspan.parentNode.removeChild(text.tspan);
+                            text.stroke && text.stroke.parentNode.removeChild(text.stroke)
+                        }
+                    })
+                })
+            }
+            return hasEllipsis
+        }
         function createTextNodes(wrapper, text, isStroked) {
             var items;
             wrapper._texts = null;
@@ -4748,7 +4895,8 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     that.type = type || "line";
                 if (tagName === "text") {
                     that.attr = textAttr;
-                    that.css = textCss
+                    that.css = textCss;
+                    that.applyEllipsis = applyTextEllipsis
                 }
                 else if (tagName === "path")
                     if (that.type === "arc") {
@@ -4780,6 +4928,60 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 var elem = this.element,
                     parent = elem.parentNode;
                 parent && parent.removeChild(elem);
+                return this
+            },
+            enableLinks: function() {
+                this._links = [];
+                return this
+            },
+            checkLinks: function() {
+                var count = 0;
+                $.each(this._links, function(_, item) {
+                    if (!item._link.virtual)
+                        ++count
+                });
+                if (count > 0)
+                    throw new Error("There are non disposed links!");
+            },
+            virtualLink: function(parameters) {
+                linkItem({_link: {
+                        virtual: true,
+                        name: parameters.name || parameters,
+                        after: parameters.after
+                    }}, this._links);
+                return this
+            },
+            linkOn: function(target, parameters) {
+                this._link = {
+                    to: target,
+                    is: false,
+                    name: parameters.name || parameters,
+                    after: parameters.after
+                };
+                linkItem(this, target._links);
+                return this
+            },
+            linkOff: function() {
+                unlinkItem(this, this._link.to._links);
+                this._link = null;
+                return this
+            },
+            linkAppend: function() {
+                var link = this._link,
+                    items = link.to._links,
+                    i,
+                    next;
+                for (i = link.i + 1; (next = items[i]) && !next._link.is; ++i);;
+                this._insert(link.to, next);
+                link.is = true;
+                return this
+            },
+            _insert: function(parent, next) {
+                parent.element.insertBefore(this.element, next ? next.element : null)
+            },
+            linkRemove: function() {
+                this.remove();
+                this._link.is = false;
                 return this
             },
             clear: function() {
@@ -4909,6 +5111,32 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 return this
             }
         };
+        function updateIndexes(items, k) {
+            var i,
+                item;
+            for (i = k; !!(item = items[i]); ++i)
+                item._link.i = i
+        }
+        function linkItem(target, items) {
+            var key = target._link.after,
+                i,
+                item;
+            if (key) {
+                for (i = 0; (item = items[i]) && item._link.name !== key; ++i);;
+                if (item)
+                    for (++i; (item = items[i]) && item._link.after === key; ++i);
+            }
+            else
+                i = items.length;
+            items.splice(i, 0, target);
+            updateIndexes(items, i)
+        }
+        function unlinkItem(target, items) {
+            var i;
+            for (i = 0; items[i] !== target; ++i);;
+            items.splice(i, 1);
+            updateIndexes(items, i)
+        }
         function SvgRenderer(options) {
             var that = this;
             that.root = that._createElement("svg", {
@@ -4928,20 +5156,20 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 display: "block",
                 overflow: "hidden"
             });
-            that._defs = that._createElement("defs");
+            that._defs = that._createElement("defs").append(that.root);
             that._animationController = new rendererNS.AnimationController(that.root.element);
             that._animation = {
                 enabled: true,
                 duration: 1000,
                 easing: "easeOutCubic"
-            }
+            };
+            that.pathModified = !!options.pathModified
         }
         rendererNS.SvgRenderer = SvgRenderer;
         SvgRenderer.prototype = {
             constructor: SvgRenderer,
             setOptions: function(options) {
                 var that = this;
-                that.pathModified = !!options.pathModified;
                 that.rtl = !!options.rtl;
                 that.encodeHtml = !!options.encodeHtml,
                 that.updateAnimationOptions(options.animation || {});
@@ -4957,7 +5185,6 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 if (!container || that.drawn)
                     return that;
                 that.root.append(container);
-                that._defs.append(that.root);
                 that.drawn = true;
                 return that
             },
@@ -4972,7 +5199,6 @@ if (!DevExpress.MOD_VIZ_CORE) {
             clear: function() {
                 var that = this;
                 that.root.remove();
-                that._defs.remove();
                 that.drawn = null;
                 return this
             },
@@ -5198,8 +5424,10 @@ if (!DevExpress.MOD_VIZ_CORE) {
             mathMin = math.min,
             mathMax = math.max,
             mathFloor = math.floor,
+            mathCeil = math.ceil,
             mathSin = math.sin,
             mathCos = math.cos,
+            _each = $.each,
             baseElementPrototype = rendererNS.SvgElement.prototype,
             documentFragment = doc.createDocumentFragment(),
             STROKEWIDTH = "stroke-width",
@@ -5575,6 +5803,59 @@ if (!DevExpress.MOD_VIZ_CORE) {
                             processAttr(element, attr, value, params)
                     },
                     attr: baseAttr,
+                    applyEllipsis: function(maxWidth) {
+                        var element = this.element,
+                            textContent,
+                            lineIndex = 0,
+                            lines = [{
+                                    commonLength: 0,
+                                    parts: []
+                                }],
+                            bbox = this.getBBox(),
+                            maxLength = 0,
+                            requiredLength,
+                            hasEllipsis = false;
+                        if (maxWidth > 0 && bbox.width > maxWidth) {
+                            _each(element.childNodes || [], function(i, text) {
+                                if (text.nodeName !== "BR") {
+                                    textContent = $(text).text();
+                                    lines[lineIndex].parts.push({
+                                        span: text,
+                                        startIndex: lines[lineIndex].commonLength + 1,
+                                        endIndex: lines[lineIndex].commonLength + textContent.length
+                                    });
+                                    lines[lineIndex].commonLength += textContent.length
+                                }
+                                else {
+                                    lines.push({
+                                        commonLength: 0,
+                                        parts: []
+                                    });
+                                    lineIndex++
+                                }
+                            });
+                            _each(lines, function(_, line) {
+                                maxLength = mathMax(maxLength, line.commonLength)
+                            });
+                            requiredLength = mathCeil(maxLength * maxWidth / bbox.width);
+                            _each(lines, function(_, line) {
+                                _each(line.parts, function(i, text) {
+                                    var newText;
+                                    if (text.startIndex < requiredLength && text.endIndex > requiredLength) {
+                                        newText = $(text.span).text().substr(0, requiredLength - text.startIndex - 4) + "...";
+                                        if (text.span.nodeName === "#text")
+                                            text.span.data = newText;
+                                        else
+                                            text.span.innerHTML = newText;
+                                        hasEllipsis = true
+                                    }
+                                    else if (text.startIndex > requiredLength)
+                                        text.span.parentNode.removeChild(text.span)
+                                })
+                            })
+                        }
+                        return hasEllipsis
+                    },
                     _applyTransformation: function(params) {
                         this.element.offsetHeight;
                         var that = this,
@@ -5757,19 +6038,26 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     height: renderer.root.attr("height")
                 })
             },
-            append: function(parent) {
-                parent = parent || this.renderer.root;
-                (parent.element || parent).appendChild(this.element);
+            _onAppended: function(parent) {
+                var that = this;
                 if (parent._children) {
-                    this._parent = parent;
-                    if (inArray(parent._children, this) === -1)
-                        parent._children.push(this);
-                    this.attr(extend(getInheritSettings(parent._fullSettings), this._settings), true)
+                    that._parent = parent;
+                    if (inArray(parent._children, that) === -1)
+                        parent._children.push(that);
+                    that.attr(extend(getInheritSettings(parent._fullSettings), that._settings), true)
                 }
-                this._applyStyleSheet();
-                if (parent._clipRect && this !== parent._clipRect)
-                    parent._clipRect.append(parent);
+                that._applyStyleSheet();
+                if (parent._clipRect && that !== parent._clipRect)
+                    parent._clipRect.append(parent)
+            },
+            append: function(parent) {
+                baseElementPrototype.append.apply(this, arguments);
+                this._onAppended(parent || this.renderer.root);
                 return this
+            },
+            _insert: function(parent) {
+                baseElementPrototype._insert.apply(this, arguments);
+                this._onAppended(parent)
             },
             _applyTransformation: function(params) {
                 var that = this,
@@ -5796,16 +6084,14 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 style.top = y + (settings.translateY || 0)
             },
             remove: function() {
-                var that = this,
-                    parent = that._parent;
-                if (parent)
-                    parent._children.splice(inArray(parent._children, that), 1);
-                that._parent = null;
-                return baseElementPrototype.remove.call(that)
+                var parent = this._parent;
+                parent && parent._children.splice(inArray(parent._children, this), 1);
+                this._parent = null;
+                return baseElementPrototype.remove.apply(this, arguments)
             },
             clear: function() {
                 this._children = [];
-                return baseElementPrototype.clear.call(this)
+                return baseElementPrototype.clear.apply(this, arguments)
             },
             getBBox: function() {
                 var clientRect = this._getBBox(),
@@ -5915,6 +6201,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     append: stubReturnedThis,
                     dispose: stubReturnedThis
                 };
+                that.pathModified = !!options.pathModified;
                 that.setOptions(options)
             };
         extend(VmlRenderer.prototype, rendererNS.SvgRenderer.prototype);
@@ -6241,466 +6528,444 @@ if (!DevExpress.MOD_VIZ_CORE) {
         }
     })(DevExpress);
     /*! Module viz-core, file seriesFamily.js */
-    (function($, DX, undefined) {
-        var utils = DX.utils,
+    (function($, DX) {
+        var core = DX.viz.core,
             _math = Math,
             _round = _math.round,
             _abs = _math.abs,
             _pow = _math.pow,
-            _each = $.each;
-        DX.viz.core.series.helpers.SeriesFamily = DX.Class.inherit(function() {
-            var ctor = function(options) {
-                    var debug = DX.utils.debug;
-                    debug.assert(options.type, "type was not passed or empty");
-                    var that = this,
-                        stubFunction = $.noop;
-                    that.type = options.type.toLowerCase();
-                    that.pane = options.pane;
-                    that.series = [];
-                    that.updateOptions(options);
-                    switch (that.type) {
-                        case"bar":
-                            that.adjustSeriesDimensions = adjustBarSeriesDimensions;
-                            that.adjustSeriesValues = stubFunction;
-                            that.updateSeriesValues = updateBarSeriesValues;
-                            break;
-                        case"rangebar":
-                            that.adjustSeriesDimensions = adjustBarSeriesDimensions;
-                            that.adjustSeriesValues = stubFunction;
-                            that.updateSeriesValues = stubFunction;
-                            break;
-                        case"fullstackedbar":
-                            that.fullStacked = true;
-                            that.adjustSeriesDimensions = adjustStackedBarSeriesDimensions;
-                            that.adjustSeriesValues = adjustStackedSeriesValues;
-                            that.updateSeriesValues = updateStackedSeriesValues;
-                            break;
-                        case"stackedbar":
-                            that.adjustSeriesDimensions = adjustStackedBarSeriesDimensions;
-                            that.adjustSeriesValues = adjustStackedSeriesValues;
-                            that.updateSeriesValues = updateStackedSeriesValues;
-                            break;
-                        case"fullstackedarea":
-                        case"fullstackedline":
-                        case"fullstackedspline":
-                        case"fullstackedsplinearea":
-                            that.fullStacked = true;
-                            that.adjustSeriesDimensions = stubFunction;
-                            that.adjustSeriesValues = adjustStackedSeriesValues;
-                            that.updateSeriesValues = stubFunction;
-                            break;
-                        case"stackedarea":
-                        case"stackedsplinearea":
-                        case"stackedline":
-                        case"stackedspline":
-                            that.adjustSeriesDimensions = stubFunction;
-                            that.adjustSeriesValues = adjustStackedSeriesValues;
-                            that.updateSeriesValues = stubFunction;
-                            break;
-                        case"candlestick":
-                        case"stock":
-                            that.adjustSeriesDimensions = adjustCandlestickSeriesDimensions;
-                            that.adjustSeriesValues = stubFunction;
-                            that.updateSeriesValues = stubFunction;
-                            break;
-                        case"bubble":
-                            that.adjustSeriesDimensions = adjustBubbleSeriesDimensions;
-                            that.adjustSeriesValues = stubFunction;
-                            that.updateSeriesValues = stubFunction;
-                            break;
-                        default:
-                            that.adjustSeriesDimensions = stubFunction;
-                            that.adjustSeriesValues = stubFunction;
-                            that.updateSeriesValues = stubFunction;
-                            break
-                    }
-                };
-            var updateOptions = function(options) {
-                    this.equalBarWidth = options.equalBarWidth;
-                    this.minBubbleSize = options.minBubbleSize;
-                    this.maxBubbleSize = options.maxBubbleSize
-                };
-            var dispose = function() {
-                    this.series = null;
-                    this.translators = null
-                };
-            var add = function(series) {
-                    var that = this,
-                        singleSeries,
+            _each = $.each,
+            _noop = $.noop;
+        function getStacksWithArgument(stackKeepers, argument) {
+            var stacksWithArgument = [];
+            _each(stackKeepers, function(stackName, seriesInStack) {
+                _each(seriesInStack, function(_, singleSeries) {
+                    var points = singleSeries.getPointsByArg(argument),
+                        pointsLength = points.length,
                         i;
-                    if (!$.isArray(series))
-                        series = [series];
-                    for (i = 0; i < series.length; i++) {
-                        singleSeries = series[i];
-                        if (singleSeries.type.toLowerCase() === that.type)
-                            that.series.push(singleSeries)
-                    }
-                };
-            function correctPointCoordinates(points, width, offset) {
-                _each(points, function(_, point) {
-                    point.correctCoordinates({
-                        width: width,
-                        offset: offset
+                    for (i = 0; i < pointsLength; ++i)
+                        if (points[i] && points[i].value) {
+                            stacksWithArgument.push(stackName);
+                            return false
+                        }
+                })
+            });
+            return stacksWithArgument
+        }
+        function correctPointCoordinatesForStacks(stackKeepers, stacksWithArgument, argument, middleIndex, width, spacing) {
+            _each(stackKeepers, function(stackName, seriesInStack) {
+                var stackIndex = $.inArray(stackName, stacksWithArgument),
+                    offset;
+                if (stackIndex === -1)
+                    return;
+                offset = (stackIndex - middleIndex + 0.5) * width - (middleIndex - stackIndex - 0.5) * spacing;
+                _each(seriesInStack, function(_, singleSeries) {
+                    _each(singleSeries.getPointsByArg(argument) || [], function(_, point) {
+                        if (point && point.value)
+                            point.correctCoordinates({
+                                width: width,
+                                offset: offset
+                            })
                     })
                 })
+            })
+        }
+        function adjustBarSeriesDimensionsCore(series, interval, stackCount, equalBarWidth, seriesStackIndexCallback) {
+            var spacing,
+                width,
+                maxWidth,
+                middleIndex,
+                stackIndex,
+                i,
+                points,
+                seriesOffset,
+                stackName,
+                argumentsKeeper = {},
+                stackKeepers = {},
+                stacksWithArgument,
+                count;
+            if (equalBarWidth) {
+                width = equalBarWidth.width && equalBarWidth.width < 0 ? 0 : equalBarWidth.width;
+                spacing = equalBarWidth.spacing && equalBarWidth.spacing < 0 ? 0 : equalBarWidth.spacing;
+                if (!spacing)
+                    if (stackCount > 1) {
+                        spacing = width ? _round((interval * 0.7 - width * stackCount) / (stackCount - 1)) : _round(interval * 0.7 / stackCount * 0.2);
+                        if (spacing < 1)
+                            spacing = 1
+                    }
+                    else
+                        spacing = 0;
+                if (!width) {
+                    width = _round((interval * 0.7 - spacing * (stackCount - 1)) / stackCount);
+                    if (width < 2)
+                        width = 2
+                }
+                if (width * stackCount + spacing * (stackCount - 1) > interval) {
+                    spacing = _round((interval * 0.7 - width * stackCount) / (stackCount - 1));
+                    if (spacing < 1) {
+                        spacing = 1;
+                        maxWidth = _round((interval * 0.7 - spacing * (stackCount - 1)) / stackCount)
+                    }
+                }
+                middleIndex = stackCount / 2;
+                for (i = 0; i < series.length; i++) {
+                    stackIndex = seriesStackIndexCallback(i, stackCount);
+                    points = series[i].getPoints();
+                    seriesOffset = (stackIndex - middleIndex + 0.5) * (maxWidth || width) - (middleIndex - stackIndex - 0.5) * spacing;
+                    correctPointCoordinates(points, width, seriesOffset)
+                }
             }
-            function getStacksWithArgument(stackKeepers, argument) {
-                var stacksWithArgument = [];
-                _each(stackKeepers, function(stackName, seriesInStack) {
-                    _each(seriesInStack, function(_, singleSeries) {
-                        var points = singleSeries.getPointsByArg(argument),
-                            pointsLength = points.length,
-                            i;
-                        for (i = 0; i < pointsLength; ++i)
-                            if (points[i] && points[i].value) {
-                                stacksWithArgument.push(stackName);
-                                return false
-                            }
+            else {
+                _each(series, function(i, singleSeries) {
+                    stackName = singleSeries.getStackName && singleSeries.getStackName();
+                    stackName = stackName || i.toString();
+                    if (!stackKeepers[stackName])
+                        stackKeepers[stackName] = [];
+                    stackKeepers[stackName].push(singleSeries)
+                });
+                _each(series, function(i, singleSeries) {
+                    _each(singleSeries.getPoints(), function(_, point) {
+                        var argument = point.argument;
+                        if (!argumentsKeeper.hasOwnProperty(argument))
+                            argumentsKeeper[argument.valueOf()] = 1
                     })
                 });
-                return stacksWithArgument
+                for (var argument in argumentsKeeper) {
+                    if (!argumentsKeeper.hasOwnProperty(argument))
+                        continue;
+                    stacksWithArgument = getStacksWithArgument(stackKeepers, argument);
+                    count = stacksWithArgument.length;
+                    spacing = _round(interval * 0.7 / count * 0.2);
+                    if (spacing < 1)
+                        spacing = 1;
+                    width = _round((interval * 0.7 - spacing * (count - 1)) / count);
+                    if (width < 2)
+                        width = 2;
+                    middleIndex = count / 2;
+                    correctPointCoordinatesForStacks(stackKeepers, stacksWithArgument, argument, middleIndex, width, spacing)
+                }
             }
-            function correctPointCoordinatesForStacks(stackKeepers, stacksWithArgument, argument, middleIndex, width, spacing) {
-                _each(stackKeepers, function(stackName, seriesInStack) {
-                    var stackIndex = $.inArray(stackName, stacksWithArgument),
-                        offset;
-                    if (stackIndex === -1)
-                        return;
-                    offset = (stackIndex - middleIndex + 0.5) * width - (middleIndex - stackIndex - 0.5) * spacing;
-                    _each(seriesInStack, function(_, singleSeries) {
-                        _each(singleSeries.getPointsByArg(argument) || [], function(_, point) {
-                            if (point && point.value)
-                                point.correctCoordinates({
-                                    width: width,
-                                    offset: offset
-                                })
-                        })
-                    })
+        }
+        function correctPointCoordinates(points, width, offset) {
+            _each(points, function(_, point) {
+                point.correctCoordinates({
+                    width: width,
+                    offset: offset
                 })
-            }
-            var adjustBarSeriesDimensionsCore = function(series, interval, stackCount, equalBarWidth, seriesStackIndexCallback) {
-                    var spacing,
-                        width,
-                        maxWidth,
-                        middleIndex,
-                        stackIndex,
-                        i,
-                        points,
-                        seriesOffset,
-                        stackName,
-                        argumentsKeeper = {},
-                        stackKeepers = {},
-                        stacksWithArgument,
-                        count;
-                    if (equalBarWidth) {
-                        width = equalBarWidth.width && equalBarWidth.width < 0 ? 0 : equalBarWidth.width;
-                        spacing = equalBarWidth.spacing && equalBarWidth.spacing < 0 ? 0 : equalBarWidth.spacing;
-                        if (!spacing)
-                            if (stackCount > 1) {
-                                spacing = width ? _round((interval * 0.7 - width * stackCount) / (stackCount - 1)) : _round(interval * 0.7 / stackCount * 0.2);
-                                if (spacing < 1)
-                                    spacing = 1
-                            }
-                            else
-                                spacing = 0;
-                        if (!width) {
-                            width = _round((interval * 0.7 - spacing * (stackCount - 1)) / stackCount);
-                            if (width < 2)
-                                width = 2
-                        }
-                        if (width * stackCount + spacing * (stackCount - 1) > interval) {
-                            spacing = _round((interval * 0.7 - width * stackCount) / (stackCount - 1));
-                            if (spacing < 1) {
-                                spacing = 1;
-                                maxWidth = _round((interval * 0.7 - spacing * (stackCount - 1)) / stackCount)
-                            }
-                        }
-                        middleIndex = stackCount / 2;
-                        for (i = 0; i < series.length; i++) {
-                            stackIndex = seriesStackIndexCallback(i);
-                            points = series[i].getPoints();
-                            seriesOffset = (stackIndex - middleIndex + 0.5) * (maxWidth || width) - (middleIndex - stackIndex - 0.5) * spacing;
-                            correctPointCoordinates(points, width, seriesOffset)
-                        }
+            })
+        }
+        function checkMinBarSize(value, minShownValue) {
+            return _abs(value) < minShownValue ? value >= 0 ? minShownValue : -minShownValue : value
+        }
+        function getValueType(value) {
+            return value >= 0 ? "positive" : "negative"
+        }
+        function getVisibleSeries(that) {
+            return core.utils.map(that.series, function(s) {
+                    return s.isVisible() ? s : null
+                })
+        }
+        function getAbsStackSumByArg(stackKeepers, stackName, argument) {
+            var positiveStackValue = (stackKeepers.positive[stackName] || {})[argument] || 0,
+                negativeStackValue = -(stackKeepers.negative[stackName] || {})[argument] || 0;
+            return positiveStackValue + negativeStackValue
+        }
+        function getSeriesStackIndexCallback(rotated, series, stackIndexes) {
+            if (!rotated)
+                return function(seriesIndex, stackCount) {
+                        return stackIndexes ? stackIndexes[series[seriesIndex].getStackName()] : seriesIndex
+                    };
+            else
+                return function(seriesIndex, stackCount) {
+                        return stackCount - (stackIndexes ? stackIndexes[series[seriesIndex].getStackName()] : seriesIndex) - 1
+                    }
+        }
+        function adjustBarSeriesDimensions(translators) {
+            var debug = DX.utils.debug;
+            debug.assert(translators, "translator was not passed or empty");
+            var that = this,
+                series = getVisibleSeries(that);
+            adjustBarSeriesDimensionsCore(series, translators.arg.getInterval(), series.length, that.equalBarWidth, getSeriesStackIndexCallback(that.rotated, series))
+        }
+        function adjustStackedBarSeriesDimensions(translators) {
+            var debug = DX.utils.debug;
+            debug.assert(translators, "translators was not passed or empty");
+            var that = this,
+                series = getVisibleSeries(that),
+                stackIndexes = {},
+                stackCount = 0;
+            _each(series, function() {
+                var stackName = this.getStackName();
+                if (!stackIndexes.hasOwnProperty(stackName))
+                    stackIndexes[stackName] = stackCount++
+            });
+            adjustBarSeriesDimensionsCore(series, translators.arg.getInterval(), stackCount, that.equalBarWidth, getSeriesStackIndexCallback(that.rotated, series, stackIndexes))
+        }
+        function adjustStackedSeriesValues() {
+            var that = this,
+                series = getVisibleSeries(that),
+                stackKeepers = {
+                    positive: {},
+                    negative: {}
+                },
+                holesStack = {
+                    left: {},
+                    right: {}
+                };
+            _each(series, function(seriesIndex, singleSeries) {
+                var points = singleSeries.getPoints(),
+                    hole = false;
+                singleSeries._prevSeries = series[seriesIndex - 1],
+                singleSeries.holes = $.extend(true, {}, holesStack);
+                _each(points, function(index, point) {
+                    var value = point.initialValue,
+                        argument = point.argument.valueOf(),
+                        stackName = singleSeries.getStackName(),
+                        stacks = value >= 0 ? stackKeepers.positive : stackKeepers.negative,
+                        currentStack;
+                    stacks[stackName] = stacks[stackName] || {};
+                    currentStack = stacks[stackName];
+                    if (currentStack[argument]) {
+                        point.correctValue(currentStack[argument]);
+                        currentStack[argument] += value
                     }
                     else {
-                        _each(series, function(i, singleSeries) {
-                            stackName = singleSeries.getStackName && singleSeries.getStackName();
-                            stackName = stackName || i.toString();
-                            if (!stackKeepers[stackName])
-                                stackKeepers[stackName] = [];
-                            stackKeepers[stackName].push(singleSeries)
-                        });
-                        _each(series, function(i, singleSeries) {
-                            _each(singleSeries.getPoints(), function(_, point) {
-                                var argument = point.argument;
-                                if (!argumentsKeeper.hasOwnProperty(argument))
-                                    argumentsKeeper[argument.valueOf()] = 1
-                            })
-                        });
-                        for (var argument in argumentsKeeper) {
-                            if (!argumentsKeeper.hasOwnProperty(argument))
-                                continue;
-                            stacksWithArgument = getStacksWithArgument(stackKeepers, argument);
-                            count = stacksWithArgument.length;
-                            spacing = _round(interval * 0.7 / count * 0.2);
-                            if (spacing < 1)
-                                spacing = 1;
-                            width = _round((interval * 0.7 - spacing * (count - 1)) / count);
-                            if (width < 2)
-                                width = 2;
-                            middleIndex = count / 2;
-                            correctPointCoordinatesForStacks(stackKeepers, stacksWithArgument, argument, middleIndex, width, spacing)
-                        }
+                        currentStack[argument] = value;
+                        point.resetCorrection()
                     }
+                    if (!point.hasValue()) {
+                        var prevPoint = points[index - 1];
+                        if (!hole && prevPoint && prevPoint.hasValue()) {
+                            argument = prevPoint.argument.valueOf();
+                            prevPoint._skipSetRightHole = true;
+                            holesStack.right[argument] = (holesStack.right[argument] || 0) + (prevPoint.value - (isFinite(prevPoint.minValue) ? prevPoint.minValue : 0))
+                        }
+                        hole = true
+                    }
+                    else if (hole) {
+                        hole = false;
+                        holesStack.left[argument] = (holesStack.left[argument] || 0) + (point.value - (isFinite(point.minValue) ? point.minValue : 0));
+                        point._skipSetLeftHole = true
+                    }
+                })
+            });
+            _each(series, function(seriesIndex, singleSeries) {
+                var points = singleSeries.getPoints(),
+                    holes = singleSeries.holes;
+                _each(points, function(index, point) {
+                    var argument = point.argument.valueOf();
+                    point.resetHoles();
+                    !point._skipSetLeftHole && point.setHole(holes.left[argument] || holesStack.left[argument] && 0, "left");
+                    !point._skipSetRightHole && point.setHole(holes.right[argument] || holesStack.right[argument] && 0, "right");
+                    point._skipSetLeftHole = null;
+                    point._skipSetRightHole = null
+                })
+            });
+            that._stackKeepers = stackKeepers;
+            _each(series, function(_, singleSeries) {
+                _each(singleSeries.getPoints(), function(_, point) {
+                    var argument = point.argument.valueOf();
+                    point.setPercentValue(getAbsStackSumByArg(stackKeepers, singleSeries.getStackName(), argument), that.fullStacked, holesStack.left[argument], holesStack.right[argument])
+                })
+            })
+        }
+        function updateStackedSeriesValues(translators) {
+            var that = this,
+                series = getVisibleSeries(that),
+                stack = that._stackKeepers,
+                stackKeepers = {
+                    positive: {},
+                    negative: {}
                 };
-            function checkMinBarSize(value, minShownValue) {
-                return _abs(value) < minShownValue ? value >= 0 ? minShownValue : -minShownValue : value
-            }
-            function getValueType(value) {
-                return value >= 0 ? "positive" : "negative"
-            }
-            function getVisibleSeries(that) {
-                return $.map(that.series, function(s) {
-                        return s.isVisible() ? s : null
-                    })
-            }
-            function getAbsStackSumByArg(stackKeepers, stackName, argument) {
-                var positiveStackValue = (stackKeepers.positive[stackName] || {})[argument] || 0,
-                    negativeStackValue = -(stackKeepers.negative[stackName] || {})[argument] || 0;
-                return positiveStackValue + negativeStackValue
-            }
-            var adjustBarSeriesDimensions = function(translators) {
-                    var debug = DX.utils.debug;
-                    debug.assert(translators, "translator was not passed or empty");
-                    var that = this,
-                        equalBarWidth = that.equalBarWidth,
-                        series = getVisibleSeries(that);
-                    adjustBarSeriesDimensionsCore(series, getInterval(that, translators), series.length, equalBarWidth, function(seriesIndex) {
-                        return seriesIndex
-                    })
-                };
-            var adjustStackedBarSeriesDimensions = function(translators) {
-                    var debug = DX.utils.debug;
-                    debug.assert(translators, "translators was not passed or empty");
-                    var that = this,
-                        series = getVisibleSeries(that),
-                        stackIndexes = {},
-                        stackCount = 0,
-                        equalBarWidth = that.equalBarWidth;
-                    _each(series, function() {
-                        var stackName = this.getStackName();
-                        if (!stackIndexes.hasOwnProperty(stackName))
-                            stackIndexes[stackName] = stackCount++
-                    });
-                    adjustBarSeriesDimensionsCore(series, getInterval(that, translators), stackCount, equalBarWidth, function(seriesIndex) {
-                        return stackIndexes[series[seriesIndex].getStackName()]
-                    })
-                };
-            var adjustStackedSeriesValues = function() {
-                    var that = this,
-                        series = getVisibleSeries(that),
-                        stackKeepers = {
-                            positive: {},
-                            negative: {}
-                        },
-                        holesStack = {
-                            left: {},
-                            right: {}
-                        };
-                    _each(series, function(seriesIndex, singleSeries) {
-                        var points = singleSeries.getPoints(),
-                            hole = false;
-                        singleSeries._prevSeries = series[seriesIndex - 1],
-                        singleSeries.holes = $.extend(true, {}, holesStack);
-                        _each(points, function(index, point) {
-                            var value = point.initialValue,
-                                argument = point.argument.valueOf(),
-                                stackName = singleSeries.getStackName(),
-                                stacks = value >= 0 ? stackKeepers.positive : stackKeepers.negative,
-                                currentStack;
-                            stacks[stackName] = stacks[stackName] || {};
-                            currentStack = stacks[stackName];
-                            if (currentStack[argument]) {
-                                point.correctValue(currentStack[argument]);
-                                currentStack[argument] += value
-                            }
-                            else {
-                                currentStack[argument] = value;
-                                point.resetCorrection()
-                            }
-                            if (!point.hasValue()) {
-                                var prevPoint = points[index - 1];
-                                if (!hole && prevPoint && prevPoint.hasValue()) {
-                                    argument = prevPoint.argument.valueOf();
-                                    prevPoint._skipSetRightHole = true;
-                                    holesStack.right[argument] = (holesStack.right[argument] || 0) + (prevPoint.value - (isFinite(prevPoint.minValue) ? prevPoint.minValue : 0))
-                                }
-                                hole = true
-                            }
-                            else if (hole) {
-                                hole = false;
-                                holesStack.left[argument] = (holesStack.left[argument] || 0) + (point.value - (isFinite(point.minValue) ? point.minValue : 0));
-                                point._skipSetLeftHole = true
-                            }
-                        })
-                    });
-                    _each(series, function(seriesIndex, singleSeries) {
-                        var points = singleSeries.getPoints(),
-                            holes = singleSeries.holes;
-                        _each(points, function(index, point) {
-                            var argument = point.argument.valueOf();
-                            point.resetHoles();
-                            !point._skipSetLeftHole && point.setHole(holes.left[argument] || holesStack.left[argument] && 0, "left");
-                            !point._skipSetRightHole && point.setHole(holes.right[argument] || holesStack.right[argument] && 0, "right");
-                            point._skipSetLeftHole = null;
-                            point._skipSetRightHole = null
-                        })
-                    });
-                    that._stackKeepers = stackKeepers;
-                    setPercentStackedValues(series, stackKeepers, that.fullStacked, holesStack)
-                };
-            var setPercentStackedValues = function(series, stackKeepers, fullStacked, holeStack) {
-                    _each(series, function(_, singleSeries) {
-                        _each(singleSeries.getPoints(), function(_, point) {
-                            var argument = point.argument.valueOf();
-                            point.setPercentValue(getAbsStackSumByArg(stackKeepers, singleSeries.getStackName(), argument), fullStacked, holeStack.left[argument], holeStack.right[argument])
-                        })
-                    })
-                };
-            var updateStackedSeriesValues = function(translators) {
-                    var that = this,
-                        series = getVisibleSeries(that),
-                        stack = that._stackKeepers,
-                        stackKeepers = {
-                            positive: {},
-                            negative: {}
-                        };
-                    _each(series, function(_, singleSeries) {
-                        var minBarSize = singleSeries.getOptions().minBarSize,
-                            minShownBusinessValue = minBarSize && translators.val.getMinBarSize(minBarSize),
-                            stackName = singleSeries.getStackName();
-                        _each(singleSeries.getPoints(), function(index, point) {
-                            if (!point.hasValue())
-                                return;
-                            var value = point.initialValue,
-                                argument = point.argument.valueOf(),
-                                updateValue,
-                                valueType,
-                                currentStack;
-                            if (that.fullStacked)
-                                value = _abs(value) / getAbsStackSumByArg(stack, stackName, argument) || 0;
-                            updateValue = checkMinBarSize(value, minShownBusinessValue);
-                            valueType = getValueType(updateValue);
-                            currentStack = stackKeepers[valueType][stackName] = stackKeepers[valueType][stackName] || {};
-                            if (currentStack[argument]) {
-                                point.minValue = currentStack[argument];
-                                currentStack[argument] += updateValue
-                            }
-                            else
-                                currentStack[argument] = updateValue;
-                            point.value = currentStack[argument]
-                        })
-                    });
+            _each(series, function(_, singleSeries) {
+                var minBarSize = singleSeries.getOptions().minBarSize,
+                    minShownBusinessValue = minBarSize && translators.val.getMinBarSize(minBarSize),
+                    stackName = singleSeries.getStackName();
+                _each(singleSeries.getPoints(), function(index, point) {
+                    if (!point.hasValue())
+                        return;
+                    var value = point.initialValue,
+                        argument = point.argument.valueOf(),
+                        updateValue,
+                        valueType,
+                        currentStack;
                     if (that.fullStacked)
-                        updateFullStackedSeriesValues(series, stackKeepers)
-                };
-            var updateFullStackedSeriesValues = function(series, stackKeepers) {
-                    _each(series, function(_, singleSeries) {
-                        var stackName = singleSeries.getStackName ? singleSeries.getStackName() : "default";
-                        _each(singleSeries.getPoints(), function(index, point) {
-                            var value = _abs(point.value),
-                                argument = point.argument.valueOf(),
-                                valueType = getValueType(value),
-                                currentStack;
-                            stackKeepers[valueType][stackName] = stackKeepers[valueType][stackName] || {};
-                            currentStack = stackKeepers[valueType][stackName];
-                            point.value = point.value / currentStack[argument] || 0;
-                            if (utils.isNumber(point.minValue))
-                                point.minValue = point.minValue / currentStack[argument] || 0
-                        })
+                        value = _abs(value) / getAbsStackSumByArg(stack, stackName, argument) || 0;
+                    updateValue = checkMinBarSize(value, minShownBusinessValue);
+                    valueType = getValueType(updateValue);
+                    currentStack = stackKeepers[valueType][stackName] = stackKeepers[valueType][stackName] || {};
+                    if (currentStack[argument]) {
+                        point.minValue = currentStack[argument];
+                        currentStack[argument] += updateValue
+                    }
+                    else
+                        currentStack[argument] = updateValue;
+                    point.value = currentStack[argument]
+                })
+            });
+            if (that.fullStacked)
+                updateFullStackedSeriesValues(series, stackKeepers)
+        }
+        function updateFullStackedSeriesValues(series, stackKeepers) {
+            _each(series, function(_, singleSeries) {
+                var stackName = singleSeries.getStackName ? singleSeries.getStackName() : "default";
+                _each(singleSeries.getPoints(), function(index, point) {
+                    var argument = point.argument.valueOf(),
+                        valueType = getValueType(_abs(point.value)),
+                        currentStack;
+                    stackKeepers[valueType][stackName] = stackKeepers[valueType][stackName] || {};
+                    currentStack = stackKeepers[valueType][stackName];
+                    point.value = point.value / currentStack[argument] || 0;
+                    if (DX.utils.isNumber(point.minValue))
+                        point.minValue = point.minValue / currentStack[argument] || 0
+                })
+            })
+        }
+        function updateBarSeriesValues(translators) {
+            _each(this.series, function(_, singleSeries) {
+                var minBarSize = singleSeries.getOptions().minBarSize,
+                    minShownBusinessValue = minBarSize && translators.val.getMinBarSize(minBarSize);
+                if (minShownBusinessValue)
+                    _each(singleSeries.getPoints(), function(index, point) {
+                        if (point.hasValue())
+                            point.value = checkMinBarSize(point.initialValue, minShownBusinessValue)
                     })
-                };
-            var updateBarSeriesValues = function(translators) {
-                    _each(this.series, function(_, singleSeries) {
-                        var minBarSize = singleSeries.getOptions().minBarSize,
-                            minShownBusinessValue = minBarSize && translators.val.getMinBarSize(minBarSize);
-                        if (minShownBusinessValue)
-                            _each(singleSeries.getPoints(), function(index, point) {
-                                if (point.hasValue())
-                                    point.value = checkMinBarSize(point.initialValue, minShownBusinessValue)
-                            })
-                    })
-                };
-            var adjustCandlestickSeriesDimensions = function(translators) {
-                    var debug = DX.utils.debug;
-                    debug.assert(translators, "translator was not passed or empty");
-                    var that = this,
-                        series = getVisibleSeries(that);
-                    adjustBarSeriesDimensionsCore(series, getInterval(that, translators), series.length, true, function(seriesIndex) {
-                        return seriesIndex
-                    })
-                };
-            var getInterval = function(that, translators) {
-                    var argTranslator = translators.arg;
-                    that.interval = argTranslator.getInterval();
-                    return that.interval
-                };
-            var adjustBubbleSeriesDimensions = function(translators) {
-                    var debug = DX.utils.debug;
-                    debug.assert(translators, "translator was not passed or empty");
-                    var that = this,
-                        series = getVisibleSeries(that),
-                        visibleAreaX = translators.arg.getCanvasVisibleArea(),
-                        visibleAreaY = translators.val.getCanvasVisibleArea(),
-                        min = Math.min(visibleAreaX.max - visibleAreaX.min, visibleAreaY.max - visibleAreaY.min),
-                        minBubbleArea = _pow(that.minBubbleSize, 2),
-                        maxBubbleArea = _pow(min * that.maxBubbleSize, 2),
-                        equalBubbleSize = (min * that.maxBubbleSize + that.minBubbleSize) / 2,
-                        minPointSize = Infinity,
-                        maxPointSize = 0,
-                        pointSize,
-                        bubbleArea,
-                        sizeProportion,
-                        sizeDispersion,
-                        areaDispersion;
-                    _each(series, function(_, seriesItem) {
-                        _each(seriesItem.getPoints(), function(_, point) {
-                            maxPointSize = maxPointSize > point.size ? maxPointSize : point.size;
-                            minPointSize = minPointSize < point.size ? minPointSize : point.size
-                        })
-                    });
-                    sizeDispersion = maxPointSize - minPointSize;
-                    areaDispersion = _abs(maxBubbleArea - minBubbleArea);
-                    minPointSize = minPointSize < 0 ? 0 : minPointSize;
-                    _each(series, function(_, seriesItem) {
-                        _each(seriesItem.getPoints(), function(_, point) {
-                            if (maxPointSize === minPointSize)
-                                pointSize = _round(equalBubbleSize);
-                            else {
-                                sizeProportion = _abs(point.size - minPointSize) / sizeDispersion;
-                                bubbleArea = areaDispersion * sizeProportion + minBubbleArea;
-                                pointSize = _round(Math.sqrt(bubbleArea))
-                            }
-                            point.correctCoordinates(pointSize)
-                        })
-                    })
-                };
-            return {
-                    ctor: ctor,
-                    dispose: dispose,
-                    add: add,
-                    updateOptions: updateOptions
+            })
+        }
+        function adjustCandlestickSeriesDimensions(translators) {
+            var debug = DX.utils.debug;
+            debug.assert(translators, "translator was not passed or empty");
+            var series = getVisibleSeries(this);
+            adjustBarSeriesDimensionsCore(series, translators.arg.getInterval(), series.length, true, getSeriesStackIndexCallback(this.rotated, series))
+        }
+        function adjustBubbleSeriesDimensions(translators) {
+            var debug = DX.utils.debug;
+            debug.assert(translators, "translator was not passed or empty");
+            var that = this,
+                series = getVisibleSeries(that),
+                visibleAreaX = translators.arg.getCanvasVisibleArea(),
+                visibleAreaY = translators.val.getCanvasVisibleArea(),
+                min = _math.min(visibleAreaX.max - visibleAreaX.min, visibleAreaY.max - visibleAreaY.min),
+                minBubbleArea = _pow(that.minBubbleSize, 2),
+                maxBubbleArea = _pow(min * that.maxBubbleSize, 2),
+                equalBubbleSize = (min * that.maxBubbleSize + that.minBubbleSize) / 2,
+                minPointSize = Infinity,
+                maxPointSize = 0,
+                pointSize,
+                bubbleArea,
+                sizeProportion,
+                sizeDispersion,
+                areaDispersion;
+            _each(series, function(_, seriesItem) {
+                _each(seriesItem.getPoints(), function(_, point) {
+                    maxPointSize = maxPointSize > point.size ? maxPointSize : point.size;
+                    minPointSize = minPointSize < point.size ? minPointSize : point.size
+                })
+            });
+            sizeDispersion = maxPointSize - minPointSize;
+            areaDispersion = _abs(maxBubbleArea - minBubbleArea);
+            minPointSize = minPointSize < 0 ? 0 : minPointSize;
+            _each(series, function(_, seriesItem) {
+                _each(seriesItem.getPoints(), function(_, point) {
+                    if (maxPointSize === minPointSize)
+                        pointSize = _round(equalBubbleSize);
+                    else {
+                        sizeProportion = _abs(point.size - minPointSize) / sizeDispersion;
+                        bubbleArea = areaDispersion * sizeProportion + minBubbleArea;
+                        pointSize = _round(_math.sqrt(bubbleArea))
+                    }
+                    point.correctCoordinates(pointSize)
+                })
+            })
+        }
+        function SeriesFamily(options) {
+            var debug = DX.utils.debug;
+            debug.assert(options.type, "type was not passed or empty");
+            var that = this;
+            that.type = options.type.toLowerCase();
+            that.pane = options.pane;
+            that.rotated = !!(options.rotated && options.sortSeriesPointsByAxis);
+            that.series = [];
+            that.updateOptions(options);
+            switch (that.type) {
+                case"bar":
+                    that.adjustSeriesDimensions = adjustBarSeriesDimensions;
+                    that.updateSeriesValues = updateBarSeriesValues;
+                    break;
+                case"rangebar":
+                    that.adjustSeriesDimensions = adjustBarSeriesDimensions;
+                    break;
+                case"fullstackedbar":
+                    that.fullStacked = true;
+                    that.adjustSeriesDimensions = adjustStackedBarSeriesDimensions;
+                    that.adjustSeriesValues = adjustStackedSeriesValues;
+                    that.updateSeriesValues = updateStackedSeriesValues;
+                    break;
+                case"stackedbar":
+                    that.adjustSeriesDimensions = adjustStackedBarSeriesDimensions;
+                    that.adjustSeriesValues = adjustStackedSeriesValues;
+                    that.updateSeriesValues = updateStackedSeriesValues;
+                    break;
+                case"fullstackedarea":
+                case"fullstackedline":
+                case"fullstackedspline":
+                case"fullstackedsplinearea":
+                    that.fullStacked = true;
+                    that.adjustSeriesValues = adjustStackedSeriesValues;
+                    break;
+                case"stackedarea":
+                case"stackedsplinearea":
+                case"stackedline":
+                case"stackedspline":
+                    that.adjustSeriesValues = adjustStackedSeriesValues;
+                    break;
+                case"candlestick":
+                case"stock":
+                    that.adjustSeriesDimensions = adjustCandlestickSeriesDimensions;
+                    break;
+                case"bubble":
+                    that.adjustSeriesDimensions = adjustBubbleSeriesDimensions;
+                    break
+            }
+        }
+        core.series.helpers.SeriesFamily = SeriesFamily;
+        SeriesFamily.prototype = {
+            constructor: SeriesFamily,
+            adjustSeriesDimensions: _noop,
+            adjustSeriesValues: _noop,
+            updateSeriesValues: _noop,
+            updateOptions: function(options) {
+                var that = this;
+                that.equalBarWidth = options.equalBarWidth;
+                that.minBubbleSize = options.minBubbleSize;
+                that.maxBubbleSize = options.maxBubbleSize
+            },
+            dispose: function() {
+                this.series = this.translators = null
+            },
+            add: function(series) {
+                var that = this,
+                    singleSeries,
+                    i = 0;
+                if (!$.isArray(series))
+                    series = [series];
+                while (i < series.length) {
+                    singleSeries = series[i];
+                    if (singleSeries.type.toLowerCase() === that.type)
+                        that.series.push(singleSeries);
+                    i++
                 }
-        }())
+            }
+        }
     })(jQuery, DevExpress);
     /*! Module viz-core, file baseSeries.js */
-    (function($, DX) {
+    (function($, DX, undefined) {
         var viz = DX.viz,
             core = viz.core,
             seriesNS = core.series,
             utils = DX.utils,
             _isDefined = utils.isDefined,
+            _map = core.utils.map,
             _each = $.each,
             _extend = $.extend,
             _isEmptyObject = $.isEmptyObject,
@@ -6722,6 +6987,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
             HOVER = "hover",
             NORMAL = "normal",
             SELECTION = "selection",
+            RESET_ITEM = "resetItem",
             getEmptyBusinessRange = function() {
                 return {
                         arg: {},
@@ -6773,11 +7039,62 @@ if (!DevExpress.MOD_VIZ_CORE) {
         function includePointsMode(mode) {
             return mode === INCLUDE_POINTS || mode === "allseriespoints"
         }
-        function Series() {
-            this.ctor.apply(this, arguments)
+        function toLowerCase(str) {
+            return str.toLowerCase()
+        }
+        function getLabelOptions(labelOptions, defaultColor) {
+            var opt = labelOptions || {},
+                labelFont = _extend({}, opt.font) || {},
+                labelBorder = opt.border || {},
+                labelConnector = opt.connector || {},
+                backgroundAttr = {
+                    fill: opt.backgroundColor || defaultColor,
+                    "stroke-width": labelBorder.visible ? labelBorder.width || 0 : 0,
+                    stroke: labelBorder.visible && labelBorder.width ? labelBorder.color : "none",
+                    dashStyle: labelBorder.dashStyle
+                },
+                connectorAttr = {
+                    stroke: labelConnector.visible && labelConnector.width ? labelConnector.color || defaultColor : "none",
+                    "stroke-width": labelConnector.visible ? labelConnector.width || 0 : 0
+                };
+            labelFont.color = opt.backgroundColor === "none" && toLowerCase(labelFont.color) === "#ffffff" && opt.position !== "inside" ? defaultColor : labelFont.color;
+            return {
+                    alignment: opt.alignment,
+                    format: opt.format,
+                    argumentFormat: opt.argumentFormat,
+                    precision: opt.precision,
+                    argumentPrecision: opt.argumentPrecision,
+                    percentPrecision: opt.percentPrecision,
+                    customizeText: $.isFunction(opt.customizeText) ? opt.customizeText : undefined,
+                    attributes: {font: labelFont},
+                    visible: labelFont.size !== 0 ? opt.visible : false,
+                    showForZeroValues: opt.showForZeroValues,
+                    horizontalOffset: opt.horizontalOffset,
+                    verticalOffset: opt.verticalOffset,
+                    radialOffset: opt.radialOffset,
+                    background: backgroundAttr,
+                    position: opt.position,
+                    connector: connectorAttr,
+                    rotationAngle: opt.rotationAngle
+                }
+        }
+        function isInInterval(argument, ticks, nowIndexTicks, ticksInterval) {
+            var minTick = ticks[nowIndexTicks],
+                maxTick = ticks[nowIndexTicks + 1],
+                sumMinTickTicksInterval;
+            ticksInterval = $.isNumeric(ticksInterval) ? ticksInterval : utils.dateToMilliseconds(ticksInterval);
+            sumMinTickTicksInterval = utils.isDate(minTick) ? new Date(minTick.getTime() + ticksInterval) : minTick + ticksInterval;
+            if (argument >= minTick && argument < sumMinTickTicksInterval)
+                return true;
+            if (argument < minTick || maxTick === undefined)
+                return false;
+            return "nextInterval"
         }
         function applyPointStyle(point, styleName) {
-            !point.isSelected() && point.applyStyle(styleName)
+            !point.isSelected() && !point.hasSelectedView && point.applyStyle(styleName)
+        }
+        function Series() {
+            this.ctor.apply(this, arguments)
         }
         seriesNS.Series = Series;
         Series.prototype = {
@@ -6881,7 +7198,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     widgetType = newOptions.widgetType,
                     oldType = that.type,
                     newType = newOptions.type;
-                that.type = newType && newType.toString().toLowerCase();
+                that.type = newType && toLowerCase(newType.toString());
                 if (!that._checkType(widgetType) || that._checkPolarBarType(widgetType, newOptions)) {
                     that.dispose();
                     that.isUpdated = false;
@@ -7129,7 +7446,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
             },
             setSelectedState: function(state, mode, legendCallback) {
                 var that = this;
-                that.lastSelectionMode = (mode || that._options.selectionMode).toLowerCase();
+                that.lastSelectionMode = toLowerCase(mode || that._options.selectionMode);
                 if (state && !that.isSelected()) {
                     that.fullState = that.fullState | SELECTED_STATE;
                     that._nearestPoint && applyPointStyle(that._nearestPoint, "normal");
@@ -7141,7 +7458,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     if (that.isHovered())
                         that._changeStyle(legendCallback, APPLY_HOVER, SELECTION);
                     else
-                        that._changeStyle(legendCallback, "resetItem")
+                        that._changeStyle(legendCallback, RESET_ITEM)
                 }
             },
             setHoverState: function(state, mode, legendCallback) {
@@ -7154,8 +7471,18 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 else if (!state && that.isHovered()) {
                     that._nearestPoint = null;
                     that.fullState = that.fullState & ~HOVER_STATE;
-                    !that.isSelected() && that._changeStyle(legendCallback, "resetItem")
+                    !that.isSelected() && that._changeStyle(legendCallback, RESET_ITEM)
                 }
+            },
+            setHoverView: function() {
+                if (this._canShangeView()) {
+                    this._applyStyle(this._styles.hover);
+                    return this
+                }
+                return null
+            },
+            releaseHoverView: function(legendCallback) {
+                this._canShangeView() && this._applyStyle(this._styles.normal)
             },
             isFullStackedSeries: function() {
                 return this.type.indexOf("fullstacked") === 0
@@ -7165,6 +7492,9 @@ if (!DevExpress.MOD_VIZ_CORE) {
             },
             isFinancialSeries: function() {
                 return this.type === "stock" || this.type === "candlestick"
+            },
+            _canShangeView: function() {
+                return !this.isSelected() && toLowerCase(this._options.hoverMode) !== NONE_MODE
             },
             _changeStyle: function(legendCallBack, legendAction, prevStyle) {
                 var that = this,
@@ -7271,42 +7601,6 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 }
                 return pointOptions
             },
-            _getLabelOptions: function(labelOptions, defaultColor) {
-                var opt = labelOptions || {},
-                    labelFont = _extend({}, opt.font) || {},
-                    labelBorder = opt.border || {},
-                    labelConnector = opt.connector || {},
-                    backgroundAttr = {
-                        fill: opt.backgroundColor || defaultColor,
-                        "stroke-width": labelBorder.visible ? labelBorder.width || 0 : 0,
-                        stroke: labelBorder.visible && labelBorder.width ? labelBorder.color : "none",
-                        dashStyle: labelBorder.dashStyle
-                    },
-                    connectorAttr = {
-                        stroke: labelConnector.visible && labelConnector.width ? labelConnector.color || defaultColor : "none",
-                        "stroke-width": labelConnector.visible ? labelConnector.width || 0 : 0
-                    };
-                labelFont.color = opt.backgroundColor === "none" && labelFont.color.toLowerCase() === "#ffffff" && opt.position !== "inside" ? defaultColor : labelFont.color;
-                return {
-                        alignment: opt.alignment,
-                        format: opt.format,
-                        argumentFormat: opt.argumentFormat,
-                        precision: opt.precision,
-                        argumentPrecision: opt.argumentPrecision,
-                        percentPrecision: opt.percentPrecision,
-                        customizeText: $.isFunction(opt.customizeText) ? opt.customizeText : undefined,
-                        attributes: {font: labelFont},
-                        visible: labelFont.size !== 0 ? opt.visible : false,
-                        showForZeroValues: opt.showForZeroValues,
-                        horizontalOffset: opt.horizontalOffset,
-                        verticalOffset: opt.verticalOffset,
-                        radialOffset: opt.radialOffset,
-                        background: backgroundAttr,
-                        position: opt.position,
-                        connector: connectorAttr,
-                        rotationAngle: opt.rotationAngle
-                    }
-            },
             show: function() {
                 if (!this._visible)
                     this._changeVisibility(true)
@@ -7340,7 +7634,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                         widgetType: options.widgetType,
                         visibilityChanged: options.visibilityChanged
                     });
-                parsedOptions.label = that._getLabelOptions(labelOptions, styles.normal.fill);
+                parsedOptions.label = getLabelOptions(labelOptions, styles.normal.fill);
                 parsedOptions.errorBars = options.valueErrorBar;
                 return parsedOptions
             },
@@ -7354,19 +7648,17 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     visibleArea;
                 if (that.argumentAxisType === "discrete" || that.valueAxisType === "discrete") {
                     visibleArea = argTranslator.getCanvasVisibleArea();
-                    originalPoints = $.map(originalPoints, function(p) {
+                    originalPoints = _map(originalPoints, function(p) {
                         var pos = argTranslator.translate(p.argument),
-                            result;
+                            result = null;
                         if (pos >= visibleArea.min && pos <= visibleArea.max)
                             result = p;
-                        else {
+                        else
                             p.setInvisibility();
-                            result = null
-                        }
                         return result
                     });
                     ticksInterval = originalPoints.length / ticks;
-                    arrayFusPoints = $.map(originalPoints, function(point, index) {
+                    arrayFusPoints = _map(originalPoints, function(point, index) {
                         if (Math.floor(nowIndexTicks) <= index) {
                             nowIndexTicks += ticksInterval;
                             return point
@@ -7379,16 +7671,16 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 that._aggregatedPoints = that._aggregatedPoints || [];
                 _each(originalPoints, function(_, point) {
                     point.setInvisibility();
-                    switch (that._isInInterval(point.argument, ticks, nowIndexTicks, ticksInterval)) {
+                    switch (isInInterval(point.argument, ticks, nowIndexTicks, ticksInterval)) {
                         case true:
                             fusPoints.push(point);
                             break;
                         case"nextInterval":
                             var pointData = that._fusionPoints(fusPoints, ticks[nowIndexTicks], nowIndexTicks);
-                            while (that._isInInterval(point.argument, ticks, nowIndexTicks, ticksInterval) === "nextInterval")
+                            while (isInInterval(point.argument, ticks, nowIndexTicks, ticksInterval) === "nextInterval")
                                 nowIndexTicks++;
                             fusPoints = [];
-                            that._isInInterval(point.argument, ticks, nowIndexTicks, ticksInterval) === true && fusPoints.push(point);
+                            isInInterval(point.argument, ticks, nowIndexTicks, ticksInterval) === true && fusPoints.push(point);
                             if (that._createPoint(pointData, that._aggregatedPoints, lastPointIndex))
                                 lastPointIndex++
                     }
@@ -7401,18 +7693,6 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 that._correctPointsLength(lastPointIndex, that._aggregatedPoints);
                 that._endUpdateData();
                 return that._aggregatedPoints
-            },
-            _isInInterval: function(argument, ticks, nowIndexTicks, ticksInterval) {
-                var minTick = ticks[nowIndexTicks],
-                    maxTick = ticks[nowIndexTicks + 1],
-                    sumMinTickTicksInterval;
-                ticksInterval = $.isNumeric(ticksInterval) ? ticksInterval : utils.dateToMilliseconds(ticksInterval);
-                sumMinTickTicksInterval = utils.isDate(minTick) ? new Date(minTick.getTime() + ticksInterval) : minTick + ticksInterval;
-                if (argument >= minTick && argument < sumMinTickTicksInterval)
-                    return true;
-                if (argument < minTick || maxTick === undefined)
-                    return false;
-                return "nextInterval"
             },
             canRenderCompleteHandle: function() {
                 var result = this._canRenderCompleteHandle;
@@ -7437,42 +7717,62 @@ if (!DevExpress.MOD_VIZ_CORE) {
             getVisiblePoints: function() {
                 return (this._drawedPoints || []).slice()
             },
-            setPointHoverState: function(point, legendCallback) {
-                point.fullState = point.fullState | HOVER_STATE;
-                if (!(this.isSelected() && includePointsMode(this.lastSelectionMode)) && !point.isSelected()) {
+            setPointHoverState: function(data) {
+                var point = data.point,
+                    legendCallback = data.legendCallback;
+                if (data.setState)
+                    point.fullState = point.fullState | HOVER_STATE;
+                if (!(this.isSelected() && includePointsMode(this.lastSelectionMode)) && !point.isSelected() && !point.hasSelectedView) {
                     point.applyStyle(HOVER);
                     legendCallback && legendCallback("applyHover")
                 }
             },
-            releasePointHoverState: function(point, legendCallback) {
-                var that = this;
-                point.fullState = point.fullState & ~HOVER_STATE;
-                if (!(that.isSelected() && includePointsMode(that.lastSelectionMode)) && !point.isSelected())
+            releasePointHoverState: function(data) {
+                var that = this,
+                    point = data.point,
+                    legendCallback = data.legendCallback;
+                if (data.setState)
+                    point.fullState = point.fullState & ~HOVER_STATE;
+                if (!(that.isSelected() && includePointsMode(that.lastSelectionMode)) && !point.isSelected() && !point.hasSelectedView)
                     if (!(that.isHovered() && includePointsMode(that.lastHoverMode)) || that.isSelected() && that.lastSelectionMode === EXLUDE_POINTS) {
                         point.applyStyle(NORMAL);
-                        legendCallback && legendCallback("resetItem")
+                        legendCallback && legendCallback(RESET_ITEM)
                     }
             },
-            setPointSelectedState: function(point, legendCallback) {
-                point.fullState = point.fullState | SELECTED_STATE;
+            setPointSelectedState: function(data) {
+                var legendCallback = data.legendCallback,
+                    point = data.point;
+                if (data.setState)
+                    point.fullState = point.fullState | SELECTED_STATE;
+                else
+                    point.hasSelectedView = true;
                 point.applyStyle(SELECTION);
                 legendCallback && legendCallback("applySelected")
             },
-            releasePointSelectedState: function(point, legendCallback) {
-                var that = this;
-                point.fullState = point.fullState & ~SELECTED_STATE;
+            releasePointSelectedState: function(data) {
+                var that = this,
+                    pointStyle,
+                    point = data.point,
+                    legendCallback = data.legendCallback,
+                    legendAction;
+                if (data.setState)
+                    point.fullState = point.fullState & ~SELECTED_STATE;
+                else
+                    point.hasSelectedView = false;
                 if (that.isHovered() && includePointsMode(that.lastHoverMode) || point.isHovered()) {
-                    point.applyStyle(HOVER);
-                    legendCallback && legendCallback("applyHover")
+                    pointStyle = HOVER;
+                    legendAction = "applyHover"
                 }
                 else if (that.isSelected() && includePointsMode(that.lastSelectionMode)) {
-                    point.applyStyle(SELECTION);
-                    legendCallback && legendCallback("applySelected")
+                    pointStyle = SELECTION;
+                    legendAction = "applySelected"
                 }
                 else {
-                    point.applyStyle(NORMAL);
-                    legendCallback && legendCallback("resetItem")
+                    pointStyle = NORMAL;
+                    legendAction = RESET_ITEM
                 }
+                point.applyStyle(pointStyle);
+                legendCallback && legendCallback(legendAction)
             },
             selectPoint: function(point) {
                 triggerEvent(this._extGroups.seriesGroup, new _Event("selectpoint"), point)
@@ -7506,11 +7806,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 that._disposePoints(that._originalPoints);
                 that._disposePoints(that._aggregatedPoints);
                 that._disposePoints(that._oldPoints);
-                that._points = null;
-                that._oldPoints = null;
-                that._aggregatedPoints = null;
-                that._originalPoints = null;
-                that._drawedPoints = null
+                that._points = that._oldPoints = that._aggregatedPoints = that._originalPoints = that._drawedPoints = null
             },
             _deletePatterns: function() {
                 _each(this._patterns || [], function(_, pattern) {
@@ -7557,14 +7853,17 @@ if (!DevExpress.MOD_VIZ_CORE) {
     })(jQuery, DevExpress);
     /*! Module viz-core, file rangeDataCalculator.js */
     (function($, DX, undefined) {
-        var _math = Math,
+        var core = DX.viz.core,
+            _math = Math,
             _abs = _math.abs,
             _min = _math.min,
             _max = _math.max,
             _each = $.each,
             _isEmptyObject = $.isEmptyObject,
-            _isDefined = DX.utils.isDefined,
+            utils = DX.utils,
+            _isDefined = utils.isDefined,
             _isFinite = isFinite,
+            unique = core.utils.unique,
             MIN_VISIBLE = "minVisible",
             MAX_VISIBLE = "maxVisible",
             DISCRETE = "discrete";
@@ -7611,14 +7910,6 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 _truncateValue(data, val);
                 _truncateValue(data, minVal)
             }
-        }
-        function _unique(array) {
-            var values = {};
-            return $.map(array, function(item) {
-                    var result = !values[item] ? item : null;
-                    values[item] = true;
-                    return result
-                })
         }
         function _processZoomArgument(series, zoomArgs, isDiscrete) {
             var data = series._rangeData.arg,
@@ -7723,8 +8014,8 @@ if (!DevExpress.MOD_VIZ_CORE) {
         }
         function _fillRangeData(series) {
             var data = series._rangeData;
-            data.arg.categories && (data.arg.categories = _unique(data.arg.categories));
-            data.val.categories && (data.val.categories = _unique(data.val.categories));
+            data.arg.categories && (data.arg.categories = unique(data.arg.categories));
+            data.val.categories && (data.val.categories = unique(data.val.categories));
             data.arg.axisType = series.argumentAxisType;
             data.arg.dataType = series.argumentType;
             data.val.axisType = series.valueAxisType;
@@ -7815,7 +8106,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 _processNewInterval(series, calcIntervalFunction);
             _fillRangeData(series)
         }
-        DX.viz.core.series.helpers.rangeDataCalculator = {
+        core.series.helpers.rangeDataCalculator = {
             processRange: processRange,
             calculateRangeData: calculateRangeData,
             addLabelPaddings: addLabelPaddings,
@@ -7827,16 +8118,17 @@ if (!DevExpress.MOD_VIZ_CORE) {
     })(jQuery, DevExpress);
     /*! Module viz-core, file scatterSeries.js */
     (function($, DX) {
-        var series = DX.viz.core.series,
+        var core = DX.viz.core,
+            series = core.series,
             rangeCalculator = series.helpers.rangeDataCalculator,
             chartSeries = series.mixins.chart,
             _each = $.each,
             _extend = $.extend,
-            _map = $.map,
             _noop = $.noop,
             _utils = DX.utils,
             _isDefined = _utils.isDefined,
             _isString = _utils.isString,
+            _map = core.utils.map,
             math = Math,
             _floor = math.floor,
             _abs = math.abs,
@@ -7872,7 +8164,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
             return $.inArray(type, [FIXED, PERCENT, VARIANCE, STANDARD_DEVIATION, STANDARD_ERROR, UNDEFINED]) !== -1
         }
         function variance(array, expectedValue) {
-            return sum($.map(array, function(value) {
+            return sum(_map(array, function(value) {
                     return (value - expectedValue) * (value - expectedValue)
                 })) / array.length
         }
@@ -8110,7 +8402,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 _calcMedianValue: function(fusionPoints, valueField) {
                     var result,
                         allValue = _map(fusionPoints, function(point) {
-                            return point[valueField]
+                            return _isDefined(point[valueField]) ? point[valueField] : null
                         });
                     allValue.sort(function(a, b) {
                         return a - b
@@ -8208,8 +8500,8 @@ if (!DevExpress.MOD_VIZ_CORE) {
                             };
                             break;
                         default:
-                            valueArray = $.map(data, function(item) {
-                                return item[valueField]
+                            valueArray = _map(data, function(item) {
+                                return _isDefined(item[valueField]) ? item[valueField] : null
                             });
                             valueArrayLength = valueArray.length;
                             floatErrorValue = floatErrorValue || 1;
@@ -8334,8 +8626,8 @@ if (!DevExpress.MOD_VIZ_CORE) {
             CANVAS_POSITION_START = "canvas_position_start",
             CANVAS_POSITION_TOP = "canvas_position_top",
             DISCRETE = "discrete",
+            _map = core.utils.map,
             _extend = $.extend,
-            _map = $.map,
             _each = $.each;
         function clonePoint(point, newX, newY, newAngle) {
             var p = utils.clone(point);
@@ -8689,7 +8981,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
             polarSeries = series.mixins.polar,
             lineSeries = chartSeries.line,
             rangeCalculator = core.series.helpers.rangeDataCalculator,
-            _map = $.map,
+            _map = core.utils.map,
             _extend = $.extend,
             HOVER_COLOR_HIGHLIGHTING = 20;
         var baseAreaMethods = {
@@ -8855,8 +9147,8 @@ if (!DevExpress.MOD_VIZ_CORE) {
     })(jQuery, DevExpress);
     /*! Module viz-core, file barSeries.js */
     (function($, DX) {
-        var viz = DX.viz,
-            series = viz.core.series,
+        var core = DX.viz.core,
+            series = core.series,
             chartSeries = series.mixins.chart,
             polarSeries = series.mixins.polar,
             scatterSeries = chartSeries.scatter,
@@ -8960,7 +9252,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 },
                 _beginUpdateData: function(data) {
                     scatterSeries._beginUpdateData.call(this, data);
-                    this._patterns = $.map(this._patterns, function(pattern) {
+                    this._patterns = core.utils.map(this._patterns, function(pattern) {
                         if (pattern._custom) {
                             pattern.remove();
                             return null
@@ -9031,8 +9323,10 @@ if (!DevExpress.MOD_VIZ_CORE) {
     (function($, DX) {
         var core = DX.viz.core,
             series = core.series.mixins.chart,
+            _utils = DX.utils,
             _extend = $.extend,
-            _isDefined = DX.utils.isDefined,
+            _isDefined = _utils.isDefined,
+            _map = core.utils.map,
             _noop = $.noop,
             rangeCalculator = core.series.helpers.rangeDataCalculator,
             areaSeries = series.area;
@@ -9103,13 +9397,13 @@ if (!DevExpress.MOD_VIZ_CORE) {
             },
             _prepareSegment: function(points, rotated) {
                 var processedPoints = this._processSinglePointsAreaSegment(points, rotated),
-                    processedMinPointsCoords = $.map(processedPoints, function(pt) {
+                    processedMinPointsCoords = _map(processedPoints, function(pt) {
                         return pt.getCoords(true)
                     });
                 return {
                         line: processedPoints,
                         bottomLine: processedMinPointsCoords,
-                        area: $.map(processedPoints, function(pt) {
+                        area: _map(processedPoints, function(pt) {
                             return pt.getCoords()
                         }).concat(processedMinPointsCoords.slice().reverse()),
                         singlePointSegment: processedPoints !== points
@@ -9240,7 +9534,8 @@ if (!DevExpress.MOD_VIZ_CORE) {
     })(jQuery, DevExpress);
     /*! Module viz-core, file pieSeries.js */
     (function($, DX) {
-        var mixins = DX.viz.core.series.mixins,
+        var core = DX.viz.core,
+            mixins = core.series.mixins,
             pieSeries = mixins.pie,
             _utils = DX.utils,
             scatterSeries = mixins.chart.scatter,
@@ -9248,7 +9543,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
             _extend = $.extend,
             _each = $.each,
             _noop = $.noop,
-            _map = $.map,
+            _map = core.utils.map,
             _isFinite = isFinite,
             _max = Math.max;
         pieSeries.pie = _extend({}, barSeries, {
@@ -9403,19 +9698,24 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     minShownValue,
                     pointIndex = 0,
                     total,
-                    isAllPointsNegative = _max.apply(null, _map(originalPoints, function(p) {
-                        return p.value
-                    })) <= 0,
-                    points = that._originalPoints = that._points = _map(originalPoints, function(point) {
-                        if (point.value === null || !isAllPointsNegative && point.value < 0 || point.value === 0 && !minSegmentSize) {
-                            point.dispose();
-                            return null
-                        }
-                        else {
-                            point.index = pointIndex++;
-                            return point
-                        }
-                    });
+                    isAllPointsNegative = true,
+                    points,
+                    i = 0,
+                    len = originalPoints.length;
+                while (i < len && isAllPointsNegative) {
+                    isAllPointsNegative = originalPoints[i].value <= 0;
+                    i++
+                }
+                points = that._originalPoints = that._points = _map(originalPoints, function(point) {
+                    if (point.value === null || !isAllPointsNegative && point.value < 0 || point.value === 0 && !minSegmentSize) {
+                        point.dispose();
+                        return null
+                    }
+                    else {
+                        point.index = pointIndex++;
+                        return point
+                    }
+                });
                 total = that._getArrangeTotal(points);
                 if (minSegmentSize)
                     minShownValue = this._getArrangeMinShownValue(points, total);
@@ -9468,8 +9768,9 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     })
             },
             getPointByCoord: function(x, y) {
-                var points = this._points;
-                for (var i = 0; i < points.length; i++)
+                var points = this._points,
+                    i = 0;
+                for (; i < points.length; i++)
                     if (points[i].coordsIn(x, y))
                         return points[i]
             },
@@ -9807,15 +10108,22 @@ if (!DevExpress.MOD_VIZ_CORE) {
             return point
         }
         function preparePointsForStackedAreaSegment(points) {
-            points = $.map(points, function(p) {
-                var result = [p];
+            var i = 0,
+                p,
+                result = [],
+                array,
+                len = points.length;
+            while (i < len) {
+                p = points[i];
+                array = [p];
                 if (p.leftHole)
-                    result = [clonePoint(p, p.leftHole, p.minLeftHole, "left"), p];
+                    array = [clonePoint(p, p.leftHole, p.minLeftHole, "left"), p];
                 if (p.rightHole)
-                    result.push(clonePoint(p, p.rightHole, p.minRightHole, "right"));
-                return result
-            });
-            return points
+                    array.push(clonePoint(p, p.rightHole, p.minRightHole, "right"));
+                result.push(array);
+                i++
+            }
+            return [].concat.apply([], result)
         }
         chartSeries.stackedarea = _extend({}, areaSeries, baseStackedSeries, {_prepareSegment: function(points, rotated) {
                 return areaSeries._prepareSegment.call(this, preparePointsForStackedAreaSegment(points, this._prevSeries), rotated)
@@ -9838,15 +10146,19 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     areaSegment = chartSeries.splinearea._prepareSegment.call(this, points, rotated);
                 else {
                     var fwPoints = chartSeries.spline._calculateBezierPoints(points, rotated),
-                        bwPoints = $.map(points, function(p) {
+                        bwPoints = core.utils.map(points, function(p) {
                             var point = p.getCoords(true);
                             point.argument = p.argument;
                             return point
                         }),
-                        prevSeriesFwPoints = $.map(that._prevSeries._segments, function(seg) {
-                            return seg.line
-                        }),
-                        pointByArg = {};
+                        prevSeriesFwPoints = [],
+                        pointByArg = {},
+                        i = 0,
+                        len = that._prevSeries._segments.length;
+                    while (i < len) {
+                        prevSeriesFwPoints = prevSeriesFwPoints.concat(that._prevSeries._segments[i].line);
+                        i++
+                    }
                     $.each(prevSeriesFwPoints, function(_, p) {
                         if (p.argument !== null) {
                             var argument = p.argument.valueOf();
@@ -9982,19 +10294,32 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 }
             },
             setHoverState: function() {
-                this.series.setPointHoverState(this)
+                this.series.setPointHoverState({
+                    point: this,
+                    setState: true
+                })
             },
             releaseHoverState: function(callback) {
                 var that = this;
-                that.series.releasePointHoverState(that, callback);
+                that.series.releasePointHoverState({
+                    point: that,
+                    legendCallback: callback,
+                    setState: true
+                });
                 if (that.graphic)
                     !that.isSelected() && that.graphic.toBackground()
             },
             setSelectedState: function() {
-                this.series.setPointSelectedState(this)
+                this.series.setPointSelectedState({
+                    point: this,
+                    setState: true
+                })
             },
             releaseSelectedState: function() {
-                this.series.releasePointSelectedState(this)
+                this.series.releasePointSelectedState({
+                    point: this,
+                    setState: true
+                })
             },
             select: function() {
                 this.series.selectPoint(this)
@@ -10211,10 +10536,6 @@ if (!DevExpress.MOD_VIZ_CORE) {
         var _degreesToRadians = DX.utils.degreesToRadians,
             _patchFontOptions = DX.viz.core.utils.patchFontOptions,
             _round = Math.round,
-            _abs = Math.abs,
-            _min = Math.min,
-            _max = Math.max,
-            _ceil = Math.ceil,
             _getCosAndSin = DX.utils.getCosAndSin,
             _rotateBBox = DX.viz.renderers.rotateBBox,
             LABEL_BACKGROUND_PADDING_X = 8,
@@ -10237,8 +10558,8 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 isLabelInside: function(labelPoint, figure) {
                     return labelPoint.x >= figure.x && labelPoint.x <= figure.x + figure.width && labelPoint.y >= figure.y && labelPoint.y <= figure.y + figure.height
                 },
-                prepareLabelPoints: function(points, center, angle, hasBackground) {
-                    return !hasBackground ? points : [center]
+                prepareLabelPoints: function(points) {
+                    return points
                 },
                 getFigureCenter: function(figure) {
                     return [figure.x + figure.width / 2, figure.y + figure.height / 2]
@@ -10391,7 +10712,8 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     }
                     else
                         disposeItem(that, "_connector");
-                    that._updateText(text);
+                    that._text.attr({text: text});
+                    that._updateBackground(that._text.getBBox());
                     if (customVisibility !== null)
                         customVisibility ? that.show() : that.hide()
                 }
@@ -10399,9 +10721,8 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     that.hide();
                 return that
             },
-            _updateText: function(text) {
-                var that = this,
-                    bbox = that._text.attr({text: text}).getBBox();
+            _updateBackground: function(bbox) {
+                var that = this;
                 that._textSize = [bbox.width, bbox.height];
                 if (that._background) {
                     bbox.x -= LABEL_BACKGROUND_PADDING_X;
@@ -10410,7 +10731,6 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     bbox.height += 2 * LABEL_BACKGROUND_PADDING_Y;
                     that._background.attr(bbox)
                 }
-                that._labelSize = [bbox.width / 2, bbox.height / 2];
                 if (that._options.rotationAngle) {
                     that._insideGroup.rotate(that._options.rotationAngle, bbox.x + bbox.width / 2, bbox.y + bbox.height / 2);
                     bbox = _rotateBBox(bbox, [bbox.x + bbox.width / 2, bbox.y + bbox.height / 2], -that._options.rotationAngle)
@@ -10430,7 +10750,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 if (!strategy.isLabelInside(bbox, figure, that._options.position !== "inside")) {
                     xc = bbox.x + bbox.width / 2;
                     yc = bbox.y + bbox.height / 2;
-                    points = strategy.prepareLabelPoints([[xc, yc - that._labelSize[1]], [xc + that._labelSize[0], yc], [xc, yc + that._labelSize[1]], [xc - that._labelSize[0], yc]], [xc, yc], -that._options.rotationAngle || 0, !!that._background);
+                    points = strategy.prepareLabelPoints([[xc, yc - that._textSize[1] / 2], [xc + that._textSize[0] / 2, yc], [xc, yc + that._textSize[1] / 2], [xc - that._textSize[0] / 2, yc]], [xc, yc], -that._options.rotationAngle || 0);
                     labelPoint = getClosestCoord(strategy.getFigureCenter(figure), points);
                     labelPoint = [_round(labelPoint[0]), _round(labelPoint[1])];
                     figurePoint = strategy.findFigurePoint(figure, labelPoint);
@@ -10438,33 +10758,9 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 }
                 return points
             },
-            fit: function(size) {
-                var that = this;
-                if (!that._textContent)
-                    return that;
-                var cossin = _getCosAndSin(-that._options.rotationAngle || 0),
-                    textSize = _min(_abs(that._textSize[0] / cossin.cos), _abs(that._textSize[1] / cossin.sin)),
-                    requiredTextSize = _min(_abs(size.width / cossin.cos), _abs(size.height / cossin.sin)),
-                    text = that._textContent,
-                    i,
-                    ii,
-                    line,
-                    lines,
-                    lineLength,
-                    requiredLineLength;
-                if (textSize > requiredTextSize) {
-                    lines = text.split(/\r\n|\n|<br\s*\/?>/g);
-                    for (i = 0, ii = lines.length, lineLength = 0; i < ii; ++i) {
-                        line = lines[i] = lines[i].replace(/<[^>]+>/g, '');
-                        lineLength = _max(lineLength, line.length)
-                    }
-                    requiredLineLength = _ceil(lineLength * requiredTextSize / textSize);
-                    for (i = 0; i < ii; ++i)
-                        lines[i] = (line = lines[i]).length > requiredLineLength ? line.substr(0, requiredLineLength - 4) + "..." : line;
-                    text = lines.join("<br/>")
-                }
-                that._updateText(text);
-                return that
+            fit: function(maxWidth) {
+                this._text && this._text.applyEllipsis(maxWidth);
+                this._updateBackground(this._text.getBBox())
             },
             shift: function(x, y) {
                 var that = this;
@@ -11578,10 +11874,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 var that = this,
                     bbox = that._label.getBoundingRect(),
                     coord = that._checkHorizontalLabelPosition(bbox, bbox, that._getVisibleArea());
-                that._label.fit({
-                    width: bbox.width - _abs(coord.x - bbox.x),
-                    height: bbox.height - _abs(coord.y - bbox.y)
-                })
+                that._label.fit(bbox.width - _abs(coord.x - bbox.x))
             },
             _getVisibleArea: function() {
                 var canvas = this.series.canvas;
@@ -14656,12 +14949,8 @@ if (!DevExpress.MOD_VIZ_CORE) {
     /*! Module viz-core, file factory.js */
     (function($, DX) {
         var viz = DX.viz,
-            charts = viz.charts,
-            series = charts.series;
+            charts = viz.charts;
         charts.factory = function() {
-            var createSeriesFamily = function(options) {
-                    return new series.SeriesFamily(options)
-                };
             var createThemeManager = function(options, groupName) {
                     return new charts.ThemeManager(options, groupName)
                 };
@@ -14678,7 +14967,6 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     return new charts.Crosshair(renderer, options, params, group)
                 };
             return {
-                    createSeriesFamily: createSeriesFamily,
                     createThemeManager: createThemeManager,
                     createTracker: createTracker,
                     createChartLayoutManager: createChartLayoutManager,
@@ -14777,6 +15065,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 this.callBase.apply(this, arguments);
                 this.option({incidentOccured: defaultIncidentOccured})
             },
+            _useLinks: true,
             _init: function() {
                 var that = this;
                 that.callBase.apply(that, arguments);
@@ -14784,7 +15073,11 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 that._themeManager.setCallback(function() {
                     that._handleThemeOptions()
                 });
-                that._renderer = new DX.viz.renderers.Renderer({cssClass: that._rootClassPrefix + " " + that._rootClass});
+                that._renderer = new DX.viz.renderers.Renderer({
+                    cssClass: that._rootClassPrefix + " " + that._rootClass,
+                    pathModified: that.option("pathModified")
+                });
+                that._useLinks && that._renderer.root.enableLinks();
                 that._initIncidentOccured();
                 that._renderVisibilityChange();
                 that._initEventTrigger();
@@ -14797,9 +15090,11 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 that._initialShowLoadingIndicator()
             },
             _initTooltip: function() {
-                this._tooltip = new core.Tooltip({
-                    cssClass: this._rootClassPrefix + "-tooltip",
-                    eventTrigger: this._eventTrigger
+                var that = this;
+                that._tooltip = new core.Tooltip({
+                    cssClass: that._rootClassPrefix + "-tooltip",
+                    eventTrigger: that._eventTrigger,
+                    pathModified: that.option("pathModified")
                 })
             },
             _getAnimationOptions: $.noop,
@@ -14816,8 +15111,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
             _setHiddenState: function() {
                 var that = this;
                 that._clean = that._render = $.noop;
-                that._canvas = null;
-                that._incidentOccured('W2001', [that.NAME])
+                that._canvas = null
             },
             _setVisibleState: function() {
                 delete this._clean;
@@ -14878,6 +15172,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 that._eventTrigger.dispose();
                 that._disposeCore();
                 that._disposeLoadingIndicator();
+                that._useLinks && that._renderer.root.checkLinks();
                 that._renderer.dispose();
                 that._tooltip && that._tooltip.dispose();
                 that._themeManager.dispose();
@@ -14968,7 +15263,6 @@ if (!DevExpress.MOD_VIZ_CORE) {
                             that._setThemeAndRtl();
                             break;
                         case"encodeHtml":
-                        case"pathModified":
                             that._handleThemeOptions();
                             break;
                         case"tooltip":
@@ -14984,7 +15278,6 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     options = {
                         rtl: that.option(OPTION_RTL_ENABLED),
                         encodeHtml: that.option("encodeHtml"),
-                        pathModified: that.option("pathModified"),
                         animation: that._getAnimationOptions()
                     };
                 that._renderer.setOptions(options);
@@ -15054,9 +15347,6 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 this._resetIsReady();
                 this._loadIndicator.endLoading(complete)
             },
-            _repairLoadIndicator: function() {
-                this._loadIndicator.append()
-            },
             _disposeLoadingIndicator: function() {
                 this._loadIndicator.dispose();
                 this._loadIndicator = null
@@ -15079,7 +15369,6 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 return html.replace(/xmlns:NS1="[\s\S]*?"/gi, "").replace(/NS1:xmlns:xlink="([\s\S]*?)"/gi, 'xmlns:xlink="$1"')
             },
             _checkLoadingIndicatorHiding: function(bool) {
-                this._repairLoadIndicator();
                 if (bool)
                     this._fulfillLoadingIndicatorHiding()
             },

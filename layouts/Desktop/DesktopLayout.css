@@ -49,11 +49,11 @@
 }
 
 .desktop-layout #navBar .dx-tab {
-    padding: 4px 30px 9px;
+    padding: 9px 30px 11px;
 }
 
 .desktop-layout #navBar .dx-nav-item {
-    height: 25px;
+    height: 40px;
 }
 
  .desktop-layout #navBar .dx-nav-item.dx-state-focused {

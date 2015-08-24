@@ -25,8 +25,8 @@
             this._navigationManager.navigationCanceled.remove(this._navigationCanceledHandler);
             return this.callBase.apply(this, arguments)
         },
-        _onNavigatingCanceled: function() {
-            if (this.slideOut.option("menuVisible"))
+        _onNavigatingCanceled: function(args) {
+            if (this.slideOut.option("menuVisible") && args.cancelReason !== "redirect")
                 this._toggleNavigation()
         },
         _createNavigationWidget: function() {

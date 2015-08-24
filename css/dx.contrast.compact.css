@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme
-* Version: 15.1.5
-* Build date: Jul 15, 2015
+* Version: 15.1.6
+* Build date: Aug 14, 2015
 *
 * Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -445,6 +445,10 @@
 {
   opacity: .5;
 }
+.dx-pivotgridfieldchooser .dx-drag-source.dx-area-box
+{
+  display: none;
+}
 .dx-rtl .dx-pivotgrid-area-data
 {
   border-left: 0;
@@ -738,9 +742,9 @@
 }
 .dx-scheduler-work-space-month .dx-scheduler-appointment.dx-state-hover
 {
-  -webkit-box-shadow: inset 5px 0 0 0 white;
-  -moz-box-shadow: inset 5px 0 0 0 white;
-  box-shadow: inset 5px 0 0 0 white;
+  -webkit-box-shadow: inset 5px 0 0 0 white,inset -2px 0 0 0 white;
+  -moz-box-shadow: inset 5px 0 0 0 white,inset -2px 0 0 0 white;
+  box-shadow: inset 5px 0 0 0 white,inset -2px 0 0 0 white;
 }
 .dx-scheduler-work-space-month .dx-scheduler-appointment.dx-draggable-dragging
 {
@@ -751,6 +755,10 @@
 .dx-scheduler-work-space-month .dx-scheduler-appointment-content
 {
   padding: 0 7px;
+}
+.dx-scheduler-work-space-month .dx-scheduler-appointment-recurrence-icon
+{
+  top: 0;
 }
 .dx-scheduler-work-space-week .dx-scheduler-header-panel-cell:nth-child(7n), .dx-scheduler-work-space-month .dx-scheduler-header-panel-cell:nth-child(7n), .dx-scheduler-work-space-week .dx-scheduler-date-table-cell:nth-child(7n), .dx-scheduler-work-space-month .dx-scheduler-date-table-cell:nth-child(7n), .dx-scheduler-work-space-week .dx-scheduler-all-day-table-cell:nth-child(7n), .dx-scheduler-work-space-month .dx-scheduler-all-day-table-cell:nth-child(7n)
 {
@@ -910,7 +918,7 @@
 {
   background-color: #000;
 }
-.dx-scheduler-appointments
+.dx-scheduler-scrollable-appointments
 {
   position: absolute;
 }
@@ -918,7 +926,6 @@
 {
   background-clip: padding-box;
   display: inline-block;
-  overflow: hidden;
   border-top: 1px solid transparent;
   border-left: 1px solid transparent;
   position: absolute;
@@ -944,9 +951,17 @@
 }
 .dx-scheduler-appointment.dx-state-hover
 {
-  -webkit-box-shadow: inset 0 5px 0 0 white;
-  -moz-box-shadow: inset 0 5px 0 0 white;
-  box-shadow: inset 0 5px 0 0 white;
+  -webkit-box-shadow: inset 0 5px 0 0 white,inset 0 -2px 0 0 white;
+  -moz-box-shadow: inset 0 5px 0 0 white,inset 0 -2px 0 0 white;
+  box-shadow: inset 0 5px 0 0 white,inset 0 -2px 0 0 white;
+}
+.dx-scheduler-appointment.dx-state-hover .dx-resizable-handle-top
+{
+  height: 5px;
+}
+.dx-scheduler-appointment.dx-state-hover .dx-resizable-handle-left
+{
+  width: 5px;
 }
 .dx-scheduler-appointment.dx-draggable-dragging
 {
@@ -962,9 +977,13 @@
   -moz-opacity: .7;
   opacity: .7;
 }
-.dx-scheduler-appointment .dx-scheduler-appointment-recurrence-icon
+.dx-scheduler-appointment .dx-resizable-handle-top
 {
-  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA8AAAAQCAQAAABjX+2PAAAAN0lEQVQoz2P4z4APMpAmbfwfBIyxS6NJgqRhACaJAoiSxm44hjSqAizSyJBK0jgBQWlqRgkaBAAoUUTKKq2B7wAAAABJRU5ErkJggg==);
+  top: -1px;
+}
+.dx-scheduler-appointment .dx-resizable-handle-left
+{
+  left: -1px;
 }
 .dx-scheduler-appointment .dx-appointment-reduced-icon
 {
@@ -991,10 +1010,12 @@
 {
   position: absolute;
   background-repeat: no-repeat;
-  width: 16px;
-  height: 16px;
-  top: 2px;
-  right: 4px;
+  top: 3px;
+  right: 7px;
+}
+.dx-scheduler-appointment-recurrence-icon.dx-icon-repeat
+{
+  font-size: 18px;
 }
 .dx-scheduler-appointment-reduced .dx-scheduler-appointment-recurrence-icon
 {
@@ -1003,6 +1024,7 @@
 .dx-scheduler-appointment-content
 {
   padding: 5px 7px;
+  overflow: hidden;
 }
 .dx-scheduler-appointment-empty .dx-scheduler-appointment-content
 {
@@ -1020,7 +1042,7 @@
 {
   font-size: 11px;
 }
-.dx-scheduler-all-day-container .dx-scheduler-appointment-content-details, .dx-scheduler-work-space-month .dx-scheduler-appointment-content-details
+.dx-scheduler-all-day-appointment .dx-scheduler-appointment-content-details, .dx-scheduler-work-space-month .dx-scheduler-appointment-content-details
 {
   display: none;
 }
@@ -1059,37 +1081,37 @@
 {
   margin-top: 10px;
 }
-.dx-sheduler-appointment-popup .dx-field
+.dx-scheduler-appointment-popup .dx-field
 {
   min-height: 0;
 }
-.dx-sheduler-appointment-popup .dx-field-label
+.dx-scheduler-appointment-popup .dx-field-label
 {
   width: 20%;
 }
-.dx-sheduler-appointment-popup .dx-field-value:not(.dx-switch):not(.dx-numberbox):not(.dx-datebox)
+.dx-scheduler-appointment-popup .dx-field-value:not(.dx-switch):not(.dx-numberbox):not(.dx-datebox)
 {
   width: 80%;
 }
-.dx-sheduler-appointment-popup .dx-field-value
+.dx-scheduler-appointment-popup .dx-field-value
 {
   padding-left: 0;
   padding-right: 0;
 }
-.dx-sheduler-appointment-popup .dx-field-value:not(.dx-widget)>.dx-checkbox
+.dx-scheduler-appointment-popup .dx-field-value:not(.dx-widget)>.dx-checkbox
 {
   float: left;
 }
-.dx-sheduler-appointment-popup .dx-field-value:not(.dx-widget)>.dx-checkbox.dx-rtl
+.dx-scheduler-appointment-popup .dx-field-value:not(.dx-widget)>.dx-checkbox.dx-rtl
 {
   float: right;
 }
-.dx-numberbox.dx-recurrence-numberbox-interval, .dx-numberbox.dx-recurrence-numberbox-day-of-month, .dx-selectbox.dx-recurrence-selectbox-month-of-year, .dx-numberbox.dx-recurrence-numberbox-repeat-count, .dx-datebox.dx-recurrence-datebox-until-date, .dx-datebox.dx-sheduler-appointment-popup-start-date, .dx-datebox.dx-sheduler-appointment-popup-end-date, .dx-switch.dx-sheduler-appointment-popup-allday, .dx-switch.dx-recurrence-switch-repeat-end
+.dx-numberbox.dx-recurrence-numberbox-interval, .dx-numberbox.dx-recurrence-numberbox-day-of-month, .dx-selectbox.dx-recurrence-selectbox-month-of-year, .dx-numberbox.dx-recurrence-numberbox-repeat-count, .dx-datebox.dx-recurrence-datebox-until-date, .dx-datebox.dx-scheduler-appointment-popup-start-date, .dx-datebox.dx-scheduler-appointment-popup-end-date, .dx-switch.dx-scheduler-appointment-popup-allday, .dx-switch.dx-recurrence-switch-repeat-end
 {
   float: left;
   position: relative !important;
 }
-.dx-numberbox.dx-recurrence-numberbox-interval.dx-rtl, .dx-numberbox.dx-recurrence-numberbox-day-of-month.dx-rtl, .dx-selectbox.dx-recurrence-selectbox-month-of-year.dx-rtl, .dx-numberbox.dx-recurrence-numberbox-repeat-count.dx-rtl, .dx-datebox.dx-recurrence-datebox-until-date.dx-rtl, .dx-datebox.dx-sheduler-appointment-popup-start-date.dx-rtl, .dx-datebox.dx-sheduler-appointment-popup-end-date.dx-rtl, .dx-switch.dx-sheduler-appointment-popup-allday.dx-rtl, .dx-switch.dx-recurrence-switch-repeat-end.dx-rtl
+.dx-numberbox.dx-recurrence-numberbox-interval.dx-rtl, .dx-numberbox.dx-recurrence-numberbox-day-of-month.dx-rtl, .dx-selectbox.dx-recurrence-selectbox-month-of-year.dx-rtl, .dx-numberbox.dx-recurrence-numberbox-repeat-count.dx-rtl, .dx-datebox.dx-recurrence-datebox-until-date.dx-rtl, .dx-datebox.dx-scheduler-appointment-popup-start-date.dx-rtl, .dx-datebox.dx-scheduler-appointment-popup-end-date.dx-rtl, .dx-switch.dx-scheduler-appointment-popup-allday.dx-rtl, .dx-switch.dx-recurrence-switch-repeat-end.dx-rtl
 {
   float: right;
 }
@@ -1097,7 +1119,7 @@
 {
   width: 70px !important;
 }
-.dx-datebox.dx-recurrence-datebox-until-date, .dx-datebox.dx-sheduler-appointment-popup-start-date, .dx-datebox.dx-sheduler-appointment-popup-end-date
+.dx-datebox.dx-recurrence-datebox-until-date, .dx-datebox.dx-scheduler-appointment-popup-start-date, .dx-datebox.dx-scheduler-appointment-popup-end-date
 {
   width: inherit !important;
 }
@@ -1156,7 +1178,7 @@
 {
   margin-left: 0;
 }
-.dx-rtl .dx-scheduler-all-day-container
+.dx-rtl .dx-scheduler-fixed-appointments
 {
   direction: ltr;
 }
@@ -1188,7 +1210,7 @@
   margin-left: 0;
   margin-right: -100px;
 }
-.dx-rtl .dx-scheduler-appointments.dx-rtl
+.dx-rtl .dx-scheduler-scrollable-appointments.dx-rtl
 {
   direction: ltr;
 }
@@ -1198,7 +1220,7 @@
 }
 .dx-rtl .dx-scheduler-appointment-recurrence-icon
 {
-  left: 4px;
+  left: 7px;
   right: auto;
 }
 .dx-scheduler-appointment-reduced .dx-rtl .dx-scheduler-appointment-recurrence-icon
@@ -2191,6 +2213,14 @@
 {
   content: "\f010 ";
 }
+.dx-icon-repeat
+{
+  font: 14px/1 DXIcons;
+}
+.dx-icon-repeat:before
+{
+  content: "\f069 ";
+}
 .dx-icon
 {
   color: #fff;
@@ -2282,14 +2312,6 @@
   font-size: 11px;
   padding: 0 5px 2px;
   line-height: normal;
-}
-:not(.dx-rtl)>.dx-resizable-handle-corner-bottom-right
-{
-  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAQAAACROWYpAAAASklEQVRIx2P8z0A+YBzVPKp5VDMY6ALhZSAkS3MUAw/DF4ZlA2AzvQMM4VgynI0IJjICjCKb6R1g2BxLtLOxBRPRAUaRzcO1MAAAayRCARMgZZcAAAAASUVORK5CYII=);
-}
-.dx-rtl .dx-resizable-handle-corner-bottom-left
-{
-  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAQAAACROWYpAAAASklEQVRIx2P8z0A+YBzVPKp5VDMY6ALhZSAkS3MUAw/DF4ZlA2AzvQMM4VgynI0IJjICjCKb6R1g2BxLtLOxBRPRAUaRzcO1MAAAayRCARMgZZcAAAAASUVORK5CYII=);
 }
 .dx-box-item-content
 {
@@ -2658,22 +2680,6 @@
 {
   background-color: transparent;
   background-color: rgba(255,255,255,0);
-  -webkit-transition: background-color .2s linear 0;
-  -moz-transition: background-color .2s linear 0;
-  -o-transition: background-color .2s linear 0;
-  transition: background-color .2s linear 0;
-  -webkit-transition: background-color .2s linear 0,none 1s linear 0;
-  -moz-transition: background-color .2s linear 0,none 1s linear 0;
-  -o-transition: background-color .2s linear 0,none 1s linear 0;
-  transition: background-color .2s linear 0,none 1s linear 0;
-  -webkit-transition: background-color .2s linear 0,none 1s linear 0,none 1s linear 0;
-  -moz-transition: background-color .2s linear 0,none 1s linear 0,none 1s linear 0;
-  -o-transition: background-color .2s linear 0,none 1s linear 0,none 1s linear 0;
-  transition: background-color .2s linear 0,none 1s linear 0,none 1s linear 0;
-  -webkit-transition: background-color .2s linear 0,none 1s linear 0,none 1s linear 0,none 1s linear 0;
-  -moz-transition: background-color .2s linear 0,none 1s linear 0,none 1s linear 0,none 1s linear 0;
-  -o-transition: background-color .2s linear 0,none 1s linear 0,none 1s linear 0,none 1s linear 0;
-  transition: background-color .2s linear 0,none 1s linear 0,none 1s linear 0,none 1s linear 0;
 }
 .dx-scrollbar-hoverable.dx-state-hover, .dx-scrollbar-hoverable.dx-scrollable-scrollbar-active
 {
@@ -2704,22 +2710,18 @@
 .dx-scrollbar-vertical.dx-scrollbar-hoverable
 {
   width: 8px;
-  -webkit-transition: width .2s linear 150ms;
-  -moz-transition: width .2s linear 150ms;
-  -o-transition: width .2s linear 150ms;
-  transition: width .2s linear 150ms;
-  -webkit-transition: width .2s linear 150ms,none 1s linear 0;
-  -moz-transition: width .2s linear 150ms,none 1s linear 0;
-  -o-transition: width .2s linear 150ms,none 1s linear 0;
-  transition: width .2s linear 150ms,none 1s linear 0;
-  -webkit-transition: width .2s linear 150ms,none 1s linear 0,none 1s linear 0;
-  -moz-transition: width .2s linear 150ms,none 1s linear 0,none 1s linear 0;
-  -o-transition: width .2s linear 150ms,none 1s linear 0,none 1s linear 0;
-  transition: width .2s linear 150ms,none 1s linear 0,none 1s linear 0;
-  -webkit-transition: width .2s linear 150ms,none 1s linear 0,none 1s linear 0,none 1s linear 0;
-  -moz-transition: width .2s linear 150ms,none 1s linear 0,none 1s linear 0,none 1s linear 0;
-  -o-transition: width .2s linear 150ms,none 1s linear 0,none 1s linear 0,none 1s linear 0;
-  transition: width .2s linear 150ms,none 1s linear 0,none 1s linear 0,none 1s linear 0;
+  -webkit-transition: width .2s linear 150ms,background-color .2s linear 150ms;
+  -moz-transition: width .2s linear 150ms,background-color .2s linear 150ms;
+  -o-transition: width .2s linear 150ms,background-color .2s linear 150ms;
+  transition: width .2s linear 150ms,background-color .2s linear 150ms;
+  -webkit-transition: width .2s linear 150ms,background-color .2s linear 150ms,none 1s linear 0;
+  -moz-transition: width .2s linear 150ms,background-color .2s linear 150ms,none 1s linear 0;
+  -o-transition: width .2s linear 150ms,background-color .2s linear 150ms,none 1s linear 0;
+  transition: width .2s linear 150ms,background-color .2s linear 150ms,none 1s linear 0;
+  -webkit-transition: width .2s linear 150ms,background-color .2s linear 150ms,none 1s linear 0,none 1s linear 0;
+  -moz-transition: width .2s linear 150ms,background-color .2s linear 150ms,none 1s linear 0,none 1s linear 0;
+  -o-transition: width .2s linear 150ms,background-color .2s linear 150ms,none 1s linear 0,none 1s linear 0;
+  transition: width .2s linear 150ms,background-color .2s linear 150ms,none 1s linear 0,none 1s linear 0;
 }
 .dx-scrollbar-vertical.dx-scrollbar-hoverable .dx-scrollable-scroll
 {
@@ -2784,22 +2786,6 @@
 .dx-scrollbar-vertical.dx-scrollbar-hoverable.dx-state-hover, .dx-scrollbar-vertical.dx-scrollbar-hoverable.dx-scrollable-scrollbar-active
 {
   width: 15px;
-  -webkit-transition: width .2s linear 150ms;
-  -moz-transition: width .2s linear 150ms;
-  -o-transition: width .2s linear 150ms;
-  transition: width .2s linear 150ms;
-  -webkit-transition: width .2s linear 150ms,none 1s linear 0;
-  -moz-transition: width .2s linear 150ms,none 1s linear 0;
-  -o-transition: width .2s linear 150ms,none 1s linear 0;
-  transition: width .2s linear 150ms,none 1s linear 0;
-  -webkit-transition: width .2s linear 150ms,none 1s linear 0,none 1s linear 0;
-  -moz-transition: width .2s linear 150ms,none 1s linear 0,none 1s linear 0;
-  -o-transition: width .2s linear 150ms,none 1s linear 0,none 1s linear 0;
-  transition: width .2s linear 150ms,none 1s linear 0,none 1s linear 0;
-  -webkit-transition: width .2s linear 150ms,none 1s linear 0,none 1s linear 0,none 1s linear 0;
-  -moz-transition: width .2s linear 150ms,none 1s linear 0,none 1s linear 0,none 1s linear 0;
-  -o-transition: width .2s linear 150ms,none 1s linear 0,none 1s linear 0,none 1s linear 0;
-  transition: width .2s linear 150ms,none 1s linear 0,none 1s linear 0,none 1s linear 0;
 }
 .dx-scrollbar-vertical.dx-scrollbar-hoverable.dx-state-hover .dx-scrollable-scroll, .dx-scrollbar-vertical.dx-scrollbar-hoverable.dx-scrollable-scrollbar-active .dx-scrollable-scroll
 {
@@ -2812,22 +2798,18 @@
 .dx-scrollbar-horizontal.dx-scrollbar-hoverable
 {
   height: 8px;
-  -webkit-transition: height .2s linear 150ms;
-  -moz-transition: height .2s linear 150ms;
-  -o-transition: height .2s linear 150ms;
-  transition: height .2s linear 150ms;
-  -webkit-transition: height .2s linear 150ms,none 1s linear 0;
-  -moz-transition: height .2s linear 150ms,none 1s linear 0;
-  -o-transition: height .2s linear 150ms,none 1s linear 0;
-  transition: height .2s linear 150ms,none 1s linear 0;
-  -webkit-transition: height .2s linear 150ms,none 1s linear 0,none 1s linear 0;
-  -moz-transition: height .2s linear 150ms,none 1s linear 0,none 1s linear 0;
-  -o-transition: height .2s linear 150ms,none 1s linear 0,none 1s linear 0;
-  transition: height .2s linear 150ms,none 1s linear 0,none 1s linear 0;
-  -webkit-transition: height .2s linear 150ms,none 1s linear 0,none 1s linear 0,none 1s linear 0;
-  -moz-transition: height .2s linear 150ms,none 1s linear 0,none 1s linear 0,none 1s linear 0;
-  -o-transition: height .2s linear 150ms,none 1s linear 0,none 1s linear 0,none 1s linear 0;
-  transition: height .2s linear 150ms,none 1s linear 0,none 1s linear 0,none 1s linear 0;
+  -webkit-transition: height .2s linear 150ms,background-color .2s linear 150ms;
+  -moz-transition: height .2s linear 150ms,background-color .2s linear 150ms;
+  -o-transition: height .2s linear 150ms,background-color .2s linear 150ms;
+  transition: height .2s linear 150ms,background-color .2s linear 150ms;
+  -webkit-transition: height .2s linear 150ms,background-color .2s linear 150ms,none 1s linear 0;
+  -moz-transition: height .2s linear 150ms,background-color .2s linear 150ms,none 1s linear 0;
+  -o-transition: height .2s linear 150ms,background-color .2s linear 150ms,none 1s linear 0;
+  transition: height .2s linear 150ms,background-color .2s linear 150ms,none 1s linear 0;
+  -webkit-transition: height .2s linear 150ms,background-color .2s linear 150ms,none 1s linear 0,none 1s linear 0;
+  -moz-transition: height .2s linear 150ms,background-color .2s linear 150ms,none 1s linear 0,none 1s linear 0;
+  -o-transition: height .2s linear 150ms,background-color .2s linear 150ms,none 1s linear 0,none 1s linear 0;
+  transition: height .2s linear 150ms,background-color .2s linear 150ms,none 1s linear 0,none 1s linear 0;
 }
 .dx-scrollbar-horizontal.dx-scrollbar-hoverable .dx-scrollable-scroll
 {
@@ -2892,22 +2874,6 @@
 .dx-scrollbar-horizontal.dx-scrollbar-hoverable.dx-state-hover, .dx-scrollbar-horizontal.dx-scrollbar-hoverable.dx-scrollable-scrollbar-active
 {
   height: 15px;
-  -webkit-transition: height .2s linear 150ms;
-  -moz-transition: height .2s linear 150ms;
-  -o-transition: height .2s linear 150ms;
-  transition: height .2s linear 150ms;
-  -webkit-transition: height .2s linear 150ms,none 1s linear 0;
-  -moz-transition: height .2s linear 150ms,none 1s linear 0;
-  -o-transition: height .2s linear 150ms,none 1s linear 0;
-  transition: height .2s linear 150ms,none 1s linear 0;
-  -webkit-transition: height .2s linear 150ms,none 1s linear 0,none 1s linear 0;
-  -moz-transition: height .2s linear 150ms,none 1s linear 0,none 1s linear 0;
-  -o-transition: height .2s linear 150ms,none 1s linear 0,none 1s linear 0;
-  transition: height .2s linear 150ms,none 1s linear 0,none 1s linear 0;
-  -webkit-transition: height .2s linear 150ms,none 1s linear 0,none 1s linear 0,none 1s linear 0;
-  -moz-transition: height .2s linear 150ms,none 1s linear 0,none 1s linear 0,none 1s linear 0;
-  -o-transition: height .2s linear 150ms,none 1s linear 0,none 1s linear 0,none 1s linear 0;
-  transition: height .2s linear 150ms,none 1s linear 0,none 1s linear 0,none 1s linear 0;
 }
 .dx-scrollbar-horizontal.dx-scrollbar-hoverable.dx-state-hover .dx-scrollable-scroll, .dx-scrollbar-horizontal.dx-scrollbar-hoverable.dx-scrollable-scrollbar-active .dx-scrollable-scroll
 {
@@ -3015,13 +2981,13 @@
 }
 .dx-checkbox-text
 {
-  margin-left: -22px;
-  padding-left: 27px;
+  margin-left: -16px;
+  padding-left: 21px;
 }
 .dx-rtl .dx-checkbox-text, .dx-rtl.dx-checkbox-text
 {
-  margin-right: -22px;
-  padding-right: 27px;
+  margin-right: -16px;
+  padding-right: 21px;
 }
 .dx-checkbox-checked .dx-checkbox-icon
 {
@@ -3158,12 +3124,12 @@
   content: ' ';
   width: 100%;
   height: 100%;
+  background-color: #fff;
   -webkit-border-radius: 2px;
   -moz-border-radius: 2px;
   -ms-border-radius: 2px;
   -o-border-radius: 2px;
   border-radius: 2px;
-  background-color: #fff;
 }
 .dx-switch-on-value .dx-switch-handle:before
 {
@@ -3190,7 +3156,7 @@
 }
 .dx-rtl .dx-switch .dx-switch-container, .dx-switch.dx-rtl .dx-switch-container
 {
-  margin: 0 0 -3px 0;
+  margin: 0 0 0 -3px;
 }
 .dx-tabs
 {
@@ -3335,7 +3301,7 @@
   vertical-align: middle;
   line-height: 21px;
 }
-.dx-state-disabled .dx-tab-text
+.dx-state-disabled .dx-tab-content
 {
   filter: alpha(opacity=30);
   -khtml-opacity: .3;
@@ -3415,13 +3381,41 @@
   -moz-box-shadow: none;
   box-shadow: none;
 }
-.dx-texteditor.dx-state-readonly
+.dx-texteditor.dx-invalid .dx-texteditor-input
 {
-  background: transparent;
+  padding-right: 24px;
 }
-.dx-texteditor.dx-state-readonly .dx-texteditor-input
+.dx-texteditor.dx-invalid.dx-rtl .dx-texteditor-input
 {
-  background: transparent;
+  padding: 4px 5px 4px;
+  padding-left: 24px;
+}
+.dx-texteditor.dx-invalid .dx-texteditor-container:after
+{
+  right: 2px;
+}
+.dx-rtl .dx-texteditor.dx-invalid .dx-texteditor-container:after
+{
+  left: 2px;
+  right: auto;
+}
+.dx-texteditor.dx-show-clear-button:not(.dx-texteditor-empty).dx-invalid .dx-texteditor-input
+{
+  padding-right: 48px;
+}
+.dx-texteditor.dx-show-clear-button:not(.dx-texteditor-empty).dx-invalid.dx-rtl .dx-texteditor-input
+{
+  padding: 4px 5px 4px;
+  padding-left: 48px;
+}
+.dx-texteditor.dx-show-clear-button:not(.dx-texteditor-empty).dx-invalid .dx-texteditor-container:after
+{
+  right: 26px;
+}
+.dx-rtl .dx-texteditor.dx-show-clear-button:not(.dx-texteditor-empty).dx-invalid .dx-texteditor-container:after
+{
+  left: 26px;
+  right: auto;
 }
 .dx-show-clear-button .dx-texteditor-input
 {
@@ -3459,15 +3453,6 @@
   padding: 4px;
   font-size: 15px;
   line-height: 15px;
-}
-.dx-show-clear-button.dx-invalid.dx-texteditor .dx-texteditor-input
-{
-  padding-right: 48px;
-}
-.dx-show-clear-button.dx-invalid.dx-texteditor.dx-rtl .dx-texteditor-input
-{
-  padding: 4px 5px 4px;
-  padding-left: 48px;
 }
 .dx-placeholder
 {
@@ -3513,30 +3498,6 @@
   text-align: center;
   line-height: 16px;
   font-size: 11px;
-  right: 4px;
-}
-.dx-rtl .dx-invalid.dx-texteditor .dx-texteditor-container:after, .dx-rtl.dx-invalid.dx-texteditor .dx-texteditor-container:after
-{
-  left: 4px;
-  right: auto;
-}
-.dx-invalid.dx-texteditor.dx-show-clear-button:not(.dx-texteditor-empty) .dx-texteditor-container:after
-{
-  right: 26px;
-}
-.dx-rtl .dx-invalid.dx-texteditor.dx-show-clear-button:not(.dx-texteditor-empty) .dx-texteditor-container:after
-{
-  left: 26px;
-  right: auto;
-}
-.dx-invalid.dx-texteditor .dx-texteditor-input
-{
-  padding-right: 24px;
-}
-.dx-invalid.dx-texteditor.dx-rtl .dx-texteditor-input
-{
-  padding: 4px 5px 4px;
-  padding-left: 24px;
 }
 .dx-rtl .dx-placeholder, .dx-rtl .dx-placeholder:before
 {
@@ -4432,10 +4393,6 @@
   overflow: hidden;
   width: 20px;
 }
-.dx-numberbox-spin-touch-friendly .dx-numberbox-spin-container
-{
-  width: 60px;
-}
 .dx-numberbox-spin-up-icon
 {
   font: 14px/1 DXIcons;
@@ -4472,18 +4429,6 @@
 {
   padding-right: 40px;
 }
-.dx-numberbox-spin.dx-numberbox-spin-touch-friendly .dx-numberbox-spin-container
-{
-  border-left: none;
-}
-.dx-numberbox-spin.dx-numberbox-spin-touch-friendly.dx-show-clear-button .dx-texteditor-input
-{
-  padding-right: 80px;
-}
-.dx-numberbox-spin.dx-numberbox-spin-touch-friendly .dx-numberbox-spin-up-icon, .dx-numberbox-spin.dx-numberbox-spin-touch-friendly .dx-numberbox-spin-down-icon
-{
-  background-position: center;
-}
 .dx-numberbox-spin-button
 {
   background-color: #000;
@@ -4498,6 +4443,94 @@
 {
   background-color: #fff;
   color: #000;
+}
+.dx-numberbox-spin.dx-invalid .dx-texteditor-input
+{
+  padding-right: 44px;
+}
+.dx-numberbox-spin.dx-invalid.dx-rtl .dx-texteditor-input
+{
+  padding: 4px 5px 4px;
+  padding-left: 44px;
+}
+.dx-numberbox-spin.dx-invalid .dx-texteditor-container:after
+{
+  right: 22px;
+}
+.dx-rtl .dx-numberbox-spin.dx-invalid .dx-texteditor-container:after
+{
+  left: 22px;
+  right: auto;
+}
+.dx-numberbox-spin.dx-show-clear-button:not(.dx-texteditor-empty).dx-invalid .dx-texteditor-input
+{
+  padding-right: 68px;
+}
+.dx-numberbox-spin.dx-show-clear-button:not(.dx-texteditor-empty).dx-invalid.dx-rtl .dx-texteditor-input
+{
+  padding: 4px 5px 4px;
+  padding-left: 68px;
+}
+.dx-numberbox-spin.dx-show-clear-button:not(.dx-texteditor-empty).dx-invalid .dx-texteditor-container:after
+{
+  right: 46px;
+}
+.dx-rtl .dx-numberbox-spin.dx-show-clear-button:not(.dx-texteditor-empty).dx-invalid .dx-texteditor-container:after
+{
+  left: 46px;
+  right: auto;
+}
+.dx-numberbox-spin-touch-friendly.dx-invalid .dx-texteditor-input
+{
+  padding-right: 84px;
+}
+.dx-numberbox-spin-touch-friendly.dx-invalid.dx-rtl .dx-texteditor-input
+{
+  padding: 4px 5px 4px;
+  padding-left: 84px;
+}
+.dx-numberbox-spin-touch-friendly.dx-invalid .dx-texteditor-container:after
+{
+  right: 62px;
+}
+.dx-rtl .dx-numberbox-spin-touch-friendly.dx-invalid .dx-texteditor-container:after
+{
+  left: 62px;
+  right: auto;
+}
+.dx-numberbox-spin-touch-friendly.dx-show-clear-button:not(.dx-texteditor-empty).dx-invalid .dx-texteditor-input
+{
+  padding-right: 108px;
+}
+.dx-numberbox-spin-touch-friendly.dx-show-clear-button:not(.dx-texteditor-empty).dx-invalid.dx-rtl .dx-texteditor-input
+{
+  padding: 4px 5px 4px;
+  padding-left: 108px;
+}
+.dx-numberbox-spin-touch-friendly.dx-show-clear-button:not(.dx-texteditor-empty).dx-invalid .dx-texteditor-container:after
+{
+  right: 86px;
+}
+.dx-rtl .dx-numberbox-spin-touch-friendly.dx-show-clear-button:not(.dx-texteditor-empty).dx-invalid .dx-texteditor-container:after
+{
+  left: 86px;
+  right: auto;
+}
+.dx-numberbox-spin-touch-friendly .dx-numberbox-spin-container
+{
+  width: 60px;
+}
+.dx-numberbox-spin-touch-friendly .dx-numberbox-spin-container
+{
+  border-left: none;
+}
+.dx-numberbox-spin-touch-friendly.dx-show-clear-button .dx-texteditor-input
+{
+  padding-right: 80px;
+}
+.dx-numberbox-spin-touch-friendly .dx-numberbox-spin-up-icon, .dx-numberbox-spin-touch-friendly .dx-numberbox-spin-down-icon
+{
+  background-position: center;
 }
 .dx-rtl .dx-numberbox.dx-numberbox-spin-touch-friendly .dx-numberbox-spin-container, .dx-numberbox.dx-rtl.dx-numberbox-spin-touch-friendly .dx-numberbox-spin-container
 {
@@ -4976,8 +5009,6 @@
   min-height: 28px;
   border-bottom: 1px solid #fff;
   background: #000;
-  font-weight: normal;
-  font-size: 18px;
 }
 .dx-popup-title.dx-toolbar
 {
@@ -6577,10 +6608,6 @@
 {
   margin: 0 3px;
 }
-.dx-datagrid.dx-context-menu .dx-menu-items-container .dx-icon
-{
-  color: #fff;
-}
 .dx-datagrid.dx-context-menu .dx-menu-items-container .dx-icon-context-menu-sort-asc
 {
   font: 14px/1 DXIcons;
@@ -6799,6 +6826,11 @@
 {
   padding: 5px;
   background: #000;
+}
+.dx-editor-cell .dx-texteditor.dx-dropdowneditor .dx-texteditor-input
+{
+  padding-right: 24px;
+  padding-left: 5px;
 }
 .dx-editor-cell .dx-texteditor.dx-numberbox-spin .dx-texteditor-input
 {
@@ -7364,7 +7396,8 @@
 }
 .dx-rtl .dx-editor-cell .dx-dropdowneditor.dx-dropdowneditor-button-visible .dx-texteditor-input, .dx-rtl .dx-editor-cell .dx-editor-with-menu .dx-dropdowneditor.dx-dropdowneditor-button-visible .dx-texteditor-input
 {
-  padding-left: 29px;
+  padding-right: 5px;
+  padding-left: 24px;
 }
 .dx-rtl .dx-datagrid .dx-column-lines>td
 {
@@ -7832,6 +7865,10 @@
   border-bottom: 1px solid #fff;
   padding: 4px 0 6px 21px;
 }
+.dx-treeview .dx-treeview-select-all-item .dx-checkbox-text
+{
+  padding-left: 26px;
+}
 .dx-treeview .dx-treeview-node-container:first-child>.dx-treeview-node
 {
   padding-left: 10px;
@@ -7981,6 +8018,7 @@
 .dx-field-label
 {
   color: #fff;
+  cursor: default;
 }
 .dx-field-value.dx-attention
 {
@@ -8158,7 +8196,7 @@
 }
 .dx-fileuploader-dragover .dx-fileuploader-input-wrapper
 {
-  border-color: #fff;
+  border: none;
   padding: 0;
 }
 .dx-fileuploader-dragover .dx-fileuploader-input-wrapper .dx-fileuploader-button
@@ -8172,13 +8210,18 @@
 .dx-fileuploader-dragover .dx-fileuploader-input-container
 {
   display: block;
+  border: 3px dashed #fff;
   width: 100%;
 }
 .dx-fileuploader-dragover .dx-fileuploader-input
 {
   display: block;
   width: 100%;
-  padding: 4px 0;
+  padding: 4px 3px;
+  margin: -3px;
+  -webkit-box-sizing: content-box;
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
 }
 .dx-fileuploader-dragover .dx-fileuploader-input-label
 {
@@ -8392,58 +8435,58 @@
   border-top: 1px solid rgba(0,0,0,.7);
   border-bottom: 1px solid rgba(0,0,0,.7);
 }
-.dx-sheduler-appointment-popup .dx-popup-content
+.dx-scheduler-appointment-popup .dx-popup-content
 {
   padding: 0;
   margin-bottom: 10px;
 }
-.dx-sheduler-appointment-popup .dx-popup-content .dx-scrollable-container
+.dx-scheduler-appointment-popup .dx-popup-content .dx-scrollable-container
 {
   padding: 0 10px;
 }
-.dx-sheduler-appointment-popup .dx-fieldset
+.dx-scheduler-appointment-popup .dx-fieldset
 {
   margin: 0 15px 15px 10px;
 }
-.dx-sheduler-appointment-popup .dx-popup-title
+.dx-scheduler-appointment-popup .dx-popup-title
 {
   background-color: #000;
   border-bottom: none;
 }
-.dx-sheduler-appointment-popup .dx-popup-title .dx-closebutton, .dx-sheduler-appointment-popup .dx-popup-title .dx-closebutton.dx-rtl
+.dx-scheduler-appointment-popup .dx-popup-title .dx-closebutton, .dx-scheduler-appointment-popup .dx-popup-title .dx-closebutton.dx-rtl
 {
   margin: 0;
 }
-.dx-sheduler-appointment-popup .dx-toolbar-after
+.dx-scheduler-appointment-popup .dx-toolbar-after
 {
   margin-right: 4px;
 }
-.dx-rtl .dx-sheduler-appointment-popup .dx-toolbar-after
+.dx-rtl .dx-scheduler-appointment-popup .dx-toolbar-after
 {
   margin-left: 4px;
   margin-right: 0;
 }
-.dx-sheduler-appointment-popup .dx-recurrence-repeat-end-container
+.dx-scheduler-appointment-popup .dx-recurrence-repeat-end-container
 {
   margin: 0;
 }
-.dx-sheduler-appointment-popup .dx-sheduler-appointment-popup-allday-field, .dx-sheduler-appointment-popup .dx-recurrence-interval-field, .dx-sheduler-appointment-popup .dx-sheduler-appointment-popup-recurrence-field
+.dx-scheduler-appointment-popup .dx-scheduler-appointment-popup-allday-field, .dx-scheduler-appointment-popup .dx-recurrence-interval-field, .dx-scheduler-appointment-popup .dx-scheduler-appointment-popup-recurrence-field
 {
   margin-top: 14px;
 }
-.dx-sheduler-appointment-popup .dx-recurrence-switch
+.dx-scheduler-appointment-popup .dx-recurrence-switch
 {
   margin-top: 6px;
 }
-.dx-sheduler-appointment-popup .dx-sheduler-appointment-popup-recurrence-field
+.dx-scheduler-appointment-popup .dx-scheduler-appointment-popup-recurrence-field
 {
   margin-bottom: 13px;
 }
-.dx-sheduler-appointment-popup .dx-recurrence-repeat-on, .dx-sheduler-appointment-popup .dx-recurrence-repeat-end-field, .dx-sheduler-appointment-popup .dx-sheduler-appointment-popup-allday-field
+.dx-scheduler-appointment-popup .dx-recurrence-repeat-on, .dx-scheduler-appointment-popup .dx-recurrence-repeat-end-field, .dx-scheduler-appointment-popup .dx-scheduler-appointment-popup-allday-field
 {
   margin-bottom: 4px;
 }
-.dx-sheduler-appointment-popup .dx-recurrence-interval-field
+.dx-scheduler-appointment-popup .dx-recurrence-interval-field
 {
   margin-bottom: 10px;
   margin-top: -4px;
@@ -8488,6 +8531,7 @@
 .dx-desktop-layout-main-menu .dx-nav-item.dx-tab-selected
 {
   background: #fff;
+  border-top: 1px solid #fff;
 }
 .dx-desktop-layout-main-menu .dx-nav-item.dx-tab-selected .dx-tab-text
 {
@@ -8503,7 +8547,7 @@
 }
 .dx-desktop-layout-main-menu .dx-nav-item.dx-state-hover
 {
-  background: #fff;
+  background: #cf00d7;
 }
 .dx-desktop-layout-main-menu .dx-nav-item.dx-state-hover .dx-tab-text
 {

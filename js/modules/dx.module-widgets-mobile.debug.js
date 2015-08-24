@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Mobile Widgets)
-* Version: 15.1.5
-* Build date: Jul 15, 2015
+* Version: 15.1.6
+* Build date: Aug 14, 2015
 *
 * Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -797,6 +797,7 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
             },
             _createPopover: function() {
                 var popover = this._createComponent(this._$popup, "dxPopover", {
+                        disabled: false,
                         showTitle: true,
                         title: this.option("title"),
                         width: this.option("width") || 200,
@@ -810,6 +811,7 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
             },
             _createPopup: function() {
                 var popup = this._createComponent(this._$popup, "dxPopup", {
+                        disabled: false,
                         dragEnabled: false,
                         title: this.option("title"),
                         width: this.option("width") || "100%",
@@ -877,6 +879,7 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
                         that = this;
                     this._$cancelButton = $("<div>").addClass(ACTION_SHEET_CANCEL_BUTTON_CLASS).appendTo(this._popup.content());
                     this._createComponent(this._$cancelButton, "dxButton", {
+                        disabled: false,
                         text: this.option("cancelText"),
                         onClick: function(e) {
                             var hidingArgs = {
@@ -976,7 +979,8 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
                 return translator.locate($element).left
             };
         var move = function($element, position) {
-                translator.move($element, {left: position})
+                translator.move($element, {left: position});
+                $element.css("visibility", "")
             };
         var animation = {
                 backgroundMove: function($element, position, completeAction) {
@@ -996,13 +1000,16 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
                             complete: completeAction
                         })
                 },
-                itemMove: function($item, position, completeAction) {
+                itemMove: function($item, itemPosition, completeAction) {
                     return fx.animate($item, {
                             type: "slide",
-                            to: {left: position},
+                            to: {left: itemPosition},
                             duration: PANORAMA_ITEM_MOVE_DURATION,
                             easing: PANORAMA_ITEM_MOVE_EASING,
-                            complete: completeAction
+                            complete: function() {
+                                completeAction && completeAction.apply(this, arguments);
+                                $item.css("visibility", position($item) > 0 ? "" : "hidden")
+                            }
                         })
                 }
             };
@@ -1971,7 +1978,7 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
                         this._changeMenuOption("itemTemplate", this._getTemplate(value));
                         break;
                     case"items":
-                        this._changeMenuOption(name, value);
+                        this._changeMenuOption("items", this.option("items"));
                         break;
                     case"dataSource":
                         this._changeMenuOption(name, value);

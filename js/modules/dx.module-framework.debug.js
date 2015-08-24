@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Single Page App Framework)
-* Version: 15.1.5
-* Build date: Jul 15, 2015
+* Version: 15.1.6
+* Build date: Aug 14, 2015
 *
 * Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -98,7 +98,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
             W3002: "A view with the '{0}' key has already been released.",
             W3003: "Layout resolving context:\n{0}\nAvailable layout controller registrations:\n{1}\n",
             W3004: "Layout resolving context:\n{0}\nConcurent layout controller registrations for the context:\n{1}\n",
-            W3005: "Direct hash-based navigation is detected. Use data-bind=\"dxAction: url\" instead of href=\"#url\".\nFound markup:\n{0}\n"
+            W3005: "Direct hash-based navigation is detected in a mobile application. Use data-bind=\"dxAction: url\" instead of href=\"#url\" to avoid navigation issues.\nFound markup:\n{0}\n"
         })
     })(jQuery, DevExpress);
     /*! Module framework, file framework.routing.js */
@@ -356,7 +356,8 @@ if (!DevExpress.MOD_FRAMEWORK) {
                         title: "",
                         icon: "",
                         visible: true,
-                        disabled: false
+                        disabled: false,
+                        renderStage: "onViewShown"
                     })
                 },
                 execute: function() {
@@ -1082,12 +1083,14 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 return this.callBase(uri, !this._browserAdapter.isRootPage())
             },
             _saveBrowserState: function() {
-                if (window.sessionStorage)
+                var sessionStorage = DX.utils.getSessionStorage();
+                if (sessionStorage)
                     sessionStorage.setItem(SESSION_KEY, true)
             },
             _initRootPage: function() {
-                var hash = this.getUri();
-                if (!window.sessionStorage || sessionStorage.getItem(SESSION_KEY))
+                var hash = this.getUri(),
+                    sessionStorage = DX.utils.getSessionStorage();
+                if (!sessionStorage || sessionStorage.getItem(SESSION_KEY))
                     return $.Deferred().resolve().promise();
                 sessionStorage.removeItem(SESSION_KEY);
                 this._browserAdapter.createRootPage();
@@ -1584,6 +1587,13 @@ if (!DevExpress.MOD_FRAMEWORK) {
             if ((actionArguments.component || {}).NAME === "dxCommand")
                 $.extend(options, actionArguments.component.option())
         }
+        function preventDefaultLinkBehaviour(e) {
+            if (!e)
+                return;
+            var $targetElement = $(e.target);
+            if ($targetElement.attr('href'))
+                e.preventDefault()
+        }
         DX.framework.createActionExecutors = function(app) {
             return {
                     routing: {execute: function(e) {
@@ -1599,6 +1609,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
                                     routeValues = action;
                                 uri = app.router.format(routeValues);
                                 prepareNavigateOptions(options, e);
+                                preventDefaultLinkBehaviour(options.jQueryEvent);
                                 app.navigate(uri, options);
                                 e.handled = true
                             }
@@ -1627,6 +1638,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
                             });
                             var options = {};
                             prepareNavigateOptions(options, e);
+                            preventDefaultLinkBehaviour(options.jQueryEvent);
                             app.navigate(uri, options);
                             e.handled = true
                         }}
@@ -1658,7 +1670,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 this.navigationManager.on("navigatingBack", $.proxy(this._onNavigatingBack, this));
                 this.navigationManager.on("navigated", $.proxy(this._onNavigated, this));
                 this.navigationManager.on("navigationCanceled", $.proxy(this._onNavigationCanceled, this));
-                this.stateManager = options.stateManager || new DX.framework.StateManager({storage: options.stateStorage || sessionStorage});
+                this.stateManager = options.stateManager || new DX.framework.StateManager({storage: options.stateStorage || DX.utils.getSessionStorage()});
                 this.stateManager.addStateSource(this.navigationManager);
                 this.viewCache = this._createViewCache(options);
                 this.commandMapping = this._createCommandMapping(options.commandMapping);
@@ -1770,6 +1782,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 var uri = this.router.format(routeData);
                 if (args.uri !== uri && uri) {
                     args.cancel = true;
+                    args.cancelReason = "redirect";
                     DX.utils.executeAsync(function() {
                         that.navigate(uri, args.options)
                     })
@@ -1838,13 +1851,26 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 })
             },
             _acquireViewInfo: function(navigationItem, navigateOptions) {
-                var viewInfo = this.viewCache.getView(navigationItem.key);
+                var routeData = this.router.parse(navigationItem.uri),
+                    viewInfoKey = this._getViewInfoKey(navigationItem, routeData),
+                    viewInfo = this.viewCache.getView(viewInfoKey);
                 if (!viewInfo) {
                     viewInfo = this._createViewInfo(navigationItem, navigateOptions);
                     this._obtainViewLink(viewInfo);
-                    this.viewCache.setView(navigationItem.key, viewInfo)
+                    this.viewCache.setView(viewInfoKey, viewInfo)
                 }
+                else
+                    viewInfo.routeData = routeData;
                 return viewInfo
+            },
+            _getViewInfoKey: function(navigationItem, routeData) {
+                var args = {
+                        key: navigationItem.key,
+                        navigationItem: navigationItem,
+                        routeData: routeData
+                    };
+                this._processEvent("resolveViewCacheKey", args);
+                return args.key
             },
             _processEvent: function(eventName, args, model) {
                 this._callComponentMethod(eventName, args);
@@ -1860,7 +1886,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
                         viewName: routeData.view,
                         routeData: routeData,
                         uri: uri,
-                        key: navigationItem.key,
+                        key: this._getViewInfoKey(navigationItem, routeData),
                         canBack: this.canBack(),
                         navigateOptions: navigateOptions,
                         previousViewInfo: this._getPreviousViewInfo(navigateOptions)
@@ -1908,7 +1934,8 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 var that = this;
                 var eventArgs = {
                         viewInfo: viewInfo,
-                        direction: direction
+                        direction: direction,
+                        params: viewInfo.routeData
                     };
                 return that._showViewImpl(eventArgs.viewInfo, eventArgs.direction).done(function() {
                         DX.utils.executeAsync(function() {
@@ -1992,8 +2019,10 @@ if (!DevExpress.MOD_FRAMEWORK) {
             _getPreviousViewInfo: function(navigateOptions) {
                 var previousNavigationItem = this.navigationManager.previousItem(navigateOptions.stack),
                     result;
-                if (previousNavigationItem)
-                    result = this.viewCache.getView(previousNavigationItem.key);
+                if (previousNavigationItem) {
+                    var routeData = this.router.parse(previousNavigationItem.uri);
+                    result = this.viewCache.getView(this._getViewInfoKey(previousNavigationItem, routeData))
+                }
                 return result
             },
             back: function(options) {
@@ -2730,8 +2759,10 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 this._defaultPaneName = options.defaultPaneName || "content";
                 this._transitionDuration = options.transitionDuration === undefined ? 400 : options.transitionDuration;
                 this.viewReleased = $.Callbacks();
+                this.viewHidden = $.Callbacks();
+                this.viewShowing = $.Callbacks();
                 this.viewRendered = $.Callbacks();
-                this._callbacksToEvents("DefaultLayoutController", ["viewReleased", "viewRendered"])
+                this._callbacksToEvents("DefaultLayoutController", ["viewReleased", "viewHidden", "viewShowing", "viewRendered"])
             },
             init: function(options) {
                 options = options || {};
@@ -2749,19 +2780,41 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 }
             },
             activate: function() {
+                if (this._disabledState) {
+                    this._disabledState = false;
+                    this._notifyShowing();
+                    return $.Deferred().resolve().promise()
+                }
                 var $rootElement = this._getRootElement();
                 this._showElements($rootElement);
                 this._attachRefreshViewRequiredHandler();
                 return $.Deferred().resolve().promise()
             },
             deactivate: function() {
+                this._disabledState = false;
                 this._releaseVisibleViews();
                 this._hideElements(this._getRootElement());
                 this._detachRefreshViewRequiredHandler();
                 return $.Deferred().resolve().promise()
             },
+            disable: function() {
+                this._disabledState = true;
+                this._notifyHidden()
+            },
             activeViewInfo: function() {
                 return this._visibleViews[this._defaultPaneName]
+            },
+            _notifyShowing: function() {
+                var that = this;
+                $.each(this._visibleViews, function(index, viewInfo) {
+                    that.viewShowing.fireWith(that, [viewInfo])
+                })
+            },
+            _notifyHidden: function() {
+                var that = this;
+                $.each(this._visibleViews, function(index, viewInfo) {
+                    that.viewHidden.fireWith(that, [viewInfo])
+                })
             },
             _applyTemplate: function($elements, model) {
                 $elements.each(function(i, element) {
@@ -2864,7 +2917,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 if (previousViewTemplateId && previousViewTemplateId === viewInfo.currentViewTemplateId && viewInfo === previousViewInfo)
                     return $.Deferred().resolve().promise();
                 that._ensureViewRendered(viewInfo);
-                this.fireEvent("viewShowing", [viewInfo, direction]);
+                that.viewShowing.fireWith(that, [viewInfo, direction]);
                 return this._showViewImpl(viewInfo, direction, previousViewTemplateId).done(function() {
                         that._onViewShown(viewInfo)
                     })
@@ -2994,31 +3047,34 @@ if (!DevExpress.MOD_FRAMEWORK) {
             _onViewShown: function(viewInfo) {
                 $(document).trigger("dx.viewchanged")
             },
-            _enter: function(animationItems) {
+            _enter: function(animationItems, animationModifier) {
                 var transitionExecutor = this.transitionExecutor;
                 $.each(animationItems, function(index, item) {
-                    transitionExecutor.enter(item.$element, item.animation)
+                    transitionExecutor.enter(item.$element, item.animation, animationModifier)
                 })
             },
-            _leave: function(animationItems) {
+            _leave: function(animationItems, animationModifier) {
                 var transitionExecutor = this.transitionExecutor;
                 $.each(animationItems, function(index, item) {
-                    transitionExecutor.leave(item.$element, item.animation)
+                    transitionExecutor.leave(item.$element, item.animation, animationModifier)
                 })
             },
             _doTransition: function(oldViewInfo, newViewInfo, direction) {
+                var animationModifier = {direction: direction};
                 if (oldViewInfo)
-                    this._leave(oldViewInfo.renderResult.animationItems);
-                this._enter(newViewInfo.renderResult.animationItems);
-                return this.transitionExecutor.start({direction: direction})
+                    this._leave(oldViewInfo.renderResult.animationItems, animationModifier);
+                this._enter(newViewInfo.renderResult.animationItems, animationModifier);
+                this._showView(newViewInfo);
+                return this.transitionExecutor.start()
             },
             _showViewImpl: function(viewInfo, direction, previousViewTemplateId) {
                 var that = this,
                     result,
                     previousViewInfo = this._getPreviousViewInfo(viewInfo);
-                this._showView(viewInfo);
-                if (!previousViewInfo || previousViewInfo === viewInfo || DX.fx.off)
-                    result = that._changeView(viewInfo, previousViewTemplateId);
+                if (!previousViewInfo || previousViewInfo === viewInfo || DX.fx.off) {
+                    this._showView(viewInfo);
+                    result = that._changeView(viewInfo, previousViewTemplateId)
+                }
                 else
                     result = that._doTransition(previousViewInfo, viewInfo, direction).then(function() {
                         return that._changeView(viewInfo)
@@ -3099,7 +3155,8 @@ if (!DevExpress.MOD_FRAMEWORK) {
             _hideView: function(viewInfo, templateId) {
                 if (viewInfo.renderResult) {
                     var $markupToHide = templateId === undefined ? viewInfo.renderResult.$markup : viewInfo.renderResult.markupCache[templateId];
-                    this._hideViewElements($markupToHide)
+                    this._hideViewElements($markupToHide);
+                    this.viewHidden.fireWith(this, [viewInfo])
                 }
             },
             _showViewElements: function($elements) {
@@ -3559,7 +3616,8 @@ if (!DevExpress.MOD_FRAMEWORK) {
             _initMarkupFilters: function(viewEngine) {
                 var filters = [];
                 filters.push(this._localizeMarkup);
-                filters.push(this._notifyIfBadMarkup);
+                if (this._applicationMode === "mobileApp")
+                    filters.push(this._notifyIfBadMarkup);
                 if (viewEngine.markupLoaded)
                     viewEngine.markupLoaded.add(function(args) {
                         $.each(filters, function(_, filter) {
@@ -3664,29 +3722,27 @@ if (!DevExpress.MOD_FRAMEWORK) {
             },
             _activateLayoutController: function(layoutController, targetNode) {
                 var that = this,
-                    result = $.Deferred(),
                     previousLayoutController = that._activeLayoutController();
-                if (previousLayoutController !== layoutController)
-                    layoutController.activate(targetNode).done(function() {
-                        var tasks = [];
-                        if (!layoutController.isOverlay) {
-                            var controllerToDeactivate;
-                            while (that._activeLayoutControllersStack.length && controllerToDeactivate !== layoutController) {
-                                controllerToDeactivate = that._activeLayoutController();
-                                if (controllerToDeactivate !== layoutController) {
-                                    that._activeLayoutControllersStack.pop();
-                                    tasks.push(controllerToDeactivate.deactivate())
-                                }
-                            }
-                        }
-                        $.when.apply($, tasks).done(function() {
-                            that._activeLayoutControllersStack.push(layoutController);
-                            result.resolve()
-                        })
-                    });
+                if (previousLayoutController === layoutController)
+                    return $.Deferred().resolve().promise();
+                return layoutController.activate(targetNode).then($.proxy(this._deactivatePreviousLayoutControllers, this, layoutController))
+            },
+            _deactivatePreviousLayoutControllers: function(layoutController) {
+                var that = this,
+                    tasks = [],
+                    controllerToDeactivate = that._activeLayoutControllersStack.pop();
+                if (layoutController.isOverlay) {
+                    that._activeLayoutControllersStack.push(controllerToDeactivate);
+                    tasks.push(controllerToDeactivate.disable())
+                }
                 else
-                    result.resolve();
-                return result.promise()
+                    while (controllerToDeactivate && controllerToDeactivate !== layoutController) {
+                        tasks.push(controllerToDeactivate.deactivate());
+                        controllerToDeactivate = that._activeLayoutControllersStack.pop()
+                    }
+                return $.when.apply($, tasks).then(function() {
+                        that._activeLayoutControllersStack.push(layoutController)
+                    })
             },
             init: function() {
                 var that = this,
@@ -3738,13 +3794,17 @@ if (!DevExpress.MOD_FRAMEWORK) {
                             controller.on("viewReleased", function(viewInfo) {
                                 that._onViewReleased(viewInfo)
                             });
+                            controller.on("viewHidden", function(viewInfo) {
+                                that._onViewHidden(viewInfo)
+                            });
                             controller.on("viewRendered", function(viewInfo) {
                                 that._processEvent("viewRendered", {viewInfo: viewInfo}, viewInfo.model)
                             });
                             controller.on("viewShowing", function(viewInfo, direction) {
                                 that._processEvent("viewShowing", {
                                     viewInfo: viewInfo,
-                                    direction: direction
+                                    direction: direction,
+                                    params: viewInfo.routeData
                                 }, viewInfo.model)
                             })
                         }
@@ -3752,7 +3812,6 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 })
             },
             _onViewReleased: function(viewInfo) {
-                this._onViewHidden(viewInfo);
                 this._releaseViewLink(viewInfo)
             },
             renderNavigation: function() {

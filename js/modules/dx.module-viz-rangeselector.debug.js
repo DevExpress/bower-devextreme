@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Range Selector)
-* Version: 15.1.5
-* Build date: Jul 15, 2015
+* Version: 15.1.6
+* Build date: Aug 14, 2015
 *
 * Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -149,7 +149,8 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
         var rangeSelector = DX.viz.rangeSelector,
             utils = DX.utils,
             core = DX.viz.core,
-            patchFontOptions = core.utils.patchFontOptions,
+            coreUtils = core.utils,
+            patchFontOptions = coreUtils.patchFontOptions,
             ParseUtils = core.ParseUtils,
             formatHelper = DX.formatHelper,
             SCALE_TEXT_SPACING = 5,
@@ -402,7 +403,7 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
                     rangeForCategories.addRange(translatorRange.arg);
                     translatorRange.arg = rangeForCategories;
                     categories = rangeForCategories.categories || [];
-                    scaleOptions._categoriesInfo = categoriesInfo = utils.getCategoriesInfo(categories, startValue || categories[0], endValue || categories[categories.length - 1])
+                    scaleOptions._categoriesInfo = categoriesInfo = coreUtils.getCategoriesInfo(categories, startValue || categories[0], endValue || categories[categories.length - 1])
                 }
                 if (_isDefined(startValue) && _isDefined(endValue)) {
                     inverted = scaleOptions.inverted = categoriesInfo ? categoriesInfo.inverted : startValue > endValue;
@@ -506,12 +507,11 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
                 this._reinitDataSource()
             },
             _initCore: function() {
-                var renderer = this._renderer;
-                this.rangeContainer = rangeSelector.rangeSelectorFactory.createRangeContainer(renderer);
-                renderer.root.css({
+                this._renderer.root.css({
                     "touch-action": "pan-y",
                     "-ms-touch-action": "pan-y"
-                })
+                });
+                this.rangeContainer = rangeSelector.rangeSelectorFactory.createRangeContainer(this._renderer)
             },
             _getDefaultSize: function() {
                 return {
@@ -931,35 +931,45 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
                 }
         }
         RangeContainer = function(renderer) {
-            baseVisualElementMethods.init.apply(this, arguments);
-            this.slidersContainer = createSlidersContainer(renderer);
-            this.rangeView = createRangeView(renderer);
-            this.scale = createScale(renderer)
+            var that = this;
+            baseVisualElementMethods.init.apply(that, arguments);
+            that.slidersContainer = createSlidersContainer(renderer);
+            that.rangeView = createRangeView(renderer);
+            that.scale = createScale(renderer);
+            that._clipRect = renderer.clipRect();
+            that._root = renderer.g().attr({
+                'class': 'rangeContainer',
+                clipId: that._clipRect.id
+            }).linkOn(renderer.root, "range-container")
         };
         RangeContainer.prototype = $.extend({}, baseVisualElementMethods, {
             constructor: RangeContainer,
             dispose: function() {
                 this.slidersContainer.dispose();
-                this.slidersContainer = null
+                this._root.linkOff();
+                this.slidersContainer = this._root = null
             },
             _applyOptions: function(options) {
                 var that = this,
                     scaleLabelsAreaHeight = options.scaleLabelsAreaHeight,
                     canvas = options.canvas,
                     isCompactMode = options.isCompactMode,
+                    height = canvas.height,
                     viewCanvas = {
                         left: canvas.left,
                         top: canvas.top,
                         width: canvas.width,
-                        height: canvas.height >= scaleLabelsAreaHeight ? canvas.height - scaleLabelsAreaHeight : 0
-                    };
+                        height: height >= scaleLabelsAreaHeight ? height - scaleLabelsAreaHeight : 0
+                    },
+                    scaleCanvas = $.extend({}, canvas, {height: height - scaleLabelsAreaHeight > 0 ? height : scaleLabelsAreaHeight}),
+                    scaleOptions = options.scale;
                 that._viewCanvas = viewCanvas;
                 that.slidersContainer.applyOptions({
                     isCompactMode: isCompactMode,
                     canvas: viewCanvas,
                     selectedRangeColor: options.selectedRangeColor,
                     translator: options.translators.x,
-                    scale: options.scale,
+                    scale: scaleOptions,
                     selectedRange: options.selectedRange,
                     sliderMarker: options.sliderMarker,
                     sliderHandle: options.sliderHandle,
@@ -975,20 +985,20 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
                     chart: options.chart,
                     seriesDataSource: options.seriesDataSource,
                     behavior: options.behavior,
-                    isEmpty: options.scale.isEmpty
+                    isEmpty: scaleOptions.isEmpty
                 });
                 that.scale.applyOptions({
                     isCompactMode: isCompactMode,
-                    canvas: canvas,
+                    canvas: scaleCanvas,
                     translator: options.translators.x,
-                    scale: options.scale,
+                    scale: scaleOptions,
                     scaleLabelsAreaHeight: scaleLabelsAreaHeight,
                     setSelectedRange: options.setSelectedRange
                 })
             },
             _draw: function() {
                 var that = this,
-                    containerGroup,
+                    containerGroup = that._root,
                     rangeViewGroup,
                     slidersContainerGroup,
                     scaleGroup,
@@ -998,12 +1008,14 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
                     viewCanvas = that._viewCanvas,
                     renderer = that._renderer,
                     slidersContainer = that.slidersContainer;
-                that._clipRect = renderer.clipRect(clipRectCanvas.left, clipRectCanvas.top, clipRectCanvas.width, clipRectCanvas.height);
+                that._clipRect.attr({
+                    x: clipRectCanvas.left,
+                    y: clipRectCanvas.top,
+                    width: clipRectCanvas.width,
+                    height: clipRectCanvas.height
+                });
                 that._viewClipRect = renderer.clipRect(viewCanvas.left, viewCanvas.top, viewCanvas.width, viewCanvas.height);
-                containerGroup = renderer.g().attr({
-                    'class': 'rangeContainer',
-                    clipId: that._clipRect.id
-                }).append(renderer.root);
+                containerGroup.linkAppend();
                 rangeViewGroup = renderer.g().attr({
                     'class': 'view',
                     clipId: that._viewClipRect.id
@@ -1718,7 +1730,7 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
                     else
                         setValues(startValue, endValue);
                 else {
-                    categoriesInfo = utils.getCategoriesInfo(scaleoptions._categoriesInfo.categories, startValue, endValue);
+                    categoriesInfo = DX.viz.core.utils.getCategoriesInfo(scaleoptions._categoriesInfo.categories, startValue, endValue);
                     setValues(categoriesInfo.start, categoriesInfo.end, categoriesInfo.inverted ^ scaleoptions.inverted)
                 }
             },
@@ -2252,7 +2264,8 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
                     maxValue,
                     maxRange = scale.maxRange,
                     minRange = scale.minRange,
-                    isNegative;
+                    isNegative,
+                    tmp;
                 if (scale.type === DISCRETE) {
                     if (checkItemsSpacing(that.getPosition(), anotherSlider.getPosition(), options.translator.getInterval())) {
                         isValid = false;
@@ -2261,10 +2274,20 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
                 }
                 else {
                     isNegative = !scale.inverted && sliderIndex === START_VALUE_INDEX || scale.inverted && sliderIndex === END_VALUE_INDEX;
-                    if (maxRange)
-                        minValue = that._addInterval(anotherBusinessValue, isNegative ? maxRange : minRange, isNegative);
-                    if (minRange)
-                        maxValue = that._addInterval(anotherBusinessValue, isNegative ? minRange : maxRange, isNegative);
+                    if (maxRange) {
+                        tmp = that._addInterval(anotherBusinessValue, maxRange, isNegative);
+                        if (isNegative)
+                            minValue = tmp;
+                        else
+                            maxValue = tmp
+                    }
+                    if (minRange) {
+                        tmp = that._addInterval(anotherBusinessValue, minRange, isNegative);
+                        if (isNegative)
+                            maxValue = tmp;
+                        else
+                            minValue = tmp
+                    }
                     if (maxValue !== undefined && result > maxValue) {
                         result = values ? rangeSelectorUtils.findLessOrEqualValue(values, maxValue) : maxValue;
                         isValid = false
@@ -2833,7 +2856,7 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
                 return $.isArray(data) && data.length > 0 && (utils.isNumber(data[0]) || utils.isDate(data[0]))
             };
         var convertToArrayOfObjects = function(data) {
-                return $.map(data, function(item, i) {
+                return core.utils.map(data, function(item, i) {
                         return {
                                 arg: item,
                                 val: i
@@ -2900,7 +2923,7 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
             that._hideChart = false;
             seriesTemplate = themeManager.getOptions('seriesTemplate');
             if (options.dataSource && seriesTemplate)
-                templatedSeries = utils.processSeriesTemplate(seriesTemplate, options.dataSource);
+                templatedSeries = core.utils.processSeriesTemplate(seriesTemplate, options.dataSource);
             that._series = that._calculateSeries(options, templatedSeries);
             that._seriesFamilies = processSeriesFamilies(that._series, themeManager.getOptions('equalBarWidth'), themeManager.getOptions('minBubbleSize'), themeManager.getOptions('maxBubbleSize'))
         };

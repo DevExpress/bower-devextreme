@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Core Library)
-* Version: 15.1.5
-* Build date: Jul 15, 2015
+* Version: 15.1.6
+* Build date: Aug 14, 2015
 *
 * Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -13,7 +13,7 @@ if (!window.DevExpress) {
     (function($, global, undefined) {
         global.DevExpress = global.DevExpress || {};
         $.extend(global.DevExpress, {
-            VERSION: "15.1.5",
+            VERSION: "15.1.6",
             abstract: function() {
                 throw global.DevExpress.Error("E0001");
             },
@@ -536,6 +536,10 @@ if (!window.DevExpress) {
                         return null
                 }
             };
+        var getDefaultAlignment = function(isRtlEnabled) {
+                var rtlEnabled = isRtlEnabled || DX.rtlEnabled;
+                return rtlEnabled ? "right" : "left"
+            };
         var extendFromObject = function(target, source, overrideExistingValues) {
                 target = target || {};
                 for (var prop in source)
@@ -626,7 +630,7 @@ if (!window.DevExpress) {
                     case"string":
                         return raw.split(/\s+/, 4);
                     case"object":
-                        return [raw.left || raw.x || raw.h, raw.top || raw.y || raw.v, raw.right || raw.x || raw.h, raw.bottom || raw.y || raw.v];
+                        return [raw.x || raw.h || raw.left, raw.y || raw.v || raw.top, raw.x || raw.h || raw.right, raw.y || raw.v || raw.bottom];
                     case"number":
                         return [raw];
                     default:
@@ -778,7 +782,8 @@ if (!window.DevExpress) {
             orderEach: orderEach,
             unwrapObservable: unwrapObservable,
             getImageSourceType: getImageSourceType,
-            getImageContainer: getImageContainer
+            getImageContainer: getImageContainer,
+            getDefaultAlignment: getDefaultAlignment
         }
     })(jQuery, DevExpress);
     /*! Module core, file utils.console.js */
@@ -1328,7 +1333,8 @@ if (!window.DevExpress) {
         var dateInRange = function(date, min, max, format) {
                 if (format === "date") {
                     min = min && new Date(min.getFullYear(), min.getMonth(), min.getDate());
-                    max = max && new Date(max.getFullYear(), max.getMonth(), max.getDate())
+                    max = max && new Date(max.getFullYear(), max.getMonth(), max.getDate());
+                    date = date && new Date(date.getFullYear(), date.getMonth(), date.getDate())
                 }
                 return normalizeDate(date, min, max) === date
             };
@@ -1357,6 +1363,22 @@ if (!window.DevExpress) {
                 if (!(date instanceof Date))
                     date = new Date(date);
                 return date
+            };
+        var deserializeDate = function(value, serializationFormat) {
+                var parsedValue;
+                if (!serializationFormat || serializationFormat === "number" || serializationFormat === "yyyy/MM/dd") {
+                    parsedValue = serializationFormat === "number" ? value : !isDate(value) && Date.parse(value);
+                    return parsedValue ? new Date(parsedValue) : value
+                }
+                if (value !== undefined)
+                    return Globalize.parseDate(value, serializationFormat)
+            };
+        var serializeDate = function(value, serializationFormat) {
+                if (serializationFormat === "number")
+                    return value && value.valueOf && value.valueOf();
+                if (serializationFormat)
+                    return Globalize.format(value, serializationFormat);
+                return value
             };
         $.extend(DX.utils, {
             dateUnitIntervals: dateUnitIntervals,
@@ -1390,7 +1412,9 @@ if (!window.DevExpress) {
             dateInRange: dateInRange,
             normalizeDate: normalizeDate,
             fixTimezoneGap: fixTimezoneGap,
-            makeDate: makeDate
+            makeDate: makeDate,
+            deserializeDate: deserializeDate,
+            serializeDate: serializeDate
         })
     })(jQuery, DevExpress);
     /*! Module core, file utils.recurrence.js */
@@ -1516,6 +1540,8 @@ if (!window.DevExpress) {
                 return rule
             };
         var getDateByAsciiString = function(string) {
+                if (typeof string !== "string")
+                    return string;
                 var date = Globalize.parseDate(string, "yyyyMMddThhmmss");
                 if (!date)
                     date = Globalize.parseDate(string, "yyyyMMdd");
@@ -1610,7 +1636,8 @@ if (!window.DevExpress) {
             getRecurrenceRule: getRecurrenceRule,
             getAsciiStringByDate: getAsciiStringByDate,
             getDatesByRecurrence: getDatesByRecurrence,
-            dateInRecurrenceRange: dateInRecurrenceRange
+            dateInRecurrenceRange: dateInRecurrenceRange,
+            getDateByAsciiString: getDateByAsciiString
         })
     })(jQuery, DevExpress);
     /*! Module core, file utils.dom.js */
@@ -1666,11 +1693,10 @@ if (!window.DevExpress) {
             };
         var initMobileViewport = function(options) {
                 options = $.extend({}, options);
-                var device = DX.devices.current();
                 var realDevice = DX.devices.real();
-                var allowZoom = options.allowZoom,
-                    allowPan = options.allowPan,
-                    allowSelection = "allowSelection" in options ? options.allowSelection : device.platform === "generic";
+                var allowZoom = options.allowZoom;
+                var allowPan = options.allowPan;
+                var allowSelection = "allowSelection" in options ? options.allowSelection : realDevice.platform === "generic";
                 var metaSelector = "meta[name=viewport]";
                 if (!$(metaSelector).length)
                     $("<meta />").attr("name", "viewport").appendTo("head");
@@ -1860,76 +1886,6 @@ if (!window.DevExpress) {
             };
         $.extend(DX.utils, {caret: caret})
     })(jQuery, DevExpress);
-    /*! Module core, file utils.graphics.js */
-    (function($, DX, undefined) {
-        var _utils = DX.utils,
-            isFunction = _utils.isFunction,
-            _inArray = $.inArray,
-            isDefined = _utils.isDefined;
-        var processSeriesTemplate = function(seriesTemplate, items) {
-                var customizeSeries = isFunction(seriesTemplate.customizeSeries) ? seriesTemplate.customizeSeries : $.noop,
-                    nameField = seriesTemplate.nameField || 'series',
-                    generatedSeries = {},
-                    seriesOrder = [],
-                    series;
-                for (var i = 0, length = items.length; i < length; i++) {
-                    var data = items[i];
-                    if (nameField in data) {
-                        series = generatedSeries[data[nameField]];
-                        if (!series) {
-                            series = generatedSeries[data[nameField]] = {
-                                name: data[nameField],
-                                data: []
-                            };
-                            seriesOrder.push(series.name)
-                        }
-                        series.data.push(data)
-                    }
-                }
-                return $.map(seriesOrder, function(orderedName) {
-                        var group = generatedSeries[orderedName],
-                            seriesOptions = customizeSeries.call(null, group.name);
-                        return $.extend(group, seriesOptions)
-                    })
-            };
-        var getCategoriesInfo = function(categories, startValue, endValue) {
-                if (!(categories && categories.length > 0))
-                    return {};
-                startValue = isDefined(startValue) ? startValue : categories[0];
-                endValue = isDefined(endValue) ? endValue : categories[categories.length - 1];
-                var categoriesValue = $.map(categories, function(category) {
-                        return category && category.valueOf()
-                    }),
-                    visibleCategories = [],
-                    indexStartValue = isDefined(startValue) ? _inArray(startValue.valueOf(), categoriesValue) : 0,
-                    indexEndValue = isDefined(endValue) ? _inArray(endValue.valueOf(), categoriesValue) : categories.length - 1,
-                    swapBuf,
-                    hasVisibleCategories,
-                    inverted = false,
-                    visibleCategoriesLen;
-                indexStartValue < 0 && (indexStartValue = 0);
-                indexEndValue < 0 && (indexEndValue = categories.length - 1);
-                if (indexEndValue < indexStartValue) {
-                    swapBuf = indexEndValue;
-                    indexEndValue = indexStartValue;
-                    indexStartValue = swapBuf;
-                    inverted = true
-                }
-                visibleCategories = categories.slice(indexStartValue, indexEndValue + 1);
-                visibleCategoriesLen = visibleCategories.length;
-                hasVisibleCategories = visibleCategoriesLen > 0;
-                return {
-                        categories: hasVisibleCategories ? visibleCategories : null,
-                        start: hasVisibleCategories ? visibleCategories[inverted ? visibleCategoriesLen - 1 : 0] : null,
-                        end: hasVisibleCategories ? visibleCategories[inverted ? 0 : visibleCategoriesLen - 1] : null,
-                        inverted: inverted
-                    }
-            };
-        $.extend(_utils, {
-            processSeriesTemplate: processSeriesTemplate,
-            getCategoriesInfo: getCategoriesInfo
-        })
-    })(jQuery, DevExpress);
     /*! Module core, file utils.arrays.js */
     (function($, DX, undefined) {
         var isEmptyArray = function(entity) {
@@ -1956,6 +1912,18 @@ if (!window.DevExpress) {
             wrapToArray: wrapToArray,
             removeDublicates: removeDublicates
         })
+    })(jQuery, DevExpress);
+    /*! Module core, file utils.window.js */
+    (function($, DX, undefined) {
+        var getSessionStorage = function() {
+                var sessionStorage;
+                try {
+                    sessionStorage = window.sessionStorage
+                }
+                catch(e) {}
+                return sessionStorage
+            };
+        $.extend(DX.utils, {getSessionStorage: getSessionStorage})
     })(jQuery, DevExpress);
     /*! Module core, file devices.js */
     (function($, DX, undefined) {
@@ -2156,11 +2124,7 @@ if (!window.DevExpress) {
                 return result
             },
             _getDeviceNameFromSessionStorage: function() {
-                var sessionStorage;
-                try {
-                    sessionStorage = this._window.sessionStorage
-                }
-                catch(e) {}
+                var sessionStorage = DX.utils.getSessionStorage();
                 if (!sessionStorage)
                     return;
                 var deviceOrName = sessionStorage.getItem("dx-force-device");
@@ -2172,15 +2136,16 @@ if (!window.DevExpress) {
                 }
             },
             _fromConfig: function(config) {
-                var shortcuts = {
-                        phone: config.deviceType === "phone",
-                        tablet: config.deviceType === "tablet",
-                        android: config.platform === "android",
-                        ios: config.platform === "ios",
-                        win8: config.platform === "win8",
-                        generic: config.platform === "generic"
+                var result = $.extend({}, DEFAULT_DEVICE, this._currentDevice, config),
+                    shortcuts = {
+                        phone: result.deviceType === "phone",
+                        tablet: result.deviceType === "tablet",
+                        android: result.platform === "android",
+                        ios: result.platform === "ios",
+                        win8: result.platform === "win8",
+                        generic: result.platform === "generic"
                     };
-                return $.extend({}, DEFAULT_DEVICE, this._currentDevice, shortcuts, config)
+                return $.extend(result, shortcuts)
             },
             _fromUA: function(ua) {
                 var config;
@@ -2222,14 +2187,15 @@ if (!window.DevExpress) {
         var webkitRegExp = /(webkit)[ \/]([\w.]+)/,
             ieRegExp = /(msie) (\d{1,2}\.\d)/,
             ie11RegExp = /(trident).*rv:(\d{1,2}\.\d)/,
+            msEdge = /(edge)\/((\d+)?[\w\.]+)/,
             mozillaRegExp = /(mozilla)(?:.*? rv:([\w.]+))/;
         var browserFromUA = function(ua) {
                 ua = ua.toLowerCase();
                 var result = {},
-                    matches = ieRegExp.exec(ua) || ie11RegExp.exec(ua) || ua.indexOf("compatible") < 0 && mozillaRegExp.exec(ua) || webkitRegExp.exec(ua) || [],
+                    matches = ieRegExp.exec(ua) || ie11RegExp.exec(ua) || msEdge.exec(ua) || ua.indexOf("compatible") < 0 && mozillaRegExp.exec(ua) || webkitRegExp.exec(ua) || [],
                     browserName = matches[1],
                     browserVersion = matches[2];
-                if (browserName === "trident")
+                if (browserName === "trident" || browserName === "edge")
                     browserName = "msie";
                 if (browserName) {
                     result[browserName] = true;
@@ -3059,9 +3025,14 @@ if (!window.DevExpress) {
                         finish: function() {
                             this.currentValue = this.to;
                             this.draw();
+                            DX.cancelAnimationFrame(config.frameAnimation.animationFrameId);
                             deferred.resolve()
                         },
                         draw: function() {
+                            if (config.draw) {
+                                config.draw(this.currentValue);
+                                return
+                            }
                             var currentValue = $.extend({}, this.currentValue);
                             if (currentValue[TRANSFORM_PROP])
                                 currentValue[TRANSFORM_PROP] = $.map(currentValue[TRANSFORM_PROP], function(value, prop) {
@@ -3078,12 +3049,19 @@ if (!window.DevExpress) {
                     if (config.delay) {
                         config.frameAnimation.startTime += config.delay;
                         config.frameAnimation.delayTimeout = setTimeout(function() {
-                            that._animationStep($element, config)
+                            that._startAnimation($element, config)
                         }, config.delay)
                     }
                     else
-                        that._animationStep($element, config);
+                        that._startAnimation($element, config);
                     return deferred.promise()
+                },
+                _startAnimation: function($element, config) {
+                    $element.off(removeEventName).on(removeEventName, function() {
+                        if (config.frameAnimation)
+                            DX.cancelAnimationFrame(config.frameAnimation.animationFrameId)
+                    });
+                    this._animationStep($element, config)
                 },
                 _parseTransform: function(transformString) {
                     var result = {};
@@ -3104,6 +3082,7 @@ if (!window.DevExpress) {
                     var frameAnimation = config && config.frameAnimation;
                     if (!frameAnimation)
                         return;
+                    DX.cancelAnimationFrame(frameAnimation.animationFrameId);
                     clearTimeout(frameAnimation.delayTimeout);
                     if (jumpToEnd)
                         frameAnimation.finish();
@@ -3120,9 +3099,10 @@ if (!window.DevExpress) {
                     }
                     frameAnimation.currentValue = this._calcStepValue(frameAnimation, now - frameAnimation.startTime);
                     frameAnimation.draw();
-                    DX.requestAnimationFrame($.proxy(function() {
-                        this._animationStep($element, config)
-                    }, this))
+                    var that = this;
+                    frameAnimation.animationFrameId = DX.requestAnimationFrame(function() {
+                        that._animationStep($element, config)
+                    })
                 },
                 _calcStepValue: function(frameAnimation, currentDuration) {
                     var calcValueRecursively = function(from, to) {
@@ -3404,7 +3384,7 @@ if (!window.DevExpress) {
             };
         var setupAnimationOnElement = function() {
                 var animation = this,
-                    $element = animation.$element,
+                    $element = animation.element,
                     config = animation.config;
                 setupPosition($element, config.from);
                 setupPosition($element, config.to);
@@ -3417,7 +3397,7 @@ if (!window.DevExpress) {
                     config.start.apply(this, [$element, config])
             };
         var onElementAnimationComplete = function(animation) {
-                var $element = animation.$element,
+                var $element = animation.element,
                     config = animation.config;
                 $element.removeData(ANIM_DATA_KEY);
                 if (config.complete)
@@ -3426,7 +3406,7 @@ if (!window.DevExpress) {
             };
         var startAnimationOnElement = function() {
                 var animation = this,
-                    $element = animation.$element,
+                    $element = animation.element,
                     config = animation.config;
                 animation.isStarted = true;
                 return animation.strategy.animate($element, config).done(function() {
@@ -3435,20 +3415,20 @@ if (!window.DevExpress) {
             };
         var stopAnimationOnElement = function(jumpToEnd) {
                 var animation = this,
-                    $element = animation.$element,
+                    $element = animation.element,
                     config = animation.config;
                 clearTimeout(animation.startTimeout);
                 if (!animation.isStarted)
                     animation.start();
                 animation.strategy.stop($element, config, jumpToEnd)
             };
-        var createAnimation = function($element, initialConfig) {
+        var createAnimation = function(element, initialConfig) {
                 var defaultConfig = initialConfig.type === "css" ? defaultCssConfig : defaultJSConfig,
                     config = $.extend(true, {}, defaultConfig, initialConfig),
                     configurator = getAnimationConfigurator(config),
                     strategy = getAnimationStrategy(config),
                     animation = {
-                        $element: $element,
+                        element: $(element),
                         config: config,
                         configurator: configurator,
                         strategy: strategy,
@@ -3508,7 +3488,7 @@ if (!window.DevExpress) {
                     animation.startTimeout = setTimeout(function() {
                         animation.start()
                     });
-                    animation.$element.off("dxremove.dxFXStartAnimation").on("dxremove.dxFXStartAnimation", function() {
+                    animation.element.off("dxremove.dxFXStartAnimation").on("dxremove.dxFXStartAnimation", function() {
                         clearTimeout(animation.startTimeout)
                     })
                 }
@@ -3528,7 +3508,10 @@ if (!window.DevExpress) {
             };
         var setProps = function($element, props) {
                 $.each(props, function(key, value) {
-                    $element.css(key, value)
+                    try {
+                        $element.css(key, value)
+                    }
+                    catch(e) {}
                 })
             };
         var stop = function(element, jumpToEnd) {
@@ -4437,7 +4420,7 @@ if (!window.DevExpress) {
                 r,
                 g,
                 b;
-            Hi = Math.floor(h / 60);
+            Hi = Math.floor(h % 360 / 60);
             Vmin = (100 - s) * v / 100;
             a = (v - Vmin) * (h % 60 / 60);
             Vinc = Vmin + a;
@@ -4622,9 +4605,13 @@ if (!window.DevExpress) {
     })(DevExpress);
     /*! Module core, file localization.js */
     (function($, DX, undefined) {
+        Globalize._findClosestNeutralCulture = function(cultureSelector) {
+            var neutral = (cultureSelector || this.cultureSelector || "").substring(0, 2),
+                culture = this.findClosestCulture(neutral);
+            return culture || {messages: {}}
+        };
         Globalize.localize = function(key, cultureSelector) {
-            var neutral = (cultureSelector || this.cultureSelector || "").substring(0, 2);
-            return this.findClosestCulture(cultureSelector).messages[key] || this.findClosestCulture(neutral).messages[key] || this.cultures["default"].messages[key]
+            return this.findClosestCulture(cultureSelector).messages[key] || this._findClosestNeutralCulture(cultureSelector).messages[key] || this.cultures["default"].messages[key]
         };
         var localization = function() {
                 var newMessages = {};
@@ -5165,7 +5152,8 @@ if (!window.DevExpress) {
             E4014: "Unknown key type is detected: {0}",
             E4015: "Unknown entity name or alias is used: {0}",
             E4016: "The compileSetter(expr) method is called with 'self' passed as a parameter",
-            E4017: "Keys cannot be modified"
+            E4017: "Keys cannot be modified",
+            E4018: "The server has returned a non-numeric value in a response to an item count request"
         })
     })(jQuery, DevExpress);
     /*! Module core, file data.js */
@@ -6248,6 +6236,7 @@ if (!window.DevExpress) {
         }
         var ajaxOptionsForRequest = function(protocolVersion, request, requestOptions) {
                 request = $.extend({
+                    async: true,
                     method: "get",
                     url: "",
                     params: {},
@@ -6277,6 +6266,7 @@ if (!window.DevExpress) {
                         dataType: useJsonp ? "jsonp" : "json",
                         jsonp: useJsonp && "$callback",
                         type: method,
+                        async: request.async,
                         timeout: request.timeout,
                         headers: request.headers,
                         contentType: contentType,
@@ -6312,7 +6302,10 @@ if (!window.DevExpress) {
                     if (error)
                         d.reject(error);
                     else if (requestOptions.countOnly)
-                        d.resolve(tuplet.count);
+                        if (isFinite(tuplet.count))
+                            d.resolve(tuplet.count);
+                        else
+                            d.reject(new DX.Error("E4018"));
                     else if (nextUrl) {
                         if (!isAbsoluteUrl(nextUrl))
                             nextUrl = toAbsoluteUrl(options.url, nextUrl);
@@ -6357,7 +6350,7 @@ if (!window.DevExpress) {
                     }
                     catch(x) {}
                 }
-                var errorObj = response && (response.error || response["@odata.error"]);
+                var errorObj = response && (response.error || response["odata.error"] || response["@odata.error"]);
                 if (errorObj) {
                     message = formatDotNetError(errorObj) || message;
                     if (httpStatus === 200)
@@ -6825,7 +6818,7 @@ if (!window.DevExpress) {
             },
             createQuery: abstract,
             totalCount: function(options) {
-                return this._addFailHandlers(this._totalCountImpl(options))
+                return this._totalCountImpl(options)
             },
             _totalCountImpl: function(options) {
                 options = options || {};
@@ -7321,7 +7314,7 @@ if (!window.DevExpress) {
                 userResult.then(function(count) {
                     d.resolve(Number(count))
                 }, createUserFuncFailureHandler(d));
-                return d.promise()
+                return this._addFailHandlers(d.promise())
             },
             _loadImpl: function(options) {
                 var userFunc = this._loadFunc,
@@ -7399,6 +7392,28 @@ if (!window.DevExpress) {
         var data = DX.data,
             CustomStore = data.CustomStore,
             Class = DX.Class;
+        var CANCELED_TOKEN = "canceled";
+        function OperationManager() {
+            this._counter = -1;
+            this._deferreds = {}
+        }
+        OperationManager.prototype.constructor = OperationManager;
+        OperationManager.prototype.add = function addOperation(deferred) {
+            this._counter += 1;
+            this._deferreds[this._counter] = deferred;
+            return this._counter
+        };
+        OperationManager.prototype.remove = function removeOperation(operationId) {
+            return delete this._deferreds[operationId]
+        };
+        OperationManager.prototype.cancel = function cancelOperation(operationId) {
+            if (operationId in this._deferreds) {
+                this._deferreds[operationId].reject(CANCELED_TOKEN);
+                return true
+            }
+            return false
+        };
+        var operationManager = new OperationManager;
         var storeTypeRegistry = {
                 jaydata: "JayDataStore",
                 breeze: "BreezeStore",
@@ -7406,34 +7421,9 @@ if (!window.DevExpress) {
                 local: "LocalStore",
                 array: "ArrayStore"
             };
-        var nextLoadOperationId = function() {
-                var id = -1;
-                return function() {
-                        return ++id
-                    }
-            }();
-        var canceledOperationsRegistry = function() {
-                var registry = {};
-                return {
-                        add: function(operationId) {
-                            registry[operationId] = true
-                        },
-                        has: function(operationId) {
-                            return operationId in registry
-                        },
-                        remove: function(operationId) {
-                            delete registry[operationId]
-                        }
-                    }
-            }();
-        var ensureIsNotRejected = function(loadOperationId, pendingDeferred) {
-                if (canceledOperationsRegistry.has(loadOperationId)) {
-                    canceledOperationsRegistry.remove(loadOperationId);
-                    pendingDeferred.reject("canceled");
-                    return false
-                }
-                return true
-            };
+        function isPending(deferred) {
+            return deferred.state() === "pending"
+        }
         function normalizeDataSourceOptions(options) {
             var store;
             function createCustomStoreFromLoadFunc() {
@@ -7711,32 +7701,43 @@ if (!window.DevExpress) {
                 load: function() {
                     var that = this,
                         d = $.Deferred(),
-                        loadOptions;
-                    this._scheduleLoadCallbacks(d);
-                    this._scheduleChangedCallbacks(d);
-                    loadOptions = this._createLoadOptions();
-                    this.fireEvent("customizeStoreLoadOptions", [loadOptions]);
-                    if (!ensureIsNotRejected(loadOptions.operationId, d))
-                        return d.promise();
+                        loadOperation;
                     function errorCallback() {
-                        if (arguments[0] !== "canceled") {
-                            that.fireEvent("loadError", arguments);
-                            that.loadError.fire.apply(that.loadError, arguments)
-                        }
+                        if (arguments[0] === CANCELED_TOKEN)
+                            return;
+                        that.fireEvent("loadError", arguments);
+                        that.loadError.fire.apply(that.loadError, arguments)
                     }
                     function loadTask() {
                         if (that._disposed)
                             return undefined;
-                        return that._loadFromStore(loadOptions, d)
+                        if (!isPending(d))
+                            return;
+                        return that._loadFromStore(loadOperation, d)
                     }
+                    this._scheduleLoadCallbacks(d);
+                    this._scheduleChangedCallbacks(d);
+                    loadOperation = this._createLoadOperation(d);
+                    this.fireEvent("customizeStoreLoadOptions", [loadOperation]);
                     this._loadQueue.add(function() {
-                        if (typeof loadOptions.delay === "number")
-                            that._delayedLoadTask = DX.utils.executeAsync(loadTask, loadOptions.delay);
+                        if (typeof loadOperation.delay === "number")
+                            that._delayedLoadTask = DX.utils.executeAsync(loadTask, loadOperation.delay);
                         else
                             loadTask();
                         return d.promise()
                     });
-                    return d.promise({loadOperationId: loadOptions.operationId}).fail(errorCallback)
+                    return d.promise({operationId: loadOperation.operationId}).fail(errorCallback)
+                },
+                _createLoadOperation: function(deferred) {
+                    var id = operationManager.add(deferred),
+                        options = this._createStoreLoadOptions();
+                    deferred.always(function() {
+                        operationManager.remove(id)
+                    });
+                    return {
+                            operationId: id,
+                            storeLoadOptions: options
+                        }
                 },
                 reload: function() {
                     var prop,
@@ -7749,7 +7750,7 @@ if (!window.DevExpress) {
                     return this.load()
                 },
                 cancel: function(loadOperationId) {
-                    canceledOperationsRegistry.add(loadOperationId)
+                    return operationManager.cancel(loadOperationId)
                 },
                 _addSearchOptions: function(storeLoadOptions) {
                     if (this._disposed)
@@ -7772,12 +7773,6 @@ if (!window.DevExpress) {
                         }
                     result.userData = this._userData;
                     return result
-                },
-                _createLoadOptions: function() {
-                    return {
-                            operationId: nextLoadOperationId(),
-                            storeLoadOptions: this._createStoreLoadOptions()
-                        }
                 },
                 _addSearchFilter: function(storeLoadOptions) {
                     var value = this._searchValue,
@@ -7810,15 +7805,14 @@ if (!window.DevExpress) {
                                 extra: extra
                             }, loadOptions);
                             that.fireEvent("customizeLoadResult", [loadResult]);
-                            if (ensureIsNotRejected(loadOptions.operationId, pendingDeferred))
-                                that._processStoreLoadResult(loadResult, pendingDeferred)
+                            that._processStoreLoadResult(loadResult, pendingDeferred)
                         }
                         if (that._disposed)
                             return;
+                        if (!isPending(pendingDeferred))
+                            return;
                         processResult()
                     }
-                    if (!ensureIsNotRejected(loadOptions.operationId, pendingDeferred))
-                        return pendingDeferred.promise();
                     return this.store().load(loadOptions.storeLoadOptions).done(handleSuccess).fail(pendingDeferred.reject)
                 },
                 _processStoreLoadResult: function(loadResult, pendingDeferred) {
@@ -7827,8 +7821,6 @@ if (!window.DevExpress) {
                         extra = loadResult.extra,
                         storeLoadOptions = loadResult.storeLoadOptions;
                     function resolvePendingDeferred() {
-                        if (!ensureIsNotRejected(loadResult.operationId, pendingDeferred))
-                            return pendingDeferred;
                         that._isLoaded = true;
                         that._totalCount = isFinite(extra.totalCount) ? extra.totalCount : -1;
                         return pendingDeferred.resolve(data, extra)
@@ -7837,7 +7829,7 @@ if (!window.DevExpress) {
                         that.store().totalCount(storeLoadOptions).done(function(count) {
                             extra.totalCount = count;
                             resolvePendingDeferred()
-                        }).fail(function(){})
+                        }).fail(pendingDeferred.reject)
                     }
                     if (that._disposed)
                         return;
@@ -8219,118 +8211,116 @@ if (!window.DevExpress) {
                 backward: " dx-backward",
                 none: " dx-no-direction",
                 undefined: " dx-no-direction"
-            };
-        var addToAnimate = function(targetArray, $elements, animationConfig, type) {
-                $elements.each(function() {
-                    var resultAnimationConfig = prepareElementAnimationConfig(animationConfig, type);
-                    if (resultAnimationConfig)
-                        targetArray.push({
-                            $element: $(this),
-                            animationConfig: resultAnimationConfig
-                        })
-                })
-            };
-        var prepareElementAnimationConfig = function(config, type) {
-                var result;
-                if (typeof config === "string") {
-                    var presetName = config;
-                    config = DX.animationPresets.getPreset(presetName)
-                }
-                if (!config)
-                    result = undefined;
-                else if ($.isFunction(config[type]))
-                    result = config[type];
-                else {
-                    var cssClass = "dx-" + type;
-                    result = $.extend({skipElementInitialStyles: true}, config);
-                    if (!result.type || result.type === "css") {
-                        var extraCssClasses = result.extraCssClasses ? " " + result.extraCssClasses : "";
-                        result.type = "css";
-                        result.from = result.from || cssClass + extraCssClasses;
-                        result.to = result.to || cssClass + "-active"
-                    }
-                }
-                return result
-            };
-        var setupAnimations = function(items, config) {
-                var result = [];
-                $.each(items, function(index, item) {
-                    var animationConfig = item.animationConfig,
-                        $element = item.$element,
-                        animationInstance;
-                    if ($.isPlainObject(animationConfig)) {
-                        var fxConfig = getFXConfig(animationConfig, config);
-                        fxConfig.staggerDelay = fxConfig.staggerDelay || 0;
-                        fxConfig.delay = index * fxConfig.staggerDelay + fxConfig.delay;
-                        animationInstance = DX.fx.createAnimation($element, fxConfig)
-                    }
-                    else if ($.isFunction(animationConfig))
-                        animationInstance = animationConfig($element, config);
-                    animationInstance.setup();
-                    result.push({
-                        $element: $element,
-                        animationInstance: animationInstance
-                    })
-                });
-                return result
-            };
-        var startAnimations = function(items) {
-                for (var i = 0; i < items.length; i++)
-                    items[i].animationInstance.start()
-            };
-        var getFXConfig = function(animation, config) {
-                var result = animation;
-                result.cleanupWhen = config.cleanupWhen;
-                result.delay = result.delay || 0;
-                if (result.type === "css") {
-                    var direction = animation.direction || config.direction,
-                        directionPostfix = directionPostfixes[direction];
-                    result.from += directionPostfix
-                }
-                return result
-            };
+            },
+            DX_ANIMATING_CLASS = "dx-animating";
         var TransitionExecutor = DevExpress.Class.inherit({
                 ctor: function() {
-                    this.toEnterItems = [];
-                    this.toLeaveItems = [];
+                    this._accumulatedDelays = {
+                        enter: 0,
+                        leave: 0
+                    };
+                    this._animations = [];
                     this.reset()
                 },
+                _createAnimations: function($elements, initialConfig, configModifier, type) {
+                    var that = this,
+                        result = [],
+                        animationConfig;
+                    configModifier = configModifier || {};
+                    animationConfig = this._prepareElementAnimationConfig(initialConfig, configModifier, type);
+                    if (animationConfig)
+                        $elements.each(function() {
+                            var animation = that._createAnimation($(this), animationConfig, configModifier);
+                            if (animation) {
+                                animation.element.addClass(DX_ANIMATING_CLASS);
+                                animation.setup();
+                                result.push(animation)
+                            }
+                        });
+                    return result
+                },
+                _prepareElementAnimationConfig: function(config, configModifier, type) {
+                    var result;
+                    if (typeof config === "string") {
+                        var presetName = config;
+                        config = DX.animationPresets.getPreset(presetName)
+                    }
+                    if (!config)
+                        result = undefined;
+                    else if ($.isFunction(config[type]))
+                        result = config[type];
+                    else {
+                        result = $.extend({
+                            skipElementInitialStyles: true,
+                            cleanupWhen: this._completePromise
+                        }, config, configModifier);
+                        if (!result.type || result.type === "css") {
+                            var cssClass = "dx-" + type,
+                                extraCssClasses = (result.extraCssClasses ? " " + result.extraCssClasses : "") + directionPostfixes[result.direction];
+                            result.type = "css";
+                            result.from = (result.from || cssClass) + extraCssClasses;
+                            result.to = result.to || cssClass + "-active"
+                        }
+                        result.staggerDelay = result.staggerDelay || 0;
+                        result.delay = result.delay || 0;
+                        if (result.staggerDelay) {
+                            result.delay += this._accumulatedDelays[type];
+                            this._accumulatedDelays[type] += result.staggerDelay
+                        }
+                    }
+                    return result
+                },
+                _createAnimation: function($element, animationConfig, configModifier) {
+                    var result;
+                    if ($.isPlainObject(animationConfig))
+                        result = DX.fx.createAnimation($element, animationConfig);
+                    else if ($.isFunction(animationConfig))
+                        result = animationConfig($element, configModifier);
+                    return result
+                },
+                _startAnimations: function() {
+                    var animations = this._animations;
+                    for (var i = 0; i < animations.length; i++)
+                        animations[i].start()
+                },
+                _clearAnimations: function() {
+                    var animations = this._animations;
+                    for (var i = 0; i < animations.length; i++)
+                        animations[i].element.removeClass(DX_ANIMATING_CLASS);
+                    this._animations.length = 0
+                },
                 reset: function() {
-                    this.toEnterItems.length = 0;
-                    this.toLeaveItems.length = 0
+                    this._accumulatedDelays.enter = 0;
+                    this._accumulatedDelays.leave = 0;
+                    this._clearAnimations();
+                    this._completeDeferred = $.Deferred();
+                    this._completePromise = this._completeDeferred.promise()
                 },
-                enter: function($elements, animation) {
-                    animation = animation || {};
-                    addToAnimate(this.toEnterItems, $elements, animation, "enter")
+                enter: function($elements, animationConfig, configModifier) {
+                    var animations = this._createAnimations($elements, animationConfig, configModifier, "enter");
+                    this._animations.push.apply(this._animations, animations)
                 },
-                leave: function($elements, animation) {
-                    animation = animation || {};
-                    addToAnimate(this.toLeaveItems, $elements, animation, "leave")
+                leave: function($elements, animationConfig, configModifier) {
+                    var animations = this._createAnimations($elements, animationConfig, configModifier, "leave");
+                    this._animations.push.apply(this._animations, animations)
                 },
-                start: function(config) {
-                    config = $.extend({}, config);
+                start: function() {
                     var that = this,
                         result;
-                    if (!this.toEnterItems.length && !this.toLeaveItems.length) {
+                    if (!this._animations.length) {
                         that.reset();
                         result = $.Deferred().resolve().promise()
                     }
                     else {
-                        var animationItems = [],
-                            animationDeferreds,
-                            completeDeferred = $.Deferred();
-                        config.cleanupWhen = completeDeferred.promise();
-                        animationItems.push.apply(animationItems, setupAnimations(this.toEnterItems, config));
-                        animationItems.push.apply(animationItems, setupAnimations(this.toLeaveItems, config));
-                        animationDeferreds = $.map(animationItems, function(item) {
-                            return item.animationInstance.deferred
-                        });
+                        var animationDeferreds = $.map(this._animations, function(animation) {
+                                return animation.deferred
+                            });
                         result = $.when.apply($, animationDeferreds).always(function() {
-                            completeDeferred.resolve();
+                            that._completeDeferred.resolve();
                             that.reset()
                         });
                         DX.utils.executeAsync(function() {
-                            startAnimations(animationItems)
+                            that._startAnimations()
                         })
                     }
                     return result
@@ -8365,14 +8355,77 @@ if (!window.DevExpress) {
                                     defaultStaggerAnimationStartDelay: 0
                                 }
                             }, {
-                                device: function(device) {
-                                    return device.android
+                                device: function() {
+                                    return DX.devices.current().android || DX.devices.real.android
                                 },
                                 options: {defaultAnimationDelay: 100}
                             }])
                 },
                 _getPresetOptionName: function(animationName) {
                     return optionPrefix + animationName
+                },
+                _createAndroidSlideAnimationConfig: function(throughOpacity, widthMultiplier) {
+                    var that = this;
+                    return {
+                            enter: function($element, configModifier) {
+                                var width = $element.parent().width() * widthMultiplier,
+                                    direction = configModifier.direction,
+                                    config = {
+                                        type: "slide",
+                                        delay: that.option("defaultAnimationDelay"),
+                                        duration: that.option("defaultAnimationDuration"),
+                                        to: {
+                                            left: 0,
+                                            opacity: 1
+                                        }
+                                    };
+                                if (direction === "forward")
+                                    config.from = {
+                                        left: width,
+                                        opacity: throughOpacity
+                                    };
+                                else if (direction === "backward")
+                                    config.from = {
+                                        left: -width,
+                                        opacity: throughOpacity
+                                    };
+                                else
+                                    config.from = {
+                                        left: 0,
+                                        opacity: 0
+                                    };
+                                return DX.fx.createAnimation($element, config)
+                            },
+                            leave: function($element, configModifier) {
+                                var width = $element.parent().width() * widthMultiplier,
+                                    direction = configModifier.direction,
+                                    config = {
+                                        type: "slide",
+                                        delay: that.option("defaultAnimationDelay"),
+                                        duration: that.option("defaultAnimationDuration"),
+                                        from: {
+                                            left: 0,
+                                            opacity: 1
+                                        }
+                                    };
+                                if (direction === "forward")
+                                    config.to = {
+                                        left: -width,
+                                        opacity: throughOpacity
+                                    };
+                                else if (direction === "backward")
+                                    config.to = {
+                                        left: width,
+                                        opacity: throughOpacity
+                                    };
+                                else
+                                    config.to = {
+                                        left: 0,
+                                        opacity: 0
+                                    };
+                                return DX.fx.createAnimation($element, config)
+                            }
+                        }
                 },
                 resetToDefaults: function() {
                     this.clear();
@@ -8422,11 +8475,22 @@ if (!window.DevExpress) {
                             delay: this.option("defaultAnimationDelay"),
                             duration: this.option("defaultAnimationDuration")
                         }});
-                    this.registerPreset("slide", {animation: {
+                    this.registerPreset("slide", {
+                        device: function() {
+                            return DX.devices.current().android || DX.devices.real.android
+                        },
+                        animation: this._createAndroidSlideAnimationConfig(1, 1)
+                    });
+                    this.registerPreset("slide", {
+                        device: function() {
+                            return !DX.devices.current().android && !DX.devices.real.android
+                        },
+                        animation: {
                             extraCssClasses: "dx-slide-animation",
                             delay: this.option("defaultAnimationDelay"),
                             duration: this.option("defaultAnimationDuration")
-                        }});
+                        }
+                    });
                     this.registerPreset("ios7-slide", {animation: {
                             extraCssClasses: "dx-ios7-slide-animation",
                             delay: this.option("defaultAnimationDelay"),
@@ -8437,11 +8501,22 @@ if (!window.DevExpress) {
                             delay: this.option("defaultAnimationDelay"),
                             duration: this.option("defaultAnimationDuration")
                         }});
-                    this.registerPreset("ios7-toolbar", {animation: {
+                    this.registerPreset("ios7-toolbar", {
+                        device: function() {
+                            return !DX.devices.current().android && !DX.devices.real.android
+                        },
+                        animation: {
                             extraCssClasses: "dx-ios7-toolbar-animation",
                             delay: this.option("defaultAnimationDelay"),
                             duration: this.option("defaultAnimationDuration")
-                        }});
+                        }
+                    });
+                    this.registerPreset("ios7-toolbar", {
+                        device: function() {
+                            return DX.devices.current().android || DX.devices.real.android
+                        },
+                        animation: this._createAndroidSlideAnimationConfig(0, 0.4)
+                    });
                     this.registerPreset("stagger-fade", {animation: {
                             extraCssClasses: "dx-fade-animation",
                             staggerDelay: this.option("defaultStaggerAnimationDelay"),
@@ -8945,7 +9020,7 @@ if (!window.DevExpress) {
                         $itemContent.html(itemData.html)
                 }
                 else
-                    $itemContent.html(String(itemData));
+                    $itemContent.text(String(itemData));
                 return $itemContent
             },
             itemFrame: function(itemData) {
@@ -9017,7 +9092,7 @@ if (!window.DevExpress) {
                     $("<strong>").text(" - " + Globalize.format(DX.utils.makeDate(itemData.endDate), "t")).appendTo($details);
                 $details.appendTo($itemContent);
                 if (itemData.recurrenceRule)
-                    $("<span>").addClass("dx-scheduler-appointment-recurrence-icon").appendTo($itemContent);
+                    $("<span>").addClass("dx-scheduler-appointment-recurrence-icon dx-icon-repeat").appendTo($itemContent);
                 return $itemContent
             }};
         TEMPLATE_GENERATORS.dxOverlay = {content: emptyTemplate};
@@ -9134,7 +9209,10 @@ if (!window.DevExpress) {
             title: function(itemData) {
                 var itemTitleData = itemData;
                 if ($.isPlainObject(itemData))
-                    itemTitleData = $.extend({}, itemData, {text: itemData.title});
+                    itemTitleData = $.extend({}, itemData, {
+                        text: itemData.title,
+                        html: null
+                    });
                 var $title = TEMPLATE_GENERATORS.dxTabs.item(itemTitleData);
                 return $title
             }
@@ -9360,6 +9438,13 @@ if (!window.DevExpress) {
                 cleanKoData(this, false);
             return originalHtml.apply(this, arguments)
         };
+        var originalReplaceWith = $.fn.replaceWith;
+        $.fn.replaceWith = function(value) {
+            var result = originalReplaceWith.apply(this, arguments);
+            if (!this.parent().length)
+                cleanKoData(this, true);
+            return result
+        };
         ko.bindingHandlers.dxAction = {update: function(element, valueAccessor, allBindingsAccessor, viewModel) {
                 var $element = $(element);
                 var unwrappedValue = ko.utils.unwrapObservable(valueAccessor()),
@@ -9512,7 +9597,8 @@ if (!window.DevExpress) {
             compileSetter = DX.data.utils.compileSetter,
             compileGetter = DX.data.utils.compileGetter;
         var ITEM_ALIAS_ATTRIBUTE_NAME = "dxItemAlias",
-            DEFAULT_MODEL_ALIAS = "scopeValue";
+            DEFAULT_MODEL_ALIAS = "scopeValue",
+            ELEMENT_MODEL_DATA_KEY = "dxElementModel";
         var SKIP_APPLY_ACTION_CATEGORIES = ["rendering"];
         var phoneJsModule = DX.ng.module;
         var safeApply = function(func, scope) {
@@ -9525,30 +9611,50 @@ if (!window.DevExpress) {
             };
         var ComponentBuilder = DX.Class.inherit({
                 ctor: function(options) {
+                    this._componentDisposing = $.Callbacks();
+                    this._scope = options.scope;
                     this._$element = options.$element;
+                    this._$element.data(ELEMENT_MODEL_DATA_KEY, this._scope);
                     this._$templates = options.$templates;
                     this._componentClass = options.componentClass;
-                    this._scope = options.scope;
                     this._parse = options.parse;
                     this._compile = options.compile;
-                    this._ngOptions = this._normalizeOptions(options.ngOptions);
                     this._itemAlias = options.itemAlias;
-                    this._componentDisposing = $.Callbacks();
-                    if (options.ngOptions.data)
-                        this._initDataScope(options.ngOptions.data)
+                    this._normalizeOptions(options.ngOptions);
+                    this._initComponentBindings();
+                    this._initComponent(this._scope);
+                    if (options.ngOptions)
+                        this._triggerShownEvent();
+                    else
+                        this._addOptionsStringWatcher(options.ngOptionsString)
+                },
+                _addOptionsStringWatcher: function(optionsString) {
+                    var that = this;
+                    var clearOptionsStringWatcher = that._scope.$watch(optionsString, function(newOptions) {
+                            if (!newOptions)
+                                return;
+                            clearOptionsStringWatcher();
+                            that._normalizeOptions(newOptions);
+                            that._initComponentBindings();
+                            that._component.option(that._evalOptions(that._scope));
+                            that._triggerShownEvent()
+                        });
+                    that._componentDisposing.add(clearOptionsStringWatcher)
                 },
                 _normalizeOptions: function(options) {
-                    var result = $.extend({}, options);
+                    var that = this;
+                    that._ngOptions = $.extend({}, options);
+                    if (!options)
+                        return;
                     if (options.bindingOptions)
                         $.each(options.bindingOptions, function(key, value) {
                             if ($.type(value) === 'string')
-                                result.bindingOptions[key] = {dataPath: value}
+                                that._ngOptions.bindingOptions[key] = {dataPath: value}
                         });
-                    return result
+                    if (options.data)
+                        that._initDataScope(options.data)
                 },
-                initComponentWithBindings: function() {
-                    this._initComponentBindings();
-                    this._initComponent(this._scope);
+                _triggerShownEvent: function() {
                     this._shownEventTimer = setTimeout($.proxy(function() {
                         DX.utils.triggerShownEvent(this._$element)
                     }, this))
@@ -9580,7 +9686,6 @@ if (!window.DevExpress) {
                 _initComponentBindings: function() {
                     var that = this,
                         optionDependencies = {};
-                    that._disposingCallbacks = $.Callbacks();
                     if (that._ngOptions.bindingOptions)
                         $.each(that._ngOptions.bindingOptions, function(optionPath, value) {
                             var separatorIndex = optionPath.search(/\[|\./),
@@ -9611,10 +9716,7 @@ if (!window.DevExpress) {
                                     }
                                 };
                             updateWatcher();
-                            that._disposingCallbacks.add(function() {
-                                clearWatcher();
-                                that._componentDisposing.fire()
-                            })
+                            that._componentDisposing.add(clearWatcher)
                         });
                     that._optionChangedCallbacks = $.Callbacks().add(function(args) {
                         var optionName = args.name,
@@ -9630,7 +9732,7 @@ if (!window.DevExpress) {
                             })
                         }, that._scope)
                     });
-                    that._disposingCallbacks.add(function() {
+                    that._componentDisposing.add(function() {
                         clearTimeout(that._shownEventTimer)
                     })
                 },
@@ -9720,7 +9822,7 @@ if (!window.DevExpress) {
                             result[key] = scope.$eval(value.dataPath)
                         });
                     result._optionChangedCallbacks = this._optionChangedCallbacks;
-                    result._disposingCallbacks = this._disposingCallbacks;
+                    result._disposingCallbacks = this._componentDisposing;
                     result.templateProvider = ui.NgTemplateProvider;
                     result.templateCompiler = $.proxy(function($template) {
                         return this._compilerByTemplate($template)
@@ -9742,10 +9844,10 @@ if (!window.DevExpress) {
             });
         ComponentBuilder = ComponentBuilder.inherit({
             ctor: function(options) {
-                this.callBase.apply(this, arguments);
                 this._componentName = options.componentName;
                 this._ngModel = options.ngModel;
-                this._ngModelController = options.ngModelController
+                this._ngModelController = options.ngModelController;
+                this.callBase.apply(this, arguments)
             },
             _isNgModelRequired: function() {
                 return this._componentClass.subclassOf(ui.Editor) && this._ngModel
@@ -9758,7 +9860,7 @@ if (!window.DevExpress) {
                 if (!this._isNgModelRequired())
                     return;
                 var that = this;
-                var ngModelWatcher = this._scope.$watch(this._ngModel, function(newValue, oldValue) {
+                var clearNgModelWatcher = this._scope.$watch(this._ngModel, function(newValue, oldValue) {
                         if (newValue === oldValue)
                             return;
                         that._component.option(that._ngModelOption(), newValue)
@@ -9768,9 +9870,7 @@ if (!window.DevExpress) {
                         return;
                     that._ngModelController.$setViewValue(args.value)
                 });
-                this._disposingCallbacks.add(function() {
-                    ngModelWatcher()
-                })
+                this._componentDisposing.add(clearNgModelWatcher)
             },
             _ngModelOption: function() {
                 if ($.inArray(this._componentName, ["dxFileUploader", "dxTagBox"]) > -1)
@@ -9788,7 +9888,7 @@ if (!window.DevExpress) {
         var NgComponent = DX.DOMComponent.inherit({
                 _modelByElement: function(element) {
                     if (element.length)
-                        return element.scope()
+                        return element.data(ELEMENT_MODEL_DATA_KEY)
                 },
                 _createActionByOption: function(optionName, config) {
                     var action = this.callBase.apply(this, arguments);
@@ -9832,19 +9932,19 @@ if (!window.DevExpress) {
                                         $content = componentClass.subclassOf(ui.Widget) ? $element.contents().detach() : null;
                                     return function(scope, $element, attrs, ngModelController) {
                                             $element.append($content);
-                                            var componentBuilder = new ComponentBuilder({
-                                                    componentClass: componentClass,
-                                                    componentName: componentName,
-                                                    compile: $compile,
-                                                    parse: $parse,
-                                                    $element: $element,
-                                                    scope: scope,
-                                                    ngOptions: attrs[componentName] ? scope.$eval(attrs[componentName]) : {},
-                                                    ngModel: attrs.ngModel,
-                                                    ngModelController: ngModelController,
-                                                    itemAlias: attrs[ITEM_ALIAS_ATTRIBUTE_NAME]
-                                                });
-                                            componentBuilder.initComponentWithBindings()
+                                            new ComponentBuilder({
+                                                componentClass: componentClass,
+                                                componentName: componentName,
+                                                compile: $compile,
+                                                parse: $parse,
+                                                $element: $element,
+                                                scope: scope,
+                                                ngOptionsString: attrs[componentName],
+                                                ngOptions: attrs[componentName] ? scope.$eval(attrs[componentName]) : {},
+                                                ngModel: attrs.ngModel,
+                                                ngModelController: ngModelController,
+                                                itemAlias: attrs[ITEM_ALIAS_ATTRIBUTE_NAME]
+                                            })
                                         }
                                 }
                             }
@@ -9999,7 +10099,7 @@ if (!window.DevExpress) {
                 var template = TEMPLATE_GENERATORS.CollectionWidget.item(),
                     startDateBinding = createElementWithBindAttr("strong", {text: "Globalize.format(DevExpress.utils.makeDate($data.startDate), 't')"}),
                     endDateBinding = createElementWithBindAttr("strong", {text: "' - ' + Globalize.format(DevExpress.utils.makeDate($data.endDate), 't')"});
-                template = [template.substring(0, template.length - 6), "<div class='dx-scheduler-appointment-content-details'>", "<!-- ko if: $data.startDate -->" + startDateBinding + "<!-- /ko -->", "<!-- ko if: $data.endDate -->" + endDateBinding + "<!-- /ko -->", "</div>", "<!-- ko if: $data.recurrenceRule --><span class='dx-scheduler-appointment-recurrence-icon'></span><!-- /ko -->", "</div>"];
+                template = [template.substring(0, template.length - 6), "<div class='dx-scheduler-appointment-content-details'>", "<!-- ko if: $data.startDate -->" + startDateBinding + "<!-- /ko -->", "<!-- ko if: $data.endDate -->" + endDateBinding + "<!-- /ko -->", "</div>", "<!-- ko if: $data.recurrenceRule --><span class='dx-scheduler-appointment-recurrence-icon dx-icon-repeat'></span><!-- /ko -->", "</div>"];
                 return template.join("")
             }};
         TEMPLATE_GENERATORS.dxOverlay = {content: emptyTemplate};
@@ -10090,7 +10190,7 @@ if (!window.DevExpress) {
             item: TEMPLATE_GENERATORS.CollectionWidget.item,
             title: function() {
                 var template = TEMPLATE_GENERATORS.dxTabs.item();
-                return template.replace(/\$data\.text/g, '$data.title')
+                return template.replace(/\$data\.text/g, '$data.title').replace(/\!\$data\.html\ \&\&\ /, "")
             }
         };
         var NAVBAR_ITEM_BADGE_CLASS = "dx-navbar-item-badge";
@@ -10210,7 +10310,7 @@ if (!window.DevExpress) {
                     return $("<div>").attr("ng-if", "text").attr("ng-bind", "text")
                 },
                 primitive: function() {
-                    return $("<div>").attr("ng-if", "scopeValue").attr("ng-bind-html", "'' + scopeValue")
+                    return $("<div>").attr("ng-if", "scopeValue").attr("ng-bind", "'' + scopeValue")
                 }
             };
         var TEMPLATE_GENERATORS = {};
@@ -10264,7 +10364,7 @@ if (!window.DevExpress) {
                 $("<strong>").attr("ng-if", "startDate").text("{{startDate | date : 'shortTime' }}").appendTo($details);
                 $("<strong>").attr("ng-if", "endDate").text(" - {{endDate | date : 'shortTime' }}").appendTo($details);
                 $details.appendTo($itemContent);
-                $("<span>").attr("ng-if", "recurrenceRule").addClass("dx-scheduler-appointment-recurrence-icon").appendTo($itemContent);
+                $("<span>").attr("ng-if", "recurrenceRule").addClass("dx-scheduler-appointment-recurrence-icon dx-icon-repeat").appendTo($itemContent);
                 return $itemContent
             }};
         TEMPLATE_GENERATORS.dxOverlay = {content: emptyTemplate};
@@ -10353,6 +10453,7 @@ if (!window.DevExpress) {
             title: function() {
                 var content = TEMPLATE_GENERATORS.dxTabs.item();
                 content.find(".dx-tab-text").eq(0).attr("ng-bind", "title").attr("ng-if", "title");
+                content.find("[ng-if='html']").remove();
                 return content
             }
         };
@@ -10434,7 +10535,8 @@ if (!window.DevExpress) {
     (function($, DX, undefined) {
         var DX_LINK_SELECTOR = "link[rel=dx-theme]",
             THEME_ATTR = "data-theme",
-            ACTIVE_ATTR = "data-active";
+            ACTIVE_ATTR = "data-active",
+            DX_HAIRLINES_CLASS = "dx-hairlines";
         var context,
             $activeThemeLink,
             knownThemes,
@@ -10592,7 +10694,21 @@ if (!window.DevExpress) {
         var themeClasses;
         function attachCssClasses(element, themeName) {
             themeClasses = getCssClasses(themeName).join(" ");
-            $(element).addClass(themeClasses)
+            $(element).addClass(themeClasses);
+            var activateHairlines = function() {
+                    var pixelRatio = window.devicePixelRatio;
+                    if (!pixelRatio || pixelRatio < 2)
+                        return;
+                    var $tester = $("<div>");
+                    $tester.css("border", ".5px solid transparent");
+                    $("body").append($tester);
+                    if ($tester.outerHeight() === 1) {
+                        $(element).addClass(DX_HAIRLINES_CLASS);
+                        themeClasses += " " + DX_HAIRLINES_CLASS
+                    }
+                    $tester.remove()
+                };
+            activateHairlines()
         }
         function detachCssClasses(element, themeName) {
             $(element).removeClass(themeClasses)
@@ -11383,6 +11499,7 @@ if (!window.DevExpress) {
     /*! Module core, file ui.events.pointer.base.js */
     (function($, DX, undefined) {
         var ui = DX.ui,
+            browser = DX.browser,
             events = ui.events;
         var POINTER_EVENTS_NAMESPACE = "dxPointerEvents";
         var BaseStrategy = DX.Class.inherit({
@@ -11403,7 +11520,8 @@ if (!window.DevExpress) {
                             type: this._eventName,
                             pointerType: e.pointerType || events.eventSource(e),
                             originalEvent: e,
-                            delegateTarget: delegateTarget
+                            delegateTarget: delegateTarget,
+                            timeStamp: browser.mozilla ? (new Date).getTime() : e.timeStamp
                         })
                 },
                 _getDelegateTarget: function(e) {
@@ -12311,16 +12429,35 @@ if (!window.DevExpress) {
             events = ui.events,
             devices = DX.devices,
             support = DX.support,
+            browser = DX.browser,
             abs = Math.abs;
         var SLEEP = 0,
             INITED = 1,
             STARTED = 2,
             TOUCH_BOUNDARY = 10,
             IMMEDIATE_TOUCH_BOUNDARY = 0,
-            IMMEDIATE_TIMEOUT = 180;
+            IMMEDIATE_TIMEOUT = 180,
+            GESTURE_COVER_CLASS = "dx-gesture-cover";
         var isMousewheelEvent = function(e) {
                 return e && e.type === "dxmousewheel"
             };
+        var supportPointerEvents = function() {
+                var cssSupport = support.styleProp("pointer-events");
+                var msieLess11 = browser.msie && parseInt(browser.version, 10) < 11;
+                return cssSupport && !msieLess11
+            };
+        var pointerEventsLocker = function() {
+                var isDesktop = devices.real().platform === "generic";
+                if (!supportPointerEvents() || !isDesktop)
+                    return $.noop;
+                var $cover = $("<div>").addClass(GESTURE_COVER_CLASS).css("pointerEvents", "none");
+                $(function() {
+                    $cover.appendTo("body")
+                });
+                return function(toggle) {
+                        $cover.css("pointerEvents", toggle ? "none" : "all")
+                    }
+            }();
         var GestureEmitter = events.Emitter.inherit({
                 configurate: function(data) {
                     this.getElement().css("msTouchAction", data.immediate ? "pinch-zoom" : "");
@@ -12373,8 +12510,10 @@ if (!window.DevExpress) {
                         this._move(e);
                         this._forgetAccept()
                     }
-                    else if (this._stage === STARTED)
-                        this._move(e);
+                    else if (this._stage === STARTED) {
+                        this._clearSelection(e);
+                        this._move(e)
+                    }
                     this._prevEventData = events.eventData(e)
                 },
                 _directionConfirmed: function(e) {
@@ -12409,17 +12548,9 @@ if (!window.DevExpress) {
                 _togglePointerAddons: function(toggle, e) {
                     var isStarted = this._stage === STARTED;
                     if (isStarted) {
-                        this._togglePointerInteration(toggle);
+                        pointerEventsLocker(toggle);
                         if (!isMousewheelEvent(e))
                             this._togglePointerCursor(toggle)
-                    }
-                },
-                _togglePointerInteration: function(toggle) {
-                    var isDesktop = devices.real().platform === "generic";
-                    if (isDesktop) {
-                        $("body").css("pointer-events", toggle ? "" : "none");
-                        if (support.supportProp("user-select"))
-                            $("body").css(support.styleProp("user-select"), toggle ? "" : "none")
                     }
                 },
                 _togglePointerCursor: function(toggle) {
@@ -12617,7 +12748,7 @@ if (!window.DevExpress) {
             };
         var SwipeEmitter = events.GestureEmitter.inherit({
                 TICK_INTERVAL: 300,
-                FAST_SWIPE_SPEED_LIMIT: 5,
+                FAST_SWIPE_SPEED_LIMIT: 10,
                 ctor: function(element) {
                     this.callBase(element);
                     this.direction = "horizontal";
@@ -12632,9 +12763,11 @@ if (!window.DevExpress) {
                 _itemSizeFunc: function() {
                     return this.itemSizeFunc || this._defaultItemSizeFunc
                 },
+                _init: function(e) {
+                    this._tickData = events.eventData(e)
+                },
                 _start: function(e) {
                     this._savedEventData = events.eventData(e);
-                    this._tickData = {time: 0};
                     e = this._fireEvent(SWIPE_START_EVENT, e);
                     if (!e.cancel) {
                         this._maxLeftOffset = e.maxLeftOffset;
@@ -13266,7 +13399,7 @@ if (!window.DevExpress) {
                     templates[anonimiousTemplateName] = this._createTemplate($anonimiousTemplate, this)
             },
             _getAriaTarget: function() {
-                return this.element()
+                return this._focusTarget()
             },
             _getAnonimousTemplateName: function() {
                 return ANONYMOUS_TEMPLATE_NAME
@@ -13824,7 +13957,7 @@ if (!window.DevExpress) {
             },
             _getValidationTooltipPosition: function(positionRequest) {
                 var rtlEnabled = this.option("rtlEnabled"),
-                    tooltipPositionSide = rtlEnabled ? "right" : "left",
+                    tooltipPositionSide = DX.utils.getDefaultAlignment(rtlEnabled),
                     tooltipOriginalOffset = this.option("validationTooltipOffset"),
                     tooltipOffset = {
                         h: tooltipOriginalOffset.h,
@@ -14291,12 +14424,12 @@ if (!window.DevExpress) {
                     return this._itemContainer().find(this._itemSelector())
                 },
                 _render: function() {
+                    this.onFocusedItemChanged = this._createActionByOption("onFocusedItemChanged");
                     this.callBase();
                     this.element().addClass(COLLECTION_CLASS);
                     this._attachClickEvent();
                     this._attachHoldEvent();
-                    this._attachContextMenuEvent();
-                    this.onFocusedItemChanged = this._createActionByOption("onFocusedItemChanged")
+                    this._attachContextMenuEvent()
                 },
                 _attachClickEvent: function() {
                     var itemSelector = this._itemSelector(),

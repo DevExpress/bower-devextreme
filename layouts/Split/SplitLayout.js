@@ -169,7 +169,7 @@
             $.each(that._panesConfig, function(_, paneConfig) {
                 var controller = paneConfig.controller;
                 controller.init($.extend({}, options, {$viewPort: that._$mainLayout.find(paneConfig.selector)}));
-                $.each(["viewRendered", "viewShowing", "viewReleased"], function(_, callbacksPropertyName) {
+                $.each(["viewRendered", "viewShowing", "viewReleased", "viewHidden"], function(_, callbacksPropertyName) {
                     controller.on(callbacksPropertyName, function(args) {
                         that.fireEvent(callbacksPropertyName, [args])
                     })

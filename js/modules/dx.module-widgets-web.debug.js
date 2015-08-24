@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Web Widgets)
-* Version: 15.1.5
-* Build date: Jul 15, 2015
+* Version: 15.1.6
+* Build date: Aug 14, 2015
 *
 * Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -1182,6 +1182,9 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 }
                 return $items
             },
+            _getAriaTarget: function() {
+                return this.element()
+            },
             _refreshActiveDescendant: function() {
                 var $target = this._overlay.content(),
                     id = this.getFocusedItemId();
@@ -1218,7 +1221,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
             },
             _renderContentImpl: function() {
                 this._renderContextMenuOverlay();
-                this._detachShowContextMenuEvents();
+                this._detachShowContextMenuEvents(this.option("target"));
                 this._attachShowContextMenuEvents();
                 this._attachInvokeContextMenuEvents();
                 this.callBase()
@@ -1232,16 +1235,16 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 $overlayContent.addClass(DX_CONTEXT_MENU_CLASS);
                 this._addCustomCssClass($overlayContent);
                 this._addPlatformDependentClass($overlayContent);
-                if (this.option("visible"))
+                if (this._overlay.option("visible"))
                     this._show()
             },
             _addPlatformDependentClass: function($element) {
                 if (DX.devices.current().phone)
                     $element.addClass(DX_MENU_PHONE_CLASS)
             },
-            _detachShowContextMenuEvents: function() {
+            _detachShowContextMenuEvents: function(target) {
                 var eventName = events.addNamespace("dxcontextmenu", this.NAME);
-                $(this.option("target")).off(eventName);
+                $(target).off(eventName);
                 this._overlay && this._overlay.content().off(eventName)
             },
             _attachShowContextMenuEvents: function() {
@@ -2025,7 +2028,9 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
             },
             _nestedItemOnSelectionChangedHandler: function(args) {
                 var selectedItems = args.addedItems,
-                    submenu = args.element.dxSubmenu("instance");
+                    submenu = args.element.dxSubmenu("instance"),
+                    onSelectionChanged = this._createActionByOption("onSelectionChanged", {});
+                onSelectionChanged(args);
                 this._clearSelectionInSubmenus(selectedItems[0], submenu);
                 this._clearRootSelection();
                 this.option("selectedItems", selectedItems)
@@ -2141,7 +2146,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 return $submenu._overlay.content().find("." + DX_STATE_FOCUSED_CLASS)
             },
             _getSubmenuInstance: function($submenu) {
-                return $submenu.dxSubmenu("instance")
+                return $submenu.data().dxSubmenu
             },
             _getSubmenuElementByRootElement: function($rootItem) {
                 return $rootItem && $rootItem.children("." + DX_CONTEXT_MENU_CLASS)
@@ -2238,7 +2243,8 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     clearTimeout(this._hideSubmenuTimer);
                     clearTimeout(this._showSubmenuTimer);
                     this._showSubmenuTimer = setTimeout(function() {
-                        if (!that._getSubmenuInstanceByRootElement($item)._overlay.option("visible"))
+                        var submenu = that._getSubmenuInstanceByRootElement($item);
+                        if (submenu && !submenu._overlay.option("visible"))
                             that._showSubmenu($item)
                     }, that._getShowDelay())
                 }
@@ -2418,7 +2424,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     showCheckBoxes: false,
                     selectNodesRecursive: true,
                     selectAllEnabled: false,
-                    selectAllText: "(" + Globalize.localize("dxList-selectAll") + ")",
+                    selectAllText: Globalize.localize("dxList-selectAll"),
                     onItemSelected: null,
                     onItemExpanded: null,
                     onItemCollapsed: null,
@@ -2845,15 +2851,24 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 });
                 this._renderFocusTarget()
             },
+            _executeItemRenderAction: function(index, itemData, itemElement) {
+                var node = this._getNodeByKey(this._getItemKey(itemData));
+                this._getItemRenderAction()({
+                    itemElement: itemElement,
+                    itemIndex: index,
+                    itemData: itemData,
+                    node: node
+                })
+            },
             _addLeafClass: function($node) {
                 $node.addClass(IS_LEAF)
             },
             _attachDblclickToItem: function($item) {
                 var that = this,
                     eventName = events.addNamespace(DBLCLICK_EVENT_NAME, that.NAME);
-                $item.off(eventName).on(eventName, function() {
+                $item.off(eventName).on(eventName, function(e) {
                     var itemData = that._getItemData($item);
-                    that._toggleExpandedState(itemData)
+                    that._toggleExpandedState(itemData, undefined, e)
                 })
             },
             _toggleExpandedState: function(itemData, state, e) {
@@ -2869,8 +2884,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 if (!utils.isDefined(state))
                     state = !currentState;
                 this._updateExpandedState(itemData, state);
-                this._updateExpandedItemsUI(itemData, state);
-                this._fireExpandedStateUpdatedEvt(state, itemData, e)
+                this._updateExpandedItemsUI(itemData, state, e)
             },
             _createLoadIndicator: function($node) {
                 var $icon = $node.find(">." + TOGGLE_ITEM_VISIBILITY_CLASS),
@@ -3132,20 +3146,23 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     });
                 this._resumeDeprecatedWarnings()
             },
-            _updateExpandedItemsUI: function(itemData, state) {
+            _updateExpandedItemsUI: function(itemData, state, e) {
                 var $node = this._getNodeElementById(this._getItemKey(itemData)),
                     $icon = $node.find(">." + TOGGLE_ITEM_VISIBILITY_CLASS),
                     $nodeContainer = $node.find(" > ." + NODE_CONTAINER_CLASS);
                 $icon.toggleClass(TOGGLE_ITEM_VISIBILITY_OPENED_CLASS, state);
                 if (state)
                     this._renderNestedItems($nodeContainer).done($.proxy(function(itemsLoaded) {
-                        if (itemsLoaded)
+                        if (itemsLoaded) {
                             this.setAria("expanded", state, $node);
+                            this._fireExpandedStateUpdatedEvt(state, itemData, e)
+                        }
                         this._animateNodeContainer($nodeContainer, state)
                     }, this));
                 else {
                     this.setAria("expanded", state, $node);
-                    this._animateNodeContainer($nodeContainer, state)
+                    this._animateNodeContainer($nodeContainer, state);
+                    this._fireExpandedStateUpdatedEvt(state, itemData, e)
                 }
             },
             _animateNodeContainer: function($nodeContainer, state) {
@@ -3169,15 +3186,19 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
             _fireExpandedStateUpdatedEvt: function(isExpanded, itemData, e) {
                 var optionName = isExpanded ? "onItemExpanded" : "onItemCollapsed",
                     itemKey = this._getItemKey(itemData),
-                    node = this._getNodeByKey(itemKey);
+                    node = this._getNodeByKey(itemKey),
+                    target;
                 var handler = this.option(optionName);
                 if (handler)
-                    handler.call(this, {
-                        itemData: itemData,
-                        node: node,
-                        itemElement: this._getNodeElementById(this._keyGetter(itemData)).find(">." + ITEM_CLASS),
-                        jQueryEvent: e
-                    })
+                    if (utils.isDefined(e))
+                        this._itemJQueryEventHandler(e, optionName, {node: node});
+                    else {
+                        target = this._itemElements().eq(itemKey - 1);
+                        this._itemEventHandler(target, optionName, {
+                            jQueryEvent: e,
+                            node: node
+                        })
+                    }
             },
             _getParentById: function(nodes, id) {
                 var parent;
@@ -3403,11 +3424,18 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
             },
             _itemEventHandlerImpl: function(initiator, action, actionArgs) {
                 var $itemElement = $(initiator).closest("." + NODE_CLASS).find("> ." + ITEM_CLASS);
-                actionArgs = $.extend({
-                    itemElement: $itemElement,
-                    itemData: this._getItemData($itemElement)
-                }, actionArgs);
-                return action(actionArgs)
+                return action($.extend(this._extendActionArgs($itemElement), actionArgs))
+            },
+            _itemContextMenuHandler: function(e) {
+                this._createEventHandler("onItemContextMenu", e)
+            },
+            _itemHoldHandler: function(e) {
+                this._createEventHandler("onItemHold", e)
+            },
+            _createEventHandler: function(eventName, e) {
+                var itemData = this._getItemData(e.currentTarget),
+                    node = this._getNodeByKey(this._getItemKey(itemData));
+                this._itemJQueryEventHandler(e, eventName, {node: node})
             },
             _itemClass: function() {
                 return ITEM_CLASS
@@ -3679,13 +3707,25 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
             addNamespace = ui.events.addNamespace;
         var SORTABLE_NAMESPACE = "dxSortable",
             SORTABLE_CLASS = "dx-sortable";
-        var elementHasPoint = function(element, x, y) {
-                var $item = $(element),
-                    offset = $item.offset();
-                if (x >= offset.left && x <= offset.left + $item.outerWidth(true))
-                    if (y >= offset.top && y <= offset.top + $item.outerHeight(true))
-                        return true
-            };
+        function elementHasPoint(element, x, y) {
+            var $item = $(element),
+                offset = $item.offset();
+            if (x >= offset.left && x <= offset.left + $item.outerWidth(true))
+                if (y >= offset.top && y <= offset.top + $item.outerHeight(true))
+                    return true
+        }
+        function getItemsOffset($elements) {
+            var result = [];
+            $.each($elements, function() {
+                var item = this;
+                if ($(item).is(':visible'))
+                    result.push({
+                        pos: $(item).offset().top + $(item).outerHeight(true) / 2,
+                        item: $(item)
+                    })
+            });
+            return result
+        }
         DX.registerComponent("dxSortable", ui, DX.DOMComponent.inherit({
             _setDefaultOptions: function() {
                 this.callBase();
@@ -3723,35 +3763,42 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     sourceClass = that.option("sourceClass"),
                     dragClass = that.option("dragClass"),
                     targetClass = that.option("targetClass"),
+                    onDragging = that.option("onDragging"),
                     $sourceItem,
                     sourceIndex,
                     $targetItem,
                     $targetGroup,
                     startPosition,
                     $draggable,
-                    element = that.element();
-                element.off(addNamespace("dxdragstart dxdrag dxdragend dxdragenter dxdragleave dxdrop", SORTABLE_NAMESPACE));
-                element.on(addNamespace("dxdragstart", SORTABLE_NAMESPACE), itemSelector, function(e) {
+                    $sourceGroup,
+                    element = that.element(),
+                    $groups,
+                    i;
+                element.off(addNamespace("dxdragstart dxdrag dxdragend dxdragenter dxdragleave dxdrop", SORTABLE_NAMESPACE)).on(addNamespace("dxdragstart", SORTABLE_NAMESPACE), itemSelector, function(e) {
                     $sourceItem = $(e.currentTarget);
                     startPosition = $sourceItem.offset();
                     startPosition.top -= element.offset().top;
                     startPosition.left -= element.offset().left;
+                    sourceIndex = $sourceItem.index();
+                    $groups = groupSelector ? element.find(groupSelector) : element;
+                    $sourceGroup = $sourceItem.closest(groupSelector).attr("group");
                     $draggable = that._renderItem($sourceItem, 'drag').appendTo(element);
                     $targetItem = that._renderItem($sourceItem, 'target');
                     $draggable.addClass(dragClass);
                     $sourceItem.addClass(sourceClass);
-                    sourceIndex = $sourceItem.index();
                     $targetItem.addClass(targetClass)
-                });
-                element.on(addNamespace("dxdrag", SORTABLE_NAMESPACE), function(e) {
-                    if (!$sourceItem)
-                        return;
-                    var onDragging = that.option("onDragging"),
-                        draggingArgs,
+                }).on(addNamespace("dxdrag", SORTABLE_NAMESPACE), function(e) {
+                    var draggingArgs,
                         $item,
                         $itemContainer,
                         $items,
-                        $groups = groupSelector ? element.find(groupSelector) : element;
+                        itemsOffset = [];
+                    if (!$sourceItem)
+                        return;
+                    $draggable.css({
+                        top: startPosition.top + e.offset.y,
+                        left: startPosition.left + e.offset.x
+                    });
                     $targetGroup && $targetGroup.removeClass(targetClass);
                     $targetGroup = undefined;
                     $.each($groups, function() {
@@ -3761,18 +3808,8 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         }
                     });
                     if ($targetGroup) {
-                        $itemContainer = $targetGroup.find(itemContainerSelector);
-                        $items = $itemContainer.find(itemSelector);
-                        $.each($items, function() {
-                            if (elementHasPoint(this, e.pageX, e.pageY)) {
-                                $item = $(this);
-                                return false
-                            }
-                        })
-                    }
-                    if ($targetGroup && $sourceItem) {
                         draggingArgs = {
-                            sourceGroup: $sourceItem.closest(groupSelector).attr("group"),
+                            sourceGroup: $sourceGroup,
                             sourceIndex: sourceIndex,
                             sourceElement: $sourceItem,
                             targetGroup: $targetGroup.attr("group"),
@@ -3780,29 +3817,29 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         };
                         onDragging && onDragging(draggingArgs)
                     }
-                    if (draggingArgs && draggingArgs.cancel) {
+                    if (draggingArgs && draggingArgs.cancel)
                         $targetGroup = undefined;
-                        $item = undefined
-                    }
-                    $targetGroup && $targetGroup.addClass(targetClass);
-                    if ($item) {
-                        if (!$item.hasClass(targetClass)) {
-                            $targetItem.detach();
-                            if (!$item.hasClass(sourceClass) && !$item.prev().hasClass(sourceClass))
-                                $targetItem.insertBefore($item)
-                        }
-                    }
-                    else {
-                        $targetItem.detach();
-                        if ($targetGroup && !$items.last().hasClass(sourceClass))
+                    if ($targetGroup) {
+                        $targetGroup.addClass(targetClass);
+                        $itemContainer = $targetGroup.find(itemContainerSelector);
+                        $items = $itemContainer.find(itemSelector);
+                        itemsOffset = getItemsOffset($items);
+                        for (i = 0; i < itemsOffset.length; i++)
+                            if (e.pageY < itemsOffset[i].pos) {
+                                $item = itemsOffset[i] && itemsOffset[i].item;
+                                break
+                            }
+                        if ($item)
+                            if (!$item.hasClass(sourceClass) && (!$item.prev().hasClass(sourceClass) || !$item.prev().is(":visible")))
+                                $targetItem.insertBefore($item);
+                            else
+                                $targetItem.detach();
+                        else if (!($items.last().is(":visible") && $items.last().hasClass(sourceClass)))
                             $targetItem.appendTo($itemContainer)
                     }
-                    $draggable.css({
-                        top: startPosition.top + e.offset.y,
-                        left: startPosition.left + e.offset.x
-                    })
-                });
-                element.on(addNamespace("dxdragend", SORTABLE_NAMESPACE), function() {
+                    else
+                        $targetItem.detach()
+                }).on(addNamespace("dxdragend", SORTABLE_NAMESPACE), function() {
                     var onChanged = that.option("onChanged"),
                         changedArgs,
                         sourceGroup;
@@ -3867,8 +3904,10 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
         var DATAGRID_ROW_SELECTOR = ".dx-row",
             DATAGRID_DEPRECATED_TEMPLATE_WARNING = "Specifying grid templates with the name of a jQuery selector is now deprecated. Instead, use the jQuery object that references this selector.";
         var ModuleItem = DX.Class.inherit({
+                _endUpdateCore: function(){},
                 ctor: function(component) {
                     var that = this;
+                    that._updateLockCount = 0;
                     that.component = component;
                     that._actions = {};
                     that._actionConfigs = {};
@@ -3877,10 +3916,18 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         that[this] = $.Callbacks(flags)
                     })
                 },
+                init: function(){},
                 callbackNames: function(){},
                 callbackFlags: function(name){},
                 publicMethods: function(){},
-                init: function(){},
+                beginUpdate: function() {
+                    this._updateLockCount++
+                },
+                endUpdate: function() {
+                    this._updateLockCount--;
+                    if (!this._updateLockCount)
+                        this._endUpdateCore()
+                },
                 option: function() {
                     return this.component.option.apply(this.component, arguments)
                 },
@@ -3942,8 +3989,25 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 }
             });
         var View = ModuleItem.inherit({
-                element: function() {
-                    return this._$element
+                _isReady: function() {
+                    return this.component.isReady()
+                },
+                _endUpdateCore: function() {
+                    this.callBase();
+                    if (!this._isReady() && this._requireReady) {
+                        this._requireRender = false;
+                        this.component._requireResize = false;
+                        this._requireReady = false
+                    }
+                    if (this._requireRender) {
+                        this._requireRender = false;
+                        this.render(this._$parent)
+                    }
+                },
+                _invalidate: function(requireResize, requireReady) {
+                    this._requireRender = true;
+                    this.component._requireResize = this.component._requireResize || requireResize;
+                    this._requireReady = this._requireReady || requireReady
                 },
                 _renderCore: function(options){},
                 _resizeCore: function(){},
@@ -3956,6 +4020,9 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     this.renderCompleted = $.Callbacks();
                     this.resizeCompleted = $.Callbacks()
                 },
+                element: function() {
+                    return this._$element
+                },
                 isVisible: function() {
                     return true
                 },
@@ -3966,7 +4033,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     var $element = this._$element,
                         isVisible = this.isVisible();
                     if (!$element) {
-                        $element = this._$element = $('<div />').appendTo($parent);
+                        $element = this._$element = $("<div />").appendTo($parent);
                         this._$parent = $parent
                     }
                     $element.toggle(isVisible);
@@ -4158,7 +4225,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                 return DevExpress.browser.webkit
                             },
                             options: {loadPanel: {animation: {show: {
-                                            easing: 'cubic-bezier(1, 0, 1, 0)',
+                                            easing: "cubic-bezier(1, 0, 1, 0)",
                                             duration: 500,
                                             from: {opacity: 0},
                                             to: {opacity: 1}
@@ -4169,12 +4236,12 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 var that = this;
                 that.callBase();
                 processModules(that, ui.dxDataGrid.modules);
-                callModuleItemsMethod(that, 'init')
+                callModuleItemsMethod(that, "init")
             },
             _clean: $.noop,
             _optionChanged: function(args) {
                 var that = this;
-                callModuleItemsMethod(that, 'optionChanged', [args]);
+                callModuleItemsMethod(that, "optionChanged", [args]);
                 if (!args.handled)
                     that.callBase(args)
             },
@@ -4187,14 +4254,14 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
             },
             _renderContentImpl: function() {
                 var that = this;
-                that.getView('gridView').render(that.element())
+                that.getView("gridView").render(that.element())
             },
             _renderContent: function() {
                 this._renderContentImpl()
             },
             _getTemplate: function(templateName) {
                 var template = templateName;
-                if (DX.utils.isString(template) && template[0] === '#') {
+                if (DX.utils.isString(template) && template[0] === "#") {
                     template = $(templateName);
                     DX.utils.logger.warn(DATAGRID_DEPRECATED_TEMPLATE_WARNING)
                 }
@@ -4203,7 +4270,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
             _dispose: function() {
                 var that = this;
                 that.callBase();
-                callModuleItemsMethod(that, 'dispose')
+                callModuleItemsMethod(that, "dispose")
             },
             isReady: function() {
                 return this.getController("data").isReady()
@@ -4211,11 +4278,11 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
             beginUpdate: function() {
                 var that = this;
                 that.callBase();
-                callModuleItemsMethod(that, 'beginUpdate')
+                callModuleItemsMethod(that, "beginUpdate")
             },
             endUpdate: function() {
                 var that = this;
-                callModuleItemsMethod(that, 'endUpdate');
+                callModuleItemsMethod(that, "endUpdate");
                 that.callBase()
             },
             getController: function(name) {
@@ -4253,7 +4320,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
             },
             processModules: processModules,
             formatValue: function(value, options) {
-                var valueText = DX.formatHelper.format(value, options.format, options.precision) || value && value.toString() || '',
+                var valueText = DX.formatHelper.format(value, options.format, options.precision) || value && value.toString() || "",
                     formatObject = {
                         value: value,
                         valueText: options.getDisplayFormat ? options.getDisplayFormat(valueText) : valueText
@@ -4347,17 +4414,17 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
             dataGrid = ui.dxDataGrid;
         dataGrid.StateStoringController = dataGrid.ViewController.inherit(function() {
             var getStorage = function(options) {
-                    var storage = options.type === 'sessionStorage' ? sessionStorage : localStorage;
+                    var storage = options.type === "sessionStorage" ? DX.utils.getSessionStorage() : localStorage;
                     if (!storage)
                         throw new Error("E1007");
                     return storage
                 };
             var getUniqueStorageKey = function(options) {
-                    return 'dx_datagrid_' + (utils.isDefined(options.storageKey) ? options.storageKey : 'storage')
+                    return "dx_datagrid_" + (utils.isDefined(options.storageKey) ? options.storageKey : "storage")
                 };
             var dateReviver = function(key, value) {
                     var date;
-                    if (typeof value === 'string') {
+                    if (typeof value === "string") {
                         date = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2}(?:\.\d*)?)Z$/.exec(value);
                         if (date)
                             return new Date(Date.UTC(+date[1], +date[2] - 1, +date[3], +date[4], +date[5], +date[6]))
@@ -4365,11 +4432,11 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     return value
                 };
             var processLoadState = function(that) {
-                    var columnsController = that.getController('columns'),
-                        selectionController = that.getController('selection'),
+                    var columnsController = that.getController("columns"),
+                        selectionController = that.getController("selection"),
                         exportController = that.getController("export"),
-                        dataController = that.getController('data'),
-                        pagerView = that.getView('pagerView');
+                        dataController = that.getController("data"),
+                        pagerView = that.getView("pagerView");
                     if (columnsController)
                         columnsController.columnsChanged.add(function() {
                             $.extend(that._state, {columns: columnsController.getUserState()});
@@ -4403,25 +4470,25 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         searchText = state.searchText,
                         selectedRowKeys = state.selectedRowKeys,
                         exportController = that.getController("export"),
-                        columnsController = that.getController('columns'),
-                        scrollingMode = that.option('scrolling.mode');
+                        columnsController = that.getController("columns"),
+                        scrollingMode = that.option("scrolling.mode");
                     that.component.beginUpdate();
                     if (columnsController)
                         columnsController.setUserState(state.columns);
                     if (exportController)
                         exportController.selectionOnly(state.exportSelectionOnly);
-                    that.option('selectedRowKeys', selectedRowKeys || []);
-                    if (allowedPageSizes && that.option('pager.allowedPageSizes') === 'auto')
-                        that.option('pager').allowedPageSizes = allowedPageSizes;
-                    that.option('searchPanel.text', searchText || '');
-                    that.option('paging.pageSize', scrollingMode !== "virtual" && scrollingMode !== "infinite" && state.pageSize ? state.pageSize : that._initialPageSize);
-                    that.option('paging.pageIndex', state.pageIndex || 0);
+                    that.option("selectedRowKeys", selectedRowKeys || []);
+                    if (allowedPageSizes && that.option("pager.allowedPageSizes") === "auto")
+                        that.option("pager").allowedPageSizes = allowedPageSizes;
+                    that.option("searchPanel.text", searchText || "");
+                    that.option("paging.pageSize", scrollingMode !== "virtual" && scrollingMode !== "infinite" && state.pageSize ? state.pageSize : that._initialPageSize);
+                    that.option("paging.pageIndex", state.pageIndex || 0);
                     that.component.endUpdate()
                 };
             return {
                     _loadState: function() {
-                        var options = this.option('stateStoring');
-                        if (options.type === 'custom')
+                        var options = this.option("stateStoring");
+                        if (options.type === "custom")
                             return options.customLoad && options.customLoad();
                         try {
                             return JSON.parse(getStorage(options).getItem(getUniqueStorageKey(options)), dateReviver)
@@ -4431,8 +4498,8 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         }
                     },
                     _saveState: function(state) {
-                        var options = this.option('stateStoring');
-                        if (options.type === 'custom') {
+                        var options = this.option("stateStoring");
+                        if (options.type === "custom") {
                             options.customSave && options.customSave(state);
                             return
                         }
@@ -4442,10 +4509,10 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         catch(e) {}
                     },
                     publicMethods: function() {
-                        return ['state']
+                        return ["state"]
                     },
                     isEnabled: function() {
-                        return this.option('stateStoring.enabled')
+                        return this.option("stateStoring.enabled")
                     },
                     init: function() {
                         var that = this;
@@ -4456,7 +4523,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                             if (that._savingTimeoutID !== undefined)
                                 that._saveState(that.state())
                         },
-                        $(window).on('unload', that._windowUnloadHandler);
+                        $(window).on("unload", that._windowUnloadHandler);
                         processLoadState(that)
                     },
                     isLoaded: function() {
@@ -4494,12 +4561,12 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         that._savingTimeoutID = setTimeout(function() {
                             that._saveState(that.state());
                             that._savingTimeoutID = undefined
-                        }, that.option('stateStoring.savingTimeout'))
+                        }, that.option("stateStoring.savingTimeout"))
                     },
                     optionChanged: function(args) {
                         var that = this;
                         switch (args.name) {
-                            case'stateStoring':
+                            case"stateStoring":
                                 if (that.isEnabled())
                                     that.load();
                                 args.handled = true;
@@ -4510,16 +4577,16 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     },
                     dispose: function() {
                         clearTimeout(this._savingTimeoutID);
-                        $(window).off('unload', this._windowUnloadHandler)
+                        $(window).off("unload", this._windowUnloadHandler)
                     }
                 }
         }());
-        dataGrid.registerModule('stateStoring', {
+        dataGrid.registerModule("stateStoring", {
             defaultOptions: function() {
                 return {stateStoring: {
                             enabled: false,
                             storageKey: null,
-                            type: 'localStorage',
+                            type: "localStorage",
                             customLoad: null,
                             customSave: null,
                             savingTimeout: 2000
@@ -4529,14 +4596,14 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
             extenders: {controllers: {
                     columns: {getVisibleColumns: function() {
                             var visibleColumns = this.callBase(),
-                                stateStoringController = this.getController('stateStoring');
+                                stateStoringController = this.getController("stateStoring");
                             return stateStoringController.isEnabled() && !stateStoringController.isLoaded() ? [] : visibleColumns
                         }},
                     data: {
                         _refreshDataSource: function() {
                             var that = this,
                                 callBase = that.callBase,
-                                stateStoringController = that.getController('stateStoring');
+                                stateStoringController = that.getController("stateStoring");
                             if (stateStoringController.isEnabled() && !stateStoringController.isLoaded()) {
                                 clearTimeout(that._restoreStateTimeoutID);
                                 that._restoreStateTimeoutID = setTimeout(function() {
@@ -4551,7 +4618,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         },
                         isLoading: function() {
                             var that = this,
-                                stateStoringController = that.getController('stateStoring');
+                                stateStoringController = that.getController("stateStoring");
                             return this.callBase() || stateStoringController.isLoading()
                         },
                         dispose: function() {
@@ -4571,9 +4638,9 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
             normalizeIndexes = utils.normalizeIndexes,
             dataUtils = DX.data.utils,
             isDefined = utils.isDefined;
-        var USER_STATE_FIELD_NAMES_15_1 = ['filterValues', 'filterType', 'fixed', 'fixedPosition'],
-            USER_STATE_FIELD_NAMES = ['visibleIndex', 'dataField', 'name', 'dataType', 'width', 'visibleWidth', 'visible', 'sortOrder', 'sortIndex', 'groupIndex', 'filterValue', 'selectedFilterOperation'].concat(USER_STATE_FIELD_NAMES_15_1),
-            DATAGRID_COMMAND_EXPAND_CLASS = 'dx-command-expand';
+        var USER_STATE_FIELD_NAMES_15_1 = ["filterValues", "filterType", "fixed", "fixedPosition"],
+            USER_STATE_FIELD_NAMES = ["visibleIndex", "dataField", "name", "dataType", "width", "visibleWidth", "visible", "sortOrder", "sortIndex", "groupIndex", "filterValue", "selectedFilterOperation"].concat(USER_STATE_FIELD_NAMES_15_1),
+            DATAGRID_COMMAND_EXPAND_CLASS = "dx-command-expand";
         dataGrid.checkChanges = function(changes, changeNames) {
             var changesWithChangeNamesCount = 0,
                 i;
@@ -4588,12 +4655,12 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         showInColumnChooser: true
                     },
                     DATATYPE_OPERATIONS = {
-                        number: ['=', '<>', '<', '>', '<=', '>='],
-                        string: ['contains', 'notcontains', 'startswith', 'endswith', '=', '<>'],
-                        date: ['=', '<>', '<', '>', '<=', '>=']
+                        number: ["=", "<>", "<", ">", "<=", ">="],
+                        string: ["contains", "notcontains", "startswith", "endswith", "=", "<>"],
+                        date: ["=", "<>", "<", ">", "<=", ">="]
                     },
-                    GROUP_LOCATION = 'group',
-                    COLUMN_CHOOSER_LOCATION = 'columnChooser';
+                    GROUP_LOCATION = "group",
+                    COLUMN_CHOOSER_LOCATION = "columnChooser";
                 var convertNameToCaption = function(name) {
                         var captionList = [],
                             i,
@@ -4602,9 +4669,9 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                             isNewWord = false;
                         for (i = 0; i < name.length; i++) {
                             char = name.charAt(i);
-                            isNewWord = char === char.toUpperCase() || char in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
-                            if (char === '_' || char === '.') {
-                                char = ' ';
+                            isNewWord = char === char.toUpperCase() || char in ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
+                            if (char === "_" || char === ".") {
+                                char = " ";
                                 isNewWord = true
                             }
                             else if (i === 0) {
@@ -4613,11 +4680,11 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                             }
                             else if (!isPrevCharNewWord && isNewWord)
                                 if (captionList.length > 0)
-                                    captionList.push(' ');
+                                    captionList.push(" ");
                             captionList.push(char);
                             isPrevCharNewWord = isNewWord
                         }
-                        return captionList.join('')
+                        return captionList.join("")
                     };
                 var createColumn = function(that, columnOptions, userStateColumnOptions) {
                         var commonColumnOptions,
@@ -4649,77 +4716,64 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     };
                 var getValueDataType = function(value) {
                         var dataType = $.type(value);
-                        if (dataType !== 'string' && dataType !== 'boolean' && dataType !== 'number' && dataType !== 'date')
+                        if (dataType !== "string" && dataType !== "boolean" && dataType !== "number" && dataType !== "date")
                             dataType = undefined;
                         return dataType
                     };
                 var getSerializationFormat = function(dataType, value) {
                         switch (dataType) {
-                            case'date':
+                            case"date":
                                 if (utils.isNumber(value))
-                                    return 'number';
+                                    return "number";
                                 else if (utils.isString(value))
-                                    return 'yyyy/MM/dd';
+                                    return "yyyy/MM/dd";
                                 break;
-                            case'number':
+                            case"number":
                                 if (utils.isString(value))
-                                    return 'string'
+                                    return "string"
                         }
                     };
                 var updateSerializers = function(options, dataType) {
                         if (!options.deserializeValue) {
-                            if (dataType === 'date') {
+                            if (dataType === "date") {
                                 options.deserializeValue = function(value) {
-                                    var serializationFormat = this.serializationFormat,
-                                        parsedValue;
-                                    if (!serializationFormat || serializationFormat === 'number' || serializationFormat === 'yyyy/MM/dd') {
-                                        parsedValue = serializationFormat === 'number' ? value : !utils.isDate(value) && Date.parse(value);
-                                        return parsedValue ? new Date(parsedValue) : value
-                                    }
-                                    else if (value !== undefined)
-                                        return Globalize.parseDate(value, serializationFormat)
+                                    return utils.deserializeDate(value, this.serializationFormat)
                                 };
                                 options.serializeValue = function(value) {
-                                    var serializationFormat = this.serializationFormat;
-                                    if (serializationFormat === 'number')
-                                        return value && value.valueOf && value.valueOf();
-                                    else if (serializationFormat)
-                                        return Globalize.format(value, serializationFormat);
-                                    else
-                                        return value
+                                    return utils.serializeDate(value, this.serializationFormat)
                                 }
                             }
-                            if (dataType === 'number') {
+                            if (dataType === "number") {
                                 options.deserializeValue = function(value) {
-                                    return value ? Number(value) : value
+                                    return utils.isDefined(value) ? Number(value) : value
                                 };
                                 options.serializeValue = function(value) {
-                                    return value ? value.toString() : value
+                                    return utils.isDefined(value) && this.serializationFormat === "string" ? value.toString() : value
                                 }
                             }
                         }
                     };
                 var getAlignmentByDataType = function(dataType, isRTL) {
                         switch (dataType) {
-                            case'number':
-                                return 'right';
-                            case'boolean':
-                                return 'center';
-                            case'date':
-                                return 'left';
+                            case"number":
+                                return "right";
+                            case"boolean":
+                                return "center";
+                            case"date":
+                                return "left";
                             default:
-                                return isRTL ? 'right' : 'left'
+                                return utils.getDefaultAlignment(isRTL)
                         }
                     };
                 var getCustomizeTextByDataType = function(dataType) {
-                        if (dataType === 'boolean')
+                        if (dataType === "boolean")
                             return function(e) {
                                     if (e.value === true)
-                                        return this.trueText || 'true';
+                                        return this.trueText || "true";
                                     else if (e.value === false)
-                                        return this.falseText || 'false';
+                                        return this.falseText || "false";
                                     else
-                                        return e.valueText || ''
+                                        return e.valueText || ""
                                 }
                     };
                 var createColumnsFromDataSource = function(that, dataSource) {
@@ -4733,7 +4787,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                 for (fieldName in firstItems[i])
                                     processedFields[fieldName] = true;
                         for (fieldName in processedFields)
-                            if (fieldName.indexOf('__') !== 0) {
+                            if (fieldName.indexOf("__") !== 0) {
                                 var column = createColumn(that, fieldName);
                                 result.push(column)
                             }
@@ -4782,7 +4836,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         })
                     };
                 var updateColumnGroupIndexes = function(that, currentColumn) {
-                        normalizeIndexes(that._columns, 'groupIndex', currentColumn, function(column) {
+                        normalizeIndexes(that._columns, "groupIndex", currentColumn, function(column) {
                             var grouped = column.grouped;
                             delete column.grouped;
                             return grouped
@@ -4793,12 +4847,12 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                             if (isDefined(column.sortIndex) && !isSortOrderValid(column.sortOrder))
                                 delete column.sortIndex
                         });
-                        normalizeIndexes(that._columns, 'sortIndex', currentColumn, function(column) {
+                        normalizeIndexes(that._columns, "sortIndex", currentColumn, function(column) {
                             return !isDefined(column.groupIndex) && isSortOrderValid(column.sortOrder)
                         })
                     };
                 var updateColumnVisibleIndexes = function(that, currentColumn) {
-                        normalizeIndexes(that._columns, 'visibleIndex', currentColumn)
+                        normalizeIndexes(that._columns, "visibleIndex", currentColumn)
                     };
                 var getColumnIndexByVisibleIndex = function(that, visibleIndex, location) {
                         var columns = location === GROUP_LOCATION ? that.getGroupColumns() : location === COLUMN_CHOOSER_LOCATION ? that.getChooserColumns() : that.getVisibleColumns(),
@@ -4830,7 +4884,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                             column,
                             i;
                         function handleStateField(index, fieldName) {
-                            if (fieldName === 'dataType')
+                            if (fieldName === "dataType")
                                 column[fieldName] = column[fieldName] || columnsUserState[i][fieldName];
                             else if ($.inArray(fieldName, USER_STATE_FIELD_NAMES_15_1) >= 0) {
                                 if (fieldName in columnsUserState[i])
@@ -4861,9 +4915,6 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         updateColumnSortIndexes(that, column);
                         updateColumnVisibleIndexes(that, column)
                     };
-                var isLocalDataSource = function(dataSource) {
-                        return dataSource && dataSource.store && dataSource.store() instanceof DX.data.ArrayStore
-                    };
                 var assignColumns = function(that, columns) {
                         that._columns = columns;
                         that._visibleColumns = undefined;
@@ -4875,7 +4926,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                 changeTypes: {length: 0},
                                 columnIndex: columnIndex
                             };
-                        optionName = optionName || 'all';
+                        optionName = optionName || "all";
                         var changeTypes = columnChanges.changeTypes;
                         if (changeType && !changeTypes[changeType]) {
                             changeTypes[changeType] = true;
@@ -4912,24 +4963,24 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         if (arguments.length === 3)
                             return optionGetter(column, {functionsAsIs: true});
                         if (optionGetter(column, {functionsAsIs: true}) !== value) {
-                            if (optionName === 'groupIndex')
-                                changeType = 'grouping';
-                            else if (optionName === 'sortIndex' || optionName === 'sortOrder')
-                                changeType = 'sorting';
+                            if (optionName === "groupIndex")
+                                changeType = "grouping";
+                            else if (optionName === "sortIndex" || optionName === "sortOrder")
+                                changeType = "sorting";
                             else
-                                changeType = 'columns';
+                                changeType = "columns";
                             dataUtils.compileSetter(optionName)(column, value, {functionsAsIs: true});
                             if (!notFireEvent)
                                 updateColumnChanges(that, changeType, optionName, column.index)
                         }
                     };
                 var isSortOrderValid = function(sortOrder) {
-                        return sortOrder === 'asc' || sortOrder === 'desc'
+                        return sortOrder === "asc" || sortOrder === "desc"
                     };
                 var addExpandColumn = function(that) {
                         that.addCommandColumn({
-                            command: 'expand',
-                            width: 'auto',
+                            command: "expand",
+                            width: "auto",
                             cssClass: DATAGRID_COMMAND_EXPAND_CLASS,
                             allowEditing: false,
                             allowGrouping: false,
@@ -4940,10 +4991,12 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         })
                     };
                 return {
+                        _endUpdateCore: function() {
+                            fireColumnsChanged(this)
+                        },
                         init: function() {
                             var that = this,
-                                columns = that.option('columns');
-                            that._updateLockCount = that._updateLockCount || 0;
+                                columns = that.option("columns");
                             that._commandColumns = that._commandColumns || [];
                             that._columns = that._columns || [];
                             addExpandColumn(that);
@@ -4960,29 +5013,29 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                 updateIndexes(that)
                         },
                         callbackNames: function() {
-                            return ['columnsChanged']
+                            return ["columnsChanged"]
                         },
                         optionChanged: function(args) {
                             switch (args.name) {
-                                case'columns':
+                                case"columns":
                                     args.handled = true;
                                     this._columnsUserState = null;
                                     this.init();
                                     break;
-                                case'commonColumnSettings':
-                                case'columnAutoWidth':
-                                case'allowColumnResizing':
-                                case'allowColumnReordering':
-                                case'columnFixing':
-                                case'grouping':
-                                case'groupPanel':
-                                case'regenerateColumnsByVisibleItems':
-                                case'customizeColumns':
-                                case'editing':
+                                case"commonColumnSettings":
+                                case"columnAutoWidth":
+                                case"allowColumnResizing":
+                                case"allowColumnReordering":
+                                case"columnFixing":
+                                case"grouping":
+                                case"groupPanel":
+                                case"regenerateColumnsByVisibleItems":
+                                case"customizeColumns":
+                                case"editing":
                                     args.handled = true;
                                     this.reinit();
                                     break;
-                                case'rtlEnabled':
+                                case"rtlEnabled":
                                     this.reinit();
                                     break;
                                 default:
@@ -4990,13 +5043,13 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                             }
                         },
                         publicMethods: function() {
-                            return ['addColumn', 'columnOption', 'columnCount', 'clearSorting', 'clearGrouping']
+                            return ["addColumn", "columnOption", "columnCount", "clearSorting", "clearGrouping"]
                         },
                         applyDataSource: function(dataSource, forceApplying) {
                             var that = this,
                                 isDataSourceLoaded = dataSource && dataSource.isLoaded();
                             that._dataSource = dataSource;
-                            if (!that._dataSourceApplied || that._dataSourceColumnsCount === 0 || forceApplying || that.option('regenerateColumnsByVisibleItems'))
+                            if (!that._dataSourceApplied || that._dataSourceColumnsCount === 0 || forceApplying || that.option("regenerateColumnsByVisibleItems"))
                                 if (isDataSourceLoaded) {
                                     if (!that._isColumnsFromOptions) {
                                         assignColumns(that, createColumnsFromDataSource(that, dataSource));
@@ -5021,23 +5074,14 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         isDataSourceApplied: function() {
                             return this._dataSourceApplied
                         },
-                        beginUpdate: function() {
-                            this._updateLockCount++
-                        },
-                        endUpdate: function() {
-                            var that = this;
-                            that._updateLockCount--;
-                            if (!that._updateLockCount)
-                                fireColumnsChanged(that)
-                        },
                         getCommonSettings: function() {
-                            var commonColumnSettings = this.option('commonColumnSettings') || {},
-                                groupingOptions = this.option('grouping') || {},
-                                groupPanelOptions = this.option('groupPanel') || {};
+                            var commonColumnSettings = this.option("commonColumnSettings") || {},
+                                groupingOptions = this.option("grouping") || {},
+                                groupPanelOptions = this.option("groupPanel") || {};
                             return $.extend({
-                                    allowFixing: this.option('columnFixing.enabled'),
-                                    allowResizing: this.option('allowColumnResizing'),
-                                    allowReordering: this.option('allowColumnReordering'),
+                                    allowFixing: this.option("columnFixing.enabled"),
+                                    allowResizing: this.option("allowColumnResizing"),
+                                    allowReordering: this.option("allowColumnReordering"),
                                     autoExpandGroup: groupingOptions.autoExpandAll,
                                     allowCollapsing: groupingOptions.allowCollapsing,
                                     allowGrouping: groupPanelOptions.allowColumnDragging && groupPanelOptions.visible
@@ -5166,7 +5210,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                 })
                             });
                             if (!notGroupedColumnsCount && this._columns.length)
-                                result.push({command: 'empty'});
+                                result.push({command: "empty"});
                             return result
                         },
                         getHiddenColumns: function() {
@@ -5236,16 +5280,16 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                     updateColumnVisibleIndexes(that, column)
                                 }
                                 column.visible = targetLocation !== COLUMN_CHOOSER_LOCATION;
-                                updateColumnChanges(that, isGroupMoving ? 'grouping' : 'columns');
+                                updateColumnChanges(that, isGroupMoving ? "grouping" : "columns");
                                 fireColumnsChanged(that)
                             }
                         },
                         changeSortOrder: function(columnIndex, sortOrder) {
                             var that = this,
-                                sortingOptions = that.option('sorting'),
+                                sortingOptions = that.option("sorting"),
                                 sortingMode = sortingOptions && sortingOptions.mode,
-                                needResetSorting = sortingMode === 'single' || !sortOrder,
-                                allowSorting = sortingMode === 'single' || sortingMode === 'multiple',
+                                needResetSorting = sortingMode === "single" || !sortOrder,
+                                allowSorting = sortingMode === "single" || sortingMode === "multiple",
                                 column = that._columns[columnIndex],
                                 nextSortOrder = function(column) {
                                     if (sortOrder === "ctrl") {
@@ -5255,9 +5299,9 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                         delete column.sortIndex
                                     }
                                     else if (isDefined(column.groupIndex) || isDefined(column.sortIndex))
-                                        column.sortOrder = column.sortOrder === 'desc' ? 'asc' : 'desc';
+                                        column.sortOrder = column.sortOrder === "desc" ? "asc" : "desc";
                                     else
-                                        column.sortOrder = 'asc';
+                                        column.sortOrder = "asc";
                                     return true
                                 },
                                 isSortingChanged = false;
@@ -5276,7 +5320,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                         isSortingChanged = true
                                     }
                                 }
-                                else if (sortOrder === 'none') {
+                                else if (sortOrder === "none") {
                                     if (column.sortOrder) {
                                         delete column.sortIndex;
                                         delete column.sortOrder;
@@ -5288,11 +5332,11 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                             }
                             if (isSortingChanged) {
                                 updateColumnSortIndexes(that);
-                                updateColumnChanges(that, 'sorting');
+                                updateColumnChanges(that, "sorting");
                                 fireColumnsChanged(that)
                             }
                         },
-                        getSortDataSourceParameters: function() {
+                        getSortDataSourceParameters: function(useLocalSelector) {
                             var that = this,
                                 sortColumns = [],
                                 sort = [];
@@ -5304,8 +5348,8 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                 var sortOrder = this && this.sortOrder;
                                 if (isSortOrderValid(sortOrder))
                                     sort.push({
-                                        selector: this.calculateSortValue || this.selector || this.dataField || this.calculateCellValue,
-                                        desc: this.sortOrder === 'desc'
+                                        selector: this.calculateSortValue || useLocalSelector && this.selector || this.dataField || this.calculateCellValue,
+                                        desc: this.sortOrder === "desc"
                                     })
                             });
                             return sort.length > 0 ? sort : null
@@ -5313,11 +5357,11 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         getGroupDataSourceParameters: function(useLocalSelector) {
                             var group = [];
                             $.each(this.getGroupColumns(), function() {
-                                var selector = this.calculateGroupValue || this.selector || useLocalSelector && this.groupSelector || this.dataField || this.calculateCellValue;
+                                var selector = this.calculateGroupValue || useLocalSelector && this.selector || this.dataField || this.calculateCellValue;
                                 if (selector)
                                     group.push({
                                         selector: selector,
-                                        desc: this.sortOrder === 'desc',
+                                        desc: this.sortOrder === "desc",
                                         isExpanded: !!this.autoExpandGroup
                                     })
                             });
@@ -5338,7 +5382,6 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         },
                         updateColumnDataTypes: function(dataSource) {
                             var firstItems = getFirstItems(dataSource),
-                                isLocalData = isLocalDataSource(dataSource),
                                 rtlEnabled = this.option("rtlEnabled");
                             $.each(this._columns, function(index, column) {
                                 var i,
@@ -5374,10 +5417,9 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                                 lookup.serializationFormat = lookup.serializationFormat || getSerializationFormat(lookup.dataType, lookup.calculateCellValue(value, true))
                                         }
                                 }
-                                if (isLocalData && column.userDataType || !column.dataField)
-                                    column.selector = column.selector || $.proxy(column, 'calculateCellValue');
-                                else if (column.userDataType)
-                                    column.groupSelector = column.groupSelector || $.proxy(column, 'calculateCellValue');
+                                column.selector = column.selector || function(data) {
+                                    return column.calculateCellValue(data)
+                                };
                                 updateSerializers(column, column.dataType);
                                 if (lookup)
                                     updateSerializers(lookup, lookup.dataType);
@@ -5388,15 +5430,15 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                     column.customizeText = column.customizeText || getCustomizeTextByDataType(dataType);
                                     if (!isDefined(column.filterOperations))
                                         column.filterOperations = !lookup && DATATYPE_OPERATIONS[dataType] || [];
-                                    column.defaultFilterOperation = column.filterOperations && column.filterOperations[0] || '=';
+                                    column.defaultFilterOperation = column.filterOperations && column.filterOperations[0] || "=";
                                     column.defaultSelectedFilterOperation = column.selectedFilterOperation;
-                                    column.showEditorAlways = isDefined(column.showEditorAlways) ? column.showEditorAlways : dataType === 'boolean' && !column.cellTemplate
+                                    column.showEditorAlways = isDefined(column.showEditorAlways) ? column.showEditorAlways : dataType === "boolean" && !column.cellTemplate
                                 }
                             })
                         },
                         _customizeColumns: function(columns) {
                             var that = this,
-                                customizeColumns = that.option('customizeColumns');
+                                customizeColumns = that.option("customizeColumns");
                             if (customizeColumns) {
                                 customizeColumns(columns);
                                 assignColumns(that, createColumnsFromOptions(that, columns))
@@ -5419,10 +5461,10 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                             that._dataSourceApplied = true
                                         }
                                         if (!equalSortParameters(sortParameters, that.getSortDataSourceParameters()))
-                                            updateColumnChanges(that, 'sorting');
+                                            updateColumnChanges(that, "sorting");
                                         if (!equalSortParameters(groupParameters, that.getGroupDataSourceParameters()))
-                                            updateColumnChanges(that, 'grouping');
-                                        updateColumnChanges(that, 'columns');
+                                            updateColumnChanges(that, "grouping");
+                                        updateColumnChanges(that, "columns");
                                         fireColumnsChanged(that)
                                     })
                             }
@@ -5445,7 +5487,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                                 selector = sortParameters[i].selector;
                                                 isExpanded = sortParameters[i].isExpanded;
                                                 if (selector === column.dataField || selector === column.name || selector === column.selector || selector === column.calculateCellValue || selector === column.calculateGroupValue) {
-                                                    column.sortOrder = column.sortOrder || (sortParameters[i].desc ? 'desc' : 'asc');
+                                                    column.sortOrder = column.sortOrder || (sortParameters[i].desc ? "desc" : "asc");
                                                     if (isExpanded !== undefined)
                                                         column.autoExpandGroup = isExpanded;
                                                     column[indexParameterName] = i;
@@ -5470,17 +5512,17 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                 }
                                 if ((fromDataSource || !columnsGroupParameters && !that._hasUserState) && !equalSortParameters(groupParameters, columnsGroupParameters)) {
                                     that.__groupingUpdated = true;
-                                    updateSortGroupParameterIndexes(that._columns, groupParameters, 'groupIndex');
+                                    updateSortGroupParameterIndexes(that._columns, groupParameters, "groupIndex");
                                     if (fromDataSource) {
-                                        updateColumnChanges(that, 'grouping');
+                                        updateColumnChanges(that, "grouping");
                                         isColumnsChanged = true
                                     }
                                 }
                                 if ((fromDataSource || !columnsSortParameters && !that._hasUserState) && !equalSortParameters(sortParameters, columnsSortParameters)) {
                                     that.__sortingUpdated = true;
-                                    updateSortGroupParameterIndexes(that._columns, sortParameters, 'sortIndex');
+                                    updateSortGroupParameterIndexes(that._columns, sortParameters, "sortIndex");
                                     if (fromDataSource) {
-                                        updateColumnChanges(that, 'sorting');
+                                        updateColumnChanges(that, "sorting");
                                         isColumnsChanged = true
                                     }
                                 }
@@ -5488,24 +5530,19 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                     fireColumnsChanged(that)
                             }
                         },
-                        updateFilter: function(dataSource, filter) {
-                            var that = this,
-                                isLocalData = isLocalDataSource(dataSource);
-                            var updateFilterCore = function(filter) {
-                                    if (!utils.isArray(filter))
-                                        return;
-                                    var column,
-                                        i;
-                                    if (utils.isString(filter[0])) {
-                                        column = that.columnOption(filter[0]);
-                                        if (column && column.calculateCellValue)
-                                            filter[0] = $.proxy(column, 'calculateCellValue')
-                                    }
-                                    for (i = 0; i < filter.length; i++)
-                                        updateFilterCore(filter[i])
-                                };
-                            if (isLocalData)
-                                updateFilterCore(filter)
+                        updateFilter: function(filter) {
+                            var that = this;
+                            if (!utils.isArray(filter))
+                                return;
+                            var column,
+                                i;
+                            if (utils.isString(filter[0])) {
+                                column = that.columnOption(filter[0]);
+                                if (column && column.calculateCellValue)
+                                    filter[0] = $.proxy(column, "calculateCellValue")
+                            }
+                            for (i = 0; i < filter.length; i++)
+                                that.updateFilter(filter[i])
                         },
                         columnCount: function() {
                             return this._columns.length
@@ -5636,7 +5673,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                         var column = this,
                                             result,
                                             parsedValue;
-                                        if (column.dataType === 'number') {
+                                        if (column.dataType === "number") {
                                             if (utils.isString(text)) {
                                                 parsedValue = Globalize.parseFloat(text);
                                                 if (utils.isNumber(parsedValue))
@@ -5645,13 +5682,13 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                             else if (utils.isDefined(text))
                                                 result = Number(text)
                                         }
-                                        else if (column.dataType === 'boolean') {
+                                        else if (column.dataType === "boolean") {
                                             if (text === column.trueText)
                                                 result = true;
                                             else if (text === column.falseText)
                                                 result = false
                                         }
-                                        else if (column.dataType === 'date') {
+                                        else if (column.dataType === "date") {
                                             parsedValue = Globalize.parseDate(text);
                                             if (parsedValue)
                                                 result = parsedValue
@@ -5675,7 +5712,8 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                             if (columnOptions.lookup)
                                 calculatedColumnOptions.lookup = {
                                     calculateCellValue: function(value, skipDeserialization) {
-                                        value = this.valueMap && this.valueMap[value];
+                                        if (this.valueExpr)
+                                            value = this.valueMap && this.valueMap[value];
                                         return this.deserializeValue && !skipDeserialization ? this.deserializeValue(value) : value
                                     },
                                     updateValueMap: function() {
@@ -5699,13 +5737,15 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                             dataSourceOptions;
                                         if (dataSource)
                                             if (utils.isObject(dataSource) || utils.isArray(dataSource)) {
-                                                dataSourceOptions = dataUtils.normalizeDataSourceOptions(dataSource);
-                                                dataSourceOptions.paginate = false;
-                                                dataSource = new DX.data.DataSource(dataSourceOptions);
-                                                return dataSource.load().done(function(data) {
-                                                        that.items = data;
-                                                        that.updateValueMap && that.updateValueMap()
-                                                    })
+                                                if (that.valueExpr) {
+                                                    dataSourceOptions = dataUtils.normalizeDataSourceOptions(dataSource);
+                                                    dataSourceOptions.paginate = false;
+                                                    dataSource = new DX.data.DataSource(dataSourceOptions);
+                                                    return dataSource.load().done(function(data) {
+                                                            that.items = data;
+                                                            that.updateValueMap && that.updateValueMap()
+                                                        })
+                                                }
                                             }
                                             else
                                                 DX.log("E1016");
@@ -5722,7 +5762,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     }
             }());
         ui.dxDataGrid.ColumnsController = ColumnsController;
-        dataGrid.registerModule('columns', {
+        dataGrid.registerModule("columns", {
             defaultOptions: function() {
                 return {
                         commonColumnSettings: {
@@ -5762,10 +5802,10 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
             DATAGRID_SELECTION_DISABLED_CLASS: DATAGRID_SELECTION_DISABLED_CLASS,
             DATAGRID_COMMAND_SELECT_CLASS: DATAGRID_COMMAND_SELECT_CLASS
         });
-        var SHOW_CHECKBOXES_MODE = 'selection.showCheckBoxesInMultipleMode';
-        var SELECTION_MODE = 'selection.mode';
+        var SHOW_CHECKBOXES_MODE = "selection.showCheckBoxesInMultipleMode";
+        var SELECTION_MODE = "selection.mode";
         var isSelectable = function(selectionMode) {
-                return selectionMode === 'single' || selectionMode === 'multiple'
+                return selectionMode === "single" || selectionMode === "multiple"
             };
         dataGrid.SelectionController = dataGrid.Controller.inherit(function() {
             var indexOfSelectedItemKey = function(that, key, isSelectAll) {
@@ -5781,7 +5821,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         return $.inArray(key, selectedItemKeys)
                 };
             var addSelectedItem = function(that, itemData) {
-                    var key = that.getController('data').keyOf(itemData);
+                    var key = that.getController("data").keyOf(itemData);
                     if (indexOfSelectedItemKey(that, key) === -1) {
                         that._selectedItemKeys.push(key);
                         that._addedItemKeys.push(key);
@@ -5823,7 +5863,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     var isSelectedItemsChanged = false,
                         itemIndexStep,
                         index,
-                        dataController = that.getController('data'),
+                        dataController = that.getController("data"),
                         isFocusedItemSelected = items[that._focusedItemIndex] && that.isRowSelected(dataController.keyOf(items[that._focusedItemIndex].data));
                     var addRemoveSelectedItem = function(that, data, isRemove) {
                             if (isRemove)
@@ -5864,18 +5904,18 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         if (key)
                             $.each(selectedItemKeys, function(index, keyValue) {
                                 if (criteria.length > 0)
-                                    criteria.push(isSelectAll ? 'and' : 'or');
+                                    criteria.push(isSelectAll ? "and" : "or");
                                 if ($.isArray(key)) {
                                     keyCriteria = [];
                                     for (i = 0; i < key.length; i++) {
                                         if (i > 0)
-                                            keyCriteria.push(isSelectAll ? 'or' : 'and');
-                                        keyCriteria.push([key[i], isSelectAll ? '<>' : '=', keyValue[key[i]]])
+                                            keyCriteria.push(isSelectAll ? "or" : "and");
+                                        keyCriteria.push([key[i], isSelectAll ? "<>" : "=", keyValue[key[i]]])
                                     }
                                     criteria.push(keyCriteria)
                                 }
                                 else
-                                    criteria.push([key, isSelectAll ? '<>' : '=', keyValue])
+                                    criteria.push([key, isSelectAll ? "<>" : "=", keyValue])
                             });
                         else
                             criteria = function(item) {
@@ -5890,7 +5930,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 };
             var updateSelectedItems = function(that) {
                     var changedItemIndexes = [],
-                        dataController = that.getController('data'),
+                        dataController = that.getController("data"),
                         addedItemKeys,
                         removedItemKeys;
                     if (dataController) {
@@ -5898,14 +5938,14 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                             if (isDataItem(row) && row.isSelected !== that.isRowSelected(row.key))
                                 changedItemIndexes.push(index)
                         });
-                        if (that.option(SHOW_CHECKBOXES_MODE) === 'onClick')
+                        if (that.option(SHOW_CHECKBOXES_MODE) === "onClick")
                             if (that._selectedItemKeys.length > 1)
                                 that.startSelectionWithCheckboxes();
                             else if (that._selectedItemKeys.length === 0 && changedItemIndexes.length)
                                 that.stopSelectionWithCheckboxes();
                         if (changedItemIndexes.length)
                             dataController.updateItems({
-                                changeType: 'updateSelection',
+                                changeType: "updateSelection",
                                 itemIndexes: changedItemIndexes
                             });
                         addedItemKeys = that._addedItemKeys;
@@ -5930,11 +5970,11 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     var columnsController = that.getController("columns"),
                         isSelectColumnVisible = that.isSelectColumnVisible();
                     columnsController.addCommandColumn({
-                        command: 'select',
+                        command: "select",
                         visible: isSelectColumnVisible,
                         visibleIndex: -1,
-                        dataType: 'boolean',
-                        alignment: 'center',
+                        dataType: "boolean",
+                        alignment: "center",
                         cssClass: DATAGRID_COMMAND_SELECT_CLASS,
                         width: "auto"
                     });
@@ -5954,7 +5994,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         that.createAction("onSelectionChanged", {excludeValidators: ["disabled", "readOnly"]})
                     },
                     callbackNames: function() {
-                        return ['selectionChanged']
+                        return ["selectionChanged"]
                     },
                     optionChanged: function(args) {
                         var that = this;
@@ -5962,7 +6002,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         switch (args.name) {
                             case"selection":
                                 that.init();
-                                that.getController('columns').updateColumns();
+                                that.getController("columns").updateColumns();
                                 args.handled = true;
                                 break;
                             case"selectedRowKeys":
@@ -5973,7 +6013,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         }
                     },
                     publicMethods: function() {
-                        return ['selectRows', 'deselectRows', 'selectRowsByIndexes', 'getSelectedRowKeys', 'getSelectedRowsData', 'clearSelection', 'selectAll', 'startSelectionWithCheckboxes', 'stopSelectionWithCheckboxes', 'isRowSelected']
+                        return ["selectRows", "deselectRows", "selectRowsByIndexes", "getSelectedRowKeys", "getSelectedRowsData", "clearSelection", "selectAll", "startSelectionWithCheckboxes", "stopSelectionWithCheckboxes", "isRowSelected"]
                     },
                     isRowSelected: function(key) {
                         var index = indexOfSelectedItemKey(this, key);
@@ -5981,10 +6021,10 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     },
                     isSelectColumnVisible: function() {
                         var showCheckboxesMode = this.option(SHOW_CHECKBOXES_MODE);
-                        return this.option(SELECTION_MODE) === 'multiple' && (showCheckboxesMode === 'always' || showCheckboxesMode === 'onClick' || this._isSelectionWithCheckboxes)
+                        return this.option(SELECTION_MODE) === "multiple" && (showCheckboxesMode === "always" || showCheckboxesMode === "onClick" || this._isSelectionWithCheckboxes)
                     },
                     isSelectAll: function() {
-                        var dataController = this.getController('data'),
+                        var dataController = this.getController("data"),
                             items = dataController.items(),
                             combinedFilter = dataController.getCombinedFilter(),
                             selectedItems = this.getSelectedRowsData(),
@@ -6003,7 +6043,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                             return true
                     },
                     selectAll: function() {
-                        if (this.option(SHOW_CHECKBOXES_MODE) === 'onClick')
+                        if (this.option(SHOW_CHECKBOXES_MODE) === "onClick")
                             this.startSelectionWithCheckboxes();
                         return this.selectedItemKeys([], true, false, true)
                     },
@@ -6022,7 +6062,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                             criteria,
                             isFunctionCriteria,
                             deferred,
-                            dataController = that.getController('data'),
+                            dataController = that.getController("data"),
                             dataSource = dataController.dataSource(),
                             store = dataSource && dataSource.store(),
                             dataSourceFilter,
@@ -6097,13 +6137,13 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         return this.selectedItemKeys(keys, true, true)
                     },
                     selectRowsByIndexes: function(indexes) {
-                        var items = this.getController('data').items(),
+                        var items = this.getController("data").items(),
                             keys = [];
                         if (!utils.isArray(indexes))
                             indexes = Array.prototype.slice.call(arguments, 0);
                         $.each(indexes, function() {
                             var item = items[this];
-                            if (item && item.rowType === 'data')
+                            if (item && item.rowType === "data")
                                 keys.push(item.key)
                         });
                         return this.selectRows(keys)
@@ -6113,7 +6153,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     },
                     changeItemSelection: function(itemIndex, keys) {
                         var that = this,
-                            dataController = that.getController('data'),
+                            dataController = that.getController("data"),
                             items = dataController.items(),
                             item = items[itemIndex],
                             itemData = item && item.data,
@@ -6126,12 +6166,12 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                             keys = keys || {};
                             if (that.isSelectionWithCheckboxes())
                                 keys.control = true;
-                            if (keys.shift && selectionMode === 'multiple' && that._focusedItemIndex >= 0)
+                            if (keys.shift && selectionMode === "multiple" && that._focusedItemIndex >= 0)
                                 isSelectedItemsChanged = changeItemSelectionWhenShiftKeyPressed(that, itemIndex, items);
                             else if (keys.control) {
                                 resetItemSelectionWhenShiftKeyPressed(that);
                                 isSelected = that.isRowSelected(itemKey);
-                                if (selectionMode === 'single')
+                                if (selectionMode === "single")
                                     clearSelectedItems(that);
                                 if (isSelected)
                                     removeSelectedItem(that, itemKey);
@@ -6164,15 +6204,15 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     isSelectionWithCheckboxes: function() {
                         var selectionMode = this.option(SELECTION_MODE),
                             showCheckboxesMode = this.option(SHOW_CHECKBOXES_MODE);
-                        return selectionMode === 'multiple' && (showCheckboxesMode === 'always' || this._isSelectionWithCheckboxes)
+                        return selectionMode === "multiple" && (showCheckboxesMode === "always" || this._isSelectionWithCheckboxes)
                     },
                     startSelectionWithCheckboxes: function() {
                         var that = this,
                             isSelectColumnVisible = that.isSelectColumnVisible();
-                        if (that.option(SELECTION_MODE) === 'multiple' && !that.isSelectionWithCheckboxes()) {
+                        if (that.option(SELECTION_MODE) === "multiple" && !that.isSelectionWithCheckboxes()) {
                             that._isSelectionWithCheckboxes = true;
                             updateSelectColumn(that);
-                            if (isSelectColumnVisible === that.isSelectColumnVisible() && that.option(SHOW_CHECKBOXES_MODE) === 'onClick')
+                            if (isSelectColumnVisible === that.isSelectColumnVisible() && that.option(SHOW_CHECKBOXES_MODE) === "onClick")
                                 updateSelectedItems(that);
                             return true
                         }
@@ -6190,12 +6230,12 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 }
         }());
         $.extend(dataGrid.__internals, {DATAGRID_CHECKBOXES_HIDDEN_CLASS: DATAGRID_CHECKBOXES_HIDDEN_CLASS});
-        dataGrid.registerModule('selection', {
+        dataGrid.registerModule("selection", {
             defaultOptions: function() {
                 return {
                         selection: {
-                            mode: 'none',
-                            showCheckBoxesInMultipleMode: 'onClick',
+                            mode: "none",
+                            showCheckBoxesInMultipleMode: "onClick",
                             allowSelectAll: true
                         },
                         selectedRowKeys: []
@@ -6207,7 +6247,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         setDataSource: function(dataSource) {
                             this.callBase(dataSource);
                             if (dataSource)
-                                this.getController('selection').refresh()
+                                this.getController("selection").refresh()
                         },
                         setSelectionLoading: function(isLoading) {
                             this._isSelectionLoading = isLoading;
@@ -6221,12 +6261,12 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                             var that = this,
                                 dataSource = that._dataSource;
                             if (dataSource && value && dataSource.pageIndex() !== value)
-                                that.getController('selection').focusedItemIndex(-1);
+                                that.getController("selection").focusedItemIndex(-1);
                             return that.callBase(value)
                         },
                         _processDataItem: function() {
                             var that = this,
-                                selectionController = that.getController('selection'),
+                                selectionController = that.getController("selection"),
                                 hasSelectColumn = selectionController.isSelectColumnVisible(),
                                 dataItem = this.callBase.apply(this, arguments);
                             dataItem.isSelected = selectionController.isRowSelected(dataItem.key);
@@ -6235,50 +6275,50 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                             return dataItem
                         },
                         refresh: function() {
-                            return $.when(this.getController('selection').refresh(), this.callBase.apply(this, arguments))
+                            return $.when(this.getController("selection").refresh(), this.callBase.apply(this, arguments))
                         }
                     }},
                 views: {
                     columnHeadersView: {
                         _renderCore: function(options) {
                             var that = this;
-                            that.getController('selection').selectionChanged.remove(that._selectionChangedHandler);
+                            that.getController("selection").selectionChanged.remove(that._selectionChangedHandler);
                             that.callBase(options)
                         },
                         _getDefaultTemplate: function(column) {
                             var that = this,
                                 groupElement,
-                                selectionController = that.getController('selection'),
-                                dataController = that.getController('data');
+                                selectionController = that.getController("selection"),
+                                dataController = that.getController("data");
                             if (column.command === "select")
                                 return function($cell, options) {
                                         var column = options.column;
-                                        if (column.command === 'select') {
+                                        if (column.command === "select") {
                                             $cell.addClass(DATAGRID_EDITOR_CELL_CLASS);
-                                            groupElement = $('<div />').appendTo($cell).addClass(DATAGRID_SELECT_CHECKBOX_CLASS);
+                                            groupElement = $("<div />").appendTo($cell).addClass(DATAGRID_SELECT_CHECKBOX_CLASS);
                                             that.setAria("label", Globalize.localize("dxDataGrid-ariaSelectAll"), $cell);
-                                            that.getController('editorFactory').createEditor(groupElement, $.extend({}, column, {
+                                            that.getController("editorFactory").createEditor(groupElement, $.extend({}, column, {
                                                 parentType: "headerRow",
                                                 value: selectionController.isSelectAll(),
                                                 setValue: function(value, e) {
                                                     if (e.jQueryEvent && selectionController.isSelectAll() !== value) {
                                                         if (e.previousValue === undefined || e.previousValue) {
                                                             selectionController.deselectAll();
-                                                            e.component.option('value', false)
+                                                            e.component.option("value", false)
                                                         }
                                                         if (e.previousValue === false)
                                                             if (that.option("selection.allowSelectAll"))
                                                                 selectionController.selectAll();
                                                             else
-                                                                e.component.option('value', false);
+                                                                e.component.option("value", false);
                                                         e.jQueryEvent.preventDefault()
                                                     }
                                                 }
                                             }));
-                                            $cell.on('dxclick', that.createAction(function(e) {
+                                            $cell.on("dxclick", that.createAction(function(e) {
                                                 var event = e.jQueryEvent;
-                                                if (!$(event.target).closest('.' + DATAGRID_SELECT_CHECKBOX_CLASS).length)
-                                                    $(event.currentTarget).children().trigger('dxclick');
+                                                if (!$(event.target).closest("." + DATAGRID_SELECT_CHECKBOX_CLASS).length)
+                                                    $(event.currentTarget).children().trigger("dxclick");
                                                 event.preventDefault()
                                             }));
                                             that._selectionChangedHandler = function() {
@@ -6301,27 +6341,27 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         _getDefaultTemplate: function(column) {
                             var that = this,
                                 groupElement;
-                            if (column.command === 'select')
+                            if (column.command === "select")
                                 return function(container, options) {
-                                        if (options.rowType === 'data' && !options.row.inserted) {
+                                        if (options.rowType === "data" && !options.row.inserted) {
                                             container.addClass(DATAGRID_EDITOR_CELL_CLASS);
-                                            container.on('dxclick', that.createAction(function(e) {
-                                                var selectionController = that.getController('selection'),
+                                            container.on("dxclick", that.createAction(function(e) {
+                                                var selectionController = that.getController("selection"),
                                                     event = e.jQueryEvent,
-                                                    rowIndex = that.getRowIndex($(event.currentTarget).closest('.' + DATAGRID_ROW_CLASS));
+                                                    rowIndex = that.getRowIndex($(event.currentTarget).closest("." + DATAGRID_ROW_CLASS));
                                                 if (rowIndex >= 0) {
                                                     selectionController.startSelectionWithCheckboxes();
                                                     selectionController.changeItemSelection(rowIndex, {shift: event.shiftKey})
                                                 }
                                             }));
                                             that.setAria("label", Globalize.localize("dxDataGrid-ariaSelectRow"), container);
-                                            groupElement = $('<div />').addClass(DATAGRID_SELECT_CHECKBOX_CLASS).appendTo(container);
-                                            that.getController('editorFactory').createEditor(groupElement, $.extend({}, column, {
+                                            groupElement = $("<div />").addClass(DATAGRID_SELECT_CHECKBOX_CLASS).appendTo(container);
+                                            that.getController("editorFactory").createEditor(groupElement, $.extend({}, column, {
                                                 parentType: "dataRow",
                                                 value: options.value,
                                                 setValue: function(value, e) {
-                                                    if (e && e.jQueryEvent && e.jQueryEvent.type === 'keydown')
-                                                        container.trigger('dxclick', e)
+                                                    if (e && e.jQueryEvent && e.jQueryEvent.type === "keydown")
+                                                        container.trigger("dxclick", e)
                                                 }
                                             }))
                                         }
@@ -6332,7 +6372,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         _update: function(change) {
                             var that = this,
                                 tableElements = that.getTableElements();
-                            if (change.changeType === 'updateSelection') {
+                            if (change.changeType === "updateSelection") {
                                 if (tableElements.length > 0) {
                                     $.each(tableElements, function(_, tableElement) {
                                         $.each(change.itemIndexes || [], function(_, index) {
@@ -6341,7 +6381,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                             if (change.items[index]) {
                                                 $row = that._getRowElements($(tableElement)).eq(index);
                                                 isSelected = !!change.items[index].isSelected;
-                                                $row.toggleClass(DATAGRID_ROW_SELECTION_CLASS, isSelected).find('.' + DATAGRID_SELECT_CHECKBOX_CLASS).dxCheckBox('option', 'value', isSelected);
+                                                $row.toggleClass(DATAGRID_ROW_SELECTION_CLASS, isSelected).find("." + DATAGRID_SELECT_CHECKBOX_CLASS).dxCheckBox("option", "value", isSelected);
                                                 that.setAria("selected", isSelected, $row)
                                             }
                                         })
@@ -6358,20 +6398,20 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                 $table = that.callBase.apply(that, arguments);
                             if (selectionMode !== "none")
                                 $table.on(events.addNamespace("dxhold", "dxDataGridRowsView"), "." + DATAGRID_DATA_ROW_CLASS, that.createAction(function(e) {
-                                    var selectionController = that.getController('selection'),
+                                    var selectionController = that.getController("selection"),
                                         event = e.jQueryEvent,
                                         rowIndex = $(event.target).closest("." + DATAGRID_DATA_ROW_CLASS).index();
-                                    if (that.option(SHOW_CHECKBOXES_MODE) === 'onLongTap')
+                                    if (that.option(SHOW_CHECKBOXES_MODE) === "onLongTap")
                                         if (selectionController.isSelectionWithCheckboxes())
                                             selectionController.stopSelectionWithCheckboxes();
                                         else
                                             selectionController.startSelectionWithCheckboxes();
                                     else {
-                                        if (that.option(SHOW_CHECKBOXES_MODE) === 'onClick')
+                                        if (that.option(SHOW_CHECKBOXES_MODE) === "onClick")
                                             selectionController.startSelectionWithCheckboxes();
                                         selectionController.changeItemSelection(rowIndex, {control: true})
                                     }
-                                })).on('mousedown selectstart', that.createAction(function(e) {
+                                })).on("mousedown selectstart", that.createAction(function(e) {
                                     var event = e.jQueryEvent;
                                     if (event.shiftKey)
                                         event.preventDefault()
@@ -6395,7 +6435,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                 isSelectionDisabled = $(jQueryEvent.target).closest("." + DATAGRID_SELECTION_DISABLED_CLASS).length;
                             if (!isCommandSelect) {
                                 if (!isSelectionDisabled)
-                                    if (that.getController('selection').changeItemSelection(e.rowIndex, {
+                                    if (that.getController("selection").changeItemSelection(e.rowIndex, {
                                         control: jQueryEvent.ctrlKey,
                                         shift: jQueryEvent.shiftKey
                                     })) {
@@ -6411,7 +6451,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         },
                         _updateCheckboxesClass: function() {
                             var tableElements = this.getTableElements(),
-                                selectionController = this.getController('selection'),
+                                selectionController = this.getController("selection"),
                                 isCheckBoxesHidden = selectionController.isSelectColumnVisible() && !selectionController.isSelectionWithCheckboxes();
                             $.each(tableElements, function(_, tableElement) {
                                 $(tableElement).toggleClass(DATAGRID_CHECKBOXES_HIDDEN_CLASS, isCheckBoxesHidden)
@@ -6429,11 +6469,11 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
             addNamespace = DX.ui.events.addNamespace;
         var DATAGRID_CHECKBOX_SIZE_CLASS = "dx-datagrid-checkbox-size",
             DATAGRID_CELL_FOCUS_DISABLED_CLASS = "dx-cell-focus-disabled",
-            DATAGRID_MODULE_NAMESPACE = 'dxDataGridEditorFactory',
-            DATAGRID_UPDATE_FOCUS_EVENTS = addNamespace('focusin dxpointerdown dxclick', DATAGRID_MODULE_NAMESPACE),
-            DATAGRID_FOCUS_OVERLAY_CLASS = 'dx-datagrid-focus-overlay',
-            DATAGRID_FOCUSED_ELEMENT_CLASS = 'dx-focused',
-            DATAGRID_CONTENT_CLASS = 'dx-datagrid-content',
+            DATAGRID_MODULE_NAMESPACE = "dxDataGridEditorFactory",
+            DATAGRID_UPDATE_FOCUS_EVENTS = addNamespace("focusin dxpointerdown dxclick", DATAGRID_MODULE_NAMESPACE),
+            DATAGRID_FOCUS_OVERLAY_CLASS = "dx-datagrid-focus-overlay",
+            DATAGRID_FOCUSED_ELEMENT_CLASS = "dx-focused",
+            DATAGRID_CONTENT_CLASS = "dx-datagrid-content",
             DATAGRID_POINTER_EVENTS_TARGET_CLASS = "dx-pointer-events-target",
             DATAGRID_POINTER_EVENTS_NONE_CLASS = "dx-pointer-events-none",
             DX_HIDDEN = "dx-hidden",
@@ -6456,14 +6496,14 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                         options && options.setValue(e.value)
                                     };
                                 window.clearTimeout(e.component._valueChangeTimeoutID);
-                                if (e.jQueryEvent && e.jQueryEvent.type === 'keyup')
+                                if (e.jQueryEvent && e.jQueryEvent.type === "keyup")
                                     e.component._valueChangeTimeoutID = window.setTimeout(function() {
                                         updateValue(e)
                                     }, utils.isDefined(options.updateValueTimeout) ? options.updateValueTimeout : 0);
                                 else
                                     updateValue(e)
                             },
-                            valueChangeEvent: 'change' + (options.parentType === 'filterRow' ? ' keyup' : '')
+                            valueChangeEvent: "change" + (options.parentType === "filterRow" ? " keyup" : "")
                         }, options)
                 };
             var prepareDateBox = function(options) {
@@ -6471,7 +6511,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     options.editorOptions = getResultConfig({
                         value: options.value,
                         pickerType: "calendar",
-                        customOverlayCssClass: 'dx-datagrid',
+                        customOverlayCssClass: "dx-datagrid",
                         onValueChanged: function(args) {
                             options.setValue(args.value)
                         },
@@ -6482,13 +6522,13 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 };
             var prepareTextBox = function(options) {
                     var config = getTextEditorConfig(options),
-                        isSearching = options.parentType === 'searchPanel',
+                        isSearching = options.parentType === "searchPanel",
                         toString = function(value) {
-                            return DX.utils.isDefined(value) ? value.toString() : ''
+                            return DX.utils.isDefined(value) ? value.toString() : ""
                         };
                     config.value = toString(options.value);
-                    config.valueChangeEvent += isSearching ? ' keyup search' : '';
-                    config.mode = isSearching ? 'search' : 'text';
+                    config.valueChangeEvent += isSearching ? " keyup search" : "";
+                    config.mode = isSearching ? "search" : "text";
                     options.editorName = "dxTextBox";
                     options.editorOptions = config
                 };
@@ -6499,13 +6539,13 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     options.editorOptions = config
                 };
             var prepareBooleanEditor = function(options) {
-                    if (options.parentType === 'filterRow')
+                    if (options.parentType === "filterRow")
                         prepareSelectBox($.extend(options, {lookup: {
                                 displayExpr: function(data) {
                                     if (data === true)
-                                        return options.trueText || 'true';
+                                        return options.trueText || "true";
                                     else if (data === false)
-                                        return options.falseText || 'false'
+                                        return options.falseText || "false"
                                 },
                                 dataSource: [true, false],
                                 rtlEnabled: options.rtlEnabled,
@@ -6575,7 +6615,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 };
             return {
                     _getFocusedElement: function($dataGridElement) {
-                        return $dataGridElement.find('[tabindex]:focus, input:focus')
+                        return $dataGridElement.find("[tabindex]:focus, input:focus")
                     },
                     _updateFocusCore: function() {
                         var $focus = this._$focusedElement,
@@ -6584,7 +6624,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                             $focus = this._getFocusedElement($dataGridElement);
                             if ($focus.length) {
                                 if (!$focus.hasClass(DATAGRID_CELL_FOCUS_DISABLED_CLASS))
-                                    $focus = $focus.closest('.dx-row > td, .' + DATAGRID_CELL_FOCUS_DISABLED_CLASS);
+                                    $focus = $focus.closest(".dx-row > td, ." + DATAGRID_CELL_FOCUS_DISABLED_CLASS);
                                 if ($focus.length && !$focus.hasClass(DATAGRID_CELL_FOCUS_DISABLED_CLASS)) {
                                     this.focus($focus);
                                     return
@@ -6621,13 +6661,13 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                             return that._$focusedElement;
                         else if ($element)
                             setTimeout(function() {
-                                var $focusOverlay = that._$focusOverlay = that._$focusOverlay || $('<div>').addClass(DATAGRID_FOCUS_OVERLAY_CLASS + " " + DATAGRID_POINTER_EVENTS_TARGET_CLASS),
+                                var $focusOverlay = that._$focusOverlay = that._$focusOverlay || $("<div>").addClass(DATAGRID_FOCUS_OVERLAY_CLASS + " " + DATAGRID_POINTER_EVENTS_TARGET_CLASS),
                                     focusOverlayPosition;
                                 if (hideBorder)
                                     that._$focusOverlay && that._$focusOverlay.addClass(DX_HIDDEN);
                                 else {
                                     var align = DevExpress.browser.msie ? "left bottom" : DevExpress.browser.mozilla ? "right bottom" : "left top",
-                                        $content = $element.closest('.' + DATAGRID_CONTENT_CLASS);
+                                        $content = $element.closest("." + DATAGRID_CONTENT_CLASS);
                                     $focusOverlay.removeClass(DX_HIDDEN).appendTo($content).outerWidth($element.outerWidth() + 1).outerHeight($element.outerHeight() + 1);
                                     focusOverlayPosition = {
                                         my: align,
@@ -6637,7 +6677,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                     };
                                     that._updateFocusOverlaySize($focusOverlay, focusOverlayPosition);
                                     DX.position($focusOverlay, focusOverlayPosition);
-                                    $focusOverlay.css('visibility', 'visible')
+                                    $focusOverlay.css("visibility", "visible")
                                 }
                                 that._$focusedElement && that._$focusedElement.removeClass(DATAGRID_FOCUSED_ELEMENT_CLASS);
                                 $element.addClass(DATAGRID_FOCUSED_ELEMENT_CLASS);
@@ -6673,11 +6713,11 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                             $container = that.component && that.component.element(),
                             isIE10OrLower = DX.browser.msie && parseInt(DX.browser.version) < 11;
                         if ($container) {
-                            $container.on(addNamespace('keydown', DATAGRID_MODULE_NAMESPACE), function(e) {
+                            $container.on(addNamespace("keydown", DATAGRID_MODULE_NAMESPACE), function(e) {
                                 if (e.which === TAB_KEY)
                                     that._updateFocusHandler(e)
                             });
-                            isIE10OrLower && $container.on('dxclick dxpointerup dxpointerdown', "." + DATAGRID_POINTER_EVENTS_TARGET_CLASS, $.proxy(that._focusOverlayEventProxy, that))
+                            isIE10OrLower && $container.on("dxclick dxpointerup dxpointerdown", "." + DATAGRID_POINTER_EVENTS_TARGET_CLASS, $.proxy(that._focusOverlayEventProxy, that))
                         }
                     },
                     _focusOverlayEventProxy: function(e) {
@@ -6690,12 +6730,13 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                             return;
                         $currentTarget.addClass(DX_HIDDEN);
                         element = $target.get(0).ownerDocument.elementFromPoint(e.clientX, e.clientY);
-                        $(element).trigger(jQuery.Event(e.type, {
-                            clientX: e.clientX,
-                            clientY: e.clientY
-                        }));
+                        DX.ui.events.fireEvent({
+                            originalEvent: e,
+                            target: element
+                        });
+                        e.stopPropagation();
                         $currentTarget.removeClass(DX_HIDDEN);
-                        $focusedElement && $focusedElement.find('input').focus()
+                        $focusedElement && $focusedElement.find("input").focus()
                     },
                     dispose: function() {
                         clearTimeout(this._updateFocusTimeoutID);
@@ -6706,7 +6747,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         var editorPreparing = this.option("editorPreparing"),
                             editorPrepared = this.option("editorPrepared");
                         this.component._resumeDeprecatedWarnings();
-                        options.rtlEnabled = this.option('rtlEnabled');
+                        options.rtlEnabled = this.option("rtlEnabled");
                         options.disabled = options.disabled || this.option("disabled");
                         options.cancel = false;
                         options.editorElement = $container;
@@ -6714,13 +6755,13 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                             prepareSelectBox(options);
                         else
                             switch (options.dataType) {
-                                case'date':
+                                case"date":
                                     prepareDateBox(options);
                                     break;
-                                case'boolean':
+                                case"boolean":
                                     prepareBooleanEditor(options);
                                     break;
-                                case'number':
+                                case"number":
                                     prepareNumberBox(options);
                                     break;
                                 default:
@@ -6738,11 +6779,16 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 }
         }());
         $.extend(dataGrid.__internals, {DATAGRID_FOCUSED_ELEMENT_CLASS: DATAGRID_FOCUSED_ELEMENT_CLASS});
-        dataGrid.registerModule('editorFactory', {
+        dataGrid.registerModule("editorFactory", {
             defaultOptions: function() {
                 return {}
             },
-            controllers: {editorFactory: dataGrid.EditorFactoryController}
+            controllers: {editorFactory: dataGrid.EditorFactoryController},
+            extenders: {controllers: {columnsResizer: {_startResizing: function(args) {
+                            this.callBase(args);
+                            if (this.isResizing())
+                                this.getController("editorFactory").loseFocus()
+                        }}}}
         })
     })(jQuery, DevExpress);
     /*! Module widgets-web, file ui.dataGrid.columnsView.js */
@@ -6775,7 +6821,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 width,
                 clientRect;
             if ($tableElement) {
-                cells = $tableElement.children('tbody').children('tr').filter(':not(.' + DATAGRID_GROUP_ROW_CLASS + ')').first().find("> td");
+                cells = $tableElement.children("tbody").children("tr").filter(":not(." + DATAGRID_GROUP_ROW_CLASS + ")").first().find("> td");
                 $.each(cells, function(index, item) {
                     width = $(item).outerWidth(true);
                     if (item.getBoundingClientRect) {
@@ -6790,32 +6836,37 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
         };
         dataGrid.ColumnsView = dataGrid.View.inherit({
             _getColumnAlignment: function(alignment) {
-                var rtlEnabled = this.option('rtlEnabled');
-                return alignment !== 'center' ? alignment : rtlEnabled ? 'right' : 'left'
+                var rtlEnabled = this.option("rtlEnabled");
+                return alignment !== "center" ? alignment : utils.getDefaultAlignment(rtlEnabled)
             },
             _applyColumnState: function(options) {
                 var that = this,
-                    $span,
-                    columnAlignment,
-                    indicatorAlignment,
-                    column = options.column,
-                    $rootElement = options.rootElement,
-                    $indicatorsContainer = $rootElement.find("." + DATAGRID_COLUMN_INDICATORS_CLASS),
-                    nameClass = indicatorNamesClass[options.name],
-                    getIndicatorAlignment = function(columnAlignment) {
-                        return columnAlignment === 'right' ? 'left' : 'right'
-                    };
-                columnAlignment = that._getColumnAlignment(column.alignment);
-                indicatorAlignment = getIndicatorAlignment(columnAlignment);
-                $span = $('<span />').addClass(nameClass);
+                    columnAlignment = that._getColumnAlignment(options.column.alignment),
+                    parameters = $.extend(true, {columnAlignment: columnAlignment}, options),
+                    $indicatorsContainer = that._createIndicatorContainer(parameters),
+                    $span = $("<span />").addClass(indicatorNamesClass[options.name]);
+                parameters.container = $indicatorsContainer;
+                parameters.indicator = $span;
+                that._renderIndicator(parameters);
+                $indicatorsContainer[!options.showColumnLines ? "appendTo" : "prependTo"](options.rootElement).addClass(DATAGRID_INDICATOR_ALIGNMENT_CLASS + columnAlignment);
+                return $span
+            },
+            _createIndicatorContainer: function(options) {
+                var that = this,
+                    $indicatorsContainer = options.rootElement.find("." + DATAGRID_COLUMN_INDICATORS_CLASS),
+                    indicatorAlignment = that._getColumnAlignment(options.column.alignment) === "right" ? "left" : "right";
                 if (!$indicatorsContainer.length)
                     $indicatorsContainer = $("<div/>").addClass(DATAGRID_COLUMN_INDICATORS_CLASS);
-                $indicatorsContainer.append($span).css('float', options.showColumnLines ? indicatorAlignment : column.alignment !== 'center' ? columnAlignment : null);
-                if (!options.showColumnLines)
-                    $indicatorsContainer.addClass(DATAGRID_INDICATOR_ALIGNMENT_CLASS + columnAlignment).appendTo($rootElement);
-                else
-                    $indicatorsContainer.prependTo($rootElement);
-                return $span
+                $indicatorsContainer.css("float", options.showColumnLines ? indicatorAlignment : null);
+                return $indicatorsContainer
+            },
+            _getIndicatorContainer: function($cell) {
+                return $cell && $cell.find("." + DATAGRID_COLUMN_INDICATORS_CLASS)
+            },
+            _renderIndicator: function(options) {
+                var $container = options.container,
+                    $indicator = options.indicator;
+                $container && $indicator && $container.append($indicator)
             },
             _updateIndicatorHeights: function(indicatorName) {
                 var that = this,
@@ -6829,12 +6880,13 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     }
             },
             _updateIndicatorHeight: function($cell, indicatorName) {
-                var $textContent = $cell.find('.' + DATAGRID_CELL_CONTENT_CLASS),
-                    $indicator = $cell.find('.' + indicatorNamesClass[indicatorName]);
+                var $textContent = $cell.find("." + DATAGRID_CELL_CONTENT_CLASS),
+                    $indicator = $cell.find("." + indicatorNamesClass[indicatorName]);
                 if ($indicator.length) {
                     $indicator.height("auto");
                     $indicator.height($textContent.height() || $cell.height())
                 }
+                this._setColumnTextWidth($cell)
             },
             _updateIndicators: function(indicatorName) {
                 var that = this,
@@ -6851,22 +6903,28 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                             name: indicatorName,
                             rootElement: $cell,
                             column: column,
-                            showColumnLines: this.option('showColumnLines')
+                            showColumnLines: this.option("showColumnLines")
                         })
+            },
+            _setColumnTextWidth: function($cell) {
+                var $indicatorContainer = this._getIndicatorContainer($cell);
+                $cell.find("." + DATAGRID_CELL_CONTENT_CLASS).css("max-width", $cell.width() - $indicatorContainer.outerWidth())
             },
             _updateCell: function($cell, parameters) {
                 if (parameters.rowType)
                     this._cellPrepared($cell, parameters)
             },
             _createCell: function(column) {
-                return $("<td/>").css('text-align', column.alignment || 'left').toggleClass(column.cssClass, !utils.isDefined(column.groupIndex)).attr('role', 'gridcell').toggleClass(DATAGRID_GROUP_SPACE_CLASS, column.command === "expand")
+                var defaultAlignment = utils.getDefaultAlignment(this.option("rtlEnabled")),
+                    alignment = column.alignment || defaultAlignment;
+                return $("<td/>").css("text-align", alignment).toggleClass(column.cssClass, !utils.isDefined(column.groupIndex)).attr("role", "gridcell").toggleClass(DATAGRID_GROUP_SPACE_CLASS, column.command === "expand")
             },
             _createRow: function(row) {
-                return $("<tr />").addClass(DATAGRID_ROW_CLASS).attr('role', 'row')
+                return $("<tr />").addClass(DATAGRID_ROW_CLASS).attr("role", "row")
             },
             _createTable: function(columns) {
                 var that = this,
-                    $table = $('<table />').addClass(DATAGRID_TABLE_CLASS).addClass(DATAGRID_TABLE_FIXED_CLASS).attr('role', 'grid');
+                    $table = $("<table />").addClass(DATAGRID_TABLE_CLASS).addClass(DATAGRID_TABLE_FIXED_CLASS).attr("role", "grid");
                 if (columns) {
                     $table.append(that._createColGroup(columns));
                     if (DX.devices.real().ios)
@@ -6878,12 +6936,13 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                             $element = $(e.target),
                             $cell = $(e.currentTarget),
                             $row = $cell.parent(),
-                            isDataRow = $row.hasClass('dx-data-row'),
+                            isDataRow = $row.hasClass("dx-data-row"),
+                            isHeaderRow = $row.hasClass("dx-header-row"),
                             $cells = $row.children(),
                             visibleColumns = that._columnsController.getVisibleColumns(),
                             visibleColumnIndex = $cells.index($cell),
                             column = visibleColumns[visibleColumnIndex];
-                        if (!isDataRow || isDataRow && column && !column.cellTemplate) {
+                        if (!isDataRow && !isHeaderRow || isDataRow && column && !column.cellTemplate || isHeaderRow && column && !column.headerCellTemplate) {
                             if ($element.data(DATAGRID_CELL_HINT_VISIBLE)) {
                                 $element.removeAttr("title");
                                 $element.data(DATAGRID_CELL_HINT_VISIBLE, false)
@@ -6899,7 +6958,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
             _createColGroup: function(columns) {
                 var i,
                     j,
-                    colgroupElement = $('<colgroup />'),
+                    colgroupElement = $("<colgroup />"),
                     colspan,
                     columnsLength = columns.length;
                 for (i = 0; i < columnsLength; i++) {
@@ -6910,7 +6969,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 return colgroupElement
             },
             _createCol: function(column) {
-                return $('<col />').width(column.visibleWidth || column.width)
+                return $("<col />").width(column.visibleWidth || column.width)
             },
             renderDelayedTemplates: function() {
                 var templateParameters,
@@ -6925,7 +6984,14 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
             _processTemplate: function(template, options) {
                 var that = this,
                     renderingTemplate;
-                if ($.isFunction(template))
+                if (template && template.render)
+                    renderingTemplate = {
+                        allowRenderToDetachedContainer: template.allowRenderToDetachedContainer,
+                        render: function(options, container) {
+                            template.render(container, options)
+                        }
+                    };
+                else if ($.isFunction(template))
                     renderingTemplate = {render: function(options, container) {
                             template(container, options)
                         }};
@@ -6940,16 +7006,16 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 var that = this,
                     renderingTemplate = that._processTemplate(template, options);
                 if (renderingTemplate)
-                    if (options.denyRenderToDetachedContainer || renderingTemplate.denyRenderToDetachedContainer)
+                    if (renderingTemplate.allowRenderToDetachedContainer) {
+                        renderingTemplate.render(options, container);
+                        return true
+                    }
+                    else
                         that._delayedTemplates.push({
                             template: renderingTemplate,
                             container: container,
                             options: options
                         });
-                    else {
-                        renderingTemplate.render(options, container);
-                        return true
-                    }
                 return false
             },
             _appendRow: function($table, $row) {
@@ -7043,7 +7109,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     cellPrepared,
                     extendOptions = function(event) {
                         return {
-                                cellElement: $(event.target).closest('td'),
+                                cellElement: $(event.target).closest("td"),
                                 jQueryEvent: event,
                                 eventType: event.type
                             }
@@ -7079,15 +7145,16 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
             },
             _columnOptionChanged: function(e) {
                 var optionNames = e.optionNames;
-                if (dataGrid.checkChanges(optionNames, ['width', 'visibleWidth'])) {
+                if (dataGrid.checkChanges(optionNames, ["width", "visibleWidth"])) {
                     var visibleColumns = this._columnsController.getVisibleColumns();
                     var widths = $.map(visibleColumns, function(column) {
-                            return column.visibleWidth || column.width || 'auto'
+                            return column.visibleWidth || column.width || "auto"
                         });
                     this.setColumnWidths(widths);
                     return
                 }
-                this.render()
+                if (!this._requireReady)
+                    this.render()
             },
             getTableElements: function() {
                 return this._tableElement || $()
@@ -7101,20 +7168,20 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
             optionChanged: function(args) {
                 this.callBase(args);
                 switch (args.name) {
-                    case'cellHintEnabled':
-                    case'onCellPrepared':
-                    case'onRowPrepared':
-                    case'onCellHoverChanged':
-                        this.render();
-                        this.component.resize();
+                    case"cellHintEnabled":
+                    case"onCellPrepared":
+                    case"onRowPrepared":
+                    case"onCellHoverChanged":
+                        this._invalidate(true, true);
                         args.handled = true;
                         break
                 }
             },
             init: function() {
                 var that = this;
-                that._columnsController = that.getController('columns');
-                that._dataController = that.getController('data');
+                that._scrollLeft = 0;
+                that._columnsController = that.getController("columns");
+                that._dataController = that.getController("data");
                 that._delayedTemplates = [];
                 that._templatesCache = {};
                 that.createAction("onCellClick");
@@ -7131,19 +7198,28 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 that._dataController && that._dataController.changed.add($.proxy(that._handleDataChanged, that))
             },
             _handleDataChanged: function(e){},
-            scrollOffset: function(pos) {
+            callbackNames: function() {
+                return ["scrollChanged"]
+            },
+            scrollTo: function(pos) {
                 var that = this,
                     $element = that.element(),
-                    $scrollContainer = $element && $element.find('.' + DATAGRID_SCROLL_CONTAINER_CLASS);
-                if (pos === undefined)
-                    return $scrollContainer && $scrollContainer.scrollLeft();
-                else if (that._scrollLeft !== pos) {
-                    that._scrollLeft = pos;
-                    $scrollContainer && $scrollContainer.scrollLeft(pos)
+                    $scrollContainer = $element && $element.find("." + DATAGRID_SCROLL_CONTAINER_CLASS);
+                that._skipScrollChanged = false;
+                if (utils.isDefined(pos) && utils.isDefined(pos.left) && that._scrollLeft !== pos.left) {
+                    that._scrollLeft = pos.left;
+                    $scrollContainer && $scrollContainer.scrollLeft(pos.left);
+                    that._skipScrollChanged = true
                 }
             },
             wrapTableInScrollContainer: function($table) {
-                return $('<div/>').addClass(DATAGRID_CONTENT_CLASS).addClass(DATAGRID_SCROLL_CONTAINER_CLASS).append($table)
+                var that = this,
+                    $scrollContainer;
+                $scrollContainer = $("<div/>").on("scroll", function() {
+                    !that._skipScrollChanged && that.scrollChanged.fire({left: $scrollContainer.scrollLeft()}, that.name);
+                    that._skipScrollChanged = false
+                }).addClass(DATAGRID_CONTENT_CLASS).addClass(DATAGRID_SCROLL_CONTAINER_CLASS).append($table);
+                return $scrollContainer
             },
             getColumnWidths: function() {
                 var that = this,
@@ -7163,14 +7239,14 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 if (tableElements.length && widths)
                     for (i = 0; i < tableElements.length; i++) {
                         columnIndex = 0;
-                        $cols = $(tableElements[i]).find('col');
+                        $cols = $(tableElements[i]).find("col");
                         columns = this.getColumns($(tableElements[i]));
                         for (j = 0; j < columns.length; j++) {
                             if (columns[j].colspan) {
                                 columnIndex += columns[j].colspan;
                                 continue
                             }
-                            $cols.eq(columnIndex).width(widths[columnIndex] || 'auto');
+                            $cols.eq(columnIndex).width(widths[columnIndex] || "auto");
                             columnIndex++
                         }
                     }
@@ -7187,7 +7263,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     columnIndex,
                     columnVisibleIndex = columnIdentificator;
                 if (utils.isString(columnIdentificator)) {
-                    columnIndex = columnsController.columnOption(columnIdentificator, 'index');
+                    columnIndex = columnsController.columnOption(columnIdentificator, "index");
                     columnVisibleIndex = columnsController.getVisibleIndex(columnIndex)
                 }
                 if ($cells.length && columnVisibleIndex >= 0)
@@ -7215,7 +7291,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
             },
             _getRowElements: function(tableElement) {
                 tableElement = tableElement || this._getTableElement();
-                return tableElement && tableElement.children('tbody').children('.' + DATAGRID_ROW_CLASS) || $()
+                return tableElement && tableElement.children("tbody").children("." + DATAGRID_ROW_CLASS) || $()
             },
             getRowIndex: function($row) {
                 return this._getRowElements().index($row)
@@ -7241,9 +7317,9 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
         var ui = DX.ui,
             utils = DX.utils,
             dataGrid = ui.dxDataGrid;
-        var DATAGRID_COLUMN_CHOOSER_CLASS = 'dx-datagrid-column-chooser',
-            DATAGRID_COLUMN_CHOOSER_BUTTON_CLASS = 'dx-datagrid-column-chooser-button',
-            DATAGRID_COLUMN_CHOOSER_ICON_NAME = 'column-chooser',
+        var DATAGRID_COLUMN_CHOOSER_CLASS = "dx-datagrid-column-chooser",
+            DATAGRID_COLUMN_CHOOSER_BUTTON_CLASS = "dx-datagrid-column-chooser-button",
+            DATAGRID_COLUMN_CHOOSER_ICON_NAME = "column-chooser",
             DATAGRID_COLUMN_CHOOSER_ITEM_CLASS = "dx-column-chooser-item",
             DATAGRID_COLUMN_CHOOSER_MESSAGE_CLASS = "dx-column-chooser-message",
             DATAGRID_HEADERS_DRAG_ACTION_CLASS = "dx-datagrid-drag-action";
@@ -7255,7 +7331,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     $columnChooserButton;
                 if (columnChooserEnabled)
                     if (!$showColumnChooserButton.length) {
-                        $columnChooserButton = $('<div />').addClass(DATAGRID_COLUMN_CHOOSER_BUTTON_CLASS).appendTo($element);
+                        $columnChooserButton = $("<div />").addClass(DATAGRID_COLUMN_CHOOSER_BUTTON_CLASS).appendTo($element);
                         that._createComponent($columnChooserButton, "dxButton", {
                             icon: DATAGRID_COLUMN_CHOOSER_ICON_NAME,
                             onClick: function() {
@@ -7276,7 +7352,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         my: "right bottom",
                         at: "right bottom",
                         of: rowsView && rowsView.element(),
-                        collision: 'fit',
+                        collision: "fit",
                         offset: "-2 -2",
                         boundaryOffset: "2 2"
                     }
@@ -7290,7 +7366,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     scrollableInstance = this._createComponent($content, "dxScrollable", dataGrid.createScrollableOptions(this));
                 this._renderColumnChooserItems($content, chooserColumns);
                 if (!chooserColumns.length)
-                    $('<span />').addClass(DATAGRID_COLUMN_CHOOSER_MESSAGE_CLASS).text(columnChooserOptions ? columnChooserOptions.emptyPanelText : "").appendTo(scrollableInstance.content())
+                    $("<span />").addClass(DATAGRID_COLUMN_CHOOSER_MESSAGE_CLASS).text(columnChooserOptions ? columnChooserOptions.emptyPanelText : "").appendTo(scrollableInstance.content())
             },
             _initializePopupContainer: function() {
                 var that = this,
@@ -7312,7 +7388,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         position: that.getController("columnChooser").getPosition(),
                         width: columnChooserOptions.width,
                         height: columnChooserOptions.height,
-                        rtlEnabled: that.option('rtlEnabled'),
+                        rtlEnabled: that.option("rtlEnabled"),
                         container: columnChooserOptions.container
                     };
                 if (isGenericTheme)
@@ -7339,16 +7415,16 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     $item;
                 $scrollableContainer.empty();
                 $.each(chooserColumns, function(index, chooserColumn) {
-                    $item = $('<div />').addClass(chooserColumn.cssClass).addClass(DATAGRID_COLUMN_CHOOSER_ITEM_CLASS).toggleClass(DATAGRID_HEADERS_DRAG_ACTION_CLASS, chooserColumn.allowHiding).text(chooserColumn.caption).appendTo($scrollableContainer)
+                    $item = $("<div />").addClass(chooserColumn.cssClass).addClass(DATAGRID_COLUMN_CHOOSER_ITEM_CLASS).toggleClass(DATAGRID_HEADERS_DRAG_ACTION_CLASS, chooserColumn.allowHiding).text(chooserColumn.caption).appendTo($scrollableContainer)
                 });
                 dxScrollable.update()
             },
             getColumnElements: function() {
                 var $content = this._popupContainer && this._popupContainer.content();
-                return $content && $content.find('.' + DATAGRID_COLUMN_CHOOSER_ITEM_CLASS)
+                return $content && $content.find("." + DATAGRID_COLUMN_CHOOSER_ITEM_CLASS)
             },
             getName: function() {
-                return 'columnChooser'
+                return "columnChooser"
             },
             getColumns: function() {
                 return this._columnsController.getChooserColumns()
@@ -7360,7 +7436,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 var that = this,
                     container = that._popupContainer && that._popupContainer._container(),
                     offset;
-                if (container && container.is(':visible')) {
+                if (container && container.is(":visible")) {
                     offset = container.offset();
                     return {
                             left: offset.left,
@@ -7390,7 +7466,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 return popupContainer && popupContainer.option("visible")
             },
             publicMethods: function() {
-                return ['showColumnChooser', 'hideColumnChooser']
+                return ["showColumnChooser", "hideColumnChooser"]
             }
         });
         $.extend(dataGrid.__internals, {
@@ -7399,7 +7475,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
             DATAGRID_COLUMN_CHOOSER_BUTTON_CLASS: DATAGRID_COLUMN_CHOOSER_BUTTON_CLASS,
             DATAGRID_COLUMN_CHOOSER_MESSAGE_CLASS: DATAGRID_COLUMN_CHOOSER_MESSAGE_CLASS
         });
-        dataGrid.registerModule('columnChooser', {
+        dataGrid.registerModule("columnChooser", {
             defaultOptions: function() {
                 return {columnChooser: {
                             enabled: false,
@@ -7422,7 +7498,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         },
                         optionChanged: function(args) {
                             switch (args.name) {
-                                case'columnChooser':
+                                case"columnChooser":
                                     this._renderShowColumnChooserButton();
                                     args.handled = true;
                                     break;
@@ -7432,7 +7508,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         },
                         isVisible: function() {
                             var that = this,
-                                columnChooserEnabled = that.option('columnChooser.enabled');
+                                columnChooserEnabled = that.option("columnChooser.enabled");
                             return that.callBase() || columnChooserEnabled
                         }
                     }}}
@@ -7473,7 +7549,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
             DATAGRID_POINTER_EVENTS_NONE_CLASS = "dx-pointer-events-none",
             DATAGRID_POINTER_EVENTS_TARGET_CLASS = "dx-pointer-events-target";
         var getEditMode = function(that) {
-                var editMode = that.option('editing.editMode');
+                var editMode = that.option("editing.editMode");
                 if (editMode === DATAGRID_EDIT_MODE_BATCH || editMode === DATAGRID_EDIT_MODE_CELL)
                     return editMode;
                 return DATAGRID_EDIT_MODE_ROW
@@ -7481,12 +7557,12 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
         dataGrid.EditingController = dataGrid.ViewController.inherit(function() {
             var getDefaultEditorTemplate = function(that) {
                     return function(container, options) {
-                            var $editor = $('<div/>').appendTo(container);
-                            that.getController('editorFactory').createEditor($editor, $.extend({}, options.column, {
+                            var $editor = $("<div/>").appendTo(container);
+                            that.getController("editorFactory").createEditor($editor, $.extend({}, options.column, {
                                 value: options.value,
                                 setValue: options.setValue,
                                 row: options.row,
-                                parentType: 'dataRow',
+                                parentType: "dataRow",
                                 width: null,
                                 readOnly: options.setValue === undefined
                             }))
@@ -7526,20 +7602,20 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                     isDataRow,
                                     rowIndex;
                                 if (getEditMode(that) !== DATAGRID_EDIT_MODE_ROW && that.isEditing() && !that._editCellInProgress) {
-                                    isEditorPopup = $(event.target).closest('.dx-overlay-wrapper').length;
+                                    isEditorPopup = $(event.target).closest(".dx-overlay-wrapper").length;
                                     isDomElement = $(event.target).closest(document).length;
                                     isFocusOverlay = $(event.target).hasClass(DATAGRID_FOCUS_OVERLAY_CLASS);
-                                    isDataRow = $(event.target).closest('.' + DATAGRID_DATA_ROW_CLASS).length;
+                                    isDataRow = $(event.target).closest("." + DATAGRID_DATA_ROW_CLASS).length;
                                     visibleColumns = that._columnsController.getVisibleColumns();
-                                    $targetCell = $(event.target).closest('td');
+                                    $targetCell = $(event.target).closest("." + DATAGRID_ROW_CLASS + "> td");
                                     columnIndex = $targetCell[0] && $targetCell[0].cellIndex;
-                                    rowIndex = that.getView('rowsView').getRowIndex($targetCell.parent());
+                                    rowIndex = that.getView("rowsView").getRowIndex($targetCell.parent());
                                     allowEditing = visibleColumns[columnIndex] && visibleColumns[columnIndex].allowEditing;
                                     if ((!isDataRow || isDataRow && !allowEditing && !that.isEditCell(rowIndex, columnIndex)) && !isEditorPopup && !isFocusOverlay && isDomElement)
                                         that.closeEditCell()
                                 }
                             });
-                            $(document).on('dxclick', that._saveEditorHandler)
+                            $(document).on("dxclick", that._saveEditorHandler)
                         }
                         that._updateEditColumn();
                         that._updateEditButtons()
@@ -7570,7 +7646,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         return columnIndex
                     },
                     getFirstEditableCellInRow: function(rowIndex) {
-                        return this.getView('rowsView').getCellElement(rowIndex ? rowIndex : 0, this.getFirstEditableColumnIndex())
+                        return this.getView("rowsView").getCellElement(rowIndex ? rowIndex : 0, this.getFirstEditableColumnIndex())
                     },
                     getFocusedCellInRow: function(rowIndex) {
                         return this.getFirstEditableCellInRow(rowIndex)
@@ -7588,7 +7664,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     },
                     dispose: function() {
                         this.callBase();
-                        $(document).off('dxclick', this._saveEditorHandler)
+                        $(document).off("dxclick", this._saveEditorHandler)
                     },
                     optionChanged: function(args) {
                         if (args.name === "editing") {
@@ -7599,7 +7675,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                             this.callBase(args)
                     },
                     publicMethods: function() {
-                        return ['insertRow', 'editRow', 'editCell', 'closeEditCell', 'removeRow', 'saveEditData', 'undeleteRow', 'cancelEditData']
+                        return ["insertRow", "editRow", "editCell", "closeEditCell", "removeRow", "saveEditData", "undeleteRow", "cancelEditData"]
                     },
                     refresh: function() {
                         if (getEditMode(this) === DATAGRID_EDIT_MODE_ROW || getEditMode(this) === DATAGRID_EDIT_MODE_CELL)
@@ -7690,7 +7766,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     insertRow: function() {
                         var that = this,
                             dataController = that._dataController,
-                            rowsView = that.getView('rowsView'),
+                            rowsView = that.getView("rowsView"),
                             param = {data: {}},
                             insertKey = {
                                 pageIndex: dataController.pageIndex(),
@@ -7699,6 +7775,8 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                             oldEditRowIndex = that._editRowIndex,
                             editMode = getEditMode(that),
                             $firstCell;
+                        if (editMode === DATAGRID_EDIT_MODE_CELL && that.hasChanges())
+                            that.saveEditData();
                         that.refresh();
                         if (editMode !== DATAGRID_EDIT_MODE_BATCH) {
                             if (that._insertIndex > 1)
@@ -7713,7 +7791,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                             type: DATA_EDIT_DATA_INSERT_TYPE
                         });
                         dataController.updateItems({
-                            changeType: 'update',
+                            changeType: "update",
                             rowIndices: [oldEditRowIndex, insertKey.rowIndex]
                         });
                         $firstCell = that.getFirstEditableCellInRow(insertKey.rowIndex);
@@ -7756,7 +7834,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                             oldData: item.data
                         });
                         dataController.updateItems({
-                            changeType: 'update',
+                            changeType: "update",
                             rowIndices: [oldEditRowIndex, rowIndex]
                         });
                         $editingCell = that.getFocusedCellInRow(that._editRowIndex);
@@ -7780,7 +7858,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                             columns = that._columnsController.getVisibleColumns(),
                             showEditorAlways = params.column && params.column.showEditorAlways,
                             $editCell;
-                        if (params.column && item && item.rowType === 'data' && !item.removed && editMode !== DATAGRID_EDIT_MODE_ROW) {
+                        if (params.column && item && item.rowType === "data" && !item.removed && editMode !== DATAGRID_EDIT_MODE_ROW) {
                             if (that.isEditCell(rowIndex, columnIndex))
                                 return true;
                             if (editMode === DATAGRID_EDIT_MODE_CELL && !item.inserted && that.hasChanges()) {
@@ -7803,7 +7881,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                             if (!showEditorAlways || columns[oldEditColumnIndex] && !columns[oldEditColumnIndex].showEditorAlways) {
                                 that._editCellInProgress = true;
                                 dataController.updateItems({
-                                    changeType: 'update',
+                                    changeType: "update",
                                     rowIndices: [oldEditRowIndex, that._editRowIndex]
                                 })
                             }
@@ -7819,7 +7897,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         setTimeout(function() {
                             if (beforeFocusCallback)
                                 beforeFocusCallback();
-                            $cell.find('[tabindex], input').focus()
+                            $cell.find("[tabindex], input").focus()
                         })
                     },
                     removeRow: function(rowIndex) {
@@ -7852,7 +7930,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                     });
                                 if (isBatchMode)
                                     dataController.updateItems({
-                                        changeType: 'update',
+                                        changeType: "update",
                                         rowIndices: [oldEditRowIndex, rowIndex]
                                     });
                                 else
@@ -7885,7 +7963,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                 else
                                     editData.type = DATA_EDIT_DATA_UPDATE_TYPE;
                                 dataController.updateItems({
-                                    changeType: 'update',
+                                    changeType: "update",
                                     rowIndices: [oldEditRowIndex, rowIndex]
                                 })
                             }
@@ -8010,8 +8088,10 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                 that._editColumnIndex = -1;
                                 that._editRowIndex = -1
                             };
-                        if (that._beforeSaveEditData())
-                            return;
+                        if (that._beforeSaveEditData()) {
+                            that._afterSaveEditData();
+                            return
+                        }
                         that._saveEditDataCore(deferreds, processedKeys);
                         if (deferreds.length) {
                             $.when.apply($, deferreds).done(function() {
@@ -8032,7 +8112,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         else {
                             resetEditIndices(that);
                             dataController.updateItems(rowIndex >= 0 && {
-                                changeType: 'update',
+                                changeType: "update",
                                 rowIndices: [rowIndex]
                             })
                         }
@@ -8040,10 +8120,10 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     },
                     _updateEditColumn: function() {
                         var that = this,
-                            editing = that.option('editing'),
+                            editing = that.option("editing"),
                             isEditColumnVisible = editing && ((editing.editEnabled || editing.insertEnabled) && getEditMode(that) === DATAGRID_EDIT_MODE_ROW || editing.removeEnabled);
                         that._columnsController.addCommandColumn({
-                            command: 'edit',
+                            command: "edit",
                             visible: isEditColumnVisible,
                             cssClass: "dx-command-edit",
                             width: "auto"
@@ -8056,9 +8136,9 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                             cancelChangesButton = that._cancelChangesButton,
                             hasChanges = that.hasChanges();
                         if (saveChangesButton)
-                            saveChangesButton.option('disabled', !hasChanges);
+                            saveChangesButton.option("disabled", !hasChanges);
                         if (cancelChangesButton)
-                            cancelChangesButton.option('disabled', !hasChanges)
+                            cancelChangesButton.option("disabled", !hasChanges)
                     },
                     cancelEditData: function() {
                         var that = this,
@@ -8080,7 +8160,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                     that._editRowIndex = -1;
                                     that._editColumnIndex = -1;
                                     dataController.updateItems({
-                                        changeType: 'update',
+                                        changeType: "update",
                                         rowIndices: [oldEditRowIndex]
                                     })
                                 }
@@ -8142,17 +8222,17 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                             isRowMode = getEditMode(that) === DATAGRID_EDIT_MODE_ROW,
                             isRowEditing = that.isEditRow(rowIndex),
                             isCellEditing = that.isEditCell(rowIndex, options.columnIndex);
-                        if ((column.showEditorAlways || column.setCellValue && (isRowEditing && column.allowEditing || isCellEditing)) && options.rowType === 'data' && !utils.isDefined(column.command)) {
+                        if ((column.showEditorAlways || column.setCellValue && (isRowEditing && column.allowEditing || isCellEditing)) && options.rowType === "data" && !utils.isDefined(column.command)) {
                             if (((editEnabled || isRowEditing) && column.allowEditing || isCellEditing) && (isRowMode && isRowEditing || !isRowMode))
                                 options.setValue = function(value) {
                                     that.updateFieldValue(options, value)
                                 };
                             template = column.editCellTemplate || getDefaultEditorTemplate(that)
                         }
-                        else if (column.command === 'edit' && options.rowType === 'data')
+                        else if (column.command === "edit" && options.rowType === "data")
                             template = function(container, options) {
                                 var createLink = function(container, text, methodName, options) {
-                                        var $link = $('<a />').addClass(DATAGRID_LINK_CLASS).text(text).on(addNamespace('dxclick', DATAGRID_EDITING_NAMESPACE), that.createAction(function(params) {
+                                        var $link = $("<a />").addClass(DATAGRID_LINK_CLASS).text(text).on(addNamespace("dxclick", DATAGRID_EDITING_NAMESPACE), that.createAction(function(params) {
                                                 var e = params.jQueryEvent;
                                                 e.stopPropagation();
                                                 setTimeout(function() {
@@ -8161,29 +8241,29 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                             }));
                                         options.rtlEnabled ? container.prepend($link, "&nbsp;") : container.append($link, "&nbsp;")
                                     };
-                                container.css('text-align', 'center');
-                                options.rtlEnabled = that.option('rtlEnabled');
+                                container.css("text-align", "center");
+                                options.rtlEnabled = that.option("rtlEnabled");
                                 editingOptions = that.option("editing") || {};
                                 editingTexts = editingOptions.texts || {};
                                 if (options.row && options.row.rowIndex === that._editRowIndex && isRowMode) {
-                                    createLink(container, editingTexts.saveRowChanges, 'saveEditData', options);
-                                    createLink(container, editingTexts.cancelRowChanges, 'cancelEditData', options)
+                                    createLink(container, editingTexts.saveRowChanges, "saveEditData", options);
+                                    createLink(container, editingTexts.cancelRowChanges, "cancelEditData", options)
                                 }
                                 else {
                                     if (editingOptions.editEnabled && isRowMode)
-                                        createLink(container, editingTexts.editRow, 'editRow', options);
+                                        createLink(container, editingTexts.editRow, "editRow", options);
                                     if (editingOptions.removeEnabled)
                                         if (options.row.removed)
-                                            createLink(container, editingTexts.undeleteRow, 'undeleteRow', options);
+                                            createLink(container, editingTexts.undeleteRow, "undeleteRow", options);
                                         else
-                                            createLink(container, editingTexts.deleteRow, 'removeRow', options)
+                                            createLink(container, editingTexts.deleteRow, "removeRow", options)
                                 }
                             };
                         return template
                     },
                     renderEditButtons: function(rootElement) {
                         var that = this,
-                            insertButton = rootElement.find('.' + DATAGRID_EDIT_BUTTON_CLASS),
+                            insertButton = rootElement.find("." + DATAGRID_EDIT_BUTTON_CLASS),
                             editingOptions = that.option("editing") || {},
                             editingTexts = that.option("editing.texts") || {},
                             titleButtonTextByClassNames = {
@@ -8192,7 +8272,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                 addrow: editingTexts.addRow
                             };
                         var createEditButton = function(rootElement, className, methodName) {
-                                return $('<div />').addClass(DATAGRID_EDIT_BUTTON_CLASS).addClass("dx-datagrid-" + className + "-button").appendTo(rootElement).dxButton({
+                                return $("<div />").addClass(DATAGRID_EDIT_BUTTON_CLASS).addClass("dx-datagrid-" + className + "-button").appendTo(rootElement).dxButton({
                                         icon: "edit-button-" + className,
                                         onClick: function(options) {
                                             var e = options.jQueryEvent;
@@ -8200,17 +8280,17 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                             that[methodName]()
                                         },
                                         hint: titleButtonTextByClassNames && titleButtonTextByClassNames[className]
-                                    }).dxButton('instance')
+                                    }).dxButton("instance")
                             };
                         if (insertButton.length)
                             insertButton.remove();
                         if ((editingOptions.editEnabled || editingOptions.insertEnabled || editingOptions.removeEnabled) && getEditMode(that) === DATAGRID_EDIT_MODE_BATCH) {
-                            that._cancelChangesButton = createEditButton(rootElement, "cancel", 'cancelEditData');
-                            that._saveChangesButton = createEditButton(rootElement, "save", 'saveEditData');
+                            that._cancelChangesButton = createEditButton(rootElement, "cancel", "cancelEditData");
+                            that._saveChangesButton = createEditButton(rootElement, "save", "saveEditData");
                             that._updateEditButtons()
                         }
                         if (editingOptions.insertEnabled)
-                            createEditButton(rootElement, "addrow", 'insertRow')
+                            createEditButton(rootElement, "addrow", "insertRow")
                     },
                     createHighlightCell: function($cell) {
                         var $highlight = $cell.find("." + DATAGRID_CELL_HIGHLIGHT_OUTLINE);
@@ -8233,10 +8313,10 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     _beforeCancelEditData: function(){}
                 }
         }());
-        dataGrid.registerModule('editing', {
+        dataGrid.registerModule("editing", {
             defaultOptions: function() {
                 return {editing: {
-                            editMode: 'row',
+                            editMode: "row",
                             insertEnabled: false,
                             editEnabled: false,
                             removeEnabled: false,
@@ -8256,9 +8336,10 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
             },
             controllers: {editing: dataGrid.EditingController},
             extenders: {
-                controllers: {data: {
+                controllers: {
+                    data: {
                         init: function() {
-                            this._editingController = this.getController('editing');
+                            this._editingController = this.getController("editing");
                             this.callBase()
                         },
                         reload: function() {
@@ -8277,13 +8358,33 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         _processDataItem: function(dataItem, options) {
                             this._editingController.processDataItem(dataItem, options.visibleColumns, this._generateDataValues);
                             return this.callBase(dataItem, options)
+                        },
+                        _processItem: function(item, options) {
+                            item = this.callBase(item, options);
+                            if (item.inserted) {
+                                options.dataIndex--;
+                                delete item.dataIndex
+                            }
+                            return item
                         }
-                    }},
+                    },
+                    columnsResizer: {_startResizing: function(args) {
+                            var that = this,
+                                editingController = that.getController("editing"),
+                                isCellEditing = function() {
+                                    var editingOptions = that.option("editing");
+                                    return editingOptions && editingOptions.editMode !== DATAGRID_EDIT_MODE_ROW && editingController.isEditing()
+                                };
+                            that.callBase(args);
+                            if (that.isResizing() && isCellEditing())
+                                editingController.closeEditCell()
+                        }}
+                },
                 views: {
                     rowsView: {
                         _getColumnTemplate: function(options) {
                             var that = this,
-                                template = that.getController('editing').getColumnTemplate(options);
+                                template = that.getController("editing").getColumnTemplate(options);
                             return template || that.callBase(options)
                         },
                         _createTable: function() {
@@ -8306,7 +8407,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                 isRowInserted,
                                 isRowModified;
                             if (row) {
-                                editingController = this.getController('editing');
+                                editingController = this.getController("editing");
                                 isEditRow = editingController.isEditRow(row.rowIndex);
                                 isRowRemoved = !!row.removed;
                                 isRowInserted = !!row.inserted;
@@ -8324,7 +8425,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         },
                         _rowClick: function(e) {
                             var that = this,
-                                editingController = that.getController('editing'),
+                                editingController = that.getController("editing"),
                                 $targetCell = $(e.jQueryEvent.target).closest("." + DATAGRID_ROW_CLASS + "> td"),
                                 columnIndex = that.getCellIndex($targetCell),
                                 editEnabled = that.option("editing.editEnabled"),
@@ -8336,42 +8437,45 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                 that.callBase(e)
                         },
                         _cellPrepared: function($cell, parameters) {
-                            var modifiedValues = parameters.row && (parameters.row.inserted ? parameters.row.values : parameters.row.modifiedValues),
-                                columnIndex = parameters.columnIndex,
-                                alignment = parameters.column.alignment,
-                                editingController = this.getController('editing'),
-                                editMode = editingController.getEditMode();
+                            var columnIndex = parameters.columnIndex,
+                                editingController = this.getController("editing"),
+                                editMode = editingController.getEditMode(),
+                                isCommandCell = !!parameters.column.command,
+                                isEditableCell = parameters.setValue;
                             parameters.isEditing = editingController.isEditCell(parameters.rowIndex, parameters.columnIndex) || editingController.isEditRow(parameters.rowIndex) && parameters.column.allowEditing;
                             if (!utils.isDefined(parameters.column.command) && (parameters.isEditing || parameters.column.showEditorAlways)) {
-                                $cell.addClass(DATAGRID_EDITOR_CELL_CLASS).toggleClass(DATAGRID_READONLY_CLASS, !parameters.setValue);
+                                var alignment = parameters.column.alignment;
+                                $cell.addClass(DATAGRID_EDITOR_CELL_CLASS).toggleClass(DATAGRID_READONLY_CLASS, !isEditableCell).toggleClass(DATAGRID_CELL_FOCUS_DISABLED_CLASS, !isEditableCell);
                                 if (alignment)
-                                    $cell.find('input').first().css('text-align', alignment)
+                                    $cell.find("input").first().css("text-align", alignment)
                             }
-                            if ($cell.children('.' + CHECKBOX_CLASS).length === 1)
-                                $cell.addClass(DATAGRID_EDITOR_INLINE_BLOCK).toggleClass(DATAGRID_CELL_FOCUS_DISABLED_CLASS, !!parameters.column.command);
-                            if (editMode === DATAGRID_EDIT_MODE_BATCH || editMode === DATAGRID_EDIT_MODE_CELL && parameters.row.inserted)
-                                if (modifiedValues && modifiedValues[columnIndex] !== undefined && parameters.column && !parameters.column.command) {
+                            if ($cell.children("." + CHECKBOX_CLASS).length === 1)
+                                $cell.addClass(DATAGRID_EDITOR_INLINE_BLOCK).toggleClass(DATAGRID_CELL_FOCUS_DISABLED_CLASS, isCommandCell || !isEditableCell);
+                            if (editMode === DATAGRID_EDIT_MODE_BATCH || editMode === DATAGRID_EDIT_MODE_CELL && parameters.row.inserted) {
+                                var modifiedValues = parameters.row && (parameters.row.inserted ? parameters.row.values : parameters.row.modifiedValues);
+                                if (modifiedValues && modifiedValues[columnIndex] !== undefined && parameters.column && !isCommandCell) {
                                     editingController.createHighlightCell($cell);
                                     $cell.addClass(DATAGRID_CELL_MODIFIED)
                                 }
-                                else if (parameters.setValue)
-                                    editingController.createHighlightCell($cell, true);
+                                else if (isEditableCell)
+                                    editingController.createHighlightCell($cell, true)
+                            }
                             this.callBase.apply(this, arguments)
                         },
                         _update: function(change) {
                             this.callBase(change);
-                            if (change.changeType === 'updateSelection')
-                                this._getTableElement().children('tbody').children('.' + DATAGRID_EDIT_ROW).removeClass(DATAGRID_ROW_SELECTED)
+                            if (change.changeType === "updateSelection")
+                                this.getTableElements().children("tbody").children("." + DATAGRID_EDIT_ROW).removeClass(DATAGRID_ROW_SELECTED)
                         }
                     },
                     headerPanel: {
                         _renderCore: function() {
                             this.callBase();
-                            this.getController('editing').renderEditButtons(this.element())
+                            this.getController("editing").renderEditButtons(this.element())
                         },
                         isVisible: function() {
                             var that = this,
-                                editingOptions = that.getController('editing').option('editing');
+                                editingOptions = that.getController("editing").option("editing");
                             return that.callBase() || editingOptions && (editingOptions.insertEnabled || (editingOptions.editEnabled || editingOptions.removeEnabled) && editingOptions.editMode === DATAGRID_EDIT_MODE_BATCH)
                         }
                     }
@@ -8500,7 +8604,12 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                     options.brokenRule.column = column
                                 }
                                 if ($container && !that.getDisableApplyValidationResults()) {
-                                    !options.isValid && editingController.createHighlightCell($container, true);
+                                    if (!options.isValid) {
+                                        var $focus = $container.find(":focus");
+                                        editingController.createHighlightCell($container, true);
+                                        if (!$focus.is(":focus"))
+                                            $focus.focus().trigger("dxpointerdown")
+                                    }
                                     $container.toggleClass(DATAGRID_INVALIDATE_CLASS, !options.isValid)
                                 }
                             };
@@ -8529,7 +8638,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     }
                 }
         }());
-        dataGrid.registerModule('validating', {
+        dataGrid.registerModule("validating", {
             defaultOptions: function() {
                 return {}
             },
@@ -8550,7 +8659,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         },
                         _updateRowAndPageIndices: function() {
                             var that = this,
-                                startInsertIndex = that.getView('rowsView').getTopVisibleItemIndex(),
+                                startInsertIndex = that.getView("rowsView").getTopVisibleItemIndex(),
                                 rowIndex = startInsertIndex;
                             $.each(that._editData, function(_, editData) {
                                 if (!editData.isValid && editData.pageIndex !== that._pageIndex) {
@@ -8666,6 +8775,8 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                         result = true
                                     }
                                 }
+                                else if (that.getEditMode() === DATAGRID_EDIT_MODE_ROW)
+                                    result = !isFullValid
                             }
                             return result
                         },
@@ -8708,7 +8819,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     editorFactory: {
                         loseFocus: function(skipValidator) {
                             if (!skipValidator)
-                                this.getController('validating').setValidator(null);
+                                this.getController("validating").setValidator(null);
                             this.callBase()
                         },
                         focus: function($element) {
@@ -8717,11 +8828,11 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                 rowsView = that.getView("rowsView"),
                                 $tdElement = $element && $element.closest("td"),
                                 validator = $tdElement && $tdElement.data("dxValidator"),
-                                validatingController = that.getController('validating'),
+                                validatingController = that.getController("validating"),
                                 $tooltip = $tdElement && $tdElement.closest(".dx-datagrid-rowsview").find(".dx-tooltip"),
                                 column = $tdElement && that.getController("columns").getVisibleColumns()[$tdElement.index()];
                             $tooltip && $tooltip.remove();
-                            if (validator) {
+                            if (validator && column) {
                                 var value = validator.option("adapter").getValue();
                                 validatingController.setValidator(validator);
                                 if (value !== undefined) {
@@ -8741,7 +8852,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                                 collision: "fit flip",
                                                 boundary: rowsView.element(),
                                                 boundaryOffset: "0 0",
-                                                offset: "0 -9",
+                                                offset: "1 -10",
                                                 my: "top " + alignment,
                                                 at: "bottom " + alignment
                                             },
@@ -8796,7 +8907,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
         dataGrid.combineFilters = function(filters, operation) {
             var resultFilter = [],
                 i;
-            operation = operation || 'and';
+            operation = operation || "and";
             for (i = 0; i < filters.length; i++) {
                 if (!filters[i])
                     continue;
@@ -8814,7 +8925,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     init: function() {
                         var that = this;
                         that._items = [];
-                        that._columnsController = that.getController('columns');
+                        that._columnsController = that.getController("columns");
                         that._columnsChangedHandler = $.proxy(that._handleColumnsChanged, that);
                         that._dataChangedHandler = $.proxy(that._handleDataChanged, that);
                         that._loadingChangedHandler = $.proxy(that._handleLoadingChanged, that);
@@ -8824,20 +8935,20 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         that._isLoading = false;
                         that._isCustomLoading = false;
                         that._refreshDataSource();
-                        that.createAction('onDataErrorOccurred');
+                        that.createAction("onDataErrorOccurred");
                         that.dataErrorOccurred.add(function(error) {
-                            return that.executeAction('onDataErrorOccurred', {error: error})
+                            return that.executeAction("onDataErrorOccurred", {error: error})
                         })
                     },
                     callbackNames: function() {
-                        return ['changed', 'loadingChanged', 'dataErrorOccurred', 'pageIndexChanged', 'pageSizeChanged', 'filterChanged', 'dataSourceChanged']
+                        return ["changed", "loadingChanged", "dataErrorOccurred", "pageChanged", "dataSourceChanged"]
                     },
                     callbackFlags: function(name) {
-                        if (name === 'dataErrorOccurred')
-                            return 'stopOnFalse'
+                        if (name === "dataErrorOccurred")
+                            return "stopOnFalse"
                     },
                     publicMethods: function() {
-                        return ['beginCustomLoading', 'endCustomLoading', 'refresh', 'filter', 'clearFilter', 'getCombinedFilter', 'keyOf', 'byKey', 'getDataByKeys', 'pageIndex', 'pageSize', 'pageCount', 'totalCount', '_disposeDataSource', 'getKeyByRowIndex', 'getRowIndexByKey']
+                        return ["beginCustomLoading", "endCustomLoading", "refresh", "filter", "clearFilter", "getCombinedFilter", "keyOf", "byKey", "getDataByKeys", "pageIndex", "pageSize", "pageCount", "totalCount", "_disposeDataSource", "getKeyByRowIndex", "getRowIndexByKey"]
                     },
                     optionChanged: function(args) {
                         var that = this;
@@ -8854,17 +8965,17 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                             return
                         }
                         switch (args.name) {
-                            case'loadingTimeout':
-                            case'remoteOperations':
+                            case"loadingTimeout":
+                            case"remoteOperations":
                                 handled();
                                 break;
-                            case'dataSource':
-                            case'scrolling':
-                            case'paging':
+                            case"dataSource":
+                            case"scrolling":
+                            case"paging":
                                 handled();
                                 reload();
                                 break;
-                            case'rtlEnabled':
+                            case"rtlEnabled":
                                 reload();
                                 break;
                             default:
@@ -8889,7 +9000,8 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                             if (additionalFilter)
                                 if (columnsController.isDataSourceApplied() || columnsController.isAllDataTypesDefined())
                                     filter = dataGrid.combineFilters([additionalFilter, filter]);
-                            columnsController.updateFilter(dataSource, filter)
+                            if (!dataSource.remoteOperations().filtering)
+                                columnsController.updateFilter(filter)
                         }
                         return filter
                     },
@@ -8912,6 +9024,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         storeLoadOptions.group = columnsController.getGroupDataSourceParameters();
                         dataSource.sort(storeLoadOptions.sort);
                         dataSource.group(storeLoadOptions.group);
+                        storeLoadOptions.sort = columnsController.getSortDataSourceParameters(!dataSource.remoteOperations().sorting);
                         e.group = columnsController.getGroupDataSourceParameters(true);
                         this._isFirstLoading = false
                     },
@@ -8931,16 +9044,17 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                 that._dataSource.sort(that._columnsController.getSortDataSourceParameters());
                                 that.reload()
                             }
+                            that.pageChanged.fire()
                         }
                         else if (changeTypes.columns) {
                             if (optionNames.filterValues || optionNames.filterValue || optionNames.selectedFilterOperation)
                                 if (this.option("filterRow.applyFilter") !== "onClick" || optionNames.filterValues) {
-                                    filterValue = that._columnsController.columnOption(e.columnIndex, 'filterValue');
-                                    filterValues = that._columnsController.columnOption(e.columnIndex, 'filterValues');
+                                    filterValue = that._columnsController.columnOption(e.columnIndex, "filterValue");
+                                    filterValues = that._columnsController.columnOption(e.columnIndex, "filterValues");
                                     if (utils.isArray(filterValues) || e.columnIndex === undefined || utils.isDefined(filterValue) || !optionNames.selectedFilterOperation || optionNames.filterValue)
                                         that._applyFilter()
                                 }
-                            if (!that._needApplyFilter && !dataGrid.checkChanges(optionNames, ['width', 'visibleWidth', 'filterValue', 'selectedFilterOperation', 'filterValues']))
+                            if (!that._needApplyFilter && !dataGrid.checkChanges(optionNames, ["width", "visibleWidth", "filterValue", "selectedFilterOperation", "filterValues"]))
                                 that._columnsController.columnsChanged.add(updateItemsHandler)
                         }
                     },
@@ -8982,14 +9096,13 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                             dataSource = this.option("dataSource"),
                             pageIndex = this.option("paging.pageIndex"),
                             pageSize = this.option("paging.pageSize"),
-                            scrollingMode = that.option('scrolling.mode'),
+                            scrollingMode = that.option("scrolling.mode"),
                             pagingEnabled = this.option("paging.enabled"),
-                            appendMode = scrollingMode === 'infinite',
-                            virtualMode = scrollingMode === 'virtual',
+                            appendMode = scrollingMode === "infinite",
+                            virtualMode = scrollingMode === "virtual",
                             oldDataSource = this._dataSource;
                         that.callBase();
                         dataSource = that._dataSource;
-                        that._dataSource = oldDataSource;
                         that._isFirstLoading = true;
                         if (dataSource) {
                             dataSource.requireTotalCount(!appendMode);
@@ -8999,8 +9112,11 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                 dataSource.pageSize(pageSize);
                             if (pageIndex !== undefined)
                                 dataSource.pageIndex(pageIndex);
+                            that._dataSource = oldDataSource;
                             that.setDataSource(dataSource)
                         }
+                        else if (oldDataSource)
+                            that.updateItems()
                     },
                     _loadDataSource: function() {
                         var dataSource = this._dataSource;
@@ -9030,7 +9146,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     },
                     _generateDataItem: function(data) {
                         return {
-                                rowType: 'data',
+                                rowType: "data",
                                 data: data,
                                 key: this.keyOf(data)
                             }
@@ -9057,27 +9173,28 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         var that = this,
                             items,
                             dataSource = that._dataSource,
-                            changeType = change.changeType || 'refresh';
+                            changeType = change.changeType || "refresh";
+                        change.changeType = changeType;
                         if (dataSource) {
                             items = change.items || dataSource.items();
                             items = that._processItems(items.slice(0), changeType);
-                            change.changeType = changeType;
                             change.items = items;
                             switch (changeType) {
-                                case'prepend':
+                                case"prepend":
                                     that._items.unshift.apply(that._items, items);
                                     break;
-                                case'append':
+                                case"append":
                                     that._items.push.apply(that._items, items);
                                     break;
-                                case'update':
-                                    var rowIndices = change.rowIndices.slice(0),
+                                case"update":
+                                    var prevIndex = -1,
+                                        rowIndices = change.rowIndices.slice(0),
                                         rowIndexCorrection = 0;
                                     rowIndices.sort(function(a, b) {
                                         return a - b
                                     });
                                     for (var i = 0; i < rowIndices.length; i++)
-                                        if (rowIndices[i] < 0 || rowIndices[i - 1] === rowIndices[i]) {
+                                        if (rowIndices[i] < 0) {
                                             rowIndices.splice(i, 1);
                                             i--
                                         }
@@ -9093,7 +9210,10 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                             oldNextItem,
                                             newNextItem;
                                         rowIndex += rowIndexCorrection;
+                                        if (prevIndex === rowIndex)
+                                            return;
                                         change.rowIndices.push(rowIndex);
+                                        prevIndex = rowIndex;
                                         oldItem = that._items[rowIndex];
                                         oldNextItem = that._items[rowIndex + 1];
                                         newItem = items[rowIndex];
@@ -9101,20 +9221,21 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                         if (newItem)
                                             change.items.push(newItem);
                                         if (oldItem && newItem && equalItems(oldItem, newItem)) {
-                                            changeType = 'update';
+                                            changeType = "update";
                                             that._items[rowIndex] = newItem;
                                             if (oldItem.visible !== newItem.visible)
                                                 change.items.splice(-1, 1, {visible: newItem.visible})
                                         }
                                         else if (newItem && !oldItem || newNextItem && equalItems(oldItem, newNextItem)) {
-                                            changeType = 'insert';
+                                            changeType = "insert";
                                             that._items.splice(rowIndex, 0, newItem);
                                             rowIndexCorrection++
                                         }
                                         else if (oldItem && !newItem || oldNextItem && equalItems(newItem, oldNextItem)) {
-                                            changeType = 'remove';
+                                            changeType = "remove";
                                             that._items.splice(rowIndex, 1);
-                                            rowIndexCorrection--
+                                            rowIndexCorrection--;
+                                            prevIndex = -1
                                         }
                                         change.changeTypes.push(changeType)
                                     });
@@ -9127,14 +9248,13 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                 item.rowIndex = index
                             })
                         }
+                        else
+                            that._items = []
                     },
                     updateItems: function(change) {
-                        var that = this;
                         change = change || {};
-                        if (that._dataSource && that._columnsController.isDataSourceApplied()) {
-                            that._updateItemsCore(change);
-                            that.changed.fire(change)
-                        }
+                        this._updateItemsCore(change);
+                        this.changed.fire(change)
                     },
                     isLoading: function() {
                         return this._isLoading || this._isCustomLoading
@@ -9150,7 +9270,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                             dataSource = that._dataSource;
                         if (dataSource) {
                             dataSource.pageIndex(0);
-                            return that.reload().done($.proxy(that.filterChanged, 'fire'))
+                            return that.reload().done($.proxy(that.pageChanged, "fire"))
                         }
                     },
                     filter: function(filterExpr) {
@@ -9209,7 +9329,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     _createDataSourceAdapterCore: function(dataSource, remoteOperations) {
                         var dataSourceAdapterType,
                             dataSourceAdapter;
-                        if (remoteOperations === 'auto')
+                        if (remoteOperations === "auto")
                             remoteOperations = !(dataSource.store() instanceof DX.data.ArrayStore);
                         if (remoteOperations === true)
                             remoteOperations = {
@@ -9227,13 +9347,14 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         return this._createDataSourceAdapterCore(dataSource, remoteOperations)
                     },
                     setDataSource: function(dataSource) {
-                        var that = this;
-                        if (that._dataSource) {
-                            that._dataSource.changed.remove(that._dataChangedHandler);
-                            that._dataSource.loadingChanged.remove(that._loadingChangedHandler);
-                            that._dataSource.loadError.remove(that._loadErrorHandler);
-                            that._dataSource.customizeStoreLoadOptions.remove(that._customizeStoreLoadOptionsHandler);
-                            that._dataSource.dispose(that._isSharedDataSource)
+                        var that = this,
+                            oldDataSource = that._dataSource;
+                        if (oldDataSource) {
+                            oldDataSource.changed.remove(that._dataChangedHandler);
+                            oldDataSource.loadingChanged.remove(that._loadingChangedHandler);
+                            oldDataSource.loadError.remove(that._loadErrorHandler);
+                            oldDataSource.customizeStoreLoadOptions.remove(that._customizeStoreLoadOptionsHandler);
+                            oldDataSource.dispose(that._isSharedDataSource)
                         }
                         if (dataSource)
                             dataSource = that._createDataSourceAdapter(dataSource);
@@ -9341,7 +9462,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                             if (value !== undefined)
                                 if (dataSource.pageIndex() !== value) {
                                     dataSource.pageIndex(value);
-                                    return dataSource.load().done($.proxy(that.pageIndexChanged, 'fire'))
+                                    return dataSource.load().done($.proxy(that.pageChanged, "fire"))
                                 }
                             return dataSource.pageIndex()
                         }
@@ -9359,7 +9480,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                 dataSource.pageSize(value);
                                 if (pagingOptions)
                                     pagingOptions.pageSize = value;
-                                return dataSource.reload().done($.proxy(that.pageSizeChanged, 'fire'))
+                                return dataSource.reload().done($.proxy(that.pageChanged, "fire"))
                             }
                     },
                     beginCustomLoading: function(messageText) {
@@ -9382,22 +9503,22 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         this.setDataSource(null)
                     }
                 };
-            dataGrid.proxyMethod(members, 'load');
-            dataGrid.proxyMethod(members, 'reload');
-            dataGrid.proxyMethod(members, 'itemsCount', 0);
-            dataGrid.proxyMethod(members, 'totalItemsCount', 0);
-            dataGrid.proxyMethod(members, 'hasKnownLastPage', true);
-            dataGrid.proxyMethod(members, 'isLoaded', false);
-            dataGrid.proxyMethod(members, 'totalCount', 0);
+            dataGrid.proxyMethod(members, "load");
+            dataGrid.proxyMethod(members, "reload");
+            dataGrid.proxyMethod(members, "itemsCount", 0);
+            dataGrid.proxyMethod(members, "totalItemsCount", 0);
+            dataGrid.proxyMethod(members, "hasKnownLastPage", true);
+            dataGrid.proxyMethod(members, "isLoaded", false);
+            dataGrid.proxyMethod(members, "totalCount", 0);
             return members
         }());
-        dataGrid.registerModule('data', {
+        dataGrid.registerModule("data", {
             defaultOptions: function() {
                 return {
                         loadingTimeout: 0,
                         dataSource: null,
                         onDataErrorOccurred: null,
-                        remoteOperations: 'auto',
+                        remoteOperations: "auto",
                         paging: {
                             enabled: true,
                             pageSize: undefined,
@@ -9417,7 +9538,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     init: function(dataSource, remoteOperations) {
                         var that = this;
                         that._dataSource = dataSource;
-                        that._remoteOperations = remoteOperations;
+                        that._remoteOperations = remoteOperations || {};
                         that._isLastPage = !dataSource.isLastPage();
                         that._hasLastPage = false;
                         that._currentTotalCount = 0;
@@ -9441,6 +9562,9 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                     return this._dataSource[memberName].apply(this._dataSource, arguments)
                                 }
                         })
+                    },
+                    remoteOperations: function() {
+                        return this._remoteOperations
                     },
                     dispose: function(isSharedDataSource) {
                         var that = this,
@@ -9487,7 +9611,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     },
                     _handleLoadError: function(error) {
                         this.changed.fire({
-                            changeType: 'loadError',
+                            changeType: "loadError",
                             error: error
                         });
                         this.loadError.fire(error)
@@ -9551,7 +9675,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
         dataGrid.DataSourceAdapterClient = dataGrid.DataSourceAdapterServer.inherit({
             _handleDataLoading: function(options) {
                 this.callBase(options);
-                var remoteOperations = this._remoteOperations || {},
+                var remoteOperations = this._remoteOperations,
                     loadOptions = options.loadOptions = options.storeLoadOptions;
                 options.storeLoadOptions = {userData: loadOptions.userData};
                 if (remoteOperations.filtering) {
@@ -9579,7 +9703,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 new DX.data.ArrayStore(options.data).load(loadOptions).done(function(data) {
                     options.data = data;
                     if (loadOptions.requireTotalCount)
-                        options.extra = options.extra || {totalCount: data.length}
+                        options.extra = $.isPlainObject(options.extra) ? options.extra : {totalCount: data.length}
                 });
                 this._handleDataLoadedCore(options);
                 callBase.apply(this, arguments)
@@ -9666,7 +9790,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         },
                         _isVirtualPaging: function() {
                             var scrollingMode = this.option("scrolling.mode");
-                            return scrollingMode === 'virtual' || scrollingMode === 'infinite'
+                            return scrollingMode === "virtual" || scrollingMode === "infinite"
                         },
                         updateItemsCount: function(data, groupsCount) {
                             function calculateItemsCount(that, items, groupsCount) {
@@ -9708,9 +9832,11 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                     }
                                     if (childrenAtFirst && executeCallback(callback, groupsInfo[i].data, parents, callbackResults) === false)
                                         return false;
+                                    if (!groupsInfo[i].data || groupsInfo[i].data.offset !== groupsInfo[i].offset)
+                                        updateOffsets = true;
                                     parents.pop()
                                 }
-                                return $.when.apply($, callbackResults).always(function() {
+                                return updateOffsets && $.when.apply($, callbackResults).always(function() {
                                         updateGroupInfoOffsets(groupsInfo)
                                     })
                             }
@@ -9829,10 +9955,10 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         init: function() {
                             var that = this;
                             that.callBase();
-                            that.createAction('onRowExpanding');
-                            that.createAction('onRowExpanded');
-                            that.createAction('onRowCollapsing');
-                            that.createAction('onRowCollapsed')
+                            that.createAction("onRowExpanding");
+                            that.createAction("onRowExpanded");
+                            that.createAction("onRowCollapsing");
+                            that.createAction("onRowCollapsed")
                         },
                         _processItems: function(items, changeType) {
                             var groupColumns = this._columnsController.getGroupColumns();
@@ -9860,9 +9986,9 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                 resultItems,
                                 path;
                             if (!options) {
-                                scrollingMode = that.option('scrolling.mode');
+                                scrollingMode = that.option("scrolling.mode");
                                 options = {
-                                    collectContinuationItems: scrollingMode !== 'virtual' && scrollingMode !== 'infinite',
+                                    collectContinuationItems: scrollingMode !== "virtual" && scrollingMode !== "infinite",
                                     resultItems: [],
                                     path: []
                                 }
@@ -9872,7 +9998,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                             if (options.data)
                                 if (options.collectContinuationItems || !options.data.isContinuation)
                                     resultItems.push({
-                                        rowType: 'group',
+                                        rowType: "group",
                                         data: options.data,
                                         groupIndex: path.length - 1,
                                         isExpanded: !!options.data.items,
@@ -9896,7 +10022,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                             return resultItems
                         },
                         publicMethods: function() {
-                            return this.callBase().concat(['collapseAll', 'expandAll', 'isRowExpanded', 'expandRow', 'collapseRow'])
+                            return this.callBase().concat(["collapseAll", "expandAll", "isRowExpanded", "expandRow", "collapseRow"])
                         },
                         collapseAll: function(groupIndex) {
                             var dataSource = this._dataSource;
@@ -9964,16 +10090,16 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                 $element = that.element(),
                                 groupPanelOptions = that.option("groupPanel"),
                                 $groupPanel,
-                                groupColumns = that.getController('columns').getGroupColumns();
-                            $groupPanel = $element.find('.' + DATAGRID_GROUP_PANEL_CLASS);
+                                groupColumns = that.getController("columns").getGroupColumns();
+                            $groupPanel = $element.find("." + DATAGRID_GROUP_PANEL_CLASS);
                             if (groupPanelOptions && groupPanelOptions.visible) {
                                 if (!$groupPanel.length)
-                                    $groupPanel = $('<div />').addClass(DATAGRID_GROUP_PANEL_CLASS).prependTo($element);
+                                    $groupPanel = $("<div />").addClass(DATAGRID_GROUP_PANEL_CLASS).prependTo($element);
                                 else
                                     $groupPanel.show();
                                 that._renderGroupPanelItems($groupPanel, groupColumns);
                                 if (groupPanelOptions.allowColumnDragging && !groupColumns.length)
-                                    $('<div />').addClass(DATAGRID_GROUP_PANEL_MESSAGE_CLASS).text(groupPanelOptions.emptyPanelText).appendTo($groupPanel)
+                                    $("<div />").addClass(DATAGRID_GROUP_PANEL_MESSAGE_CLASS).text(groupPanelOptions.emptyPanelText).appendTo($groupPanel)
                             }
                             else
                                 $groupPanel.hide()
@@ -9986,7 +10112,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                             })
                         },
                         _createGroupPanelItem: function($rootElement, groupColumn) {
-                            return $('<div />').addClass(groupColumn.cssClass).addClass(DATAGRID_GROUP_PANEL_ITEM_CLASS).appendTo($rootElement).text(groupColumn.caption)
+                            return $("<div />").addClass(groupColumn.cssClass).addClass(DATAGRID_GROUP_PANEL_ITEM_CLASS).appendTo($rootElement).text(groupColumn.caption)
                         },
                         _renderCore: function() {
                             this.callBase.apply(this, arguments);
@@ -9998,16 +10124,16 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         },
                         getColumnElements: function() {
                             var $element = this.element();
-                            return $element && $element.find('.' + DATAGRID_GROUP_PANEL_ITEM_CLASS)
+                            return $element && $element.find("." + DATAGRID_GROUP_PANEL_ITEM_CLASS)
                         },
                         getColumns: function() {
-                            return this.getController('columns').getGroupColumns()
+                            return this.getController("columns").getGroupColumns()
                         },
                         getBoundingRect: function() {
                             var that = this,
                                 $element = that.element(),
                                 offset;
-                            if ($element && $element.find('.' + DATAGRID_GROUP_PANEL_CLASS).length) {
+                            if ($element && $element.find("." + DATAGRID_GROUP_PANEL_CLASS).length) {
                                 offset = $element.offset();
                                 return {
                                         top: offset.top,
@@ -10017,10 +10143,10 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                             return null
                         },
                         getName: function() {
-                            return 'group'
+                            return "group"
                         },
                         isVisible: function() {
-                            return this.callBase() || this.option('groupPanel.visible')
+                            return this.callBase() || this.option("groupPanel.visible")
                         },
                         optionChanged: function(args) {
                             if (args.name === "groupPanel") {
@@ -10037,8 +10163,8 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 return {
                         _rowClick: function(e) {
                             var that = this,
-                                dataController = that.getController('data'),
-                                $expandElement = $(e.jQueryEvent.target).closest('.' + DATAGRID_EXPAND_CLASS),
+                                dataController = that.getController("data"),
+                                $expandElement = $(e.jQueryEvent.target).closest("." + DATAGRID_EXPAND_CLASS),
                                 key;
                             if ($expandElement.length) {
                                 key = dataController.getKeyByRowIndex(e.rowIndex);
@@ -10071,7 +10197,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
             DATAGRID_EXPAND_CLASS: DATAGRID_EXPAND_CLASS,
             DATAGRID_SELECTION_DISABLED_CLASS: DATAGRID_SELECTION_DISABLED_CLASS
         });
-        dataGrid.registerModule('grouping', {
+        dataGrid.registerModule("grouping", {
             defaultOptions: function() {
                 return {
                         grouping: {
@@ -10210,7 +10336,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         return;
                     for (i = 0; i < items.length; i++) {
                         item = items[i];
-                        if ('key' in item && item.items !== undefined) {
+                        if ("key" in item && item.items !== undefined) {
                             path.push(item.key);
                             if (additionalGroupInfo && pathEquals(additionalGroupInfo.path, path) && !item.isContinuation)
                                 additionalGroupInfo.offset = offset;
@@ -10245,7 +10371,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         i,
                         filter = [];
                     for (i = 0; i < path.length; i++)
-                        filter.push([groups[i].selector, '=', path[i]]);
+                        filter.push([groups[i].selector, "=", path[i]]);
                     if (storeLoadOptions.filter)
                         filter.push(storeLoadOptions.filter);
                     return dataGrid.combineFilters(filter)
@@ -10259,7 +10385,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     for (i = 0; i < path.length; i++) {
                         filterElement = [];
                         for (j = 0; j <= i; j++)
-                            filterElement.push([groups[j].selector, i === j ? '<>' : '=', path[j]]);
+                            filterElement.push([groups[j].selector, i === j ? "<>" : "=", path[j]]);
                         filter.push(dataGrid.combineFilters(filterElement))
                     }
                     filter = dataGrid.combineFilters(filter, "or");
@@ -10274,9 +10400,9 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     for (i = 0; i < path.length; i++) {
                         filterElement = [];
                         for (j = 0; j <= i; j++)
-                            filterElement.push([groups[j].selector, i === j ? groups[j].desc ? '>' : '<' : '=', path[j]]);
+                            filterElement.push([groups[j].selector, i === j ? groups[j].desc ? ">" : "<" : "=", path[j]]);
                         if (filter.length)
-                            filter.push('or');
+                            filter.push("or");
                         filter.push(filterElement)
                     }
                     if (storeLoadOptions.filter)
@@ -10384,7 +10510,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     _changeRowExpandCore: function(path) {
                         var that = this,
                             dataSource = that._dataSource,
-                            beginPageIndex = that.beginPageIndex && that.beginPageIndex() || that.pageIndex(),
+                            beginPageIndex = that.beginPageIndex ? that.beginPageIndex() : that.pageIndex(),
                             dataSourceItems = that.items(),
                             offset = correctSkipLoadOption(that, beginPageIndex * that.pageSize()),
                             groupInfo = that.findGroupInfo(path),
@@ -10719,18 +10845,31 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
             DATAGRID_SCROLLABLE_CONTAINER = "dx-scrollable-container",
             DATAGRID_SCROLLABLE_CONTENT = "dx-scrollable-content",
             DATAGRID_CONTENT_CLASS = "dx-datagrid-content",
-            SCROLLING_MODE_INFINITE = 'infinite',
-            SCROLLING_MODE_VIRTUAL = 'virtual',
-            PIXELS_LIMIT = 250000;
+            SCROLLING_MODE_INFINITE = "infinite",
+            SCROLLING_MODE_VIRTUAL = "virtual",
+            PIXELS_LIMIT = 250000,
+            CONTENT_HEIHGT_LIMIT = 15000000;
         var VirtualScrollingDataSourceAdapterExtender = function() {
+                var getViewportPageCount = function(that) {
+                        var pageSize = that.pageSize();
+                        return pageSize && that._viewportSize >= 0 ? Math.ceil(that._viewportSize / pageSize) : 1
+                    };
                 var getPreloadPageCount = function(that) {
-                        return that.option('scrolling.preloadEnabled') ? 2 : 1
+                        var preloadEnabled = that.option('scrolling.preloadEnabled'),
+                            pageCount = getViewportPageCount(that);
+                        if (pageCount) {
+                            if (preloadEnabled)
+                                pageCount++;
+                            if (isAppendMode(that))
+                                pageCount--
+                        }
+                        return pageCount
                     };
                 var isVirtualMode = function(that) {
-                        return !that._isLoadingAll && that.option('scrolling.mode') === SCROLLING_MODE_VIRTUAL
+                        return !that._isLoadingAll && that.option("scrolling.mode") === SCROLLING_MODE_VIRTUAL
                     };
                 var isAppendMode = function(that) {
-                        return !that._isLoadingAll && that.option('scrolling.mode') === SCROLLING_MODE_INFINITE
+                        return !that._isLoadingAll && that.option("scrolling.mode") === SCROLLING_MODE_INFINITE
                     };
                 var getBeginPageIndex = function(that) {
                         return that._cache.length ? that._cache[0].pageIndex : -1
@@ -10741,7 +10880,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 var updateLoading = function(that) {
                         var beginPageIndex = getBeginPageIndex(that);
                         if (isVirtualMode(that))
-                            if (beginPageIndex < 0 || that._viewportItemIndex >= 0 && (beginPageIndex * that.pageSize() > that._viewportItemIndex || beginPageIndex * that.pageSize() + that.itemsCount() < that._viewportItemIndex + that._viewportSize) && that._dataSource.isLoading()) {
+                            if (beginPageIndex < 0 || that._viewportSize >= 0 && that._viewportItemIndex >= 0 && (beginPageIndex * that.pageSize() > that._viewportItemIndex || beginPageIndex * that.pageSize() + that.itemsCount() < that._viewportItemIndex + that._viewportSize) && that._dataSource.isLoading()) {
                                 if (!that._isLoading) {
                                     that._isLoading = true;
                                     that.loadingChanged.fire(true)
@@ -10752,10 +10891,16 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                 that.loadingChanged.fire(false)
                             }
                     };
+                var fireChanged = function(that, changed, args) {
+                        that._isChangedFiring = true;
+                        changed.call(that, args);
+                        that._isChangedFiring = false
+                    };
                 var processDelayChanged = function(that, changed) {
                         if (that._isDelayChanged) {
                             that._isDelayChanged = false;
-                            changed.call(that)
+                            fireChanged(that, changed);
+                            return true
                         }
                     };
                 var processChanged = function(that, changed, changeType, isDelayChanged) {
@@ -10765,9 +10910,9 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                 changeType: changeType,
                                 items: items
                             };
-                        if (changeType === 'append')
+                        if (changeType === "append")
                             that._items.push.apply(that._items, items);
-                        else if (changeType === 'prepend')
+                        else if (changeType === "prepend")
                             that._items.unshift.apply(that._items, items);
                         else
                             that._items = items;
@@ -10776,7 +10921,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         that._isDelayChanged = isDelayChanged;
                         that._isLoadingAll = false;
                         if (!isDelayChanged)
-                            changed.call(that, change)
+                            fireChanged(that, changed, change)
                     };
                 return {
                         init: function(dataSource) {
@@ -10814,33 +10959,35 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                 lastCacheLength = that._cache.length,
                                 changeType,
                                 cacheItem;
-                            if (isVirtualMode(that)) {
+                            if (isVirtualMode(that) || isAppendMode(that)) {
                                 beginPageIndex = getBeginPageIndex(that);
-                                if (beginPageIndex >= 0)
-                                    if (beginPageIndex + that._cache.length === dataSource.pageIndex());
-                                    else if (beginPageIndex - 1 === dataSource.pageIndex());
-                                    else
+                                if (beginPageIndex >= 0) {
+                                    if (isVirtualMode(that) && beginPageIndex + that._cache.length !== dataSource.pageIndex() && beginPageIndex - 1 !== dataSource.pageIndex())
                                         that._cache = [];
+                                    if (isAppendMode(that) && dataSource.pageIndex() === 0)
+                                        that._cache = []
+                                }
                                 cacheItem = {
                                     pageIndex: dataSource.pageIndex(),
                                     itemsCount: that.itemsCount(true)
                                 };
                                 processDelayChanged(that, callBase);
                                 if (beginPageIndex === dataSource.pageIndex() + 1) {
-                                    changeType = 'prepend';
+                                    changeType = "prepend";
                                     that._cache.unshift(cacheItem)
                                 }
                                 else {
-                                    changeType = 'append';
+                                    changeType = "append";
                                     that._cache.push(cacheItem)
                                 }
                                 processChanged(that, callBase, that._cache.length > 1 ? changeType : undefined, lastCacheLength === 0);
                                 that.load().done(function() {
-                                    processDelayChanged(that, callBase)
+                                    if (processDelayChanged(that, callBase))
+                                        that.load()
                                 })
                             }
                             else
-                                processChanged(that, callBase, isAppendMode(that) && dataSource.pageIndex() !== 0 ? 'append' : undefined)
+                                processChanged(that, callBase)
                         },
                         items: function() {
                             return this._items
@@ -10881,8 +11028,8 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                 virtualMode = isVirtualMode(that),
                                 appendMode = isAppendMode(that),
                                 totalItemsCount = that.totalItemsCount(),
-                                lastPageSize,
                                 needLoad = that._viewportItemIndex < 0,
+                                lastPageSize,
                                 maxPageIndex,
                                 newPageIndex;
                             that._viewportItemIndex = itemIndex;
@@ -10908,21 +11055,9 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                 }
                             }
                         },
-                        setViewportSize: function(size) {
-                            var that = this,
-                                pageSize;
-                            if (that._viewportSize !== size) {
-                                that._viewportSize = size;
-                                if ((isVirtualMode(that) || isAppendMode(that)) && !that._userPageSize) {
-                                    pageSize = Math.ceil(size / 5) * 10;
-                                    if (pageSize !== that.pageSize()) {
-                                        that.pageSize(pageSize);
-                                        that.reload()
-                                    }
-                                }
-                            }
-                        },
-                        getViewportSize: function() {
+                        viewportSize: function(size) {
+                            if (size !== undefined)
+                                this._viewportSize = size;
                             return this._viewportSize
                         },
                         pageIndex: function(pageIndex) {
@@ -10936,7 +11071,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         },
                         beginPageIndex: function() {
                             var beginPageIndex = getBeginPageIndex(this);
-                            return beginPageIndex > 0 ? beginPageIndex : 0
+                            return beginPageIndex >= 0 ? beginPageIndex : this.pageIndex()
                         },
                         endPageIndex: function() {
                             var endPageIndex = getEndPageIndex(this);
@@ -10955,26 +11090,28 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                     }
                                 };
                             this._isLoadingAll = isLoadingAll;
-                            if (isVirtualMode(this)) {
+                            if (isVirtualMode(this) || isAppendMode(this)) {
                                 if (beginPageIndex < 0 || !this._cache[this._pageIndex - beginPageIndex])
                                     pageIndexForLoad = this._pageIndex;
-                                if (beginPageIndex >= 0 && pageIndexForLoad < 0 && this._viewportItemIndex >= 0 && beginPageIndex + this._cache.length <= this._pageIndex + getPreloadPageCount(this))
-                                    pageIndexForLoad = beginPageIndex + this._cache.length;
+                                if (beginPageIndex >= 0 && pageIndexForLoad < 0 && this._viewportSize >= 0)
+                                    if (beginPageIndex > 0 && getEndPageIndex(this) + 1 === this.pageCount() && this._cache.length < getPreloadPageCount(this) + 1)
+                                        pageIndexForLoad = beginPageIndex - 1;
+                                    else if (beginPageIndex + this._cache.length <= this._pageIndex + getPreloadPageCount(this))
+                                        pageIndexForLoad = beginPageIndex + this._cache.length;
                                 if (pageIndexForLoad >= 0)
                                     result = loadCore(this, pageIndexForLoad);
                                 updateLoading(this)
                             }
-                            else if (isAppendMode(this)) {
-                                if (!dataSource.isLoaded() || this.pageIndex() === this.pageCount()) {
-                                    dataSource.pageIndex(this.pageIndex());
-                                    result = dataSource.load()
-                                }
-                            }
                             else
                                 result = dataSource.load();
                             if (!result && this._lastPageIndex !== this.pageIndex())
-                                this.changed.fire({changeType: 'pageIndex'});
+                                this.changed.fire({changeType: "pageIndex"});
                             return result || $.Deferred().resolve()
+                        },
+                        loadIfNeed: function() {
+                            var that = this;
+                            if ((isVirtualMode(that) || isAppendMode(that)) && !that.isLoading() && !that._isChangedFiring)
+                                that.load()
                         },
                         isLoading: function() {
                             return this._isLoading
@@ -10982,10 +11119,11 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         isLoaded: function() {
                             return this._dataSource.isLoaded() && this._isLoaded
                         },
-                        changeRowExpand: function() {
+                        _changeRowExpandCore: function() {
+                            var result = this.callBase.apply(this, arguments);
                             this._cache = [];
                             updateLoading(this);
-                            return this.callBase.apply(this, arguments)
+                            return result
                         },
                         refresh: function(storeLoadOptions, isReload) {
                             var that = this,
@@ -11029,7 +11167,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                     contentElement.append(tableElement);
                                 else
                                     contentElement.children().first().replaceWith(tableElement);
-                                if (contentElement.children('table').length === 1) {
+                                if (contentElement.children("table").length === 1) {
                                     contentElement.append(that._createTable());
                                     that._contentHeight = 0
                                 }
@@ -11042,9 +11180,10 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                             var that = this,
                                 contentTable,
                                 changeType = change && change.changeType;
-                            if (changeType === 'append' || changeType === 'prepend') {
+                            if (changeType === "append" || changeType === "prepend") {
                                 contentTable = contentElement.children().first();
-                                tableElement.children('tbody').children('tr')[changeType === 'append' ? 'appendTo' : 'prependTo'](contentTable)
+                                tableElement.children("tbody").children("tr")[changeType === "append" ? "appendTo" : "prependTo"](contentTable);
+                                that._getFreeSpaceRowElements().not(":last").remove()
                             }
                             else
                                 that.callBase.apply(that, arguments);
@@ -11063,10 +11202,16 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                             if (virtualItemsCount) {
                                 contentElement = that._findContentElement();
                                 $tables = contentElement.children();
-                                $contentTable = $tables.first();
+                                $contentTable = $tables.eq(0);
                                 virtualTable = $tables.eq(1);
-                                DX.translator.move($contentTable, {top: Math.floor(virtualItemsCount.begin * rowHeight)});
-                                contentHeight = (virtualItemsCount.begin + virtualItemsCount.end) * rowHeight + $contentTable.outerHeight();
+                                that._contentTableHeight = $contentTable.outerHeight();
+                                contentHeight = (virtualItemsCount.begin + virtualItemsCount.end + that._dataController.itemsCount()) * that._rowHeight;
+                                if (contentHeight > CONTENT_HEIHGT_LIMIT)
+                                    that._heightRatio = CONTENT_HEIHGT_LIMIT / contentHeight;
+                                else
+                                    that._heightRatio = 1;
+                                contentHeight = (virtualItemsCount.begin + virtualItemsCount.end) * rowHeight * that._heightRatio + that._contentTableHeight;
+                                DX.translator.move($contentTable, {top: Math.floor(virtualItemsCount.begin * rowHeight * that._heightRatio)});
                                 isRenderVirtualTableContentRequired = that._contentHeight !== contentHeight || contentHeight === 0 || !that._isTableLinesDisplaysCorrect(virtualTable) || !that._isColumnElementsEqual($contentTable.find("col"), virtualTable.find("col"));
                                 if (isRenderVirtualTableContentRequired) {
                                     that._contentHeight = contentHeight;
@@ -11078,7 +11223,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         },
                         _isTableLinesDisplaysCorrect: function(table) {
                             var hasColumnLines = table.find("." + DATAGRID_COLUMN_LINES_CLASS).length > 0;
-                            return hasColumnLines === this.option('showColumnLines')
+                            return hasColumnLines === this.option("showColumnLines")
                         },
                         _isColumnElementsEqual: function($columns, $virtualColumns) {
                             var result = $columns.length === $virtualColumns.length;
@@ -11094,15 +11239,15 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         _renderVirtualTableContent: function(container, height) {
                             var that = this,
                                 columns = that._columnsController.getVisibleColumns(),
-                                html = that._createColGroup(columns).prop('outerHTML'),
-                                freeSpaceCellsHtml = '',
+                                html = that._createColGroup(columns).prop("outerHTML"),
+                                freeSpaceCellsHtml = "",
                                 i,
-                                columnLinesClass = that.option('showColumnLines') ? DATAGRID_COLUMN_LINES_CLASS : '',
+                                columnLinesClass = that.option("showColumnLines") ? DATAGRID_COLUMN_LINES_CLASS : "",
                                 createFreeSpaceRowHtml = function(height) {
-                                    return '<tr style="height:' + height + 'px;" class="' + DATAGRID_FREESPACE_CLASS + ' ' + DATAGRID_ROW_CLASS + ' ' + columnLinesClass + '" >' + freeSpaceCellsHtml + '</tr>'
+                                    return "<tr style='height:" + height + "px;' class='" + DATAGRID_FREESPACE_CLASS + " " + DATAGRID_ROW_CLASS + " " + columnLinesClass + "' >" + freeSpaceCellsHtml + "</tr>"
                                 };
                             for (i = 0; i < columns.length; i++)
-                                freeSpaceCellsHtml += columns[i].command === "expand" ? '<td class="' + DATAGRID_GROUP_SPACE_CLASS + '"/>' : '<td />';
+                                freeSpaceCellsHtml += columns[i].command === "expand" ? "<td class='" + DATAGRID_GROUP_SPACE_CLASS + "'/>" : "<td />";
                             while (height > PIXELS_LIMIT) {
                                 html += createFreeSpaceRowHtml(PIXELS_LIMIT);
                                 height -= PIXELS_LIMIT
@@ -11112,7 +11257,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                             container.html(html)
                         },
                         _findBottomLoadPanel: function() {
-                            var $bottomLoadPanel = this.element().find('.' + DATAGRID_BOTTOM_LOAD_PANEL_CLASS);
+                            var $bottomLoadPanel = this.element().find("." + DATAGRID_BOTTOM_LOAD_PANEL_CLASS);
                             if ($bottomLoadPanel.length)
                                 return $bottomLoadPanel
                         },
@@ -11125,7 +11270,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                 bottomLoadPanelElement = that._findBottomLoadPanel();
                             if (showBottomLoading) {
                                 if (!bottomLoadPanelElement)
-                                    $('<div />').addClass(DATAGRID_BOTTOM_LOAD_PANEL_CLASS).append($('<div />').dxLoadIndicator()).appendTo(that._findContentElement())
+                                    $("<div />").addClass(DATAGRID_BOTTOM_LOAD_PANEL_CLASS).append($("<div />").dxLoadIndicator()).appendTo(that._findContentElement())
                             }
                             else if (bottomLoadPanelElement)
                                 bottomLoadPanelElement.remove()
@@ -11133,8 +11278,19 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         _handleScroll: function(e) {
                             var that = this;
                             if (that._hasHeight && that._rowHeight)
-                                that._dataController.setViewportItemIndex(e.scrollOffset.top / that._rowHeight);
+                                that._setViewportScrollTop(e.scrollOffset.top);
                             that.callBase.apply(that, arguments)
+                        },
+                        _setViewportScrollTop: function(scrollTop) {
+                            var that = this,
+                                virtualItemsCount = that._dataController.virtualItemsCount(),
+                                heightRatio = that._heightRatio || 1,
+                                rowHeight = that._rowHeight,
+                                beginHeight = virtualItemsCount ? Math.floor(virtualItemsCount.begin * rowHeight * heightRatio) : 0;
+                            if (virtualItemsCount && scrollTop >= beginHeight && scrollTop <= beginHeight + that._contentTableHeight)
+                                that._dataController.setViewportItemIndex(virtualItemsCount.begin + (scrollTop - beginHeight) / rowHeight);
+                            else
+                                that._dataController.setViewportItemIndex(scrollTop / (rowHeight * heightRatio))
                         },
                         _renderScrollableCore: function($element) {
                             var that = this;
@@ -11156,7 +11312,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                                     scrollTop -= $element.offset().top;
                                                     scrollTop = scrollTop > 0 ? scrollTop : 0;
                                                     that._scrollTop = scrollTop;
-                                                    that._dataController.setViewportItemIndex(scrollTop / that._rowHeight)
+                                                    that._setViewportScrollTop(scrollTop)
                                                 }
                                             };
                                         if (oldHandler)
@@ -11171,21 +11327,21 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                             scrollHandler,
                                             oldScrollHandler;
                                         if (dxScrollable) {
-                                            oldScrollHandler = dxScrollable.option('onScroll');
+                                            oldScrollHandler = dxScrollable.option("onScroll");
                                             scrollHandler = createWindowScrollHandler($scrollElement, oldScrollHandler);
-                                            dxScrollable.option('onScroll', scrollHandler);
+                                            dxScrollable.option("onScroll", scrollHandler);
                                             that.on("disposing", function() {
-                                                if (dxScrollable.option('onScroll') === scrollHandler)
-                                                    dxScrollable.option('onScroll', oldScrollHandler)
+                                                if (dxScrollable.option("onScroll") === scrollHandler)
+                                                    dxScrollable.option("onScroll", oldScrollHandler)
                                             })
                                         }
                                         else if ($scrollElement.is(document) || $scrollElement.css("overflow-y") === "auto") {
                                             if ($scrollElement.is(document))
                                                 $scrollElement = $(window);
                                             scrollHandler = createWindowScrollHandler($scrollElement);
-                                            $scrollElement.on('scroll', scrollHandler);
+                                            $scrollElement.on("scroll", scrollHandler);
                                             that.on("disposing", function() {
-                                                $scrollElement.off('scroll', scrollHandler)
+                                                $scrollElement.off("scroll", scrollHandler)
                                             })
                                         }
                                     };
@@ -11195,17 +11351,16 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         },
                         _needUpdateRowHeight: function(itemsCount) {
                             var that = this;
-                            return that.callBase.apply(that, arguments) || itemsCount > 0 && that.option('scrolling.mode') === SCROLLING_MODE_INFINITE
+                            return that.callBase.apply(that, arguments) || itemsCount > 0 && that.option("scrolling.mode") === SCROLLING_MODE_INFINITE
                         },
                         _updateRowHeight: function() {
                             var that = this,
-                                lastRowHeight = that._rowHeight,
                                 viewportHeight;
                             that.callBase.apply(that, arguments);
-                            if (!lastRowHeight && that._rowHeight) {
+                            if (that._rowHeight) {
                                 that._updateContentPosition();
                                 viewportHeight = that._hasHeight ? that.element().outerHeight() : $(window).outerHeight();
-                                that._dataController.setViewportSize(Math.round(viewportHeight / that._rowHeight))
+                                that._dataController.viewportSize(Math.round(viewportHeight / that._rowHeight))
                             }
                         },
                         setLoading: function(isLoading, messageText) {
@@ -11215,6 +11370,12 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                             if (hasBottomLoadPanel)
                                 isLoading = false;
                             callBase.call(that, isLoading, messageText)
+                        },
+                        _resizeCore: function() {
+                            this.callBase();
+                            var dataSource = this._dataController.dataSource();
+                            if (dataSource && dataSource.loadIfNeed)
+                                dataSource.loadIfNeed()
                         },
                         getTableElements: function(isVirtualTable) {
                             var result = this.callBase();
@@ -11228,19 +11389,19 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
             DATAGRID_BOTTOM_LOAD_PANEL_CLASS: DATAGRID_BOTTOM_LOAD_PANEL_CLASS,
             DATAGRID_TABLE_CONTENT_CLASS: DATAGRID_TABLE_CONTENT_CLASS
         });
-        dataGrid.registerModule('virtualScrolling', {
+        dataGrid.registerModule("virtualScrolling", {
             defaultOptions: function() {
                 return {scrolling: {
-                            mode: 'standard',
+                            mode: "standard",
                             preloadEnabled: false,
-                            useNativeScrolling: 'auto'
+                            useNativeScrolling: "auto"
                         }}
             },
             extenders: {
                 controllers: {data: function() {
                         var members = {};
                         dataGrid.proxyMethod(members, "virtualItemsCount");
-                        dataGrid.proxyMethod(members, "setViewportSize");
+                        dataGrid.proxyMethod(members, "viewportSize");
                         dataGrid.proxyMethod(members, "setViewportItemIndex");
                         return members
                     }()},
@@ -11261,13 +11422,14 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
             DATAGRID_CONTEXT_MENU_SORT_ASC_ICON = "context-menu-sort-asc",
             DATAGRID_CONTEXT_MENU_SORT_DESC_ICON = "context-menu-sort-desc",
             DATAGRID_CONTEXT_MENU_SORT_NONE_ICON = "context-menu-sort-none",
-            DATAGRID_CELL_FOCUS_DISABLED_CLASS = "dx-cell-focus-disabled";
+            DATAGRID_CELL_FOCUS_DISABLED_CLASS = "dx-cell-focus-disabled",
+            DATAGRID_COLUMN_INDICATORS_CLASS = "dx-column-indicators";
         var createCellContent = function($cell, column, showColumnLines) {
-                var $content = $('<div />').addClass(DATAGRID_CELL_CONTENT_CLASS);
+                var $content = $("<div />").addClass(DATAGRID_CELL_CONTENT_CLASS);
                 if (showColumnLines)
                     $content.appendTo($cell);
                 else
-                    $content.css("float", column.alignment || 'left').prependTo($cell);
+                    $content.css({float: column.alignment || "left"}).prependTo($cell);
                 return $content
             };
         dataGrid.ColumnHeadersView = dataGrid.ColumnsView.inherit({
@@ -11278,7 +11440,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 if (column.command)
                     template = function($container, options) {
                         var column = options.column;
-                        $container.html('&nbsp;');
+                        $container.html("&nbsp;");
                         $container.addClass(column.cssClass)
                     };
                 else
@@ -11289,7 +11451,10 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 return template
             },
             _getHeaderTemplate: function(column) {
-                return !utils.isDefined(column.command) && column.headerCellTemplate || this._getDefaultTemplate(column)
+                return !utils.isDefined(column.command) && column.headerCellTemplate || {
+                        allowRenderToDetachedContainer: true,
+                        render: this._getDefaultTemplate(column)
+                    }
             },
             _processTemplate: function(template, options) {
                 var that = this,
@@ -11306,8 +11471,9 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 return resultTemplate
             },
             _handleDataChanged: function(e) {
-                if (this._isGroupingChanged) {
+                if (this._isGroupingChanged || this._requireReady) {
                     this._isGroupingChanged = false;
+                    this._requireReady = false;
                     this.render()
                 }
             },
@@ -11324,7 +11490,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 return $cell
             },
             _createRow: function(row) {
-                var $row = this.callBase(row).toggleClass(DATAGRID_COLUMN_LINES_CLASS, this.option('showColumnLines'));
+                var $row = this.callBase(row).toggleClass(DATAGRID_COLUMN_LINES_CLASS, this.option("showColumnLines"));
                 if (row.rowType === "header")
                     $row.addClass(DATAGRID_HEADER_ROW_CLASS);
                 return $row
@@ -11335,8 +11501,9 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     scrollLeft = that._scrollLeft;
                 $container.addClass(DATAGRID_HEADERS_CLASS).toggleClass(DATAGRID_NOWRAP_CLASS, !that.option("wordWrapEnabled")).empty();
                 that._setTableElement(that._renderTable());
+                that.callBase.apply(that, arguments);
                 that._scrollLeft = 0;
-                that.scrollOffset(scrollLeft)
+                that.scrollTo({left: scrollLeft})
             },
             _renderTable: function() {
                 var $table = this.callBase.apply(this, arguments),
@@ -11346,7 +11513,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
             },
             _getRows: function() {
                 var result = [];
-                if (this.option('showColumnHeaders'))
+                if (this.option("showColumnHeaders"))
                     result.push({rowType: "header"});
                 return result
             },
@@ -11374,7 +11541,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
             getHeadersRowHeight: function() {
                 var tableElement = this._getTableElement();
                 if (tableElement) {
-                    var $headerRow = tableElement.find('.' + DATAGRID_HEADER_ROW_CLASS).first();
+                    var $headerRow = tableElement.find("." + DATAGRID_HEADER_ROW_CLASS).first();
                     return $headerRow && $headerRow.height()
                 }
                 return 0
@@ -11384,7 +11551,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     scrollLeft = that._scrollLeft;
                 that.callBase(widths);
                 that._scrollLeft = 0;
-                that.scrollOffset(scrollLeft)
+                that.scrollTo({left: scrollLeft})
             },
             processSizeChanged: function() {
                 var that = this,
@@ -11401,6 +11568,18 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
             getColumnElements: function() {
                 if (this.option("showColumnHeaders"))
                     return this.getCellElements(0)
+            },
+            getColumnWidths: function() {
+                var that = this,
+                    $columnElements = that.getColumnElements(),
+                    resultWidths = that.callBase();
+                if ($columnElements && resultWidths && $columnElements.length === resultWidths.length)
+                    $.each($columnElements, function(index, columnElement) {
+                        var $indicatorElements = $(columnElement).find("." + DATAGRID_COLUMN_INDICATORS_CLASS);
+                        if ($indicatorElements.length)
+                            resultWidths[index] += $indicatorElements.outerWidth(true)
+                    });
+                return resultWidths
             },
             allowDragging: function(column, draggingPanels) {
                 var i,
@@ -11435,7 +11614,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 return null
             },
             getName: function() {
-                return 'headers'
+                return "headers"
             },
             getColumnCount: function() {
                 var $columnElements = this.getColumnElements();
@@ -11448,7 +11627,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 that.sizeChanged = $.Callbacks()
             },
             isVisible: function() {
-                return this.option('showColumnHeaders')
+                return this.option("showColumnHeaders")
             },
             setScrollerSpacing: function(width) {
                 var that = this,
@@ -11460,10 +11639,10 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
             optionChanged: function(args) {
                 var that = this;
                 switch (args.name) {
-                    case'showColumnHeaders':
-                    case'wordWrapEnabled':
-                    case'showColumnLines':
-                        that.render();
+                    case"showColumnHeaders":
+                    case"wordWrapEnabled":
+                    case"showColumnLines":
+                        that._invalidate(true, true);
                         args.handled = true;
                         break;
                     default:
@@ -11521,7 +11700,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
             DATAGRID_HEADER_ROW_CLASS: DATAGRID_HEADER_ROW_CLASS,
             DATAGRID_NOWRAP_CLASS: DATAGRID_NOWRAP_CLASS
         });
-        dataGrid.registerModule('columnHeaders', {
+        dataGrid.registerModule("columnHeaders", {
             defaultOptions: function() {
                 return {
                         showColumnHeaders: true,
@@ -11537,23 +11716,24 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
             utils = DX.utils,
             dataGrid = ui.dxDataGrid;
         var OPERATION_ICONS = {
-                '=': 'filter-operation-equals',
-                '<>': 'filter-operation-not-equals',
-                '<': 'filter-operation-less',
-                '<=': 'filter-operation-less-equal',
-                '>': 'filter-operation-greater',
-                '>=': 'filter-operation-greater-equal',
-                'default': 'filter-operation-default',
-                notcontains: 'filter-operation-not-contains',
-                contains: 'filter-operation-contains',
-                startswith: 'filter-operation-starts-with',
-                endswith: 'filter-operation-ends-with'
+                "=": "filter-operation-equals",
+                "<>": "filter-operation-not-equals",
+                "<": "filter-operation-less",
+                "<=": "filter-operation-less-equal",
+                ">": "filter-operation-greater",
+                ">=": "filter-operation-greater-equal",
+                "default": "filter-operation-default",
+                notcontains: "filter-operation-not-contains",
+                contains: "filter-operation-contains",
+                startswith: "filter-operation-starts-with",
+                endswith: "filter-operation-ends-with"
             };
         var FILTERING_TIMEOUT = 700,
             DATAGRID_CLASS = "dx-datagrid",
+            DATAGRID_FIRST_CELL_CLASS = "dx-first-cell",
             DATAGRID_FILTER_ROW_CLASS = "dx-datagrid-filter-row",
             DATAGRID_MENU_CLASS = "dx-menu",
-            DATAGRID_MENU_IMAGE_CLASS = 'dx-menu-image',
+            DATAGRID_MENU_IMAGE_CLASS = "dx-menu-image",
             DATAGRID_CELL_CONTENT_CLASS = "dx-datagrid-text-content",
             DATAGRID_EDITOR_WITH_MENU_CLASS = "dx-editor-with-menu",
             DATAGRID_EDITOR_CONTAINER_CLASS = "dx-editor-container",
@@ -11575,10 +11755,10 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         componentNames,
                         editor,
                         $menu;
-                    if (dataGrid.checkChanges(optionNames, ['filterValue', 'selectedFilterOperation']) && e.columnIndex !== undefined) {
-                        visibleIndex = that.getController('columns').getVisibleIndex(e.columnIndex);
-                        column = that.getController('columns').columnOption(e.columnIndex);
-                        $cell = that.element().find('.' + DATAGRID_FILTER_ROW_CLASS).children().eq(visibleIndex);
+                    if (dataGrid.checkChanges(optionNames, ["filterValue", "selectedFilterOperation"]) && e.columnIndex !== undefined) {
+                        visibleIndex = that.getController("columns").getVisibleIndex(e.columnIndex);
+                        column = that.getController("columns").columnOption(e.columnIndex);
+                        $cell = that.element().find("." + DATAGRID_FILTER_ROW_CLASS).children().eq(visibleIndex);
                         $editor = $cell.find("." + TEXTEDITOR_CLASS);
                         if (optionNames.filterValue)
                             if ($editor.length) {
@@ -11589,7 +11769,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                             }
                         if (optionNames.selectedFilterOperation)
                             if (visibleIndex >= 0 && column) {
-                                $menu = $cell.find('.' + DATAGRID_MENU_CLASS);
+                                $menu = $cell.find("." + DATAGRID_MENU_CLASS);
                                 if ($menu.length)
                                     that._updateFilterOperationChooser($menu, column, $editor.parent())
                             }
@@ -11598,7 +11778,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     that.callBase(e)
                 },
                 isFilterRowVisible: function() {
-                    return this._isElementVisible(this.option('filterRow'))
+                    return this._isElementVisible(this.option("filterRow"))
                 },
                 isVisible: function() {
                     return this.callBase() || this.isFilterRowVisible()
@@ -11627,38 +11807,40 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         $editorContainer,
                         $editor;
                     var updateFilterValue = function(that, column, value) {
-                            if (value === '')
+                            if (value === "")
                                 value = undefined;
                             if (!utils.isDefined(column.filterValue) && !utils.isDefined(value))
                                 return;
                             that._applyFilterViewController.setHighLight($editorContainer, column.filterValue !== value);
                             column.filterValue = value;
-                            columnsController.columnOption(column.index, 'filterValue', value)
+                            columnsController.columnOption(column.index, "filterValue", value)
                         };
-                    if (options.rowType === "filter")
+                    if (options.rowType === "filter") {
+                        $cell.toggleClass(DATAGRID_FIRST_CELL_CLASS, options.columnIndex === 0);
                         if (column.command)
-                            $cell.html('&nbsp;');
+                            $cell.html("&nbsp;");
                         else if (column.allowFiltering) {
                             that.setAria("label", Globalize.localize("dxDataGrid-ariaColumn") + " " + column.caption + ", " + Globalize.localize("dxDataGrid-ariaFilterCell"), $cell);
                             $cell.addClass(DATAGRID_EDITOR_CELL_CLASS);
-                            $container = $('<div />').appendTo($cell),
-                            $editorContainer = $('<div />').addClass(DATAGRID_EDITOR_CONTAINER_CLASS).appendTo($container),
-                            $editor = $('<div />').appendTo($editorContainer);
-                            that.getController('editorFactory').createEditor($editor, $.extend({}, column, {
+                            $container = $("<div />").appendTo($cell),
+                            $editorContainer = $("<div />").addClass(DATAGRID_EDITOR_CONTAINER_CLASS).appendTo($container),
+                            $editor = $("<div />").appendTo($editorContainer);
+                            that.getController("editorFactory").createEditor($editor, $.extend({}, column, {
                                 value: columnsController.isDataSourceApplied() ? column.filterValue : undefined,
                                 setValue: function(value) {
                                     updateFilterValue(that, column, value)
                                 },
                                 parentType: "filterRow",
-                                showAllText: that.option('filterRow.showAllText'),
+                                showAllText: that.option("filterRow.showAllText"),
                                 updateValueTimeout: that.option("filterRow.applyFilter") === "onClick" ? 0 : FILTERING_TIMEOUT,
                                 width: null
                             }));
                             if (column.alignment)
-                                $cell.find('input').first().css('text-align', column.alignment);
+                                $cell.find("input").first().css("text-align", column.alignment);
                             if (column.filterOperations && column.filterOperations.length)
                                 that._renderFilterOperationChooser($container, column, $editorContainer)
                         }
+                    }
                     that.callBase($cell, options)
                 },
                 _updateFilterOperationChooser: function($menu, column, $editorContainer) {
@@ -11668,7 +11850,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         activeStateEnabled: false,
                         selectionMode: "single",
                         cssClass: DATAGRID_CLASS + " " + DATAGRID_CELL_FOCUS_DISABLED_CLASS + " " + DATAGRID_FILTER_MENU,
-                        showFirstSubmenuMode: 'onHover',
+                        showFirstSubmenuMode: "onHover",
                         hideSubmenuOnMouseLeave: true,
                         items: [{
                                 disabled: column.filterOperations && column.filterOperations.length ? false : true,
@@ -11681,7 +11863,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                             if (properties.itemData.items)
                                 return;
                             if (selectedFilterOperation)
-                                that._columnsController.columnOption(column.index, 'selectedFilterOperation', selectedFilterOperation);
+                                that._columnsController.columnOption(column.index, "selectedFilterOperation", selectedFilterOperation);
                             else
                                 that._columnsController.columnOption(column.index, {
                                     selectedFilterOperation: column.defaultSelectedFilterOperation,
@@ -11692,21 +11874,21 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         },
                         onSubmenuShown: function() {
                             isCellWasFocused = that._isEditorFocused($editorContainer);
-                            that.getController('editorFactory').loseFocus()
+                            that.getController("editorFactory").loseFocus()
                         },
                         onSubmenuHiding: function(e) {
                             $menu.blur();
                             $menu.dxMenu("instance").option("focusedElement", null);
                             isCellWasFocused && that._focusEditor($editorContainer)
                         },
-                        rtlEnabled: that.option('rtlEnabled')
+                        rtlEnabled: that.option("rtlEnabled")
                     })
                 },
                 _isEditorFocused: function($container) {
                     return $container.hasClass(DATAGRID_FOCUSED_CLASS) || $container.parents("." + DATAGRID_FOCUSED_CLASS).length
                 },
                 _focusEditor: function($container, showCellFocus) {
-                    this.getController('editorFactory').focus($container);
+                    this.getController("editorFactory").focus($container);
                     $container.find("input").focus()
                 },
                 _renderFilterOperationChooser: function($container, column, $editorContainer) {
@@ -11714,7 +11896,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         $menu;
                     if (that.option("filterRow.showOperationChooser")) {
                         $container.addClass(DATAGRID_EDITOR_WITH_MENU_CLASS);
-                        $menu = $('<div />').prependTo($container);
+                        $menu = $("<div />").prependTo($container);
                         that._updateFilterOperationChooser($menu, column, $editorContainer)
                     }
                 },
@@ -11735,7 +11917,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         result.push({
                             name: null,
                             text: filterRowOptions && filterRowOptions.resetOperationText,
-                            icon: OPERATION_ICONS['default']
+                            icon: OPERATION_ICONS["default"]
                         })
                     }
                     return result
@@ -11743,10 +11925,10 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 optionChanged: function(args) {
                     var that = this;
                     switch (args.name) {
-                        case'filterRow':
-                        case'showColumnLines':
-                        case'disabled':
-                            that.render();
+                        case"filterRow":
+                        case"showColumnLines":
+                        case"disabled":
+                            this._invalidate(true, true);
                             args.handled = true;
                             break;
                         default:
@@ -11776,9 +11958,9 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                 var column = this,
                                     dataField = column.dataField,
                                     filter = null;
-                                if (column.dataType === 'string' && !column.lookup)
-                                    filter = [dataField, selectedFilterOperation || 'contains', value];
-                                else if (column.dataType === 'date' && utils.isDate(value)) {
+                                if (column.dataType === "string" && !column.lookup)
+                                    filter = [dataField, selectedFilterOperation || "contains", value];
+                                else if (column.dataType === "date" && utils.isDate(value)) {
                                     var dateStart,
                                         dateEnd;
                                     switch (filterInterval) {
@@ -11795,22 +11977,22 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                             dateEnd = new Date(value.getFullYear(), value.getMonth(), value.getDate() + 1)
                                     }
                                     switch (selectedFilterOperation) {
-                                        case'<':
-                                            return [dataField, '<', dateStart];
-                                        case'<=':
-                                            return [dataField, '<', dateEnd];
-                                        case'>':
-                                            return [dataField, '>=', dateEnd];
-                                        case'>=':
-                                            return [dataField, '>=', dateStart];
-                                        case'<>':
-                                            return [[dataField, '<', dateStart], 'or', [dataField, '>=', dateEnd]];
+                                        case"<":
+                                            return [dataField, "<", dateStart];
+                                        case"<=":
+                                            return [dataField, "<", dateEnd];
+                                        case">":
+                                            return [dataField, ">=", dateEnd];
+                                        case">=":
+                                            return [dataField, ">=", dateStart];
+                                        case"<>":
+                                            return [[dataField, "<", dateStart], "or", [dataField, ">=", dateEnd]];
                                         default:
-                                            return [[dataField, '>=', dateStart], 'and', [dataField, '<', dateEnd]]
+                                            return [[dataField, ">=", dateStart], "and", [dataField, "<", dateEnd]]
                                     }
                                 }
                                 else
-                                    filter = [dataField, selectedFilterOperation || '=', value];
+                                    filter = [dataField, selectedFilterOperation || "=", value];
                                 return filter
                             },
                             allowFiltering: true
@@ -11842,7 +12024,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 }
             }
         });
-        dataGrid.registerModule('filterRow', {
+        dataGrid.registerModule("filterRow", {
             defaultOptions: function() {
                 return {filterRow: {
                             visible: false,
@@ -11852,12 +12034,12 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                             applyFilter: "auto",
                             applyFilterText: Globalize.localize("dxDataGrid-applyFilterText"),
                             operationDescriptions: {
-                                '=': Globalize.localize("dxDataGrid-filterRowOperationEquals"),
-                                '<>': Globalize.localize("dxDataGrid-filterRowOperationNotEquals"),
-                                '<': Globalize.localize("dxDataGrid-filterRowOperationLess"),
-                                '<=': Globalize.localize("dxDataGrid-filterRowOperationLessOrEquals"),
-                                '>': Globalize.localize("dxDataGrid-filterRowOperationGreater"),
-                                '>=': Globalize.localize("dxDataGrid-filterRowOperationGreaterOrEquals"),
+                                "=": Globalize.localize("dxDataGrid-filterRowOperationEquals"),
+                                "<>": Globalize.localize("dxDataGrid-filterRowOperationNotEquals"),
+                                "<": Globalize.localize("dxDataGrid-filterRowOperationLess"),
+                                "<=": Globalize.localize("dxDataGrid-filterRowOperationLessOrEquals"),
+                                ">": Globalize.localize("dxDataGrid-filterRowOperationGreater"),
+                                ">=": Globalize.localize("dxDataGrid-filterRowOperationGreaterOrEquals"),
                                 startswith: Globalize.localize("dxDataGrid-filterRowOperationStartsWith"),
                                 contains: Globalize.localize("dxDataGrid-filterRowOperationContains"),
                                 notcontains: Globalize.localize("dxDataGrid-filterRowOperationNotContains"),
@@ -11909,7 +12091,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         },
                         optionChanged: function(args) {
                             if (args.name === "filterRow") {
-                                this.render();
+                                this._invalidate();
                                 args.handled = true
                             }
                             else
@@ -11954,8 +12136,8 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
             optionChanged: function(args) {
                 var that = this;
                 switch (args.name) {
-                    case'disabled':
-                        that.render();
+                    case"disabled":
+                        that._invalidate();
                         args.handled = true;
                         break;
                     default:
@@ -11964,7 +12146,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
             }
         });
         $.extend(dataGrid.__internals, {DATAGRID_HEADER_PANEL_CLASS: DATAGRID_HEADER_PANEL_CLASS});
-        dataGrid.registerModule('headerPanel', {
+        dataGrid.registerModule("headerPanel", {
             defaultOptions: function() {
                 return {}
             },
@@ -11978,7 +12160,6 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
             utils = DX.utils;
         var DATAGRID_HEADER_FILTER_CLASS = "dx-header-filter",
             DATAGRID_HEADER_FILTER_MENU_CLASS = "dx-header-filter-menu",
-            DATAGRID_HEADER_FILTER_SPACE_CLASS = "dx-header-filter-space",
             DATAGRID_CELL_CONTENT_CLASS = "dx-datagrid-text-content";
         dataGrid.HeaderFilterController = dataGrid.ViewController.inherit({
             init: function() {
@@ -11991,25 +12172,42 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     cutoffLevel,
                     group,
                     headerFilterOptions = that.option("headerFilter"),
-                    store = that._dataController.dataSource().store();
+                    dataSource = that._dataController.dataSource(),
+                    store = dataSource.store();
                 var processGroupItems = function(groupItems, level, currentLevel, path) {
                         var value,
-                            formatOptions;
+                            displayValue,
+                            formatOptions,
+                            displaySelector,
+                            valueSelector,
+                            lookup = column.lookup;
                         currentLevel = currentLevel || 0;
                         path = path || [];
+                        if (lookup) {
+                            displaySelector = DX.data.utils.compileGetter(lookup.displayExpr);
+                            valueSelector = DX.data.utils.compileGetter(lookup.valueExpr)
+                        }
                         for (var i = 0; i < groupItems.length; i++) {
-                            value = groupItems[i].key;
-                            if (column.lookup)
-                                value = column.lookup.calculateCellValue(value);
+                            if (lookup) {
+                                value = valueSelector(groupItems[i]);
+                                displayValue = displaySelector(groupItems[i])
+                            }
+                            else {
+                                value = groupItems[i].key;
+                                displayValue = value
+                            }
+                            groupItems[i] = utils.isObject(groupItems[i]) ? groupItems[i] : {};
                             if (column.dataType === "date")
                                 formatOptions = currentLevel === 1 ? {format: {
-                                        format: 'month',
-                                        dateType: 'full'
+                                        format: "month",
+                                        dateType: "full"
                                     }} : {};
                             else
                                 formatOptions = column;
-                            groupItems[i].text = dataGrid.formatValue(value, formatOptions);
-                            path.push(groupItems[i].key);
+                            groupItems[i].text = dataGrid.formatValue(displayValue, formatOptions);
+                            if (!groupItems[i].text)
+                                groupItems[i].text = headerFilterOptions.texts.emptyValue;
+                            path.push(value);
                             if (path.length === 1)
                                 groupItems[i].filterValue = path[0];
                             else
@@ -12018,48 +12216,62 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                 groupItems[i].selected = true;
                             delete groupItems[i].key;
                             if ("items" in groupItems[i])
-                                if (currentLevel === level || !groupItems[i].text) {
+                                if (currentLevel === level || !utils.isDefined(groupItems[i].filterValue))
                                     delete groupItems[i].items;
-                                    if (!groupItems[i].text)
-                                        groupItems[i].text = headerFilterOptions.texts.emptyValue
-                                }
                                 else
                                     processGroupItems(groupItems[i].items, level, currentLevel + 1, path);
                             path.pop()
                         }
                     };
-                if (column.dataType === "date") {
-                    group = [function(data) {
-                            var value = column.calculateCellValue(data);
-                            return value && value.getFullYear()
-                        }, function(data) {
-                            var value = column.calculateCellValue(data);
-                            return value && value.getMonth() + 1
-                        }, function(data) {
-                            var value = column.calculateCellValue(data);
-                            return value && value.getDate()
-                        }];
-                    cutoffLevel = 2
+                if (column.lookup) {
+                    dataSource = DX.data.utils.normalizeDataSourceOptions(column.lookup.dataSource);
+                    dataSource.postProcess = function(items) {
+                        if (this.pageIndex() === 0) {
+                            items = items.slice(0);
+                            items.unshift(null)
+                        }
+                        processGroupItems(items, 0);
+                        return items
+                    };
+                    return dataSource
                 }
                 else {
-                    group = $.proxy(column.calculateCellValue, column);
-                    cutoffLevel = 0
-                }
-                return {
-                        filter: that._dataController.getCombinedFilter(),
-                        store: store,
-                        postProcess: function(data) {
-                            var result;
-                            new DX.data.ArrayStore(data).load({
-                                filter: this.filter(),
-                                group: group
-                            }).done(function(data) {
-                                result = data
-                            });
-                            processGroupItems(result, cutoffLevel);
-                            return result
-                        }
+                    if (column.dataType === "date") {
+                        group = [function(data) {
+                                var value = column.calculateCellValue(data);
+                                return value && value.getFullYear()
+                            }, function(data) {
+                                var value = column.calculateCellValue(data);
+                                return value && value.getMonth() + 1
+                            }, function(data) {
+                                var value = column.calculateCellValue(data);
+                                return value && value.getDate()
+                            }];
+                        cutoffLevel = 2
                     }
+                    else {
+                        group = $.proxy(column.calculateCellValue, column);
+                        cutoffLevel = 0
+                    }
+                    return {
+                            filter: that._dataController.getCombinedFilter(),
+                            group: group,
+                            load: function(options) {
+                                var d = $.Deferred();
+                                $.when(options.userData.data || store.load({
+                                    filter: options.filter,
+                                    expand: dataSource.loadOptions().expand
+                                })).done(function(data) {
+                                    options.userData.data = data;
+                                    new DX.data.ArrayStore(data).load(options).done(function(data) {
+                                        processGroupItems(data, cutoffLevel);
+                                        d.resolve(data)
+                                    }).fail(d.reject)
+                                }).fail(d.reject);
+                                return d
+                            }
+                        }
+                }
             },
             getCurrentColumn: function() {
                 return this._currentColumn
@@ -12084,6 +12296,17 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                             },
                             cancel: function() {
                                 that._currentColumn = null
+                            },
+                            onShowing: function(e) {
+                                var dxResizableInstance = e.component.overlayContent().dxResizable("instance");
+                                dxResizableInstance && dxResizableInstance.option("onResizeEnd", function(e) {
+                                    var columnsController = that.getController("columns"),
+                                        headerFilterByColumn = columnsController.columnOption(options.dataField, "headerFilter");
+                                    headerFilterByColumn = headerFilterByColumn || {};
+                                    headerFilterByColumn.width = e.width;
+                                    headerFilterByColumn.height = e.height;
+                                    columnsController.columnOption(options.dataField, "headerFilter", headerFilterByColumn, true)
+                                })
                             }
                         });
                     options.dataSource = that.getDataSource(options),
@@ -12116,7 +12339,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     };
                 if (!isSelectAll) {
                     if (options.type === "tree") {
-                        fillSelectedItemKeys(filterValues, list.option("items"), options.filterType === 'exclude');
+                        fillSelectedItemKeys(filterValues, list.option("items"), options.filterType === "exclude");
                         options.filterValues = filterValues
                     }
                     options.apply()
@@ -12198,19 +12421,9 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                     }
                                 }
                             }],
-                        rtlEnabled: that.option('rtlEnabled'),
+                        rtlEnabled: that.option("rtlEnabled"),
                         resizeEnabled: true,
-                        onShowing: function(e) {
-                            var dxResizableInstance = this._container().dxResizable("instance");
-                            dxResizableInstance && dxResizableInstance.option("onResizeEnd", function(e) {
-                                var columnsController = that.getController("columns"),
-                                    headerFilterByColumn = columnsController.columnOption(options.dataField, "headerFilter");
-                                headerFilterByColumn = headerFilterByColumn || {};
-                                headerFilterByColumn.width = e.width;
-                                headerFilterByColumn.height = e.height;
-                                columnsController.columnOption(options.dataField, "headerFilter", headerFilterByColumn, true)
-                            })
-                        }
+                        onShowing: options.onShowing
                     };
                 if (!utils.isDefined(that._popupContainer))
                     that._popupContainer = that._createComponent($element, "dxPopup", dxPopupOptions);
@@ -12291,19 +12504,33 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
         });
         var headerFilterMixin = dataGrid.headerFilterMixin = {
                 _applyColumnState: function(options) {
-                    var rootElement = options.rootElement,
+                    var $headerFilterIndicator,
+                        rootElement = options.rootElement,
                         column = options.column;
                     if (options.name === "headerFilter") {
-                        rootElement.find('.' + DATAGRID_HEADER_FILTER_CLASS + ', ' + '.' + DATAGRID_HEADER_FILTER_SPACE_CLASS).remove();
-                        var $headerFilterIndicator = this.callBase(options).css("float", this._getColumnAlignment(column.alignment) === "right" ? "left" : "right");
-                        $headerFilterIndicator.toggleClass("dx-header-filter-empty", !column.filterValues || !column.filterValues.length);
+                        rootElement.find("." + DATAGRID_HEADER_FILTER_CLASS).remove();
+                        if (column.allowFiltering)
+                            $headerFilterIndicator = this.callBase(options).toggleClass("dx-header-filter-empty", !column.filterValues || !column.filterValues.length);
                         return $headerFilterIndicator
                     }
                     return this.callBase(options)
                 },
+                _renderIndicator: function(options) {
+                    var rtlEnabled,
+                        $container = options.container,
+                        $indicator = options.indicator;
+                    if (options.name === "headerFilter") {
+                        rtlEnabled = this.option("rtlEnabled");
+                        if ($container.children().length && (!rtlEnabled && options.columnAlignment === "right" || rtlEnabled && options.columnAlignment === "left")) {
+                            $container.prepend($indicator);
+                            return
+                        }
+                    }
+                    this.callBase(options)
+                },
                 optionChanged: function(args) {
                     if (args.name === "headerFilter") {
-                        this.render();
+                        this._invalidate();
                         args.handled = true
                     }
                     else
@@ -12315,16 +12542,16 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     var that = this,
                         $headerFilterIndicator,
                         column = options.column;
+                    that.callBase($cell, options);
                     if (!column.command && !utils.isDefined(column.groupIndex) && column.allowFiltering && that.option("headerFilter.visible") && options.rowType === "header") {
                         $headerFilterIndicator = that._applyColumnState({
-                            name: 'headerFilter',
+                            name: "headerFilter",
                             rootElement: $cell,
                             column: column,
-                            showColumnLines: that.option('showColumnLines')
+                            showColumnLines: that.option("showColumnLines")
                         });
-                        that._subscribeToIndicatorEvent($headerFilterIndicator, column, 'headerFilter')
+                        $headerFilterIndicator && that._subscribeToIndicatorEvent($headerFilterIndicator, column, "headerFilter")
                     }
-                    that.callBase($cell, options)
                 },
                 _subscribeToIndicatorEvent: function($indicator, column, indicatorName) {
                     var that = this;
@@ -12341,7 +12568,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 },
                 _resizeCore: function() {
                     this.callBase();
-                    this._updateIndicatorHeights('headerFilter')
+                    this._updateIndicatorHeights("headerFilter")
                 },
                 _columnOptionChanged: function(e) {
                     var optionNames = e.optionNames;
@@ -12349,11 +12576,13 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         this._updateIndicators("headerFilter");
                         return
                     }
-                    this.callBase(e)
+                    this.callBase(e);
+                    if (optionNames.width || optionNames.visibleWidth)
+                        this._updateIndicatorHeights("headerFilter")
                 },
                 _afterRender: function() {
                     this.callBase.apply(this, arguments);
-                    this._updateIndicatorHeights('headerFilter')
+                    this._updateIndicatorHeights("headerFilter")
                 }
             });
         var HeaderPanelHeaderFilterExtender = $.extend({}, headerFilterMixin, {
@@ -12363,15 +12592,16 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         $headerFilterIndicator;
                     if (!groupColumn.command && groupColumn.allowFiltering && that.option("headerFilter.visible")) {
                         $headerFilterIndicator = that._applyColumnState({
-                            name: 'headerFilter',
+                            name: "headerFilter",
                             rootElement: $item,
                             column: {
-                                alignment: that.option("rtlEnabled") ? 'right' : 'left',
-                                filterValues: groupColumn.filterValues
+                                alignment: utils.getDefaultAlignment(that.option("rtlEnabled")),
+                                filterValues: groupColumn.filterValues,
+                                allowFiltering: groupColumn.allowFiltering
                             },
                             showColumnLines: true
                         });
-                        $headerFilterIndicator.on("dxclick", that.createAction(function(e) {
+                        $headerFilterIndicator && $headerFilterIndicator.on("dxclick", that.createAction(function(e) {
                             var event = e.jQueryEvent;
                             event.stopPropagation();
                             that.getController("headerFilter").showHeaderFilterMenu(groupColumn.index)
@@ -12381,11 +12611,11 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 },
                 _renderGroupPanelItems: function($groupPanel, groupColumns) {
                     this.callBase.apply(this, arguments);
-                    this._updateIndicatorHeights('headerFilter')
+                    this._updateIndicatorHeights("headerFilter")
                 },
                 _resizeCore: function() {
                     this.callBase();
-                    this._updateIndicatorHeights('headerFilter')
+                    this._updateIndicatorHeights("headerFilter")
                 }
             });
         var DataControllerFilterRowExtender = {_calculateAdditionalFilter: function() {
@@ -12424,7 +12654,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     });
                     return dataGrid.combineFilters(filters)
                 }};
-        dataGrid.registerModule('headerFilter', {
+        dataGrid.registerModule("headerFilter", {
             defaultOptions: function() {
                 return {headerFilter: {
                             visible: false,
@@ -12450,7 +12680,6 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
         $.extend(dataGrid.__internals, {
             DATAGRID_HEADER_FILTER_CLASS: DATAGRID_HEADER_FILTER_CLASS,
             DATAGRID_HEADER_FILTER_MENU_CLASS: DATAGRID_HEADER_FILTER_MENU_CLASS,
-            DATAGRID_HEADER_FILTER_SPACE_CLASS: DATAGRID_HEADER_FILTER_SPACE_CLASS,
             DATAGRID_CELL_CONTENT_CLASS: DATAGRID_CELL_CONTENT_CLASS
         })
     })(jQuery, DevExpress);
@@ -12461,38 +12690,33 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
             events = ui.events,
             utils = DX.utils;
         var DATAGRID_SORT_CLASS = "dx-sort",
-            DATAGRID_SORT_SPACE_CLASS = "dx-sort-space",
             DATAGRID_SORTUP_CLASS = "dx-sort-up",
             DATAGRID_SORTDOWN_CLASS = "dx-sort-down",
             DATAGRID_HEADERS_ACTION_CLASS = "dx-datagrid-action",
-            DATAGRID_CELL_CONTENT_CLASS = "dx-datagrid-text-content",
-            DATAGRID_INDICATOR_ALIGNMENT_CLASS = "dx-indicator-alignment-",
             DATAGRID_COLUMN_INDICATORS_CLASS = "dx-column-indicators",
-            COLUMN_HEADERS_VIEW_NAMESPACE = 'dxDataGridColumnHeadersView',
-            DATAGRID_BORDER_COLLAPSE_CORRECTION = 1;
+            DATAGRID_CELL_CONTENT_CLASS = "dx-datagrid-text-content",
+            COLUMN_HEADERS_VIEW_NAMESPACE = "dxDataGridColumnHeadersView";
         var sortingMixin = dataGrid.sortingMixin = {
                 _applyColumnState: function(options) {
                     var that = this,
-                        sortingMode = that.option('sorting.mode'),
+                        side,
+                        sortingMode = that.option("sorting.mode"),
                         rootElement = options.rootElement,
                         column = options.column,
-                        $indicatorsContainer = rootElement.find("." + DATAGRID_COLUMN_INDICATORS_CLASS),
-                        getSortIndicatorAlignment = function(columnAlignment) {
-                            return columnAlignment === 'right' ? 'left' : 'right'
-                        };
-                    if (options.name === 'sort') {
-                        if ((sortingMode === 'single' || sortingMode === 'multiple') && column.allowSorting)
+                        $indicatorsContainer = rootElement.find("." + DATAGRID_COLUMN_INDICATORS_CLASS);
+                    if (options.name === "sort") {
+                        side = that.option("rtlEnabled") ? "right" : "left";
+                        if ((sortingMode === "single" || sortingMode === "multiple") && column.allowSorting)
                             options.rootElement.addClass(DATAGRID_HEADERS_ACTION_CLASS);
-                        rootElement.find('.' + DATAGRID_SORT_CLASS + ', ' + '.' + DATAGRID_SORT_SPACE_CLASS).remove();
+                        rootElement.find("." + DATAGRID_SORT_CLASS).remove();
                         !$indicatorsContainer.children().length && $indicatorsContainer.remove();
+                        rootElement.children("." + DATAGRID_CELL_CONTENT_CLASS).css("margin-" + side, "");
                         if (utils.isDefined(column.sortOrder)) {
-                            var columnAlignment = that._getColumnAlignment(column.alignment),
-                                sortIndicatorAlignment = getSortIndicatorAlignment(columnAlignment),
-                                ariaSortState = column.sortOrder === 'asc' ? 'ascending' : 'descending';
+                            var ariaSortState = column.sortOrder === "asc" ? "ascending" : "descending";
                             that.setAria("sort", ariaSortState, rootElement);
+                            var $sortIndicator = that.callBase(options).toggleClass(DATAGRID_SORTUP_CLASS, column.sortOrder === "asc").toggleClass(DATAGRID_SORTDOWN_CLASS, column.sortOrder === "desc");
                             if (column.alignment === "center")
-                                $('<span />').addClass(DATAGRID_SORT_SPACE_CLASS).toggleClass(DATAGRID_INDICATOR_ALIGNMENT_CLASS + sortIndicatorAlignment, !options.showColumnLines).css("float", columnAlignment).prependTo(rootElement);
-                            var $sortIndicator = that.callBase(options).toggleClass(DATAGRID_SORTUP_CLASS, column.sortOrder === 'asc').toggleClass(DATAGRID_SORTDOWN_CLASS, column.sortOrder === 'desc');
+                                rootElement.children("." + DATAGRID_CELL_CONTENT_CLASS).css("margin-" + side, $sortIndicator.outerWidth(true));
                             return $sortIndicator
                         }
                         else
@@ -12501,6 +12725,19 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     else
                         return that.callBase(options)
                 },
+                _renderIndicator: function(options) {
+                    var rtlEnabled,
+                        $container = options.container,
+                        $indicator = options.indicator;
+                    if (options.name === "sort") {
+                        rtlEnabled = this.option("rtlEnabled");
+                        if ($container.children().length && (!rtlEnabled && options.columnAlignment === "left" || rtlEnabled && options.columnAlignment === "right")) {
+                            $container.prepend($indicator);
+                            return
+                        }
+                    }
+                    this.callBase(options)
+                },
                 _updateIndicator: function($cell, column, indicatorName) {
                     if (indicatorName === "sort" && utils.isDefined(column.groupIndex))
                         return;
@@ -12508,20 +12745,10 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 }
             };
         var ColumnHeadersViewSortingExtender = $.extend({}, sortingMixin, {
-                _updateIndicatorHeight: function($cell, indicatorName) {
-                    this.callBase($cell, indicatorName);
-                    !this.option('showColumnLines') && this._setColumnTextWidth($cell, $cell.outerWidth())
-                },
-                _setColumnTextWidth: function($column, columnWidth) {
-                    var $sortElement = $column.find("." + DATAGRID_SORT_CLASS),
-                        indicatorOuterWidth = $sortElement.outerWidth(),
-                        columnPaddings = $column.outerWidth() - $column.width(),
-                        columnContentIndent = indicatorOuterWidth + columnPaddings;
-                    $column.find("." + DATAGRID_CELL_CONTENT_CLASS).css("max-width", columnWidth - columnContentIndent - DATAGRID_BORDER_COLLAPSE_CORRECTION)
-                },
                 _renderCellContent: function($cell, options) {
                     var that = this,
                         column = options.column;
+                    that.callBase($cell, options);
                     if (!column.command && options.rowType === "header") {
                         $cell.on(events.addNamespace("dxclick", COLUMN_HEADERS_VIEW_NAMESPACE), that.createAction(function(e) {
                             var keyName = null,
@@ -12536,13 +12763,12 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                             })
                         }));
                         that._applyColumnState({
-                            name: 'sort',
+                            name: "sort",
                             rootElement: $cell,
                             column: column,
-                            showColumnLines: that.option('showColumnLines')
+                            showColumnLines: that.option("showColumnLines")
                         })
                     }
-                    that.callBase($cell, options)
                 },
                 _columnOptionChanged: function(e) {
                     var changeTypes = e.changeTypes,
@@ -12553,21 +12779,21 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     }
                     this.callBase(e);
                     if (optionNames.width || optionNames.visibleWidth)
-                        this._updateIndicatorHeights('sort')
+                        this._updateIndicatorHeights("sort")
                 },
                 _resizeCore: function() {
                     this.callBase();
-                    this._updateIndicatorHeights('sort')
+                    this._updateIndicatorHeights("sort")
                 },
                 _afterRender: function() {
                     this.callBase.apply(this, arguments);
-                    this._updateIndicatorHeights('sort')
+                    this._updateIndicatorHeights("sort")
                 },
                 optionChanged: function(args) {
                     var that = this;
                     switch (args.name) {
-                        case'sorting':
-                            that.render();
+                        case"sorting":
+                            that._invalidate();
                             args.handled = true;
                             break;
                         default:
@@ -12581,16 +12807,16 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         $item = that.callBase.apply(that, arguments);
                     $item.on(events.addNamespace("dxclick", "dxDataGridHeaderPanel"), that.createAction(function(e) {
                         setTimeout(function() {
-                            that.getController('columns').changeSortOrder(groupColumn.index)
+                            that.getController("columns").changeSortOrder(groupColumn.index)
                         })
                     }));
                     that._applyColumnState({
-                        name: 'sort',
+                        name: "sort",
                         rootElement: $item,
                         column: {
-                            alignment: that.option("rtlEnabled") ? 'right' : 'left',
+                            alignment: that.option("rtlEnabled") ? "right" : "left",
                             allowSorting: groupColumn.allowSorting,
-                            sortOrder: groupColumn.sortOrder === 'desc' ? 'desc' : 'asc'
+                            sortOrder: groupColumn.sortOrder === "desc" ? "desc" : "asc"
                         },
                         showColumnLines: true
                     });
@@ -12598,17 +12824,17 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 },
                 _renderGroupPanelItems: function($groupPanel, groupColumns) {
                     this.callBase.apply(this, arguments);
-                    this._updateIndicatorHeights('sort')
+                    this._updateIndicatorHeights("sort")
                 },
                 _resizeCore: function() {
                     this.callBase();
-                    this._updateIndicatorHeights('sort')
+                    this._updateIndicatorHeights("sort")
                 },
                 optionChanged: function(args) {
                     var that = this;
                     switch (args.name) {
-                        case'sorting':
-                            that.render();
+                        case"sorting":
+                            that._invalidate();
                             args.handled = true;
                             break;
                         default:
@@ -12616,10 +12842,10 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     }
                 }
             });
-        dataGrid.registerModule('sorting', {
+        dataGrid.registerModule("sorting", {
             defaultOptions: function() {
                 return {sorting: {
-                            mode: 'single',
+                            mode: "single",
                             ascendingText: Globalize.localize("dxDataGrid-sortingAscendingText"),
                             descendingText: Globalize.localize("dxDataGrid-sortingDescendingText"),
                             clearText: Globalize.localize("dxDataGrid-sortingClearText")
@@ -12634,8 +12860,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
             DATAGRID_SORT_CLASS: DATAGRID_SORT_CLASS,
             DATAGRID_SORTUP_CLASS: DATAGRID_SORTUP_CLASS,
             DATAGRID_SORTDOWN_CLASS: DATAGRID_SORTDOWN_CLASS,
-            DATAGRID_HEADERS_ACTION_CLASS: DATAGRID_HEADERS_ACTION_CLASS,
-            DATAGRID_BORDER_COLLAPSE_CORRECTION: DATAGRID_BORDER_COLLAPSE_CORRECTION
+            DATAGRID_HEADERS_ACTION_CLASS: DATAGRID_HEADERS_ACTION_CLASS
         })
     })(jQuery, DevExpress);
     /*! Module widgets-web, file ui.dataGrid.search.js */
@@ -12649,7 +12874,14 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
         function allowSearch(column) {
             return utils.isDefined(column.allowSearch) ? column.allowSearch : column.allowFiltering
         }
-        dataGrid.registerModule('search', {
+        function parseValue(column, text) {
+            var lookup = column.lookup;
+            if (lookup && lookup.items)
+                return column.parseValue.call(lookup, text);
+            else
+                return column.parseValue ? column.parseValue(text) : text
+        }
+        dataGrid.registerModule("search", {
             defaultOptions: function() {
                 return {searchPanel: {
                             visible: false,
@@ -12683,25 +12915,21 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                     column = columns[i];
                                     if (allowSearch(column) && column.calculateFilterExpression) {
                                         lookup = column.lookup;
-                                        if (lookup && lookup.items) {
-                                            filterValue = column.parseValue.call(lookup, text);
+                                        filterValue = parseValue(column, text);
+                                        if (lookup && lookup.items)
                                             DX.data.query(lookup.items).filter(column.calculateFilterExpression.call({
                                                 dataField: lookup.displayExpr,
                                                 dataType: lookup.dataType
-                                            }, filterValue)).enumerate().done(onQueryDone)
-                                        }
-                                        else {
-                                            filterValue = column.parseValue ? column.parseValue(text) : text;
-                                            if (filterValue !== undefined)
-                                                filters.push(column.calculateFilterExpression(filterValue))
-                                        }
+                                            }, filterValue)).enumerate().done(onQueryDone);
+                                        else if (filterValue !== undefined)
+                                            filters.push(column.calculateFilterExpression(filterValue))
                                     }
                                 }
-                                return dataGrid.combineFilters(filters, 'or')
+                                return dataGrid.combineFilters(filters, "or")
                             };
                         return {
                                 publicMethods: function() {
-                                    return this.callBase().concat(['searchByText'])
+                                    return this.callBase().concat(["searchByText"])
                                 },
                                 _calculateAdditionalFilter: function() {
                                     var that = this,
@@ -12729,22 +12957,22 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 views: {
                     headerPanel: function() {
                         var getSearchPanelOptions = function(that) {
-                                return that.option('searchPanel')
+                                return that.option("searchPanel")
                             };
                         return {
                                 _renderSearchPanel: function() {
                                     var that = this,
                                         $element = that.element(),
-                                        dataController = that.getController('data'),
+                                        dataController = that.getController("data"),
                                         searchPanelOptions = getSearchPanelOptions(that);
                                     if (searchPanelOptions && searchPanelOptions.visible) {
                                         if (!that._$searchPanel) {
-                                            that._$searchPanel = $('<div/>').addClass(DATAGRID_SEARCH_PANEL_CLASS).prependTo($element);
+                                            that._$searchPanel = $("<div/>").addClass(DATAGRID_SEARCH_PANEL_CLASS).prependTo($element);
                                             that.setAria("label", Globalize.localize("dxDataGrid-ariaSearchInGrid"), that._$searchPanel)
                                         }
                                         else
                                             that._$searchPanel.show();
-                                        that.getController('editorFactory').createEditor(that._$searchPanel, {
+                                        that.getController("editorFactory").createEditor(that._$searchPanel, {
                                             width: searchPanelOptions.width,
                                             placeholder: searchPanelOptions.placeholder,
                                             parentType: "searchPanel",
@@ -12783,22 +13011,28 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                             }
                     }(),
                     rowsView: {
-                        _highlightSearchText: function(cellElement, isEquals) {
+                        _highlightSearchText: function(cellElement, isEquals, column) {
                             var that = this,
                                 $parent,
                                 searchHTML,
                                 searchText = that.option("searchPanel.text");
                             if (searchText && that.option("searchPanel.highlightSearchText")) {
-                                searchHTML = $('<div>').text(searchText).html();
+                                if (isEquals && column) {
+                                    var value = parseValue(column, searchText);
+                                    searchText = dataGrid.formatValue(value, column);
+                                    if (!searchText)
+                                        return
+                                }
+                                searchHTML = $("<div>").text(searchText).html();
                                 $parent = cellElement.parent();
                                 if (!$parent.length)
-                                    $parent = $('<div>').append(cellElement);
+                                    $parent = $("<div>").append(cellElement);
                                 $.each($parent.find(":dxicontains('" + searchText + "')"), function(index, element) {
                                     $.each($(element).contents(), function(index, content) {
                                         if (content.nodeType !== 3)
                                             return;
                                         var highlightSearchTextInTextNode = function($content, searchText) {
-                                                var $searchTextSpan = $('<span />').addClass(DATAGRID_SEARCH_TEXT_CLASS),
+                                                var $searchTextSpan = $("<span />").addClass(DATAGRID_SEARCH_TEXT_CLASS),
                                                     text = $content.text(),
                                                     index = text.toLowerCase().indexOf(searchText.toLowerCase());
                                                 if (index >= 0) {
@@ -12813,7 +13047,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                             };
                                         if (isEquals) {
                                             if ($(content).text().toLowerCase() === searchText.toLowerCase())
-                                                $(this).replaceWith($('<span />').addClass(DATAGRID_SEARCH_TEXT_CLASS).text($(content).text()))
+                                                $(this).replaceWith($("<span />").addClass(DATAGRID_SEARCH_TEXT_CLASS).text($(content).text()))
                                         }
                                         else
                                             highlightSearchTextInTextNode($(content), searchText)
@@ -12821,17 +13055,17 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                 })
                             }
                         },
-                        _renderRows: function($table, options) {
-                            this.callBase($table, options);
+                        _renderCore: function($table, options) {
+                            this.callBase.apply(this, arguments);
                             if (this.option("rowTemplate"))
-                                this._highlightSearchText($table)
+                                this._highlightSearchText(this._getTableElement())
                         },
                         _updateCell: function($cell, parameters) {
                             var that = this,
                                 column = parameters.column,
                                 isEquals = column.dataType !== "string";
                             if (allowSearch(column))
-                                that._highlightSearchText($cell, isEquals);
+                                that._highlightSearchText($cell, isEquals, column);
                             that.callBase($cell, parameters)
                         }
                     }
@@ -12872,7 +13106,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     };
                 if (useNativeScrolling === undefined)
                     useNativeScrolling = true;
-                if (useNativeScrolling !== 'auto') {
+                if (useNativeScrolling !== "auto") {
                     options.useNative = !!useNativeScrolling;
                     options.useSimulatedScrollbar = !useNativeScrolling
                 }
@@ -12884,7 +13118,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 switch (column.command) {
                     case"empty":
                         return function(container) {
-                                container.html('&nbsp;')
+                                container.html("&nbsp;")
                             };
                     default:
                         return function(container, options) {
@@ -12907,11 +13141,11 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                             text += " " + dataGrid.getGroupRowSummaryText(options.summaryItems, summaryTexts);
                         if (data)
                             if (options.groupContinuedMessage && options.groupContinuesMessage)
-                                text += ' (' + options.groupContinuedMessage + '. ' + options.groupContinuesMessage + ')';
+                                text += " (" + options.groupContinuedMessage + ". " + options.groupContinuesMessage + ")";
                             else if (options.groupContinuesMessage)
-                                text += ' (' + options.groupContinuesMessage + ')';
+                                text += " (" + options.groupContinuesMessage + ")";
                             else if (options.groupContinuedMessage)
-                                text += ' (' + options.groupContinuedMessage + ')';
+                                text += " (" + options.groupContinuedMessage + ")";
                         container.addClass("dx-group-cell");
                         container.text(text)
                     }
@@ -12921,10 +13155,16 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 var that = this,
                     column = options.column,
                     template;
-                if (options.rowType === 'group' && column.groupIndex !== undefined)
-                    template = column.groupCellTemplate || that._getDefaultGroupTemplate();
+                if (options.rowType === "group" && column.groupIndex !== undefined)
+                    template = column.groupCellTemplate || {
+                        allowRenderToDetachedContainer: true,
+                        render: that._getDefaultGroupTemplate()
+                    };
                 else
-                    template = column.cellTemplate || that._getDefaultTemplate(column);
+                    template = column.cellTemplate || {
+                        allowRenderToDetachedContainer: true,
+                        render: that._getDefaultTemplate(column)
+                    };
                 return template
             },
             _getCellTemplate: function(options) {
@@ -12936,9 +13176,9 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     isDataRow,
                     isRowExpanded;
                 if (row) {
-                    isGroup = row.rowType === 'group';
-                    isDataRow = row.rowType === 'data';
-                    $row.toggleClass(DATAGRID_DATA_ROW_CLASS, isDataRow).toggleClass(DATAGRID_ROW_ALTERNATION_CLASS, isDataRow && row.dataIndex % 2 === 1 && this.option('rowAlternationEnabled')).toggleClass(DATAGRID_ROW_LINES_CLASS, isDataRow && this.option('showRowLines')).toggleClass(DATAGRID_COLUMN_LINES_CLASS, this.option('showColumnLines')).toggleClass(DATAGRID_GROUP_ROW_CLASS, isGroup);
+                    isGroup = row.rowType === "group";
+                    isDataRow = row.rowType === "data";
+                    $row.toggleClass(DATAGRID_DATA_ROW_CLASS, isDataRow).toggleClass(DATAGRID_ROW_ALTERNATION_CLASS, isDataRow && row.dataIndex % 2 === 1 && this.option("rowAlternationEnabled")).toggleClass(DATAGRID_ROW_LINES_CLASS, isDataRow && this.option("showRowLines")).toggleClass(DATAGRID_COLUMN_LINES_CLASS, this.option("showColumnLines")).toggleClass(DATAGRID_GROUP_ROW_CLASS, isGroup);
                     if (isGroup) {
                         isRowExpanded = row.isExpanded;
                         this.setAria({
@@ -12951,9 +13191,9 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
             },
             _createTable: function() {
                 var that = this;
-                return that.callBase.apply(that, arguments).on("dxclick", '.dx-row', that.createAction(function(e) {
+                return that.callBase.apply(that, arguments).on("dxclick", ".dx-row", that.createAction(function(e) {
                         var jQueryEvent = e.jQueryEvent;
-                        if (!$(jQueryEvent.target).closest('a').length) {
+                        if (!$(jQueryEvent.target).closest("a").length) {
                             e.rowIndex = that.getRowIndex(jQueryEvent.currentTarget);
                             e.rowElement = $(jQueryEvent.currentTarget);
                             that._rowClick(e)
@@ -12964,7 +13204,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 var that = this,
                     $element = that.element();
                 if (!$element.children().length)
-                    $element.append('<div />');
+                    $element.append("<div />");
                 that._renderLoadPanel($element);
                 that._renderScrollableCore($element)
             },
@@ -12972,7 +13212,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 var that = this;
                 that._scrollTop = e.scrollOffset.top;
                 that._scrollLeft = e.scrollOffset.left;
-                that.scrollOffsetChanged.fire(e.scrollOffset)
+                that.scrollChanged.fire(e.scrollOffset, that.name)
             },
             _renderScrollableCore: function($element) {
                 var that = this,
@@ -12981,7 +13221,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 dxScrollableOptions.onScroll = scrollHandler;
                 dxScrollableOptions.onStop = scrollHandler;
                 $element.dxScrollable(dxScrollableOptions);
-                that._scrollable = $element.data('dxScrollable');
+                that._scrollable = $element.data("dxScrollable");
                 that._scrollableContainer = that._scrollable._$container
             },
             _renderLoadPanel: function($element) {
@@ -12997,14 +13237,14 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                             position: {of: $element},
                             container: $element
                         }, loadPanelOptions);
-                        that._loadPanel = that._createComponent($('<div />').appendTo($element.parent()), "dxLoadPanel", loadPanelOptions)
+                        that._loadPanel = that._createComponent($("<div />").appendTo($element.parent()), "dxLoadPanel", loadPanelOptions)
                     }
                     else
                         that._loadPanel = null
                 }
             },
             _renderContent: function(contentElement, tableElement) {
-                contentElement.replaceWith($('<div>').addClass(DATAGRID_CONTENT_CLASS).append(tableElement));
+                contentElement.replaceWith($("<div>").addClass(DATAGRID_CONTENT_CLASS).append(tableElement));
                 return this._findContentElement()
             },
             _updateContent: function(contentElement, change, newTableElement) {
@@ -13013,7 +13253,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     changeType = change && change.changeType,
                     executors = [];
                 switch (changeType) {
-                    case'update':
+                    case"update":
                         $.each(change.rowIndices, function(index, rowIndex) {
                             var $newRowElement = that._getRowElements(newTableElement).eq(index),
                                 changeType = change.changeTypes[index],
@@ -13022,13 +13262,13 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                 var $rowsElement = that._getRowElements(),
                                     $rowElement = $rowsElement.eq(rowIndex);
                                 switch (changeType) {
-                                    case'update':
+                                    case"update":
                                         if (utils.isDefined(item.visible) && item.visible !== $rowElement.is(":visible"))
                                             $rowElement.toggle(item.visible);
                                         else
                                             $rowElement.replaceWith($newRowElement);
                                         break;
-                                    case'insert':
+                                    case"insert":
                                         if (!$rowsElement.length)
                                             $newRowElement.prependTo(tableElement);
                                         else if ($rowElement.length)
@@ -13036,7 +13276,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                         else
                                             $newRowElement.insertAfter($rowsElement.last());
                                         break;
-                                    case'remove':
+                                    case"remove":
                                         $rowElement.remove();
                                         break
                                 }
@@ -13058,7 +13298,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     i,
                     freeSpaceRowElement = that._createRow(),
                     columns = this.getColumns();
-                freeSpaceRowElement.addClass(DATAGRID_FREESPACE_CLASS).toggleClass(DATAGRID_COLUMN_LINES_CLASS, that.option('showColumnLines'));
+                freeSpaceRowElement.addClass(DATAGRID_FREESPACE_CLASS).toggleClass(DATAGRID_COLUMN_LINES_CLASS, that.option("showColumnLines"));
                 for (i = 0; i < columns.length; i++)
                     freeSpaceRowElement.append(that._createCell(columns[i]));
                 that._appendRow(tableElement, freeSpaceRowElement)
@@ -13075,7 +13315,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 if (tableElement && that._needUpdateRowHeight(itemsCount)) {
                     tableHeight = tableElement.outerHeight();
                     $freeSpaceRowElement = that._getFreeSpaceRowElements().first();
-                    if ($freeSpaceRowElement && $freeSpaceRowElement.is(':visible'))
+                    if ($freeSpaceRowElement && $freeSpaceRowElement.is(":visible"))
                         tableHeight -= $freeSpaceRowElement.outerHeight();
                     that._rowHeight = tableHeight / itemsCount
                 }
@@ -13084,7 +13324,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 var $element = this.element(),
                     $scrollableContent;
                 if ($element) {
-                    $scrollableContent = $element.find('.dx-scrollable-content');
+                    $scrollableContent = $element.find(".dx-scrollable-content");
                     if (!$scrollableContent)
                         $scrollableContent = $element;
                     return $scrollableContent.children().first()
@@ -13092,35 +13332,31 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
             },
             _getRowElements: function(tableElement) {
                 var $rows = this.callBase(tableElement);
-                return $rows && $rows.not('.' + DATAGRID_FREESPACE_CLASS)
+                return $rows && $rows.not("." + DATAGRID_FREESPACE_CLASS)
             },
             _getFreeSpaceRowElements: function() {
                 var tableElements = this.getTableElements();
-                return tableElements && tableElements.children('tbody').children('.' + DATAGRID_FREESPACE_CLASS)
+                return tableElements && tableElements.children("tbody").children("." + DATAGRID_FREESPACE_CLASS)
             },
             _getNoDataText: function() {
                 return this.option("noDataText")
             },
             _updateNoDataText: function($element) {
                 $element = $element || this.element();
-                var noDataElement = $element.find('.' + DATAGRID_NODATA_TEXT_CLASS),
+                var noDataElement = $element.find("." + DATAGRID_NODATA_TEXT_CLASS),
                     isVisible = this._dataController.isEmpty(),
                     isLoading = this._dataController.isLoading(),
-                    rtlEnabled = this.option("rtlEnabled"),
-                    noDataElementCSSConfig = {};
+                    rtlEnabled = this.option("rtlEnabled");
                 if (!noDataElement.length)
-                    noDataElement = $('<span>').addClass(DATAGRID_NODATA_TEXT_CLASS).hide().appendTo($element);
-                noDataElement.text(this._getNoDataText());
-                noDataElementCSSConfig = {
-                    marginTop: -Math.floor(noDataElement.height() / 2),
-                    marginRight: rtlEnabled ? -Math.floor(noDataElement.width() / 2) : 0,
-                    marginLeft: rtlEnabled ? 0 : -Math.floor(noDataElement.width() / 2)
-                };
-                noDataElement.css(noDataElementCSSConfig);
+                    noDataElement = $("<span>").addClass(DATAGRID_NODATA_TEXT_CLASS).appendTo($element);
                 if (isVisible && !isLoading)
-                    noDataElement.show();
+                    noDataElement.text(this._getNoDataText()).css({
+                        marginTop: -Math.floor(noDataElement.height() / 2),
+                        marginRight: rtlEnabled ? -Math.floor(noDataElement.width() / 2) : 0,
+                        marginLeft: rtlEnabled ? 0 : -Math.floor(noDataElement.width() / 2)
+                    }).removeClass("dx-hidden");
                 else
-                    noDataElement.hide()
+                    noDataElement.addClass("dx-hidden")
             },
             _rowClick: function(e) {
                 var item = this._dataController.items()[e.rowIndex] || {};
@@ -13140,7 +13376,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     }
             },
             _renderCells: function($row, options) {
-                if (options.row.rowType === 'group')
+                if (options.row.rowType === "group")
                     this._renderGroupedCells($row, options);
                 else if (options.row.values)
                     this.callBase($row, options)
@@ -13171,7 +13407,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         columnIndex: i
                     })
                 }
-                groupColumnAlignment = this.option("rtlEnabled") ? "right" : "left";
+                groupColumnAlignment = utils.getDefaultAlignment(this.option("rtlEnabled"));
                 groupColumn = $.extend({}, columns[groupCellOptions.columnIndex], {
                     command: null,
                     cssClass: null,
@@ -13184,7 +13420,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     column: groupColumn,
                     columnIndex: groupCellOptions.columnIndex
                 });
-                $groupCell.attr('colspan', groupCellOptions.colspan)
+                $groupCell.attr("colspan", groupCellOptions.colspan)
             },
             _renderRows: function($table, options) {
                 var that = this,
@@ -13193,7 +13429,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     columnsCountBeforeGroups = 0,
                     scrollingMode = that.option("scrolling.mode");
                 for (i = 0; i < columns.length; i++)
-                    if (columns[i].command === 'expand') {
+                    if (columns[i].command === "expand") {
                         columnsCountBeforeGroups = i;
                         break
                     }
@@ -13244,8 +13480,8 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     summaryCells = row && row.summaryCells,
                     value = options.value,
                     displayValue = dataGrid.getDisplayValue(column, value),
-                    groupingOptions = that.option('grouping'),
-                    scrollingMode = that.option('scrolling.mode');
+                    groupingOptions = that.option("grouping"),
+                    scrollingMode = that.option("scrolling.mode");
                 parameters = $.extend(this.callBase(options), {
                     value: value,
                     displayValue: displayValue,
@@ -13259,7 +13495,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     summaryItems: summaryCells && summaryCells[options.columnIndex],
                     resized: column.resizedCallbacks
                 });
-                if (utils.isDefined(column.groupIndex) && scrollingMode !== 'virtual' && scrollingMode !== 'infinite') {
+                if (utils.isDefined(column.groupIndex) && scrollingMode !== "virtual" && scrollingMode !== "infinite") {
                     parameters.groupContinuesMessage = data && data.isContinuationOnNextPage && groupingOptions && groupingOptions.groupContinuesMessage;
                     parameters.groupContinuedMessage = data && data.isContinuation && groupingOptions && groupingOptions.groupContinuedMessage
                 }
@@ -13305,8 +13541,8 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         }
                         else if (!that._hasHeight) {
                             freespaceRowCount = that._dataController.pageSize() - that._dataController.items().length;
-                            scrollingMode = that.option('scrolling.mode');
-                            if (freespaceRowCount > 0 && that._dataController.pageCount() > 1 && scrollingMode !== 'virtual' && scrollingMode !== 'infinite') {
+                            scrollingMode = that.option("scrolling.mode");
+                            if (freespaceRowCount > 0 && that._dataController.pageCount() > 1 && scrollingMode !== "virtual" && scrollingMode !== "infinite") {
                                 freeSpaceRowElements.height(freespaceRowCount * that._rowHeight);
                                 freeSpaceRowElements.show()
                             }
@@ -13330,12 +13566,9 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
             getScrollable: function() {
                 return this._scrollable
             },
-            callbackNames: function() {
-                return ['scrollOffsetChanged']
-            },
             init: function() {
                 var that = this,
-                    dataController = that.getController('data');
+                    dataController = that.getController("data");
                 that.callBase();
                 that._editorFactoryController = that.getController("editorFactory");
                 that._rowHeight = 0;
@@ -13349,9 +13582,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 var scrollToCurrentPageHandler = function() {
                         that.scrollToPage(dataController.pageIndex())
                     };
-                dataController.pageIndexChanged.add(scrollToCurrentPageHandler);
-                dataController.pageSizeChanged.add(scrollToCurrentPageHandler);
-                dataController.filterChanged.add(scrollToCurrentPageHandler);
+                dataController.pageChanged.add(scrollToCurrentPageHandler);
                 dataController.dataSourceChanged.add(function() {
                     that._handleScroll({scrollOffset: {
                             top: that._scrollTop,
@@ -13362,10 +13593,10 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
             _handleDataChanged: function(change) {
                 var that = this;
                 switch (change.changeType) {
-                    case'refresh':
-                    case'prepend':
-                    case'append':
-                    case'update':
+                    case"refresh":
+                    case"prepend":
+                    case"append":
+                    case"update":
                         that.render(null, change);
                         break;
                     default:
@@ -13374,7 +13605,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 }
             },
             publicMethods: function() {
-                return ['isScrollbarVisible', 'getTopVisibleRowData', 'getScrollbarWidth', 'getCellElement']
+                return ["isScrollbarVisible", "getTopVisibleRowData", "getScrollbarWidth", "getCellElement"]
             },
             contentWidth: function() {
                 return this.element().width() - this.getScrollbarWidth()
@@ -13410,18 +13641,18 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 that._updateRowHeight();
                 that._updateNoDataText();
                 that.updateFreeSpaceRowHeight();
-                dxScrollable = that.element().data('dxScrollable');
+                dxScrollable = that.element().data("dxScrollable");
                 if (dxScrollable)
                     dxScrollable.update();
                 that.setLoading(that._dataController.isLoading())
             },
             scrollToPage: function(pageIndex) {
                 var that = this,
-                    scrollingMode = that.option('scrolling.mode'),
+                    scrollingMode = that.option("scrolling.mode"),
                     dataController = that._dataController,
                     pageSize = dataController ? dataController.pageSize() : 0,
                     scrollPosition;
-                if (scrollingMode === 'virtual' || scrollingMode === 'infinite')
+                if (scrollingMode === "virtual" || scrollingMode === "infinite")
                     scrollPosition = pageIndex * that._rowHeight * pageSize;
                 else
                     scrollPosition = 0;
@@ -13432,7 +13663,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
             },
             scrollTo: function(location) {
                 var $element = this.element(),
-                    dxScrollable = $element && $element.data('dxScrollable');
+                    dxScrollable = $element && $element.data("dxScrollable");
                 if (dxScrollable)
                     dxScrollable.scrollTo(location)
             },
@@ -13441,7 +13672,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     $element = this.element(),
                     freeSpaceRowElements;
                 if (utils.isDefined(height)) {
-                    that._hasHeight = height !== 'auto';
+                    that._hasHeight = height !== "auto";
                     if ($element)
                         $element.height(height);
                     freeSpaceRowElements = this._getFreeSpaceRowElements();
@@ -13464,7 +13695,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         visible: isLoading
                     };
                     clearTimeout(that._hideLoadingTimeoutID);
-                    if (loadPanel.option('visible') && !isLoading)
+                    if (loadPanel.option("visible") && !isLoading)
                         that._hideLoadingTimeoutID = setTimeout(function() {
                             loadPanel.option(visibilityOptions)
                         }, DATAGRID_LOADPANEL_HIDE_TIMEOUT);
@@ -13479,9 +13710,10 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
             },
             setRowsOpacity: function(columnIndex, value) {
                 var that = this,
-                    $rows = that._getRowElements().not('.' + DATAGRID_GROUP_ROW_CLASS) || [];
-                $.each($rows, function(_, row) {
-                    $(row).children().eq(columnIndex).css({opacity: value})
+                    $rows = that._getRowElements().not("." + DATAGRID_GROUP_ROW_CLASS) || [];
+                $.each($rows, function(rowIndex, row) {
+                    if (!$(row).hasClass(DATAGRID_GROUP_ROW_CLASS))
+                        that.getCellElements(rowIndex).eq(columnIndex).css({opacity: value})
                 })
             },
             getTopVisibleItemIndex: function() {
@@ -13495,7 +13727,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     items = that._dataController.items(),
                     tableElement = that._getTableElement();
                 if (items.length && tableElement) {
-                    rowElements = tableElement.children('tbody').children('.dx-row:visible, .dx-error-row').not('.' + DATAGRID_FREESPACE_CLASS);
+                    rowElements = tableElement.children("tbody").children(".dx-row:visible, .dx-error-row").not("." + DATAGRID_FREESPACE_CLASS);
                     for (itemIndex = 0; itemIndex < items.length; itemIndex++) {
                         prevOffsetTop = offsetTop;
                         offsetTop = rowElements.eq(itemIndex).offset().top - contentElementOffsetTop;
@@ -13520,33 +13752,31 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 var that = this;
                 that.callBase(args);
                 switch (args.name) {
-                    case'wordWrapEnabled':
-                    case'hoverStateEnabled':
-                    case'showColumnLines':
-                    case'showRowLines':
-                    case'rowAlternationEnabled':
-                    case'rowTemplate':
-                        that.render();
-                        that.component.resize();
+                    case"wordWrapEnabled":
+                    case"hoverStateEnabled":
+                    case"showColumnLines":
+                    case"showRowLines":
+                    case"rowAlternationEnabled":
+                    case"rowTemplate":
+                        that._invalidate(true, true);
                         args.handled = true;
                         break;
-                    case'scrolling':
+                    case"scrolling":
                         that._rowHeight = null;
                         that._tableElement = null;
                         args.handled = true;
                         break;
-                    case'rtlEnabled':
+                    case"rtlEnabled":
                         that._rowHeight = null;
                         that._tableElement = null;
                         break;
                     case"disabled":
-                    case'loadPanel':
+                    case"loadPanel":
                         that._tableElement = null;
-                        that.render();
-                        that.component.resize();
+                        that._invalidate(true, true);
                         args.handled = true;
                         break;
-                    case'noDataText':
+                    case"noDataText":
                         that._updateNoDataText();
                         args.handled = true;
                         break
@@ -13569,7 +13799,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
             DATAGRID_COLUMN_LINES_CLASS: DATAGRID_COLUMN_LINES_CLASS,
             DATAGRID_ROW_ALTERNATION_CLASS: DATAGRID_ROW_ALTERNATION_CLASS
         });
-        dataGrid.registerModule('rows', {
+        dataGrid.registerModule("rows", {
             defaultOptions: function() {
                 return {
                         hoverStateEnabled: false,
@@ -13605,7 +13835,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
         dataGrid.PagerView = dataGrid.View.inherit({
             init: function() {
                 var that = this,
-                    dataController = that.getController('data');
+                    dataController = that.getController("data");
                 that._isVisible = false;
                 dataController.changed.add(function() {
                     that.render()
@@ -13613,16 +13843,16 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
             },
             _getPager: function() {
                 var $element = this.element();
-                return $element && $element.data('dxPager')
+                return $element && $element.data("dxPager")
             },
             _renderCore: function() {
                 var that = this,
                     $element = that.element().addClass(DATAGRID_PAGER_CLASS),
-                    pagerOptions = that.option('pager') || {},
-                    dataController = that.getController('data'),
+                    pagerOptions = that.option("pager") || {},
+                    dataController = that.getController("data"),
                     options = {
                         maxPagesCount: MAX_PAGES_COUNT,
-                        pageIndex: dataController.pageIndex() + 1,
+                        pageIndex: 1 + (parseInt(dataController.pageIndex()) || 0),
                         pageCount: dataController.pageCount(),
                         pageSize: dataController.pageSize(),
                         showPageSizes: pagerOptions.showPageSizeSelector,
@@ -13648,8 +13878,8 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
             },
             getPageSizes: function() {
                 var that = this,
-                    dataController = that.getController('data'),
-                    pagerOptions = that.option('pager'),
+                    dataController = that.getController("data"),
+                    pagerOptions = that.option("pager"),
                     allowedPageSizes = pagerOptions && pagerOptions.allowedPageSizes,
                     pageSize = dataController.pageSize();
                 if (!utils.isDefined(that._pageSizes) || $.inArray(pageSize, that._pageSizes) === -1) {
@@ -13664,14 +13894,14 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
             },
             isVisible: function() {
                 var that = this,
-                    dataController = that.getController('data'),
-                    pagerOptions = that.option('pager'),
+                    dataController = that.getController("data"),
+                    pagerOptions = that.option("pager"),
                     pagerVisible = pagerOptions && pagerOptions.visible,
-                    scrolling = that.option('scrolling');
+                    scrolling = that.option("scrolling");
                 if (that._isVisible)
                     return true;
-                if (pagerVisible === 'auto')
-                    if (scrolling && (scrolling.mode === 'virtual' || scrolling.mode === 'infinite'))
+                if (pagerVisible === "auto")
+                    if (scrolling && (scrolling.mode === "virtual" || scrolling.mode === "infinite"))
                         pagerVisible = false;
                     else
                         pagerVisible = dataController.pageCount() > 1 || dataController.isLoaded() && !dataController.hasKnownLastPage();
@@ -13692,380 +13922,22 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     if (isPager || isPaging)
                         that._pageSizes = null;
                     that._isVisible = false;
-                    that.render();
+                    that._invalidate();
                     if (isPager && that.component)
                         that.component.resize();
                     args.handled = true
                 }
             }
         });
-        dataGrid.registerModule('pager', {
+        dataGrid.registerModule("pager", {
             defaultOptions: function() {
                 return {pager: {
-                            visible: 'auto',
+                            visible: "auto",
                             showPageSizeSelector: false,
-                            allowedPageSizes: 'auto'
+                            allowedPageSizes: "auto"
                         }}
             },
             views: {pagerView: dataGrid.PagerView}
-        })
-    })(jQuery, DevExpress);
-    /*! Module widgets-web, file ui.dataGrid.gridView.js */
-    (function($, DX) {
-        var dataGrid = DX.ui.dxDataGrid,
-            utils = DX.utils;
-        var DATAGRID_CLASS = "dx-datagrid",
-            DATAGRID_HIDDEN_CLASS = "dx-hidden",
-            DATAGRID_TABLE_CLASS = "dx-datagrid-table",
-            DATAGRID_BORDERS_CLASS = "dx-datagrid-borders",
-            DATAGRID_TABLE_FIXED_CLASS = "dx-datagrid-table-fixed",
-            DATAGRID_COLUMN_HEADERS_HIDDEN = "dx-datagrid-headers-hidden",
-            DATAGRID_IMPORTANT_MARGIN_CLASS = "dx-datagrid-important-margin",
-            EMPTY_GRID_ROWS_HEIGHT = 100,
-            LOADPANEL_MARGIN = 50,
-            VIEW_NAMES = ['columnsSeparatorView', 'blockSeparatorView', 'trackerView', 'headerPanel', 'columnHeadersView', 'rowsView', 'footerView', 'columnChooserView', 'pagerView', 'draggingHeaderView', 'contextMenuView', 'errorView', 'headerFilterView'];
-        var isPercentWidth = function(width) {
-                return utils.isString(width) && width.slice(-1) === '%'
-            };
-        var mergeArraysByMaxValue = function(values1, values2) {
-                var result = [],
-                    i;
-                if (values1 && values2 && values1.length && values1.length === values2.length)
-                    for (i = 0; i < values1.length; i++)
-                        result.push(values1[i] > values2[i] ? values1[i] : values2[i]);
-                else if (values1)
-                    result = values1;
-                return result
-            };
-        dataGrid.ResizingController = dataGrid.ViewController.inherit({
-            _initPostRenderHandlers: function() {
-                var that = this;
-                if (!that._refreshSizesHandler) {
-                    that._refreshSizesHandler = function(e) {
-                        that._dataController.changed.remove(that._refreshSizesHandler);
-                        var changeType = e && e.changeType;
-                        if (!e || changeType === 'refresh' || changeType === 'prepend' || changeType === 'append' || changeType === 'update')
-                            that.resize();
-                        if (changeType && changeType !== "updateSelection") {
-                            utils.triggerShownEvent(that.getView("rowsView").element());
-                            that.component._fireContentReadyAction()
-                        }
-                    };
-                    that._dataController.changed.add(function() {
-                        that._dataController.changed.add(that._refreshSizesHandler)
-                    });
-                    that._columnHeadersView.sizeChanged.add(that._refreshSizesHandler)
-                }
-            },
-            _getBestFitWidths: function() {
-                var that = this,
-                    rowsColumnWidths = that._rowsView.getColumnWidths(),
-                    headerColumnWidths = that._columnHeadersView && that._columnHeadersView.getColumnWidths(),
-                    footerColumnWidths = that._footerView && that._footerView.getColumnWidths(),
-                    resultWidths;
-                resultWidths = mergeArraysByMaxValue(rowsColumnWidths, headerColumnWidths);
-                resultWidths = mergeArraysByMaxValue(resultWidths, footerColumnWidths);
-                return resultWidths
-            },
-            _setVisibleWidths: function(visibleColumns, widths) {
-                var columnsController = this._columnsController;
-                columnsController.beginUpdate();
-                $.each(visibleColumns, function(index, column) {
-                    var columnId = column.command ? "command:" + column.command : column.index;
-                    columnsController.columnOption(columnId, 'visibleWidth', widths[index])
-                });
-                columnsController.endUpdate()
-            },
-            _toggleBestFitMode: function(isBestFit) {
-                var $element = this.component.element();
-                $element.find('.' + DATAGRID_TABLE_CLASS).toggleClass(DATAGRID_TABLE_FIXED_CLASS, !isBestFit);
-                $element.find('input').toggleClass(DATAGRID_HIDDEN_CLASS, isBestFit);
-                $element.find('.dx-group-cell').toggleClass(DATAGRID_HIDDEN_CLASS, isBestFit)
-            },
-            _synchronizeColumns: function() {
-                var that = this,
-                    columnsController = that._columnsController,
-                    visibleColumns = columnsController.getVisibleColumns(),
-                    columnAutoWidth = that.option("columnAutoWidth"),
-                    needBestFit = columnAutoWidth,
-                    lastWidthReseted = false,
-                    resultWidths = [],
-                    normalizeWidthsByExpandColumns = function() {
-                        var expandColumnWidth;
-                        $.each(visibleColumns, function(index, column) {
-                            if (column.command === "expand")
-                                expandColumnWidth = resultWidths[index]
-                        });
-                        $.each(visibleColumns, function(index, column) {
-                            if (column.command === "expand" && expandColumnWidth)
-                                resultWidths[index] = expandColumnWidth
-                        })
-                    };
-                !needBestFit && $.each(visibleColumns, function(index, column) {
-                    if (column.width === "auto") {
-                        needBestFit = true;
-                        return false
-                    }
-                });
-                that._setVisibleWidths(visibleColumns, []);
-                if (needBestFit) {
-                    that._toggleBestFitMode(true);
-                    resultWidths = that._getBestFitWidths();
-                    $.each(visibleColumns, function(index, column) {
-                        var columnId = column.command ? "command:" + column.command : column.index;
-                        columnsController.columnOption(columnId, 'bestFitWidth', resultWidths[index], true)
-                    })
-                }
-                $.each(visibleColumns, function(index) {
-                    if (this.width !== 'auto')
-                        if (this.width)
-                            resultWidths[index] = this.width;
-                        else if (!columnAutoWidth)
-                            resultWidths[index] = undefined
-                });
-                lastWidthReseted = that._correctColumnWidths(resultWidths, visibleColumns);
-                if (columnAutoWidth) {
-                    normalizeWidthsByExpandColumns();
-                    that._processStretch(resultWidths, visibleColumns)
-                }
-                if (needBestFit)
-                    that._toggleBestFitMode(false);
-                if (needBestFit || lastWidthReseted)
-                    that._setVisibleWidths(visibleColumns, resultWidths)
-            },
-            _correctColumnWidths: function(resultWidths, visibleColumns) {
-                var that = this,
-                    hasPercentWidth = false,
-                    hasAutoWidth = false,
-                    lastWidthReseted = false,
-                    $element = that.component.element(),
-                    hasWidth = that._hasWidth,
-                    lastColumnIndex;
-                $.each(visibleColumns, function(index) {
-                    if (this.width !== 'auto')
-                        if (this.width)
-                            resultWidths[index] = this.width;
-                        else
-                            hasAutoWidth = true;
-                    if (isPercentWidth(this.width))
-                        hasPercentWidth = true
-                });
-                if ($element && that._maxWidth) {
-                    delete that._maxWidth;
-                    $element.css('max-width', '')
-                }
-                if (!hasAutoWidth && resultWidths.length) {
-                    var contentWidth = that._rowsView.contentWidth();
-                    var totalWidth = that._getTotalWidth(resultWidths, contentWidth);
-                    if (totalWidth <= contentWidth) {
-                        lastColumnIndex = resultWidths.length - 1;
-                        while (lastColumnIndex >= 0 && visibleColumns[lastColumnIndex] && visibleColumns[lastColumnIndex].command)
-                            lastColumnIndex--;
-                        if (lastColumnIndex >= 0) {
-                            resultWidths[lastColumnIndex] = 'auto';
-                            lastWidthReseted = true;
-                            if (!hasWidth && !hasPercentWidth) {
-                                that._maxWidth = totalWidth;
-                                $element.css('max-width', that._maxWidth)
-                            }
-                        }
-                    }
-                }
-                return lastWidthReseted
-            },
-            _processStretch: function(resultSizes, visibleColumns) {
-                var groupSize = this._rowsView.contentWidth(),
-                    tableSize = this._getTotalWidth(resultSizes, groupSize),
-                    unusedIndexes = {length: 0},
-                    diff,
-                    diffElement,
-                    onePixelElementsCount,
-                    i;
-                if (!resultSizes.length)
-                    return;
-                $.each(visibleColumns, function(index) {
-                    if (this.width) {
-                        unusedIndexes[index] = true;
-                        unusedIndexes.length++
-                    }
-                });
-                diff = groupSize - tableSize;
-                diffElement = Math.floor(diff / (resultSizes.length - unusedIndexes.length));
-                onePixelElementsCount = diff - diffElement * (resultSizes.length - unusedIndexes.length);
-                if (diff >= 0)
-                    for (i = 0; i < resultSizes.length; i++) {
-                        if (unusedIndexes[i])
-                            continue;
-                        resultSizes[i] += diffElement;
-                        if (onePixelElementsCount) {
-                            resultSizes[i]++;
-                            onePixelElementsCount--
-                        }
-                    }
-            },
-            _getTotalWidth: function(widths, groupWidth) {
-                var result = 0,
-                    width,
-                    i;
-                for (i = 0; i < widths.length; i++) {
-                    width = widths[i];
-                    if (width)
-                        result += isPercentWidth(width) ? parseInt(width) * groupWidth / 100 : parseInt(width)
-                }
-                return Math.round(result)
-            },
-            updateSize: function($rootElement) {
-                var that = this,
-                    $groupElement,
-                    width;
-                if (that._hasHeight === undefined && $rootElement && $rootElement.closest(document).length) {
-                    $groupElement = $rootElement.children('.' + DATAGRID_CLASS);
-                    if ($groupElement.length)
-                        $groupElement.detach();
-                    that._hasHeight = !!$rootElement.height();
-                    width = $rootElement.width();
-                    $rootElement.addClass(DATAGRID_IMPORTANT_MARGIN_CLASS);
-                    that._hasWidth = $rootElement.width() === width;
-                    $rootElement.removeClass(DATAGRID_IMPORTANT_MARGIN_CLASS);
-                    if ($groupElement.length)
-                        $groupElement.appendTo($rootElement)
-                }
-            },
-            publicMethods: function() {
-                return ["resize", "updateDimensions"]
-            },
-            resize: function() {
-                this.updateDimensions()
-            },
-            updateDimensions: function() {
-                var that = this,
-                    dataController = that._dataController,
-                    $rootElement = that.component.element(),
-                    rootElementHeight = $rootElement && ($rootElement.get(0).clientHeight || $rootElement.height()),
-                    loadPanelOptions = that.option('loadPanel'),
-                    height = that.option('height'),
-                    rowsViewHeight,
-                    editorFactory = that.getController('editorFactory'),
-                    $testDiv;
-                that._initPostRenderHandlers();
-                that.updateSize($rootElement);
-                if (height && that._hasHeight ^ height !== 'auto') {
-                    $testDiv = $('<div>').height(height).appendTo($rootElement);
-                    that._hasHeight = !!$testDiv.height();
-                    $testDiv.remove()
-                }
-                if (that._hasHeight && rootElementHeight > 0 && that.option('scrolling')) {
-                    rowsViewHeight = rootElementHeight;
-                    $.each(that.getViews(), function() {
-                        if (this.isVisible() && this.getHeight)
-                            rowsViewHeight -= this.getHeight()
-                    })
-                }
-                else if (!that._hasHeight && dataController.items().length === 0)
-                    rowsViewHeight = loadPanelOptions && loadPanelOptions.visible ? loadPanelOptions.height + LOADPANEL_MARGIN : EMPTY_GRID_ROWS_HEIGHT;
-                else
-                    rowsViewHeight = 'auto';
-                that._rowsView.height(rowsViewHeight);
-                that._columnHeadersView.setScrollerSpacing(that._rowsView.getScrollbarWidth());
-                that._rowsView.setScrollerSpacing();
-                that._synchronizeColumns();
-                $.each(VIEW_NAMES, function(index, viewName) {
-                    var view = that.getView(viewName);
-                    if (view)
-                        view.resize()
-                });
-                editorFactory && editorFactory.resize()
-            },
-            optionChanged: function(args) {
-                switch (args.name) {
-                    case"width":
-                    case"height":
-                        this.component._renderDimensions();
-                        this.resize();
-                    default:
-                        this.callBase(args)
-                }
-            },
-            init: function() {
-                var that = this;
-                that._dataController = that.getController('data');
-                that._columnsController = that.getController('columns');
-                that._columnHeadersView = that.getView('columnHeadersView');
-                that._footerView = that.getView("footerView");
-                that._rowsView = that.getView('rowsView');
-                that._footerView = that.getView('footerView');
-                that._rowsView.scrollOffsetChanged.add(function(e) {
-                    that._columnHeadersView.scrollOffset(e.left);
-                    that._footerView.scrollOffset(e.left)
-                })
-            }
-        });
-        dataGrid.GridView = dataGrid.View.inherit({
-            init: function() {
-                var that = this;
-                that._dataController = that.getController('data');
-                that._rowsView = that.getView('rowsView')
-            },
-            getView: function(name) {
-                return this.component._views[name]
-            },
-            element: function() {
-                return this._groupElement
-            },
-            optionChanged: function(args) {
-                var that = this;
-                if (utils.isDefined(that._groupElement) && args.name === "showBorders") {
-                    that._groupElement.toggleClass(DATAGRID_BORDERS_CLASS, !!args.value);
-                    args.handled = true
-                }
-                else
-                    that.callBase(args)
-            },
-            render: function($rootElement) {
-                var that = this,
-                    groupElement = that._groupElement || $('<div />').addClass(DATAGRID_CLASS).toggleClass(DATAGRID_BORDERS_CLASS, !!that.option("showBorders"));
-                that.component.setAria({
-                    role: "application",
-                    label: Globalize.localize("dxDataGrid-ariaDataGrid")
-                }, $rootElement);
-                that._rootElement = $rootElement || that._rootElement;
-                that._groupElement = groupElement;
-                $.each(VIEW_NAMES, function(index, viewName) {
-                    var view = that.getView(viewName);
-                    if (view)
-                        view.render(groupElement)
-                });
-                that.update()
-            },
-            update: function() {
-                var that = this,
-                    $rootElement = that._rootElement,
-                    $groupElement = that._groupElement,
-                    resizingController = that.getController('resizing');
-                if ($rootElement && $groupElement) {
-                    if (!$groupElement.parent().length) {
-                        resizingController.updateSize($rootElement);
-                        $groupElement.appendTo($rootElement);
-                        that._rowsView.renderDelayedTemplates()
-                    }
-                    resizingController.resize();
-                    if (that._dataController.isLoaded())
-                        that.component._fireContentReadyAction()
-                }
-            }
-        });
-        dataGrid.registerModule("gridView", {
-            defaultOptions: function() {
-                return {showBorders: false}
-            },
-            controllers: {resizing: dataGrid.ResizingController},
-            views: {gridView: dataGrid.GridView}
-        });
-        $.extend(dataGrid.__internals, {
-            viewNames: VIEW_NAMES,
-            DATAGRID_CLASS: DATAGRID_CLASS,
-            DATAGRID_COLUMN_HEADERS_HIDDEN: DATAGRID_COLUMN_HEADERS_HIDDEN,
-            DATAGRID_BORDERS_CLASS: DATAGRID_BORDERS_CLASS
         })
     })(jQuery, DevExpress);
     /*! Module widgets-web, file ui.dataGrid.columnsResizingReorderingModule.js */
@@ -14083,7 +13955,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
             DATAGRID_HEADERS_DRAG_ACTION_CLASS = "dx-datagrid-drag-action",
             DATAGRID_TRACKER_CLASS = "dx-datagrid-tracker",
             DATAGRID_BLOCK_SEPARATOR_CLASS = "dx-block-separator",
-            DATAGRID_HEADERS_DROP_HIGHLIGHT_CLASS = 'dx-datagrid-drop-highlight',
+            DATAGRID_HEADERS_DROP_HIGHLIGHT_CLASS = "dx-datagrid-drop-highlight",
             DATAGRID_HEADER_ROW_CLASS = "dx-header-row",
             WIDGET_CLASS = "dx-widget",
             DATAGRID_MODULE_NAMESPACE = "dxDataGridResizingReordering",
@@ -14097,9 +13969,9 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
             };
         dataGrid.getPointsByColumns = function(items, pointCreated, isVertical) {
             var cellsLength = items.length,
-                cancel = false,
-                i,
+                notCreatePoint = false,
                 point,
+                i,
                 item,
                 offset,
                 result = [],
@@ -14109,7 +13981,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 if (i < cellsLength) {
                     item = items.eq(columnIndex);
                     offset = item.offset();
-                    rtlEnabled = item.css('direction') === 'rtl'
+                    rtlEnabled = item.css("direction") === "rtl"
                 }
                 point = {
                     index: i,
@@ -14118,8 +13990,8 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     columnIndex: columnIndex
                 };
                 if (pointCreated)
-                    cancel = pointCreated(point);
-                if (!cancel)
+                    notCreatePoint = pointCreated(point);
+                if (!notCreatePoint)
                     result.push(point);
                 columnIndex++
             }
@@ -14205,7 +14077,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 })
             },
             isVisible: function() {
-                return this.option('showColumnHeaders') && (allowReordering(this) || allowResizing(this))
+                return this.option("showColumnHeaders") && (allowReordering(this) || allowResizing(this))
             },
             init: function() {
                 this.callBase();
@@ -14243,7 +14115,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 cursorName = utils.isDefined(cursorName) ? cursorName : "";
                 var $element = this.element();
                 if ($element) {
-                    $element.css('cursor', cursorName);
+                    $element.css("cursor", cursorName);
                     this._testCursorName = cursorName
                 }
             }
@@ -14251,7 +14123,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
         dataGrid.BlockSeparatorView = dataGrid.SeparatorView.inherit({
             _renderSeparator: function() {
                 this.callBase();
-                this.element().addClass(DATAGRID_BLOCK_SEPARATOR_CLASS).html('&nbsp;')
+                this.element().addClass(DATAGRID_BLOCK_SEPARATOR_CLASS).html("&nbsp;")
             },
             hide: function() {
                 var that = this,
@@ -14259,13 +14131,13 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     $element = this.element();
                 if ($element && this._isShown)
                     $element.hide();
-                if ($parent && !$parent.children('.' + DATAGRID_BLOCK_SEPARATOR_CLASS).length)
+                if ($parent && !$parent.children("." + DATAGRID_BLOCK_SEPARATOR_CLASS).length)
                     $parent.prepend(that.element());
                 that.callBase()
             },
             isVisible: function() {
                 var groupPanelOptions = this.option("groupPanel"),
-                    columnChooserOptions = this.option('columnChooser');
+                    columnChooserOptions = this.option("columnChooser");
                 return groupPanelOptions && groupPanelOptions.visible || columnChooserOptions && columnChooserOptions.enabled
             },
             show: function(targetLocation) {
@@ -14331,30 +14203,18 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 });
                 return result
             },
-            _pointCreated: function(point, columns, location, sourceColumn) {
-                var targetColumn = columns[point.columnIndex],
-                    prevColumn = columns[point.columnIndex - 1];
-                switch (location) {
-                    case"columnChooser":
-                        return true;
-                    case"headers":
-                        return sourceColumn && !sourceColumn.allowReordering || (!targetColumn || !targetColumn.allowReordering) && (!prevColumn || !prevColumn.allowReordering);
-                    default:
-                        return columns.length === 0
-                }
-            },
             _renderCore: function() {
-                this.element().addClass(DATAGRID_DRAGGING_HEADER_CLASS + ' ' + DATAGRID_CELL_CONTENT_CLASS + ' ' + WIDGET_CLASS).css('display', 'none')
+                this.element().addClass(DATAGRID_DRAGGING_HEADER_CLASS + " " + DATAGRID_CELL_CONTENT_CLASS + " " + WIDGET_CLASS).css("display", "none")
             },
             dispose: function() {
                 var element = this.element();
                 this._dragOptions = null;
-                element && element.parent().find('.' + DATAGRID_DRAGGING_HEADER_CLASS).remove()
+                element && element.parent().find("." + DATAGRID_DRAGGING_HEADER_CLASS).remove()
             },
             isVisible: function() {
                 var columnsController = this.getController("columns"),
                     commonColumnSettings = columnsController.getCommonSettings();
-                return this.option('showColumnHeaders') && (allowReordering(this) || commonColumnSettings.allowGrouping || commonColumnSettings.allowHiding)
+                return this.option("showColumnHeaders") && (allowReordering(this) || commonColumnSettings.allowGrouping || commonColumnSettings.allowHiding)
             },
             init: function() {
                 this.callBase();
@@ -14373,37 +14233,27 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     return false
                 };
                 that.element().css({
-                    textAlign: columnElement && columnElement.css('text-align'),
+                    textAlign: columnElement && columnElement.css("text-align"),
                     height: columnElement && columnElement.height(),
                     width: columnElement && columnElement.width(),
-                    whiteSpace: columnElement && columnElement.css('white-space')
+                    whiteSpace: columnElement && columnElement.css("white-space")
                 }).addClass(DATAGRID_HEADERS_DRAG_ACTION_CLASS).text(options.sourceColumn.caption);
                 that.element().appendTo($(document.body))
             },
             moveHeader: function(args) {
                 var e = args.jQueryEvent,
                     that = e.data.that,
-                    columnElements,
-                    pointsByColumns,
                     newLeft,
                     newTop,
                     moveDeltaX,
                     moveDeltaY,
                     eventData = events.eventData(e),
-                    targetDraggingPanel,
-                    controller = that._controller,
                     isResizing = that._columnsResizerViewController ? that._columnsResizerViewController.isResizing() : false,
-                    i,
-                    params,
-                    dragOptions = that._dragOptions,
-                    isVerticalOrientation,
-                    centerPosition,
-                    axisName,
-                    rtlEnabled;
+                    dragOptions = that._dragOptions;
                 if (that._isDragging && !isResizing) {
                     moveDeltaX = Math.abs(eventData.x - dragOptions.columnElement.offset().left - dragOptions.deltaX);
                     moveDeltaY = Math.abs(eventData.y - dragOptions.columnElement.offset().top - dragOptions.deltaY);
-                    if (that.element().is(':visible') || moveDeltaX > DRAGGING_DELTA || moveDeltaY > DRAGGING_DELTA) {
+                    if (that.element().is(":visible") || moveDeltaX > DRAGGING_DELTA || moveDeltaY > DRAGGING_DELTA) {
                         that.element().show();
                         newLeft = eventData.x - dragOptions.deltaX;
                         newTop = eventData.y - dragOptions.deltaY;
@@ -14411,41 +14261,52 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                             left: newLeft,
                             top: newTop
                         });
-                        targetDraggingPanel = that._getDraggingPanelByPos(eventData);
-                        if (targetDraggingPanel) {
-                            rtlEnabled = that.option('rtlEnabled');
-                            isVerticalOrientation = targetDraggingPanel.getName() === 'columnChooser';
-                            axisName = isVerticalOrientation ? 'y' : 'x';
-                            columnElements = targetDraggingPanel.getColumnElements() || [];
-                            pointsByColumns = dataGrid.getPointsByColumns(columnElements, function(point) {
-                                return that._pointCreated(point, targetDraggingPanel.getColumns(), targetDraggingPanel.getName(), dragOptions.sourceColumn)
-                            }, axisName === 'y');
-                            that._dropLocation = targetDraggingPanel.getName();
-                            if (pointsByColumns.length > 0)
-                                for (i = 0; i < pointsByColumns.length; i++) {
-                                    centerPosition = pointsByColumns[i + 1] && (pointsByColumns[i][axisName] + pointsByColumns[i + 1][axisName]) / 2;
-                                    if (centerPosition === undefined || (rtlEnabled && axisName === 'x' ? eventData[axisName] > centerPosition : eventData[axisName] < centerPosition)) {
-                                        that._dropColumnIndex = pointsByColumns[i].columnIndex;
-                                        params = that._getDropOptions();
-                                        if (columnElements[i])
-                                            params.targetColumnElement = columnElements.eq(i);
-                                        else {
-                                            params.targetColumnElement = columnElements.last();
-                                            params.isLast = true
-                                        }
-                                        params.posX = pointsByColumns[i].x;
-                                        controller.dock(params);
-                                        break
-                                    }
-                                }
-                            else {
-                                that._dropColumnIndex = -1;
-                                params = that._getDropOptions();
-                                controller.dock(params)
-                            }
-                        }
+                        that.dockHeader(eventData)
                     }
                     e.preventDefault()
+                }
+            },
+            dockHeader: function(eventData) {
+                var that = this,
+                    targetDraggingPanel = that._getDraggingPanelByPos(eventData),
+                    controller = that._controller,
+                    i,
+                    params,
+                    centerPosition;
+                if (targetDraggingPanel) {
+                    var rtlEnabled = that.option("rtlEnabled"),
+                        isVerticalOrientation = targetDraggingPanel.getName() === "columnChooser",
+                        axisName = isVerticalOrientation ? "y" : "x",
+                        columnElements = targetDraggingPanel.getColumnElements() || [],
+                        pointsByColumns = controller._generatePointsByColumns($.extend({}, that._dragOptions, {
+                            targetDraggingPanel: targetDraggingPanel,
+                            columns: targetDraggingPanel.getColumns(),
+                            columnElements: columnElements,
+                            isVerticalOrientation: isVerticalOrientation
+                        }));
+                    that._dropLocation = targetDraggingPanel.getName();
+                    if (pointsByColumns.length > 0)
+                        for (i = 0; i < pointsByColumns.length; i++) {
+                            centerPosition = pointsByColumns[i + 1] && (pointsByColumns[i][axisName] + pointsByColumns[i + 1][axisName]) / 2;
+                            if (centerPosition === undefined || (rtlEnabled && axisName === "x" ? eventData[axisName] > centerPosition : eventData[axisName] < centerPosition)) {
+                                that._dropColumnIndex = pointsByColumns[i].columnIndex;
+                                params = that._getDropOptions();
+                                if (columnElements[i])
+                                    params.targetColumnElement = columnElements.eq(i);
+                                else {
+                                    params.targetColumnElement = columnElements.last();
+                                    params.isLast = true
+                                }
+                                params.posX = pointsByColumns[i].x;
+                                controller.dock(params);
+                                break
+                            }
+                        }
+                    else {
+                        that._dropColumnIndex = -1;
+                        params = that._getDropOptions();
+                        controller.dock(params)
+                    }
                 }
             },
             dropHeader: function(args) {
@@ -14515,7 +14376,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     that._isReadyResizing = false;
                     that._columnsSeparatorView.changeCursor();
                     if (that._targetPoint && columnsSeparatorOffset.top <= eventData.y && columnsSeparatorOffset.top + that._columnsSeparatorView.height() >= eventData.y) {
-                        that._columnsSeparatorView.changeCursor('col-resize');
+                        that._columnsSeparatorView.changeCursor("col-resize");
                         that._columnsSeparatorView.moveByX(that._targetPoint.x - deltaX);
                         that._isReadyResizing = true;
                         e.preventDefault()
@@ -14530,7 +14391,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 var e = args.jQueryEvent,
                     that = e.data;
                 if (that._isResizing) {
-                    that._updatePointsByColumns();
+                    that._generatePointsByColumns();
                     that._resizingInfo = null;
                     that._columnsSeparatorView.hide();
                     that._columnsSeparatorView.changeCursor();
@@ -14586,21 +14447,21 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 that._pointsByColumns = pointsByColumns
             },
             _unsubscribeFromEvents: function() {
-                this._moveSeparatorHandler && this._$parentContainer.off(addNamespace('dxpointermove', DATAGRID_MODULE_NAMESPACE), this._moveSeparatorHandler);
-                this._startResizingHandler && this._$parentContainer.off(addNamespace('dxpointerdown', DATAGRID_MODULE_NAMESPACE), this._startResizingHandler);
+                this._moveSeparatorHandler && this._$parentContainer.off(addNamespace("dxpointermove", DATAGRID_MODULE_NAMESPACE), this._moveSeparatorHandler);
+                this._startResizingHandler && this._$parentContainer.off(addNamespace("dxpointerdown", DATAGRID_MODULE_NAMESPACE), this._startResizingHandler);
                 if (this._endResizingHandler) {
-                    this._columnsSeparatorView.element().off(addNamespace('dxpointerup', DATAGRID_MODULE_NAMESPACE), this._endResizingHandler);
-                    $(document).off(addNamespace('dxpointerup', DATAGRID_MODULE_NAMESPACE), this._endResizingHandler)
+                    this._columnsSeparatorView.element().off(addNamespace("dxpointerup", DATAGRID_MODULE_NAMESPACE), this._endResizingHandler);
+                    $(document).off(addNamespace("dxpointerup", DATAGRID_MODULE_NAMESPACE), this._endResizingHandler)
                 }
             },
             _subscribeToEvents: function() {
                 this._moveSeparatorHandler = this.createAction(this._moveSeparator);
                 this._startResizingHandler = this.createAction(this._startResizing);
                 this._endResizingHandler = this.createAction(this._endResizing);
-                this._$parentContainer.on(addNamespace('dxpointermove', DATAGRID_MODULE_NAMESPACE), this, this._moveSeparatorHandler);
-                this._$parentContainer.on(addNamespace('dxpointerdown', DATAGRID_MODULE_NAMESPACE), this, this._startResizingHandler);
-                this._columnsSeparatorView.element().on(addNamespace('dxpointerup', DATAGRID_MODULE_NAMESPACE), this, this._endResizingHandler);
-                $(document).on(addNamespace('dxpointerup', DATAGRID_MODULE_NAMESPACE), this, this._endResizingHandler)
+                this._$parentContainer.on(addNamespace("dxpointermove", DATAGRID_MODULE_NAMESPACE), this, this._moveSeparatorHandler);
+                this._$parentContainer.on(addNamespace("dxpointerdown", DATAGRID_MODULE_NAMESPACE), this, this._startResizingHandler);
+                this._columnsSeparatorView.element().on(addNamespace("dxpointerup", DATAGRID_MODULE_NAMESPACE), this, this._endResizingHandler);
+                $(document).on(addNamespace("dxpointerup", DATAGRID_MODULE_NAMESPACE), this, this._endResizingHandler)
             },
             _updateColumnsWidthIfNeeded: function(columnIndex, posX) {
                 var deltaX,
@@ -14622,25 +14483,13 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     column = visibleColumns[columnIndex];
                     nextColumn = visibleColumns[columnIndex + 1];
                     columnsController.beginUpdate();
-                    column && columnsController.columnOption(column.index, 'visibleWidth', undefined);
-                    nextColumn && columnsController.columnOption(nextColumn.index, 'visibleWidth', undefined);
-                    column && columnsController.columnOption(column.index, 'width', Math.floor(cellWidth));
-                    nextColumn && columnsController.columnOption(nextColumn.index, 'width', Math.floor(nextCellWidth));
+                    column && columnsController.columnOption(column.index, "visibleWidth", undefined);
+                    nextColumn && columnsController.columnOption(nextColumn.index, "visibleWidth", undefined);
+                    column && columnsController.columnOption(column.index, "width", Math.floor(cellWidth));
+                    nextColumn && columnsController.columnOption(nextColumn.index, "width", Math.floor(nextCellWidth));
                     columnsController.endUpdate()
                 }
                 return isUpdated
-            },
-            _updatePointsByColumns: function() {
-                var i,
-                    point,
-                    rtlEnabled = this.option("rtlEnabled"),
-                    headerElement;
-                for (i = 0; i < this._pointsByColumns.length; i++) {
-                    point = this._pointsByColumns[i];
-                    headerElement = this._columnHeadersView.getHeaderElement(point.columnIndex + 1);
-                    if (headerElement && headerElement.length > 0)
-                        point.x = headerElement.offset().left + (rtlEnabled ? headerElement.outerWidth() : 0)
-                }
             },
             isResizing: function() {
                 return this._isResizing
@@ -14674,8 +14523,8 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         that._subscribeToEvents()
                     });
                     that._rowsView.renderCompleted.add(function() {
-                        that._rowsView.scrollOffsetChanged.remove(generatePointsByColumnsScrollHandler);
-                        that._rowsView.scrollOffsetChanged.add(generatePointsByColumnsScrollHandler)
+                        that._rowsView.scrollChanged.remove(generatePointsByColumnsScrollHandler);
+                        that._rowsView.scrollChanged.add(generatePointsByColumnsScrollHandler)
                     });
                     gridView = that.getView("gridView");
                     previousScrollbarVisibility = that._rowsView.getScrollbarWidth() !== 0;
@@ -14724,6 +14573,24 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
             }
         });
         dataGrid.DraggingHeaderViewController = dataGrid.ViewController.inherit({
+            _generatePointsByColumns: function(options) {
+                var that = this;
+                return dataGrid.getPointsByColumns(options.columnElements, function(point) {
+                        return that._pointCreated(point, options.columns, options.targetDraggingPanel.getName(), options.sourceColumn)
+                    }, options.isVerticalOrientation)
+            },
+            _pointCreated: function(point, columns, location, sourceColumn) {
+                var targetColumn = columns[point.columnIndex],
+                    prevColumn = columns[point.columnIndex - 1];
+                switch (location) {
+                    case"columnChooser":
+                        return true;
+                    case"headers":
+                        return sourceColumn && !sourceColumn.allowReordering || (!targetColumn || !targetColumn.allowReordering) && (!prevColumn || !prevColumn.allowReordering);
+                    default:
+                        return columns.length === 0
+                }
+            },
             _subscribeToEvents: function(draggingHeader, draggingPanels) {
                 var that = this;
                 $.each(draggingPanels, function(_, draggingPanel) {
@@ -14735,7 +14602,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                             var $columnElement = $(columnElement);
                             if (draggingPanel.allowDragging(columns[index], draggingPanels)) {
                                 $columnElement.addClass(DATAGRID_HEADERS_DRAG_ACTION_CLASS);
-                                $columnElement.on(addNamespace('dxdragstart', DATAGRID_MODULE_NAMESPACE), that.createAction(function(args) {
+                                $columnElement.on(addNamespace("dxdragstart", DATAGRID_MODULE_NAMESPACE), that.createAction(function(args) {
                                     var e = args.jQueryEvent,
                                         eventData = events.eventData(e);
                                     draggingHeader.dragHeader({
@@ -14748,8 +14615,8 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                         draggingPanels: draggingPanels
                                     })
                                 }));
-                                $columnElement.on(addNamespace('dxdrag', DATAGRID_MODULE_NAMESPACE), {that: draggingHeader}, that.createAction(draggingHeader.moveHeader));
-                                $columnElement.on(addNamespace('dxdragend', DATAGRID_MODULE_NAMESPACE), {that: draggingHeader}, that.createAction(draggingHeader.dropHeader))
+                                $columnElement.on(addNamespace("dxdrag", DATAGRID_MODULE_NAMESPACE), {that: draggingHeader}, that.createAction(draggingHeader.moveHeader));
+                                $columnElement.on(addNamespace("dxdragend", DATAGRID_MODULE_NAMESPACE), {that: draggingHeader}, that.createAction(draggingHeader.dropHeader))
                             }
                         })
                     }
@@ -14761,9 +14628,9 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         var columnElements = draggingPanel.getColumnElements() || [];
                         $.each(columnElements, function(index, columnElement) {
                             var $columnElement = $(columnElement);
-                            $columnElement.off(addNamespace('dxdragstart', DATAGRID_MODULE_NAMESPACE));
-                            $columnElement.off(addNamespace('dxdrag', DATAGRID_MODULE_NAMESPACE));
-                            $columnElement.off(addNamespace('dxdragend', DATAGRID_MODULE_NAMESPACE));
+                            $columnElement.off(addNamespace("dxdragstart", DATAGRID_MODULE_NAMESPACE));
+                            $columnElement.off(addNamespace("dxdrag", DATAGRID_MODULE_NAMESPACE));
+                            $columnElement.off(addNamespace("dxdragend", DATAGRID_MODULE_NAMESPACE));
                             $columnElement.removeClass(DATAGRID_HEADERS_DRAG_ACTION_CLASS)
                         })
                     }
@@ -14787,7 +14654,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 that._columnHeadersView = that.getView("columnHeadersView");
                 that._columnsSeparatorView = that.getView("columnsSeparatorView");
                 that._draggingHeaderView = that.getView("draggingHeaderView");
-                that._rowsView = that.getView('rowsView');
+                that._rowsView = that.getView("rowsView");
                 that._blockSeparatorView = that.getView("blockSeparatorView");
                 that._headerPanelView = that.getView("headerPanel");
                 that._columnChooserView = that.getView("columnChooserView");
@@ -14817,20 +14684,20 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 var showSeparator = function() {
                         if (that._animationColumnIndex !== targetColumnIndex) {
                             that.hideSeparators();
-                            separator.element()[parameters.isLast ? 'insertAfter' : 'insertBefore'](parameters.targetColumnElement);
+                            separator.element()[parameters.isLast ? "insertAfter" : "insertBefore"](parameters.targetColumnElement);
                             that._animationColumnIndex = targetColumnIndex;
                             separator.show(targetLocation)
                         }
                     };
-                that._columnHeadersView.element().find('.' + DATAGRID_HEADER_ROW_CLASS).toggleClass(DATAGRID_HEADERS_DROP_HIGHLIGHT_CLASS, sourceLocation !== 'headers' && targetLocation === 'headers' && !hasTargetColumnIndex);
+                that._columnHeadersView.element().find("." + DATAGRID_HEADER_ROW_CLASS).toggleClass(DATAGRID_HEADERS_DROP_HIGHLIGHT_CLASS, sourceLocation !== "headers" && targetLocation === "headers" && !hasTargetColumnIndex);
                 if (separator) {
                     if (sourceColumnElement) {
                         sourceColumnElement.css({opacity: 0.5});
-                        if (sourceLocation === 'headers')
+                        if (sourceLocation === "headers")
                             that._rowsView.setRowsOpacity(sourceColumnIndex, 0.5)
                     }
                     if (that.allowDrop(parameters) && hasTargetColumnIndex)
-                        if (targetLocation === 'group' || targetLocation === 'columnChooser')
+                        if (targetLocation === "group" || targetLocation === "columnChooser")
                             showSeparator();
                         else {
                             that.hideSeparators();
@@ -14844,9 +14711,9 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
             drop: function(parameters) {
                 var sourceColumnElement = parameters.sourceColumnElement;
                 if (sourceColumnElement) {
-                    sourceColumnElement.css({opacity: ''});
-                    this._rowsView.setRowsOpacity(parameters.sourceColumnIndex, '');
-                    this._columnHeadersView.element().find('.' + DATAGRID_HEADER_ROW_CLASS).removeClass(DATAGRID_HEADERS_DROP_HIGHLIGHT_CLASS)
+                    sourceColumnElement.css({opacity: ""});
+                    this._rowsView.setRowsOpacity(parameters.sourceColumnIndex, "");
+                    this._columnHeadersView.element().find("." + DATAGRID_HEADER_ROW_CLASS).removeClass(DATAGRID_HEADERS_DROP_HIGHLIGHT_CLASS)
                 }
                 if (this.allowDrop(parameters)) {
                     var separator = this._getSeparator(parameters.targetLocation);
@@ -14942,9 +14809,9 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         var event = actionArgs.jQueryEvent,
                             $targetElement = $(event.target),
                             contextMenuInstance = actionArgs.component,
-                            items = that.getController('contextMenu').getContextMenuItems($targetElement);
+                            items = that.getController("contextMenu").getContextMenuItems($targetElement);
                         if (items) {
-                            contextMenuInstance.option('items', items);
+                            contextMenuInstance.option("items", items);
                             event.stopPropagation()
                         }
                         else
@@ -14998,7 +14865,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         $cell = that._getNextCell("upArrow");
                     if ($cell && $cell.length > 0)
                         setTimeout(function() {
-                            if (that.getController('editorFactory').focus())
+                            if (that.getController("editorFactory").focus())
                                 that._focus($cell);
                             that._editingController.isEditing() && $.proxy(that._focusInteractiveElement, that)($cell)
                         })
@@ -15071,10 +14938,14 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     var rowsView = this.getView("rowsView"),
                         visibleColumns = this._columnsController.getVisibleColumns(),
                         columnIndex = rowsView.getCellIndex($cell),
-                        isExpandColumn = !allCommandColumns ? visibleColumns[columnIndex].command === "expand" : false,
-                        isValidGroupSpaceColumn = !utils.isDefined(visibleColumns[columnIndex].groupIndex) || parseInt($cell.attr("colspan")) > 1;
-                    if (visibleColumns.length > columnIndex && isValidGroupSpaceColumn)
-                        return !utils.isDefined(visibleColumns[columnIndex].command) || isExpandColumn
+                        column = visibleColumns[columnIndex],
+                        isValidGroupSpaceColumn = function() {
+                            return column && !utils.isDefined(column.groupIndex) || parseInt($cell.attr("colspan")) > 1
+                        };
+                    if (visibleColumns.length > columnIndex && isValidGroupSpaceColumn()) {
+                        var isExpandColumn = !allCommandColumns ? column.command === "expand" : false;
+                        return column && !utils.isDefined(column.command) || isExpandColumn
+                    }
                 }
             },
             _isCellByPositionValid: function(cellPosition, allCommandColumns) {
@@ -15099,7 +14970,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 }
                 $focusElement.attr("tabindex", 0);
                 $focusElement.focus();
-                this.getController('editorFactory').focus($focusElement)
+                this.getController("editorFactory").focus($focusElement)
             },
             _hasSkipRow: function($row) {
                 return $row && ($row.hasClass(DATAGRID_MASTER_DETAIL_ROW_CLASS) || $row.hasClass(DATAGRID_GROUP_FOOTER_CLASS))
@@ -15199,7 +15070,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 }
             },
             _tabKeyHandler: function(eventArgs, isEditing) {
-                var editingOptions = this.option('editing'),
+                var editingOptions = this.option("editing"),
                     direction = eventArgs.shift ? "previous" : "next",
                     $cell;
                 if (editingOptions && eventArgs.originalEvent.target)
@@ -15430,7 +15301,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         rowIndex: 0
                     };
                     that._dataController.changed.add(function(change) {
-                        if (that._focusedCellPosition && change && change.changeType === 'prepend')
+                        if (that._focusedCellPosition && change && change.changeType === "prepend")
                             that._focusedCellPosition.rowIndex += change.items.length
                     });
                     that._initFocusedViews();
@@ -15442,8 +15313,8 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     $(document).on(events.addNamespace("dxpointerdown", "dxDataGridKeyboardNavigation"), that._documentClickHandler)
                 }
             },
-            _scrollToElement: function($element) {
-                this._focusedView.getScrollable().scrollToElement($element)
+            _scrollToElement: function($element, offset) {
+                this._focusedView.getScrollable().scrollToElement($element, offset)
             },
             focus: function($element) {
                 var focusView = this._getFocusedViewByElement($element);
@@ -15453,6 +15324,9 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     this._focus($element);
                     this._isHeaderView(focusView.view.name) && this._focusInteractiveElement($element)
                 }
+            },
+            getFocusedView: function() {
+                return this._focusedView
             },
             _getFocusedViewByElement: function($element) {
                 var condition = function(view) {
@@ -15493,7 +15367,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
             optionChanged: function(args) {
                 var that = this;
                 switch (args.name) {
-                    case'useKeyboard':
+                    case"useKeyboard":
                         args.handled = true;
                         break;
                     default:
@@ -15603,7 +15477,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
             optionChanged: function(args) {
                 var that = this;
                 switch (args.name) {
-                    case'errorRowEnabled':
+                    case"errorRowEnabled":
                         args.handled = true;
                         break;
                     default:
@@ -15611,14 +15485,14 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 }
             }
         });
-        dataGrid.registerModule('errorHandling', {
+        dataGrid.registerModule("errorHandling", {
             defaultOptions: function() {
                 return {errorRowEnabled: true}
             },
             controllers: {errorHandling: dataGrid.ErrorHandlingController},
             extenders: {controllers: {data: {init: function() {
                             var that = this,
-                                errorHandlingController = that.getController('errorHandling');
+                                errorHandlingController = that.getController("errorHandling");
                             that.callBase();
                             that.dataErrorOccurred.add(function(error) {
                                 var message = error && error.message || error;
@@ -15649,7 +15523,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 if (!column.command && summaryItems) {
                     for (i = 0; i < summaryItems.length; i++) {
                         summaryItem = summaryItems[i];
-                        $summaryItems.push($("<div>").css('text-align', summaryItem.alignment || column.alignment).addClass(DATAGRID_SUMMARY_ITEM_CLASS).addClass(DATAGRID_TEXT_CONTENT_CLASS).addClass(summaryItem.cssClass).toggleClass(DATAGRID_GROUP_TEXT_CONTENT_CLASS, options.rowType === "group").text(dataGrid.getSummaryText(summaryItem, options.summaryTexts)))
+                        $summaryItems.push($("<div>").css("text-align", summaryItem.alignment || column.alignment).addClass(DATAGRID_SUMMARY_ITEM_CLASS).addClass(DATAGRID_TEXT_CONTENT_CLASS).addClass(summaryItem.cssClass).toggleClass(DATAGRID_GROUP_TEXT_CONTENT_CLASS, options.rowType === "group").text(dataGrid.getSummaryText(summaryItem, options.summaryTexts)))
                     }
                     $cell.append($summaryItems)
                 }
@@ -15786,7 +15660,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
             DATAGRID_SUMMARY_ITEM_CLASS: DATAGRID_SUMMARY_ITEM_CLASS,
             DATAGRID_GROUP_FOOTER_CLASS: DATAGRID_GROUP_FOOTER_CLASS
         });
-        dataGrid.registerModule('summary', {
+        dataGrid.registerModule("summary", {
             defaultOptions: function() {
                 return {
                         summary: {
@@ -15851,13 +15725,12 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                         var groupColumnIndex = -1,
                                             afterGroupColumnIndex = -1;
                                         $.each(options.visibleColumns, function(visibleIndex) {
-                                            if (groupColumnIndex >= 0) {
+                                            if (groupItem.groupIndex === this.groupIndex)
+                                                groupColumnIndex = this.index;
+                                            if (visibleIndex > 0 && utils.isDefined(options.visibleColumns[visibleIndex - 1].groupIndex) && !utils.isDefined(this.groupIndex)) {
                                                 afterGroupColumnIndex = this.index;
-                                                if (afterGroupColumnIndex >= 0)
-                                                    return false
+                                                return false
                                             }
-                                            else if (groupItem.groupIndex === this.groupIndex)
-                                                groupColumnIndex = this.index
                                         });
                                         groupItem.summaryCells = this._calculateSummaryCells(options.summaryGroupItems, groupItem.data.aggregates || [], options.visibleColumns, function(summaryItem, column) {
                                             if (summaryItem.showInGroupFooter)
@@ -15921,7 +15794,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                         summaryCells = this._getSummaryCells(summaryTotalItems, totalAggregates);
                                         if (summaryCells.length)
                                             that._footerItems.push({
-                                                rowType: 'totalFooter',
+                                                rowType: "totalFooter",
                                                 summaryCells: summaryCells
                                             })
                                     }
@@ -15936,7 +15809,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                                 aggregator = summaryItem.summaryType || "count",
                                                 selector = calculateCellValue,
                                                 options;
-                                            if (aggregator === 'avg' || aggregator === 'sum')
+                                            if (aggregator === "avg" || aggregator === "sum")
                                                 selector = function(data) {
                                                     return Number(calculateCellValue(data))
                                                 };
@@ -16037,7 +15910,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                 _createDataSourceAdapterCore: function(dataSource, remoteOperations) {
                                     var summary = this._getSummaryOptions(),
                                         dataSourceAdapter;
-                                    if (remoteOperations === 'auto' && summary)
+                                    if (remoteOperations === "auto" && summary)
                                         remoteOperations = {
                                             filtering: true,
                                             sorting: true,
@@ -16155,7 +16028,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
             DATAGRID_MASTER_DETAIL_ROW_CLASS: DATAGRID_MASTER_DETAIL_ROW_CLASS,
             DATAGRID_ROW_LINES_CLASS: DATAGRID_ROW_LINES_CLASS
         });
-        dataGrid.registerModule('masterDetail', {
+        dataGrid.registerModule("masterDetail", {
             defaultOptions: function() {
                 return {masterDetail: {
                             enabled: false,
@@ -16173,14 +16046,14 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         }},
                     columns: {_getExpandColumnsCore: function() {
                             var expandColumns = this.callBase();
-                            if (this.option('masterDetail.enabled'))
+                            if (this.option("masterDetail.enabled"))
                                 expandColumns.push({});
                             return expandColumns
                         }},
                     data: function() {
                         var initMasterDetail = function(that) {
                                 that._expandedItems = [];
-                                that._isExpandAll = that.option('masterDetail.autoExpandAll')
+                                that._isExpandAll = that.option("masterDetail.autoExpandAll")
                             };
                         return {
                                 init: function() {
@@ -16241,7 +16114,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                             });
                                         rowIndex = that.getRowIndexByKey(key);
                                         that.updateItems({
-                                            changeType: 'update',
+                                            changeType: "update",
                                             rowIndices: [rowIndex, rowIndex + 1]
                                         })
                                     }
@@ -16253,7 +16126,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                     if (options.detailColumnIndex === undefined) {
                                         options.detailColumnIndex = -1;
                                         $.each(options.visibleColumns, function(index, column) {
-                                            if (column.command === 'expand' && !utils.isDefined(column.groupIndex)) {
+                                            if (column.command === "expand" && !utils.isDefined(column.groupIndex)) {
                                                 options.detailColumnIndex = index;
                                                 return false
                                             }
@@ -16273,10 +16146,10 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                     $.each(items, function(index, item) {
                                         result.push(item);
                                         expandIndex = dataGrid.getIndexByKey(item.key, that._expandedItems);
-                                        if (item.rowType === 'data' && (item.isExpanded || expandIndex >= 0) && !item.inserted)
+                                        if (item.rowType === "data" && (item.isExpanded || expandIndex >= 0) && !item.inserted)
                                             result.push({
                                                 visible: item.isExpanded,
-                                                rowType: 'detail',
+                                                rowType: "detail",
                                                 key: item.key,
                                                 data: item.data,
                                                 values: []
@@ -16290,19 +16163,19 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                         previousValue,
                                         isEnabledChanged,
                                         isAutoExpandAllChanged;
-                                    if (args.name === 'masterDetail') {
-                                        args.name = 'dataSource';
+                                    if (args.name === "masterDetail") {
+                                        args.name = "dataSource";
                                         switch (args.fullName) {
-                                            case'masterDetail':
+                                            case"masterDetail":
                                                 value = args.value || {};
                                                 previousValue = args.previousValue || {};
                                                 isEnabledChanged = value.enabled !== previousValue.enabled;
                                                 isAutoExpandAllChanged = value.autoExpandAll !== previousValue.autoExpandAll;
                                                 break;
-                                            case'masterDetail.enabled':
+                                            case"masterDetail.enabled":
                                                 isEnabledChanged = true;
                                                 break;
-                                            case'masterDetail.autoExpandAll':
+                                            case"masterDetail.autoExpandAll":
                                                 isAutoExpandAllChanged = true;
                                                 break
                                         }
@@ -16325,10 +16198,8 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                     var that = this,
                                         column = options.column,
                                         template;
-                                    if (column.command === 'detail') {
-                                        template = that.option('masterDetail.template') || that._getDefaultTemplate(column);
-                                        options.denyRenderToDetachedContainer = true
-                                    }
+                                    if (column.command === "detail")
+                                        template = that.option("masterDetail.template") || that._getDefaultTemplate(column);
                                     else
                                         template = that.callBase.apply(that, arguments);
                                     return template
@@ -16336,7 +16207,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                 _createRow: function(row) {
                                     var $row = this.callBase(row);
                                     if (row && row.rowType === "detail") {
-                                        this.option('showRowLines') && $row.addClass(DATAGRID_ROW_LINES_CLASS);
+                                        this.option("showRowLines") && $row.addClass(DATAGRID_ROW_LINES_CLASS);
                                         $row.addClass(DATAGRID_MASTER_DETAIL_ROW_CLASS).toggle(row.visible)
                                     }
                                     return $row
@@ -16359,7 +16230,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                         $detailCell,
                                         groupCellOptions = this._getGroupCellOptions(options),
                                         i;
-                                    if (row.rowType === 'detail') {
+                                    if (row.rowType === "detail") {
                                         for (i = 0; i < groupCellOptions.emptyCellsCount; i++)
                                             this._renderCell($row, {
                                                 value: null,
@@ -16371,10 +16242,10 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                             value: null,
                                             row: row,
                                             rowIndex: row.rowIndex,
-                                            column: {command: 'detail'},
+                                            column: {command: "detail"},
                                             columnIndex: groupCellOptions.columnIndex
                                         });
-                                        $detailCell.addClass(DATAGRID_MASTER_DETAIL_CELL_CLASS).attr('colspan', groupCellOptions.colspan)
+                                        $detailCell.addClass(DATAGRID_MASTER_DETAIL_CELL_CLASS).attr("colspan", groupCellOptions.colspan)
                                     }
                                     else
                                         this.callBase.apply(this, arguments)
@@ -16390,12 +16261,24 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
             utils = DX.utils,
             dataGrid = ui.dxDataGrid;
         var DATAGRID_CONTENT_CLASS = "dx-datagrid-content",
+            DATAGRID_GROUP_ROW_CLASS = "dx-group-row",
+            DATAGRID_FIRST_CELL_CLASS = "dx-first-cell",
             DATAGRID_HOVER_STATE_CLASS = "dx-state-hover",
             DATAGRID_HEADER_ROW_CLASS = "dx-header-row",
             DATAGRID_CONTENT_FIXED_CLASS = "dx-datagrid-content-fixed",
             DATAGRID_FIXED_COL_CLASS = "dx-col-fixed",
             DATAGRID_POINTER_EVENTS_TARGET_CLASS = "dx-pointer-events-target",
-            DATAGRID_POINTER_EVENTS_NONE_CLASS = "dx-pointer-events-none";
+            DATAGRID_POINTER_EVENTS_NONE_CLASS = "dx-pointer-events-none",
+            getTransparentColumnIndex = function(fixedColumns) {
+                var transparentColumnIndex;
+                $.each(fixedColumns, function(index, column) {
+                    if (column.command === "transparent") {
+                        transparentColumnIndex = index;
+                        return false
+                    }
+                });
+                return transparentColumnIndex
+            };
         var baseFixedColumns = {
                 init: function() {
                     this.callBase();
@@ -16437,16 +16320,29 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         that.wrapTableInScrollContainer(that._fixedTableElement).appendTo(that.element()).addClass(DATAGRID_CONTENT_FIXED_CLASS + " " + DATAGRID_POINTER_EVENTS_TARGET_CLASS);
                         that._isFixedTableRendering = false
                     }
-                    else
+                    else {
                         that._fixedTableElement && that._fixedTableElement.remove();
+                        that._fixedTableElement = null
+                    }
                     return $table
                 },
                 _renderCellContent: function($cell, options) {
                     var that = this,
+                        trasparentColumnIndex,
                         column = options.column;
-                    if (!that._isFixedTableRendering && that._isFixedColumns && (options.rowType !== "group" || !utils.isDefined(column.groupIndex)) && (column.fixed || column.command))
-                        $cell.html("&nbsp;").addClass(column.cssClass);
-                    else if (column.command !== "transparent")
+                    if (!that._isFixedTableRendering && that._isFixedColumns && (options.rowType !== "group" || !utils.isDefined(column.groupIndex))) {
+                        if (column.fixed || column.command) {
+                            $cell.html("&nbsp;").addClass(column.cssClass);
+                            return
+                        }
+                        if (options.rowType === "filter") {
+                            that.callBase($cell, options);
+                            trasparentColumnIndex = getTransparentColumnIndex(that._columnsController.getFixedColumns());
+                            $cell.toggleClass(DATAGRID_FIRST_CELL_CLASS, options.columnIndex === trasparentColumnIndex);
+                            return
+                        }
+                    }
+                    if (column.command !== "transparent")
                         that.callBase($cell, options)
                 },
                 getCellElements: function(rowIndex) {
@@ -16516,6 +16412,32 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     if (this._fixedTableElement)
                         result = result.add(this._fixedTableElement);
                     return result
+                },
+                getFixedColumns: function() {
+                    return this._columnsController.getFixedColumns()
+                },
+                getFixedColumnsOffset: function() {
+                    var offset = {
+                            left: 0,
+                            right: 0
+                        },
+                        $transparentColumn,
+                        positionTransparentColumn;
+                    if (this._fixedTableElement) {
+                        $transparentColumn = this.getTransparentColumnElement();
+                        positionTransparentColumn = $transparentColumn.position();
+                        offset = {
+                            left: positionTransparentColumn.left,
+                            right: this.element().outerWidth(true) - ($transparentColumn.outerWidth(true) + positionTransparentColumn.left)
+                        }
+                    }
+                    return offset
+                },
+                getTransparentColumnElement: function() {
+                    return this._fixedTableElement && this._fixedTableElement.find("." + DATAGRID_POINTER_EVENTS_NONE_CLASS).first()
+                },
+                isFixedColumns: function() {
+                    return this._isFixedColumns
                 },
                 _resizeCore: function() {
                     this.callBase();
@@ -16617,6 +16539,9 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         rtlEnabled = that.option("rtlEnabled");
                     that.callBase(width);
                     that.element().children("." + DATAGRID_CONTENT_FIXED_CLASS).css(rtlEnabled ? {paddingLeft: width} : {paddingRight: width})
+                },
+                getFixedColumnElements: function() {
+                    return this._fixedTableElement && this._getRowElements(this._fixedTableElement).eq(0).children()
                 }
             });
         var RowsViewFixedColumnsExtender = $.extend({}, baseFixedColumns, {
@@ -16637,8 +16562,10 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         that._updateContent($content, options.change, $fixedTable);
                         that._isFixedTableRendering = false
                     }
-                    else
+                    else {
                         that._fixedTableElement && that._fixedTableElement.remove();
+                        that._fixedTableElement = null
+                    }
                     return $table
                 },
                 _findContentElement: function() {
@@ -16663,6 +16590,10 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         return $content
                     }
                     return that.callBase()
+                },
+                _updateBottomLoading: function() {
+                    if (!this._isFixedTableRendering)
+                        this.callBase()
                 },
                 _renderContent: function(contentElement, tableElement) {
                     if (this._isFixedTableRendering)
@@ -16731,29 +16662,22 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     var that = this,
                         columns = that.getColumns(),
                         columnIndex = cellPosition.columnIndex,
-                        $rows;
-                    if (columns && columnIndex < columns.length && (columns[columnIndex].fixed || columns[columnIndex].command === "expand")) {
+                        $rows = that._getRowElements(that._fixedTableElement),
+                        $row = $rows.eq(cellPosition.rowIndex),
+                        isGroupRow = $row.hasClass(DATAGRID_GROUP_ROW_CLASS),
+                        $fixedRows;
+                    if (columns && columnIndex < columns.length && (columns[columnIndex].fixed || columns[columnIndex].command === "expand" || isGroupRow)) {
                         var $colspanElement;
-                        $rows = that._getRowElements(that._fixedTableElement);
-                        $colspanElement = $rows.first().find("[colspan]");
-                        if ($colspanElement.length && $colspanElement[0].cellIndex < columnIndex)
+                        $fixedRows = $rows;
+                        $colspanElement = $row.find("[colspan]");
+                        if (!isGroupRow && $colspanElement.length && $colspanElement[0].cellIndex < columnIndex)
                             cellPosition.columnIndex = columnIndex - $colspanElement.attr("colspan") + 1
                     }
-                    return that.callBase(cellPosition, $rows)
-                },
-                optionChanged: function(args) {
-                    switch (args.name) {
-                        case'scrolling':
-                        case'rtlEnabled':
-                        case"disabled":
-                        case'loadPanel':
-                            this._fixedTableElement = null
-                    }
-                    this.callBase(args)
+                    return that.callBase(cellPosition, $fixedRows)
                 }
             });
         var FooterViewFixedColumnsExtender = baseFixedColumns;
-        dataGrid.registerModule('fixedColumns', {
+        dataGrid.registerModule("fixedColumns", {
             defaultOptions: function() {
                 return {columnFixing: {
                             enabled: false,
@@ -16769,68 +16693,92 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 views: {
                     columnHeadersView: ColumnHeadersViewFixedColumnsExtender,
                     rowsView: RowsViewFixedColumnsExtender,
-                    footerView: FooterViewFixedColumnsExtender,
-                    draggingHeaderView: {_pointCreated: function(point, columns, location, sourceColumn) {
-                            var result = this.callBase.apply(this, arguments),
-                                targetColumn = columns[point.columnIndex],
-                                prevColumn = columns[point.columnIndex - 1],
-                                getFixedPosition = function(column) {
-                                    return column.fixedPosition === "right" ? "right" : "left"
-                                };
-                            if (!result && location === "headers")
-                                if (sourceColumn && sourceColumn.fixed)
-                                    return !(targetColumn && targetColumn.fixed && getFixedPosition(targetColumn) === getFixedPosition(sourceColumn) || prevColumn && prevColumn.fixed && getFixedPosition(prevColumn) === getFixedPosition(sourceColumn));
-                                else
-                                    return targetColumn && targetColumn.fixed && getFixedPosition(targetColumn) !== "right" || prevColumn && prevColumn.fixed && getFixedPosition(prevColumn) === "right";
-                            return result
-                        }}
+                    footerView: FooterViewFixedColumnsExtender
                 },
-                controllers: {
-                    keyboardNavigation: {_scrollToElement: function($element) {
-                            var offset = this._columnsController._getFixedColumnsOffset();
-                            this._focusedView.getScrollable().scrollToElement($element, offset)
-                        }},
-                    columns: {
-                        _getFixedColumnsOffset: function() {
-                            var offset = {
-                                    left: 0,
-                                    right: 0
-                                };
-                            if (this.option("columnFixing.enabled"))
-                                offset = {
-                                    left: this._getFixedOffsetBySide("left"),
-                                    right: this._getFixedOffsetBySide("right")
-                                };
-                            return offset
-                        },
-                        _getFixedOffsetBySide: function(direction) {
-                            var columnWidths = this.component.getView("rowsView").getColumnWidths(),
-                                visibleColumns = this.getVisibleColumns(),
-                                isDirectionLeft = direction === "left",
-                                loopParams = isDirectionLeft ? {
-                                    seedValue: 0,
-                                    runningCondition: function() {
-                                        return i < visibleColumns.length
+                controllers: function() {
+                    var normalizeColumnIndicesByPoints = function(columns, pointsByColumns) {
+                            var transparentColumnIndex = getTransparentColumnIndex(columns);
+                            if (transparentColumnIndex)
+                                $.each(pointsByColumns, function(_, point) {
+                                    if (point.index > transparentColumnIndex) {
+                                        point.columnIndex += columns[transparentColumnIndex].colspan - 1;
+                                        point.index += columns[transparentColumnIndex].colspan - 1
                                     }
-                                } : {
-                                    seedValue: visibleColumns.length - 1,
-                                    runningCondition: function() {
-                                        return i > 0
+                                });
+                            return pointsByColumns
+                        };
+                    return {
+                            draggingHeader: {
+                                _generatePointsByColumns: function(options) {
+                                    var pointsByColumns,
+                                        targetDraggingPanel = options.targetDraggingPanel;
+                                    if (targetDraggingPanel && targetDraggingPanel.getName() === "headers" && targetDraggingPanel.isFixedColumns())
+                                        if (options.sourceColumn.fixed) {
+                                            options.columnElements = targetDraggingPanel.getFixedColumnElements();
+                                            options.columns = targetDraggingPanel.getFixedColumns();
+                                            pointsByColumns = this.callBase(options);
+                                            return normalizeColumnIndicesByPoints(options.columns, pointsByColumns)
+                                        }
+                                    return this.callBase(options)
+                                },
+                                _pointCreated: function(point, columns, location, sourceColumn) {
+                                    var result = this.callBase.apply(this, arguments),
+                                        $transparentColumn = this._columnHeadersView.getTransparentColumnElement(),
+                                        boundingRect;
+                                    if (!result && location === "headers" && $transparentColumn) {
+                                        boundingRect = $transparentColumn.get(0).getBoundingClientRect();
+                                        if (sourceColumn && sourceColumn.fixed)
+                                            return sourceColumn.fixedPosition === "right" ? point.x < boundingRect.right : point.x > boundingRect.left;
+                                        else
+                                            return point.x < boundingRect.left || point.x > boundingRect.right
+                                    }
+                                    return result
+                                }
+                            },
+                            columnsResizer: {
+                                _generatePointsByColumns: function() {
+                                    var that = this,
+                                        columns = that._columnsController ? that._columnsController.getFixedColumns() : [],
+                                        cells = that._columnHeadersView.getFixedColumnElements(),
+                                        pointsByFixedColumns = [];
+                                    that.callBase();
+                                    if (cells && cells.length > 0) {
+                                        pointsByFixedColumns = dataGrid.getPointsByColumns(cells, function(point) {
+                                            return that._pointCreated(point, cells.length, columns)
+                                        });
+                                        that._pointsByFixedColumns = normalizeColumnIndicesByPoints(columns, pointsByFixedColumns)
                                     }
                                 },
-                                offset = 0,
-                                i;
-                            for (i = loopParams.seedValue; loopParams.runningCondition; isDirectionLeft ? i++ : i--) {
-                                var column = visibleColumns[i];
-                                if (column.fixed || column.command)
-                                    offset += columnWidths[i];
-                                else
-                                    break
-                            }
-                            return offset
+                                _pointCreated: function(point, cellsLength, columns) {
+                                    var currentColumn,
+                                        nextColumn;
+                                    if (point.index > 0 && point.index < cellsLength) {
+                                        currentColumn = columns[point.columnIndex - 1] || {};
+                                        nextColumn = columns[point.columnIndex] || {};
+                                        if (currentColumn.fixed || nextColumn.fixed) {
+                                            point.columnIndex -= 1;
+                                            return !((currentColumn.allowResizing || currentColumn.command === "transparent") && (nextColumn.allowResizing || nextColumn.command === "transparent"))
+                                        }
+                                    }
+                                    return this.callBase.apply(this, arguments)
+                                },
+                                _getTargetPoint: function(pointsByColumns, currentX, deltaX) {
+                                    var $transparentColumn = this._columnHeadersView.getTransparentColumnElement(),
+                                        boundingRect;
+                                    if ($transparentColumn) {
+                                        boundingRect = $transparentColumn.get(0).getBoundingClientRect();
+                                        if (currentX <= boundingRect.left || currentX >= boundingRect.right)
+                                            return this.callBase(this._pointsByFixedColumns, currentX, deltaX)
+                                    }
+                                    return this.callBase(pointsByColumns, currentX, deltaX)
+                                }
+                            },
+                            keyboardNavigation: {_scrollToElement: function($element) {
+                                    var focusedView = this.getFocusedView();
+                                    this.callBase($element, focusedView && focusedView.getFixedColumnsOffset())
+                                }}
                         }
-                    }
-                }
+                }()
             }
         })
     })(jQuery, DevExpress);
@@ -17065,7 +17013,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     this._clientExporter.option("exportedAction", this.getAction(args.name))
             },
             callbackNames: function() {
-                return ['selectionOnlyChanged']
+                return ["selectionOnlyChanged"]
             },
             getExportFormat: function() {
                 return ["EXCEL"]
@@ -17202,7 +17150,10 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                     position: {
                                         at: "left bottom",
                                         my: "left top",
-                                        offset: "0 3"
+                                        offset: "0 3",
+                                        collision: "fit",
+                                        boundary: that._$parent,
+                                        boundaryOffset: "1 1"
                                     }
                                 }).appendTo(that.component.element()).dxContextMenu("instance")
                             }
@@ -17216,7 +17167,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                             this.callBase(args);
                             if (args.name === "export") {
                                 args.handled = true;
-                                this.render()
+                                this._invalidate()
                             }
                         },
                         init: function() {
@@ -17238,6 +17189,390 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
         $.extend(dataGrid.__internals, {
             DATAGRID_EXPORT_MENU_CLASS: DATAGRID_EXPORT_MENU_CLASS,
             DATAGRID_EXPORT_BUTTON_CLASS: DATAGRID_EXPORT_BUTTON_CLASS
+        })
+    })(jQuery, DevExpress);
+    /*! Module widgets-web, file ui.dataGrid.gridView.js */
+    (function($, DX) {
+        var dataGrid = DX.ui.dxDataGrid,
+            utils = DX.utils;
+        var DATAGRID_CLASS = "dx-datagrid",
+            DATAGRID_HIDDEN_CLASS = "dx-hidden",
+            DATAGRID_TABLE_CLASS = "dx-datagrid-table",
+            DATAGRID_BORDERS_CLASS = "dx-datagrid-borders",
+            DATAGRID_TABLE_FIXED_CLASS = "dx-datagrid-table-fixed",
+            DATAGRID_COLUMN_HEADERS_HIDDEN = "dx-datagrid-headers-hidden",
+            DATAGRID_IMPORTANT_MARGIN_CLASS = "dx-datagrid-important-margin",
+            EMPTY_GRID_ROWS_HEIGHT = 100,
+            LOADPANEL_MARGIN = 50,
+            VIEW_NAMES = ["columnsSeparatorView", "blockSeparatorView", "trackerView", "headerPanel", "columnHeadersView", "rowsView", "footerView", "columnChooserView", "pagerView", "draggingHeaderView", "contextMenuView", "errorView", "headerFilterView"];
+        var isPercentWidth = function(width) {
+                return utils.isString(width) && width.slice(-1) === "%"
+            };
+        var mergeArraysByMaxValue = function(values1, values2) {
+                var result = [],
+                    i;
+                if (values1 && values2 && values1.length && values1.length === values2.length)
+                    for (i = 0; i < values1.length; i++)
+                        result.push(values1[i] > values2[i] ? values1[i] : values2[i]);
+                else if (values1)
+                    result = values1;
+                return result
+            };
+        dataGrid.ResizingController = dataGrid.ViewController.inherit({
+            _initPostRenderHandlers: function() {
+                var that = this;
+                if (!that._refreshSizesHandler) {
+                    that._refreshSizesHandler = function(e) {
+                        that._dataController.changed.remove(that._refreshSizesHandler);
+                        var changeType = e && e.changeType;
+                        if (!e || changeType === "refresh" || changeType === "prepend" || changeType === "append" || changeType === "update")
+                            that.resize();
+                        if (changeType && changeType !== "updateSelection") {
+                            utils.triggerShownEvent(that.getView("rowsView").element());
+                            that.component._fireContentReadyAction()
+                        }
+                    };
+                    that._dataController.changed.add(function() {
+                        that._dataController.changed.add(that._refreshSizesHandler)
+                    });
+                    that._columnHeadersView.sizeChanged.add(that._refreshSizesHandler)
+                }
+            },
+            _getBestFitWidths: function() {
+                var that = this,
+                    rowsColumnWidths = that._rowsView.getColumnWidths(),
+                    headerColumnWidths = that._columnHeadersView && that._columnHeadersView.getColumnWidths(),
+                    footerColumnWidths = that._footerView && that._footerView.getColumnWidths(),
+                    resultWidths;
+                resultWidths = mergeArraysByMaxValue(rowsColumnWidths, headerColumnWidths);
+                resultWidths = mergeArraysByMaxValue(resultWidths, footerColumnWidths);
+                return resultWidths
+            },
+            _setVisibleWidths: function(visibleColumns, widths) {
+                var columnsController = this._columnsController;
+                columnsController.beginUpdate();
+                $.each(visibleColumns, function(index, column) {
+                    var columnId = column.command ? "command:" + column.command : column.index;
+                    columnsController.columnOption(columnId, "visibleWidth", widths[index])
+                });
+                columnsController.endUpdate()
+            },
+            _toggleBestFitMode: function(isBestFit) {
+                var $element = this.component.element();
+                $element.find("." + DATAGRID_TABLE_CLASS).toggleClass(DATAGRID_TABLE_FIXED_CLASS, !isBestFit);
+                $element.find("input").toggleClass(DATAGRID_HIDDEN_CLASS, isBestFit);
+                $element.find(".dx-group-cell").toggleClass(DATAGRID_HIDDEN_CLASS, isBestFit);
+                $element.find(".dx-header-row .dx-datagrid-text-content").css("max-width", "")
+            },
+            _synchronizeColumns: function() {
+                var that = this,
+                    columnsController = that._columnsController,
+                    visibleColumns = columnsController.getVisibleColumns(),
+                    columnAutoWidth = that.option("columnAutoWidth"),
+                    needBestFit = columnAutoWidth,
+                    lastWidthReseted = false,
+                    resultWidths = [],
+                    normalizeWidthsByExpandColumns = function() {
+                        var expandColumnWidth;
+                        $.each(visibleColumns, function(index, column) {
+                            if (column.command === "expand")
+                                expandColumnWidth = resultWidths[index]
+                        });
+                        $.each(visibleColumns, function(index, column) {
+                            if (column.command === "expand" && expandColumnWidth)
+                                resultWidths[index] = expandColumnWidth
+                        })
+                    };
+                !needBestFit && $.each(visibleColumns, function(index, column) {
+                    if (column.width === "auto") {
+                        needBestFit = true;
+                        return false
+                    }
+                });
+                that._setVisibleWidths(visibleColumns, []);
+                if (needBestFit) {
+                    that._toggleBestFitMode(true);
+                    resultWidths = that._getBestFitWidths();
+                    $.each(visibleColumns, function(index, column) {
+                        var columnId = column.command ? "command:" + column.command : column.index;
+                        columnsController.columnOption(columnId, "bestFitWidth", resultWidths[index], true)
+                    })
+                }
+                $.each(visibleColumns, function(index) {
+                    if (this.width !== "auto")
+                        if (this.width)
+                            resultWidths[index] = this.width;
+                        else if (!columnAutoWidth)
+                            resultWidths[index] = undefined
+                });
+                lastWidthReseted = that._correctColumnWidths(resultWidths, visibleColumns);
+                if (columnAutoWidth) {
+                    normalizeWidthsByExpandColumns();
+                    that._processStretch(resultWidths, visibleColumns)
+                }
+                if (needBestFit)
+                    that._toggleBestFitMode(false);
+                if (needBestFit || lastWidthReseted)
+                    that._setVisibleWidths(visibleColumns, resultWidths)
+            },
+            _correctColumnWidths: function(resultWidths, visibleColumns) {
+                var that = this,
+                    hasPercentWidth = false,
+                    hasAutoWidth = false,
+                    lastWidthReseted = false,
+                    $element = that.component.element(),
+                    hasWidth = that._hasWidth,
+                    lastColumnIndex;
+                $.each(visibleColumns, function(index) {
+                    if (this.width !== "auto")
+                        if (this.width)
+                            resultWidths[index] = this.width;
+                        else
+                            hasAutoWidth = true;
+                    if (isPercentWidth(this.width))
+                        hasPercentWidth = true
+                });
+                if ($element && that._maxWidth) {
+                    delete that._maxWidth;
+                    $element.css("max-width", "")
+                }
+                if (!hasAutoWidth && resultWidths.length) {
+                    var contentWidth = that._rowsView.contentWidth();
+                    var totalWidth = that._getTotalWidth(resultWidths, contentWidth);
+                    if (totalWidth <= contentWidth) {
+                        lastColumnIndex = resultWidths.length - 1;
+                        while (lastColumnIndex >= 0 && visibleColumns[lastColumnIndex] && visibleColumns[lastColumnIndex].command)
+                            lastColumnIndex--;
+                        if (lastColumnIndex >= 0) {
+                            resultWidths[lastColumnIndex] = "auto";
+                            lastWidthReseted = true;
+                            if (!hasWidth && !hasPercentWidth) {
+                                that._maxWidth = totalWidth;
+                                $element.css("max-width", that._maxWidth)
+                            }
+                        }
+                    }
+                }
+                return lastWidthReseted
+            },
+            _processStretch: function(resultSizes, visibleColumns) {
+                var groupSize = this._rowsView.contentWidth(),
+                    tableSize = this._getTotalWidth(resultSizes, groupSize),
+                    unusedIndexes = {length: 0},
+                    diff,
+                    diffElement,
+                    onePixelElementsCount,
+                    i;
+                if (!resultSizes.length)
+                    return;
+                $.each(visibleColumns, function(index) {
+                    if (this.width) {
+                        unusedIndexes[index] = true;
+                        unusedIndexes.length++
+                    }
+                });
+                diff = groupSize - tableSize;
+                diffElement = Math.floor(diff / (resultSizes.length - unusedIndexes.length));
+                onePixelElementsCount = diff - diffElement * (resultSizes.length - unusedIndexes.length);
+                if (diff >= 0)
+                    for (i = 0; i < resultSizes.length; i++) {
+                        if (unusedIndexes[i])
+                            continue;
+                        resultSizes[i] += diffElement;
+                        if (onePixelElementsCount) {
+                            resultSizes[i]++;
+                            onePixelElementsCount--
+                        }
+                    }
+            },
+            _getTotalWidth: function(widths, groupWidth) {
+                var result = 0,
+                    width,
+                    i;
+                for (i = 0; i < widths.length; i++) {
+                    width = widths[i];
+                    if (width)
+                        result += isPercentWidth(width) ? parseInt(width) * groupWidth / 100 : parseInt(width)
+                }
+                return Math.round(result)
+            },
+            updateSize: function($rootElement) {
+                var that = this,
+                    $groupElement,
+                    width;
+                if (that._hasHeight === undefined && $rootElement && $rootElement.closest(document).length) {
+                    $groupElement = $rootElement.children("." + DATAGRID_CLASS);
+                    if ($groupElement.length)
+                        $groupElement.detach();
+                    that._hasHeight = !!$rootElement.height();
+                    width = $rootElement.width();
+                    $rootElement.addClass(DATAGRID_IMPORTANT_MARGIN_CLASS);
+                    that._hasWidth = $rootElement.width() === width;
+                    $rootElement.removeClass(DATAGRID_IMPORTANT_MARGIN_CLASS);
+                    if ($groupElement.length)
+                        $groupElement.appendTo($rootElement)
+                }
+            },
+            publicMethods: function() {
+                return ["resize", "updateDimensions"]
+            },
+            resize: function() {
+                !this.component._requireResize && this.updateDimensions()
+            },
+            updateDimensions: function() {
+                var that = this,
+                    dataController = that._dataController,
+                    $rootElement = that.component.element(),
+                    rootElementHeight = $rootElement && ($rootElement.get(0).clientHeight || $rootElement.height()),
+                    loadPanelOptions = that.option("loadPanel"),
+                    height = that.option("height"),
+                    rowsViewHeight,
+                    editorFactory = that.getController("editorFactory"),
+                    $testDiv;
+                that._initPostRenderHandlers();
+                that.updateSize($rootElement);
+                if (height && that._hasHeight ^ height !== "auto") {
+                    $testDiv = $("<div>").height(height).appendTo($rootElement);
+                    that._hasHeight = !!$testDiv.height();
+                    $testDiv.remove()
+                }
+                if (that._hasHeight && rootElementHeight > 0 && that.option("scrolling")) {
+                    rowsViewHeight = rootElementHeight;
+                    $.each(that.getViews(), function() {
+                        if (this.isVisible() && this.getHeight)
+                            rowsViewHeight -= this.getHeight()
+                    })
+                }
+                else if (!that._hasHeight && dataController.items().length === 0)
+                    rowsViewHeight = loadPanelOptions && loadPanelOptions.visible ? loadPanelOptions.height + LOADPANEL_MARGIN : EMPTY_GRID_ROWS_HEIGHT;
+                else
+                    rowsViewHeight = "auto";
+                that._rowsView.height(rowsViewHeight);
+                that._columnHeadersView.setScrollerSpacing(that._rowsView.getScrollbarWidth());
+                that._rowsView.setScrollerSpacing();
+                that._synchronizeColumns();
+                $.each(VIEW_NAMES, function(index, viewName) {
+                    var view = that.getView(viewName);
+                    if (view)
+                        view.resize()
+                });
+                editorFactory && editorFactory.resize()
+            },
+            optionChanged: function(args) {
+                switch (args.name) {
+                    case"width":
+                    case"height":
+                        this.component._renderDimensions();
+                        this.resize();
+                    default:
+                        this.callBase(args)
+                }
+            },
+            init: function() {
+                var that = this;
+                that._dataController = that.getController("data");
+                that._columnsController = that.getController("columns");
+                that._columnHeadersView = that.getView("columnHeadersView");
+                that._footerView = that.getView("footerView");
+                that._rowsView = that.getView("rowsView")
+            }
+        });
+        dataGrid.SynchronizeScrollingController = dataGrid.ViewController.inherit({
+            _scrollChangedHandler: function(views, pos, viewName) {
+                for (var j = 0; j < views.length; j++)
+                    if (views[j].name !== viewName)
+                        views[j].scrollTo({
+                            left: pos.left,
+                            top: pos.top
+                        })
+            },
+            init: function() {
+                var view,
+                    views = [this.getView("columnHeadersView"), this.getView("footerView"), this.getView("rowsView")],
+                    i;
+                for (i = 0; i < views.length; i++) {
+                    view = views[i];
+                    if (view)
+                        view.scrollChanged.add($.proxy(this._scrollChangedHandler, this, views))
+                }
+            }
+        });
+        dataGrid.GridView = dataGrid.View.inherit({
+            _endUpdateCore: function() {
+                if (this.component._requireResize) {
+                    this.component._requireResize = false;
+                    this._resizingController.resize()
+                }
+            },
+            init: function() {
+                var that = this;
+                that._resizingController = this.getController("resizing");
+                that._dataController = that.getController("data");
+                that._rowsView = that.getView("rowsView")
+            },
+            getView: function(name) {
+                return this.component._views[name]
+            },
+            element: function() {
+                return this._groupElement
+            },
+            optionChanged: function(args) {
+                var that = this;
+                if (utils.isDefined(that._groupElement) && args.name === "showBorders") {
+                    that._groupElement.toggleClass(DATAGRID_BORDERS_CLASS, !!args.value);
+                    args.handled = true
+                }
+                else
+                    that.callBase(args)
+            },
+            render: function($rootElement) {
+                var that = this,
+                    groupElement = that._groupElement || $("<div />").addClass(DATAGRID_CLASS).toggleClass(DATAGRID_BORDERS_CLASS, !!that.option("showBorders"));
+                that.component.setAria({
+                    role: "application",
+                    label: Globalize.localize("dxDataGrid-ariaDataGrid")
+                }, $rootElement);
+                that._rootElement = $rootElement || that._rootElement;
+                that._groupElement = groupElement;
+                $.each(VIEW_NAMES, function(index, viewName) {
+                    var view = that.getView(viewName);
+                    if (view)
+                        view.render(groupElement)
+                });
+                that.update()
+            },
+            update: function() {
+                var that = this,
+                    $rootElement = that._rootElement,
+                    $groupElement = that._groupElement,
+                    resizingController = that.getController("resizing");
+                if ($rootElement && $groupElement) {
+                    if (!$groupElement.parent().length) {
+                        resizingController.updateSize($rootElement);
+                        $groupElement.appendTo($rootElement);
+                        that._rowsView.renderDelayedTemplates()
+                    }
+                    resizingController.resize();
+                    if (that._dataController.isLoaded())
+                        that.component._fireContentReadyAction()
+                }
+            }
+        });
+        dataGrid.registerModule("gridView", {
+            defaultOptions: function() {
+                return {showBorders: false}
+            },
+            controllers: {
+                resizing: dataGrid.ResizingController,
+                synchronizeScrolling: dataGrid.SynchronizeScrollingController
+            },
+            views: {gridView: dataGrid.GridView}
+        });
+        $.extend(dataGrid.__internals, {
+            viewNames: VIEW_NAMES,
+            DATAGRID_CLASS: DATAGRID_CLASS,
+            DATAGRID_COLUMN_HEADERS_HIDDEN: DATAGRID_COLUMN_HEADERS_HIDDEN,
+            DATAGRID_BORDERS_CLASS: DATAGRID_BORDERS_CLASS
         })
     })(jQuery, DevExpress);
     /*! Module widgets-web, file ui.pivotGrid.js */
@@ -17295,6 +17630,8 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     dataSource: null,
                     activeStateEnabled: false,
                     fieldChooser: {
+                        minWidth: 250,
+                        minHeight: 250,
                         enabled: true,
                         layout: 0,
                         title: Globalize.localize("dxPivotGrid-fieldChooserTitle"),
@@ -17373,8 +17710,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 var that = this;
                 that.callBase();
                 that._initDataController();
-                that._scrollLeft = 0;
-                that._scrollTop = 0;
+                that._scrollLeft = that._scrollTop = null;
                 that._initActions()
             },
             _initActions: function() {
@@ -17382,6 +17718,11 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
             },
             _trigger: function(eventName, eventArg) {
                 this._actions[eventName](eventArg)
+            },
+            _optionValuesEqual: function(name, oldValue, newValue) {
+                if (name === "dataSource" && newValue instanceof DX.data.PivotGridDataSource && oldValue instanceof DX.data.PivotGridDataSource)
+                    return newValue === oldValue;
+                return this.callBase.apply(this, arguments)
             },
             _optionChanged: function(args) {
                 var that = this;
@@ -17434,6 +17775,8 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
             },
             _updateScrollPosition: function(columnsArea, rowsArea, dataArea) {
                 var that = this,
+                    scrollTop,
+                    scrollLeft,
                     setScrollPos = function(area, pos) {
                         var scrollable;
                         if (area) {
@@ -17445,15 +17788,19 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         }
                     };
                 if (rowsArea && !rowsArea.hasScroll())
-                    that._scrollTop = 0;
+                    that._scrollTop = null;
                 if (columnsArea && !columnsArea.hasScroll())
-                    that._scrollLeft = 0;
-                setScrollPos(dataArea, {
-                    x: that._scrollLeft,
-                    y: that._scrollTop
-                });
-                setScrollPos(columnsArea, that._scrollLeft);
-                setScrollPos(rowsArea, that._scrollTop)
+                    that._scrollLeft = null;
+                if (that._scrollTop !== null || that._scrollLeft !== null) {
+                    scrollTop = that._scrollTop || 0;
+                    scrollLeft = that._scrollLeft || 0;
+                    setScrollPos(dataArea, {
+                        x: scrollLeft,
+                        y: scrollTop
+                    });
+                    setScrollPos(columnsArea, scrollLeft);
+                    setScrollPos(rowsArea, scrollTop)
+                }
             },
             _subscribeToEvents: function(columnsArea, rowsArea, dataArea) {
                 var that = this;
@@ -17503,7 +17850,9 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                 onResize: function(e) {
                                     popup._setContentHeight();
                                     $content.dxPivotGridFieldChooser("updateDimensions")
-                                }
+                                },
+                                minWidth: fieldChooserOptions.minWidth,
+                                minHeight: fieldChooserOptions.minHeight
                             })
                         }
                     };
@@ -18093,22 +18442,29 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         return a.groupIndex - b.groupIndex
                     })
             }
-            function createDescriptions(fields, currentField) {
-                var descriptions = {
+            function sortFieldsByAreaIndex(fields) {
+                fields.sort(function(field1, field2) {
+                    return field1.areaIndex - field2.areaIndex
+                })
+            }
+            function createDescriptions(currentField) {
+                var that = this,
+                    fields = that.fields(),
+                    descriptions = {
                         rows: [],
                         columns: [],
                         values: [],
                         filters: []
                     };
+                $.each(["row", "column", "data", "filter"], function(_, areaName) {
+                    utils.normalizeIndexes(that.getAreaFields(areaName, true), 'areaIndex', currentField)
+                });
                 $.each(fields || [], function(_, field) {
                     var descriptionName = DESCRIPTION_NAME_BY_AREA[field.area],
                         dimension = descriptions[descriptionName],
                         groupName = field.groupName;
-                    if (groupName && !utils.isNumber(field.groupIndex)) {
-                        if (currentField && groupName === currentField.groupName)
-                            currentField = field;
-                        field.levels = getFieldsByGroup(fields, field)
-                    }
+                    if (groupName && !utils.isNumber(field.groupIndex))
+                        field.levels = getFieldsByGroup(fields, field);
                     if (!dimension || groupName && utils.isNumber(field.groupIndex) || field.visible === false)
                         return;
                     if (field.levels && dimension !== descriptions.filters) {
@@ -18120,15 +18476,12 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         dimension.push(field)
                 });
                 $.each(descriptions, function(_, fields) {
-                    utils.normalizeIndexes(fields, 'areaIndex', currentField);
-                    fields.sort(function(field1, field2) {
-                        return field1.areaIndex - field2.areaIndex
-                    })
+                    sortFieldsByAreaIndex(fields)
                 });
                 return descriptions
             }
             function getFieldId(field) {
-                return (field.dataField || field.groupName || '') + (field.groupInterval ? field.groupName || '' : "NOGROUP") + (field.groupInterval || '') + (field.summaryType || '')
+                return (field.dataField || field.groupName || '') + (field.groupInterval ? field.groupName || '' : "NOGROUP") + (field.groupInterval || '')
             }
             function mergeFields(fields, storeFields, retrieveFieldsOptionValue) {
                 var result = [],
@@ -18285,7 +18638,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         that._localSorting = !!options.localSorting;
                         that._retrieveFields = isDefined(options.retrieveFields) ? options.retrieveFields : true;
                         that._fields = options.fields || [];
-                        that._descriptions = options.descriptions ? $.extend(createDescriptions([]), options.descriptions) : undefined;
+                        that._descriptions = options.descriptions ? $.extend(that._createDescriptions(), options.descriptions) : undefined;
                         if (!store) {
                             $.extend(true, that._loadedData, options.store || options);
                             that._data = $.extend(true, {}, that._loadedData)
@@ -18302,10 +18655,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                 if (this.area === area && !isDefined(this.groupIndex) && this.visible !== false)
                                     areaFields.push(this)
                             });
-                            utils.normalizeIndexes(areaFields, 'areaIndex');
-                            areaFields.sort(function(field1, field2) {
-                                return field1.areaIndex - field2.areaIndex
-                            })
+                            sortFieldsByAreaIndex(areaFields)
                         }
                         else {
                             descriptions = this._descriptions || {};
@@ -18323,7 +18673,8 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     },
                     field: function(id, options) {
                         var that = this,
-                            field = this._fields && this._fields[utils.isNumber(id) ? id : findField(this._fields, id)],
+                            fields = that._fields,
+                            field = fields && fields[utils.isNumber(id) ? id : findField(fields, id)],
                             levels;
                         if (field && options) {
                             $.each(options, function(optionName, optionValue) {
@@ -18334,7 +18685,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                         levels[i][optionName] = optionValue
                                 }
                             });
-                            that._descriptions = createDescriptions(this._fields, field)
+                            that._descriptions = that._createDescriptions(field)
                         }
                         return field
                     },
@@ -18392,6 +18743,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         });
                         return d
                     },
+                    _createDescriptions: createDescriptions,
                     _fieldsPrepared: function(fields) {
                         var that = this;
                         that._fields = fields;
@@ -18401,7 +18753,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                 field.caption = createCaption(field)
                         });
                         that.fireEvent("fieldsPrepared", [fields]);
-                        that._descriptions = createDescriptions(fields)
+                        that._descriptions = that._createDescriptions()
                     },
                     isLoading: function() {
                         return this._loadingCount > 0
@@ -18468,7 +18820,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                             headerItems = area === 'column' ? that._data.columns : that._data.rows;
                         if (area === 'column' && that._descriptions.values.length > 1)
                             visibleIndex = Math.floor(visibleIndex / that._descriptions.values.length);
-                        foreachTreeItems(headerItems, function(item, path) {
+                        foreachTreeItems(headerItems, function(_, path) {
                             if (index === visibleIndex) {
                                 result = path;
                                 return false
@@ -18484,7 +18836,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         var that = this,
                             headerItems = area === 'column' ? that._loadedData.columns : that._loadedData.rows,
                             headerItem = findHeaderItem(headerItems, path),
-                            field = that.getAreaFields(area === 'columns' ? "column" : "row")[path.length - 1];
+                            field = that.getAreaFields(area)[path.length - 1];
                         if (headerItem && headerItem.children) {
                             that.fireEvent("expandValueChanging", [{
                                     area: area,
@@ -18594,12 +18946,6 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
     (function($, DX) {
         var pivotGrid = DX.ui.dxPivotGrid,
             utils = DX.utils;
-        var DESCRIPTION_NAME_BY_AREA = {
-                row: "rows",
-                column: "columns",
-                data: "values",
-                filter: "filters"
-            };
         pivotGrid.proxyMethod = function(instance, methodName, defaultResult) {
             if (!instance[methodName])
                 instance[methodName] = function() {
@@ -18889,8 +19235,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     _createDataSource: function(options) {
                         var that = this,
                             dataSourceOptions = options.dataSource,
-                            dataSource,
-                            fields;
+                            dataSource;
                         that._isSharedDataSource = dataSourceOptions instanceof pivotGrid.DataSource;
                         if (that._isSharedDataSource)
                             dataSource = dataSourceOptions;
@@ -18904,21 +19249,6 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         dataSource.on("expandValueChanging", that._expandValueChangingHandler);
                         dataSource.on("loadingChanged", that._loadingChangedHandler);
                         dataSource.on("fieldsPrepared", that._fieldsPreparedHandler);
-                        if (options.descriptions) {
-                            fields = [];
-                            $.each(DESCRIPTION_NAME_BY_AREA, function(areaName, descriptionName) {
-                                var areaFields = options.descriptions[descriptionName];
-                                if (areaFields)
-                                    $.each(areaFields, function(areaIndex, field) {
-                                        fields.push($.extend({
-                                            area: areaName,
-                                            areaIndex: areaIndex
-                                        }, field))
-                                    })
-                            })
-                        }
-                        if (fields)
-                            dataSource.fields(fields);
                         return dataSource
                     },
                     getDataSource: function() {
@@ -20142,7 +20472,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                             for (columnIndex = 0; processedCells[rowIndex][columnIndex]; columnIndex++);;
                             fillCells(processedCells, rowIndex, columnIndex, row.cells[i].rowSpan, row.cells[i].colSpan);
                             if (row.cells[i].colSpan === 1)
-                                result[columnIndex] = getRealElementWidth(row.cells[i], isFixed)
+                                result[columnIndex] = result[columnIndex] || getRealElementWidth(row.cells[i], isFixed)
                         }
                     }
                 return result
@@ -20759,8 +21089,10 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     groupSelector: ".dx-area-fields",
                     itemRender: function($sourceItem, target) {
                         var $item;
-                        if ($sourceItem.hasClass("dx-area-box"))
+                        if ($sourceItem.hasClass("dx-area-box")) {
                             $item = $sourceItem.clone();
+                            $item.insertBefore($sourceItem)
+                        }
                         else
                             $item = $(DIV).addClass("dx-area-field").addClass("dx-area-box").text($sourceItem.text());
                         if (target === "drag")
@@ -20949,16 +21281,16 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                             },
                             showColumnLines: true
                         });
-                    if (field.allowFiltering)
-                        that._columnsView._applyColumnState({
-                            name: 'headerFilter',
-                            rootElement: $fieldElement,
-                            column: {
-                                alignment: that.option("rtlEnabled") ? 'right' : 'left',
-                                filterValues: field.filterValues
-                            },
-                            showColumnLines: true
-                        })
+                    that._columnsView._applyColumnState({
+                        name: 'headerFilter',
+                        rootElement: $fieldElement,
+                        column: {
+                            alignment: that.option("rtlEnabled") ? 'right' : 'left',
+                            filterValues: field.filterValues,
+                            allowFiltering: field.allowFiltering
+                        },
+                        showColumnLines: true
+                    })
                 }
                 return $fieldElement
             },
@@ -21038,11 +21370,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
             utils = DX.utils;
         var WIDGET_CLASS = "dx-scheduler",
             WIDGET_READONLY_CLASS = "dx-scheduler-readonly",
-            APPOINTMENT_POPUP_CLASS = "dx-sheduler-appointment-popup",
-            APPOINTMENT_TOOLTIP_CLASS = "dx-scheduler-appointment-tooltip",
-            APPOINTMENT_TOOLTIP_TITLE_CLASS = "dx-scheduler-appointment-tooltip-title",
-            APPOINTMENT_TOOLTIP_DATE_CLASS = "dx-scheduler-appointment-tooltip-date",
-            APPOINTMENT_TOOLTIP_BUTTONS_CLASS = "dx-scheduler-appointment-tooltip-buttons",
+            APPOINTMENT_POPUP_CLASS = "dx-scheduler-appointment-popup",
             APPOINTEMENT_POPUP_WIDTH = 610;
         var WORKSPACES = {
                 day: "dxSchedulerWorkSpaceDay",
@@ -21113,30 +21441,19 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     case"currentView":
                         this._header.option("currentView", value);
                         this._refreshWorkSpace();
-                        this._appointments.option("renderingStrategy", value);
+                        this._appointments.option("renderingStrategy", this._getAppointmentsRenderingStrategy());
+                        this._appointments.option("allowAllDayResize", value !== "day");
                         this._filterAppointmentsByDateAndResources(true);
                         break;
                     case"appointmentTemplate":
                         this._appointments.option("itemTemplate", value);
                         break;
                     case"groups":
-                        var dateRange = this._workSpace.getDateRange();
-                        this._resourcesManager.getResourcesValueByFields(value).done($.proxy(function(groups) {
-                            var resources = this._prepareResourcesForFilter(groups);
-                            this._workSpace.option("groups", groups);
-                            this._appointmentModel.filterByDateAndResources({
-                                min: dateRange[0],
-                                max: dateRange[1],
-                                resources: resources,
-                                startDayHour: this.option("startDayHour"),
-                                endDayHour: this.option("endDayHour")
-                            });
-                            this._reloadDataSource()
-                        }, this));
+                        this._filterAppointmentsByDateAndResources(true);
                         break;
                     case"resources":
                         this._resourcesManager.setResources(value);
-                        this._filterAppointmentsByResources();
+                        this._filterAppointmentsByDateAndResources(true);
                         break;
                     case"startDayHour":
                         this._filterAppointmentsByDate();
@@ -21172,7 +21489,8 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         this.element().toggleClass(WIDGET_READONLY_CLASS, !value);
                         this._appointments.option({
                             allowDrag: value,
-                            allowResize: value
+                            allowResize: value,
+                            allowAllDayResize: value
                         });
                         this._refreshPopup();
                         this._hideTooltip();
@@ -21186,19 +21504,12 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 this._appointmentModel.filterByDate(dateRange[0], dateRange[1], this.option("startDayHour"), this.option("endDayHour"));
                 this._reloadDataSource()
             },
-            _filterAppointmentsByResources: function() {
-                if (!this.option("resources") || !this.option("resources").length)
-                    return;
-                var that = this;
-                this._resourcesManager.getResourcesValueByFields(this.option("groups")).done(function(data) {
-                    that._appointmentModel.filterByResources(that._prepareResourcesForFilter(data));
-                    that._reloadDataSource()
-                })
-            },
             _filterAppointmentsByDateAndResources: function(reloadDataSource) {
-                var dateRange = this._workSpace.getDateRange(),
-                    that = this;
-                this._resourcesManager.getResourcesValueByFields(this.option("groups")).done(function(data) {
+                var that = this,
+                    dateRange = that._workSpace.getDateRange(),
+                    groups = that.option("groups");
+                this._resourcesManager.getResourcesValueByFields(groups).done(function(data) {
+                    that._workSpace.option("groups", data);
                     var resources = that._prepareResourcesForFilter(data);
                     that._appointmentModel.filterByDateAndResources({
                         min: dateRange[0],
@@ -21215,9 +21526,10 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
             },
             _prepareResourcesForFilter: function(resources) {
                 return $.map(resources, function(resource) {
-                        var data = [];
-                        for (var i = 0, len = resource.items.length; i < len; i++)
-                            data.push(resource.items[i].id);
+                        var resourceItems = resource.items,
+                            data = [];
+                        for (var i = 0, len = resourceItems.length; i < len; i++)
+                            data.push(resourceItems[i].id);
                         return {
                                 field: resource.name,
                                 data: data
@@ -21228,8 +21540,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 this._appointments.repaint()
             },
             _visibilityChanged: function(visible) {
-                if (visible)
-                    this._dimensionChanged()
+                visible && this._dimensionChanged()
             },
             _init: function() {
                 this.callBase();
@@ -21240,15 +21551,17 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 this.element().toggleClass(WIDGET_READONLY_CLASS, !this.option("editing"));
                 this._appointmentModel = new ui.dxScheduler.dxSchedulerAppointmentModel(this._dataSource);
                 this._resourcesManager = new ui.dxScheduler.dxSchedulerResourceManager(this.option("resources"));
-                this._initActions()
+                this._initActions();
+                this._subscribes = ui.dxScheduler.subscribes
+            },
+            _dataSourceOptions: function() {
+                return {paginate: false}
             },
             _customizeStoreLoadOptions: function() {
-                if (this._dataSource)
-                    this._dataSource.on("customizeStoreLoadOptions", this._proxiedCustomizeStoreLoadOptionsHandler)
+                this._dataSource && this._dataSource.on("customizeStoreLoadOptions", this._proxiedCustomizeStoreLoadOptionsHandler)
             },
             _dispose: function() {
-                if (this._dataSource)
-                    this._dataSource.off("customizeStoreLoadOptions", this._proxiedCustomizeStoreLoadOptionsHandler);
+                this._dataSource && this._dataSource.off("customizeStoreLoadOptions", this._proxiedCustomizeStoreLoadOptionsHandler);
                 this.callBase()
             },
             _customizeStoreLoadOptionsHandler: function(options) {
@@ -21363,7 +21676,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 this._resourcesManager.getResourcesValueByFields(this.option("groups")).done($.proxy(function(groups) {
                     this._renderWorkSpace(groups);
                     var allDayContainerClass = this._workSpace.getAllDayContainerClass();
-                    this._appointments.option({allDayContainer: this.element().find("." + allDayContainerClass)});
+                    this._appointments.option({fixedContainer: this.element().find("." + allDayContainerClass)});
                     this._filterAppointmentsByDateAndResources();
                     this._appointments.option("dataSource", this._dataSource)
                 }, this))
@@ -21387,19 +21700,24 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
             _appointmentsConfig: function() {
                 return {
                         observer: this,
-                        renderingStrategy: this.option("currentView"),
+                        renderingStrategy: this._getAppointmentsRenderingStrategy(),
                         itemTemplate: this._getTemplateByOption("appointmentTemplate"),
                         onItemRendered: this.option("onAppointmentRendered"),
                         tabIndex: this.option("tabIndex"),
                         focusStateEnabled: this.option("focusStateEnabled"),
                         allowDrag: this.option("editing"),
-                        allowResize: this.option("editing")
+                        allowResize: this.option("editing"),
+                        allowAllDayResize: this.option("editing") && this.option("currentView") !== "day"
                     }
+            },
+            _getAppointmentsRenderingStrategy: function() {
+                return this.option("currentView") === "month" ? "horizontal" : "vertical"
             },
             _renderWorkSpace: function(groups) {
                 this._workSpace = this._createComponent("<div>", WORKSPACES[this.option("currentView")], this._workSpaceConfig(groups));
                 this._workSpace.getWorkArea().append(this._appointments.element());
-                this.element().append(this._workSpace.element())
+                this.element().append(this._workSpace.element());
+                DX.utils.triggerShownEvent(this._workSpace.element())
             },
             _workSpaceConfig: function(groups) {
                 return {
@@ -21421,13 +21739,20 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 delete this._workSpace;
                 this._resourcesManager.getResourcesValueByFields(this.option("groups")).done($.proxy(function(groups) {
                     this._renderWorkSpace(groups);
-                    this._appointments.option({allDayContainer: this.element().find("." + allDayContainerClass)})
+                    this._appointments.option({fixedContainer: this.element().find("." + allDayContainerClass)})
                 }, this))
             },
+            getWorkSpaceScrollableScrollTop: function() {
+                return this._workSpace.getScrollableScrollTop()
+            },
+            getWorkSpaceScrollableContainer: function() {
+                return this._workSpace.getScrollableContainer()
+            },
+            getWorkSpaceAllDayHeight: function() {
+                return this._workSpace.getAllDayHeight()
+            },
             _createPopup: function() {
-                if (this._$popup)
-                    return;
-                this._refreshPopup()
+                !this._$popup && this._refreshPopup()
             },
             _refreshPopup: function() {
                 this._$popup = $("<div>").addClass(APPOINTMENT_POPUP_CLASS).appendTo(this.element());
@@ -21452,7 +21777,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     buttons = [{
                             shortcut: "done",
                             location: "after",
-                            onClick: $.proxy(this._saveChanges, this)
+                            onClick: $.proxy(this._doneButtonClickHandler, this)
                         }, {
                             shortcut: "cancel",
                             location: "after"
@@ -21465,6 +21790,13 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         }, this)
                     }
             },
+            _doneButtonClickHandler: function(args) {
+                var oldData = $.extend({}, true, this._editAppointmentData);
+                this._saveChanges(args);
+                if (oldData)
+                    if (!this._appointmentView.option("values").allDay && oldData.allDay)
+                        this._updateScrollPosition()
+            },
             _saveChanges: function() {
                 var appointmentData = this._appointmentView.option("values"),
                     oldData = this._editAppointmentData;
@@ -21474,6 +21806,10 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     }, this));
                 else
                     this.addAppointment(appointmentData)
+            },
+            _updateScrollPosition: function() {
+                var dateToScroll = this._appointmentView.option("values").startDate;
+                this.scrollToTime(dateToScroll.getHours(), dateToScroll.getMinutes())
             },
             _checkRecurringAppointment: function(isRecurrence, callback, isDeleted) {
                 if (isRecurrence)
@@ -21515,134 +21851,8 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     result = result.concat(this._workSpace.getCoordinatesByDateInGroup(dates[i], resources, allDay));
                 return result
             },
-            _subscribes: {
-                currentViewUpdated: function(currentView) {
-                    this.option("currentView", currentView)
-                },
-                needCoordinates: function(options) {
-                    var appointmentData = options.appointmentData,
-                        startDate = options.startDate,
-                        dateRange = this._workSpace.getDateRange(),
-                        dates = utils.getDatesByRecurrence(appointmentData.recurrenceRule, startDate, dateRange[0], dateRange[1]);
-                    if (!dates.length)
-                        dates.push(startDate);
-                    var itemResources = this._resourcesManager.getResourcesFromItem(appointmentData);
-                    options.callback(this._getCoordinates(dates, itemResources, appointmentData.allDay))
-                },
-                showEditAppointmentPopup: function(appointmentData) {
-                    this._editAppointmentData = appointmentData;
-                    this.showAppointmentPopup(appointmentData)
-                },
-                showAppointmentTooltip: function(options) {
-                    this._editAppointmentData = options.data;
-                    this.showAppointmentTooltip(options.data, options.target)
-                },
-                hideAppointmentTooltip: function() {
-                    this._hideTooltip()
-                },
-                showAddAppointmentPopup: function(appointmentData) {
-                    delete this._editAppointmentData;
-                    if (this.option("editing"))
-                        this.showAppointmentPopup(appointmentData)
-                },
-                updateAppointmentAfterResize: function(options) {
-                    this._checkRecurringAppointment(options.target.recurrenceRule, $.proxy(function() {
-                        this._updateAppointment(options.target, options.data, function() {
-                            DX.translator.move(options.$appointment, options.initialCoordinates);
-                            options.target.startDate = utils.makeDate(options.target.startDate);
-                            options.target.endDate = utils.makeDate(options.target.endDate);
-                            if (this.option("currentView") === "month" || options.target.allDay || this.appointmentTakesAllDay(options.target))
-                                options.$appointment.outerWidth(options.initialSize.width);
-                            else
-                                options.$appointment.outerHeight(options.initialSize.height)
-                        })
-                    }, this))
-                },
-                updateAppointmentAfterDrag: function(options) {
-                    var target = options.data,
-                        updatedData = this._getUpdatedData(options),
-                        allDayContainerClass = this._workSpace.getAllDayContainerClass(),
-                        appointment,
-                        newCellIndex = this._workSpace.getDroppableCellIndex(),
-                        oldCellIndex = this._workSpace.getCellIndexByCoordinates(options.initialCoordinates);
-                    if (options.$appointment.parent().hasClass(allDayContainerClass) && !updatedData.allDay)
-                        updatedData.endDate = this._workSpace._calculateEndDate(updatedData.startDate);
-                    appointment = $.extend({}, target, updatedData);
-                    var isAllDay = target.allDay || updatedData.allDay;
-                    if (newCellIndex !== oldCellIndex || isAllDay)
-                        this._checkRecurringAppointment(target.recurrenceRule, $.proxy(function() {
-                            this._updateAppointment(target, appointment, function() {
-                                DX.translator.move(options.$appointment, options.initialCoordinates)
-                            })
-                        }, this));
-                    else
-                        DX.translator.move(options.$appointment, options.initialCoordinates)
-                },
-                updateCurrentDate: function(date) {
-                    this.option("currentDate", this._stripDateTime(utils.makeDate(date)))
-                },
-                getAppointmentColor: function(options) {
-                    var resourceForPainting = this._resourcesManager.getResourceForPainting(this.option("groups"));
-                    if (resourceForPainting) {
-                        var field = resourceForPainting.field;
-                        if (options.itemData[field]) {
-                            var resourceValues = DX.utils.wrapToArray(options.itemData[field]),
-                                resourceIndex = options.resourceIndex,
-                                groups = this.option("groups");
-                            if (!groups || !groups.length)
-                                resourceIndex = 0;
-                            var resourceValue = resourceValues[resourceIndex];
-                            options.callback(this._resourcesManager.getResourceColor(field, resourceValue))
-                        }
-                    }
-                },
-                getResourceForPainting: function(options) {
-                    options.callback(this._resourcesManager.getResourceForPainting(this.option("groups")))
-                },
-                getResourcesFromItem: function(options) {
-                    options.callback(this._resourcesManager.getResourcesFromItem(options.itemData))
-                },
-                getCellDimensions: function(options) {
-                    if (this._workSpace)
-                        options.callback(this._workSpace.getCellWidth(), this._workSpace.getCellHeight(), this._workSpace.getAllDayHeight())
-                },
-                initAppointmentRenderedAction: function(options) {
-                    options.callback(this._initAppointmentRenderedAction())
-                },
-                getMaxAllowedPosition: function(options) {
-                    if (this._workSpace)
-                        options.callback(this._workSpace.getMaxAllowedPosition())
-                },
-                getItemGroupIndexes: function(options) {
-                    var groups = this._resourcesManager.getResourcesFromItem(options.item),
-                        indexes = this._workSpace._getGroupIndexes(groups);
-                    options.callback(indexes)
-                },
-                appointmentTakesAllDay: function(options) {
-                    options.callback(this.appointmentTakesAllDay({
-                        startDate: options.startDate,
-                        endDate: options.endDate
-                    }))
-                },
-                checkContainerVisibility: function(options) {
-                    options.callback(this.element().is(":hidden"))
-                },
-                getResizableAppointmentArea: function(options) {
-                    var area;
-                    if (this.option("groups") && this.option("groups").length && (options.allDay || this.option("currentView") === "month")) {
-                        var groupBounds = this._workSpace.getGroupBounds(options.coordinates, options.allDay);
-                        area = {
-                            left: groupBounds.left,
-                            right: groupBounds.right,
-                            top: 0,
-                            bottom: 0
-                        }
-                    }
-                    options.callback(area)
-                }
-            },
             subsribe: function(subject, action) {
-                this._subscribes[subject] = action
+                this._subscribes[subject] = ui.dxScheduler.subscribes[subject] = action
             },
             fire: function(subject, args) {
                 var callback = this._subscribes[subject];
@@ -21654,60 +21864,10 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 return this._workSpace.getDataByDroppableCell()
             },
             showAppointmentTooltip: function(appointmentData, $appointment) {
-                var that = this;
-                ui.tooltip.show({
-                    target: $appointment,
-                    rtlEnabled: this.option("rtlEnabled"),
-                    contentTemplate: function($content) {
-                        var $tooltip = that._tooltipContent(appointmentData);
-                        $tooltip.addClass($content.attr("class"));
-                        $content.replaceWith($tooltip)
-                    },
-                    position: {
-                        my: "bottom",
-                        at: "top",
-                        of: $appointment,
-                        boundary: $($appointment).closest(".dx-scrollable"),
-                        collision: "fit flipfit"
-                    }
-                })
-            },
-            _tooltipContent: function(appointmentData) {
-                var that = this;
-                var $tooltip = $("<div>").addClass(APPOINTMENT_TOOLTIP_CLASS);
-                $("<div>").text(appointmentData.text).addClass(APPOINTMENT_TOOLTIP_TITLE_CLASS).appendTo($tooltip);
-                $("<div>").addClass(APPOINTMENT_TOOLTIP_DATE_CLASS).text(that._formatTooltipDate(appointmentData.startDate, appointmentData.endDate)).appendTo($tooltip);
-                var $buttons = $("<div>").addClass(APPOINTMENT_TOOLTIP_BUTTONS_CLASS).appendTo($tooltip);
-                if (this.option("editing"))
-                    $("<div>").appendTo($buttons).dxButton({
-                        icon: "trash",
-                        onClick: function() {
-                            that._checkRecurringAppointment(appointmentData.recurrenceRule, function() {
-                                that.deleteAppointment(appointmentData)
-                            }, true);
-                            that._hideTooltip()
-                        }
-                    });
-                $("<div>").appendTo($buttons).dxButton({
-                    icon: this.option("editing") ? "edit" : "",
-                    text: Globalize.localize("dxScheduler-openAppointment"),
-                    onClick: function() {
-                        that.showAppointmentPopup(appointmentData)
-                    }
-                });
-                return $tooltip
+                ui.dxScheduler.tooltip.show(appointmentData, $appointment, this)
             },
             _hideTooltip: function() {
-                ui.tooltip.hide()
-            },
-            _formatTooltipDate: function(startDate, endDate) {
-                var dateTimeFormat = "MMMM d h:mm tt";
-                if (this.option("currentView") === "month") {
-                    var startDateString = Globalize.format(startDate, dateTimeFormat) + " - ",
-                        endDateString = startDate.getDate() === endDate.getDate() ? Globalize.format(endDate, "t") : Globalize.format(endDate, dateTimeFormat);
-                    return startDateString + endDateString
-                }
-                return Globalize.format(startDate, "t") + " - " + Globalize.format(endDate, "t")
+                ui.dxScheduler.tooltip.hide()
             },
             _executeActionWhenOperationIsCompleted: function(action, appointment, e) {
                 var options = {appointment: appointment},
@@ -21716,6 +21876,9 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     options.error = e;
                 action(options)
             },
+            _processActionResult: function(actionOptions, callback) {
+                $.when(actionOptions.cancel).then($.proxy(callback, this))
+            },
             _updateAppointment: function(target, appointment, onUpdatePrevented) {
                 var updatingOptions = {
                         newData: appointment,
@@ -21723,12 +21886,14 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         cancel: false
                     };
                 this._actions["onAppointmentUpdating"](updatingOptions);
-                if (!updatingOptions.cancel)
-                    this._appointmentModel.update(target, appointment).always($.proxy(function(e) {
-                        this._executeActionWhenOperationIsCompleted(this._actions["onAppointmentUpdated"], appointment, e)
-                    }, this));
-                else if ($.isFunction(onUpdatePrevented))
-                    onUpdatePrevented.call(this)
+                this._processActionResult(updatingOptions, function(canceled) {
+                    if (!canceled)
+                        this._appointmentModel.update(target, appointment).always($.proxy(function(e) {
+                            this._executeActionWhenOperationIsCompleted(this._actions["onAppointmentUpdated"], appointment, e)
+                        }, this));
+                    else if ($.isFunction(onUpdatePrevented))
+                        onUpdatePrevented.call(this)
+                })
             },
             showAppointmentPopup: function(appointmentData) {
                 this._createPopup();
@@ -21737,6 +21902,9 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
             },
             getAppointmentDetailsView: function() {
                 return this._appointmentView
+            },
+            getAppointmentsInstance: function() {
+                return this._appointments
             },
             getAppointmentResourceData: function(field, value) {
                 return this._resourcesManager.getResourceDataByValue(field, value)
@@ -21749,6 +21917,23 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     appointmentDurationInHours = (appointment.endDate.getTime() - appointment.startDate.getTime()) / 3600000;
                 return appointmentDurationInHours >= etalonDayDurationInHours
             },
+            scrollToTime: function(hours, minutes) {
+                if (this.option("currentView") === "month")
+                    return;
+                var currentDate = new Date(this.option("currentDate")),
+                    scrollable = this._workSpace.getScrollable(),
+                    startDayHour = this.option("startDayHour"),
+                    endDayHour = this.option("endDayHour"),
+                    coordinates;
+                if (hours < startDayHour)
+                    hours = startDayHour;
+                if (hours >= endDayHour)
+                    hours = endDayHour - 1;
+                currentDate.setHours(hours);
+                currentDate.setMinutes(minutes);
+                coordinates = this._workSpace.getCoordinatesByDate(currentDate);
+                scrollable.scrollBy(coordinates.top - scrollable.scrollTop())
+            },
             addAppointment: function(appointment) {
                 if (!appointment.text)
                     appointment.text = "";
@@ -21757,10 +21942,12 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         cancel: false
                     };
                 this._actions["onAppointmentAdding"](addingOptions);
-                if (!addingOptions.cancel)
-                    this._appointmentModel.add(appointment).always($.proxy(function(e) {
-                        this._executeActionWhenOperationIsCompleted(this._actions["onAppointmentAdded"], appointment, e)
-                    }, this))
+                this._processActionResult(addingOptions, function(canceled) {
+                    if (!canceled)
+                        this._appointmentModel.add(appointment).always($.proxy(function(e) {
+                            this._executeActionWhenOperationIsCompleted(this._actions["onAppointmentAdded"], appointment, e)
+                        }, this))
+                })
             },
             updateAppointment: function(target, appointment) {
                 this._updateAppointment(target, appointment)
@@ -21771,12 +21958,211 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         cancel: false
                     };
                 this._actions["onAppointmentDeleting"](deletingOptions);
-                if (!deletingOptions.cancel)
-                    this._appointmentModel.remove(appointment).always($.proxy(function(e) {
-                        this._executeActionWhenOperationIsCompleted(this._actions["onAppointmentDeleted"], appointment, e)
-                    }, this))
+                this._processActionResult(deletingOptions, function(canceled) {
+                    if (!canceled)
+                        this._appointmentModel.remove(appointment).always($.proxy(function(e) {
+                            this._executeActionWhenOperationIsCompleted(this._actions["onAppointmentDeleted"], appointment, e)
+                        }, this))
+                })
             }
         }).include(ui.DataHelperMixin))
+    })(jQuery, DevExpress);
+    /*! Module widgets-web, file ui.scheduler.subscribes.js */
+    (function($, DX, undefined) {
+        DX.ui.dxScheduler.subscribes = {
+            currentViewUpdated: function(currentView) {
+                this.option("currentView", currentView)
+            },
+            needCoordinates: function(options) {
+                var appointmentData = options.appointmentData,
+                    startDate = options.startDate,
+                    dateRange = this._workSpace.getDateRange(),
+                    dates = DX.utils.getDatesByRecurrence(appointmentData.recurrenceRule, startDate, dateRange[0], dateRange[1]);
+                if (!dates.length)
+                    dates.push(startDate);
+                var itemResources = this._resourcesManager.getResourcesFromItem(appointmentData);
+                options.callback(this._getCoordinates(dates, itemResources, appointmentData.allDay))
+            },
+            showEditAppointmentPopup: function(appointmentData) {
+                this._editAppointmentData = appointmentData;
+                this.showAppointmentPopup(appointmentData)
+            },
+            showAppointmentTooltip: function(options) {
+                this._editAppointmentData = options.data;
+                this.showAppointmentTooltip(options.data, options.target)
+            },
+            hideAppointmentTooltip: function() {
+                this._hideTooltip()
+            },
+            showAddAppointmentPopup: function(appointmentData) {
+                delete this._editAppointmentData;
+                if (this.option("editing"))
+                    this.showAppointmentPopup(appointmentData)
+            },
+            updateAppointmentAfterResize: function(options) {
+                this._checkRecurringAppointment(options.target.recurrenceRule, $.proxy(function() {
+                    this._updateAppointment(options.target, options.data, function() {
+                        DX.translator.move(options.$appointment, options.initialCoordinates);
+                        options.target.startDate = DX.utils.makeDate(options.target.startDate);
+                        options.target.endDate = DX.utils.makeDate(options.target.endDate);
+                        if (this.option("currentView") === "month" || options.target.allDay || this.appointmentTakesAllDay(options.target))
+                            options.$appointment.outerWidth(options.initialSize.width);
+                        else
+                            options.$appointment.outerHeight(options.initialSize.height)
+                    })
+                }, this))
+            },
+            updateAppointmentAfterDrag: function(options) {
+                var target = options.data,
+                    updatedData = this._getUpdatedData(options),
+                    allDayContainerClass = this._workSpace.getAllDayContainerClass(),
+                    appointment,
+                    newCellIndex = this._workSpace.getDroppableCellIndex(),
+                    oldCellIndex = this._workSpace.getCellIndexByCoordinates(options.initialCoordinates);
+                if (options.$appointment.parent().hasClass(allDayContainerClass) && !updatedData.allDay)
+                    updatedData.endDate = this._workSpace._calculateEndDate(updatedData.startDate);
+                appointment = $.extend({}, target, updatedData);
+                var isAllDay = target.allDay || updatedData.allDay;
+                if (newCellIndex !== oldCellIndex || isAllDay)
+                    this._checkRecurringAppointment(target.recurrenceRule, $.proxy(function() {
+                        this._updateAppointment(target, appointment, function() {
+                            DX.translator.move(options.$appointment, options.initialCoordinates)
+                        })
+                    }, this));
+                else
+                    DX.translator.move(options.$appointment, options.initialCoordinates)
+            },
+            updateCurrentDate: function(date) {
+                this.option("currentDate", this._stripDateTime(DX.utils.makeDate(date)))
+            },
+            getAppointmentColor: function(options) {
+                var resourceForPainting = this._resourcesManager.getResourceForPainting(this.option("groups"));
+                if (resourceForPainting) {
+                    var field = resourceForPainting.field;
+                    if (options.itemData[field]) {
+                        var resourceValues = DX.utils.wrapToArray(options.itemData[field]),
+                            resourceIndex = options.resourceIndex,
+                            groups = this.option("groups");
+                        if (!groups || !groups.length)
+                            resourceIndex = 0;
+                        var resourceValue = resourceValues[resourceIndex];
+                        options.callback(this._resourcesManager.getResourceColor(field, resourceValue))
+                    }
+                }
+            },
+            getResourceForPainting: function(options) {
+                options.callback(this._resourcesManager.getResourceForPainting(this.option("groups")))
+            },
+            getResourcesFromItem: function(options) {
+                options.callback(this._resourcesManager.getResourcesFromItem(options.itemData))
+            },
+            getCellDimensions: function(options) {
+                if (this._workSpace)
+                    options.callback(this._workSpace.getCellWidth(), this._workSpace.getCellHeight(), this._workSpace.getAllDayHeight())
+            },
+            initAppointmentRenderedAction: function(options) {
+                options.callback(this._initAppointmentRenderedAction())
+            },
+            getMaxAllowedPosition: function(options) {
+                if (this._workSpace)
+                    options.callback(this._workSpace.getMaxAllowedPosition())
+            },
+            getItemGroupIndexes: function(options) {
+                var groups = this._resourcesManager.getResourcesFromItem(options.item),
+                    indexes = this._workSpace._getGroupIndexes(groups);
+                options.callback(indexes)
+            },
+            appointmentTakesAllDay: function(options) {
+                options.callback(this.appointmentTakesAllDay({
+                    startDate: options.startDate,
+                    endDate: options.endDate
+                }))
+            },
+            checkContainerVisibility: function(options) {
+                options.callback(this.element().is(":hidden"))
+            },
+            getResizableAppointmentArea: function(options) {
+                var area;
+                if (this.option("groups") && this.option("groups").length && (options.allDay || this.option("currentView") === "month")) {
+                    var groupBounds = this._workSpace.getGroupBounds(options.coordinates, options.allDay);
+                    area = {
+                        left: groupBounds.left,
+                        right: groupBounds.right,
+                        top: 0,
+                        bottom: 0
+                    }
+                }
+                options.callback(area)
+            }
+        }
+    })(jQuery, DevExpress);
+    /*! Module widgets-web, file ui.scheduler.appointmentTooltip.js */
+    (function($, DX, undefined) {
+        var ui = DX.ui,
+            APPOINTMENT_TOOLTIP_CLASS = "dx-scheduler-appointment-tooltip",
+            APPOINTMENT_TOOLTIP_TITLE_CLASS = "dx-scheduler-appointment-tooltip-title",
+            APPOINTMENT_TOOLTIP_DATE_CLASS = "dx-scheduler-appointment-tooltip-date",
+            APPOINTMENT_TOOLTIP_BUTTONS_CLASS = "dx-scheduler-appointment-tooltip-buttons";
+        ui.dxScheduler.tooltip = {
+            show: function(appointmentData, $appointment, instance) {
+                this.instance = instance;
+                var that = this,
+                    isAllDay = instance.appointmentTakesAllDay(appointmentData) || appointmentData.allDay;
+                ui.tooltip.show({
+                    target: $appointment,
+                    rtlEnabled: instance.option("rtlEnabled"),
+                    contentTemplate: function($content) {
+                        var $tooltip = that._tooltipContent(appointmentData);
+                        $tooltip.addClass($content.attr("class"));
+                        $content.replaceWith($tooltip)
+                    },
+                    position: {
+                        my: "bottom",
+                        at: "top",
+                        of: $appointment,
+                        boundary: isAllDay ? instance.element() : instance.getWorkSpaceScrollableContainer(),
+                        collision: "fit flipfit"
+                    }
+                })
+            },
+            hide: function() {
+                ui.tooltip.hide()
+            },
+            _tooltipContent: function(appointmentData) {
+                var that = this;
+                var $tooltip = $("<div>").addClass(APPOINTMENT_TOOLTIP_CLASS);
+                $("<div>").text(appointmentData.text).addClass(APPOINTMENT_TOOLTIP_TITLE_CLASS).appendTo($tooltip);
+                $("<div>").addClass(APPOINTMENT_TOOLTIP_DATE_CLASS).text(that._formatTooltipDate(appointmentData.startDate, appointmentData.endDate)).appendTo($tooltip);
+                var $buttons = $("<div>").addClass(APPOINTMENT_TOOLTIP_BUTTONS_CLASS).appendTo($tooltip);
+                if (that.instance.option("editing"))
+                    $("<div>").appendTo($buttons).dxButton({
+                        icon: "trash",
+                        onClick: function() {
+                            that.instance._checkRecurringAppointment(appointmentData.recurrenceRule, function() {
+                                that.instance.deleteAppointment(appointmentData)
+                            }, true);
+                            that.hide()
+                        }
+                    });
+                $("<div>").appendTo($buttons).dxButton({
+                    icon: that.instance.option("editing") ? "edit" : "",
+                    text: Globalize.localize("dxScheduler-openAppointment"),
+                    onClick: function() {
+                        that.instance.showAppointmentPopup(appointmentData)
+                    }
+                });
+                return $tooltip
+            },
+            _formatTooltipDate: function(startDate, endDate) {
+                var dateTimeFormat = "MMMM d h:mm tt";
+                if (this.instance.option("currentView") === "month") {
+                    var startDateString = Globalize.format(startDate, dateTimeFormat) + " - ",
+                        endDateString = startDate.getDate() === endDate.getDate() ? Globalize.format(endDate, "t") : Globalize.format(endDate, dateTimeFormat);
+                    return startDateString + endDateString
+                }
+                return Globalize.format(startDate, "t") + " - " + Globalize.format(endDate, "t")
+            }
+        }
     })(jQuery, DevExpress);
     /*! Module widgets-web, file ui.scheduler.appointmentModel.js */
     (function($, DX, undefined) {
@@ -22375,6 +22761,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     case"value":
                         this._recurrenceRule.makeRules(args.value);
                         this._switchEditor.option("value", !!args.value);
+                        this._switchEndEditor.option("value", !!this._recurrenceRule.repeatableRule());
                         this._repeatTypeEditor.option("value", this._recurrenceRule.repeatableRule() || "count");
                         this._renderRepeatEndEditor();
                         this._renderRepeatOnEditor();
@@ -22417,7 +22804,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
             _changeRepeatUntilValue: function() {
                 if (!this._$repeatDateEditor)
                     return;
-                var date = this._recurrenceRule.rules().until || new Date;
+                var date = utils.getDateByAsciiString(this._recurrenceRule.rules().until) || new Date;
                 this._repeatUntilDate.option("value", date)
             },
             _changeCheckBoxesValue: function() {
@@ -22510,7 +22897,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                     editor.options.onValueChanged(arg);
                                 scrollable.update();
                                 values[key] = arg.values ? arg.values : arg.value;
-                                if (values[key] === undefined || DX.utils.isEmptyArray(values[key]))
+                                if (values[key] === undefined)
                                     delete values[key]
                             },
                             readOnly: this.option("readOnly")
@@ -22532,7 +22919,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     var result = {value: value};
                     if (type === "dxTagBox") {
                         var values = value ? DX.utils.wrapToArray(value) : [];
-                        result = {values: values.slice()}
+                        result = {values: values}
                     }
                     return result
                 },
@@ -22970,7 +23357,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
             TIME_PANEL_ROW_CLASS = "dx-scheduler-time-panel-row",
             ALL_DAY_PANEL_CLASS = "dx-scheduler-all-day-panel",
             ALL_DAY_TABLE_CLASS = "dx-scheduler-all-day-table",
-            ALL_DAY_CONTAINER_CLASS = "dx-scheduler-all-day-container",
+            FIXED_CONTAINER_CLASS = "dx-scheduler-fixed-appointments",
             ALL_DAY_TITLE_CLASS = "dx-scheduler-all-day-title",
             ALL_DAY_TABLE_CELL_CLASS = "dx-scheduler-all-day-table-cell",
             ALL_DAY_TABLE_ROW_CLASS = "dx-scheduler-all-day-table-row",
@@ -23008,7 +23395,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                             var cellIndex = this._getFocusedCell().index(),
                                 $row = this._getFocusedCell().parent(),
                                 $cell = $row.next().children().eq(cellIndex);
-                            this._setFocusedCell($cell)
+                            this._moveToCell($cell)
                         },
                         upArrow: function(e) {
                             e.preventDefault();
@@ -23016,19 +23403,19 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                             var cellIndex = this._getFocusedCell().index(),
                                 $row = this._getFocusedCell().parent(),
                                 $cell = $row.prev().children().eq(cellIndex);
-                            this._setFocusedCell($cell)
+                            this._moveToCell($cell)
                         },
                         rightArrow: function(e) {
                             e.preventDefault();
                             e.stopPropagation();
                             var $cell = isRTL ? this._getFocusedCell().prev() : this._getFocusedCell().next();
-                            this._setFocusedCell($cell)
+                            this._moveToCell($cell)
                         },
                         leftArrow: function(e) {
                             e.preventDefault();
                             e.stopPropagation();
                             var $cell = isRTL ? this._getFocusedCell().next() : this._getFocusedCell().prev();
-                            this._setFocusedCell($cell)
+                            this._moveToCell($cell)
                         }
                     })
             },
@@ -23043,7 +23430,10 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 if (utils.isDefined(this._$focusedCell))
                     this.setAria("label", undefined, this._$focusedCell);
                 this._$focusedCell = $cell;
-                this.setAria("label", "Add appointment", this._$focusedCell);
+                this.setAria("label", "Add appointment", this._$focusedCell)
+            },
+            _moveToCell: function($cell) {
+                this._setFocusedCell($cell);
                 this._scrollable.scrollToElement($cell)
             },
             _releaseFocusedCell: function() {
@@ -23106,12 +23496,13 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 this.element().addClass(COMPONENT_CLASS);
                 this._$headerPanel = $("<table>").addClass(HEADER_PANEL_CLASS);
                 this._$allDayTable = $("<table>").addClass(ALL_DAY_TABLE_CLASS);
-                this._$allDayPanel = $("<div>").append($("<div>").addClass(ALL_DAY_CONTAINER_CLASS)).append($("<div>").addClass(ALL_DAY_TITLE_CLASS).text(Globalize.localize("dxScheduler-allDay"))).append(this._$allDayTable).addClass(ALL_DAY_PANEL_CLASS);
+                this._$fixedContainer = $("<div>").addClass(FIXED_CONTAINER_CLASS);
+                this._$allDayPanel = $("<div>").append($("<div>").addClass(ALL_DAY_TITLE_CLASS).text(Globalize.localize("dxScheduler-allDay"))).append(this._$allDayTable).addClass(ALL_DAY_PANEL_CLASS);
                 this._$timePanel = $("<table>").addClass(TIME_PANEL_CLASS);
                 this._$dateTable = $("<table>").addClass(DATE_TABLE_CLASS);
                 this._scrollable = this._createComponent("<div>", "dxScrollable", {useKeyboard: false});
                 this._scrollable.content().append(this._$timePanel, this._$dateTable);
-                this.element().append(this._$headerPanel, this._$allDayPanel, this._scrollable.element());
+                this.element().append(this._$headerPanel, this._$fixedContainer, this._$allDayPanel, this._scrollable.element());
                 this.element().addClass(this._getElementClass())
             },
             _getElementClass: $.noop,
@@ -23144,6 +23535,10 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
             _attachEvents: function() {
                 var pointerDownAction = this._createAction($.proxy(this._pointerDownHandler, this));
                 this.element().off(SCHEDULER_WORKSPACE_DXPOINTERDOWN_EVENT_NAME).on(SCHEDULER_WORKSPACE_DXPOINTERDOWN_EVENT_NAME, function(e) {
+                    if (ui.events.isMouseEvent(e) && e.which > 1) {
+                        e.preventDefault();
+                        return
+                    }
                     pointerDownAction({jQueryEvent: e})
                 })
             },
@@ -23160,9 +23555,9 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     this._setFocusedCell($target)
             },
             _showAddAppointmentPopup: function($cell) {
-                var cellData = $cell.data(CELL_DATA),
+                var cellData = this.getCellData($cell),
                     args = $.extend(cellData, cellData.groups);
-                delete cellData.groups;
+                delete args.groups;
                 this.notifyObserver("showAddAppointmentPopup", args)
             },
             _renderHeaderPanel: function() {
@@ -23286,7 +23681,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         $cell.data(CELL_DATA, data)
                     }
                 });
-                this._attachTableEvents()
+                this._attachTablesEvents()
             },
             _getTableAllDay: function() {
                 return false
@@ -23349,11 +23744,15 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 }
                 return result
             },
-            _attachTableEvents: function() {
-                var $currentTarget,
+            _attachTablesEvents: function() {
+                this._attachTableEvents(this._getDateTable());
+                this._attachTableEvents(this._getAllDayTable())
+            },
+            _attachTableEvents: function($table) {
+                var that = this,
                     cellHeight,
                     cellWidth;
-                this._getDateTables().off(SCHEDULER_CELL_DXDRAGENTER_EVENT_NAME).off(SCHEDULER_CELL_DXDROP_EVENT_NAME).on(SCHEDULER_CELL_DXDRAGENTER_EVENT_NAME, "td", {itemSizeFunc: function($element) {
+                $table.off(SCHEDULER_CELL_DXDRAGENTER_EVENT_NAME).off(SCHEDULER_CELL_DXDROP_EVENT_NAME).on(SCHEDULER_CELL_DXDRAGENTER_EVENT_NAME, "td", {itemSizeFunc: function($element) {
                         if (!cellHeight)
                             cellHeight = $element.height();
                         if (!cellWidth)
@@ -23363,10 +23762,10 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                 height: cellHeight
                             }
                     }}, function(e) {
-                    if ($currentTarget)
-                        $currentTarget.removeClass(DATE_TABLE_DROPPABLE_CELL_CLASS);
-                    $currentTarget = $(e.target);
-                    $currentTarget.addClass(DATE_TABLE_DROPPABLE_CELL_CLASS)
+                    if (that._$currentTableTarget)
+                        that._$currentTableTarget.removeClass(DATE_TABLE_DROPPABLE_CELL_CLASS);
+                    that._$currentTableTarget = $(e.target);
+                    that._$currentTableTarget.addClass(DATE_TABLE_DROPPABLE_CELL_CLASS)
                 }).on(SCHEDULER_CELL_DXDROP_EVENT_NAME, "td", function(e) {
                     $(e.target).removeClass(DATE_TABLE_DROPPABLE_CELL_CLASS);
                     cellHeight = 0;
@@ -23375,6 +23774,12 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
             },
             _getDateTables: function() {
                 return this._$dateTable.add(this._$allDayTable)
+            },
+            _getDateTable: function() {
+                return this._$dateTable
+            },
+            _getAllDayTable: function() {
+                return this._$allDayTable
             },
             _getInterval: function() {
                 return this.option("hoursInterval") * 3600000
@@ -23427,6 +23832,15 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
             },
             getWorkArea: function() {
                 return this._scrollable.content()
+            },
+            getScrollable: function() {
+                return this._scrollable
+            },
+            getScrollableScrollTop: function() {
+                return this._scrollable.scrollTop()
+            },
+            getScrollableContainer: function() {
+                return this._scrollable._container()
             },
             _getCellCoordinatesByIndex: function(index) {
                 var cellIndex = Math.floor(index / this._getRowCount()),
@@ -23488,14 +23902,15 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     timeOffset = dateTimeStamp % timeInterval;
                 return timeOffset ? timeOffset / timeInterval : 0
             },
-            _calculateTimeDurationBetweenFirstViewDateAndCurrentDate: function(currentDate, allDay) {
-                var firstViewDate = this.getFirstViewDate().getTime();
+            _getIntervalBetween: function(currentDate, firstViewDate, allDay) {
+                var startDayHour = this.option("startDayHour"),
+                    firstViewDateTime = firstViewDate.getTime();
                 if (allDay)
-                    firstViewDate = firstViewDate - this.option("startDayHour") * 60 * 60 * 1000;
-                var result = currentDate.getTime() - firstViewDate,
+                    firstViewDateTime = firstViewDateTime - startDayHour * 60 * 60 * 1000;
+                var result = currentDate.getTime() - firstViewDateTime,
                     days = Math.floor(result / (24 * 60 * 60 * 1000));
                 if (!allDay)
-                    result = result - days * this.option("startDayHour") * 3600000 - days * this._getEndDayMilliseconds();
+                    result = result - days * startDayHour * 3600000 - days * this._getEndDayMilliseconds();
                 return result
             },
             _getGroupIndexes: function(groups) {
@@ -23515,11 +23930,14 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
             _getDroppableCell: function() {
                 return this._getDateTables().find("." + DATE_TABLE_DROPPABLE_CELL_CLASS)
             },
+            getCellData: function($cell) {
+                return $.extend(true, {}, $cell.data(CELL_DATA))
+            },
             getCoordinatesByDate: function(date, groupIndex, allDay) {
                 var isRtl = this.option("rtlEnabled"),
                     stepsCount = this._getCellCount() * this._getRowCount(),
                     timeInterval = allDay ? 24 * 60 * 60 * 1000 : this._getInterval(),
-                    dateTimeStamp = this._calculateTimeDurationBetweenFirstViewDateAndCurrentDate(date, allDay);
+                    dateTimeStamp = this._getIntervalBetween(date, this.getFirstViewDate(), allDay);
                 groupIndex = groupIndex || 0;
                 var index = Math.floor(dateTimeStamp / timeInterval);
                 if (allDay)
@@ -23555,7 +23973,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 return rowIndex * $row.find("td").length + $droppableCell.index()
             },
             getDataByDroppableCell: function() {
-                var cellData = this._getDroppableCell().data(CELL_DATA);
+                var cellData = this.getCellData(this._getDroppableCell());
                 return {
                         date: cellData.startDate,
                         allDay: cellData.allDay,
@@ -23572,7 +23990,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 return this.element().find("." + DATE_TABLE_CELL_CLASS).first().outerHeight()
             },
             getAllDayHeight: function() {
-                return this.element().find("." + ALL_DAY_PANEL_CLASS + " td").first().outerHeight()
+                return this.element().find("." + ALL_DAY_TABLE_CELL_CLASS).first().outerHeight()
             },
             getMaxAllowedPosition: function() {
                 var result = [],
@@ -23586,7 +24004,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 return result
             },
             getAllDayContainerClass: function() {
-                return ALL_DAY_CONTAINER_CLASS
+                return FIXED_CONTAINER_CLASS
             },
             getCellIndexByCoordinates: function(coordinates) {
                 var $cell = this.element().find("." + DATE_TABLE_CELL_CLASS).first(),
@@ -23750,8 +24168,8 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 var startDateCopy = new Date(startDate);
                 return new Date(startDateCopy.setHours(this.option("endDayHour")))
             },
-            _calculateTimeDurationBetweenFirstViewDateAndCurrentDate: function(currentDate) {
-                return currentDate.getTime() - (this._firstViewDate.getTime() - this.option("startDayHour") * 3600000)
+            _getIntervalBetween: function(currentDate, firstViewDate) {
+                return currentDate.getTime() - (firstViewDate.getTime() - this.option("startDayHour") * 3600000)
             },
             _getCellCoordinatesByIndex: function(index) {
                 var rowIndex = Math.floor(index / this._getCellCount()),
@@ -23801,36 +24219,20 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
             }
         }))
     })(jQuery, DevExpress);
-    /*! Module widgets-web, file ui.scheduler.appointments.js */
+    /*! Module widgets-web, file ui.scheduler.appointments.strategy.base.js */
     (function($, DX, undefined) {
-        var ui = DX.ui,
-            translator = DX.translator,
-            events = ui.events;
-        var COMPONENT_CLASS = "dx-scheduler-appointments",
-            APPOINTMENT_ITEM_CLASS = "dx-scheduler-appointment",
-            RECURRENCE_APPOINTMENT_CLASS = "dx-scheduler-appointment-recurrence",
-            EMPTY_APPOINTMENT_CLASS = "dx-scheduler-appointment-empty",
-            REDUCED_APPOINTMENT_CLASS = "dx-scheduler-appointment-reduced",
-            REDUCED_APPOINTMENT_ICON = "dx-appointment-reduced-icon";
-        var MONTH_APPOINTMENT_DEFAULT_SIZE = 15,
-            MONTH_APPOINTMENT_DEFAULT_OFFSET = 3,
-            MONTH_APPOINTMENT_HEIGHT_RATIO = 0.6,
-            APPOINTMENT_DEFAULT_SIZE = 20,
-            WEEK_APPOINTMENT_DEFAULT_OFFSET = 10,
-            EMPTY_APPOINTMENT_MAX_WIDTH = 45;
-        var REDUCED_APPOINTMENT_POINTERENTER_EVENT_NAME = events.addNamespace("dxpointerenter", "dxSchedulerAppointment"),
-            REDUCED_APPOINTMENT_POINTERLEAVE_EVENT_NAME = events.addNamespace("dxpointerleave", "dxSchedulerAppointment"),
-            DBLCLICK_EVENT_NAME = events.addNamespace("dxdblclick", "dxSchedulerAppointment");
+        var ui = DX.ui;
         var BaseRenderingStrategy = DX.Class.inherit({
                 ctor: function(instance) {
-                    this.instance = instance;
-                    this.isRtl = instance.option("rtlEnabled")
+                    this.instance = instance
                 },
                 resizableConfig: DX.abstract,
                 handleResize: DX.abstract,
                 renderAppointmentGeometry: function($appointment, coordinates) {
                     var geometry = this.getAppointmentGeometry(coordinates);
-                    translator.move($appointment, {
+                    if (!this.instance.option("allowResize"))
+                        coordinates.skipResizing = true;
+                    DX.translator.move($appointment, {
                         top: geometry.top,
                         left: geometry.left
                     });
@@ -23875,7 +24277,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                 width: width
                             })) {
                                 appointmentReduced = true;
-                                if (this.isRtl)
+                                if (this._isRtl())
                                     width = Math.floor(position[j].left - currentMaxAllowedPosition);
                                 else
                                     width = currentMaxAllowedPosition - Math.floor(position[j].left)
@@ -23892,6 +24294,9 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 },
                 _needVerifyItemSize: function() {
                     return false
+                },
+                _isRtl: function() {
+                    return this.instance.option("rtlEnabled")
                 },
                 _getCurrentMaxAllowedPosition: function(index, item) {
                     this.instance.notifyObserver("getItemGroupIndexes", {
@@ -23910,7 +24315,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     return 0
                 },
                 isAppointmentGreaterThan: function(etalon, comparisonParameters) {
-                    if (this.isRtl)
+                    if (this._isRtl())
                         return comparisonParameters.left - comparisonParameters.width < etalon;
                     return comparisonParameters.left + comparisonParameters.width > etalon
                 },
@@ -23956,6 +24361,8 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     var stack = [],
                         indexes = [],
                         result = [],
+                        intersectPositions = [],
+                        intersectPositionCount = 0,
                         position;
                     for (var i = 0; i < sortedArray.length; i++) {
                         var current = sortedArray[i],
@@ -23979,15 +24386,23 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                                 count: indexes.length,
                                 i: current.i,
                                 j: current.j
-                            })
+                            });
+                            if (intersectPositionCount < indexes.length)
+                                intersectPositionCount = indexes.length
                         }
                         else {
                             var removeIndex = this._findIndexByKey(stack, "i", "j", current.i, current.j),
                                 resultItem = stack[removeIndex];
                             stack.splice(removeIndex, 1);
                             indexes[resultItem.index] = false;
-                            if (!stack.length)
+                            intersectPositions.push(resultItem);
+                            if (!stack.length) {
                                 indexes = [];
+                                for (var k = 0; k < intersectPositions.length; k++)
+                                    intersectPositions[k].count = intersectPositionCount;
+                                intersectPositions = [];
+                                intersectPositionCount = 0
+                            }
                             result.push(resultItem)
                         }
                     }
@@ -24029,7 +24444,88 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     return endDate
                 }
             });
-        var WeekRenderingStrategy = BaseRenderingStrategy.inherit({
+        ui.dxScheduler.BaseAppointmentsStrategy = BaseRenderingStrategy
+    })(jQuery, DevExpress);
+    /*! Module widgets-web, file ui.scheduler.appointments.strategy.horizontal.js */
+    (function($, DX, undefined) {
+        var ui = DX.ui;
+        var APPOINTMENT_DEFAULT_SIZE = 20,
+            MONTH_APPOINTMENT_HEIGHT_RATIO = 0.6,
+            MONTH_APPOINTMENT_DEFAULT_OFFSET = 3,
+            MONTH_APPOINTMENT_DEFAULT_SIZE = 15,
+            EMPTY_APPOINTMENT_CLASS = "dx-scheduler-appointment-empty";
+        var HorizontalRenderingStrategy = ui.dxScheduler.BaseAppointmentsStrategy.inherit({
+                resizableConfig: function() {
+                    return {
+                            minWidth: this.instance._defaultWidth,
+                            minHeight: 0,
+                            step: this.instance._defaultWidth,
+                            handles: "right left"
+                        }
+                },
+                _needVerifyItemSize: function() {
+                    return true
+                },
+                handleResize: function(args, start, end, appointment, initialSize) {
+                    var isLeft = $(args.jQueryEvent.target).hasClass("dx-resizable-handle-left") && !this._isRtl() || $(args.jQueryEvent.target).hasClass("dx-resizable-handle-right") && this._isRtl(),
+                        cellWidth = this.instance._defaultWidth || APPOINTMENT_DEFAULT_SIZE,
+                        initialWidth = initialSize.width,
+                        deltaTime = 24 * 60 * 60000 * (Math.round(args.width / cellWidth) - Math.round(initialWidth / cellWidth) || 1),
+                        startTime = isLeft ? start.getTime() - deltaTime : start.getTime(),
+                        endTime = isLeft ? end.getTime() : end.getTime() + deltaTime;
+                    return [startTime, endTime]
+                },
+                calculateAppointmentWidth: function(appointment) {
+                    var startDate = this._startDate(appointment),
+                        endDate = this._endDate(appointment),
+                        cellWidth = this.instance._defaultWidth || APPOINTMENT_DEFAULT_SIZE;
+                    var durationInHours = (endDate.getTime() - startDate.getTime()) / 3600000;
+                    var width = Math.ceil(durationInHours / 24) * cellWidth;
+                    return width
+                },
+                renderAppointmentGeometry: function($appointment, coordinates) {
+                    this.callBase($appointment, coordinates);
+                    if (coordinates.index > 1)
+                        $appointment.addClass(EMPTY_APPOINTMENT_CLASS)
+                },
+                getAppointmentGeometry: function(coordinates) {
+                    var maxHeight = this.instance._defaultHeight || APPOINTMENT_DEFAULT_SIZE,
+                        index = coordinates.index,
+                        height = MONTH_APPOINTMENT_HEIGHT_RATIO * maxHeight / 2,
+                        width = coordinates.width,
+                        top = (1 - MONTH_APPOINTMENT_HEIGHT_RATIO) * maxHeight + coordinates.top + index * height,
+                        left = coordinates.left;
+                    if (index > 1) {
+                        top = coordinates.top + MONTH_APPOINTMENT_DEFAULT_OFFSET;
+                        left = coordinates.left + (index - 2) * (MONTH_APPOINTMENT_DEFAULT_SIZE + MONTH_APPOINTMENT_DEFAULT_OFFSET) + MONTH_APPOINTMENT_DEFAULT_OFFSET;
+                        height = MONTH_APPOINTMENT_DEFAULT_SIZE,
+                        width = MONTH_APPOINTMENT_DEFAULT_SIZE;
+                        coordinates.skipResizing = true
+                    }
+                    if (this._isRtl())
+                        left -= width;
+                    return {
+                            height: height,
+                            width: width,
+                            top: top,
+                            left: left
+                        }
+                },
+                _sortCondition: function(a, b) {
+                    return this._columnCondition(a, b)
+                }
+            });
+        ui.dxScheduler.HorizontalAppointmentsStrategy = HorizontalRenderingStrategy
+    })(jQuery, DevExpress);
+    /*! Module widgets-web, file ui.scheduler.appointments.strategy.vertical.js */
+    (function($, DX, undefined) {
+        var ui = DX.ui;
+        var EMPTY_APPOINTMENT_MAX_WIDTH = 45,
+            WEEK_APPOINTMENT_DEFAULT_OFFSET = 10,
+            APPOINTMENT_DEFAULT_SIZE = 20,
+            MONTH_APPOINTMENT_DEFAULT_SIZE = 15,
+            EMPTY_APPOINTMENT_CLASS = "dx-scheduler-appointment-empty";
+        var VerticalRenderingStrategy = ui.dxScheduler.BaseAppointmentsStrategy.inherit({
                 resizableConfig: function(appointment) {
                     if (this.isAllDay(appointment))
                         return {
@@ -24048,7 +24544,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         deltaTime;
                     if (this.isAllDay(appointment)) {
                         var cellWidth = this.instance._defaultWidth || APPOINTMENT_DEFAULT_SIZE;
-                        handle = this.isRtl ? "dx-resizable-handle-right" : "dx-resizable-handle-left";
+                        handle = this._isRtl() ? "dx-resizable-handle-right" : "dx-resizable-handle-left";
                         deltaTime = 24 * 60 * 60000 * ((args.width - initialSize.width) / cellWidth) || 1
                     }
                     else {
@@ -24082,6 +24578,8 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         width = coordinates.width,
                         top = coordinates.top + index * height,
                         left = coordinates.left;
+                    if (!this.instance.option("allowResize") || !this.instance.option("allowAllDayResize"))
+                        coordinates.skipResizing = true;
                     if (count > 3)
                         if (index > 1) {
                             top = coordinates.top;
@@ -24092,7 +24590,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         }
                         else
                             top += height;
-                    if (this.isRtl)
+                    if (this._isRtl())
                         left -= width;
                     return {
                             height: height,
@@ -24107,7 +24605,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         height = coordinates.height,
                         top = coordinates.top,
                         left = coordinates.left + coordinates.index * width;
-                    if (this.isRtl)
+                    if (this._isRtl())
                         left -= maxWidth;
                     return {
                             height: height,
@@ -24156,67 +24654,22 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     return allDayCondition ? allDayCondition : this._rowCondition(a, b)
                 }
             });
-        var MonthRenderingStrategy = BaseRenderingStrategy.inherit({
-                resizableConfig: function() {
-                    return {
-                            minWidth: this.instance._defaultWidth,
-                            minHeight: 0,
-                            step: this.instance._defaultWidth,
-                            handles: "right left"
-                        }
-                },
-                _needVerifyItemSize: function() {
-                    return true
-                },
-                handleResize: function(args, start, end, appointment, initialSize) {
-                    var isLeft = $(args.jQueryEvent.target).hasClass("dx-resizable-handle-left") && !this.isRtl || $(args.jQueryEvent.target).hasClass("dx-resizable-handle-right") && this.isRtl,
-                        cellWidth = this.instance._defaultWidth || APPOINTMENT_DEFAULT_SIZE,
-                        initialWidth = initialSize.width,
-                        deltaTime = 24 * 60 * 60000 * (Math.round(args.width / cellWidth) - Math.round(initialWidth / cellWidth) || 1),
-                        startTime = isLeft ? start.getTime() - deltaTime : start.getTime(),
-                        endTime = isLeft ? end.getTime() : end.getTime() + deltaTime;
-                    return [startTime, endTime]
-                },
-                calculateAppointmentWidth: function(appointment) {
-                    var startDate = this._startDate(appointment),
-                        endDate = this._endDate(appointment),
-                        cellWidth = this.instance._defaultWidth || APPOINTMENT_DEFAULT_SIZE;
-                    var durationInHours = (endDate.getTime() - startDate.getTime()) / 3600000;
-                    var width = Math.ceil(durationInHours / 24) * cellWidth;
-                    return width
-                },
-                renderAppointmentGeometry: function($appointment, coordinates) {
-                    this.callBase($appointment, coordinates);
-                    if (coordinates.index > 1)
-                        $appointment.addClass(EMPTY_APPOINTMENT_CLASS)
-                },
-                getAppointmentGeometry: function(coordinates) {
-                    var maxHeight = this.instance._defaultHeight || APPOINTMENT_DEFAULT_SIZE,
-                        index = coordinates.index,
-                        height = MONTH_APPOINTMENT_HEIGHT_RATIO * maxHeight / 2,
-                        width = coordinates.width,
-                        top = (1 - MONTH_APPOINTMENT_HEIGHT_RATIO) * maxHeight + coordinates.top + index * height,
-                        left = coordinates.left;
-                    if (index > 1) {
-                        top = coordinates.top + MONTH_APPOINTMENT_DEFAULT_OFFSET;
-                        left = coordinates.left + (index - 2) * (MONTH_APPOINTMENT_DEFAULT_SIZE + MONTH_APPOINTMENT_DEFAULT_OFFSET) + MONTH_APPOINTMENT_DEFAULT_OFFSET;
-                        height = MONTH_APPOINTMENT_DEFAULT_SIZE,
-                        width = MONTH_APPOINTMENT_DEFAULT_SIZE;
-                        coordinates.skipResizing = true
-                    }
-                    if (this.isRtl)
-                        left -= width;
-                    return {
-                            height: height,
-                            width: width,
-                            top: top,
-                            left: left
-                        }
-                },
-                _sortCondition: function(a, b) {
-                    return this._columnCondition(a, b)
-                }
-            });
+        ui.dxScheduler.VerticalAppointmentsStrategy = VerticalRenderingStrategy
+    })(jQuery, DevExpress);
+    /*! Module widgets-web, file ui.scheduler.appointments.js */
+    (function($, DX, undefined) {
+        var ui = DX.ui,
+            translator = DX.translator,
+            events = ui.events;
+        var COMPONENT_CLASS = "dx-scheduler-scrollable-appointments",
+            APPOINTMENT_ITEM_CLASS = "dx-scheduler-appointment",
+            APPOINTMENT_ALL_DAY_ITEM_CLASS = "dx-scheduler-all-day-appointment",
+            RECURRENCE_APPOINTMENT_CLASS = "dx-scheduler-appointment-recurrence",
+            REDUCED_APPOINTMENT_CLASS = "dx-scheduler-appointment-reduced",
+            REDUCED_APPOINTMENT_ICON = "dx-appointment-reduced-icon",
+            REDUCED_APPOINTMENT_POINTERENTER_EVENT_NAME = events.addNamespace("dxpointerenter", "dxSchedulerAppointment"),
+            REDUCED_APPOINTMENT_POINTERLEAVE_EVENT_NAME = events.addNamespace("dxpointerleave", "dxSchedulerAppointment"),
+            DBLCLICK_EVENT_NAME = events.addNamespace("dxdblclick", "dxSchedulerAppointment");
         DX.registerComponent("dxSchedulerAppointments", ui.dxScheduler, ui.CollectionWidget.inherit({
             _supportedKeys: function(e) {
                 var that = this;
@@ -24240,6 +24693,9 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 this.callBase.apply(this, arguments);
                 this.option("focusedElement", $(e.target))
             },
+            _keyboardEventBindingTarget: function() {
+                return this._itemContainer()
+            },
             _setDefaultOptions: function() {
                 this.callBase();
                 this.option({
@@ -24248,10 +24704,11 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     hoverStateEnabled: true,
                     tabIndex: 0,
                     appointmentDurationInMinutes: 30,
-                    allDayContainer: null,
-                    renderingStrategy: "day",
+                    fixedContainer: null,
+                    renderingStrategy: "vertical",
                     allowDrag: true,
-                    allowResize: true
+                    allowResize: true,
+                    allowAllDayResize: true
                 })
             },
             _optionChanged: function(args) {
@@ -24262,10 +24719,11 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         this._initRenderingStrategy();
                         this.repaint();
                         break;
-                    case"allDayContainer":
+                    case"fixedContainer":
                         break;
                     case"allowDrag":
                     case"allowResize":
+                    case"allowAllDayResize":
                         this.repaint();
                         break;
                     default:
@@ -24278,26 +24736,25 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
             _itemContainer: function() {
                 var $container = this.callBase(),
                     $result = $container,
-                    $allDayContainer = this.option("allDayContainer");
-                if ($allDayContainer)
-                    $result = $container.add($allDayContainer);
+                    $fixedContainer = this.option("fixedContainer");
+                if ($fixedContainer)
+                    $result = $container.add($fixedContainer);
                 return $result
             },
             _cleanItemContainer: function() {
                 this.callBase();
-                var $allDayContainer = this.option("allDayContainer");
-                if ($allDayContainer)
-                    $allDayContainer.empty()
+                var $fixedContainer = this.option("fixedContainer");
+                if ($fixedContainer)
+                    $fixedContainer.empty()
             },
             _init: function() {
                 this.callBase();
                 this._initRenderingStrategy();
                 this.element().addClass(COMPONENT_CLASS);
-                this._appointmentClickTimeout;
                 this._preventSingleAppointmentClick = false
             },
             _initRenderingStrategy: function() {
-                this._renderingStrategy = this.option("renderingStrategy") === "month" ? new MonthRenderingStrategy(this) : new WeekRenderingStrategy(this)
+                this._renderingStrategy = this.option("renderingStrategy") === "horizontal" ? new ui.dxScheduler.HorizontalAppointmentsStrategy(this) : new ui.dxScheduler.VerticalAppointmentsStrategy(this)
             },
             _executeItemRenderAction: function(index, itemData, itemElement) {
                 var action = this._getItemRenderAction();
@@ -24365,16 +24822,20 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 this.callBase(items)
             },
             _renderItem: function(index, itemData) {
-                var $allDayContainer = this.option("allDayContainer"),
-                    $container = this.itemsContainer().not($allDayContainer);
-                if (this._renderingStrategy.isAllDay(itemData) && $allDayContainer)
-                    $container = $allDayContainer;
+                var $fixedContainer = this.option("fixedContainer"),
+                    $container = this.itemsContainer().not($fixedContainer);
+                if (this._renderingStrategy.isAllDay(itemData) && $fixedContainer)
+                    $container = $fixedContainer;
                 this.callBase(index, itemData, $container)
+            },
+            _toggleAllDayClass: function($element, value) {
+                $element.toggleClass(APPOINTMENT_ALL_DAY_ITEM_CLASS, !!value)
             },
             _postprocessRenderItem: function(args) {
                 var $appointment = args.itemElement,
                     itemData = args.itemData,
                     itemSettings = this._positionMap[args.itemIndex];
+                this._toggleAllDayClass($appointment, itemData.allDay);
                 this._attachAppointmentDblclick($appointment, itemData);
                 this._paintAppointment($appointment, 0);
                 itemData.recurrenceRule && $appointment.addClass(RECURRENCE_APPOINTMENT_CLASS);
@@ -24437,36 +24898,49 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     return;
                 var that = this,
                     appointmentData = that._getItemData($appointment),
-                    isAllDay = that._renderingStrategy.isAllDay(appointmentData);
+                    isAllDay = this._renderingStrategy.isAllDay(appointmentData),
+                    $fixedContainer = this.option("fixedContainer"),
+                    $scheduler = $appointment.closest(".dx-scheduler"),
+                    scheduler = $scheduler.dxScheduler("instance"),
+                    draggableArea = scheduler ? scheduler.getWorkSpaceScrollableContainer() : undefined,
+                    allDayPanelHeight = scheduler ? scheduler.getWorkSpaceAllDayHeight() : 0;
                 this._createComponent($appointment, "dxDraggable", {
                     onDragStart: function(e) {
                         that.notifyObserver("hideAppointmentTooltip");
-                        e.jQueryEvent.targetElements = $appointment.closest(".dx-scheduler");
+                        e.jQueryEvent.targetElements = $scheduler;
+                        if (!isAllDay && $fixedContainer)
+                            $fixedContainer.append($appointment);
                         appointmentData.initialSize = {
                             width: e.width,
                             height: e.height
                         };
-                        appointmentData.initialCoordinates = DX.translator.locate(e.element)
+                        appointmentData.initialCoordinates = translator.locate(e.element)
+                    },
+                    onDrag: function(e) {
+                        var scrollTop = scheduler && !isAllDay ? scheduler.getWorkSpaceScrollableScrollTop() - allDayPanelHeight : 0,
+                            currentCoordinates = translator.locate(e.element);
+                        translator.move($appointment, {top: currentCoordinates.top - scrollTop})
                     },
                     onDragEnd: function(e) {
-                        var itemData = that._getItemData($appointment);
-                        if (itemData._escPressed) {
-                            delete itemData._escPressed;
+                        if (!isAllDay)
+                            that.element().append($appointment);
+                        if (appointmentData._escPressed) {
+                            delete appointmentData._escPressed;
                             e.jQueryEvent.cancel = true;
                             return
                         }
                         that._dragEndHandler(e, appointmentData.initialCoordinates)
                     },
-                    area: this.element().closest(".dx-scrollable-content"),
-                    boundOffset: function() {
-                        if (isAllDay)
-                            return {top: -that._allDayHeight}
+                    area: draggableArea,
+                    boundOffset: {
+                        left: 0,
+                        top: -allDayPanelHeight,
+                        right: 0,
+                        bottom: 0
                     }
                 })
             },
             _renderResizable: function($appointment, itemSetting) {
-                if (!this.option("allowResize"))
-                    return;
                 var appointmentData = this._getItemData($appointment),
                     config = this._renderingStrategy.resizableConfig(appointmentData);
                 $.extend(config, {
@@ -24669,7 +25143,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 exponential: "0{0}E+00",
                 currency: " "
             },
-            EXCEL_START_TIME = new Date("12/30/1899").getTime(),
+            EXCEL_START_TIME = Date.UTC(1899, 11, 30),
             DAYS_COUNT_BEFORE_29_FEB_1900 = 60,
             BOLD_STYLES_COUNT = 4,
             MAX_DIGIT_WIDTH_IN_PIXELS = 7,
@@ -24771,10 +25245,13 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 if (this._maxIndex[1] < Number(cellIndex))
                     this._maxIndex[1] = Number(cellIndex);
                 do {
-                    charCode = 65 + (cellIndex > max ? cellIndex % max : Math.ceil(cellIndex));
+                    charCode = 65 + (cellIndex >= max ? cellIndex % max : Math.ceil(cellIndex));
                     sheetIndex = String.fromCharCode(charCode) + sheetIndex;
-                    cellIndex = Math.floor(cellIndex / max)
-                } while (cellIndex);
+                    if (cellIndex >= max)
+                        cellIndex = Math.floor(cellIndex / max) - 1;
+                    else
+                        break
+                } while (true);
                 sheetIndex += rowIndex;
                 return sheetIndex
             },
@@ -24802,6 +25279,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                         if ($.inArray(value, this._stringArray) === -1) {
                             if (value.indexOf("&") > 0)
                                 value = value.replace(new RegExp("&", "g"), "&amp;");
+                            value = value.replace('<', '&lt;').replace('>', '&gt;');
                             this._stringArray.push(value)
                         }
                         return $.inArray(value, this._stringArray)
@@ -24812,7 +25290,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                 var days,
                     totalTime;
                 if (utils.isDefined(date)) {
-                    days = Math.floor((date.getTime() - EXCEL_START_TIME) / (1000 * 60 * 60 * 24));
+                    days = Math.floor((Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) - EXCEL_START_TIME) / (1000 * 60 * 60 * 24));
                     if (days < DAYS_COUNT_BEFORE_29_FEB_1900)
                         days--;
                     totalTime = (date.getHours() * 3600 + date.getMinutes() * 60 + date.getSeconds()) / (24 * 3600);
@@ -24910,7 +25388,7 @@ if (!DevExpress.MOD_WIDGETS_WEB) {
                     });
                 this._styleArray.push({
                     bold: true,
-                    alignment: this._rtlEnabled ? "right" : "left",
+                    alignment: utils.getDefaultAlignment(this._rtlEnabled),
                     wrapText: 0
                 });
                 for (i = 0; i < columns.length; i++) {

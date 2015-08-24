@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Charts)
-* Version: 15.1.5
-* Build date: Jul 15, 2015
+* Version: 15.1.6
+* Build date: Aug 14, 2015
 *
 * Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -112,16 +112,12 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
             _correctTitleLength: function() {
                 var that = this,
                     text = that.title.text,
-                    lineLength,
-                    box;
+                    margin = that.changedMargin || that.options.margin,
+                    hasEllipsis;
                 that.title.attr({text: text});
                 that._setBoundingRect();
-                box = that.getLayoutOptions();
-                if (that._width > box.width || text.indexOf("<br/>") !== -1)
-                    return;
-                lineLength = text.length * that._width / box.width;
-                that.title.attr({text: text.substr(0, ~~lineLength - 1 - 3) + "..."});
-                that.title.setTitle(text);
+                hasEllipsis = that.title.applyEllipsis(that._width - margin.left - margin.right);
+                hasEllipsis && that.title.setTitle(text);
                 that._setBoundingRect()
             },
             changeSize: function(size) {
@@ -204,7 +200,7 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
     })(jQuery, DevExpress);
     /*! Module viz-charts, file axesConstants.js */
     (function($, DX, undefined) {
-        var _map = $.map;
+        var _map = DX.viz.core.utils.map;
         function getFormatObject(value, options, axisMinMax) {
             var formatObject = {
                     value: value,
@@ -674,12 +670,12 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
             core = viz.core,
             utils = DX.utils,
             constants = viz.charts.axes.constants,
+            _map = core.utils.map,
             _math = Math,
             _abs = _math.abs,
             _round = _math.round,
             _extend = $.extend,
             _noop = $.noop,
-            _map = $.map,
             HALF_PI_ANGLE = 90;
         viz.charts.axes.polarAxes = {};
         function getPolarQuarter(angle) {
@@ -917,25 +913,27 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                     spiderTicks = this.getSpiderTicks(),
                     firstTick,
                     lastTick,
-                    points = _map(spiderTicks, function(tick, i) {
-                        var result = [],
-                            nextTick;
-                        if (tick.angle >= fromAngle && tick.angle <= toAngle) {
-                            if (!firstTick) {
-                                firstTick = spiderTicks[i - 1] || spiderTicks[spiderTicks.length - 1];
-                                result.push((tick.posX + firstTick.posX) / 2, (tick.posY + firstTick.posY) / 2)
-                            }
-                            result.push(tick.posX, tick.posY);
-                            nextTick = spiderTicks[i + 1] || spiderTicks[0];
-                            lastTick = {
-                                x: (tick.posX + nextTick.posX) / 2,
-                                y: (tick.posY + nextTick.posY) / 2
-                            }
+                    nextTick,
+                    tick,
+                    points = [],
+                    i = 0,
+                    len = spiderTicks.length;
+                while (i < len) {
+                    tick = spiderTicks[i];
+                    if (tick.angle >= fromAngle && tick.angle <= toAngle) {
+                        if (!firstTick) {
+                            firstTick = spiderTicks[i - 1] || spiderTicks[spiderTicks.length - 1];
+                            points.push((tick.posX + firstTick.posX) / 2, (tick.posY + firstTick.posY) / 2)
                         }
-                        else
-                            result = null;
-                        return result
-                    });
+                        points.push(tick.posX, tick.posY);
+                        nextTick = spiderTicks[i + 1] || spiderTicks[0];
+                        lastTick = {
+                            x: (tick.posX + nextTick.posX) / 2,
+                            y: (tick.posY + nextTick.posY) / 2
+                        }
+                    }
+                    i++
+                }
                 points.push(lastTick.x, lastTick.y);
                 points.push(center.x, center.y);
                 return this._renderer.path(points, "area").attr(attr)
@@ -2233,10 +2231,17 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
         var ui = DX.ui,
             charts = DX.viz.charts,
             utils = DX.utils,
-            ACTIONS_BY_PRIORITY = ['reinit', '_reinitDataSource', '_dataInit', 'force_render', "_resize"],
+            REINIT_REFRESH_ACTION = "_reinit",
+            REINIT_DATA_SOURCE_REFRESH_ACTION = "_reinitDataSource",
+            DATA_INIT_REFRESH_ACTION = "_dataInit",
+            FORCE_RENDER_REFRESH_ACTION = "_forceRender",
+            RESIZE_REFRESH_ACTION = "_resize",
+            ACTIONS_BY_PRIORITY = [REINIT_REFRESH_ACTION, REINIT_DATA_SOURCE_REFRESH_ACTION, DATA_INIT_REFRESH_ACTION, FORCE_RENDER_REFRESH_ACTION, RESIZE_REFRESH_ACTION],
             core = DX.viz.core,
+            coreUtils = core.utils,
+            _noop = $.noop,
+            _map = coreUtils.map,
             _each = $.each,
-            _map = $.map,
             _extend = $.extend,
             DEFAULT_ANIMATION_OPTIONS = {asyncSeriesRendering: true},
             _isDefined = utils.isDefined,
@@ -2292,14 +2297,15 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
             return 0
         }
         function resolveLabelOverlappingInOneDirection(points, canvas, isRotated, shiftFunction) {
-            var stubCanvas = {
+            var rollingStocks,
+                stubCanvas = {
                     start: isRotated ? canvas.left : canvas.top,
                     end: isRotated ? canvas.width - canvas.right : canvas.height - canvas.bottom
                 };
             checkHeightLabelsInCanvas(points, stubCanvas, isRotated);
-            var rollingStocks = $.map(points, function(point) {
-                    return point && new RollingStock(point, isRotated, shiftFunction)
-                });
+            rollingStocks = _map(points, function(p) {
+                return p ? new RollingStock(p, isRotated, shiftFunction) : null
+            });
             rollingStocks.sort(function(a, b) {
                 return a.getPointPosition() - b.getPointPosition()
             });
@@ -2513,7 +2519,7 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
             _init: function() {
                 var that = this;
                 that.callBase.apply(that, arguments);
-                that._reinit()
+                that._reinit(true)
             },
             _createThemeManager: function() {
                 var option = this.option(),
@@ -2541,42 +2547,46 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
             _layoutManagerOptions: function() {
                 return this._themeManager.getOptions("adaptiveLayout")
             },
-            _reinit: function(needRedraw) {
+            _reinit: function(_skipRender) {
                 var that = this;
                 charts._setCanvasValues(that._canvas);
                 that._createTracker();
                 that._reinitAxes();
+                if (!_skipRender)
+                    that._initialized = false;
                 that._reinitDataSource();
                 if (!that.series)
-                    that._dataSpecificInit();
+                    that._dataSpecificInit(false);
+                if (!_skipRender)
+                    that._initialized = true;
                 that._correctAxes();
-                needRedraw && that._endLoading(function() {
-                    that._render({force: true})
-                })
+                _skipRender || that._forceRender()
             },
+            _correctAxes: _noop,
             _createHtmlStructure: function() {
                 var that = this,
-                    renderer = that._renderer;
-                that._backgroundRect = renderer.rect(0, 0, 0, 0).attr({
+                    renderer = that._renderer,
+                    root = renderer.root;
+                that._backgroundRect = renderer.rect().attr({
                     fill: "gray",
                     opacity: 0.0001
-                });
-                that._panesBackgroundGroup = renderer.g().attr({'class': 'dxc-background'});
-                that._titleGroup = renderer.g().attr({'class': 'dxc-title'});
+                }).append(root);
+                that._panesBackgroundGroup = renderer.g().attr({'class': 'dxc-background'}).append(root);
+                that._stripsGroup = renderer.g().attr({'class': 'dxc-strips-group'}).linkOn(root, "strips");
+                that._gridGroup = renderer.g().attr({'class': 'dxc-grids-group'}).linkOn(root, "grids");
+                that._axesGroup = renderer.g().attr({'class': 'dxc-axes-group'}).linkOn(root, "axes");
+                that._constantLinesGroup = renderer.g().attr({'class': 'dxc-constant-lines-group'}).linkOn(root, "constant-lines");
+                that._labelAxesGroup = renderer.g().attr({'class': 'dxc-strips-labels-group'}).linkOn(root, "strips-labels");
+                that._panesBorderGroup = renderer.g().attr({'class': 'dxc-border'}).linkOn(root, "border");
+                that._seriesGroup = renderer.g().attr({'class': 'dxc-series-group'}).linkOn(root, "series");
+                that._labelsGroup = renderer.g().attr({'class': 'dxc-labels-group'}).linkOn(root, "labels");
+                that._crosshairCursorGroup = renderer.g().attr({'class': 'dxc-crosshair-cursor'}).linkOn(root, "crosshair");
+                that._titleGroup = renderer.g().attr({'class': 'dxc-title'}).linkOn(root, "title");
                 that._legendGroup = renderer.g().attr({
                     'class': 'dxc-legend',
                     clipId: that._getCanvasClipRectID()
-                });
-                that._stripsGroup = renderer.g().attr({'class': 'dxc-strips-group'});
-                that._constantLinesGroup = renderer.g().attr({'class': 'dxc-constant-lines-group'});
-                that._axesGroup = renderer.g().attr({'class': 'dxc-axes-group'});
-                that._gridGroup = renderer.g().attr({'class': 'dxc-grids-group'});
-                that._panesBorderGroup = renderer.g().attr({'class': 'dxc-border'});
-                that._labelAxesGroup = renderer.g().attr({'class': 'dxc-strips-labels-group'});
-                that._scrollBarGroup = renderer.g().attr({'class': 'dxc-scroll-bar'});
-                that._seriesGroup = renderer.g().attr({'class': 'dxc-series-group'});
-                that._labelsGroup = renderer.g().attr({'class': 'dxc-labels-group'});
-                that._crosshairCursorGroup = renderer.g().attr({'class': 'dxc-crosshair-cursor'})
+                }).linkOn(root, "legend");
+                that._scrollBarGroup = renderer.g().attr({'class': 'dxc-scroll-bar'}).linkOn(root, "scroll-bar")
             },
             _disposeObjectsInArray: function(propName, fieldNames) {
                 $.each(this[propName] || [], function(_, item) {
@@ -2597,6 +2607,9 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                             that[propName] = null
                         }
                     },
+                    unlinkGroup = function(name) {
+                        that[name].linkOff()
+                    },
                     disposeObjectsInArray = this._disposeObjectsInArray;
                 clearTimeout(that._delayedRedraw);
                 that._renderer.stopAllAnimations();
@@ -2610,20 +2623,32 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                 that.paneAxis = null;
                 that._userOptions = null;
                 that._canvas = null;
+                unlinkGroup("_stripsGroup");
+                unlinkGroup("_gridGroup");
+                unlinkGroup("_axesGroup");
+                unlinkGroup("_constantLinesGroup");
+                unlinkGroup("_labelAxesGroup");
+                unlinkGroup("_panesBorderGroup");
+                unlinkGroup("_seriesGroup");
+                unlinkGroup("_labelsGroup");
+                unlinkGroup("_crosshairCursorGroup");
+                unlinkGroup("_titleGroup");
+                unlinkGroup("_legendGroup");
+                unlinkGroup("_scrollBarGroup");
                 disposeObject("_canvasClipRect");
                 disposeObject("_panesBackgroundGroup");
-                disposeObject("_titleGroup");
-                disposeObject("_scrollBarGroup");
-                disposeObject("_legendGroup");
                 disposeObject("_stripsGroup");
-                disposeObject("_constantLinesGroup");
-                disposeObject("_axesGroup");
                 disposeObject("_gridGroup");
+                disposeObject("_axesGroup");
+                disposeObject("_constantLinesGroup");
                 disposeObject("_labelAxesGroup");
                 disposeObject("_panesBorderGroup");
                 disposeObject("_seriesGroup");
                 disposeObject("_labelsGroup");
-                disposeObject("_crosshairCursorGroup")
+                disposeObject("_crosshairCursorGroup");
+                disposeObject("_titleGroup");
+                disposeObject("_legendGroup");
+                disposeObject("_scrollBarGroup")
             },
             _getAnimationOptions: function() {
                 return $.extend({}, DEFAULT_ANIMATION_OPTIONS, this._themeManager.getOptions("animation"))
@@ -2640,10 +2665,10 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
             _reinitDataSource: function() {
                 this._refreshDataSource()
             },
-            _applySize: $.noop,
+            _applySize: _noop,
             _resize: function() {
                 if (this._updateLockCount)
-                    this._processRefreshData("_resize");
+                    this._processRefreshData(RESIZE_REFRESH_ACTION);
                 else
                     this._render(this.__renderOptions || {
                         animate: false,
@@ -2766,13 +2791,11 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                     that._renderSeries(drawOptions, isRotated, isLegendInside)
                 }
             },
-            _createCrosshairCursor: $.noop,
+            _createCrosshairCursor: _noop,
             _appendSeriesGroups: function() {
-                var that = this,
-                    root = that._renderer.root;
-                that._seriesGroup.append(root);
-                that._labelsGroup.append(root);
-                that._appendAdditionalSeriesGroups()
+                this._seriesGroup.linkAppend();
+                this._labelsGroup.linkAppend();
+                this._appendAdditionalSeriesGroups()
             },
             _renderSeries: function(drawOptions, isRotated, isLegendInside) {
                 var that = this,
@@ -2811,17 +2834,21 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                     })
             },
             _resolveLabelOverlappingHide: function() {
-                var labels = $.map(this._getVisibleSeries(), function(series) {
-                        return $.map(series.getVisiblePoints(), function(point) {
-                                return point.getLabel()
-                            })
-                    }),
+                var labels = [],
                     currenctLabel,
                     nextLabel,
                     currenctLabelRect,
                     nextLabelRect,
                     i,
-                    j;
+                    j,
+                    points,
+                    series = this._getVisibleSeries();
+                for (i = 0; i < series.length; i++) {
+                    points = series[i].getVisiblePoints();
+                    for (j = 0; j < points.length; j++)
+                        labels.push(points[j].getLabel())
+                }
+                labels = [].concat.apply([], labels);
                 for (i = 0; i < labels.length; i++) {
                     currenctLabel = labels[i];
                     currenctLabelRect = currenctLabel.getBoundingRect();
@@ -2837,24 +2864,17 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
             },
             _cleanGroups: function(drawOptions) {
                 var that = this;
-                that._stripsGroup.remove();
-                that._constantLinesGroup.remove();
-                that._axesGroup.remove();
-                that._gridGroup.remove();
-                that._labelAxesGroup.remove();
-                that._labelsGroup.remove();
-                that._crosshairCursorGroup.remove();
+                that._stripsGroup.linkRemove().clear();
+                that._gridGroup.linkRemove().clear();
+                that._axesGroup.linkRemove().clear();
+                that._constantLinesGroup.linkRemove().clear();
+                that._labelAxesGroup.linkRemove().clear();
+                that._labelsGroup.linkRemove().clear();
+                that._crosshairCursorGroup.linkRemove().clear();
                 if (!drawOptions || drawOptions.drawLegend)
-                    that._legendGroup.remove().clear();
+                    that._legendGroup.linkRemove().clear();
                 if (!drawOptions || drawOptions.drawTitle)
-                    that._titleGroup.remove().clear();
-                that._stripsGroup.clear();
-                that._constantLinesGroup.clear();
-                that._axesGroup.clear();
-                that._gridGroup.clear();
-                that._labelAxesGroup.clear();
-                that._labelsGroup.clear();
-                that._crosshairCursorGroup.clear()
+                    that._titleGroup.linkRemove().clear()
             },
             _drawTitle: function() {
                 var that = this,
@@ -2974,50 +2994,50 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                         break;
                     case'dataSource':
                         that._needHandleRenderComplete = true;
-                        that._processRefreshData('_reinitDataSource');
+                        that._processRefreshData(REINIT_DATA_SOURCE_REFRESH_ACTION);
                         break;
                     case'palette':
                         themeManager.updatePalette(that.option(name));
-                        that._refreshSeries('_dataInit');
+                        that._refreshSeries(DATA_INIT_REFRESH_ACTION);
                         break;
                     case'series':
                     case'commonSeriesSettings':
                     case'containerBackgroundColor':
                     case'dataPrepareSettings':
-                        that._refreshSeries('_dataInit');
+                        that._refreshSeries(DATA_INIT_REFRESH_ACTION);
                         break;
                     case'legend':
                     case'seriesTemplate':
-                        that._processRefreshData('_dataInit');
+                        that._processRefreshData(DATA_INIT_REFRESH_ACTION);
                         break;
                     case'title':
-                        that._processRefreshData('force_render');
+                        that._processRefreshData(FORCE_RENDER_REFRESH_ACTION);
                         break;
                     case'valueAxis':
                     case'argumentAxis':
                     case'commonAxisSettings':
                     case'panes':
                     case'defaultPane':
-                        that._refreshSeries('reinit');
+                        that._refreshSeries(REINIT_REFRESH_ACTION);
                         that.paneAxis = {};
                         break;
                     case'rotated':
                         that._createScrollBar();
-                        that._refreshSeries('reinit');
+                        that._refreshSeries(REINIT_REFRESH_ACTION);
                         break;
                     case'customizePoint':
                     case'customizeLabel':
-                        that._refreshSeries('reinit');
+                        that._refreshSeries(REINIT_REFRESH_ACTION);
                         break;
                     case'scrollBar':
                         that._createScrollBar();
-                        that._processRefreshData('force_render');
+                        that._processRefreshData(FORCE_RENDER_REFRESH_ACTION);
                         break;
                     case'tooltip':
                         that._organizeStackPoints();
                         break;
                     default:
-                        that._processRefreshData('reinit')
+                        that._processRefreshData(REINIT_REFRESH_ACTION)
                 }
                 that.callBase.apply(that, arguments)
             },
@@ -3025,7 +3045,7 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                 var that = this;
                 if (that._initialized) {
                     that._scheduleLoadingIndicatorHiding();
-                    that._refreshSeries('reinit');
+                    that._refreshSeries('_reinit');
                     that.beginUpdate();
                     that._invalidate();
                     that.endUpdate()
@@ -3036,23 +3056,10 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                 this._processRefreshData(actionName)
             },
             _refresh: function() {
-                var that = this;
-                that._renderer.stopAllAnimations(true);
-                if (that._currentRefreshData) {
-                    switch (that._currentRefreshData) {
-                        case'force_render':
-                            that._render({force: true});
-                            break;
-                        case'reinit':
-                            that._reinit(true);
-                            break;
-                        default:
-                            that[that._currentRefreshData] && that[that._currentRefreshData]()
-                    }
-                    delete that._currentRefreshData
-                }
-                else
-                    that._render({force: true})
+                var methodName = this._currentRefreshData || FORCE_RENDER_REFRESH_ACTION;
+                this._currentRefreshData = null;
+                this._renderer.stopAllAnimations(true);
+                this[methodName]()
             },
             _dataSourceOptions: function() {
                 return {paginate: false}
@@ -3075,7 +3082,7 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                     y: canvas.top,
                     width: width,
                     height: height
-                }).append(that._renderer.root).toBackground()
+                })
             },
             _getCanvasClipRectID: function() {
                 return this._canvasClipRect.id
@@ -3090,16 +3097,17 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                 this._dataSpecificInit(true)
             },
             _dataSpecificInit: function(needRedraw) {
-                this.series = this.series || this._populateSeries();
-                this._repopulateSeries();
-                this._seriesPopulatedHandler(needRedraw)
-            },
-            _seriesPopulatedHandler: function(needRedraw) {
                 var that = this;
+                that.series = that.series || that._populateSeries();
+                that._repopulateSeries();
                 that._seriesPopulatedHandlerCore();
                 that._populateBusinessRange();
                 that._updateLegend();
-                needRedraw && that._endLoading(function() {
+                needRedraw && that._forceRender()
+            },
+            _forceRender: function() {
+                var that = this;
+                that._endLoading(function() {
                     that._render({force: true})
                 })
             },
@@ -3111,7 +3119,7 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                     dataValidatorOptions = themeManager.getOptions('dataPrepareSettings'),
                     seriesTemplate = themeManager.getOptions('seriesTemplate');
                 if (that._dataSource && seriesTemplate) {
-                    that._templatedSeries = utils.processSeriesTemplate(seriesTemplate, that._dataSource.items());
+                    that._templatedSeries = coreUtils.processSeriesTemplate(seriesTemplate, that._dataSource.items());
                     that._populateSeries();
                     delete that._templatedSeries;
                     data = that.teamplateData || data
@@ -3153,24 +3161,24 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                 var that = this,
                     titleOptions = that._themeManager.getOptions("title"),
                     drawTitle = titleOptions.text && drawOptions.drawTitle,
-                    drawLegend = drawOptions.drawLegend && that.legend && !legendHasInsidePosition,
+                    drawLegend = drawOptions.drawLegend && that.legend,
                     drawElements = [];
                 if (drawTitle) {
-                    that._titleGroup.append(that._renderer.root);
+                    that._titleGroup.linkAppend();
                     that._drawTitle();
                     drawElements.push(that.chartTitle)
                 }
                 if (drawLegend) {
-                    that._legendGroup.append(that._renderer.root);
-                    drawElements.push(that.legend)
+                    that._legendGroup.linkAppend();
+                    !legendHasInsidePosition && drawElements.push(that.legend)
                 }
                 drawElements.length && that.layoutManager.drawElements(drawElements, that._canvas);
                 if (drawTitle)
                     that.layoutManager.correctSizeElement(that.chartTitle, that._canvas)
             },
-            _prepareStackPoints: $.noop,
-            _resetStackPoints: $.noop,
-            _resetZoom: $.noop,
+            _prepareStackPoints: _noop,
+            _resetStackPoints: _noop,
+            _resetZoom: _noop,
             _dataIsReady: function() {
                 return this._isDataSourceReady()
             },
@@ -3223,21 +3231,11 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
             _isDefined = utils.isDefined,
             _each = $.each,
             _extend = $.extend,
-            _map = $.map,
+            _map = core.utils.map,
             MIN = 'min',
             MAX = 'max';
         function prepareAxis(axisOptions) {
             return _isArray(axisOptions) ? axisOptions.length === 0 ? [{}] : axisOptions : [axisOptions]
-        }
-        function unique(array) {
-            var values = {},
-                i,
-                len = array.length;
-            for (i = 0; i < len; i++)
-                values[array[i]] = true;
-            return _map(values, function(_, key) {
-                    return key
-                })
         }
         function prepareVisibleArea(visibleArea, axisRange, useAggregation, aggregationRange) {
             visibleArea.minVal = axisRange.min;
@@ -3335,7 +3333,7 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                     axisNames = [],
                     valueAxesCounter = 0,
                     paneWithNonVirtualAxis,
-                    crosshairOptions = that._getOption("crosshair") || {},
+                    crosshairOptions = that._getCrosshairOptions() || {},
                     crosshairEnabled = crosshairOptions.enabled,
                     horCrosshairEnabled = crosshairEnabled && crosshairOptions.horizontalLine.visible,
                     verCrosshairEnabled = crosshairEnabled && crosshairOptions.verticalLine.visible;
@@ -3366,7 +3364,7 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                         axisPanes.push(axisOptions.pane);
                     if (axisOptions.panes && axisOptions.panes.length)
                         axisPanes = axisPanes.concat(axisOptions.panes.slice(0));
-                    axisPanes = unique(axisPanes);
+                    axisPanes = core.utils.unique(axisPanes);
                     if (!axisPanes.length)
                         axisPanes.push(undefined);
                     _each(axisPanes, function(_, pane) {
@@ -3438,16 +3436,14 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                 that._prepareAxesAndDraw(drawAxes, drawStaticAxisElements, drawOptions)
             },
             _appendAdditionalSeriesGroups: function() {
-                var that = this,
-                    root = that._renderer.root;
-                that._crosshairCursorGroup.append(root);
-                that._legendGroup.append(root);
-                that._scrollBar && that._scrollBarGroup.append(root)
+                this._crosshairCursorGroup.linkAppend();
+                this._scrollBar && this._scrollBarGroup.linkAppend()
             },
             _getLegendTargets: function() {
                 return _map(this.series, function(item) {
                         if (item.getOptions().showInLegend)
-                            return item
+                            return item;
+                        return null
                     })
             },
             _legendItemTextField: "name",
@@ -3494,7 +3490,9 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                                 pane: pane.name,
                                 equalBarWidth: familyOptions.equalBarWidth,
                                 minBubbleSize: familyOptions.minBubbleSize,
-                                maxBubbleSize: familyOptions.maxBubbleSize
+                                maxBubbleSize: familyOptions.maxBubbleSize,
+                                rotated: that._isRotated(),
+                                sortSeriesPointsByAxis: that._getOption("sortSeriesPointsByAxis")
                             });
                         family.add(paneSeries);
                         family.adjustSeriesValues();
@@ -3504,13 +3502,12 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                 that.seriesFamilies = families
             },
             _appendAxesGroups: function() {
-                var that = this,
-                    root = that._renderer.root;
-                that._stripsGroup.append(root);
-                that._gridGroup.append(root);
-                that._axesGroup.append(root);
-                that._constantLinesGroup.append(root);
-                that._labelAxesGroup.append(root)
+                var that = this;
+                that._stripsGroup.linkAppend();
+                that._gridGroup.linkAppend();
+                that._axesGroup.linkAppend();
+                that._constantLinesGroup.linkAppend();
+                that._labelAxesGroup.linkAppend()
             },
             _updateAxesLayout: function(drawOptions, panesBorderOptions, rotated) {
                 this.layoutManager.updatePanesCanvases(this._getLayoutTargets(), this._canvas, rotated);
@@ -3668,7 +3665,7 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                     name: DEFAULT_PANE_NAME,
                     border: {}
                 }],
-            _map = $.map,
+            _map = core.utils.map,
             _each = $.each,
             _extend = $.extend,
             _isArray = utils.isArray,
@@ -3810,6 +3807,9 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                 })
             })
         }
+        function compareAxes(a, b) {
+            return a.priority - b.priority
+        }
         charts._test_prepareSegmentRectPoints = function() {
             var original = prepareSegmentRectPoints.original || prepareSegmentRectPoints;
             if (arguments[0])
@@ -3843,7 +3843,7 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                 that._panesClipRects = null
             },
             _correctAxes: function() {
-                this.series && this._correctValueAxes()
+                this._correctValueAxes()
             },
             _getExtraOptions: $.noop,
             _processSingleSeries: $.noop,
@@ -3951,31 +3951,32 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                     valueAxesOptions = _isArray(valueAxisOptions) ? valueAxisOptions : [valueAxisOptions],
                     valueAxes = that._valueAxes || [],
                     defaultAxisName = valueAxes[0].name,
-                    paneAxis = that.paneAxis || {},
-                    panes = that.panes,
-                    i,
+                    paneAxis = that.paneAxis,
                     neededAxis = {};
                 _each(valueAxes, function(_, axis) {
-                    if (axis.pane)
-                        return;
-                    var pane = getPaneForAxis(that.paneAxis, axis.name);
-                    if (!pane) {
-                        pane = that.defaultPane;
-                        paneAxis[pane] = paneAxis[pane] || {};
-                        paneAxis[pane][axis.name] = true
+                    var pane;
+                    if (!axis.pane) {
+                        pane = getPaneForAxis(paneAxis, axis.name);
+                        if (!pane) {
+                            pane = that.defaultPane;
+                            (paneAxis[pane] = paneAxis[pane] || {})[axis.name] = true
+                        }
+                        axis.setPane(pane)
                     }
-                    axis.setPane(pane)
                 });
-                for (i = 0; i < panes.length; i++)
-                    if (!paneAxis[panes[i].name]) {
-                        paneAxis[panes[i].name] = {};
-                        paneAxis[panes[i].name][defaultAxisName] = true
+                _each(that.panes, function(_, pane) {
+                    var name = pane.name;
+                    if (!paneAxis[name]) {
+                        paneAxis[name] = {};
+                        paneAxis[name][defaultAxisName] = true
                     }
-                _each(that.paneAxis, function(paneName, axisNames) {
+                });
+                _each(paneAxis, function(paneName, axisNames) {
                     _each(axisNames, function(axisName) {
+                        var axisOptions;
                         neededAxis[axisName + "-" + paneName] = true;
                         if (!findAxis(paneName, axisName, valueAxes)) {
-                            var axisOptions = findAxisOptions(valueAxes, valueAxesOptions, axisName);
+                            axisOptions = findAxisOptions(valueAxes, valueAxesOptions, axisName);
                             if (!axisOptions) {
                                 that._incidentOccured("W2102", [axisName]);
                                 axisOptions = {
@@ -3990,13 +3991,9 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                         }
                     })
                 });
-                valueAxes = $.grep(valueAxes, function(elem) {
+                that._valueAxes = $.grep(valueAxes, function(elem) {
                     return !!neededAxis[elem.name + "-" + elem.pane]
-                });
-                valueAxes.sort(function(a, b) {
-                    return a.priority - b.priority
-                });
-                that._valueAxes = valueAxes
+                }).sort(compareAxes)
             },
             _getSeriesForPane: function(paneName) {
                 var paneSeries = [];
@@ -4026,7 +4023,7 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                     that._scrollBar = (that._scrollBar || charts.factory.createScrollBar(that._renderer, scrollBarGroup)).update(scrollBarOptions)
                 }
                 else {
-                    scrollBarGroup.remove();
+                    scrollBarGroup.linkRemove();
                     that._scrollBar && that._scrollBar.dispose();
                     that._scrollBar = null
                 }
@@ -4089,7 +4086,6 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                         layoutManager = charts.factory.createChartLayoutManager();
                     newCanvas.right = panes[panes.length - 1].canvas.right;
                     newCanvas.bottom = panes[panes.length - 1].canvas.bottom;
-                    that._legendGroup.append(that._renderer.root);
                     layoutManager.drawElements([that.legend], newCanvas);
                     layoutManager.placeDrawnElements(newCanvas)
                 }
@@ -4274,7 +4270,7 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                     rect,
                     i,
                     rects = [];
-                that._panesBackgroundGroup && that._panesBackgroundGroup.clear();
+                that._panesBackgroundGroup.clear();
                 for (i = 0; i < that.panes.length; i++) {
                     backgroundColor = that.panes[i].backgroundColor || defaultBackgroundColor;
                     if (!backgroundColor || backgroundColor === "none") {
@@ -4287,8 +4283,7 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                     }).append(that._panesBackgroundGroup);
                     rects.push(rect)
                 }
-                that.panesBackground = rects;
-                that._panesBackgroundGroup.append(renderer.root)
+                that.panesBackground = rects
             },
             _fillPanesBackground: function() {
                 var that = this,
@@ -4317,7 +4312,7 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
             _drawPanesBorders: function(panesBorderOptions) {
                 var that = this,
                     rotated = that._isRotated();
-                that._panesBorderGroup && that._panesBorderGroup.remove().clear();
+                that._panesBorderGroup.linkRemove().clear();
                 _each(that.panes, function(i, pane) {
                     var bc,
                         borderOptions = panesBorderOptions[pane.name],
@@ -4337,7 +4332,7 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                     segmentRectParams = prepareSegmentRectPoints(bc.left, bc.top, bc.width, bc.height, borderOptions);
                     that._renderer.path(segmentRectParams.points, segmentRectParams.pathType).attr(attr).append(that._panesBorderGroup)
                 });
-                that._panesBorderGroup.append(that._renderer.root)
+                that._panesBorderGroup.linkAppend()
             },
             _createClipRect: function(clipArray, index, left, top, width, height) {
                 var that = this,
@@ -4538,6 +4533,9 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
             _getEqualBarWidth: function() {
                 return this._themeManager.getOptions("equalBarWidth")
             },
+            _getCrosshairOptions: function() {
+                return this._getOption("crosshair")
+            },
             zoomArgument: function(min, max, gesturesUsed) {
                 var that = this,
                     zoomArg;
@@ -4586,7 +4584,6 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
         DX.registerComponent("dxPieChart", viz.charts, charts.BaseChart.inherit({
             _chartType: 'pie',
             _reinitAxes: _noop,
-            _correctAxes: _noop,
             _layoutManagerOptions: function() {
                 var diameter = this._themeManager.getOptions('diameter');
                 if (utils.isNumber(diameter)) {
@@ -4736,6 +4733,7 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
     (function($, DX, undefined) {
         var charts = DX.viz.charts,
             core = DX.viz.core,
+            _noop = $.noop,
             DEFAULT_PANE_NAME = 'default';
         var PolarChart = charts.AdvancedChart.inherit({
                 _chartType: 'polar',
@@ -4763,7 +4761,6 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                 _getExtraOptions: function() {
                     return {spiderWidget: this.option("useSpiderWeb")}
                 },
-                _correctAxes: $.noop,
                 _groupSeries: function() {
                     this._groupedSeries = [this.series];
                     this._groupedSeries[0].valueAxis = this._valueAxes[0];
@@ -4771,12 +4768,10 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                     this._groupedSeries.argumentAxes = this._argumentAxes;
                     this._groupedSeries.argumentOptions = this._argumentAxes[0].getOptions()
                 },
-                _processSingleSeries: $.noop,
                 _prepareToRender: function() {
                     this._appendAxesGroups();
                     return {}
                 },
-                _isLegendInside: $.noop,
                 _renderAxes: function(drawOptions) {
                     this._drawAxes({}, drawOptions)
                 },
@@ -4818,7 +4813,6 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                     canvas.top += measure.height;
                     canvas.bottom += measure.height
                 },
-                _isRotated: $.noop,
                 _getLayoutTargets: function() {
                     return [{canvas: this._canvas}]
                 },
@@ -4829,8 +4823,6 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                             horizontalAxes: argAxes
                         }
                 },
-                _applyClipRects: $.noop,
-                _getSeriesRenderTimeout: $.noop,
                 _drawSeries: function(drawOptions) {
                     var that = this,
                         i,
@@ -4848,8 +4840,6 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                     for (i = 0; i < series.length; i++)
                         series[i].draw(that.translator, that._getAnimateOption(series[i], drawOptions), drawOptions.hideLayoutLabels, that.legend && that.legend.getActionCallback(series[i]))
                 },
-                _updateLegendPosition: $.noop,
-                _createScrollBar: $.noop,
                 _createTranslator: function(br) {
                     var themeManager = this._themeManager,
                         axisUserOptions = this.option("argumentAxis"),
@@ -4861,7 +4851,15 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                 },
                 _getEqualBarWidth: function() {
                     return !!this._themeManager.getOptions("equalBarWidth")
-                }
+                },
+                _updateLegendPosition: _noop,
+                _createScrollBar: _noop,
+                _applyClipRects: _noop,
+                _getSeriesRenderTimeout: _noop,
+                _isRotated: _noop,
+                _getCrosshairOptions: _noop,
+                _isLegendInside: _noop,
+                _processSingleSeries: _noop
             });
         DX.registerComponent('dxPolarChart', charts, PolarChart)
     })(jQuery, DevExpress);
@@ -5296,7 +5294,8 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
     })(jQuery, DevExpress);
     /*! Module viz-charts, file multiAxesSynchronizer.js */
     (function($, DX, undefined) {
-        var Range = DX.viz.core.Range,
+        var core = DX.viz.core,
+            Range = core.Range,
             utils = DX.utils,
             _adjustValue = utils.adjustValue,
             _applyPrecisionByMinDelta = utils.applyPrecisionByMinDelta,
@@ -5304,6 +5303,7 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
             _math = Math,
             _floor = _math.floor,
             _max = _math.max,
+            _abs = _math.abs,
             _each = $.each,
             MIN_RANGE_FOR_ADJUST_BOUNDS = 0.1;
         var getValueAxesPerPanes = function(valueAxes) {
@@ -5376,7 +5376,7 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                 axisInfo.tickValues = ticks
             };
         var populateAxesInfo = function(axes) {
-                return $.map(axes, function(axis) {
+                return core.utils.map(axes, function(axis) {
                         restoreOriginalBusinessRange(axis);
                         var ticksValues = axis.getTicksValues(),
                             majorTicks = ticksValues.majorTicksValues,
@@ -5394,9 +5394,9 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                             maxValue = businessRange.maxVisible;
                             synchronizedValue = options.synchronizedValue;
                             if (minValue === maxValue && _isDefined(synchronizedValue)) {
-                                minValue = majorTicks[0] - 1;
-                                maxValue = majorTicks[0] + 1;
-                                tickInterval = 1
+                                tickInterval = _abs(majorTicks[0] - synchronizedValue) || 1;
+                                minValue = majorTicks[0] - tickInterval;
+                                maxValue = majorTicks[0] + tickInterval
                             }
                             axisInfo = {
                                 axis: axis,
@@ -5579,7 +5579,7 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                     if (info.oldMaxValue - info.oldMinValue === 0)
                         invalidAxisInfo.push(info);
                     else if (!_isDefined(correctValue) && !_isDefined(info.synchronizedValue)) {
-                        correctValue = _math.abs((info.maxValue - info.minValue) / (info.tickValues[_floor(info.tickValues.length / 2)] || info.maxValue));
+                        correctValue = _abs((info.maxValue - info.minValue) / (info.tickValues[_floor(info.tickValues.length / 2)] || info.maxValue));
                         validAxisInfo = info
                     }
                 });
@@ -5627,7 +5627,7 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
             }}
     })(jQuery, DevExpress);
     /*! Module viz-charts, file tracker.js */
-    (function($, DX, math) {
+    (function($, DX, math, undefined) {
         var charts = DX.viz.charts,
             eventsConsts = DX.viz.core.series.helpers.consts.events,
             utils = DX.utils,
@@ -5645,6 +5645,9 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
             POINT_CLICK = "pointClick",
             RELEASE_POINT_SELECTED_STATE = "releasePointSelectedState",
             SET_POINT_SELECTED_STATE = "setPointSelectedState",
+            SERIES_HOVER_CHANGED = 'seriesHoverChanged',
+            POINT_HOVER_CHANGED = 'pointHoverChanged',
+            RELEASE_POINT_HOVER_STATE = 'releasePointHoverState',
             DELAY = 100;
         function processMode(mode) {
             return (mode + "").toLowerCase()
@@ -5661,6 +5664,23 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
         }
         function eventCanceled(event, target) {
             return event.cancel || !target.getOptions()
+        }
+        function inCanvas(canvas, x, y) {
+            return x >= canvas.left && x <= canvas.right && y >= canvas.top && y <= canvas.bottom
+        }
+        function setPointsSpecState(points, targetPoint, func, eventName, eventTrigger) {
+            _each(points, function(_, currentPoint) {
+                var series = currentPoint.series;
+                if (currentPoint === targetPoint) {
+                    series[func]({
+                        point: currentPoint,
+                        setState: true
+                    });
+                    eventName && eventTrigger(eventName, {target: currentPoint})
+                }
+                else
+                    series[func]({point: currentPoint})
+            })
         }
         var baseTrackerPrototype = {
                 ctor: function(options) {
@@ -5757,32 +5777,30 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                     }
                 },
                 _setPointState: function(point, action, mode, eventName, legendCallback) {
-                    var that = this;
+                    var that = this,
+                        eventTrigger = that._eventTrigger;
                     switch (mode) {
                         case ALL_ARGUMENTS_POINTS_MODE:
-                            that._toAllArgumentPoints(point.argument, action, eventName);
+                            that._toAllArgumentPoints(point.argument, action, eventName, point);
                             break;
                         case ALL_SERIES_POINTS_MODE:
-                            _each(point.series.getPoints(), function(_, point) {
-                                point.series[action](point);
-                                that._eventTrigger(eventName, {target: point})
-                            });
+                            setPointsSpecState(point.series.getPoints(), point, action, eventName, eventTrigger);
                             break;
                         case NONE_MODE:
                             break;
                         default:
-                            point.series[action](point, legendCallback);
-                            that._eventTrigger(eventName, {target: point})
+                            point.series[action]({
+                                point: point,
+                                legendCallback: legendCallback,
+                                setState: true
+                            });
+                            eventTrigger(eventName, {target: point})
                     }
                 },
-                _toAllArgumentPoints: function(argument, func, eventName) {
+                _toAllArgumentPoints: function(argument, func, eventName, targetPoint) {
                     var that = this;
                     _each(that._storedSeries, function(_, series) {
-                        var neighborPoints = series.getPointsByArg(argument);
-                        _each(neighborPoints || [], function(_, point) {
-                            series[func](point);
-                            eventName && that._eventTrigger(eventName, {target: point})
-                        })
+                        setPointsSpecState(series.getPointsByArg(argument), targetPoint, func, eventName, that._eventTrigger)
                     })
                 },
                 _setHoveredPoint: function(point, mode) {
@@ -5794,26 +5812,24 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                     that._releaseHoveredPoint();
                     if (point && point.getOptions() && mode !== NONE_MODE) {
                         that.hoveredPoint = point;
-                        that._setPointState(point, 'setPointHoverState', mode || processMode(point.getOptions().hoverMode), "pointHoverChanged", that.legendCallback(point))
+                        that._setPointState(point, 'setPointHoverState', mode || processMode(point.getOptions().hoverMode), POINT_HOVER_CHANGED, that.legendCallback(point))
                     }
                 },
                 _releaseHoveredPoint: function() {
                     var that = this,
                         point = that.hoveredPoint,
-                        mode;
+                        mode,
+                        eventTrigger = that._eventTrigger;
                     if (!point || !point.getOptions())
                         return;
                     mode = processMode(point.getOptions().hoverMode);
                     if (mode === ALL_SERIES_POINTS_MODE)
-                        _each(point.series.getPoints(), function(_, point) {
-                            point.series.releasePointHoverState(point);
-                            that._eventTrigger("pointHoverChanged", {target: point})
-                        });
+                        setPointsSpecState(point.series.getPoints(), point, RELEASE_POINT_HOVER_STATE, POINT_HOVER_CHANGED, eventTrigger);
                     else if (mode === ALL_ARGUMENTS_POINTS_MODE)
-                        that._toAllArgumentPoints(point.argument, 'releasePointHoverState', "pointHoverChanged");
-                    else {
+                        that._toAllArgumentPoints(point.argument, RELEASE_POINT_HOVER_STATE, POINT_HOVER_CHANGED, point);
+                    else if (mode !== "none") {
                         point.releaseHoverState(that.legendCallback(point));
-                        that._eventTrigger("pointHoverChanged", {target: point})
+                        eventTrigger(POINT_HOVER_CHANGED, {target: point})
                     }
                     if (that._tooltip.isEnabled())
                         that._hideTooltip(point);
@@ -5865,18 +5881,26 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                     if (mode !== NONE_MODE && that.hoveredSeries !== series || series.lastHoverMode !== mode) {
                         that._clearHover();
                         series.setHoverState(true, mode, that.legendCallback(series));
-                        that._eventTrigger("seriesHoverChanged", {target: series})
+                        that._eventTrigger(SERIES_HOVER_CHANGED, {target: series})
                     }
                     that.hoveredSeries = series;
                     if (mode === NONE_MODE)
                         $(series).trigger('NoneMode')
                 },
-                _releaseHoveredSeries: function() {
-                    var that = this;
-                    if (that.hoveredSeries) {
-                        that.hoveredSeries.setHoverState(false, undefined, that.legendCallback(that.hoveredSeries));
-                        that._eventTrigger("seriesHoverChanged", {target: that.hoveredSeries});
+                _releaseHoveredSeries: function(needSetHoverView) {
+                    var that = this,
+                        hoveredSeries = that.hoveredSeries,
+                        seriesWithHoverView = that._seriesWithHoverView;
+                    if (hoveredSeries) {
+                        hoveredSeries.setHoverState(false, undefined, that.legendCallback(hoveredSeries));
+                        if (needSetHoverView)
+                            that._seriesWithHoverView = hoveredSeries.setHoverView();
+                        that._eventTrigger(SERIES_HOVER_CHANGED, {target: hoveredSeries});
                         that.hoveredSeries = null
+                    }
+                    else if (seriesWithHoverView && !needSetHoverView) {
+                        seriesWithHoverView.releaseHoverView();
+                        that._seriesWithHoverView = null
                     }
                 },
                 _selectSeries: function(event, mode) {
@@ -5901,7 +5925,7 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                     that._hideTooltip(that.pointAtShownTooltip)
                 },
                 _clearHover: function() {
-                    this._releaseHoveredSeries();
+                    this._releaseHoveredSeries(false);
                     this._releaseHoveredPoint()
                 },
                 _hideTooltip: function(point, silent) {
@@ -5949,7 +5973,7 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                             var rootOffset = that._renderer.getRootOffset(),
                                 x = _floor(e.pageX - rootOffset.left),
                                 y = _floor(e.pageY - rootOffset.top);
-                            if (!that._inCanvas(that._mainCanvas, x, y)) {
+                            if (!inCanvas(that._mainCanvas, x, y)) {
                                 that._pointerOut();
                                 that._disableOutHandler()
                             }
@@ -5964,9 +5988,6 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                 _pointerOut: function() {
                     this._clearHover();
                     this._tooltip.isEnabled() && this._hideTooltip(this.pointAtShownTooltip)
-                },
-                _inCanvas: function(canvas, x, y) {
-                    return x >= canvas.left && x <= canvas.right && y >= canvas.top && y <= canvas.bottom
                 },
                 dispose: function() {
                     var that = this;
@@ -6030,7 +6051,7 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                     canvases = that._canvases || [];
                 for (var i = 0; i < canvases.length; i++) {
                     var c = canvases[i];
-                    if (that._inCanvas(c, x, y))
+                    if (inCanvas(c, x, y))
                         return c
                 }
                 return null
@@ -6041,7 +6062,7 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
             },
             _resetHoveredArgument: function() {
                 if (isDefined(this.hoveredArgument)) {
-                    this._toAllArgumentPoints(this.hoveredArgument, 'releasePointHoverState');
+                    this._toAllArgumentPoints(this.hoveredArgument, RELEASE_POINT_HOVER_STATE);
                     this.hoveredArgument = null
                 }
             },
@@ -6227,8 +6248,9 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                     x = _floor(e.pageX - rootOffset.left),
                     y = _floor(e.pageY - rootOffset.top),
                     canvas = that._getCanvas(x, y),
-                    series = $(e.target).data("series"),
-                    point = $(e.target).data("point") || series && series.getPointByCoord(x, y);
+                    $eventTarget = $(e.target),
+                    series = $eventTarget.data("series"),
+                    point = $eventTarget.data("point") || series && series.getPointByCoord(x, y);
                 that._enableOutHandler();
                 that._x = x;
                 that._y = y;
@@ -6287,23 +6309,27 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                         that._setTimeout(function() {
                             that._pointerOnPoint(point)
                         }, point);
-                    else
+                    else {
                         that._pointerOnPoint(point);
+                        that._seriesWithHoverView = point.series.setHoverView()
+                    }
                     return
                 }
                 else if (that._stickedSeries) {
                     series = that._stickedSeries;
                     point = series.getNeighborPoint(x, y);
-                    that.hoveredSeries && that._releaseHoveredSeries();
+                    that._releaseHoveredSeries(false);
                     point && that._setHoveredPoint(point)
                 }
                 that._pointerComplete(point)
             },
             _pointerOnPoint: function(point) {
-                var that = this;
-                that._stickedSeries = point.series;
+                var that = this,
+                    seriesWithHoverView = that._seriesWithHoverView,
+                    seriesFromPoint = point.series;
+                that._stickedSeries = seriesFromPoint;
                 that._setHoveredPoint(point);
-                that.hoveredSeries && that._releaseHoveredSeries();
+                that._releaseHoveredSeries(seriesWithHoverView ? seriesWithHoverView === seriesFromPoint : true);
                 that._pointerComplete(point)
             },
             _pointerComplete: function(point) {

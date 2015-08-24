@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Vector Map)
-* Version: 15.1.5
-* Build date: Jul 15, 2015
+* Version: 15.1.6
+* Build date: Aug 14, 2015
 *
 * Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -144,13 +144,13 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                     return this._factory.createThemeManager()
                 },
                 _initBackground: function(dataKey) {
-                    this._background = this._renderer.rect(0, 0, 0, 0).attr({"class": "dxm-background"}).data(dataKey, {type: "background"})
+                    this._background = this._renderer.rect(0, 0, 0, 0).attr({"class": "dxm-background"}).data(dataKey, {type: "background"}).append(this._root)
                 },
                 _initAreasManager: function(dataKey, notifyDirty, notifyReady) {
                     var that = this;
                     that._areasManager = that._factory.createAreasManager({
-                        container: that._root,
                         renderer: that._renderer,
+                        container: that._root,
                         projection: that._projection,
                         themeManager: that._themeManager,
                         tracker: that._tracker,
@@ -164,8 +164,8 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                 _initMarkersManager: function(dataKey, notifyDirty, notifyReady) {
                     var that = this;
                     that._markersManager = that._factory.createMarkersManager({
-                        container: that._root,
                         renderer: that._renderer,
+                        container: that._root,
                         projection: that._projection,
                         themeManager: that._themeManager,
                         tracker: that._tracker,
@@ -179,8 +179,8 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                 _initLegendsControl: function() {
                     var that = this;
                     that._legendsControl = that._factory.createLegendsControl({
-                        container: that._root,
                         renderer: that._renderer,
+                        container: that._root,
                         layoutControl: that._layoutControl,
                         dataExchanger: that._dataExchanger
                     })
@@ -188,8 +188,8 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                 _initControlBar: function(dataKey) {
                     var that = this;
                     that._controlBar = that._factory.createControlBar({
-                        container: that._root,
                         renderer: that._renderer,
+                        container: that._root,
                         layoutControl: that._layoutControl,
                         projection: that._projection,
                         dataKey: dataKey
@@ -211,8 +211,8 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                     that._initBackground(dataKey);
                     that._initAreasManager(dataKey, notifyDirty, notifyReady);
                     that._initMarkersManager(dataKey, notifyDirty, notifyReady);
-                    that._initLegendsControl();
                     that._initControlBar(dataKey);
+                    that._initLegendsControl();
                     function notifyDirty() {
                         that._resetIsReady();
                         ++notifyCounter
@@ -226,8 +226,7 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                 },
                 _initCore: function() {
                     var that = this;
-                    that._root = that._renderer.root;
-                    that._root.attr({
+                    that._root = that._renderer.root.attr({
                         align: 'center',
                         cursor: 'default'
                     });
@@ -250,6 +249,7 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                     that._resetControlBarCallbacks();
                     that._tracker.dispose();
                     that._legendsControl.dispose();
+                    that._background.remove();
                     that._areasManager.dispose();
                     that._markersManager.dispose();
                     that._controlBar.dispose();
@@ -475,7 +475,6 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                     var that = this;
                     that._tracker.reset();
                     that._layoutControl.stop();
-                    that._background.remove();
                     that._areasManager.clean();
                     that._markersManager.clean();
                     that._controlBar.clean();
@@ -484,13 +483,11 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                 _render: function() {
                     var that = this;
                     that._scheduleLoadingIndicatorHiding();
-                    that._background.append(that._root);
-                    that._areasManager.render();
-                    that._markersManager.render();
-                    that._controlBar.render();
                     that._legendsControl.render();
-                    that._layoutControl.start();
-                    that._repairLoadIndicator()
+                    that._controlBar.render();
+                    that._markersManager.render();
+                    that._areasManager.render();
+                    that._layoutControl.start()
                 },
                 _optionChanged: function(args) {
                     var that = this,
@@ -1084,7 +1081,7 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                 ctor: function(parameters) {
                     var that = this;
                     that._params = parameters;
-                    that._createElements(parameters.renderer, parameters.dataKey);
+                    that._createElements(parameters.renderer, parameters.container, parameters.dataKey);
                     parameters.layoutControl.addItem(that);
                     that._subscribeToProjection(parameters.projection);
                     that._setVisibility(false)
@@ -1093,11 +1090,11 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                     this._callbacks = callbacks;
                     return this
                 },
-                _createElements: function(renderer, dataKey) {
+                _createElements: function(renderer, container, dataKey) {
                     var that = this,
                         buttonsGroups,
                         trackersGroup;
-                    that._root = renderer.g().attr({"class": "dxm-control-bar"});
+                    that._root = renderer.g().attr({"class": "dxm-control-bar"}).linkOn(container, "control-bar");
                     buttonsGroups = that._buttonsGroup = renderer.g().attr({"class": "dxm-control-buttons"}).append(that._root);
                     trackersGroup = renderer.g().attr({
                         stroke: "none",
@@ -1193,8 +1190,8 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                 dispose: function() {
                     var that = this;
                     that._params.layoutControl.removeItem(that);
-                    that._root.clear();
-                    that._params = that._callbacks = that._root = that._buttonsGroup = that._zoomDrag = that._zoomDragCover = that._progressBar = null;
+                    that._root.clear().linkOff();
+                    that._params = that._root = that._callbacks = that._buttonsGroup = that._zoomDrag = that._zoomDragCover = that._progressBar = null;
                     return that
                 },
                 resize: function(size) {
@@ -1262,13 +1259,13 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                 clean: function() {
                     var that = this;
                     that._rendered = null;
-                    that._root.remove();
+                    that._root.linkRemove();
                     return that
                 },
                 render: function() {
                     var that = this;
                     that._rendered = true;
-                    that._root.append(that._params.container);
+                    that._root.linkAppend();
                     that._refresh();
                     return that
                 },
@@ -2074,15 +2071,20 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
     })(DevExpress, jQuery);
     /*! Module viz-vectormap, file legend.js */
     (function(DX, $, undefined) {
-        var _String = String,
-            _isArray = DX.utils.isArray,
+        var _core = DX.viz.core,
+            _String = String,
+            _utils = DX.utils,
+            _isArray = _utils.isArray,
             _extend = $.extend,
             _each = $.each,
-            _BaseLegend = DX.viz.core.Legend;
+            _BaseLegend = _core.Legend;
         function Legend(parameters) {
             var that = this;
             that._params = parameters;
-            that._root = parameters.renderer.g().attr({"class": "dxm-legend"});
+            that._root = parameters.renderer.g().attr({"class": "dxm-legend"}).linkOn(parameters.container, {
+                name: "legend",
+                after: "legend-base"
+            });
             parameters.layoutControl.addItem(that);
             _BaseLegend.apply(that, [{
                     renderer: parameters.renderer,
@@ -2095,30 +2097,31 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                     }
                 }]);
             that._onDataChanged = function(items) {
-                var itemsForUpdate = $.map(items, function(item) {
+                var itemsForUpdate = _core.utils.map(items, function(item) {
                         return _extend(true, {states: {normal: {fill: item.color}}}, item)
                     });
                 that.update(itemsForUpdate, that._options);
                 that._refresh()
             }
         }
-        var legendPrototype = Legend.prototype = DX.utils.clone(_BaseLegend.prototype);
+        var legendPrototype = Legend.prototype = _utils.clone(_BaseLegend.prototype);
         legendPrototype.constructor = Legend;
         legendPrototype.dispose = function() {
             var that = this;
             that._params.layoutControl.removeItem(that);
             that._unbindData();
+            that._root.linkOff();
             that._params = that._root = that._onDataChanged = null;
             return _BaseLegend.prototype.dispose.apply(that, arguments)
         };
         legendPrototype.clean = function() {
             this._rendered = false;
-            this._root.remove();
+            this._root.linkRemove();
             return this
         };
         legendPrototype.render = function() {
             var that = this;
-            that._root.append(that._params.container);
+            that._root.linkAppend();
             that._rendered = true;
             that._refresh();
             return that
@@ -2170,16 +2173,18 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
         };
         function LegendsControl(parameters) {
             this._parameters = parameters;
-            this._items = []
+            this._items = [];
+            parameters.container.virtualLink("legend-base")
         }
         LegendsControl.prototype = {
             constructor: LegendsControl,
             dispose: function() {
-                _each(this._items, function(_, item) {
+                var that = this;
+                _each(that._items, function(_, item) {
                     item.dispose()
                 });
-                this._parameters = this._items = null;
-                return this
+                that._parameters = that._items = null;
+                return that
             },
             setOptions: function(options, theme) {
                 var optionList = _isArray(options) ? options : [],
@@ -2477,14 +2482,14 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
         var _isFinite = isFinite,
             _utils = DX.utils,
             _coreUtils = DX.viz.core.utils,
+            _map = _coreUtils.map,
             _isString = _utils.isString,
             _isArray = _utils.isArray,
             _isFunction = _utils.isFunction,
             _patchFontOptions = _coreUtils.patchFontOptions,
             _parseScalar = _coreUtils.parseScalar,
             _extend = $.extend,
-            _each = $.each,
-            _map = $.map;
+            _each = $.each;
         var SELECTIONS = {
                 none: null,
                 single: -1,
@@ -2496,7 +2501,7 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
             if (selection !== null)
                 selection = {
                     state: {},
-                    single: selection || null
+                    single: selection
                 };
             return selection
         }
@@ -2560,7 +2565,7 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                         }
                 },
                 _initRoot: function() {
-                    this._context.root = this._root = this._params.renderer.g().attr({"class": this._rootClass})
+                    this._context.root = this._root = this._params.renderer.g().attr({"class": this._rootClass}).linkOn(this._params.container, "mapitems-" + this._dataCategory)
                 },
                 dispose: function() {
                     var that = this;
@@ -2570,6 +2575,7 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                     return that
                 },
                 _disposeRoot: function() {
+                    this._root.linkOff();
                     this._root = null
                 },
                 clean: function() {
@@ -2580,7 +2586,7 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                     return that
                 },
                 _removeRoot: function() {
-                    this._root.remove()
+                    this._root.linkRemove()
                 },
                 setOptions: function(options) {
                     var that = this;
@@ -2613,7 +2619,7 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                     that._updateGrouping()
                 },
                 _appendRoot: function() {
-                    this._root.append(this._params.container)
+                    this._root.linkAppend()
                 },
                 _destroyItems: function() {
                     var that = this;
@@ -2630,10 +2636,13 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                     this._root.clear()
                 },
                 _destroyHandles: function() {
-                    this._handles && _each(this._handles, function(_, handle) {
+                    var that = this;
+                    that._handles && _each(that._handles, function(_, handle) {
                         handle.dispose()
                     });
-                    this._handles = null
+                    if (that._context.selection)
+                        that._context.selection.state = {};
+                    that._handles = null
                 },
                 _createHandles: function(source) {
                     var that = this;
@@ -2719,10 +2728,12 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                 },
                 clearSelection: function() {
                     var selection = this._context.selection;
-                    if (selection)
+                    if (selection) {
                         _each(selection.state, function(_, handle) {
                             handle && handle.setSelected(false)
                         });
+                        selection.state = {}
+                    }
                     return this
                 },
                 raiseClick: function(index, $event) {
@@ -2986,10 +2997,11 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                 _initRoot: function() {
                     var that = this;
                     that.callBase.apply(that, arguments);
-                    that._context.labelRoot = that._labelRoot = that._params.renderer.g().attr({"class": "dxm-area-labels"})
+                    that._context.labelRoot = that._labelRoot = that._params.renderer.g().attr({"class": "dxm-area-labels"}).linkOn(that._params.container, "mapitems-areas-labels")
                 },
                 _disposeRoot: function() {
                     this.callBase.apply(this, arguments);
+                    this._labelRoot.linkOff();
                     this._labelRoot = null
                 },
                 _processSource: function(source) {
@@ -3005,13 +3017,13 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                 _itemType: "area",
                 _removeRoot: function() {
                     this.callBase.apply(this, arguments);
-                    this._labelRoot.remove()
+                    this._labelRoot.linkRemove()
                 },
                 _appendRoot: function() {
                     var that = this;
                     that.callBase.apply(that, arguments);
                     if (that._commonSettings.label.enabled)
-                        that._labelRoot.append(that._params.container)
+                        that._labelRoot.linkAppend()
                 },
                 _clearRoot: function() {
                     this.callBase.apply(this, arguments);
@@ -3195,7 +3207,8 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
             _min = _math.min,
             _extend = $.extend,
             _each = $.each,
-            _isArray = DX.utils.isArray,
+            utils = DX.utils,
+            _isArray = utils.isArray,
             CLASS_DEFAULT = "dxm-marker",
             CLASS_HOVERED = "dxm-marker dxm-marker-hovered",
             CLASS_SELECTED = "dxm-marker dxm-marker-selected",
@@ -3326,7 +3339,7 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                         }
                     });
                     if (count > 0)
-                        this._params.dataExchanger.set(this._dataCategory, "color", $.map(this._context.getPieColors(count).slice(0, count), function(color, i) {
+                        this._params.dataExchanger.set(this._dataCategory, "color", DX.viz.core.utils.map(this._context.getPieColors(count).slice(0, count), function(color, i) {
                             return {
                                     index: i,
                                     color: color

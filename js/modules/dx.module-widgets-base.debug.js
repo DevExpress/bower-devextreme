@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Common Widgets)
-* Version: 15.1.5
-* Build date: Jul 15, 2015
+* Version: 15.1.6
+* Build date: Aug 14, 2015
 *
 * Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -49,6 +49,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
     /*! Module widgets-base, file ui.scrollable.js */
     (function($, DX, undefined) {
         var ui = DX.ui,
+            utils = DX.utils,
             events = ui.events;
         var SCROLLABLE = "dxScrollable",
             SCROLLABLE_STRATEGY = "dxScrollableStrategy",
@@ -298,11 +299,21 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 return this._strategy.location()
             },
             _normalizeLocation: function(location) {
-                var direction = this.option("direction");
-                return {
-                        left: $.isPlainObject(location) ? -(location.left || location.x || 0) : direction !== VERTICAL ? -location : 0,
-                        top: $.isPlainObject(location) ? -(location.top || location.y || 0) : direction !== HORIZONTAL ? -location : 0
-                    }
+                if ($.isPlainObject(location)) {
+                    var left = utils.ensureDefined(location.left, location.x);
+                    var top = utils.ensureDefined(location.top, location.y);
+                    return {
+                            left: utils.isDefined(left) ? -left : undefined,
+                            top: utils.isDefined(top) ? -top : undefined
+                        }
+                }
+                else {
+                    var direction = this.option("direction");
+                    return {
+                            left: direction !== VERTICAL ? -location : 0,
+                            top: direction !== HORIZONTAL ? -location : 0
+                        }
+                }
             },
             _isLocked: function() {
                 return this._locked
@@ -334,6 +345,9 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             },
             _allowedDirection: function() {
                 return this._allowedDirectionValue
+            },
+            _container: function() {
+                return this._$container
             },
             content: function() {
                 return this._$content
@@ -369,17 +383,20 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 return $.when().promise()
             },
             scrollBy: function(distance) {
-                distance = this._normalizeLocation(distance);
+                distance = $.extend({
+                    top: 0,
+                    left: 0
+                }, this._normalizeLocation(distance));
                 if (!distance.top && !distance.left)
                     return;
                 this._strategy.scrollBy(distance)
             },
             scrollTo: function(targetLocation) {
-                targetLocation = this._normalizeLocation(targetLocation);
                 var location = this._location();
+                targetLocation = this._normalizeLocation(targetLocation);
                 this.scrollBy({
-                    left: location.left - targetLocation.left,
-                    top: location.top - targetLocation.top
+                    left: location.left - utils.ensureDefined(targetLocation.left, location.left),
+                    top: location.top - utils.ensureDefined(targetLocation.top, location.top)
                 })
             },
             scrollToElement: function(element, offset) {
@@ -1089,7 +1106,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                         this._velocity = 0
                 },
                 _resetThumbScrolling: function() {
-                    this._thumbScrolling = false
+                    this._thumbScrolling = false;
+                    this._crossThumbScrolling = false
                 },
                 _stopHandler: function() {
                     this._resetThumbScrolling();
@@ -1273,6 +1291,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             },
             handleStart: function(e) {
                 this._saveActive();
+                this._eventForUserAction = e;
                 this._eventHandler("start").done(this._startAction)
             },
             _saveActive: function() {
@@ -1280,13 +1299,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             },
             _resetActive: function() {
                 activeScrollable = null
-            },
-            _validateDirection: function(delta) {
-                var result = false;
-                this._eachScroller(function(scroller) {
-                    result = result || scroller._validateDirection(delta)
-                });
-                return result
             },
             handleMove: function(e) {
                 if (this._isLocked()) {
@@ -1861,9 +1873,11 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     this._$topPocket.css({top: -this._topPocketSize})
                 },
                 handleEnd: function() {
+                    this.callBase();
                     this._complete()
                 },
                 handleStop: function() {
+                    this.callBase();
                     this._complete()
                 },
                 _complete: function() {
@@ -4180,9 +4194,9 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 var $element = this.element(),
                     $handle = $("<div>");
                 $handle.addClass(RESIZABLE_HANDLE_CLASS).addClass(RESIZABLE_HANDLE_CLASS + "-" + handleName).appendTo($element);
-                this._attachEventHandlers($handle, handleName)
+                this._attachEventHandlers($handle)
             },
-            _attachEventHandlers: function($handle, handleName) {
+            _attachEventHandlers: function($handle) {
                 if (this.option("disabled"))
                     return;
                 var handlers = {};
@@ -4190,21 +4204,9 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 handlers[DRAGSTART_EVENT_NAME] = $.proxy(this._dragHandler, this);
                 handlers[DRAGSTART_END_EVENT_NAME] = $.proxy(this._dragEndHandler, this);
                 $handle.on(handlers, {
-                    direction: this._dragEventDirection(handleName),
+                    direction: "both",
                     immediate: true
                 })
-            },
-            _dragEventDirection: function(handleName) {
-                switch (handleName) {
-                    case"right":
-                    case"left":
-                        return "horizontal";
-                    case"top":
-                    case"bottom":
-                        return "vertical";
-                    default:
-                        return "both"
-                }
             },
             _dragStartHandler: function(e) {
                 this._toggleResizingClass(true);
@@ -4269,7 +4271,12 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             },
             _getOffset: function(e) {
                 var offset = e.offset,
-                    steps = DX.utils.stringPairToObject(this.option("step"));
+                    steps = DX.utils.stringPairToObject(this.option("step")),
+                    sides = this._getMovingSides(e);
+                if (!sides.left && !sides.right)
+                    offset.x = 0;
+                if (!sides.top && !sides.bottom)
+                    offset.y = 0;
                 return {
                         x: offset.x - offset.x % steps.h,
                         y: offset.y - offset.y % steps.v
@@ -5152,6 +5159,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             BUTTON_HAS_TEXT_CLASS = "dx-button-has-text",
             BUTTON_HAS_ICON_CLASS = "dx-button-has-icon",
             TEMPLATE_WRAPPER_CLASS = "dx-template-wrapper",
+            ANONYMOUS_TEMPLATE_NAME = "content",
             BUTTON_FEEDBACK_HIDE_TIMEOUT = 100;
         DX.registerComponent("dxButton", ui, ui.Widget.inherit({
             _supportedKeys: function() {
@@ -5201,6 +5209,9 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                             }
                         }])
             },
+            _getAnonimousTemplateName: function() {
+                return ANONYMOUS_TEMPLATE_NAME
+            },
             _init: function() {
                 this.callBase();
                 this._feedbackHideTimeout = BUTTON_FEEDBACK_HIDE_TIMEOUT
@@ -5234,8 +5245,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     back = this.option("type") === "back";
                 if (back && !icon)
                     icon = "back";
-                if (back && !text)
-                    text = DX.localization.localizeString("@Back");
                 return {
                         icon: icon,
                         text: text
@@ -5740,6 +5749,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this._renderEvents();
                 this._renderEnterKeyAction();
                 this._renderEmptinessEvent();
+                this._createValueChangeEventAction();
                 this.callBase()
             },
             _renderInput: function() {
@@ -5855,7 +5865,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             _clearValueHandler: function(e) {
                 var $input = this._input();
                 e.stopPropagation();
-                this._valueChangeEventHandler();
+                this._executeValueChangeAction(e);
                 this.reset();
                 !$input.is(":focus") && $input.focus()
             },
@@ -5880,7 +5890,14 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 var keyUpNamespace = events.addNamespace(this._renderValueEventName(), this.NAME + "TextChange");
                 this._input().off(keyUpNamespace).on(keyUpNamespace, $.proxy(this._keyUpHandler, this));
                 var valueChangeEventNamespace = events.addNamespace(this.option("valueChangeEvent"), eventNamespace);
-                this._input().off("." + eventNamespace).on(valueChangeEventNamespace, $.proxy(this._valueChangeEventHandler, this)).on("paste", $.proxy(this._pasteHandler, this))
+                this._input().off("." + eventNamespace).on(valueChangeEventNamespace, $.proxy(this._executeValueChangeAction, this)).on("paste", $.proxy(this._pasteHandler, this))
+            },
+            _createValueChangeEventAction: function() {
+                if (!this._valueChangeEventAction)
+                    this._valueChangeEventAction = this._createAction($.proxy(this._valueChangeEventHandler, this))
+            },
+            _executeValueChangeAction: function(e) {
+                this._valueChangeEventAction({jQueryEvent: e})
             },
             _renderValueEventName: function() {
                 return "input change keyup"
@@ -5890,14 +5907,12 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             },
             _pasteHandler: function(e) {
                 clearTimeout(this._pasteTimer);
-                this._pasteTimer = setTimeout($.proxy(this._valueChangeEventHandler, this, e))
+                this._pasteTimer = setTimeout($.proxy(this._executeValueChangeAction, this, e))
             },
             _focusInHandler: function(e) {
-                e.stopPropagation();
                 this.element().addClass(TEXTEDITOR_STATE_FOCUSED_CLASS)
             },
             _focusOutHandler: function(e) {
-                e.stopPropagation();
                 this.element().removeClass(TEXTEDITOR_STATE_FOCUSED_CLASS)
             },
             _renderEmptinessEvent: function() {
@@ -5911,7 +5926,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this._toggleEmptiness(isEmpty)
             },
             _valueChangeEventHandler: function(e, formattedValue) {
-                this._saveValueChangeEvent(e);
+                this._saveValueChangeEvent(e.jQueryEvent);
                 this.option("value", arguments.length > 1 ? formattedValue : this._input().val())
             },
             _renderEnterKeyAction: function() {
@@ -6026,6 +6041,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             utils = DX.utils;
         var EMPTY_CHAR = " ";
         var EMPTY_CHAR_CODE = 32;
+        var ESCAPED_CHAR = "\\";
         var TEXTEDITOR_MASKED_CLASS = "dx-texteditor-masked";
         var MASK_EVENT_NAMESPACE = "dxMask";
         var FORWARD_DIRECTION = "forward";
@@ -6111,8 +6127,10 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 var mask = this.option("mask");
                 if (index >= mask.length)
                     return new ui.dxTextEditor.EmptyMaskRule;
-                var result = this._getMaskRule(mask[index]);
-                result.next(this._parseMaskRule(index + 1));
+                var currentMaskChar = mask[index];
+                var isEscapedChar = currentMaskChar === ESCAPED_CHAR;
+                var result = isEscapedChar ? new ui.dxTextEditor.StubMaskRule({maskChar: mask[index + 1]}) : this._getMaskRule(currentMaskChar);
+                result.next(this._parseMaskRule(index + 1 + isEscapedChar));
                 return result
             },
             _getMaskRule: function(pattern) {
@@ -6575,9 +6593,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 if (this._isAndroid())
                     this._input().on(events.addNamespace("keydown", this.NAME), $.proxy(this._onKeyDownAndroidHandler, this)).on(events.addNamespace("change", this.NAME), $.proxy(this._onChangeAndroidHandler, this))
             },
-            _getAriaTarget: function() {
-                return this._input()
-            },
             _renderProps: function() {
                 this.callBase();
                 this._toggleMaxLengthProp()
@@ -6706,7 +6721,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                         enter: function(e) {
                             if (this.option("opened")) {
                                 e.preventDefault();
-                                this._valueChangeEventHandler(e)
+                                this._executeValueChangeAction(e)
                             }
                             return true
                         }
@@ -6751,15 +6766,15 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     openOnFieldClick: false,
                     deferRendering: true,
                     showDropButton: true,
-                    dropPosition: this._getDefaultDropPosition(),
+                    popupPosition: this._getDefaultPopupPosition(),
                     applyButtonText: Globalize.localize("OK"),
                     cancelButtonText: Globalize.localize("Cancel"),
                     buttonsLocation: "default",
                     showPopupTitle: false
                 })
             },
-            _getDefaultDropPosition: function() {
-                var position = this.option("rtlEnabled") ? "right" : "left";
+            _getDefaultPopupPosition: function() {
+                var position = DX.utils.getDefaultAlignment(this.option("rtlEnabled"));
                 return {
                         offset: {
                             h: 0,
@@ -6773,7 +6788,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             _defaultOptionsRules: function() {
                 return this.callBase().concat([{
                             device: {platform: "generic"},
-                            options: {dropPosition: {offset: {v: 0}}}
+                            options: {popupPosition: {offset: {v: 0}}}
                         }])
             },
             _inputWrapper: function() {
@@ -6926,7 +6941,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             _contentReadyHandler: $.noop,
             _popupConfig: function() {
                 return {
-                        position: $.extend(this.option("dropPosition"), {of: this.element()}),
+                        position: $.extend(this.option("popupPosition"), {of: this.element()}),
                         showTitle: this.option("showPopupTitle"),
                         width: "auto",
                         height: "auto",
@@ -6976,7 +6991,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 if (this._popup && this._popup.option("visible")) {
                     var myTop = DX.position(this.element()).top,
                         popupTop = DX.position(this._popup.content()).top;
-                    positionRequest = myTop + this.option("dropPosition").offset.v > popupTop ? "below" : "above"
+                    positionRequest = myTop + this.option("popupPosition").offset.v > popupTop ? "below" : "above"
                 }
                 return this.callBase(positionRequest)
             },
@@ -7010,9 +7025,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             _validatedOpening: function() {
                 if (!this.option("readOnly"))
                     this._toggleOpenState(true)
-            },
-            _getAriaTarget: function() {
-                return this._input()
             },
             _getPopupButtons: function() {
                 return this.option("applyValueMode") === "useButtons" ? this._popupButtonsConfig() : []
@@ -7075,7 +7087,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     case"openOnFieldClick":
                         this._invalidate();
                         break;
-                    case"dropPosition":
+                    case"popupPosition":
                     case"deferRendering":
                         break;
                     case"applyValueMode":
@@ -7170,7 +7182,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     noDataText: Globalize.localize("dxCollectionWidget-noDataText"),
                     onSelectionChanged: null,
                     onItemClick: $.noop,
-                    dropPosition: {
+                    popupPosition: {
                         my: "left top",
                         at: "left bottom",
                         offset: {
@@ -7185,7 +7197,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             _defaultOptionsRules: function() {
                 return this.callBase().concat([{
                             device: {platform: "win8"},
-                            options: {dropPosition: {offset: {v: -6}}}
+                            options: {popupPosition: {offset: {v: -6}}}
                         }, {
                             device: function(device) {
                                 return device.platform === "android"
@@ -7302,13 +7314,17 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             _processDataSourceChanging: function() {
                 this._setListDataSource();
                 this._renderInputValue().fail($.proxy(function() {
-                    if (this.option("displayCustomValue"))
+                    if (this._isCustomValueAllowed())
                         return;
                     this.reset()
                 }, this))
             },
+            _isCustomValueAllowed: function() {
+                return this.option("displayCustomValue")
+            },
             reset: function() {
                 this.option("value", null);
+                this._clearFilter();
                 this._clearSelectedItem()
             },
             _selectedItemClass: function() {
@@ -7432,7 +7448,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 return dataSource.load().done($.proxy(this._dataSourceFiltered, this))
             },
             _clearFilter: function() {
-                this._dataSource.searchValue("")
+                this._dataSource.searchValue(null)
             },
             _dataSourceFiltered: function() {
                 this._clearSearchTimer();
@@ -7785,9 +7801,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 else
                     $input.val(valueFormat(value))
             },
-            _getAriaTarget: function() {
-                return this._input()
-            },
             _renderProps: function() {
                 this.callBase();
                 this._input().prop({
@@ -8094,9 +8107,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     this.callBase();
                     this.option($.extend(this._dataExpressionDefaultOptions(), {_itemAttributes: {role: "radio"}}))
                 },
-                _getAriaTarget: function() {
-                    return this._focusTarget()
-                },
                 _focusTarget: function() {
                     return this.element().parent()
                 },
@@ -8215,6 +8225,9 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     this.itemElements().css("height", 100 / itemsCount + "%")
                 }
             },
+            _getAriaTarget: function() {
+                return this.element()
+            },
             _setCollectionWidgetOption: function() {
                 this._setWidgetOption("_radios", arguments)
             },
@@ -8284,7 +8297,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     showNavButtons: false,
                     scrollByContent: true,
                     scrollingEnabled: true,
-                    wordWrap: false,
                     selectionMode: "single",
                     activeStateEnabled: true,
                     selectionRequired: false,
@@ -8294,9 +8306,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             },
             _defaultOptionsRules: function() {
                 return this.callBase().concat([{
-                            device: {platform: "win8"},
-                            options: {wordWrap: true}
-                        }, {
                             device: {platform: "generic"},
                             options: {
                                 showNavButtons: true,
@@ -8333,8 +8342,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this._renderWrapper();
                 if (this._allowScrolling()) {
                     this._renderScrollable();
-                    this._renderNavButtons();
-                    this._updateNavButtons()
+                    this._renderNavButtons()
                 }
                 else {
                     this.element().removeClass(TABS_NAV_BUTTONS_CLASS);
@@ -8367,8 +8375,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this.element().append(this._scrollable.element())
             },
             _allowScrolling: function() {
-                if (this.option("wordWrap"))
-                    return false;
                 if (!this.option("scrollingEnabled"))
                     return false;
                 var tabItemsWidth = 0;
@@ -8415,6 +8421,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 var navButton = this._createComponent($("<div>").addClass(TABS_NAV_BUTTON_CLASS), "dxButton", {
                         focusStateEnabled: false,
                         icon: icon,
+                        type: "back",
                         onClick: function() {
                             that._updateScrollPosition(offset, 1)
                         },
@@ -8433,15 +8440,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 if (this._holdInterval)
                     clearInterval(this._holdInterval)
             },
-            _updateNavButtons: function() {
-                var $element = this.element(),
-                    tabsHeight = $element.height();
-                $element.find("." + TABS_LEFT_NAV_BUTTON_CLASS).css({height: tabsHeight});
-                $element.find("." + TABS_RIGHT_NAV_BUTTON_CLASS).css({
-                    height: tabsHeight,
-                    "margin-top": -tabsHeight
-                })
-            },
             _renderSelection: function(addedSelection) {
                 this._scrollable && this._scrollable.scrollToElement(this.itemElements().eq(addedSelection[0]))
             },
@@ -8459,7 +8457,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             },
             _optionChanged: function(args) {
                 switch (args.name) {
-                    case"wordWrap":
                     case"scrollingEnabled":
                     case"showNavButtons":
                         this._invalidate();
@@ -8600,32 +8597,34 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             _arrangeTitle: function() {
                 if (this.element().is(":hidden"))
                     return;
-                var $section = this._$toolbarItemsContainer.find(TOOLBAR_LABEL_SELECTOR).eq(0).parent(),
-                    $label = $section.children(TOOLBAR_LABEL_SELECTOR).eq(0);
+                var $label = this._$toolbarItemsContainer.find(TOOLBAR_LABEL_SELECTOR).eq(0),
+                    $section = $label.parent();
                 if (!$label.length)
                     return;
                 var containerWidth = this._$toolbarItemsContainer.width(),
                     labelOffset = this._$beforeSection.outerWidth() ? this._$beforeSection.outerWidth() : $label.position().left,
                     widthBeforeSection = $section.hasClass("dx-toolbar-before") ? 0 : labelOffset,
                     widthAfterSection = $section.hasClass("dx-toolbar-after") ? 0 : this._$afterSection.outerWidth(),
-                    elemsAtSectionWidth = 10;
+                    elemsAtSectionWidth = 0;
                 $section.children().not(TOOLBAR_LABEL_SELECTOR).each(function() {
                     elemsAtSectionWidth += $(this).outerWidth()
                 });
-                var maxLabelWidth = containerWidth - widthBeforeSection - widthAfterSection - elemsAtSectionWidth,
-                    labelLongerThanMax = $label.outerWidth() > maxLabelWidth;
+                var freeSpace = containerWidth - elemsAtSectionWidth;
+                var centeredLabelWidth = freeSpace - Math.max(widthBeforeSection, widthAfterSection) * 2,
+                    labelLongerThanCenteredWidth = $label.outerWidth() > centeredLabelWidth;
                 $section.css({
-                    marginLeft: labelLongerThanMax ? widthBeforeSection : "",
-                    marginRight: labelLongerThanMax ? widthAfterSection : ""
+                    marginLeft: labelLongerThanCenteredWidth ? widthBeforeSection : "",
+                    marginRight: labelLongerThanCenteredWidth ? widthAfterSection : ""
                 });
-                $label.css("max-width", maxLabelWidth)
+                var labelPaddings = $label.outerWidth() - $label.width();
+                $label.css("max-width", freeSpace - widthBeforeSection - widthAfterSection - labelPaddings)
             },
             _renderItem: function(index, item, _, $after) {
                 var location = item.location || "center",
                     container = this._$toolbarItemsContainer.find(".dx-toolbar-" + location),
-                    itemHasTest = Boolean(item.text),
+                    itemHasText = Boolean(item.text),
                     itemElement = this.callBase(index, item, container, $after);
-                itemElement.toggleClass(TOOLBAR_BUTTON_CLASS, !itemHasTest).toggleClass(TOOLBAR_LABEL_CLASS, itemHasTest);
+                itemElement.toggleClass(TOOLBAR_BUTTON_CLASS, !itemHasText).toggleClass(TOOLBAR_LABEL_CLASS, itemHasText);
                 return itemElement
             },
             _hasVisibleMenuItems: function() {
@@ -9120,12 +9119,13 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     }, this));
                 else {
                     clearTimeout(this._showLoadingIndicatorTimer);
-                    if (this._scrollView) {
-                        this._scrollView.finishLoading();
-                        !this._preventScrollTop && this.scrollTo(0)
-                    }
-                    delete this._preventScrollTop
+                    this._scrollView && this._scrollView.finishLoading()
                 }
+            },
+            _dataSourceChangedHandler: function(newItems) {
+                if (!this._shouldAppendItems())
+                    this._scrollView && this._scrollView.scrollTo(0);
+                this.callBase(newItems)
             },
             _hideLoadingIfLoadIndicationOff: function() {
                 if (!this.option("indicateLoading"))
@@ -9156,7 +9156,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 }
             },
             _scrollBottomHandler: function(e) {
-                this._preventScrollTop = true;
                 this._pageLoadingAction(e);
                 if (!this._isDataSourceLoading())
                     this._loadNextPage();
@@ -9931,6 +9930,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             events = ui.events;
         var LIST_EDIT_DECORATOR = "dxListEditDecorator",
             POINTER_DOWN_EVENT_NAME = events.addNamespace("dxpointerdown", LIST_EDIT_DECORATOR),
+            ACTIVE_EVENT_NAME = events.addNamespace("dxactive", LIST_EDIT_DECORATOR),
             LIST_ITEM_CONTENT_CLASS = "dx-list-item-content",
             SWITCHABLE_DELETE_READY_CLASS = "dx-list-switchable-delete-ready",
             SWITCHABLE_MENU_SHIELD_POSITIONING_CLASS = "dx-list-switchable-menu-shield-positioning",
@@ -9997,12 +9997,13 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             },
             _toggleScrolling: function(readyToDelete) {
                 var scrollView = this._list.element().dxScrollView("instance");
-                if (readyToDelete) {
-                    this._scrollViewDisabled = scrollView.option("disabled");
-                    scrollView.option("disabled", true)
-                }
+                if (readyToDelete)
+                    scrollView.on("start", this._cancelScrolling);
                 else
-                    scrollView.option("disabled", this._scrollViewDisabled)
+                    scrollView.off("start", this._cancelScrolling)
+            },
+            _cancelScrolling: function(args) {
+                args.jQueryEvent.cancel = true
             },
             _cacheReadyToDeleteItem: function($itemElement, cache) {
                 if (cache)
@@ -10022,10 +10023,12 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 }
             },
             _enablePositioning: function($itemElement) {
-                $itemElement.addClass(SWITCHABLE_MENU_ITEM_SHIELD_POSITIONING_CLASS)
+                $itemElement.addClass(SWITCHABLE_MENU_ITEM_SHIELD_POSITIONING_CLASS);
+                $itemElement.on(ACTIVE_EVENT_NAME, $.noop)
             },
             _disablePositioning: function($itemElement) {
-                $itemElement.removeClass(SWITCHABLE_MENU_ITEM_SHIELD_POSITIONING_CLASS)
+                $itemElement.removeClass(SWITCHABLE_MENU_ITEM_SHIELD_POSITIONING_CLASS);
+                $itemElement.off(ACTIVE_EVENT_NAME)
             },
             _prepareDeleteReady: function($itemElement) {
                 $itemElement.addClass(SWITCHABLE_DELETE_READY_CLASS)
@@ -10171,7 +10174,9 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             SLIDE_MENU_BUTTONS_CLASS = "dx-list-slide-menu-buttons",
             SLIDE_MENU_BUTTON_CLASS = "dx-list-slide-menu-button",
             SLIDE_MENU_BUTTON_MENU_CLASS = "dx-list-slide-menu-button-menu",
-            SLIDE_MENU_BUTTON_DELETE_CLASS = "dx-list-slide-menu-button-delete";
+            SLIDE_MENU_BUTTON_DELETE_CLASS = "dx-list-slide-menu-button-delete",
+            SLIDE_MENU_ANIMATION_DURATION = 400,
+            SLIDE_MENU_ANIMATION_EASING = "cubic-bezier(0.075, 0.82, 0.165, 1)";
         ui.dxList.registerEditDecorator("menu", "slide", ui.dxList.SwitchableEditDecorator.inherit({
             _shouldHandleSwipe: true,
             _init: function() {
@@ -10252,18 +10257,48 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     offset = this._cachedItemWidth * args.offset,
                     startOffset = this._isReadyToDelete($itemElement) ? -this._cachedButtonWidth * signCorrection : 0,
                     correctedOffset = (offset + startOffset) * signCorrection,
-                    contentPosition = correctedOffset < 0 ? offset + startOffset : 0,
-                    buttonPosition = correctedOffset < 0 ? correctedOffset : 0;
-                translator.move(this._$cachedContent, {left: contentPosition});
-                this._$buttonsContainer.css(rtl ? "right" : "left", Math.max(this._cachedItemWidth + buttonPosition, this._minButtonContainerLeftOffset()));
+                    percent = correctedOffset < 0 ? Math.abs((offset + startOffset) / this._cachedButtonWidth) : 0;
+                this._setPositions(this._getPostions(percent));
                 return true
+            },
+            _getStartPositions: function() {
+                var rtl = this._isRtlEnabled(),
+                    signCorrection = rtl ? -1 : 1;
+                return {
+                        content: 0,
+                        buttonsContainer: rtl ? -this._cachedButtonWidth : this._cachedItemWidth,
+                        buttons: -this._cachedButtonWidth * signCorrection
+                    }
+            },
+            _getPostions: function(percent) {
+                var rtl = this._isRtlEnabled(),
+                    signCorrection = rtl ? -1 : 1,
+                    startPositions = this._getStartPositions();
+                return {
+                        content: startPositions.content - percent * this._cachedButtonWidth * signCorrection,
+                        buttonsContainer: startPositions.buttonsContainer - Math.min(percent, 1) * this._cachedButtonWidth * signCorrection,
+                        buttons: startPositions.buttons + Math.min(percent, 1) * this._cachedButtonWidth * signCorrection
+                    }
+            },
+            _getCurrentPositions: function() {
+                return {
+                        content: translator.locate(this._$cachedContent).left,
+                        buttonsContainer: translator.locate(this._$buttonsContainer).left,
+                        buttons: translator.locate(this._$buttons).left
+                    }
+            },
+            _setPositions: function(positions) {
+                translator.move(this._$cachedContent, {left: positions.content});
+                translator.move(this._$buttonsContainer, {left: positions.buttonsContainer});
+                translator.move(this._$buttons, {left: positions.buttons})
             },
             _cacheItemData: function($itemElement) {
                 if ($itemElement[0] === this._cachedNode)
                     return;
                 this._$cachedContent = $itemElement.find("." + SLIDE_MENU_CONTENT_CLASS);
                 this._cachedItemWidth = $itemElement.outerWidth();
-                this._cachedButtonWidth = this._cachedButtonWidth || $itemElement.find("." + SLIDE_MENU_BUTTONS_CLASS).outerWidth();
+                this._cachedButtonWidth = this._cachedButtonWidth || this._$buttons.outerWidth();
+                this._$buttonsContainer.width(this._cachedButtonWidth);
                 if (this._$cachedContent.length)
                     this._cachedNode = $itemElement[0]
             },
@@ -10281,7 +10316,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             },
             _enablePositioning: function($itemElement) {
                 fx.stop(this._$cachedContent, true);
-                fx.stop(this._$buttonsContainer, true);
                 this.callBase.apply(this, arguments);
                 this._$buttonsContainer.appendTo($itemElement)
             },
@@ -10290,43 +10324,26 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this._$buttonsContainer.detach()
             },
             _animatePrepareDeleteReady: function() {
-                var rtl = this._isRtlEnabled(),
-                    directionCorrection = rtl ? 1 : -1;
-                this._$buttonsContainer.css(rtl ? "left" : "right", "0");
-                var contentAnimation = fx.animate(this._$cachedContent, {
-                        to: {left: this._cachedButtonWidth * directionCorrection},
-                        type: "slide",
-                        duration: 200
-                    });
-                var direction = rtl ? "right" : "left",
-                    buttonToAnimation = {};
-                buttonToAnimation[direction] = this._minButtonContainerLeftOffset();
-                var buttonAnimation = fx.animate(this._$buttonsContainer, {
-                        to: buttonToAnimation,
-                        duration: 200
-                    });
-                return $.when(contentAnimation, buttonAnimation).promise()
+                return this._animateToPositions(this._getPostions(1))
             },
             _animateForgetDeleteReady: function($itemElement) {
                 this._cacheItemData($itemElement);
-                var rtl = this._isRtlEnabled();
-                this._$buttonsContainer.css(rtl ? "left" : "right", "0");
-                var contentAnimation = fx.animate(this._$cachedContent, {
-                        to: {left: 0},
-                        type: "slide",
-                        duration: 200
-                    });
-                var direction = rtl ? "right" : "left",
-                    buttonToAnimation = {};
-                buttonToAnimation[direction] = this._cachedItemWidth;
-                var buttonAnimation = fx.animate(this._$buttonsContainer, {
-                        to: buttonToAnimation,
-                        duration: 200,
-                        complete: $.proxy(function() {
-                            this._$buttonsContainer.css(direction, "100%")
-                        }, this)
-                    });
-                return $.when(contentAnimation, buttonAnimation).promise()
+                return this._animateToPositions(this._getPostions(0))
+            },
+            _animateToPositions: function(positions) {
+                var that = this,
+                    currentPosition = this._getCurrentPositions(),
+                    durationTimePart = Math.min(Math.abs(currentPosition.content - positions.content) / this._cachedButtonWidth, 1);
+                return fx.animate(this._$cachedContent, {
+                        from: this._getCurrentPositions(),
+                        to: positions,
+                        easing: SLIDE_MENU_ANIMATION_EASING,
+                        duration: SLIDE_MENU_ANIMATION_DURATION * durationTimePart,
+                        strategy: "frame",
+                        draw: function(positions) {
+                            that._setPositions(positions)
+                        }
+                    })
             },
             dispose: function() {
                 if (this._menu)
@@ -11239,6 +11256,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                         break;
                     case"disabled":
                         this._scrollView.option("disabled", args.value);
+                        this.callBase(args);
                         break;
                     case"baseItemWidth":
                     case"baseItemHeight":
@@ -11669,18 +11687,19 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             _activeStateUnit: SLIDER_HANDLE_SELECTOR,
             _supportedKeys: function() {
                 var isRTL = this.option("rtlEnabled");
-                var that = this,
-                    moveHandleRight = function(step) {
-                        var val = that.option("value");
-                        step = that._valueStep(step);
-                        val = isRTL ? val - step : val + step;
-                        that.option("value", val)
-                    },
-                    moveHandleLeft = function(step) {
-                        var val = that.option("value");
-                        step = that._valueStep(step);
-                        val = isRTL ? val + step : val - step;
-                        that.option("value", val)
+                var that = this;
+                var roundedValue = function(offset, isLeftDirection) {
+                        offset = that._valueStep(offset);
+                        var step = that.option("step");
+                        var value = that.option("value");
+                        var division = (value - that.option("min")) % step;
+                        return isLeftDirection ? value - offset + (division ? step - division : 0) : value + offset - division
+                    };
+                var moveHandleRight = function(offset) {
+                        that.option("value", roundedValue(offset, isRTL))
+                    };
+                var moveHandleLeft = function(offset) {
+                        that.option("value", roundedValue(offset, !isRTL))
                     };
                 return $.extend(this.callBase(), {
                         leftArrow: function(e) {
@@ -11884,7 +11903,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     this._createAction($.proxy(this._startHandler, this))({jQueryEvent: e.jQueryEvent});
                 this._feedbackDeferred = $.Deferred();
                 ui.events.lockFeedback(this._feedbackDeferred);
-                this._toggleActiveState(this._activeHandle(), true);
+                this._toggleActiveState(this._activeHandle(), this.option("activeStateEnabled"));
                 this._startOffset = this._currentRatio;
                 startOffset = this._startOffset * this._swipePixelRatio();
                 endOffset = (1 - this._startOffset) * this._swipePixelRatio();
@@ -13016,14 +13035,15 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     animation: {
                         show: {
                             type: "pop",
-                            duration: 400
+                            duration: 300,
+                            from: {scale: 0.55}
                         },
                         hide: {
                             type: "pop",
-                            duration: 400,
+                            duration: 300,
                             to: {
                                 opacity: 0,
-                                scale: 0
+                                scale: 0.55
                             },
                             from: {
                                 opacity: 1,
@@ -13185,13 +13205,9 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this._initContainer(this.option("container"));
                 this._refresh()
             },
-            _renderVisibilityAnimate: function() {
-                var visible = this.option("visible");
+            _renderVisibilityAnimate: function(visible) {
                 this._stopAnimation();
-                if (visible)
-                    return this._show();
-                else
-                    return this._hide()
+                return visible ? this._show() : this._hide()
             },
             _normalizePosition: function() {
                 this._position = this.option("position")
@@ -13199,6 +13215,9 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             _show: function() {
                 if (this._isParentHidden())
                     return $.Deferred().resolve();
+                if (this._currentVisible)
+                    return $.when().promise();
+                this._currentVisible = true;
                 this._normalizePosition();
                 var that = this,
                     deferred = $.Deferred(),
@@ -13229,6 +13248,9 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 return animation
             },
             _hide: function() {
+                if (!this._currentVisible)
+                    return $.when().promise();
+                this._currentVisible = false;
                 var that = this,
                     deferred = $.Deferred(),
                     animation = this.option("animation") || {},
@@ -13276,6 +13298,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             _toggleVisibility: function(visible) {
                 if (visible && this._isParentHidden())
                     return;
+                this._currentVisible = visible;
                 this._stopAnimation();
                 if (!visible)
                     utils.triggerHidingEvent(this._$content);
@@ -13642,12 +13665,11 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             },
             _visibilityChanged: function(visible) {
                 if (visible) {
-                    if (this.option("visible") && this._$content.is(":hidden"))
-                        this._show();
-                    this._dimensionChanged()
+                    if (this.option("visible"))
+                        this._renderVisibilityAnimate(visible)
                 }
-                else if (this._$content.is(":visible"))
-                    this._hide()
+                else
+                    this._renderVisibilityAnimate(visible)
             },
             _dimensionChanged: function() {
                 this._renderGeometry()
@@ -13656,7 +13678,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this._cleanFocusState()
             },
             _dispose: function() {
-                this._stopAnimation();
+                DX.fx.stop(this._$content, false);
                 this._toggleViewPortSubscriptiion(false);
                 this._toggleSubscriptions(false);
                 this._updateZIndexStackPosition(false);
@@ -13700,7 +13722,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                         break;
                     case"visible":
                         delete this._geometryChangeHandled;
-                        this._renderVisibilityAnimate().done($.proxy(function() {
+                        this._renderVisibilityAnimate(value).done($.proxy(function() {
                             if (!this._animateDeferred)
                                 return;
                             this._animateDeferred.resolveWith(this)
@@ -13786,31 +13808,31 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 top: {
                     my: "top",
                     at: "top",
-                    of: window,
+                    of: null,
                     offset: "0 0"
                 },
                 bottom: {
                     my: "bottom",
                     at: "bottom",
-                    of: window,
+                    of: null,
                     offset: "0 -20"
                 },
                 center: {
                     my: "center",
                     at: "center",
-                    of: window,
+                    of: null,
                     offset: "0 0"
                 },
                 right: {
                     my: "center right",
                     at: "center right",
-                    of: window,
+                    of: null,
                     offset: "0 0"
                 },
                 left: {
                     my: "center left",
                     at: "center left",
-                    of: window,
+                    of: null,
                     offset: "0 0"
                 }
             };
@@ -13838,6 +13860,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     shading: false,
                     height: "auto",
                     closeOnBackButton: false,
+                    hideOnSwipe: true,
                     resizeEnabled: false
                 })
             },
@@ -13897,7 +13920,11 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this._wrapper().addClass(TOAST_WRAPPER_CLASS);
                 this._$content.addClass(TOAST_CLASS_PREFIX + String(this.option("type")).toLowerCase());
                 this.content().addClass(TOAST_CONTENT_CLASS);
-                this._$content.off("dxswipe").on("dxswipe", $.proxy(this.hide, this))
+                this._toggleCloseOnSwipe()
+            },
+            _toggleCloseOnSwipe: function() {
+                this._$content.off("dxswipe");
+                this.option("hideOnSwipe") && this._$content.on("dxswipe", $.proxy(this.hide, this))
             },
             _posStringToObject: function() {
                 if (!DX.utils.isString(this.option("position")))
@@ -13949,6 +13976,9 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     case"message":
                         if (this._message)
                             this._message.text(args.value);
+                        break;
+                    case"hideOnSwipe":
+                        this._toggleCloseOnSwipe();
                         break;
                     case"displayTime":
                     case"position":
@@ -15206,6 +15236,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
         var ui = DX.ui,
             fx = DX.fx,
             utils = DX.utils,
+            translator = DX.translator,
             CALENDAR_CLASS = "dx-calendar",
             CALENDAR_BODY_CLASS = "dx-calendar-body",
             CALENDAR_CELL_CLASS = "dx-calendar-cell",
@@ -15213,17 +15244,11 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             CALENDAR_FOOTER_CLASS = "dx-calendar-footer",
             CALENDAR_TODAY_BUTTON_CLASS = "dx-calendar-today-button",
             CALENDAR_HAS_FOOTER_CLASS = "dx-calendar-with-footer",
-            MONTH_VIEW_ANIMATION_DURATION = 300,
-            ANIMATION_DURATION_ILLEGAL_RANGE = 200,
+            CALENDAR_VIEWS_WRAPPER_CLASS = "dx-calendar-views-wrapper",
             ANIMATION_DURATION_SHOW_VIEW = 250,
             POP_ANIMATION_FROM = 0.6,
             POP_ANIMATION_TO = 1,
-            SHOT_SWIPE_OFFSET = 0.5,
             CALENDAR_DATE_VALUE_KEY = "dxDateValueKey",
-            SWIPE_POSITION = {
-                left: -1,
-                right: 1
-            },
             LEVEL_COMPARE_MAP = {
                 month: 3,
                 year: 2,
@@ -15362,53 +15387,9 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 var zoomLevel = this.option("zoomLevel"),
                     isNewView = this._view && !utils.sameView(zoomLevel, normalizedDate, this._view.option("date"));
                 if (isNewView) {
-                    this._view.element().remove();
-                    delete this._view;
-                    this._renderView()
+                    this._disposeViews();
+                    this._renderViews()
                 }
-            },
-            _render: function() {
-                this.callBase();
-                this.element().addClass(CALENDAR_CLASS);
-                this._renderView();
-                this._renderFooter();
-                this._onContouredChanged = this._createActionByOption("onContouredChanged");
-                this.setAria({
-                    role: "listbox",
-                    label: Globalize.localize("dxCalendar-ariaWidgetName")
-                })
-            },
-            _renderView: function() {
-                this._change = "";
-                this._renderBody();
-                this._renderSpecificView();
-                this._renderNavigator();
-                this._renderSwipeable()
-            },
-            _renderBody: function() {
-                if (!this._body) {
-                    this._body = $("<div>").addClass(CALENDAR_BODY_CLASS);
-                    this.element().append(this._body)
-                }
-            },
-            _renderSwipeable: function() {
-                var that = this;
-                if (!this._swipeable)
-                    this._swipeable = this._createComponent(this.element(), "dxSwipeable", {
-                        elastic: false,
-                        onStart: function(e) {
-                            that._swipeStartHandler(e)
-                        },
-                        onUpdated: function(e) {
-                            that._swipeUpdateHandler(e)
-                        },
-                        onEnd: function(e) {
-                            that._swipeEndHandler(e)
-                        },
-                        itemWidthFunc: function() {
-                            return this.element().width()
-                        }
-                    })
             },
             _waitRenderView: function(offset, direction) {
                 if (this._alreadyViewRender)
@@ -15436,215 +15417,209 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this._viewKeyboardProcessor = new ui.KeyboardProcessor;
                 this._keyboardProcessor.push(this._viewKeyboardProcessor)
             },
-            _swipeStartHandler: function(e) {
-                if (this._viewsAnimating) {
-                    e.jQueryEvent.cancel = true;
-                    return
+            _render: function() {
+                this.callBase();
+                this.element().addClass(CALENDAR_CLASS);
+                this._renderBody();
+                this._renderViews();
+                this._renderNavigator();
+                this._renderSwipeable();
+                this._renderFooter();
+                this.setAria({
+                    role: "listbox",
+                    label: Globalize.localize("dxCalendar-ariaWidgetName")
+                })
+            },
+            _renderBody: function() {
+                if (!this._viewsWrapper) {
+                    var body = $("<div>").addClass(CALENDAR_BODY_CLASS);
+                    this._viewsWrapper = $("<div>").addClass(CALENDAR_VIEWS_WRAPPER_CLASS);
+                    body.append(this._viewsWrapper);
+                    this.element().append(body)
                 }
-                this._swipeInProgress = true;
-                this._viewsOnLeft = [this._view];
-                this._viewsOnRight = [this._view]
+            },
+            _renderViews: function() {
+                this._change = "";
+                this.element().addClass("dx-calendar-view-" + this.option("zoomLevel"));
+                var currentDate = this.option("currentDate");
+                this._view = this._renderSpecificView(currentDate);
+                this._view.option("_keyboardProcessor", this._viewKeyboardProcessor);
+                this._beforeView = this._renderSpecificView(this._getDateByOffset(-1, currentDate));
+                this._afterView = this._renderSpecificView(this._getDateByOffset(1, currentDate));
+                this._translateViews();
+                this._onContouredChanged = this._createActionByOption("onContouredChanged")
+            },
+            _viewWidth: function() {
+                if (!this._viewWidthValue)
+                    this._viewWidthValue = this.element().width();
+                return this._viewWidthValue
+            },
+            _getDateByOffset: function(offset, date) {
+                date = new Date(date || this.option("currentDate"));
+                var difference = utils.getDifferenceInMonth(this.option("zoomLevel")) * offset;
+                date.setMonth(date.getMonth() + difference);
+                return date
+            },
+            _translateViews: function() {
+                var rtlCorrection = this.option("rtlEnabled") && !(DX.browser.msie && DX.browser.version[0] !== "8") ? -1 : 1;
+                translator.move(this._view.element(), {left: 0});
+                translator.move(this._beforeView.element(), {left: -this._viewWidth() * rtlCorrection});
+                translator.move(this._afterView.element(), {left: this._viewWidth() * rtlCorrection})
+            },
+            _renderSpecificView: function(date) {
+                var specificView = ui.dxCalendar.views[this.option("zoomLevel")],
+                    $view = $("<div>").appendTo(this._viewsWrapper),
+                    config = this._viewConfig(date);
+                return new specificView($view, config)
+            },
+            _viewConfig: function(date) {
+                return {
+                        date: date,
+                        min: this.option("min"),
+                        max: this.option("max"),
+                        firstDayOfWeek: this.option("firstDayOfWeek"),
+                        value: this.option("value"),
+                        rtl: this.option("rtlEnabled"),
+                        disabled: this.option("disabled") || DevExpress.designMode,
+                        tabIndex: undefined,
+                        focusStateEnabled: this.option("focusStateEnabled"),
+                        hoverStateEnabled: this.option("hoverStateEnabled"),
+                        onValueChanged: $.proxy(this._viewValueChangedHandler, this),
+                        onContouredDateChanged: $.proxy(this._viewContouredChangedHandler, this),
+                        onCellClick: $.proxy(this._cellClickHandler, this),
+                        cellTemplate: this._getTemplateByOption("cellTemplate"),
+                        allowValueSelection: this._isMaxZoomLevel()
+                    }
+            },
+            _cellClickHandler: function(e) {
+                var zoomLevel = this.option("zoomLevel"),
+                    nextView = utils.getViewDown(zoomLevel);
+                var isMaxZoomLevel = this._isMaxZoomLevel();
+                if (nextView && !isMaxZoomLevel) {
+                    var target = e.jQueryEvent.currentTarget;
+                    this._navigateDown(target)
+                }
+                else
+                    this._cellClickOptionAction(e)
+            },
+            _isMaxZoomLevel: function() {
+                return this.option("zoomLevel") === this.option("maxZoomLevel")
+            },
+            _viewValueChangedHandler: function(e) {
+                if (this._isMaxZoomLevel())
+                    this.option("value", e.value)
+            },
+            _viewContouredChangedHandler: function(e) {
+                var date = e.value,
+                    currentDate = this.option("currentDate"),
+                    zoomLevel = this.option("zoomLevel"),
+                    isSameView = utils.sameView(zoomLevel, currentDate, date);
+                this.setAria("activedescendant", e.ariaId);
+                this._onContouredChanged && this._onContouredChanged(e.ariaId);
+                if (date && !isSameView && !this._isAlreadyNavigated && (this._isMaxZoomLevel() || this._change === "key" || this._change === "upDownArrow")) {
+                    var dir = utils.getFirstMonthDate(date) > currentDate ? 1 : -1;
+                    this._isAlreadyNavigated = true;
+                    this._navigate(dir)
+                }
+            },
+            _renderNavigator: function() {
+                if (!this._navigator) {
+                    var $navigator = $("<div>").prependTo(this.element());
+                    this._navigator = new ui.dxCalendar.Navigator($navigator, this._navigatorConfig())
+                }
+                this._navigator.option("text", this._view._getNavigatorCaption());
+                this._updateButtonsVisibility()
+            },
+            _renderSwipeable: function() {
+                var that = this;
+                if (!this._swipeable)
+                    this._swipeable = this._createComponent(this.element(), "dxSwipeable", {
+                        onStart: function(e) {
+                            that._swipeStartHandler(e)
+                        },
+                        onUpdated: function(e) {
+                            that._swipeUpdateHandler(e)
+                        },
+                        onEnd: function(e) {
+                            that._swipeEndHandler(e)
+                        },
+                        itemSizeFunc: $.proxy(this._viewWidth, this)
+                    })
+            },
+            _swipeStartHandler: function(e) {
+                fx.stop(this._viewsWrapper, true);
+                e.jQueryEvent.maxLeftOffset = 1;
+                e.jQueryEvent.maxRightOffset = 1
             },
             _swipeUpdateHandler: function(e) {
-                this._setOffset(e.jQueryEvent.offset);
-                if (this._swipeOffset >= 0)
-                    this._renderViews(this._viewsOnLeft, SWIPE_POSITION.right);
-                else
-                    this._renderViews(this._viewsOnRight, SWIPE_POSITION.left)
+                var offset = e.jQueryEvent.offset;
+                translator.move(this._viewsWrapper, {left: offset * this._viewWidth()});
+                this._updateNavigatorCaption(offset)
             },
-            _setOffset: function(offset) {
-                var swipeDirection = offset > 0 ? SWIPE_POSITION.right : SWIPE_POSITION.left,
-                    prevOffset = this._swipeOffset || 0;
-                if (swipeDirection * (offset - prevOffset) <= 1)
-                    this._swipeOffset = offset
+            _updateNavigatorCaption: function(offset) {
+                offset *= this.option("rtlEnabled") ? -1 : 1;
+                var view = this._view;
+                if (offset > 0.5)
+                    view = this._beforeView;
+                else if (offset < -0.5)
+                    view = this._afterView;
+                this._navigator.option("text", view._getNavigatorCaption())
             },
-            _renderViews: function(viewsArray, swipePosition) {
-                var arrayInsertIndex = Math.ceil(swipePosition * this._swipeOffset),
-                    zoomLevel = this.option("zoomLevel");
-                var offset = swipePosition * arrayInsertIndex;
-                offset *= utils.getDifferenceInMonth(zoomLevel);
-                offset = this.option("rtlEnabled") ? offset : -1 * offset;
-                this._initalizeViewDimensions();
-                if (!viewsArray[arrayInsertIndex]) {
-                    this._newDate = new Date(this.option("currentDate"));
-                    this._newDate.setMonth(this._newDate.getMonth() + offset);
-                    var $body = this._body,
-                        $view = $("<div>").appendTo($body);
-                    viewsArray[arrayInsertIndex] = new ui.dxCalendar.views[zoomLevel]($view, this._viewConfig())
+            _swipeEndHandler: function(e) {
+                var targetOffset = e.jQueryEvent.targetOffset,
+                    moveOffset = !targetOffset ? 0 : targetOffset / Math.abs(targetOffset),
+                    animationTo = moveOffset * this._viewWidth();
+                var rtlCorrection = this.option("rtlEnabled") ? -1 : 1,
+                    newDate = this._getDateByOffset(-moveOffset * rtlCorrection);
+                if (this._isDateInInvalidRange(newDate))
+                    if (moveOffset >= 0) {
+                        animationTo = 0;
+                        newDate = new Date(this.option("min"))
+                    }
+                    else {
+                        animationTo = 0;
+                        newDate = new Date(this.option("max"))
+                    }
+                this._isAlreadyNavigated = true;
+                this._animateWrapper(animationTo, ANIMATION_DURATION_SHOW_VIEW).done($.proxy(function() {
+                    this._updateViews(moveOffset * rtlCorrection);
+                    this.option("currentDate", new Date(this._view.option("date")));
+                    this._view.option("contouredDate", newDate);
+                    this._resetLocation()
+                }, this))
+            },
+            _updateViews: function(offset) {
+                this._view.option("_keyboardProcessor", null);
+                if (offset > 0) {
+                    this._afterView.element().remove();
+                    this._afterView = this._view;
+                    this._view = this._beforeView;
+                    this._beforeView = this._renderSpecificView(this._getDateByOffset(-1, this._view.option("date")))
                 }
-                this._translateViews(viewsArray, swipePosition)
+                else if (offset < 0) {
+                    this._beforeView.element().remove();
+                    this._beforeView = this._view;
+                    this._view = this._afterView;
+                    this._afterView = this._renderSpecificView(this._getDateByOffset(1, this._view.option("date")))
+                }
+                this._view.option("_keyboardProcessor", this._viewKeyboardProcessor);
+                this._translateViews()
             },
-            _translateViews: function(viewsArray, swipePosition) {
-                var prevView = viewsArray[Math.floor(swipePosition * this._swipeOffset)],
-                    nextView = viewsArray[Math.ceil(swipePosition * this._swipeOffset)],
-                    localOffset = this._swipeOffset % 1;
-                this._normalizeViewsPosition();
-                DX.translator.move(prevView.element(), {left: this._correctionMovement * localOffset * this._viewWidth});
-                if (swipePosition * localOffset >= 0.05)
-                    DX.translator.move(nextView.element(), {left: this._correctionMovement * (localOffset - swipePosition) * this._viewWidth});
-                this._view = this._isInView(prevView, this._viewWidth / 2) ? prevView : nextView;
-                this._renderNavigator()
-            },
-            _normalizeViewsPosition: function() {
-                var i;
-                for (i = 0; i < this._viewsOnLeft.length; i++)
-                    DX.translator.move(this._viewsOnLeft[i].element(), {left: -this._correctionMovement * this._viewWidth});
-                for (i = 0; i < this._viewsOnRight.length; i++)
-                    DX.translator.move(this._viewsOnRight[i].element(), {left: this._correctionMovement * this._viewWidth})
-            },
-            _isDateInInvalidRange: function() {
-                if (this._view.isBoundary(this._newDate))
+            _isDateInInvalidRange: function(date) {
+                if (this._view.isBoundary(date))
                     return;
                 var min = this.option("min"),
                     max = this.option("max"),
-                    normalizedDate = utils.normalizeDate(this._newDate, min, max);
+                    normalizedDate = utils.normalizeDate(date, min, max);
                 return normalizedDate === min || normalizedDate === max
             },
-            _trimUnusedViews: function(viewsArray) {
-                var animatedViews = viewsArray.slice(),
-                    indexCurrentView = $.inArray(this._view, animatedViews) + 1,
-                    boundaryIndex = this._getBoundaryIndexView(animatedViews);
-                animatedViews = animatedViews.splice(0, indexCurrentView + 1);
-                animatedViews.splice(0, boundaryIndex);
-                this._disposeUnusedViews(viewsArray, indexCurrentView);
-                return animatedViews
-            },
-            _cleanFocusState: function() {
-                this.callBase();
-                if (this._viewKeyboardProcessor)
-                    this._viewKeyboardProcessor.dispose()
-            },
-            _getBoundaryIndexView: function(arrayViews) {
-                var length = arrayViews.length;
-                for (var i = length - 1; i >= 0; i--) {
-                    if (!arrayViews[i])
-                        continue;
-                    if (this._view.isBoundary(arrayViews[i].option("date")))
-                        return i
-                }
-            },
-            _disposeUnusedViews: function(arrayViews, index) {
-                var length = arrayViews.length;
-                for (var i = length - 1; i > index; i--)
-                    arrayViews[i].element().remove()
-            },
-            _moveInRange: function(arrayViews, swipePosition) {
-                var length = arrayViews.length,
-                    startOffset = arrayViews[length - 1].element().position().left * swipePosition,
-                    summaryWidth = startOffset;
-                for (var i = length - 1; i >= 0; i--) {
-                    DX.translator.move(arrayViews[i].element(), {left: this._correctionMovement * summaryWidth * swipePosition});
-                    summaryWidth += arrayViews[i].element().width()
-                }
-                summaryWidth -= arrayViews[0].element().width();
-                return this._animateToBoundary(arrayViews, summaryWidth, swipePosition)
-            },
-            _animateToBoundary: function(arrayViews, summaryWidth, swipePosition) {
-                this._animation = $.Deferred();
-                var length = arrayViews.length;
-                for (var i = length - 1; i >= 0; i--) {
-                    var leftPosition = arrayViews[i].element().position().left;
-                    this._animateView(arrayViews[i], leftPosition - summaryWidth * swipePosition, ANIMATION_DURATION_ILLEGAL_RANGE * length)
-                }
-                return this._animation.promise()
-            },
-            _swipeEndHandler: function(e) {
-                var that = this,
-                    targetOffset = e.jQueryEvent.targetOffset;
-                this._viewsAnimating = true;
-                var animation,
-                    isShortSwipe = false;
-                if (Math.abs(e.jQueryEvent.offset) < SHOT_SWIPE_OFFSET)
-                    if (targetOffset === 1 || targetOffset === -1)
-                        isShortSwipe = true;
-                if (this._isDateInInvalidRange()) {
-                    this._toggleNavigatorDisabled(true);
-                    this._$footer && this._$footer.toggleClass("dx-state-disabled", true);
-                    if (this._swipeOffset > 0) {
-                        animation = this._animatedIllegalRange(that._viewsOnLeft, SWIPE_POSITION.right);
-                        this._newDate = new Date(this.option("min"))
-                    }
-                    else {
-                        animation = this._animatedIllegalRange(that._viewsOnRight, SWIPE_POSITION.left);
-                        this._newDate = new Date(this.option("max"))
-                    }
-                }
-                else
-                    animation = this._alignViews(isShortSwipe);
-                animation.done(function() {
-                    that._disposeViews();
-                    if (!that._isDateInInvalidRange())
-                        that.option("currentDate", that._view.option("date"));
-                    that._viewsAnimating = false;
-                    that._toggleNavigatorDisabled(false);
-                    that._$footer && that._$footer.toggleClass("dx-state-disabled", false);
-                    that._normalizedCircledDate(that._view.option("date"))
-                });
-                this._swipeInProgress = false;
-                this._swipeOffset = 0
-            },
-            _animatedIllegalRange: function(viewsArray, swipeDirection) {
-                var animatedViews = this._trimUnusedViews(viewsArray);
-                return this._moveInRange(animatedViews, swipeDirection)
-            },
-            _alignViews: function(isShortSwipe) {
-                this._animation = $.Deferred();
-                this._swipeOffset = this._swipeOffset || 0;
-                var firstVisibleView,
-                    secondVisibleView;
-                if (this._swipeOffset >= 0)
-                    firstVisibleView = this._viewsOnLeft[Math.floor(Math.abs(this._swipeOffset))],
-                    secondVisibleView = this._viewsOnLeft[Math.ceil(Math.abs(this._swipeOffset))];
-                else
-                    firstVisibleView = this._viewsOnRight[Math.ceil(Math.abs(this._swipeOffset))],
-                    secondVisibleView = this._viewsOnRight[Math.floor(Math.abs(this._swipeOffset))];
-                if (this._isInView(firstVisibleView, this._viewWidth / 2))
-                    if (isShortSwipe)
-                        this._arrangeViews(secondVisibleView, firstVisibleView, SWIPE_POSITION.right);
-                    else
-                        this._arrangeViews(firstVisibleView, secondVisibleView, SWIPE_POSITION.left);
-                else if (isShortSwipe)
-                    this._arrangeViews(firstVisibleView, secondVisibleView, SWIPE_POSITION.left);
-                else
-                    this._arrangeViews(secondVisibleView, firstVisibleView, SWIPE_POSITION.right);
-                this._renderNavigator();
-                return this._animation.promise()
-            },
-            _arrangeViews: function(firstView, secondView, swipePosition) {
-                this._centerView(firstView);
-                this._animateView(secondView, swipePosition * this._viewWidth, MONTH_VIEW_ANIMATION_DURATION)
-            },
-            _animateView: function(view, to, duration) {
-                var that = this;
-                fx.animate(view.element(), {
-                    type: "slide",
-                    from: {left: view.element().position().left},
-                    to: {left: to},
-                    duration: duration,
-                    complete: function() {
-                        that._animation.resolve()
-                    }
-                })
-            },
-            _centerView: function(view) {
-                this._animateView(view, 0, MONTH_VIEW_ANIMATION_DURATION);
-                this._view = view
-            },
-            _isInView: function(view, point) {
-                var $element = view.element(),
-                    left = $element.position().left;
-                return point > left && point <= left + $element.width()
-            },
-            _disposeViews: function() {
-                var i;
-                for (i = 0; i < this._viewsOnLeft.length; i++)
-                    if (this._viewsOnLeft[i] !== this._view)
-                        this._viewsOnLeft[i].element().remove();
-                for (i = 0; i < this._viewsOnRight.length; i++)
-                    if (this._viewsOnRight[i] !== this._view)
-                        this._viewsOnRight[i].element().remove();
-                this._viewsOnLeft = [];
-                this._viewsOnRight = []
+            _animateWrapper: function(to, duration) {
+                return fx.animate(this._viewsWrapper, {
+                        type: "slide",
+                        from: {left: this._viewsWrapper.position().left},
+                        to: {left: to},
+                        duration: duration
+                    })
             },
             _renderFooter: function() {
                 var that = this,
@@ -15670,6 +15645,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     this.option("zoomLevel", this.option("maxZoomLevel"));
                     this._animateShowView();
                     this.option("value", today);
+                    this._renderNavigator();
                     return
                 }
                 var currentDate = this._view.option("date"),
@@ -15680,27 +15656,29 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     this.option("value", today);
                     return
                 }
-                this._addPrevView(today);
-                this._animateNavigation(offset).done($.proxy(function() {
-                    this._clearPrevView();
-                    this.option("value", new Date)
+                this._afterView.element().remove();
+                this._beforeView.element().remove();
+                delete this._afterView;
+                delete this._beforeView;
+                var newView = this._renderSpecificView(new Date(today.getFullYear(), today.getMonth(), 1)),
+                    sideSign = offset > 0 ? 1 : -1;
+                translator.move(newView.element(), {left: this._viewWidth() * sideSign});
+                var endPosition = this._viewWidth() * -sideSign * (this.option("rtlEnabled") ? -1 : 1);
+                this._animateWrapper(endPosition, ANIMATION_DURATION_SHOW_VIEW).done($.proxy(function() {
+                    this._view.element().remove();
+                    this._view = newView;
+                    this._beforeView = this._renderSpecificView(this._getDateByOffset(-1, new Date(today.getFullYear(), today.getMonth(), 1)));
+                    this._afterView = this._renderSpecificView(this._getDateByOffset(1, new Date(today.getFullYear(), today.getMonth(), 1)));
+                    this._translateViews();
+                    this.option("value", new Date(today));
+                    this._renderNavigator();
+                    this._resetLocation()
                 }, this))
-            },
-            _isMaxZoomLevel: function() {
-                return this.option("zoomLevel") === this.option("maxZoomLevel")
-            },
-            _renderNavigator: function() {
-                if (!this._navigator) {
-                    var $navigator = $("<div>").prependTo(this.element());
-                    this._navigator = new ui.dxCalendar.Navigator($navigator, this._navigatorConfig())
-                }
-                this._navigator.option("text", this._view._getNavigatorCaption());
-                this._updateButtonsVisibility()
             },
             _updateButtonsVisibility: function() {
                 var viewType = this.option("zoomLevel"),
                     isRTL = this.option("rtlEnabled"),
-                    difference = isRTL ? -1 * utils.getDifferenceInMonth(viewType) : 1 * utils.getDifferenceInMonth(viewType);
+                    difference = (isRTL ? -1 : 1) * utils.getDifferenceInMonth(viewType);
                 this._navigator.toggleButton("next", !this._view.canNavigate(difference));
                 this._navigator.toggleButton("prev", !this._view.canNavigate(-difference))
             },
@@ -15713,10 +15691,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     }
             },
             _navigatorClickHandler: function(e) {
-                var viewType = this.option("zoomLevel"),
-                    difference = utils.getDifferenceInMonth(viewType),
-                    deltaDifference = difference * e.direction;
-                this._navigate(deltaDifference)
+                this._navigate(e.direction)
             },
             _isMinZoomLevel: function(zoomLevel) {
                 var min = this.option("min"),
@@ -15733,6 +15708,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 contouredDate && this._contouredStack.push(contouredDate);
                 this.option("currentDate", contouredDate || this._view.option("date"));
                 this.option("zoomLevel", nextView);
+                this._renderNavigator();
                 this._animateShowView()
             },
             _navigateDown: function(cell) {
@@ -15747,26 +15723,20 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     newCurrentDate = $(cell).data(CALENDAR_DATE_VALUE_KEY);
                 this.option("currentDate", newCurrentDate);
                 this.option("zoomLevel", nextView);
+                this._renderNavigator();
                 this._animateShowView();
                 if (this._contouredStack && this._contouredStack.length > 0) {
-                    var circledDate = this._view.getCircledDate(newCurrentDate, this._contouredStack);
-                    this._normalizedCircledDate(circledDate);
-                    this._view.option("contouredDate", circledDate);
+                    var contouredDate = this._view.getContouredDate(newCurrentDate, this._contouredStack);
+                    this._normalizeContouredDate(contouredDate);
                     return
                 }
-                this._normalizedCircledDate(newCurrentDate);
-                this._view.option("contouredDate", newCurrentDate)
+                this._normalizeContouredDate(newCurrentDate)
             },
             _animateShowView: function() {
                 fx.stop(this._view.element(), true);
-                this._viewsAnimating = true;
                 this._popAnimationView(this._view, POP_ANIMATION_FROM, POP_ANIMATION_TO, ANIMATION_DURATION_SHOW_VIEW).done($.proxy(function() {
-                    this._viewsAnimating = false;
                     this._view.moveContouredDate(0)
                 }, this))
-            },
-            _toggleNavigatorDisabled: function(state) {
-                this._navigator && this._navigator.option("disabled", state)
             },
             _popAnimationView: function(view, from, to, duration) {
                 return fx.animate(view.element(), {
@@ -15782,75 +15752,15 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                         duration: duration
                     })
             },
-            _renderSpecificView: function() {
-                var specificView = ui.dxCalendar.views[this.option("zoomLevel")],
-                    $body = this._body,
-                    $view = $("<div>").appendTo($body);
-                this._view = new specificView($view, this._viewConfig());
-                this.element().addClass("dx-calendar-view-" + this.option("zoomLevel"));
-                this._correctionMovement = DX.browser.msie && this.option("rtlEnabled") ? -1 : 1
-            },
-            _viewConfig: function() {
-                return {
-                        date: this._swipeInProgress ? this._newDate : this.option("currentDate"),
-                        min: this.option("min"),
-                        max: this.option("max"),
-                        firstDayOfWeek: this.option("firstDayOfWeek"),
-                        value: this.option("value"),
-                        rtl: this.option("rtlEnabled"),
-                        disabled: this.option("disabled") || DevExpress.designMode,
-                        _keyboardProcessor: this._viewKeyboardProcessor,
-                        tabIndex: undefined,
-                        focusStateEnabled: this.option("focusStateEnabled"),
-                        hoverStateEnabled: this.option("hoverStateEnabled"),
-                        onValueChanged: $.proxy(this._viewValueChangedHandler, this),
-                        onContouredDateChanged: $.proxy(this._viewContouredChangedHandler, this),
-                        onCellClick: $.proxy(this._handlerOnCellClick, this),
-                        cellTemplate: this._getTemplateByOption("cellTemplate"),
-                        allowValueSelection: this._isMaxZoomLevel()
-                    }
-            },
-            _cellClickHandler: function(e) {
-                this._cellClickAction({jQueryEvent: e})
-            },
-            _handlerOnCellClick: function(e) {
-                var zoomLevel = this.option("zoomLevel"),
-                    nextView = utils.getViewDown(zoomLevel);
-                var _isMaxZoomLevel = this._isMaxZoomLevel();
-                if (nextView && !_isMaxZoomLevel) {
-                    var target = e.jQueryEvent.currentTarget;
-                    this._navigateDown(target)
-                }
-                else
-                    this._cellClickOptionAction(e)
-            },
-            _viewValueChangedHandler: function(e) {
-                if (this._isMaxZoomLevel())
-                    this.option("value", e.value)
-            },
-            _viewContouredChangedHandler: function(e) {
-                var date = e.value,
-                    currentDate = this.option("currentDate"),
-                    zoomLevel = this.option("zoomLevel"),
-                    isSameView = utils.sameView(zoomLevel, currentDate, date);
-                this.setAria("activedescendant", e.ariaId);
-                this._onContouredChanged && this._onContouredChanged(e.ariaId);
-                if (date && !isSameView && !this._isAlreadyNavigated && (this._isMaxZoomLevel() || this._change === "key" || this._change === "upDownArrow")) {
-                    var dir = utils.getFirstMonthDate(date) > currentDate ? 1 : -1,
-                        difference = utils.getDifferenceInMonth(zoomLevel) * dir;
-                    this._isAlreadyNavigated = true;
-                    this._navigate(difference)
-                }
-            },
-            _normalizedCircledDate: function(date) {
+            _normalizeContouredDate: function(date) {
                 var $cell;
                 if (this._view.isBoundary(date)) {
                     var zoomLevel = this.option("zoomLevel"),
                         $cells = this._view.$body.find("." + CALENDAR_CELL_CLASS).not("." + CALENDAR_EMPTY_CELL_CLASS);
                     var min = this.option("min"),
                         max = this.option("max");
-                    if (utils.sameView(zoomLevel, min, max))
-                        $cell = Math.abs(min - date) > Math.abs(max - date) ? $cells.last() : $cells.first();
+                    if (this._swipeOffset && utils.sameView(zoomLevel, min, max))
+                        $cell = this._swipeOffset < 0 ? $cells.last() : $cells.first();
                     else if (utils.sameView(zoomLevel, date, min))
                         $cell = $cells.first();
                     else if (utils.sameView(zoomLevel, date, max))
@@ -15867,69 +15777,64 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 }
                 this._view.option("contouredDate", date)
             },
-            _initalizeViewDimensions: function() {
-                this._viewWidth = this._viewWidth || this._body.width();
-                this._viewHeight = this._viewHeight || this._body.height()
-            },
             _navigate: function(difference) {
                 if (this._view.canNavigate(difference)) {
+                    if (fx.isAnimating(this._viewsWrapper))
+                        fx.stop(this._viewsWrapper, true);
                     var currentDate = this.option("currentDate"),
-                        newDate = new Date(currentDate);
-                    var circledDate;
-                    newDate.setMonth(currentDate.getMonth() + difference);
+                        newDate = this._getDateByOffset(difference, currentDate);
                     utils.fixTimezoneGap(currentDate, newDate);
-                    circledDate = this._view.getNextCircledDate(difference);
-                    if (this._change === "upDownArrow")
-                        circledDate = this._view.option("contouredDate");
-                    if (this._change === "key") {
-                        var zoomLevel = this.option("zoomLevel");
-                        circledDate = difference < 0 ? utils.getLastDateView(zoomLevel, newDate) : utils.getFirstDateView(zoomLevel, newDate)
-                    }
-                    this._changeView(newDate, difference).done($.proxy(function() {
-                        this._clearPrevView();
-                        this._normalizedCircledDate(circledDate);
-                        this._isAlreadyNavigated = false
+                    var contouredDate = this._getNextContoured(newDate, difference);
+                    var isRTL = this.option("rtlEnabled") ? 1 : -1;
+                    this._isAlreadyNavigated = true;
+                    this._animateWrapper(isRTL * difference * this._viewWidth(), ANIMATION_DURATION_SHOW_VIEW).done($.proxy(function() {
+                        this._updateViews(difference);
+                        this.option("currentDate", new Date(newDate));
+                        this._normalizeContouredDate(contouredDate);
+                        this._isAlreadyNavigated = false;
+                        this._resetLocation();
+                        this._renderNavigator()
                     }, this))
                 }
             },
-            _changeView: function(newDate, difference) {
-                if (fx.isAnimating(this._view.element())) {
-                    this._stopCurrentAnimation();
-                    this._prevView && this._prevView.element().remove()
+            _resetLocation: function() {
+                DX.translator.move(this._viewsWrapper, {left: 0})
+            },
+            _getNextContoured: function(newDate, difference) {
+                var contouredDate = this._view.getNextContouredDate(difference);
+                if (this._change === "upDownArrow")
+                    contouredDate = this._view.option("contouredDate");
+                else if (this._change === "key") {
+                    var zoomLevel = this.option("zoomLevel");
+                    contouredDate = difference < 0 ? utils.getLastDateView(zoomLevel, newDate) : utils.getFirstDateView(zoomLevel, newDate)
                 }
-                this._addPrevView(newDate);
-                return this._animateNavigation(difference)
-            },
-            _clearPrevView: function() {
-                this._prevView.element().remove();
-                delete this._prevView
-            },
-            _addPrevView: function(date) {
-                var $view = $("<div>");
-                this._prevView = new ui.dxCalendar.views[this.option("zoomLevel")]($view, this._viewConfig());
-                this._body.append(this._prevView.element());
-                this.option("currentDate", date)
-            },
-            _stopCurrentAnimation: function() {
-                this._prevView && fx.stop(this._prevView.element(), true);
-                fx.stop(this._view.element(), true)
-            },
-            _animateNavigation: function(difference) {
-                this._animation = $.Deferred();
-                this._initalizeViewDimensions();
-                var navDirection = difference < 0 ? -1 : 1;
-                DX.translator.move(this._view.element(), {left: this._correctionMovement * navDirection * this._viewWidth});
-                this._animateView(this._view, 0, MONTH_VIEW_ANIMATION_DURATION);
-                this._animateView(this._prevView, -navDirection * this._viewWidth, MONTH_VIEW_ANIMATION_DURATION);
-                return this._animation.promise()
+                return contouredDate
             },
             _clean: function() {
                 this.callBase();
-                delete this._body;
+                this._clearViewWidthCache();
+                delete this._viewsWrapper;
                 delete this._navigator;
-                delete this._$footer;
-                delete this._viewWidth;
-                delete this._viewHeight
+                delete this._$footer
+            },
+            _clearViewWidthCache: function() {
+                delete this._viewWidthValue
+            },
+            _cleanFocusState: function() {
+                this.callBase();
+                if (this._viewKeyboardProcessor)
+                    this._viewKeyboardProcessor.dispose()
+            },
+            _disposeViews: function() {
+                this._view.element().remove();
+                this._beforeView.element().remove();
+                this._afterView.element().remove();
+                delete this._view;
+                delete this._beforeView;
+                delete this._afterView
+            },
+            _visibilityChanged: function() {
+                this._translateViews()
             },
             _optionChanged: function(args) {
                 var value = args.value;
@@ -15940,18 +15845,18 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                         var date = this.option("value");
                         date = date ? new Date(date) : new Date;
                         this._updateCurrentDate(date);
-                        this._view.element().remove();
-                        this._renderView();
+                        this._disposeViews();
+                        this._renderViews();
                         break;
                     case"currentDate":
                         this._updateCurrentDate(value);
+                        this._renderNavigator();
                         break;
                     case"zoomLevel":
                         this.element().removeClass("dx-calendar-view-" + args.previousValue);
                         this._correctZoomLevel();
-                        this._view.element().remove();
-                        delete this._view;
-                        this._renderView();
+                        this._disposeViews();
+                        this._renderViews();
                         this._updateButtonsVisibility();
                         break;
                     case"minZoomLevel":
@@ -16217,7 +16122,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this._selectedCell = selectedCell
             },
             _getCellAriaLabel: $.noop,
-            getNextCircledDate: function(difference) {
+            getNextContouredDate: function(difference) {
                 var circledDate = this.option("contouredDate") && new Date(this.option("contouredDate"));
                 if (circledDate)
                     circledDate.setMonth(circledDate.getMonth() + difference);
@@ -16361,7 +16266,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 isBoundary: function(date) {
                     return utils.sameMonthAndYear(date, this.option("min")) || utils.sameMonthAndYear(date, this.option("max"))
                 },
-                getNextCircledDate: function(difference) {
+                getNextContouredDate: function(difference) {
                     var circledDate = this.option("contouredDate") && new Date(this.option("contouredDate"));
                     if (circledDate) {
                         var currentDay = circledDate.getDate();
@@ -16372,7 +16277,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     }
                     return circledDate
                 },
-                getCircledDate: function(currentDate, contouredStack) {
+                getContouredDate: function(currentDate, contouredStack) {
                     var lastContour = contouredStack.pop(),
                         day = lastContour.getDate(),
                         circled = new Date(currentDate);
@@ -16430,7 +16335,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 isBoundary: function(date) {
                     return utils.sameYear(date, this.option("min")) || utils.sameYear(date, this.option("max"))
                 },
-                getCircledDate: function(currentDate, contouredStack) {
+                getContouredDate: function(currentDate, contouredStack) {
                     var lastContour = contouredStack.pop(),
                         month = lastContour.getMonth(),
                         circled = new Date(currentDate);
@@ -16494,7 +16399,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 isBoundary: function(date) {
                     return utils.sameDecade(date, this.option("min")) || utils.sameDecade(date, this.option("max"))
                 },
-                getCircledDate: function(currentDate, contouredStack) {
+                getContouredDate: function(currentDate, contouredStack) {
                     var lastContour = contouredStack.pop(),
                         year = lastContour.getFullYear(),
                         circled = new Date(currentDate);
@@ -17464,7 +17369,10 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                             },
                             options: {pickerType: "rollers"}
                         }, {
-                            device: {platform: "generic"},
+                            device: {
+                                platform: "generic",
+                                deviceType: "desktop"
+                            },
                             options: {
                                 pickerType: "calendar",
                                 buttonsLocation: "bottom after"
@@ -17664,7 +17572,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             },
             _renderValue: function() {
                 var mode = this.option("mode"),
-                    value = this.option("value"),
+                    value = this.dateOption("value"),
                     patternKey = dateUtils.FORMATS_MAP[mode],
                     pattern = this._getPattern(patternKey);
                 this._validateValue(value);
@@ -17682,14 +17590,14 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             _valueChangeEventHandler: function(e) {
                 var text = this.option("text"),
                     date = this._strategy.getParsedText(text, this._getFormatString()),
-                    value = this.option("value"),
+                    value = this.dateOption("value"),
                     modelValue = new Date(value && value.valueOf()),
                     mode = this.option("mode"),
                     newValue = (mode !== "text" ? dateUtils.mergeDates(modelValue, date, mode) : date) || null;
                 this._text = text;
                 this._textHasBeenChanged = true;
                 if (this._validateValue(date))
-                    this.option("value", newValue);
+                    this.dateOption("value", newValue);
                 else
                     this.option().value = null;
                 this.validationRequest.fire({
@@ -17701,7 +17609,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 var text = this.option("text"),
                     hasText = !!text,
                     isDate = !!value,
-                    isDateInRange = isDate && utils.dateInRange(value, this.option("min"), this.option("max"), this.option("format")),
+                    isDateInRange = isDate && utils.dateInRange(value, this.dateOption("min"), this.dateOption("max"), this.option("format")),
                     isValid = this._textHasBeenChanged && !hasText || !hasText && !value || isDateInRange,
                     validationMessage = "";
                 if (!isDate)
@@ -17767,7 +17675,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this._refresh()
             },
             _applyButtonHandler: function() {
-                this.option("value", this._strategy.getValue());
+                this.dateOption("value", this._strategy.getValue());
                 this.callBase()
             },
             _dispose: function() {
@@ -17835,6 +17743,20 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     default:
                         this.callBase.apply(this, arguments)
                 }
+            },
+            _getSerializtionFormat: function() {
+                var value = this.option("value");
+                if (utils.isNumber(value))
+                    return "number";
+                if (!utils.isString(value))
+                    return;
+                return this.option("format") === "date" ? "yyyy/MM/dd" : "yyyy/MM/dd HH:mm:ss"
+            },
+            dateOption: function(optionName, value) {
+                var serializationFormat = this._getSerializtionFormat();
+                if (arguments.length === 1)
+                    return utils.deserializeDate(this.option(optionName), serializationFormat);
+                this.option(optionName, utils.serializeDate(value, serializationFormat))
             }
         }));
         ui.dxDateBox.renderingStrategies = {}
@@ -17892,15 +17814,12 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             },
             popupShowingHandler: $.noop,
             popupHiddenHandler: $.noop,
-            _getDateBoxValue: function() {
-                return this.dateBox.option("value")
-            },
             _updateValue: function() {
-                this._widget && this._widget.option("value", this._getDateBoxValue())
+                this._widget && this._widget.option("value", this.dateBoxValue())
             },
             _valueChangedHandler: function(args) {
                 if (this.dateBox.option("opened") && this.dateBox.option("applyValueMode") === "instantly")
-                    this.dateBox.option("value", args.value)
+                    this.dateBoxValue(args.value)
             },
             textChangedHandler: $.noop,
             renderValue: function() {
@@ -17914,6 +17833,11 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 var popup = this._getPopup();
                 if (popup)
                     popup.content().empty()
+            },
+            dateBoxValue: function() {
+                var args = ["value"];
+                arguments.length && args.push(arguments[0]);
+                return this.dateBox.dateOption.apply(this.dateBox, args)
             }
         })
     })(jQuery, DevExpress);
@@ -17945,7 +17869,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                                 }
                                 if (this._widget.option("zoomLevel") === this._widget.option("maxZoomLevel")) {
                                     var contouredDate = this._widget._view.option("contouredDate");
-                                    contouredDate && this.dateBox.option("value", contouredDate);
+                                    contouredDate && this.dateBoxValue(contouredDate);
                                     this.dateBox.close();
                                     this.dateBox._valueChangeEventHandler(e)
                                 }
@@ -17963,10 +17887,10 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             },
             _getWidgetOptions: function() {
                 return $.extend(this.dateBox.option("calendarOptions"), {
-                        value: this._getDateBoxValue(),
+                        value: this.dateBoxValue(),
                         _keyboardProcessor: this._widgetKeyboardProcessor,
-                        min: this.dateBox.option("min"),
-                        max: this.dateBox.option("max"),
+                        min: this.dateBox.dateOption("min"),
+                        max: this.dateBox.dateOption("max"),
                         onValueChanged: $.proxy(this._valueChangedHandler, this),
                         onCellClick: $.proxy(this._cellClickHandler, this),
                         tabIndex: null,
@@ -18011,7 +17935,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 if (isSameDate)
                     return;
                 if (dateBox.option("applyValueMode") === "instantly")
-                    dateBox.option("value", this.getValue())
+                    this.dateBoxValue(this.getValue())
             },
             _getParsedValue: function() {
                 return this.getParsedText(this.dateBox.option("text"), this.dateBox.option("formatString"))
@@ -18021,7 +17945,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 if (!parsedValue && !preventDefaultValue)
                     parsedValue = new Date;
                 if (this._widget) {
-                    var value = this.dateBox.option("value");
+                    var value = this.dateBoxValue();
                     if (parsedValue) {
                         if (value)
                             parsedValue.setHours(value.getHours(), value.getMinutes(), value.getSeconds());
@@ -18035,11 +17959,10 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             },
             _cellClickHandler: function() {
                 var dateBox = this.dateBox;
-                if (dateBox.option("applyValueMode") === "instantly")
-                    dateBox.option({
-                        opened: dateBox._textHasBeenChanged,
-                        value: this.getValue()
-                    })
+                if (dateBox.option("applyValueMode") === "instantly") {
+                    dateBox.option("opened", dateBox._textHasBeenChanged);
+                    this.dateBoxValue(this.getValue())
+                }
             },
             dispose: function() {
                 this.dateBox.off("optionChanged");
@@ -18071,7 +17994,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             _renderWidget: function() {
                 this.callBase();
                 this._timeView = this.dateBox._createComponent($("<div>"), "dxTimeView", {
-                    value: this.dateBox.option("value"),
+                    value: this.dateBoxValue(),
                     onValueChanged: $.proxy(this._valueChangedHandler, this)
                 })
             },
@@ -18235,15 +18158,12 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             _getWidgetName: function() {
                 return "dxDateView"
             },
-            _getDateBoxValue: function() {
-                return this.callBase() || new Date
-            },
             _getWidgetOptions: function() {
                 return {
-                        value: this._getDateBoxValue(),
+                        value: this.dateBoxValue() || new Date,
                         format: this.dateBox.option("format"),
-                        minDate: this.dateBox.option("min") || new Date(1900, 1, 1),
-                        maxDate: this.dateBox.option("max") || new Date($.now() + 50 * dateUtils.ONE_YEAR),
+                        minDate: this.dateBox.dateOption("min") || new Date(1900, 1, 1),
+                        maxDate: this.dateBox.dateOption("max") || new Date($.now() + 50 * dateUtils.ONE_YEAR),
                         visible: false,
                         onDisposing: $.proxy(function() {
                             this._widget = null
@@ -18280,8 +18200,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             },
             renderInputMinMax: function($input) {
                 $input.attr({
-                    min: Globalize.format(this.dateBox.option("min"), "yyyy-MM-dd"),
-                    max: Globalize.format(this.dateBox.option("max"), "yyyy-MM-dd")
+                    min: Globalize.format(this.dateBox.dateOption("min"), "yyyy-MM-dd"),
+                    max: Globalize.format(this.dateBox.dateOption("max"), "yyyy-MM-dd")
                 })
             }
         })
@@ -18363,7 +18283,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             _updateValue: function() {
                 if (!this._widget)
                     return;
-                var value = this._getDateBoxValue(),
+                var value = this.dateBoxValue(),
                     dateIndex = this._getDateIndex(value);
                 this._widget.option("selectedIndex", dateIndex)
             },
@@ -18380,8 +18300,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 return first.getHours() === second.getHours() && first.getMinutes() === second.getMinutes()
             },
             _getTimeListItems: function() {
-                var min = this.dateBox.option("min") || new Date(0, 0, 0, 0, 0),
-                    max = this.dateBox.option("max") || new Date(0, 0, 0, 23, 59),
+                var min = this.dateBox.dateOption("min") || new Date(0, 0, 0, 0, 0),
+                    max = this.dateBox.dateOption("max") || new Date(0, 0, 0, 23, 59),
                     interval = this.dateBox.option("interval"),
                     result = [],
                     current = new Date(min),
@@ -18401,7 +18321,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             },
             _listItemClickHandler: function(e) {
                 this.dateBox.option("opened", false);
-                this.dateBox.option("value", e.itemData)
+                this.dateBoxValue(e.itemData)
             },
             attachKeyboardEvents: function(keyboardProcessor) {
                 var child = keyboardProcessor.attachChildProcessor();
@@ -18885,9 +18805,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     $.extend(options, {applyValueMode: applyValueMode})
                 }
                 this.callBase(options)
-            },
-            _getAriaTarget: function() {
-                return this._$field
             },
             _dataSourceOptions: function() {
                 this._suppressDeprecatedWarnings();
@@ -19375,7 +19292,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                             device: function(device) {
                                 return device.platform === "android"
                             },
-                            options: {dropPosition: {offset: {
+                            options: {popupPosition: {offset: {
                                         h: -16,
                                         v: -9
                                     }}}
@@ -19534,15 +19451,15 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     openOnFieldClick: true,
                     showDropButton: true,
                     displayCustomValue: false,
-                    _isAdaptableDropPosition: false
+                    _isAdaptablePopupPosition: false
                 })
             },
             _defaultOptionsRules: function() {
                 return this.callBase().concat([{
                             device: {platform: "win8"},
                             options: {
-                                _isAdaptableDropPosition: true,
-                                dropPosition: {
+                                _isAdaptablePopupPosition: true,
+                                popupPosition: {
                                     at: "left top",
                                     offset: {
                                         h: 0,
@@ -19555,8 +19472,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                                 return device.platform === "android"
                             },
                             options: {
-                                _isAdaptableDropPosition: true,
-                                dropPosition: {
+                                _isAdaptablePopupPosition: true,
+                                popupPosition: {
                                     my: "top left",
                                     at: "top left",
                                     offset: {
@@ -19591,17 +19508,17 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 }
             },
             _updatePopupPosition: function() {
-                if (!this.option("_isAdaptableDropPosition") || this.option("dropPosition") !== this.initialOption("dropPosition"))
+                if (!this.option("_isAdaptablePopupPosition") || this.option("popupPosition") !== this.initialOption("popupPosition"))
                     return;
                 if (this._isEditable()) {
-                    var adaptablePopupPosition = $.extend(this._getDefaultDropPosition(), {offset: {
-                                h: this.option("dropPosition").offset.h,
+                    var adaptablePopupPosition = $.extend(this._getDefaultPopupPosition(), {offset: {
+                                h: this.option("popupPosition").offset.h,
                                 v: -4
                             }});
                     this._setPopupOption("position", adaptablePopupPosition)
                 }
                 else
-                    this._setPopupOption("position", this.initialOption("dropPosition"))
+                    this._setPopupOption("position", this.initialOption("popupPosition"))
             },
             _scrollToSelectedItem: function() {
                 if (this._dataSource.paginate() && this._isEditable())
@@ -19636,7 +19553,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this.callBase(isUnknownItem ? null : item)
             },
             _isCustomValueAllowed: function() {
-                return this.option("fieldEditEnabled") || this.option("displayCustomValue")
+                return this.option("fieldEditEnabled") || this.callBase()
             },
             _displayValue: function(item) {
                 item = !DX.utils.isDefined(item) && this._isCustomValueAllowed() ? this.option("value") : item;
@@ -19662,11 +19579,13 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 }, this))
             },
             _toggleOpenState: function() {
-                this.callBase.apply(this, arguments);
-                var searchValue = this._searchValue(),
-                    shouldSearch = searchValue.length && this._dataSource.searchValue() !== searchValue;
-                if (this.option("opened") && this._isEditable() && shouldSearch)
-                    this._filterDataSource("")
+                if (this.option("disabled") || !this._wasSearch() || this.option("opened") || !this._isEditable()) {
+                    this.callBase.apply(this, arguments);
+                    return
+                }
+                this._wasSearch(false);
+                this._filterDataSource(null);
+                this._input().focus()
             },
             _renderTooltip: function() {
                 if (this.option("tooltipEnabled"))
@@ -19713,7 +19632,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 if (value === undefined)
                     value = this.option("fieldEditEnabled") && this._searchValue() ? this._searchValue() : this.option("value");
                 this.option("opened", false);
-                this._clearFilter();
+                if (this._wasSearch())
+                    this._clearFilter();
                 this._setValue(value)
             },
             _setValue: function(value) {
@@ -19723,7 +19643,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this.reset()
             },
             _valueChangeEventHandler: function(e) {
-                if (CONTROL_KEY[e.which || e.keyCode])
+                var event = e.jQueryEvent;
+                if (CONTROL_KEY[event.which || event.keyCode])
                     return;
                 if (this.option("fieldEditEnabled")) {
                     this._valueUpdateSuppressed = true;
@@ -19738,9 +19659,19 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                         return false
                     })
             },
+            _search: function() {
+                if (this._isMinFilterLengthExceeded())
+                    this._wasSearch(true);
+                this.callBase()
+            },
+            _wasSearch: function(value) {
+                if (!arguments.length)
+                    return this._wasSearchValue;
+                this._wasSearchValue = value
+            },
             _optionChanged: function(args) {
                 switch (args.name) {
-                    case"_isAdaptableDropPosition":
+                    case"_isAdaptablePopupPosition":
                         break;
                     case"tooltipEnabled":
                         this._renderTooltip();
@@ -19789,7 +19720,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                                 return;
                             e.preventDefault();
                             e.stopPropagation();
-                            var values = this.option("values");
+                            var values = this._values();
                             this._removeTagWithUpdate(values[values.length - 1])
                         },
                         enter: function(e) {
@@ -19814,7 +19745,9 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             _init: function() {
                 this.callBase();
                 this._initValuesChangedAction();
-                this._initDynamicTagTemplate()
+                this._initDynamicTagTemplate();
+                this._values(this.option("values"));
+                this._updateValues()
             },
             _initValuesChangedAction: function() {
                 this._valuesChangedAction = this._createActionByOption("onValuesChanged");
@@ -19830,7 +19763,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             },
             _render: function() {
                 this.callBase();
-                this._updateValues();
                 this.element().addClass(TAGBOX_CLASS);
                 this.element().toggleClass(TAGBOX_ONLY_SELECT_CLASS, !(this.option("searchEnabled") || this.option("fieldEditEnabled")));
                 this.element().find(".dx-texteditor-container").off(TAGBOX_TAG_REMOVE_CLICK_EVENT_NAME).on(TAGBOX_TAG_REMOVE_CLICK_EVENT_NAME, "." + TAGBOX_TAG_REMOVE_BUTTON_CLASS, $.proxy(function(e) {
@@ -19898,7 +19830,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             },
             _cleanTags: function() {
                 var $tags = this._tagElements();
-                var values = this.option("values");
+                var values = this._values();
                 $.each($tags, function(_, tag) {
                     var $tag = $(tag);
                     if ($.inArray($tag.data(TAGBOX_TAG_DATA_KEY), values) < 0)
@@ -19934,7 +19866,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 return result
             },
             _toggleEmptinessEventHandler: function() {
-                this._toggleEmptiness(!this.option("values").length && !this._searchValue().length)
+                this._toggleEmptiness(!this._values().length && !this._searchValue().length)
             },
             _removeTagHandler: function(args) {
                 var e = args.jQueryEvent;
@@ -19945,10 +19877,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             },
             _removeTagWithUpdate: function(itemValue) {
                 this._removeTag(itemValue);
-                this._suppressingSelectionChanged(function() {
-                    this._updateValues()
-                });
-                this.option("values", this.option("values"))
+                this.option("values", this._values())
             },
             _selectionChangeHandler: function(e) {
                 $.each(e.removedItems || [], $.proxy(function(_, removedItem) {
@@ -19958,18 +19887,18 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     this._addTag(this._valueGetter(addedItem))
                 }, this));
                 this.callBase(e);
-                this._updateValues();
+                this.option("values", this._values());
                 this._valuesChangedAction(e)
             },
             _removeTag: function(value) {
                 this.option().value = value;
-                var values = this.option("values"),
+                var values = this._values(),
                     index = this._valueIndex(value);
                 if (index >= 0)
                     values.splice(index, 1)
             },
             _addTag: function(value) {
-                var values = this.option("values"),
+                var values = this._values(),
                     index = this._valueIndex(value);
                 if (index < 0)
                     values.push(value)
@@ -19980,7 +19909,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             _setValue: function(value) {
                 if (value === null || this._isSelectedValue(value))
                     return;
-                var values = this.option("values");
+                var values = this._values();
                 values.push(value);
                 this.option("values", values)
             },
@@ -19997,8 +19926,10 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 }, this));
                 return result
             },
-            _values: function() {
-                return this.option("values") || []
+            _values: function(values) {
+                if (!arguments.length)
+                    return this._valuesData || [];
+                this._valuesData = values.slice()
             },
             _optionValuesEqual: function(name, value, prevValue) {
                 if (name === "value")
@@ -20025,7 +19956,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             _valueChangeArgs: function() {
                 var result = this.callBase.apply(this, arguments);
                 delete result.previousValue;
-                return $.extend(result, {values: this.option("values")})
+                return $.extend(result, {values: this._values()})
             },
             _optionChanged: function(args) {
                 switch (args.name) {
@@ -20039,6 +19970,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                         this._invalidate();
                         break;
                     case"values":
+                        this._values(args.value);
                         this._updateValues();
                         break;
                     case"onValuesChanged":
@@ -20129,6 +20061,9 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             },
             _itemContainer: function() {
                 return this._$itemContainer
+            },
+            _itemElements: function() {
+                return this._itemContainer().children(this._itemSelector())
             },
             _itemWidth: function() {
                 if (!this._itemWidthValue)
@@ -20351,6 +20286,9 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             getCurrentValidationError: function() {
                 return this.editor.option("validationError")
             },
+            bypass: function() {
+                return this.editor.option("disabled")
+            },
             applyValidationResults: function(params) {
                 this.editor.option({
                     isValid: params.isValid,
@@ -20417,6 +20355,10 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     this.element().addClass(VALIDATOR_CLASS);
                     this.callBase()
                 },
+                _visibilityChanged: function(visible) {
+                    if (visible)
+                        this._initGroupRegistration()
+                },
                 _optionChanged: function(args) {
                     switch (args.name) {
                         case"validationGroup":
@@ -20435,6 +20377,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     var that = this,
                         adapter = that.option("adapter"),
                         name = that.option("name"),
+                        bypass = adapter.bypass && adapter.bypass(),
                         value = adapter.getValue(),
                         currentError = adapter.getCurrentValidationError && adapter.getCurrentValidationError(),
                         rules = $.map(that.option("validationRules"), function(rule) {
@@ -20442,7 +20385,9 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                             return rule
                         }),
                         result;
-                    if (currentError && currentError.editorSpecific) {
+                    if (bypass)
+                        result = {isValid: true};
+                    else if (currentError && currentError.editorSpecific) {
                         currentError.validator = this;
                         result = {
                             isValid: false,
@@ -20578,13 +20523,17 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     }));
                 that.validators = params.validators;
                 $.each(that.validators, function(_, validator) {
-                    var handler = $.proxy(that._itemValidationHandler, that),
-                        disposingHandler = function() {
-                            validator.off("validated", handler);
-                            handler = null
-                        };
-                    validator.on("validated", handler);
-                    validator.on("disposing", disposingHandler)
+                    if (validator._validationSummary !== this) {
+                        var handler = $.proxy(that._itemValidationHandler, that),
+                            disposingHandler = function() {
+                                validator.off("validated", handler);
+                                validator._validationSummary = null;
+                                handler = null
+                            };
+                        validator.on("validated", handler);
+                        validator.on("disposing", disposingHandler);
+                        validator._validationSummary = this
+                    }
                 });
                 that.option("items", items)
             },
@@ -20656,6 +20605,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
     /*! Module widgets-base, file ui.fileUploader.js */
     (function($, DX, undefined) {
         var ui = DX.ui,
+            events = ui.events,
             utils = DX.utils;
         var FILEUPLOADER_CLASS = "dx-fileuploader",
             FILEUPLOADER_EMPTY_CLASS = "dx-fileuploader-empty",
@@ -20744,7 +20694,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this.callBase.apply(this, arguments);
                 this._initFileInput();
                 this._initLabel();
-                this._initDragEvents();
                 this._createFiles();
                 this.element().addClass(FILEUPLOADER_CLASS)
             },
@@ -20789,33 +20738,13 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     this._$inputLabel = $("<div>");
                 this._$inputLabel.text(this.option("labelText"))
             },
-            _initDragEvents: function() {
-                if (DX.devices.real().platform !== "generic" || DX.browser.msie)
-                    return;
-                this._dragEventsCount = 0;
-                this.element().on("dragenter", $.proxy(this._dragEnterHandler, this)).on("dragleave", $.proxy(this._dragLeaveHandler, this)).on("drop", $.proxy(this._dropHandler, this))
-            },
-            _dragEnterHandler: function() {
-                if (this.option("disabled"))
-                    return false;
-                this._dragEventsCount++;
-                this.element().addClass(FILEUPLOADER_DRAGOVER)
-            },
-            _dragLeaveHandler: function() {
-                this._dragEventsCount--;
-                if (this._dragEventsCount <= 0)
-                    this.element().removeClass(FILEUPLOADER_DRAGOVER)
-            },
-            _dropHandler: function() {
-                this._dragEventsCount = 0;
-                this.element().removeClass(FILEUPLOADER_DRAGOVER)
-            },
             _focusTarget: function() {
                 return this.element().find("." + FILEUPLOADER_BUTTON_CLASS)
             },
             _render: function() {
                 this._renderWrapper();
                 this._renderInputWrapper();
+                this._renderDragEvents();
                 this._renderSelectButton();
                 this._renderInputContainer();
                 this._renderFiles();
@@ -20957,6 +20886,27 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             },
             _renderInputWrapper: function() {
                 this._$inputWrapper = $("<div>").addClass(FILEUPLOADER_INPUT_WRAPPER_CLASS).appendTo(this._$content)
+            },
+            _renderDragEvents: function() {
+                if (DX.devices.real().platform !== "generic" || DX.browser.msie)
+                    return;
+                this._dragEventsCount = 0;
+                this._$inputWrapper.off("." + this.NAME).on(events.addNamespace("dragenter", this.NAME), $.proxy(this._dragEnterHandler, this)).on(events.addNamespace("dragleave", this.NAME), $.proxy(this._dragLeaveHandler, this)).on(events.addNamespace("drop", this.NAME), $.proxy(this._dropHandler, this))
+            },
+            _dragEnterHandler: function() {
+                if (this.option("disabled"))
+                    return false;
+                this._dragEventsCount++;
+                this.element().addClass(FILEUPLOADER_DRAGOVER)
+            },
+            _dragLeaveHandler: function() {
+                this._dragEventsCount--;
+                if (this._dragEventsCount <= 0)
+                    this.element().removeClass(FILEUPLOADER_DRAGOVER)
+            },
+            _dropHandler: function() {
+                this._dragEventsCount = 0;
+                this.element().removeClass(FILEUPLOADER_DRAGOVER)
             },
             _renderWrapper: function() {
                 var $wrapper = $("<div>").addClass(FILEUPLOADER_WRAPPER_CLASS).appendTo(this.element());
@@ -21277,12 +21227,16 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             },
             _renderLayout: function() {
                 var $element = this.element();
-                var $tabs = $("<div>").addClass(TABPANEL_TABS_CLASS).appendTo($element);
+                this._$tabContainer = $("<div>").addClass(TABPANEL_TABS_CLASS).appendTo($element);
+                var $tabs = $("<div>").appendTo(this._$tabContainer);
                 this._tabs = this._createComponent($tabs, "dxTabs", this._tabConfig());
-                var $container = $("<div>").addClass(TABPANEL_CONTAINER_CLASS).appendTo($element);
-                $container.append(this._$wrapper);
-                var tabsHeight = $tabs.outerHeight();
-                $container.css({
+                this._$container = $("<div>").addClass(TABPANEL_CONTAINER_CLASS).appendTo($element);
+                this._$container.append(this._$wrapper);
+                this._updateLayout()
+            },
+            _updateLayout: function() {
+                var tabsHeight = this._$tabContainer.outerHeight();
+                this._$container.css({
                     "margin-top": -tabsHeight,
                     "padding-top": tabsHeight
                 })
@@ -21334,6 +21288,10 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             _setTabsOption: function(name, value) {
                 if (this._tabs)
                     this._tabs.option(name, value)
+            },
+            _visibilityChanged: function(visible) {
+                if (visible)
+                    this._updateLayout()
             },
             _optionChanged: function(args) {
                 var name = args.name,

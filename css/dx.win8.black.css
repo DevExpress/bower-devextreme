@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme
-* Version: 15.1.5
-* Build date: Jul 15, 2015
+* Version: 15.1.6
+* Build date: Aug 14, 2015
 *
 * Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -445,6 +445,10 @@
 {
   opacity: .5;
 }
+.dx-pivotgridfieldchooser .dx-drag-source.dx-area-box
+{
+  display: none;
+}
 .dx-rtl .dx-pivotgrid-area-data
 {
   border-left: 0;
@@ -738,9 +742,9 @@
 }
 .dx-scheduler-work-space-month .dx-scheduler-appointment.dx-state-hover
 {
-  -webkit-box-shadow: inset 5px 0 0 0 rgba(0,0,0,.3);
-  -moz-box-shadow: inset 5px 0 0 0 rgba(0,0,0,.3);
-  box-shadow: inset 5px 0 0 0 rgba(0,0,0,.3);
+  -webkit-box-shadow: inset 5px 0 0 0 rgba(0,0,0,.3),inset -2px 0 0 0 rgba(0,0,0,.3);
+  -moz-box-shadow: inset 5px 0 0 0 rgba(0,0,0,.3),inset -2px 0 0 0 rgba(0,0,0,.3);
+  box-shadow: inset 5px 0 0 0 rgba(0,0,0,.3),inset -2px 0 0 0 rgba(0,0,0,.3);
 }
 .dx-scheduler-work-space-month .dx-scheduler-appointment.dx-draggable-dragging
 {
@@ -751,6 +755,10 @@
 .dx-scheduler-work-space-month .dx-scheduler-appointment-content
 {
   padding: 0 7px;
+}
+.dx-scheduler-work-space-month .dx-scheduler-appointment-recurrence-icon
+{
+  top: 0;
 }
 .dx-scheduler-work-space-week .dx-scheduler-header-panel-cell:nth-child(7n), .dx-scheduler-work-space-month .dx-scheduler-header-panel-cell:nth-child(7n), .dx-scheduler-work-space-week .dx-scheduler-date-table-cell:nth-child(7n), .dx-scheduler-work-space-month .dx-scheduler-date-table-cell:nth-child(7n), .dx-scheduler-work-space-week .dx-scheduler-all-day-table-cell:nth-child(7n), .dx-scheduler-work-space-month .dx-scheduler-all-day-table-cell:nth-child(7n)
 {
@@ -910,7 +918,7 @@
 {
   background-color: rgba(255,255,255,.3);
 }
-.dx-scheduler-appointments
+.dx-scheduler-scrollable-appointments
 {
   position: absolute;
 }
@@ -918,7 +926,6 @@
 {
   background-clip: padding-box;
   display: inline-block;
-  overflow: hidden;
   border-top: 1px solid transparent;
   border-left: 1px solid transparent;
   position: absolute;
@@ -944,9 +951,17 @@
 }
 .dx-scheduler-appointment.dx-state-hover
 {
-  -webkit-box-shadow: inset 0 5px 0 0 rgba(0,0,0,.3);
-  -moz-box-shadow: inset 0 5px 0 0 rgba(0,0,0,.3);
-  box-shadow: inset 0 5px 0 0 rgba(0,0,0,.3);
+  -webkit-box-shadow: inset 0 5px 0 0 rgba(0,0,0,.3),inset 0 -2px 0 0 rgba(0,0,0,.3);
+  -moz-box-shadow: inset 0 5px 0 0 rgba(0,0,0,.3),inset 0 -2px 0 0 rgba(0,0,0,.3);
+  box-shadow: inset 0 5px 0 0 rgba(0,0,0,.3),inset 0 -2px 0 0 rgba(0,0,0,.3);
+}
+.dx-scheduler-appointment.dx-state-hover .dx-resizable-handle-top
+{
+  height: 5px;
+}
+.dx-scheduler-appointment.dx-state-hover .dx-resizable-handle-left
+{
+  width: 5px;
 }
 .dx-scheduler-appointment.dx-draggable-dragging
 {
@@ -962,9 +977,13 @@
   -moz-opacity: .7;
   opacity: .7;
 }
-.dx-scheduler-appointment .dx-scheduler-appointment-recurrence-icon
+.dx-scheduler-appointment .dx-resizable-handle-top
 {
-  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA8AAAAQCAQAAABjX+2PAAAAN0lEQVQoz2P4z4APMhCQRgPGYFFjBqwAiyTCHGN8luORxm44hjSqAizS6K6igjTZoUpZlOCXBgCgg6BgjR3VXwAAAABJRU5ErkJggg==);
+  top: -1px;
+}
+.dx-scheduler-appointment .dx-resizable-handle-left
+{
+  left: -1px;
 }
 .dx-scheduler-appointment .dx-appointment-reduced-icon
 {
@@ -991,10 +1010,12 @@
 {
   position: absolute;
   background-repeat: no-repeat;
-  width: 16px;
-  height: 16px;
-  top: 2px;
-  right: 4px;
+  top: 3px;
+  right: 7px;
+}
+.dx-scheduler-appointment-recurrence-icon.dx-icon-repeat
+{
+  font-size: 18px;
 }
 .dx-scheduler-appointment-reduced .dx-scheduler-appointment-recurrence-icon
 {
@@ -1003,6 +1024,7 @@
 .dx-scheduler-appointment-content
 {
   padding: 5px 7px;
+  overflow: hidden;
 }
 .dx-scheduler-appointment-empty .dx-scheduler-appointment-content
 {
@@ -1020,7 +1042,7 @@
 {
   font-size: 11px;
 }
-.dx-scheduler-all-day-container .dx-scheduler-appointment-content-details, .dx-scheduler-work-space-month .dx-scheduler-appointment-content-details
+.dx-scheduler-all-day-appointment .dx-scheduler-appointment-content-details, .dx-scheduler-work-space-month .dx-scheduler-appointment-content-details
 {
   display: none;
 }
@@ -1059,37 +1081,37 @@
 {
   margin-top: 10px;
 }
-.dx-sheduler-appointment-popup .dx-field
+.dx-scheduler-appointment-popup .dx-field
 {
   min-height: 0;
 }
-.dx-sheduler-appointment-popup .dx-field-label
+.dx-scheduler-appointment-popup .dx-field-label
 {
   width: 20%;
 }
-.dx-sheduler-appointment-popup .dx-field-value:not(.dx-switch):not(.dx-numberbox):not(.dx-datebox)
+.dx-scheduler-appointment-popup .dx-field-value:not(.dx-switch):not(.dx-numberbox):not(.dx-datebox)
 {
   width: 80%;
 }
-.dx-sheduler-appointment-popup .dx-field-value
+.dx-scheduler-appointment-popup .dx-field-value
 {
   padding-left: 0;
   padding-right: 0;
 }
-.dx-sheduler-appointment-popup .dx-field-value:not(.dx-widget)>.dx-checkbox
+.dx-scheduler-appointment-popup .dx-field-value:not(.dx-widget)>.dx-checkbox
 {
   float: left;
 }
-.dx-sheduler-appointment-popup .dx-field-value:not(.dx-widget)>.dx-checkbox.dx-rtl
+.dx-scheduler-appointment-popup .dx-field-value:not(.dx-widget)>.dx-checkbox.dx-rtl
 {
   float: right;
 }
-.dx-numberbox.dx-recurrence-numberbox-interval, .dx-numberbox.dx-recurrence-numberbox-day-of-month, .dx-selectbox.dx-recurrence-selectbox-month-of-year, .dx-numberbox.dx-recurrence-numberbox-repeat-count, .dx-datebox.dx-recurrence-datebox-until-date, .dx-datebox.dx-sheduler-appointment-popup-start-date, .dx-datebox.dx-sheduler-appointment-popup-end-date, .dx-switch.dx-sheduler-appointment-popup-allday, .dx-switch.dx-recurrence-switch-repeat-end
+.dx-numberbox.dx-recurrence-numberbox-interval, .dx-numberbox.dx-recurrence-numberbox-day-of-month, .dx-selectbox.dx-recurrence-selectbox-month-of-year, .dx-numberbox.dx-recurrence-numberbox-repeat-count, .dx-datebox.dx-recurrence-datebox-until-date, .dx-datebox.dx-scheduler-appointment-popup-start-date, .dx-datebox.dx-scheduler-appointment-popup-end-date, .dx-switch.dx-scheduler-appointment-popup-allday, .dx-switch.dx-recurrence-switch-repeat-end
 {
   float: left;
   position: relative !important;
 }
-.dx-numberbox.dx-recurrence-numberbox-interval.dx-rtl, .dx-numberbox.dx-recurrence-numberbox-day-of-month.dx-rtl, .dx-selectbox.dx-recurrence-selectbox-month-of-year.dx-rtl, .dx-numberbox.dx-recurrence-numberbox-repeat-count.dx-rtl, .dx-datebox.dx-recurrence-datebox-until-date.dx-rtl, .dx-datebox.dx-sheduler-appointment-popup-start-date.dx-rtl, .dx-datebox.dx-sheduler-appointment-popup-end-date.dx-rtl, .dx-switch.dx-sheduler-appointment-popup-allday.dx-rtl, .dx-switch.dx-recurrence-switch-repeat-end.dx-rtl
+.dx-numberbox.dx-recurrence-numberbox-interval.dx-rtl, .dx-numberbox.dx-recurrence-numberbox-day-of-month.dx-rtl, .dx-selectbox.dx-recurrence-selectbox-month-of-year.dx-rtl, .dx-numberbox.dx-recurrence-numberbox-repeat-count.dx-rtl, .dx-datebox.dx-recurrence-datebox-until-date.dx-rtl, .dx-datebox.dx-scheduler-appointment-popup-start-date.dx-rtl, .dx-datebox.dx-scheduler-appointment-popup-end-date.dx-rtl, .dx-switch.dx-scheduler-appointment-popup-allday.dx-rtl, .dx-switch.dx-recurrence-switch-repeat-end.dx-rtl
 {
   float: right;
 }
@@ -1097,7 +1119,7 @@
 {
   width: 70px !important;
 }
-.dx-datebox.dx-recurrence-datebox-until-date, .dx-datebox.dx-sheduler-appointment-popup-start-date, .dx-datebox.dx-sheduler-appointment-popup-end-date
+.dx-datebox.dx-recurrence-datebox-until-date, .dx-datebox.dx-scheduler-appointment-popup-start-date, .dx-datebox.dx-scheduler-appointment-popup-end-date
 {
   width: inherit !important;
 }
@@ -1156,7 +1178,7 @@
 {
   margin-left: 0;
 }
-.dx-rtl .dx-scheduler-all-day-container
+.dx-rtl .dx-scheduler-fixed-appointments
 {
   direction: ltr;
 }
@@ -1188,7 +1210,7 @@
   margin-left: 0;
   margin-right: -100px;
 }
-.dx-rtl .dx-scheduler-appointments.dx-rtl
+.dx-rtl .dx-scheduler-scrollable-appointments.dx-rtl
 {
   direction: ltr;
 }
@@ -1198,7 +1220,7 @@
 }
 .dx-rtl .dx-scheduler-appointment-recurrence-icon
 {
-  left: 4px;
+  left: 7px;
   right: auto;
 }
 .dx-scheduler-appointment-reduced .dx-rtl .dx-scheduler-appointment-recurrence-icon
@@ -2273,6 +2295,14 @@
 {
   content: "\f010 ";
 }
+.dx-icon-repeat
+{
+  font: 14px/1 DXIcons;
+}
+.dx-icon-repeat:before
+{
+  content: "\f069 ";
+}
 .dx-widget
 {
   color: #fff;
@@ -2355,14 +2385,6 @@
   padding: 0 6px;
   background-color: #00b8ff;
   color: #fff;
-}
-:not(.dx-rtl)>.dx-resizable-handle-corner-bottom-right
-{
-  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAQAAACROWYpAAAASklEQVRIx2P8z0A+YBzVPKp5VDMY6ALhZSAkS3MUAw/DF4ZlA2AzvQMM4VgynI0IJjICjCKb6R1g2BxLtLOxBRPRAUaRzcO1MAAAayRCARMgZZcAAAAASUVORK5CYII=);
-}
-.dx-rtl .dx-resizable-handle-corner-bottom-left
-{
-  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAQAAACROWYpAAAASklEQVRIx2P8z0A+YBzVPKp5VDMY6ALhZSAkS3MUAw/DF4ZlA2AzvQMM4VgynI0IJjICjCKb6R1g2BxLtLOxBRPRAUaRzcO1MAAAayRCARMgZZcAAAAASUVORK5CYII=);
 }
 .dx-button
 {
@@ -2727,8 +2749,8 @@
 }
 .dx-tabs .dx-indent-wrapper
 {
-  display: inline-block;
-  padding: 0 10px;
+  display: table;
+  padding: 0 8px;
 }
 .dx-tabs .dx-indent-wrapper:before
 {
@@ -2737,10 +2759,43 @@
   content: '';
   vertical-align: middle;
 }
+.dx-tabs.dx-tabs-nav-buttons .dx-indent-wrapper
+{
+  display: table;
+}
+.dx-tabs.dx-tabs-nav-buttons .dx-scrollable-wrapper
+{
+  margin-left: 30px;
+  margin-right: 30px;
+}
+.dx-tabs .dx-tabs-nav-button
+{
+  height: 28px;
+  width: 28px;
+  margin: 5px 0;
+}
+.dx-tabs .dx-icon-chevronprev, .dx-tabs .dx-icon-chevronnext
+{
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  font-size: 18px;
+  line-height: 26px;
+}
+.dx-tabs .dx-icon-chevronprev
+{
+  text-align: left;
+  padding-left: 2px;
+}
+.dx-tabs .dx-icon-chevronnext
+{
+  text-align: right;
+  padding-right: 6px;
+}
 .dx-tab
 {
+  display: table-cell;
   padding-right: 25px;
-  display: inline-block;
 }
 .dx-tab .dx-icon
 {
@@ -3691,8 +3746,8 @@
   position: absolute;
   top: 0;
   display: block;
-  width: 82px;
-  height: 153px;
+  width: 81px;
+  height: 152px;
   background-color: #1f1f1f;
   content: "";
 }
@@ -3701,8 +3756,8 @@
   position: absolute;
   bottom: 0;
   display: block;
-  width: 82px;
-  height: 153px;
+  width: 81px;
+  height: 152px;
   background-color: #1f1f1f;
   content: "";
 }
@@ -4234,10 +4289,11 @@
 .dx-popover-wrapper .dx-overlay-content
 {
   border: 1px solid #fff;
-}
-.dx-popover-wrapper .dx-overlay-content:not(.dx-popover-fullscreen)
-{
   padding: 0 20px;
+}
+.dx-popover-wrapper .dx-overlay-content.dx-popover-fullscreen
+{
+  padding: 0;
 }
 .dx-popover-wrapper .dx-popup-title
 {
@@ -5226,6 +5282,11 @@
 {
   color: #00b8ff;
 }
+.dx-dropdownmenu-popup-wrapper .dx-overlay-content
+{
+  border: none;
+  padding: 0;
+}
 .dx-dropdownmenu-popup-wrapper .dx-overlay-content .dx-popup-content
 {
   padding: 0;
@@ -5261,10 +5322,6 @@
 .dx-dropdownmenu-popup-wrapper .dx-overlay-content .dx-popup-content .dx-list-item-content
 {
   padding: 8px;
-}
-.dx-dropdownmenu-popup-wrapper.dx-overlay-content
-{
-  position: absolute;
 }
 .dx-dropdownmenu-popup-wrapper.dx-popover-wrapper .dx-overlay-content
 {
@@ -5749,10 +5806,6 @@
 {
   border-top: 1px solid #c7c7c7;
 }
-.dx-datagrid.dx-context-menu .dx-menu-items-container .dx-icon
-{
-  color: #242424;
-}
 .dx-datagrid .dx-menu-items-container .dx-menu-item .dx-icon-context-menu-sort-asc
 {
   font: 14px/1 DXIcons;
@@ -5909,13 +5962,15 @@
 {
   margin-top: -2px;
 }
+.dx-datagrid .dx-editor-cell .dx-texteditor.dx-dropdowneditor .dx-texteditor-input
+{
+  padding-right: 34px;
+}
 .dx-datagrid .dx-editor-cell .dx-texteditor .dx-texteditor-input
 {
+  padding: 7px;
   margin: 0;
   border: 0;
-  padding: 7px;
-  padding-top: 8px;
-  padding-bottom: 6px;
   background: #000;
   color: #fff;
 }
@@ -5931,14 +5986,6 @@
 .dx-datagrid .dx-editor-cell .dx-texteditor.dx-numberbox-spin-touch-friendly .dx-texteditor-input
 {
   padding-right: 79px;
-}
-.dx-datagrid .dx-editor-cell .dx-dropdowneditor.dx-dropdowneditor-button-visible .dx-texteditor-input
-{
-  padding-right: 41px;
-}
-.dx-datagrid .dx-editor-cell .dx-dropdowneditor.dx-selectbox.dx-dropdowneditor-button-visible .dx-texteditor-input
-{
-  padding-right: 7px;
 }
 .dx-datagrid .dx-editor-cell .dx-numberbox-spin-up-icon
 {
@@ -6011,10 +6058,6 @@
 .dx-datagrid .dx-error-row td .dx-closebutton:before
 {
   content: "\f00a ";
-}
-.dx-datagrid-export-menu.dx-context-menu .dx-icon
-{
-  color: #fff;
 }
 .dx-datagrid-export-menu.dx-context-menu .dx-submenu>.dx-menu-items-container
 {
@@ -6487,7 +6530,7 @@
 }
 .dx-datagrid-export-menu .dx-menu-item .dx-checkbox .dx-checkbox-text
 {
-  padding-left: 8px;
+  padding-left: 26px;
 }
 .dx-datagrid-bottom-load-panel
 {
@@ -6544,7 +6587,7 @@
 }
 .dx-rtl .dx-editor-cell .dx-dropdowneditor.dx-dropdowneditor-button-visible .dx-texteditor-input, .dx-rtl .dx-editor-cell .dx-editor-with-menu .dx-dropdowneditor.dx-dropdowneditor-button-visible .dx-texteditor-input
 {
-  padding-left: 41px;
+  padding-left: 34px;
 }
 .dx-rtl .dx-editor-cell .dx-dropdowneditor.dx-selectbox.dx-dropdowneditor-button-visible .dx-texteditor-input, .dx-rtl .dx-editor-cell .dx-editor-with-menu .dx-dropdowneditor.dx-selectbox.dx-dropdowneditor-button-visible .dx-texteditor-input
 {
@@ -6957,7 +7000,6 @@
 .dx-calendar-body .dx-widget
 {
   padding: 1px;
-  margin: 1px;
 }
 .dx-calendar-body table
 {
@@ -7031,6 +7073,10 @@ td.dx-calendar-other-view
   margin: 0 0 7px 0;
   border-bottom: 1px solid #fff;
   padding: 9px 0 11px 30px;
+}
+.dx-treeview .dx-treeview-select-all-item .dx-checkbox-text
+{
+  padding-left: 28px;
 }
 .dx-treeview .dx-loadindicator
 {
@@ -7354,6 +7400,14 @@ td.dx-calendar-other-view
 .dx-timeview
 {
   height: 300px;
+}
+.dx-timeview .dx-numberbox
+{
+  margin: 4px 0;
+}
+.dx-timeview .dx-numberbox .dx-texteditor-container
+{
+  margin: 0;
 }
 .dx-timeview-clock
 {

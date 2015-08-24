@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Sparklines)
-* Version: 15.1.5
-* Build date: Jul 15, 2015
+* Version: 15.1.6
+* Build date: Aug 14, 2015
 *
 * Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -52,6 +52,7 @@ if (!DevExpress.MOD_VIZ_SPARKLINES) {
                     }
                 })
             },
+            _useLinks: false,
             _clean: function() {
                 var that = this;
                 if (that._tooltipShown) {
@@ -316,6 +317,7 @@ if (!DevExpress.MOD_VIZ_SPARKLINES) {
     (function($, DX, undefined) {
         var viz = DX.viz,
             core = viz.core,
+            utils = DX.utils,
             MIN_BAR_WIDTH = 1,
             MAX_BAR_WIDTH = 50,
             DEFAULT_BAR_INTERVAL = 4,
@@ -333,14 +335,14 @@ if (!DevExpress.MOD_VIZ_SPARKLINES) {
                 bar: true,
                 winloss: true
             },
-            _map = $.map,
             _math = Math,
             _abs = _math.abs,
             _round = _math.round,
             _max = _math.max,
             _min = _math.min,
             _isFinite = isFinite,
-            _isDefined = DX.utils.isDefined,
+            _map = core.utils.map,
+            _isDefined = utils.isDefined,
             _Number = Number,
             _String = String;
         DX.registerComponent("dxSparkline", viz.sparklines, viz.sparklines.BaseSparkline.inherit({
