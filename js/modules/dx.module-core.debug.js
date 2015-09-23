@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Core Library)
-* Version: 15.1.6
-* Build date: Aug 14, 2015
+* Version: 15.1.7
+* Build date: Sep 22, 2015
 *
 * Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -13,7 +13,7 @@ if (!window.DevExpress) {
     (function($, global, undefined) {
         global.DevExpress = global.DevExpress || {};
         $.extend(global.DevExpress, {
-            VERSION: "15.1.6",
+            VERSION: "15.1.7",
             abstract: function() {
                 throw global.DevExpress.Error("E0001");
             },
@@ -68,6 +68,9 @@ if (!window.DevExpress) {
                     }
             }(),
             viewPortChanged: $.Callbacks(),
+            hideTopOverlay: function() {
+                return this.hideTopOverlayCallback.fire()
+            },
             hideTopOverlayCallback: function() {
                 var callbacks = [];
                 return {
@@ -159,7 +162,8 @@ if (!window.DevExpress) {
                 W0002: "{0} - '{1}' method is deprecated in {2}. {3}",
                 W0003: "{0} - '{1}' property is deprecated in {2}. {3}",
                 W0004: "Timeout for theme loading is over: {0}",
-                W0005: "'{0}' event is deprecated in {1}. {2}"
+                W0005: "'{0}' event is deprecated in {1}. {2}",
+                W0006: "Invalid recurrence rule: '{0}'"
             };
         var ERROR_URL = "http://js.devexpress.com/error/" + DX.VERSION.split(".").slice(0, 2).join("_") + "/";
         var combineMessage = function(args) {
@@ -671,6 +675,10 @@ if (!window.DevExpress) {
                         left: left
                     }
             };
+        var exncodeRegExp = [new RegExp("&", "g"), new RegExp('"', "g"), new RegExp("'", "g"), new RegExp("<", "g"), new RegExp(">", "g")];
+        var encodeHtml = function(str) {
+                return String(str).replace(exncodeRegExp[0], '&amp;').replace(exncodeRegExp[1], '&quot;').replace(exncodeRegExp[2], '&#39;').replace(exncodeRegExp[3], '&lt;').replace(exncodeRegExp[4], '&gt;')
+            };
         var orderEach = function(map, func) {
                 var keys = [],
                     key,
@@ -771,6 +779,7 @@ if (!window.DevExpress) {
             extendFromObject: extendFromObject,
             clone: clone,
             executeAsync: executeAsync,
+            encodeHtml: encodeHtml,
             stringFormat: DX.stringFormat,
             findBestMatches: findBestMatches,
             replaceAll: replaceAll,
@@ -1457,6 +1466,17 @@ if (!window.DevExpress) {
                 bymonthday: "getDate",
                 byday: "getDay"
             };
+        var ruleNames = ["freq", "interval", "byday", "bymonth", "bymonthday", "count", "until", "byhour", "byminute", "bysecond"],
+            freqNames = ["DAILY", "WEEKLY", "MONTHLY", "YEARLY", "SECONDLY", "MINUTELY", "HOURLY"],
+            days = {
+                SU: 0,
+                MO: 1,
+                TU: 2,
+                WE: 3,
+                TH: 4,
+                FR: 5,
+                SA: 6
+            };
         var dateInRecurrenceRange = function(recurrenceString, currentDate, viewStartDate, viewEndDate) {
                 var result = [];
                 if (recurrenceString)
@@ -1470,23 +1490,24 @@ if (!window.DevExpress) {
                 return intervalObject
             };
         var getDatesByRecurrence = function(recurrenceString, recurrenceStartDate, viewStartDate, viewEndDate) {
-                if (!recurrenceString)
-                    return [];
                 var result = [],
                     recurrenceRule = getRecurrenceRule(recurrenceString);
-                if (!recurrenceRule.freq)
+                if (!recurrenceRule.isValid)
+                    return [];
+                var rule = recurrenceRule.rule;
+                if (!rule.freq)
                     return result;
-                recurrenceRule.interval = normalizeInterval(recurrenceRule.freq, recurrenceRule.interval);
-                viewEndDate = utils.normalizeDate(viewEndDate, viewStartDate, recurrenceRule.until);
+                rule.interval = normalizeInterval(rule.freq, rule.interval);
+                viewEndDate = utils.normalizeDate(viewEndDate, viewStartDate, rule.until);
                 var recurrenceCounter = 0,
                     dateCounter = 0,
-                    dateRules = splitDateRules(recurrenceRule),
+                    dateRules = splitDateRules(rule),
                     ruleDates = getDatesByRules(dateRules, recurrenceStartDate),
                     currentDate = ruleDates[0],
                     firstDate = new Date(recurrenceStartDate);
-                utils.correctDateWithUnitBeginning(firstDate, recurrenceRule.interval);
+                utils.correctDateWithUnitBeginning(firstDate, rule.interval);
                 var firstDateInterval = getDatePartDiffs(recurrenceStartDate, firstDate);
-                while (currentDate <= viewEndDate && recurrenceRule.count !== recurrenceCounter) {
+                while (currentDate <= viewEndDate && rule.count !== recurrenceCounter) {
                     if (checkDateByRule(currentDate, dateRules)) {
                         if (currentDate >= viewStartDate) {
                             viewStartDate = new Date(currentDate);
@@ -1499,7 +1520,7 @@ if (!window.DevExpress) {
                     currentDate = ruleDates[dateCounter % ruleDates.length];
                     if (dateCounter / ruleDates.length >= 1) {
                         dateCounter = 0;
-                        firstDate = utils.addInterval(firstDate, recurrenceRule.interval);
+                        firstDate = utils.addInterval(firstDate, rule.interval);
                         ruleDates = getDatesByRules(dateRules, utils.addInterval(firstDate, firstDateInterval));
                         currentDate = ruleDates[0]
                     }
@@ -1517,27 +1538,108 @@ if (!window.DevExpress) {
                     }
             };
         var getRecurrenceRule = function(recurrence) {
-                if (!recurrence)
-                    return {};
+                var result = {
+                        rule: {},
+                        isValid: false
+                    };
+                if (recurrence) {
+                    result.rule = parseRecurrenceRule(recurrence);
+                    result.isValid = validateRRule(result.rule, recurrence)
+                }
+                return result
+            };
+        var loggedWarnings = [];
+        var validateRRule = function(rule, recurrence) {
+                if (brokenRuleNameExists(rule) || $.inArray(rule.freq, freqNames) === -1 || wrongCountRule(rule) || wrongIntervalRule(rule) || wrongDayOfWeek(rule) || wrongByMonthDayRule(rule) || wrongByMonth(rule) || wrongUntilRule(rule)) {
+                    logBrokenRule(recurrence);
+                    return false
+                }
+                return true
+            };
+        var wrongUntilRule = function(rule) {
+                var wrongUntil = false,
+                    until = rule.until;
+                if (until !== undefined && !(until instanceof Date))
+                    wrongUntil = true;
+                return wrongUntil
+            };
+        var wrongCountRule = function(rule) {
+                var wrongCount = false,
+                    count = rule.count;
+                if (count && typeof count === "string")
+                    wrongCount = true;
+                return wrongCount
+            };
+        var wrongByMonthDayRule = function(rule) {
+                var wrongByMonthDay = false,
+                    byMonthDay = rule.bymonthday;
+                if (byMonthDay && isNaN(parseInt(byMonthDay)))
+                    wrongByMonthDay = true;
+                return wrongByMonthDay
+            };
+        var wrongByMonth = function(rule) {
+                var wrongByMonth = false,
+                    byMonth = rule.bymonth;
+                if (byMonth && isNaN(parseInt(byMonth)))
+                    wrongByMonth = true;
+                return wrongByMonth
+            };
+        var wrongIntervalRule = function(rule) {
+                var wrongInterval = false,
+                    interval = rule.interval;
+                if (interval && typeof interval === "string")
+                    wrongInterval = true;
+                return wrongInterval
+            };
+        var wrongDayOfWeek = function(rule) {
+                var daysByRule = daysFromByDayRule(rule),
+                    brokenDaysExist = false;
+                $.each(daysByRule, function(_, day) {
+                    if (!days.hasOwnProperty(day)) {
+                        brokenDaysExist = true;
+                        return false
+                    }
+                });
+                return brokenDaysExist
+            };
+        var brokenRuleNameExists = function(rule) {
+                var brokenRuleExists = false;
+                $.each(rule, function(ruleName, _) {
+                    if ($.inArray(ruleName, ruleNames) === -1) {
+                        brokenRuleExists = true;
+                        return false
+                    }
+                });
+                return brokenRuleExists
+            };
+        var logBrokenRule = function(recurrence) {
+                if ($.inArray(recurrence, loggedWarnings) === -1) {
+                    DX.log("W0006", recurrence);
+                    loggedWarnings.push(recurrence)
+                }
+            };
+        var parseRecurrenceRule = function(recurrence) {
                 var ruleObject = {},
-                    ruleStrings = recurrence.split(";");
-                for (var i = 0, len = ruleStrings.length; i < len; i++) {
-                    var rule = ruleStrings[i].split("="),
+                    ruleParts = recurrence.split(";");
+                for (var i = 0, len = ruleParts.length; i < len; i++) {
+                    var rule = ruleParts[i].split("="),
                         ruleName = rule[0].toLowerCase(),
                         ruleValue = rule[1];
                     ruleObject[ruleName] = ruleValue
                 }
-                return normalizeRRule(ruleObject)
-            };
-        var normalizeRRule = function(rule) {
-                var count = parseInt(rule.count);
+                var count = parseInt(ruleObject.count);
                 if (!isNaN(count))
-                    rule.count = count;
-                var interval = parseInt(rule.interval);
-                rule.interval = isNaN(interval) ? 1 : interval;
-                if (rule.freq && rule.until)
-                    rule.until = getDateByAsciiString(rule.until);
-                return rule
+                    ruleObject.count = count;
+                if (ruleObject.interval) {
+                    var interval = parseInt(ruleObject.interval);
+                    if (!isNaN(interval))
+                        ruleObject.interval = interval
+                }
+                else
+                    ruleObject.interval = 1;
+                if (ruleObject.freq && ruleObject.until)
+                    ruleObject.until = getDateByAsciiString(ruleObject.until);
+                return ruleObject
             };
         var getDateByAsciiString = function(string) {
                 if (typeof string !== "string")
@@ -1546,6 +1648,12 @@ if (!window.DevExpress) {
                 if (!date)
                     date = Globalize.parseDate(string, "yyyyMMdd");
                 return date
+            };
+        var daysFromByDayRule = function(rule) {
+                var result = [];
+                if (rule.byday)
+                    result = rule.byday.split(",");
+                return result
             };
         var getAsciiStringByDate = function(date) {
                 return date.getFullYear() + ('0' + (date.getMonth() + 1)).slice(-2) + ('0' + date.getDate()).slice(-2)
@@ -1569,15 +1677,6 @@ if (!window.DevExpress) {
                     result.push(dateRule)
                 }
                 return result
-            };
-        var days = {
-                SU: 0,
-                MO: 1,
-                TU: 2,
-                WE: 3,
-                TH: 4,
-                FR: 5,
-                SA: 6
             };
         var handleRuleFieldValue = function(field, value) {
                 var result = parseInt(value);
@@ -1637,7 +1736,8 @@ if (!window.DevExpress) {
             getAsciiStringByDate: getAsciiStringByDate,
             getDatesByRecurrence: getDatesByRecurrence,
             dateInRecurrenceRange: dateInRecurrenceRange,
-            getDateByAsciiString: getDateByAsciiString
+            getDateByAsciiString: getDateByAsciiString,
+            daysFromByDayRule: daysFromByDayRule
         })
     })(jQuery, DevExpress);
     /*! Module core, file utils.dom.js */
@@ -2263,7 +2363,7 @@ if (!window.DevExpress) {
             };
         DX.support = {
             touchEvents: "ontouchstart" in window,
-            touch: "ontouchstart" in window || !!window.navigator.msMaxTouchPoints,
+            touch: "ontouchstart" in window || !!window.navigator.msMaxTouchPoints || !!window.navigator.maxTouchPoints,
             pointer: window.navigator.pointerEnabled || window.navigator.msPointerEnabled,
             transform: supportProp("transform"),
             transition: supportProp("transition"),
@@ -2361,6 +2461,13 @@ if (!window.DevExpress) {
                     oversize += data.myLocation - bounds.max;
                 return oversize
             };
+        var collisionSide = function(direction, data, bounds) {
+                if (data.myLocation < bounds.min)
+                    return direction === "h" ? "left" : "top";
+                if (data.myLocation > bounds.max)
+                    return direction === "h" ? "right" : "bottom";
+                return "none"
+            };
         var initMyLocation = function(data) {
                 data.myLocation = data.atLocation + getAlignFactor(data.atAlign) * data.atSize - getAlignFactor(data.myAlign) * data.mySize + data.offset
             };
@@ -2389,7 +2496,7 @@ if (!window.DevExpress) {
                             });
                         initMyLocation(inverseData);
                         inverseData.oversize = calculateOversize(inverseData, bounds);
-                        if (inverseData.myLocation >= bounds.min && inverseData.myLocation <= bounds.max) {
+                        if (inverseData.myLocation >= bounds.min && inverseData.myLocation <= bounds.max || data.oversize > inverseData.oversize) {
                             data.myLocation = inverseData.myLocation;
                             data.oversize = inverseData.oversize;
                             data.flip = true
@@ -2516,6 +2623,8 @@ if (!window.DevExpress) {
                     }();
                 h.oversize = calculateOversize(h, bounds.h);
                 v.oversize = calculateOversize(v, bounds.v);
+                h.collisionSide = collisionSide("h", h, bounds.h);
+                v.collisionSide = collisionSide("v", v, bounds.v);
                 if (decolliders[h.collision])
                     decolliders[h.collision](h, bounds.h);
                 if (decolliders[v.collision])
@@ -2528,13 +2637,15 @@ if (!window.DevExpress) {
                         location: preciser(h.myLocation),
                         oversize: preciser(h.oversize),
                         fit: h.fit,
-                        flip: h.flip
+                        flip: h.flip,
+                        collisionSide: h.collisionSide
                     },
                     v: {
                         location: preciser(v.myLocation),
                         oversize: preciser(v.oversize),
                         fit: v.fit,
-                        flip: v.flip
+                        flip: v.flip,
+                        collisionSide: v.collisionSide
                     },
                     precise: options.precise
                 });
@@ -3390,8 +3501,10 @@ if (!window.DevExpress) {
                 setupPosition($element, config.to);
                 animation.configurator.setup($element, config);
                 $element.data(ANIM_DATA_KEY, animation);
-                if (DX.fx.off)
+                if (DX.fx.off) {
                     config.duration = 0;
+                    config.delay = 0
+                }
                 animation.strategy.initAnimation($element, config);
                 if (config.start)
                     config.start.apply(this, [$element, config])
@@ -4741,6 +4854,7 @@ if (!window.DevExpress) {
             "dxDataGrid-editingUndeleteRow": "Undelete",
             "dxDataGrid-editingConfirmDeleteMessage": "Are you sure you want to delete this record?",
             "dxDataGrid-editingConfirmDeleteTitle": "",
+            "dxDataGrid-validationCancelChanges": "Cancel changes",
             "dxDataGrid-groupPanelEmptyText": "Drag a column header here to group by that column",
             "dxDataGrid-noDataText": "No data",
             "dxDataGrid-searchPanelPlaceholder": "Search...",
@@ -5451,6 +5565,35 @@ if (!window.DevExpress) {
             }
             return DX.data.query(data).select(selector).filter([[criterion], "or", criteria]).toArray()
         }
+        var processRequestResultLock = function() {
+                var lockCount = 0,
+                    lockDeferred;
+                var obtain = function() {
+                        if (lockCount === 0)
+                            lockDeferred = $.Deferred();
+                        lockCount++
+                    };
+                var release = function() {
+                        lockCount--;
+                        if (lockCount < 1)
+                            lockDeferred.resolve()
+                    };
+                var promise = function() {
+                        var deferred = lockCount === 0 ? $.Deferred().resolve() : lockDeferred;
+                        return deferred.promise()
+                    };
+                var reset = function() {
+                        lockCount = 0;
+                        if (lockDeferred)
+                            lockDeferred.resolve()
+                    };
+                return {
+                        obtain: obtain,
+                        release: release,
+                        promise: promise,
+                        reset: reset
+                    }
+            }();
         var data = DX.data = {
                 utils: {
                     compileGetter: compileGetter,
@@ -5461,7 +5604,8 @@ if (!window.DevExpress) {
                     keysEqual: keysEqual,
                     errorMessageFromXhr: errorMessageFromXhr,
                     aggregators: aggregators,
-                    multiLevelSearch: multiLevelSearch
+                    multiLevelSearch: multiLevelSearch,
+                    processRequestResultLock: processRequestResultLock
                 },
                 Guid: Guid,
                 base64_encode: base64_encode,
@@ -5559,7 +5703,7 @@ if (!window.DevExpress) {
             _seed: function(aggregates) {
                 return $.map(aggregates, function(aggregate) {
                         var aggregator = aggregate.aggregator,
-                            seed = "seed" in aggregator ? aggregator.seed : NaN;
+                            seed = "seed" in aggregator ? $.isFunction(aggregator.seed) ? aggregator.seed() : aggregator.seed : NaN;
                         return $.isArray(seed) ? [seed] : seed
                     })
             },
@@ -6783,7 +6927,7 @@ if (!window.DevExpress) {
                 options = options || {};
                 this.fireEvent("loading", [options]);
                 this.loading.fire(options);
-                return this._loadImpl(options).done(function(result, extra) {
+                return this._withLock(this._loadImpl(options)).done(function(result, extra) {
                         that.fireEvent("loaded", [result, options]);
                         that.loaded.fire(result, extra)
                     })
@@ -6816,6 +6960,19 @@ if (!window.DevExpress) {
                     q = q.slice(skip || 0, take);
                 return q.enumerate()
             },
+            _withLock: function(task) {
+                var result = $.Deferred();
+                task.done(function() {
+                    var that = this,
+                        args = arguments;
+                    DX.data.utils.processRequestResultLock.promise().done(function() {
+                        result.resolveWith(that, args)
+                    })
+                }).fail(function() {
+                    result.rejectWith(this, arguments)
+                });
+                return result
+            },
             createQuery: abstract,
             totalCount: function(options) {
                 return this._totalCountImpl(options)
@@ -6834,7 +6991,7 @@ if (!window.DevExpress) {
                 return q.count()
             },
             byKey: function(key, extraOptions) {
-                return this._addFailHandlers(this._byKeyImpl(key, extraOptions))
+                return this._addFailHandlers(this._withLock(this._byKeyImpl(key, extraOptions)))
             },
             _byKeyImpl: abstract,
             insert: function(values) {
@@ -7172,14 +7329,14 @@ if (!window.DevExpress) {
                     var d = $.Deferred();
                     $.when(this._sendRequest(this._byKeyUrl(key), this._updateMethod, null, values)).done(function() {
                         d.resolve(key, values)
-                    }).fail(d.reject, d);
+                    }).fail(d.reject);
                     return d.promise()
                 },
                 _removeImpl: function(key) {
                     var d = $.Deferred();
                     $.when(this._sendRequest(this._byKeyUrl(key), "DELETE")).done(function() {
                         d.resolve(key)
-                    }).fail(d.reject, d);
+                    }).fail(d.reject);
                     return d.promise()
                 },
                 _byKeyUrl: function(key, useOriginalHost) {
@@ -8661,12 +8818,20 @@ if (!window.DevExpress) {
                 },
                 _createComponent: function(element, name, config) {
                     config = config || {};
+                    var synchronizableOptions = $.grep(["rtlEnabled", "disabled"], function(value) {
+                            return !(value in config)
+                        });
                     this._extendConfig(config, {
                         rtlEnabled: this.option("rtlEnabled"),
                         disabled: this.option("disabled")
                     });
-                    var $element = $(element)[name](config);
-                    return $element[name]("instance")
+                    var $element = $(element)[name](config),
+                        instance = $element[name]("instance");
+                    this.on("optionChanged", function(args) {
+                        if ($.inArray(args.name, synchronizableOptions) >= 0)
+                            instance.option(args.name, args.value)
+                    });
+                    return instance
                 },
                 _extendConfig: function(config, extendConfig) {
                     $.each(extendConfig, function(key, value) {
@@ -8771,14 +8936,15 @@ if (!window.DevExpress) {
                         return $.data(element, name)
                     })
             };
-        var disposeComponents = function() {
-                $.each(getComponents(this), function() {
-                    this._dispose()
-                })
+        var disposeComponents = function(element) {
+                var components = getComponents(element);
+                for (var i = 0; i < components.length; i++)
+                    components[i]._dispose()
             };
         var originalCleanData = $.cleanData;
-        $.cleanData = function(element) {
-            $.each(element, disposeComponents);
+        $.cleanData = function(elements) {
+            for (var i = 0; i < elements.length; i++)
+                disposeComponents(elements[i]);
             return originalCleanData.apply(this, arguments)
         };
         DX.DOMComponent = DOMComponent;
@@ -9170,7 +9336,7 @@ if (!window.DevExpress) {
         TEMPLATE_GENERATORS.dxPivotTabs = {item: function(itemData) {
                 var $itemContent = $("<div>");
                 var $itemText;
-                if ($.isPlainObject(itemData))
+                if (itemData && itemData.title)
                     $itemText = $("<span>").text(itemData.title);
                 else
                     $itemText = $("<span>").text(String(itemData));
@@ -9501,19 +9667,8 @@ if (!window.DevExpress) {
                 var rect = element.getBoundingClientRect();
                 return rect.bottom >= 0 && rect.right >= 0 && rect.top <= (window.innerHeight || document.documentElement.clientHeight) && rect.left <= (window.innerWidth || document.documentElement.clientWidth)
             };
-        var renderImpl = function($element, options, viewModel, bindingContext) {
-                var animatePromise,
-                    childBindingContext = bindingContext.createChildContext(viewModel),
-                    renderedArgs = {element: $element};
-                $element.find(".dx-defered-rendering-load-indicator").remove();
-                ko.applyBindingsToDescendants(childBindingContext, $element[0]);
-                options._renderedDeferred.resolve(renderedArgs);
-                if (options.onRendered)
-                    options.onRendered.apply(viewModel, [renderedArgs]);
-                $element.children().removeClass("dx-invisible-while-pending-rendering");
-                DX.utils.triggerShownEvent($element.children());
-                $element.removeClass("dx-pending-rendering");
-                $element.removeClass("dx-pending-rendering-active");
+        var animate = function($element, options) {
+                var animatePromise;
                 if (options.animation) {
                     var transitionExecutor = new DX.TransitionExecutor;
                     if (options.staggerItemSelector) {
@@ -9532,31 +9687,56 @@ if (!window.DevExpress) {
                     animatePromise = $.Deferred().resolve().promise();
                 return animatePromise
             };
+        var renderImpl = function($element, options, viewModel, bindingContext) {
+                var childBindingContext = bindingContext.createChildContext(viewModel),
+                    renderedArgs = {element: $element};
+                ko.applyBindingsToDescendants(childBindingContext, $element[0]);
+                setRenderedState($element);
+                options._renderedDeferred.resolve(renderedArgs);
+                if (options.onRendered)
+                    options.onRendered.apply(viewModel, [renderedArgs]);
+                $element.data("dx-is-rendered", true);
+                return animate($element, options)
+            };
         var initElement = function($element, options) {
-                $element.addClass("dx-defer-rendering dx-pending-rendering dx-loadindicator-container");
+                $element.addClass("dx-defer-rendering dx-loadindicator-container");
                 $element.data("dx-rendered-promise", options._renderedDeferred.promise());
+                setLoadingState($element, options)
+            };
+        var setLoadingState = function($element, options) {
+                $element.addClass("dx-pending-rendering");
                 if (options.hiddenUntilRendered)
                     $element.children().addClass("dx-invisible-while-pending-rendering");
-                if (options.showLoadIndicator && options.showLoadIndicatorImmediately)
+                if (options.showLoadIndicator && (options.showLoadIndicatorImmediately || isRendered($element)))
                     showLoadIndicator($element)
+            };
+        var setRenderedState = function($element) {
+                $element.find(".dx-defered-rendering-load-indicator").remove();
+                $element.removeClass("dx-pending-rendering");
+                $element.removeClass("dx-pending-rendering-active");
+                $element.children().removeClass("dx-invisible-while-pending-rendering");
+                DX.utils.triggerShownEvent($element.children())
+            };
+        var isRendered = function($element) {
+                return $element.data("dx-is-rendered")
             };
         var initRender = function($element, options, viewModel, bindingContext) {
                 var doRender = function() {
                         return render($element, options, viewModel, bindingContext)
                     };
-                if (options.renderWhen)
+                if (options.renderWhen && options.renderWhen.done)
                     options.renderWhen.done(doRender);
                 else {
                     $element.data("dx-render-delegate", doRender);
-                    $element.addClass("dx-pending-rendering-manual")
+                    if (options.renderWhen === undefined)
+                        $element.addClass("dx-pending-rendering-manual")
                 }
             };
-        ko.bindingHandlers.dxDeferRendering = {init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
-                var $element = $(element),
-                    passedOptions = ko.unwrap(valueAccessor()),
+        var getOptions = function(valueAccessor) {
+                var passedOptions = ko.unwrap(valueAccessor()),
                     showLoadIndicatorImmediately = ko.unwrap(passedOptions.showLoadIndicatorImmediately),
-                    hiddenUntilRendered = ko.unwrap(passedOptions.hiddenUntilRendered),
-                    options = {
+                    hiddenUntilRendered = ko.unwrap(passedOptions.hiddenUntilRendered);
+                return {
                         showLoadIndicator: ko.unwrap(passedOptions.showLoadIndicator) || false,
                         showLoadIndicatorImmediately: showLoadIndicatorImmediately !== undefined ? showLoadIndicatorImmediately : true,
                         hiddenUntilRendered: hiddenUntilRendered !== undefined ? hiddenUntilRendered : true,
@@ -9566,11 +9746,36 @@ if (!window.DevExpress) {
                         onRendered: ko.unwrap(passedOptions.onRendered),
                         onShown: ko.unwrap(passedOptions.onShown),
                         _renderedDeferred: $.Deferred()
-                    };
+                    }
+            };
+        var onOptionsChanged = function($element, prevOptions, options, viewModel, bindingContext) {
+                if (prevOptions.renderWhen === false && options.renderWhen === true)
+                    if (isRendered($element)) {
+                        setRenderedState($element);
+                        animate($element, options)
+                    }
+                    else
+                        render($element, options, viewModel, bindingContext);
+                else if (prevOptions.renderWhen === true && options.renderWhen === false)
+                    setLoadingState($element, options)
+            };
+        ko.bindingHandlers.dxDeferRendering = {
+            init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+                var $element = $(element),
+                    options = getOptions(valueAccessor);
                 initElement($element, options);
                 initRender($element, options, viewModel, bindingContext);
                 return {controlsDescendantBindings: true}
-            }};
+            },
+            update: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+                var $element = $(element),
+                    prevOptions = $element.data("dx-defer-rendering-options"),
+                    options = getOptions(valueAccessor);
+                if (prevOptions)
+                    onOptionsChanged($element, prevOptions, options, viewModel, bindingContext);
+                $element.data("dx-defer-rendering-options", options)
+            }
+        };
         ko.bindingHandlers.dxIcon = {
             init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
                 var options = ko.utils.unwrapObservable(valueAccessor()) || {},
@@ -10124,7 +10329,7 @@ if (!window.DevExpress) {
         TEMPLATE_GENERATORS.dxPivotTabs = {item: function() {
                 var titleBinding = createElementWithBindAttr("span", {text: "title"}),
                     primitiveBinding = createElementWithBindAttr("div", {text: "String($data)"});
-                var markup = ["<div>", "<!-- ko if: $data.title -->", titleBinding, "<!-- /ko -->", "<!-- ko ifnot: $.isPlainObject($data) -->", primitiveBinding, "<!-- /ko -->", "</div>"];
+                var markup = ["<div>", "<!-- ko if: $data.title -->", titleBinding, "<!-- /ko -->", "<!-- ko ifnot: $data.title || $.isPlainObject($data) -->", primitiveBinding, "<!-- /ko -->", "</div>"];
                 return markup.join("")
             }};
         TEMPLATE_GENERATORS.dxPivot = {
@@ -10386,7 +10591,7 @@ if (!window.DevExpress) {
             content: TEMPLATE_GENERATORS.CollectionWidget.item
         };
         TEMPLATE_GENERATORS.dxPivotTabs = {item: function() {
-                return baseElements.container().append($("<span>").attr("ng-if", "title").attr("ng-bind", "title")).append(baseElements.primitive())
+                return baseElements.container().append($("<span>").attr("ng-if", "title || scopeValue && scopeValue.title").attr("ng-bind", "title || scopeValue && scopeValue.title")).append(baseElements.primitive().attr("ng-if", "scopeValue && !scopeValue.title"))
             }};
         TEMPLATE_GENERATORS.dxPivot = {
             title: TEMPLATE_GENERATORS.dxPivotTabs.item,
@@ -11092,7 +11297,7 @@ if (!window.DevExpress) {
                     var action = new DX.Action(this.onClick || this.clickAction, {context: popupInstance});
                     popupButtons.push({
                         toolbar: 'bottom',
-                        location: 'center',
+                        location: DX.devices.current().android ? 'after' : 'center',
                         widget: 'button',
                         options: {
                             text: this.text,
@@ -11732,7 +11937,9 @@ if (!window.DevExpress) {
                     pointers.push(e)
             };
         var removePointer = function(e) {
-                pointers.splice(getPointerIndex(e), 1)
+                var index = getPointerIndex(e);
+                if (index > -1)
+                    pointers.splice(index, 1)
             };
         var updatePointer = function(e) {
                 pointers[getPointerIndex(e)] = e
@@ -12008,25 +12215,40 @@ if (!window.DevExpress) {
                     this._updateEmitters(e)
                 },
                 _mouseWheelHandler: function(e) {
+                    if (!this._allowInterruptionByMousewheel())
+                        return;
+                    e.pointers = [null];
+                    this._pointerDownHandler(e);
+                    this._adjustWheelEvent(e);
+                    this._pointerMoveHandler(e);
+                    e.pointers = [];
+                    this._pointerUpHandler(e)
+                },
+                _allowInterruptionByMousewheel: function() {
                     var allowInterruption = true;
                     this._eachEmitter(function(emitter) {
                         allowInterruption = emitter.allowInterruptionByMousewheel() && allowInterruption;
                         return allowInterruption
                     });
-                    if (!allowInterruption)
-                        return;
-                    e.pointers = [null];
-                    this._pointerDownHandler(e);
+                    return allowInterruption
+                },
+                _adjustWheelEvent: function(e) {
+                    var closestGestureEmitter = null;
                     this._eachEmitter(function(emitter) {
-                        var direction = emitter.getDirection ? emitter.getDirection(e) : "",
-                            prop = direction !== "horizontal" ? "pageY" : "pageX";
-                        if (direction)
-                            e[prop] += e.delta;
-                        return !direction
+                        if (!(emitter instanceof events.GestureEmitter))
+                            return;
+                        var direction = emitter.getDirection(e);
+                        if (direction !== "horizontal" && !e.shiftKey || direction !== "vertical" && e.shiftKey) {
+                            closestGestureEmitter = emitter;
+                            return false
+                        }
                     });
-                    this._pointerMoveHandler(e);
-                    e.pointers = [];
-                    this._pointerUpHandler(e)
+                    if (!closestGestureEmitter)
+                        return;
+                    var direction = closestGestureEmitter.getDirection(e),
+                        verticalGestureDirection = direction === "both" && !e.shiftKey || direction === "vertical",
+                        prop = verticalGestureDirection ? "pageY" : "pageX";
+                    e[prop] += e.delta
                 },
                 isActive: function(element) {
                     var result = false;
@@ -12614,12 +12836,16 @@ if (!window.DevExpress) {
             GESTURE_LOCK_KEY = "dxGestureLock",
             GESTURE_UNLOCK_TIMEOUT = 400,
             NAMESPACED_SCROLL_EVENT = events.addNamespace("scroll", "dxScrollEmitter");
+        var isWheelEvent = function(e) {
+                return e.type === "dxmousewheel"
+            };
         var ScrollEmitter = events.GestureEmitter.inherit({
                 ctor: function(element) {
                     this.callBase.apply(this, arguments);
                     this.direction = "both";
-                    $.data(element, "scroll", $.proxy(this._treatScroll, this));
-                    $(element).on(NAMESPACED_SCROLL_EVENT, $.proxy(this._treatScroll, this))
+                    this._lastWheelDirection = null;
+                    this._proxiedTreatScroll = $.proxy(this._treatScroll, this);
+                    $(element).on(NAMESPACED_SCROLL_EVENT, this._proxiedTreatScroll)
                 },
                 validate: function() {
                     return true
@@ -12634,20 +12860,33 @@ if (!window.DevExpress) {
                 _prepareGesture: function() {
                     if (this._gestureEndTimer)
                         this._clearGestureTimer();
-                    else
-                        $.data(this._domElement(), GESTURE_LOCK_KEY, true)
+                    $.data(this._domElement(), GESTURE_LOCK_KEY, true)
+                },
+                _clearGestureTimer: function() {
+                    clearTimeout(this._gestureEndTimer);
+                    $.data(this._domElement(), GESTURE_LOCK_KEY, false);
+                    this._gestureEndTimer = null
                 },
                 _forgetGesture: function() {
                     var that = this;
                     this._gestureEndTimer = setTimeout(function() {
-                        $.data(that._domElement(), GESTURE_LOCK_KEY, false);
-                        that._gestureEndTimer = null
+                        that._clearGestureTimer()
                     }, GESTURE_UNLOCK_TIMEOUT)
                 },
                 _init: function(e) {
-                    if ($.data(this._domElement(), GESTURE_LOCK_KEY))
+                    if (!this._wheelDirectionChanged(e) && $.data(this._domElement(), GESTURE_LOCK_KEY))
                         this._accept(e);
+                    else
+                        this._clearGestureTimer();
                     this._fireEvent(SCROLL_INIT_EVENT, e)
+                },
+                _wheelDirectionChanged: function(e) {
+                    if (!isWheelEvent(e))
+                        return false;
+                    var direction = e.shiftKey;
+                    var result = this._lastWheelDirection !== null && direction !== this._lastWheelDirection;
+                    this._lastWheelDirection = direction;
+                    return result
                 },
                 move: function(e) {
                     this.callBase.apply(this, arguments);
@@ -12670,12 +12909,12 @@ if (!window.DevExpress) {
                             x: 0,
                             y: 0
                         };
-                    var isWheelEvent = e.type === "dxmousewheel";
-                    if (endEventDelta.time < INERTIA_TIMEOUT) {
-                        var deltaEventData = events.eventDelta(this._savedEventData, this._prevEventData);
+                    if (!isWheelEvent(e) && endEventDelta.time < INERTIA_TIMEOUT) {
+                        var eventDelta = events.eventDelta(this._savedEventData, this._prevEventData),
+                            velocityMultiplier = FRAME_DURATION / eventDelta.time;
                         velocity = {
-                            x: isWheelEvent ? 0 : deltaEventData.x * FRAME_DURATION / deltaEventData.time,
-                            y: isWheelEvent ? 0 : deltaEventData.y * FRAME_DURATION / deltaEventData.time
+                            x: eventDelta.x * velocityMultiplier,
+                            y: eventDelta.y * velocityMultiplier
                         }
                     }
                     this._fireEvent(SCROLL_END_EVENT, e, {velocity: velocity})
@@ -12689,13 +12928,8 @@ if (!window.DevExpress) {
                 },
                 dispose: function() {
                     this.callBase.apply(this, arguments);
-                    $.data(this._domElement(), GESTURE_LOCK_KEY, false);
                     this._clearGestureTimer();
-                    this.getElement().off(NAMESPACED_SCROLL_EVENT)
-                },
-                _clearGestureTimer: function() {
-                    clearTimeout(this._gestureEndTimer);
-                    this._gestureEndTimer = null
+                    this.getElement().off(NAMESPACED_SCROLL_EVENT, this._proxiedTreatScroll)
                 }
             });
         events.registerEmitter({
@@ -13216,9 +13450,8 @@ if (!window.DevExpress) {
     (function($) {
         (function(cleanData) {
             $.cleanData = function(elements) {
-                $.each(elements, function() {
-                    $(this).triggerHandler("dxremove")
-                });
+                for (var i = 0; i < elements.length; i++)
+                    $(elements[i]).triggerHandler("dxremove");
                 return cleanData.apply(this, arguments)
             }
         })($.cleanData)
@@ -13572,7 +13805,11 @@ if (!window.DevExpress) {
                 var currentTarget = e.currentTarget,
                     focusTargets = this._focusTarget();
                 if ($.inArray(currentTarget, focusTargets) !== -1)
-                    $(e.currentTarget).toggleClass(FOCUSED_STATE_CLASS, isFocused)
+                    this._toggleFocusClass(isFocused, currentTarget)
+            },
+            _toggleFocusClass: function(isFocused, element) {
+                var $focusTarget = $(element || this._focusTarget());
+                $focusTarget.toggleClass(FOCUSED_STATE_CLASS, isFocused)
             },
             _attachKeyboardEvents: function() {
                 var processor = this.option("_keyboardProcessor") || new ui.KeyboardProcessor({
@@ -13603,7 +13840,7 @@ if (!window.DevExpress) {
                 var focusOutEvent = events.addNamespace("focusout", this.NAME + FOCUS_NAMESPACE);
                 var beforeactivateEventNamespace = events.addNamespace("beforeactivate", this.NAME + FOCUS_NAMESPACE);
                 $element.off(focusInEvent + " " + focusOutEvent + " " + beforeactivateEventNamespace);
-                $element.removeClass(FOCUSED_STATE_CLASS);
+                this._toggleFocusClass(false);
                 $element.removeAttr("tabindex");
                 if (this._keyboardProcessor)
                     this._keyboardProcessor.dispose()
@@ -14030,7 +14267,6 @@ if (!window.DevExpress) {
             ITEM_RESPONSE_WAIT_CLASS = "dx-item-response-wait",
             EMPTY_COLLECTION = "dx-empty-collection",
             TEMPLATE_WRAPPER_CLASS = "dx-template-wrapper",
-            FOCUSED_STATE_CLASS = "dx-state-focused",
             DISABLED_STATE_CLASS = "dx-state-disabled",
             INVISIBLE_STATE_CLASS = "dx-state-invisible",
             ITEM_PATH_REGEX = /^items[\[\.](\d+)[\.\]].(\w+)/;
@@ -14171,7 +14407,7 @@ if (!window.DevExpress) {
                     this.callBase.apply(this, arguments);
                     var $target = this.option("focusedElement");
                     if ($target)
-                        $target.removeClass(FOCUSED_STATE_CLASS)
+                        this._toggleFocusClass(false, $target)
                 },
                 _getActiveItem: function(last) {
                     var $focusedElement = this.option("focusedElement");
@@ -14243,7 +14479,7 @@ if (!window.DevExpress) {
                 },
                 _removeFocusedItem: function($target) {
                     if ($target && $target.length) {
-                        $target.removeClass(FOCUSED_STATE_CLASS);
+                        this._toggleFocusClass(false, $target);
                         $target.removeAttr("id")
                     }
                 },
@@ -14255,7 +14491,7 @@ if (!window.DevExpress) {
                     if (!$target || !$target.length)
                         return;
                     $target.attr("id", this.getFocusedItemId());
-                    $target.addClass(FOCUSED_STATE_CLASS);
+                    this._toggleFocusClass(true, $target);
                     this.onFocusedItemChanged(this.getFocusedItemId());
                     this._refreshActiveDescendant();
                     if (this.option("selectOnFocus"))
@@ -14893,7 +15129,8 @@ if (!window.DevExpress) {
                 },
                 _clearSelectedItems: function() {
                     this._selectedItemIndices = [];
-                    this.option("selectedItems", [])
+                    this._setOptionSilent("selectedItems", []);
+                    this._syncSelectionOptions("selectedItems")
                 },
                 _setOptionSilent: function(name, value) {
                     this._cancelOptionChange = true;

@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme
-* Version: 15.1.6
-* Build date: Aug 14, 2015
+* Version: 15.1.7
+* Build date: Sep 22, 2015
 *
 * Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -82,6 +82,7 @@ Globalize.addCultureInfo("ru", {messages: {
         "dxDataGrid-editingDeleteRow": "Удалить",
         "dxDataGrid-editingUndeleteRow": "Восстановить",
         "dxDataGrid-editingConfirmDeleteMessage": "Вы уверены, что хотите удалить эту запись?",
+        "dxDataGrid-validationCancelChanges": "Отменить изменения",
         "dxDataGrid-editingConfirmDeleteTitle": "",
         "dxDataGrid-groupPanelEmptyText": "Перетащите столбец сюда, чтобы сгруппировать по нему",
         "dxDataGrid-noDataText": "Нет данных",

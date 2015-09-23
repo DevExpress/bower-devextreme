@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Vector Map)
-* Version: 15.1.6
-* Build date: Aug 14, 2015
+* Version: 15.1.7
+* Build date: Sep 22, 2015
 *
 * Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -14,7 +14,7 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
     /*! Module viz-vectormap, file map.js */
     (function(DX, $, undefined) {
         DX.viz.map = {};
-        var _parseScalar = DX.viz.core.utils.parseScalar,
+        var _parseScalar = DX.viz.utils.parseScalar,
             DEFAULT_WIDTH = 800,
             DEFAULT_HEIGHT = 400,
             TOOLTIP_OFFSET = 12,
@@ -23,8 +23,8 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
         function generateDataKey() {
             return "vectormap-data-" + nextDataKey++
         }
-        var Map = DX.viz.core.BaseWidget.inherit({
-                _eventsMap: _extend({}, DX.viz.core.BaseWidget.prototype._eventsMap, {
+        var Map = DX.viz.BaseWidget.inherit({
+                _eventsMap: _extend({}, DX.viz.BaseWidget.prototype._eventsMap, {
                     onClick: {
                         name: "click",
                         deprecated: "click",
@@ -220,7 +220,7 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                     function notifyReady() {
                         if (--notifyCounter === 0) {
                             that._drawn();
-                            that._checkLoadingIndicatorHiding(true)
+                            that._fulfillLoadingIndicatorHiding()
                         }
                     }
                 },
@@ -489,56 +489,35 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                     that._areasManager.render();
                     that._layoutControl.start()
                 },
-                _optionChanged: function(args) {
-                    var that = this,
-                        value = args.value;
-                    that._scheduleLoadingIndicatorHiding();
-                    switch (args.name) {
-                        case"mapData":
-                            that._areasManager.setData(value);
-                            break;
-                        case"markers":
-                            that._markersManager.setData(value);
-                            break;
-                        case"bounds":
-                            that._projection.setBounds(value);
-                            break;
-                        case"maxZoomFactor":
-                            that._projection.setMaxZoom(value);
-                            break;
-                        case"zoomFactor":
-                            that._projection.setZoom(value);
-                            break;
-                        case"center":
-                            that._projection.setCenter(value);
-                            break;
-                        case"background":
-                            that._setBackgroundOptions();
-                            break;
-                        case"areaSettings":
-                            that._setAreasManagerOptions();
-                            break;
-                        case"markerSettings":
-                            that._setMarkersManagerOptions();
-                            break;
-                        case"controlBar":
-                            that._setControlBarOptions();
-                            break;
-                        case"legends":
-                            that._setLegendsOptions();
-                            break;
-                        case"touchEnabled":
-                        case"wheelEnabled":
-                            that._setTrackerOptions();
-                            break;
-                        case"panningEnabled":
-                        case"zoomingEnabled":
-                            that._setupInteraction();
-                            break;
-                        default:
-                            that.callBase.apply(that, arguments);
-                            break
-                    }
+                _handleChangedOptions: function(options) {
+                    var that = this;
+                    that.callBase.apply(that, arguments);
+                    if ("background" in options)
+                        that._setBackgroundOptions();
+                    if ("areaSettings" in options)
+                        that._setAreasManagerOptions();
+                    if ("markerSettings" in options)
+                        that._setMarkersManagerOptions();
+                    if ("controlBar" in options)
+                        that._setControlBarOptions();
+                    if ("legends" in options)
+                        that._setLegendsOptions();
+                    if ("touchEnabled" in options || "wheelEnabled" in options)
+                        that._setTrackerOptions();
+                    if ("panningEnabled" in options || "zoomingEnabled" in options)
+                        that._setupInteraction();
+                    if ("mapData" in options)
+                        that._areasManager.setData(options.mapData);
+                    if ("markers" in options)
+                        that._markersManager.setData(options.markers);
+                    if ("bounds" in options)
+                        that._projection.setBounds(options.bounds);
+                    if ("maxZoomFactor" in options)
+                        that._projection.setMaxZoom(options.maxZoomFactor);
+                    if ("zoomFactor" in options)
+                        that._projection.setZoom(options.zoomFactor);
+                    if ("center" in options)
+                        that._projection.setCenter(options.center)
                 },
                 _handleThemeOptionsCore: function() {
                     var that = this;
@@ -1037,7 +1016,7 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
             _pow = _math.pow,
             _ln = _math.log,
             _LN2 = _math.LN2,
-            utils = DX.viz.core.utils,
+            utils = DX.viz.utils,
             _parseScalar = utils.parseScalar,
             parseHorizontalAlignment = utils.enumParser(["left", "center", "right"]),
             parseVerticalAlignment = utils.enumParser(["top", "bottom"]),
@@ -1436,7 +1415,7 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
             _sqrt = _math.sqrt,
             _round = _math.round,
             _addNamespace = DX.ui.events.addNamespace,
-            _parseScalar = DX.viz.core.utils.parseScalar,
+            _parseScalar = DX.viz.utils.parseScalar,
             _now = $.now,
             _NAME = DX.viz.map.dxVectorMap.prototype.NAME,
             EVENTS = {};
@@ -1977,10 +1956,11 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
     })(DevExpress, jQuery);
     /*! Module viz-vectormap, file themeManager.js */
     (function(DX, $, undefined) {
-        var _Number = Number,
+        var viz = DX.viz,
+            _Number = Number,
             _extend = $.extend,
             _each = $.each;
-        var ThemeManager = DX.viz.core.BaseThemeManager.inherit({
+        var ThemeManager = viz.BaseThemeManager.inherit({
                 _themeSection: "map",
                 _fontFields: ["areaSettings.label.font", "markerSettings.label.font", "tooltip.font", "legend.font", "loadingIndicator.font"],
                 getCommonAreaSettings: function(options) {
@@ -1989,7 +1969,7 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                         i,
                         colors;
                     if (settings.paletteSize > 0) {
-                        palette = new DX.viz.core.GradientPalette(settings.palette, settings.paletteSize);
+                        palette = this.createGradientPalette(settings.palette, settings.paletteSize);
                         for (i = 0, colors = []; i < settings.paletteSize; ++i)
                             colors.push(palette.getColor(i));
                         settings._colors = colors
@@ -2053,10 +2033,7 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                         i,
                         _count = count > 8 ? count : 8;
                     if (colors.length < _count) {
-                        palette = new DX.viz.core.Palette(commonSettings._pie.palette, {
-                            stepHighlight: 50,
-                            theme: this.themeName()
-                        });
+                        palette = this.createPalette(commonSettings._pie.palette, {useHighlight: true});
                         for (i = 0, colors = []; i < _count; ++i)
                             colors.push(palette.getNextColor());
                         commonSettings._pie._colors = colors
@@ -2071,13 +2048,13 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
     })(DevExpress, jQuery);
     /*! Module viz-vectormap, file legend.js */
     (function(DX, $, undefined) {
-        var _core = DX.viz.core,
-            _String = String,
+        var viz = DX.viz,
             _utils = DX.utils,
             _isArray = _utils.isArray,
             _extend = $.extend,
             _each = $.each,
-            _BaseLegend = _core.Legend;
+            _normalizeEnum = viz.utils.normalizeEnum,
+            _BaseLegend = viz.Legend;
         function Legend(parameters) {
             var that = this;
             that._params = parameters;
@@ -2097,7 +2074,7 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                     }
                 }]);
             that._onDataChanged = function(items) {
-                var itemsForUpdate = _core.utils.map(items, function(item) {
+                var itemsForUpdate = viz.utils.map(items, function(item) {
                         return _extend(true, {states: {normal: {fill: item.color}}}, item)
                     });
                 that.update(itemsForUpdate, that._options);
@@ -2130,7 +2107,7 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
             if (size === null)
                 this.erase();
             else
-                this.setSize(size).draw();
+                this.draw(size.width, size.height);
             return this
         };
         legendPrototype.locate = _BaseLegend.prototype.shift;
@@ -2163,7 +2140,7 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
             var that = this;
             that.update(that._data, options);
             that._unbindData();
-            that._bindData(sourceMap[_String(options.source).toLowerCase()] || unknownSource);
+            that._bindData(sourceMap[_normalizeEnum(options.source)] || unknownSource);
             that._refresh();
             return that
         };
@@ -2479,15 +2456,17 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
     })(DevExpress, jQuery);
     /*! Module viz-vectormap, file mapItemsManager.js */
     (function(DX, $, undefined) {
-        var _isFinite = isFinite,
+        var viz = DX.viz,
+            _isFinite = isFinite,
             _utils = DX.utils,
-            _coreUtils = DX.viz.core.utils,
+            _coreUtils = viz.utils,
             _map = _coreUtils.map,
             _isString = _utils.isString,
             _isArray = _utils.isArray,
             _isFunction = _utils.isFunction,
             _patchFontOptions = _coreUtils.patchFontOptions,
             _parseScalar = _coreUtils.parseScalar,
+            _normalizeEnum = _coreUtils.normalizeEnum,
             _extend = $.extend,
             _each = $.each;
         var SELECTIONS = {
@@ -2496,7 +2475,7 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                 multiple: NaN
             };
         function getSelection(selectionMode) {
-            var selection = String(selectionMode).toLowerCase();
+            var selection = _normalizeEnum(selectionMode);
             selection = selection in SELECTIONS ? SELECTIONS[selection] : SELECTIONS.single;
             if (selection !== null)
                 selection = {
@@ -2515,6 +2494,49 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
             context.raiseSelectionChanged = function(handle) {
                 trigger(names.selectionChanged, {target: handle.proxy})
             }
+        }
+        function EmptyMapItemsSource(){}
+        EmptyMapItemsSource.prototype.count = function() {
+            return 0
+        };
+        function DeprecatedMapItemsSource(raw) {
+            this.raw = raw
+        }
+        DeprecatedMapItemsSource.prototype.count = function() {
+            return this.raw.length
+        };
+        DeprecatedMapItemsSource.prototype.item = function(index) {
+            return this.raw[index]
+        };
+        DeprecatedMapItemsSource.prototype.geometry = function(item) {
+            return {coordinates: item.coordinates}
+        };
+        DeprecatedMapItemsSource.prototype.attributes = function(item) {
+            return item.attributes
+        };
+        function MapItemsSource(raw) {
+            this.raw = raw
+        }
+        MapItemsSource.prototype.count = function() {
+            return this.raw.features.length
+        };
+        MapItemsSource.prototype.item = function(index) {
+            return this.raw.features[index]
+        };
+        MapItemsSource.prototype.geometry = function(item) {
+            return item.geometry
+        };
+        MapItemsSource.prototype.attributes = function(item) {
+            return item.properties
+        };
+        function wrapSource(rawSource) {
+            var sourceType = EmptyMapItemsSource;
+            if (rawSource)
+                if (_isArray(rawSource.features))
+                    sourceType = MapItemsSource;
+                else if (_isArray(rawSource))
+                    sourceType = DeprecatedMapItemsSource;
+            return new sourceType(rawSource)
         }
         var MapItemsManager = DX.Class.inherit({
                 _rootClass: null,
@@ -2645,18 +2667,29 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                     that._handles = null
                 },
                 _createHandles: function(source) {
-                    var that = this;
-                    if (_isArray(source))
-                        that._handles = _map(source, function(dataItem, i) {
-                            dataItem = dataItem || {};
-                            var handle = new MapItemHandle(that._context, that._getItemCoordinates(dataItem), that._getItemAttributes(dataItem), i, that._itemType),
-                                proxy = handle.proxy;
-                            that._initProxy(proxy, dataItem);
-                            handle.settings = that._customizeCallback.call(proxy, proxy) || {};
-                            if (handle.settings.isSelected)
-                                proxy.selected(true);
-                            return handle
-                        })
+                    var that = this,
+                        handles = [],
+                        i,
+                        ii = handles.length = source.count(),
+                        context = that._context,
+                        itemType = that._itemType,
+                        initProxy = that._initProxy,
+                        customizeCallback = that._customizeCallback,
+                        geometry = source.geometry,
+                        attributes = source.attributes,
+                        item,
+                        handle,
+                        proxy;
+                    for (i = 0; i < ii; ++i) {
+                        item = source.item(i);
+                        handles[i] = handle = new MapItemHandle(context, geometry(item), attributes(item), i, itemType);
+                        proxy = handle.proxy;
+                        initProxy(proxy, item);
+                        handle.settings = customizeCallback.call(proxy, proxy) || {};
+                        if (handle.settings.isSelected)
+                            proxy.selected(true)
+                    }
+                    that._handles = handles
                 },
                 _createItems: function(notifyReady) {
                     var that = this,
@@ -2685,7 +2718,6 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                     }
                     immediateReady && notifyReady()
                 },
-                _processSource: null,
                 setData: function(data) {
                     var that = this;
                     that._params.notifyDirty();
@@ -2701,7 +2733,7 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                             that._params.tracker.reset();
                         that._destroyItems();
                         that._destroyHandles();
-                        that._createHandles(that._processSource(source));
+                        that._createHandles(wrapSource(source));
                         that._createItems(that._params.notifyReady)
                     }
                 },
@@ -2772,8 +2804,9 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                     this._params.dataExchanger.set(this._dataCategory, settingField, groups)
                 },
                 _groupByColor: function(colorGroups, palette, valueCallback) {
-                    this._performGrouping(colorGroups, "color", valueCallback, function(count) {
-                        var _palette = new DX.viz.core.GradientPalette(palette, count),
+                    var that = this;
+                    that._performGrouping(colorGroups, "color", valueCallback, function(count) {
+                        var _palette = that._params.themeManager.createGradientPalette(palette, count),
                             i = 0,
                             list = [];
                         for (; i < count; ++i)
@@ -2805,7 +2838,7 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
             },
             project: function() {
                 var that = this;
-                that._coords = that._project(that._ctx.projection, that._proxy.coordinates());
+                that._coords = that._project(that._ctx.projection, that._proxy.geometry());
                 return this
             },
             locate: function() {
@@ -2857,7 +2890,7 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                 }
             }
         };
-        var MapItemHandle = function(context, coordinates, attributes, index, type) {
+        var MapItemHandle = function(context, geometry, attributes, index, type) {
                 var handle = this;
                 handle._ctx = context;
                 handle._idx = index;
@@ -2866,8 +2899,11 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                 handle.proxy = {
                     index: index,
                     type: type,
+                    geometry: function() {
+                        return geometry
+                    },
                     coordinates: function() {
-                        return coordinates
+                        return geometry.coordinates
                     },
                     attribute: function(name, value) {
                         if (arguments.length > 1) {
@@ -2985,6 +3021,7 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
         var _abs = Math.abs,
             _sqrt = Math.sqrt,
             _noop = $.noop,
+            _concat = Array.prototype.concat,
             TOLERANCE = 1;
         var AreasManager = DX.viz.map.dxVectorMap.prototype._factory.MapItemsManager.inherit({
                 _rootClass: "dxm-areas",
@@ -3004,16 +3041,9 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                     this._labelRoot.linkOff();
                     this._labelRoot = null
                 },
-                _processSource: function(source) {
-                    var isGeoJson = source && source.type === "FeatureCollection";
-                    this._getItemCoordinates = isGeoJson ? getCoordinatesGeoJson : getCoordinatesDefault;
-                    this._getItemAttributes = isGeoJson ? getAttributesGeoJson : getAttributesDefault;
-                    return isGeoJson ? source.features : source
-                },
                 _getCommonSettings: function(options) {
                     return this._params.themeManager.getCommonAreaSettings(options)
                 },
-                _initProxy: _noop,
                 _itemType: "area",
                 _removeRoot: function() {
                     this.callBase.apply(this, arguments);
@@ -3029,6 +3059,7 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                     this.callBase.apply(this, arguments);
                     this._labelRoot.clear()
                 },
+                _initProxy: _noop,
                 _getItemSettings: function(_, options) {
                     return this._params.themeManager.getAreaSettings(this._commonSettings, options)
                 },
@@ -3048,32 +3079,13 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                 },
                 _arrangeItems: _noop
             });
-        function getCoordinatesDefault(dataItem) {
-            return dataItem.coordinates
-        }
-        function getCoordinatesGeoJson(dataItem) {
-            var coordinates,
-                type;
-            if (dataItem.geometry) {
-                type = dataItem.geometry.type;
-                coordinates = dataItem.geometry.coordinates;
-                if (coordinates && (type === "Polygon" || type === "MultiPolygon"))
-                    type === "MultiPolygon" && (coordinates = [].concat.apply([], coordinates));
-                else
-                    coordinates = undefined
-            }
-            return coordinates
-        }
-        function getAttributesDefault(dataItem) {
-            return dataItem.attributes
-        }
-        function getAttributesGeoJson(dataItem) {
-            return dataItem.properties
-        }
         function Area(){}
         $.extend(Area.prototype, DX.viz.map._internal.mapItemBehavior, {
-            _project: function(projection, coords) {
-                return projection.projectArea(coords)
+            _project: function(projection, geometry) {
+                var coordinates = geometry.coordinates;
+                if (geometry.type === "MultiPolygon")
+                    coordinates = _concat.apply([], coordinates);
+                return projection.projectArea(coordinates)
             },
             _createRoot: function() {
                 return this._ctx.renderer.path([], "area").data(this._ctx.dataKey, this._data)
@@ -3199,7 +3211,6 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
     /*! Module viz-vectormap, file markersManager.js */
     (function(DX, $, undefined) {
         var _Number = Number,
-            _String = String,
             _isFinite = isFinite,
             _math = Math,
             _round = _math.round,
@@ -3209,6 +3220,7 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
             _each = $.each,
             utils = DX.utils,
             _isArray = utils.isArray,
+            _normalizeEnum = DX.viz.utils.normalizeEnum,
             CLASS_DEFAULT = "dxm-marker",
             CLASS_HOVERED = "dxm-marker dxm-marker-hovered",
             CLASS_SELECTED = "dxm-marker dxm-marker-selected",
@@ -3238,15 +3250,6 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                     this.callBase.apply(this, arguments);
                     this._filter.dispose();
                     this._filter = null
-                },
-                _getItemCoordinates: function(dataItem) {
-                    return dataItem.coordinates
-                },
-                _getItemAttributes: function(dataItem) {
-                    return dataItem.attributes
-                },
-                _processSource: function(source) {
-                    return source
                 },
                 _getCommonSettings: function(options) {
                     return this._params.themeManager.getCommonMarkerSettings(options)
@@ -3339,7 +3342,7 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                         }
                     });
                     if (count > 0)
-                        this._params.dataExchanger.set(this._dataCategory, "color", DX.viz.core.utils.map(this._context.getPieColors(count).slice(0, count), function(color, i) {
+                        this._params.dataExchanger.set(this._dataCategory, "color", DX.viz.utils.map(this._context.getPieColors(count).slice(0, count), function(color, i) {
                             return {
                                     index: i,
                                     color: color
@@ -3352,8 +3355,8 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                 }
             });
         var baseMarkerBehavior = _extend({}, DX.viz.map._internal.mapItemBehavior, {
-                _project: function(projection, coords) {
-                    return projection.projectPoint(coords)
+                _project: function(projection, geometry) {
+                    return projection.projectPoint(geometry.coordinates)
                 },
                 _createRoot: function() {
                     return this._ctx.renderer.g()
@@ -3580,7 +3583,7 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                     }
                 }
                 that._pie = renderer.g().attr(that._pieDefault);
-                translator = new DX.viz.core.Translator1D(0, sum, 90, 450);
+                translator = new DX.viz.Translator1D(0, sum, 90, 450);
                 startAngle = translator.translate(0);
                 colors = that._ctx.getPieColors(values.length);
                 for (value = 0, i = 0, ii = values.length; i < ii; ++i) {
@@ -3663,7 +3666,7 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
             MARKER_TYPES[markerType.prototype.type] = markerType
         });
         function parseMarkerType(type, defaultType) {
-            var _type = _String(type).toLowerCase();
+            var _type = _normalizeEnum(type);
             return MARKER_TYPES[_type] ? _type : defaultType
         }
         var __originalDefaultMarkerType = DEFAULT_MARKER_TYPE,

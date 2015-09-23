@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Gauges)
-* Version: 15.1.6
-* Build date: Aug 14, 2015
+* Version: 15.1.7
+* Build date: Sep 22, 2015
 *
 * Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -21,8 +21,9 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
             _each = $.each,
             internals = DX.viz.gauges.__internals = {};
         DX.viz.gauges.__tests = {};
-        DX.viz.gauges.dxBaseGauge = DX.viz.core.BaseWidget.inherit({
+        DX.viz.gauges.dxBaseGauge = DX.viz.BaseWidget.inherit({
             _rootClassPrefix: "dxg",
+            _invalidatingOptions: ["title", "subtitle", "indicator", "geometry", "startValue", "endValue"],
             _createThemeManager: function() {
                 return new this._factory.ThemeManager
             },
@@ -85,6 +86,10 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
                     ready: function() {
                         if (--counter === 0)
                             that._drawn()
+                    },
+                    changed: function() {
+                        if (!that._resizing)
+                            that.hideLoadingIndicator()
                     }
                 }
             },
@@ -138,7 +143,7 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
             },
             _setTooltipOptions: function() {
                 var that = this;
-                that.callBase();
+                that.callBase.apply(that, arguments);
                 that._tracker && that._tracker.setTooltipState(that._tooltip.isEnabled())
             },
             _renderDebugInfo: function() {
@@ -179,7 +184,7 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
             },
             _applySize: function() {
                 var canvas = this._canvas;
-                this._rootRect = new DX.viz.core.Rectangle({
+                this._rootRect = new DX.viz.Rectangle({
                     left: canvas.left,
                     top: canvas.top,
                     right: canvas.width - canvas.right,
@@ -194,6 +199,11 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
                 that._cleanCore();
                 that._renderCore();
                 that._resizing = null
+            },
+            _handleChangedOptions: function(options) {
+                this.callBase.apply(this, arguments);
+                if ("startValue" in options || "endValue" in options)
+                    this._setupDomain()
             },
             _setupDomain: function() {
                 var that = this;
@@ -232,7 +242,7 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
             _getApproximateScreenRange: null,
             _factory: {
                 createTranslator: function() {
-                    return new DX.viz.core.Translator1D
+                    return new DX.viz.Translator1D
                 },
                 createTracker: function(parameters) {
                     return new internals.Tracker(parameters)
@@ -277,10 +287,10 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
             _isDefined = _utils.isDefined,
             _isArray = _utils.isArray,
             _isNumber = _utils.isNumber,
-            _map = DX.viz.core.utils.map,
+            _map = DX.viz.utils.map,
+            _normalizeEnum = DX.viz.utils.normalizeEnum,
             _isFinite = isFinite,
             _Number = Number,
-            _String = String,
             _abs = Math.abs,
             _extend = $.extend,
             _each = $.each,
@@ -294,6 +304,7 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
             return _isArray(arg) ? arg : _isNumber(arg) ? [arg] : null
         }
         DX.viz.gauges.dxGauge = DX.viz.gauges.dxBaseGauge.inherit({
+            _invalidatingOptions: DX.viz.gauges.dxBaseGauge.prototype._invalidatingOptions.concat(["scale", "rangeContainer", "valueIndicator", "subvalueIndicator", "valueIndicators", "containerBackgroundColor"]),
             _initCore: function() {
                 var that = this;
                 that._setupValue(that.option(OPTION_VALUE));
@@ -304,7 +315,8 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
                 that._rangeContainer = new that._factory.RangeContainer({
                     renderer: that._renderer,
                     container: that._renderer.root,
-                    translator: that._translator
+                    translator: that._translator,
+                    themeManager: that._themeManager
                 });
                 that._scale = new that._factory.Scale({
                     renderer: that._renderer,
@@ -345,10 +357,7 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
             _renderContent: function() {
                 var that = this,
                     elements;
-                that._rangeContainer.render(_extend(that._getOption("rangeContainer"), {
-                    themeName: that._themeManager.themeName(),
-                    vertical: that._area.vertical
-                }));
+                that._rangeContainer.render(_extend(that._getOption("rangeContainer"), {vertical: that._area.vertical}));
                 that._scale.render(_extend(that._getOption("scale"), {
                     rangeContainer: that._rangeContainer.enabled ? that._rangeContainer : null,
                     approximateScreenDelta: that._getApproximateScreenRange(),
@@ -376,7 +385,7 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
             _prepareIndicatorSettings: function(options, defaultTypeField) {
                 var that = this,
                     theme = that._themeManager.theme("valueIndicators"),
-                    type = _String(options.type || that._themeManager.theme(defaultTypeField)).toLowerCase(),
+                    type = _normalizeEnum(options.type || that._themeManager.theme(defaultTypeField)),
                     settings = _extend(true, {}, theme._default, theme[type], options);
                 settings.type = type;
                 settings.animation = that._animationSettings;
@@ -413,9 +422,14 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
             _createSubvalueIndicatorsSet: function() {
                 var that = this,
                     root = that._renderer.root;
-                return new ValueIndicatorsSet({createIndicator: function(type, i) {
+                return new ValueIndicatorsSet({
+                        createIndicator: function(type, i) {
                             return that._createIndicator(type, root, 'dxg-subvalue-indicator', 'subvalue-indicator', i)
-                        }})
+                        },
+                        createPalette: function(palette) {
+                            return that._themeManager.createPalette(palette)
+                        }
+                    })
             },
             _prepareSubvalueIndicators: function() {
                 var that = this,
@@ -449,16 +463,11 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
             },
             _updateValueIndicator: function() {
                 var that = this;
-                that._valueIndicator && that._valueIndicator.value(that.__value, that._noAnimation);
-                that._checkLoadingIndicatorHiding()
+                that._valueIndicator && that._valueIndicator.value(that.__value, that._noAnimation)
             },
             _updateSubvalueIndicators: function() {
                 var that = this;
-                that._subvalueIndicatorsSet && that._subvalueIndicatorsSet.values(that.__subvalues, that._noAnimation);
-                that._checkLoadingIndicatorHiding()
-            },
-            _checkLoadingIndicatorHiding: function() {
-                this.callBase(!this._resizing)
+                that._subvalueIndicatorsSet && that._subvalueIndicatorsSet.values(that.__subvalues, that._noAnimation)
             },
             value: function(arg) {
                 var that = this;
@@ -482,37 +491,24 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
                 }
                 return that.__subvalues !== null ? that.__subvalues.slice() : undefined
             },
-            _valueChangedHandler: function(name, val) {
+            _valueChangedHandler: function(options) {
                 var that = this;
-                switch (name) {
-                    case OPTION_VALUE:
-                        that._setupValue(val);
-                        that._updateValueIndicator();
-                        that.option(OPTION_VALUE, that.__value);
-                        return true;
-                    case OPTION_SUBVALUES:
-                        if (that.__subvalues !== null) {
-                            that._setupSubvalues(val);
-                            that._updateSubvalueIndicators();
-                            that.option(OPTION_SUBVALUES, that.__subvalues);
-                            return true
-                        }
-                        return false;
-                    default:
-                        return false
+                if (OPTION_VALUE in options) {
+                    that._setupValue(options[OPTION_VALUE]);
+                    that._updateValueIndicator();
+                    that.option(OPTION_VALUE, that.__value)
+                }
+                if (OPTION_SUBVALUES in options && that.__subvalues !== null) {
+                    that._setupSubvalues(options[OPTION_SUBVALUES]);
+                    that._updateSubvalueIndicators();
+                    that.option(OPTION_SUBVALUES, that.__subvalues)
                 }
             },
-            _optionChanged: function(args) {
-                var that = this;
-                that._scheduleLoadingIndicatorHiding();
-                if (that._valueChangedHandler(args.name, args.value, args.previousValue))
-                    return;
-                if (args.name === "scale") {
-                    that._setupDomain();
-                    that._invalidate()
-                }
-                else
-                    that.callBase.apply(that, arguments)
+            _handleChangedOptions: function(options) {
+                this.callBase.apply(this, arguments);
+                if ("scale" in options)
+                    this._setupDomain();
+                this._valueChangedHandler(options)
             },
             _optionValuesEqual: function(name, oldValue, newValue) {
                 var result;
@@ -587,20 +583,17 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
             that._cleanValueIndicators = cleanValueIndicators_hardMode;
             that.indicatorValue = indicatorValue_hardMode
         }
-        function valueChangedHandler_hardMode(name, val) {
-            if (name === 'valueIndicators') {
-                setupValues(this, '_indicatorValues', val);
-                this._invalidate();
-                return true
+        function valueChangedHandler_hardMode(options) {
+            if ("valueIndicators" in options) {
+                setupValues(this, '_indicatorValues', options.valueIndicators);
+                this._invalidate()
             }
-            return false
         }
         function updateActiveElements_hardMode() {
             var that = this;
             _each(that._valueIndicators, function(_, valueIndicator) {
                 valueIndicator.value(that._indicatorValues[valueIndicator.index], that._noAnimation)
-            });
-            that._checkLoadingIndicatorHiding()
+            })
         }
         function prepareValueIndicators_hardMode() {
             var that = this,
@@ -654,8 +647,7 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
             if (value !== undefined) {
                 if (values[index] !== undefined) {
                     values[index] = processValue(value, values[index]);
-                    pointers[index] && pointers[index].value(values[index]);
-                    that._checkLoadingIndicatorHiding()
+                    pointers[index] && pointers[index].value(values[index])
                 }
                 return that
             }
@@ -704,7 +696,7 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
                 that._sample = that._parameters.createIndicator(that.type);
                 that._sample.render(options);
                 that.enabled = that._sample.enabled;
-                that._palette = _isDefined(options.palette) ? new DX.viz.core.Palette(options.palette) : null;
+                that._palette = _isDefined(options.palette) ? that._parameters.createPalette(options.palette) : null;
                 if (that.enabled) {
                     that._generatePalette(that._indicators.length);
                     that._indicators = _map(that._indicators, function(indicator, i) {
@@ -794,7 +786,7 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
         };
         DX.viz.gauges.__internals.createIndicatorCreator = function(indicators) {
             return function(parameters, type, _strict) {
-                    var indicatorType = indicators[_String(type).toLowerCase()] || !_strict && indicators._default;
+                    var indicatorType = indicators[_normalizeEnum(type)] || !_strict && indicators._default;
                     return indicatorType ? new indicatorType(parameters) : null
                 }
         }
@@ -951,12 +943,12 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
     })(DevExpress, jQuery);
     /*! Module viz-gauges, file linearGauge.js */
     (function(DX, $, undefined) {
-        var _String = String,
-            _Number = Number,
+        var _Number = Number,
             _max = Math.max,
             _min = Math.min,
             _round = Math.round,
-            _each = $.each;
+            _each = $.each,
+            _normalizeEnum = DX.viz.utils.normalizeEnum;
         DX.registerComponent("dxLinearGauge", DX.viz.gauges, DX.viz.gauges.dxGauge.inherit({
             _rootClass: 'dxg-linear-gauge',
             _factoryMethods: {
@@ -967,7 +959,7 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
             _setupCodomain: function() {
                 var that = this,
                     geometry = that.option('geometry') || {},
-                    vertical = _String(geometry.orientation).toLowerCase() === 'vertical';
+                    vertical = _normalizeEnum(geometry.orientation) === 'vertical';
                 that._area = {
                     vertical: vertical,
                     x: 0,
@@ -1072,17 +1064,17 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
             _isArray = DX.utils.isArray,
             _convertAngleToRendererSpace = DX.utils.convertAngleToRendererSpace,
             _getCosAndSin = DX.utils.getCosAndSin,
-            _patchFontOptions = DX.viz.core.utils.patchFontOptions,
+            _patchFontOptions = DX.viz.utils.patchFontOptions,
             _Number = Number,
             _isFinite = isFinite,
             _noop = $.noop,
             _extend = $.extend,
             _getSampleText = DX.viz.gauges.__internals.getSampleText,
             _formatValue = DX.viz.gauges.__internals.formatValue,
-            _Palette = DX.viz.core.Palette,
             OPTION_VALUES = "values";
         DX.registerComponent("dxBarGauge", DX.viz.gauges, DX.viz.gauges.dxBaseGauge.inherit({
             _rootClass: "dxbg-bar-gauge",
+            _invalidatingOptions: DX.viz.gauges.dxBaseGauge.prototype._invalidatingOptions.concat(["backgroundColor", "relativeInnerRadius", "barSpacing", "label"]),
             _initCore: function() {
                 var that = this;
                 that.callBase.apply(that, arguments);
@@ -1207,10 +1199,7 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
                     relativeInnerRadius,
                     radius,
                     area = that._area;
-                that._palette = new _Palette(options.palette, {
-                    stepHighlight: 50,
-                    theme: that._themeManager.themeName()
-                });
+                that._palette = that._themeManager.createPalette(options.palette, {useHighlight: true});
                 relativeInnerRadius = options.relativeInnerRadius > 0 && options.relativeInnerRadius < 1 ? _Number(options.relativeInnerRadius) : 0.1;
                 radius = area.radius;
                 if (that._context.textEnabled) {
@@ -1289,14 +1278,17 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
                 var that = this,
                     i,
                     ii;
+                that._notifiers.dirty();
                 for (i = 0, ii = that._bars.length; i < ii; ++i)
-                    that._bars[i].setValue(values[i])
+                    that._bars[i].setValue(values[i]);
+                that._notifiers.ready()
             },
             _animateBars: function(values) {
                 var that = this,
                     i,
                     ii = that._bars.length;
                 if (ii > 0) {
+                    that._notifiers.dirty();
                     for (i = 0; i < ii; ++i)
                         that._bars[i].beginAnimation(values[i]);
                     that._barsGroup.animate({_: 0}, that._animationSettings)
@@ -1308,8 +1300,7 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
                     i,
                     ii = list.length,
                     value,
-                    barValues = [],
-                    immediateReady = true;
+                    barValues = [];
                 that._values.length = ii;
                 for (i = 0; i < ii; ++i) {
                     value = list[i];
@@ -1317,20 +1308,20 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
                     if (_isFinite(value))
                         barValues.push(value)
                 }
-                that._notifiers.dirty();
                 that._animationSettings && that._barsGroup.stopAnimation();
                 if (that._bars) {
                     that._arrangeBars(barValues.length);
-                    if (that._animationSettings && !that._noAnimation) {
-                        immediateReady = false;
-                        that._animateBars(barValues)
-                    }
+                    if (that._animationSettings && !that._noAnimation)
+                        that._animateBars(barValues);
                     else
                         that._updateBars(barValues)
                 }
-                immediateReady && that._notifiers.ready();
-                !that._resizing && that.option(OPTION_VALUES, that._values);
-                that._checkLoadingIndicatorHiding(!that._resizing)
+                if (!that._resizing) {
+                    that._skipOptionChanged = true;
+                    that.option(OPTION_VALUES, that._values);
+                    that._skipOptionChanged = false
+                }
+                that._notifiers.changed()
             },
             values: function(arg) {
                 if (arg !== undefined) {
@@ -1340,22 +1331,10 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
                 else
                     return this._values.slice(0)
             },
-            _optionChanged: function(args) {
-                var that = this;
-                that._scheduleLoadingIndicatorHiding();
-                switch (args.name) {
-                    case"startValue":
-                    case"endValue":
-                        that._setupDomain();
-                        that._invalidate();
-                        break;
-                    case OPTION_VALUES:
-                        this._updateValues(args.value);
-                        break;
-                    default:
-                        that.callBase(args);
-                        break
-                }
+            _handleChangedOptions: function(options) {
+                this.callBase.apply(this, arguments);
+                if (OPTION_VALUES in options && !this._skipOptionChanged)
+                    this._updateValues(options[OPTION_VALUES])
             },
             _optionValuesEqual: function(name, oldValue, newValue) {
                 if (name === OPTION_VALUES)
@@ -1535,7 +1514,7 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
             _round = Math.round,
             _formatValue = internals.formatValue,
             _getSampleText = internals.getSampleText,
-            _patchFontOptions = DX.viz.core.utils.patchFontOptions;
+            _patchFontOptions = DX.viz.utils.patchFontOptions;
         internals.BaseElement = DX.Class.inherit({
             ctor: function(parameters) {
                 var that = this;
@@ -1657,6 +1636,7 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
                                 }
                         }
                         immediateReady && that._notifiers.ready();
+                        that._notifiers.changed();
                         return that
                     }
                     return that._currentValue
@@ -2285,7 +2265,7 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
         var indicators = DX.viz.gauges.dxLinearGauge.prototype._factory.indicators = {},
             internals = DX.viz.gauges.__internals,
             _Number = Number,
-            _String = String;
+            _normalizeEnum = DX.viz.utils.normalizeEnum;
         DX.viz.gauges.dxLinearGauge.prototype._factory.createIndicator = internals.createIndicatorCreator(indicators);
         var SimpleIndicator = internals.BaseIndicator.inherit({
                 _move: function() {
@@ -2430,7 +2410,7 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
             _isEnabled: function() {
                 var that = this;
                 that.vertical = that._options.vertical;
-                that._inverted = that.vertical ? _String(that._options.horizontalOrientation).toLowerCase() === 'right' : _String(that._options.verticalOrientation).toLowerCase() === 'bottom';
+                that._inverted = that.vertical ? _normalizeEnum(that._options.horizontalOrientation) === 'right' : _normalizeEnum(that._options.verticalOrientation) === 'bottom';
                 return that._options.length > 0 && that._options.width > 0
             },
             _isVisible: function() {
@@ -2535,7 +2515,7 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
             _isEnabled: function() {
                 var that = this;
                 that.vertical = that._options.vertical;
-                that._inverted = that.vertical ? _String(that._options.horizontalOrientation).toLowerCase() === 'right' : _String(that._options.verticalOrientation).toLowerCase() === 'bottom';
+                that._inverted = that.vertical ? _normalizeEnum(that._options.horizontalOrientation) === 'right' : _normalizeEnum(that._options.verticalOrientation) === 'bottom';
                 return true
             },
             _isVisible: function() {
@@ -2600,7 +2580,7 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
             _isEnabled: function() {
                 var that = this;
                 that.vertical = that._options.vertical;
-                that._inverted = that.vertical ? _String(that._options.horizontalOrientation).toLowerCase() === 'right' : _String(that._options.verticalOrientation).toLowerCase() === 'bottom';
+                that._inverted = that.vertical ? _normalizeEnum(that._options.horizontalOrientation) === 'right' : _normalizeEnum(that._options.verticalOrientation) === 'bottom';
                 return that._options.size > 0
             },
             _isVisible: function() {
@@ -2832,9 +2812,9 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
             _getCosAndSin = utils.getCosAndSin,
             _convertAngleToRendererSpace = utils.convertAngleToRendererSpace,
             _map = $.map,
-            _patchFontOptions = DX.viz.core.utils.patchFontOptions,
+            _patchFontOptions = DX.viz.utils.patchFontOptions,
             _formatHelper = DX.formatHelper,
-            _createTickManager = DX.viz.core.CoreFactory.createTickManager;
+            _createTickManager = DX.viz.CoreFactory.createTickManager;
         function binarySearch(x, list) {
             var a = 0,
                 b = list.length - 1,
@@ -3352,7 +3332,6 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
     (function(DX, $, undefined) {
         var internals = DX.viz.gauges.__internals,
             _Number = Number,
-            _String = String,
             _max = Math.max,
             _abs = Math.abs,
             _isString = DX.utils.isString,
@@ -3360,7 +3339,7 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
             _isFinite = isFinite,
             _each = $.each,
             _map = $.map,
-            _Palette = DX.viz.core.Palette;
+            _normalizeEnum = DX.viz.utils.normalizeEnum;
         internals.BaseRangeContainer = internals.BaseElement.inherit({
             _init: function() {
                 this._root = this._renderer.g().attr({'class': 'dxg-range-container'}).linkOn(this._container, {
@@ -3392,10 +3371,7 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
                             end: totalEnd
                         }],
                     threshold = _abs(totalDelta) / 1E4,
-                    palette = new _Palette(options.palette, {
-                        type: 'indicatingSet',
-                        theme: options.themeName
-                    }),
+                    palette = that._themeManager.createPalette(options.palette, {type: 'indicatingSet'}),
                     backgroundColor = _isString(options.backgroundColor) ? options.backgroundColor : 'none',
                     width = options.width || {},
                     startWidth = _Number(width > 0 ? width : width.start),
@@ -3562,7 +3538,7 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
                 _processOptions: function() {
                     var that = this;
                     that._inner = that._outer = 0;
-                    switch (_String(that._options.orientation).toLowerCase()) {
+                    switch (_normalizeEnum(that._options.orientation)) {
                         case'inside':
                             that._inner = 1;
                             break;
@@ -3599,7 +3575,7 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
                     that.vertical = that._options.vertical;
                     that._inner = that._outer = 0;
                     if (that.vertical)
-                        switch (_String(that._options.horizontalOrientation).toLowerCase()) {
+                        switch (_normalizeEnum(that._options.horizontalOrientation)) {
                             case'left':
                                 that._inner = 1;
                                 break;
@@ -3611,7 +3587,7 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
                                 break
                         }
                     else
-                        switch (_String(that._options.verticalOrientation).toLowerCase()) {
+                        switch (_normalizeEnum(that._options.verticalOrientation)) {
                             case'top':
                                 that._inner = 1;
                                 break;
@@ -3660,7 +3636,7 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
     /*! Module viz-gauges, file title.js */
     (function(DX, $, undefined) {
         var viz = DX.viz,
-            core = viz.core,
+            patchFontOptions = viz.utils.patchFontOptions,
             _isString = DX.utils.isString,
             _max = Math.max,
             _extend = $.extend;
@@ -3696,7 +3672,7 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
                     return that;
                 that._root.linkAppend();
                 if (hasTitle) {
-                    element = that._renderer.text(titleOptions.text, 0, 0).attr({align: 'center'}).css(core.utils.patchFontOptions(titleOptions.font)).append(that._root);
+                    element = that._renderer.text(titleOptions.text, 0, 0).attr({align: 'center'}).css(patchFontOptions(titleOptions.font)).append(that._root);
                     bbox = element.getBBox();
                     y += -bbox.y;
                     element.attr({y: y});
@@ -3705,7 +3681,7 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
                     totalHeight += bbox.height
                 }
                 if (hasSubtitle) {
-                    element = that._renderer.text(subtitleOptions.text, 0, 0).attr({align: 'center'}).css(core.utils.patchFontOptions(subtitleOptions.font)).append(that._root);
+                    element = that._renderer.text(subtitleOptions.text, 0, 0).attr({align: 'center'}).css(patchFontOptions(subtitleOptions.font)).append(that._root);
                     bbox = element.getBBox();
                     y += -bbox.y;
                     element.attr({y: y});
@@ -3736,10 +3712,11 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
         var _Number = Number,
             _String = String,
             _max = Math.max,
-            _each = $.each;
+            _each = $.each,
+            _normalizeEnum = DX.viz.utils.normalizeEnum;
         function patchLayoutOptions(options) {
             if (options.position) {
-                var position = _String(options.position).toLowerCase().split('-');
+                var position = _normalizeEnum(options.position).split('-');
                 options.verticalAlignment = position[0];
                 options.horizontalAlignment = position[1]
             }
@@ -3790,7 +3767,7 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
                         left,
                         top,
                         verticalOverlay = _Number(options.overlay) || 0;
-                    switch (_String(options.verticalAlignment).toLowerCase()) {
+                    switch (_normalizeEnum(options.verticalAlignment)) {
                         case'bottom':
                             top = currentRect.bottom - verticalOverlay;
                             currentRect.bottom += _max(options.height - verticalOverlay, 0);
@@ -3800,7 +3777,7 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
                             currentRect.top -= _max(options.height - verticalOverlay, 0);
                             break
                     }
-                    switch (_String(options.horizontalAlignment).toLowerCase()) {
+                    switch (_normalizeEnum(options.horizontalAlignment)) {
                         case'left':
                             left = rootRect.left;
                             break;
@@ -3880,7 +3857,7 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
     /*! Module viz-gauges, file themeManager.js */
     (function(DX, $, undefined) {
         var _extend = $.extend;
-        var ThemeManager = DX.viz.gauges.__internals.ThemeManager = DX.viz.core.BaseThemeManager.inherit({
+        var ThemeManager = DX.viz.gauges.__internals.ThemeManager = DX.viz.BaseThemeManager.inherit({
                 _themeSection: 'gauge',
                 _fontFields: ['scale.label.font', 'valueIndicators.rangebar.text.font', 'valueIndicators.textcloud.text.font', 'title.font', 'subtitle.font', 'tooltip.font', 'indicator.text.font', 'loadingIndicator.font'],
                 _initializeTheme: function() {
@@ -3895,7 +3872,7 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
             });
         DX.viz.gauges.dxCircularGauge.prototype._factory.ThemeManager = ThemeManager.inherit({_subTheme: "_circular"});
         DX.viz.gauges.dxLinearGauge.prototype._factory.ThemeManager = ThemeManager.inherit({_subTheme: "_linear"});
-        DX.viz.gauges.dxBarGauge.prototype._factory.ThemeManager = DX.viz.core.BaseThemeManager.inherit({
+        DX.viz.gauges.dxBarGauge.prototype._factory.ThemeManager = DX.viz.BaseThemeManager.inherit({
             _themeSection: "barGauge",
             _fontFields: ["label.font", "title.font", "tooltip.font", "loadingIndicator.font"]
         })

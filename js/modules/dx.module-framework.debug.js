@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Single Page App Framework)
-* Version: 15.1.6
-* Build date: Aug 14, 2015
+* Version: 15.1.7
+* Build date: Sep 22, 2015
 *
 * Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -1144,7 +1144,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 this._navigationDevice.uriChanged.add($.proxy(this._uriChangedHandler, this))
             },
             _uriChangedHandler: function(uri) {
-                while (DX.hideTopOverlayCallback.fire());
+                while (DX.hideTopOverlay());
                 this._forceNavigate = true;
                 this.navigate(uri)
             },
@@ -1269,7 +1269,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 this.currentStack = new DX.framework.NavigationStack
             },
             _deviceBackInitiated: function() {
-                if (!DX.hideTopOverlayCallback.fire())
+                if (!DX.hideTopOverlay())
                     this.back({isHardwareButton: true});
                 else
                     this._syncUriWithCurrentNavigationItem()
@@ -1937,8 +1937,12 @@ if (!DevExpress.MOD_FRAMEWORK) {
                         direction: direction,
                         params: viewInfo.routeData
                     };
+                if (that._processRequestResultLockEnabled)
+                    DX.data.utils.processRequestResultLock.obtain();
                 return that._showViewImpl(eventArgs.viewInfo, eventArgs.direction).done(function() {
                         DX.utils.executeAsync(function() {
+                            if (that._processRequestResultLockEnabled)
+                                DX.data.utils.processRequestResultLock.release();
                             that._processEvent("viewShown", eventArgs, viewInfo.model);
                             that._disposeRemovedViews()
                         })
@@ -3071,7 +3075,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 var that = this,
                     result,
                     previousViewInfo = this._getPreviousViewInfo(viewInfo);
-                if (!previousViewInfo || previousViewInfo === viewInfo || DX.fx.off) {
+                if (!previousViewInfo || previousViewInfo === viewInfo) {
                     this._showView(viewInfo);
                     result = that._changeView(viewInfo, previousViewTemplateId)
                 }

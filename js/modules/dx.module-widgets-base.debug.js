@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Common Widgets)
-* Version: 15.1.6
-* Build date: Aug 14, 2015
+* Version: 15.1.7
+* Build date: Sep 22, 2015
 *
 * Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -169,6 +169,10 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 var $element = this.element().addClass(SCROLLABLE_CLASS),
                     $container = this._$container = $("<div>").addClass(SCROLLABLE_CONTAINER_CLASS),
                     $content = this._$content = $("<div>").addClass(SCROLLABLE_CONTENT_CLASS);
+                $element.on(events.addNamespace("beforeactivate", SCROLLABLE), function(e) {
+                    if (!$(e.target).is(":dx-focusable"))
+                        e.preventDefault()
+                });
                 $content.append($element.contents()).appendTo($container);
                 $container.appendTo($element)
             },
@@ -369,13 +373,13 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 return this._$container.height()
             },
             scrollHeight: function() {
-                return this.content().height()
+                return this.content().outerHeight() - 2 * this.option("pushBackValue")
             },
             clientWidth: function() {
                 return this._$container.width()
             },
             scrollWidth: function() {
-                return this.content().width()
+                return this.content().outerWidth()
             },
             update: function() {
                 this._strategy.update();
@@ -425,15 +429,13 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 var elementPositionRelativeToContent = this._elementPositionRelativeToContent($element, isVertical ? 'top' : 'left');
                 var elementPosition = elementPositionRelativeToContent - pushBackOffset;
                 var elementSize = $element[isVertical ? 'outerHeight' : 'outerWidth']();
-                var elementBottom = elementPositionRelativeToContent + elementSize;
-                var scrollLocation = (isVertical ? this.scrollTop() : this.scrollLeft()) - startOffset;
-                var clientSize = (isVertical ? this.clientHeight() : this.clientWidth()) - startOffset - endOffset;
-                var scrollBottom = scrollLocation + clientSize;
-                var isEntirelyVisible = scrollLocation <= elementPosition && scrollBottom >= elementBottom;
-                var isEntirelyWithOversizeVisible = scrollLocation >= elementPosition && scrollBottom <= elementBottom;
-                var isAlreadyVisible = isEntirelyVisible || isEntirelyWithOversizeVisible;
-                var isElementAboveScrollLocation = scrollLocation > elementPosition;
-                return isAlreadyVisible ? scrollLocation : elementPosition - (isElementAboveScrollLocation ? 0 : clientSize - elementSize)
+                var scrollLocation = isVertical ? this.scrollTop() : this.scrollLeft();
+                var clientSize = isVertical ? this.clientHeight() : this.clientWidth();
+                var startDistance = scrollLocation - elementPosition + startOffset;
+                var endDistance = scrollLocation - elementPosition - elementSize + clientSize - endOffset;
+                if (startDistance <= 0 && endDistance >= 0)
+                    return scrollLocation;
+                return scrollLocation - (Math.abs(startDistance) > Math.abs(endDistance) ? endDistance : startDistance)
             },
             _elementPositionRelativeToContent: function($element, prop) {
                 var result = 0;
@@ -844,7 +846,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
         var ui = DX.ui,
             events = ui.events,
             math = Math,
-            translator = DX.translator;
+            translator = DX.translator,
+            titleize = DX.inflector.titleize;
         var realDevice = DX.devices.real;
         var isSluggishPlatform = realDevice.platform === "win8" || realDevice.platform === "android";
         var SCROLLABLE_SIMULATED = "dxSimulatedScrollable",
@@ -891,8 +894,13 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                         if (keyboardElementChange && focusedCorrectElement)
                             callbacks.fire(e.target)
                     };
-                if (window.addEventListener)
-                    window.addEventListener("focus", focusChange, true);
+                if (window.addEventListener) {
+                    var asyncFocus = "onactivate" in document;
+                    if (asyncFocus)
+                        window.addEventListener("activate", focusChange, true);
+                    else
+                        window.addEventListener("focus", focusChange, true)
+                }
                 else
                     window.attachEvent("onfocusin", focusChange);
                 return callbacks
@@ -950,6 +958,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     this._prop = options.direction === HORIZONTAL ? "left" : "top";
                     this._dimension = options.direction === HORIZONTAL ? "width" : "height";
                     this._scrollProp = options.direction === HORIZONTAL ? "scrollLeft" : "scrollTop";
+                    this._pushBackCorrection = options.direction === VERTICAL ? options.pushBackValue * 2 : 0;
                     $.each(options, $.proxy(function(optionName, optionValue) {
                         this["_" + optionName] = optionValue
                     }, this))
@@ -977,10 +986,13 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     this._location += delta;
                     this._suppressBounce();
                     this._move();
-                    if (prevLocation !== this._location) {
-                        this._scrollAction();
-                        $.data(this._$container.get(0), "scroll")()
-                    }
+                    if (Math.abs(prevLocation - this._location) < 1)
+                        return;
+                    this._scrollAction();
+                    this._$container.triggerHandler({
+                        type: "scroll",
+                        simulated: true
+                    })
                 },
                 _suppressBounce: function() {
                     if (this._bounceEnabled || this._inBounds(this._location))
@@ -1149,8 +1161,12 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     })
                 },
                 _moveToBounds: function() {
-                    this._location = this._boundLocation();
-                    this._move()
+                    var location = this._boundLocation();
+                    var locationChanged = location !== this._location;
+                    this._location = location;
+                    this._move();
+                    if (locationChanged)
+                        this._scrollAction()
                 },
                 _createActionsHandler: function(actions) {
                     this._scrollAction = actions.scroll;
@@ -1166,7 +1182,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     return this._$container[this._dimension]()
                 },
                 _contentSize: function() {
-                    return this._$content[this._dimension]()
+                    return this._$content[0]["scroll" + titleize(this._dimension)] - this._pushBackCorrection
                 },
                 _validateEvent: function(e) {
                     var $target = $(e.originalEvent.target);
@@ -1251,7 +1267,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                         scrollbarVisible: this.option("showScrollbar"),
                         bounceEnabled: this.option("bounceEnabled"),
                         inertiaEnabled: this.option("inertiaEnabled"),
-                        isAnyThumbScrolling: $.proxy(this._isAnyThumbScrolling, this)
+                        isAnyThumbScrolling: $.proxy(this._isAnyThumbScrolling, this),
+                        pushBackValue: this.option("pushBackValue")
                     }
             },
             _isAnyThumbScrolling: function($target) {
@@ -1334,7 +1351,9 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this._resetActive();
                 this._eventHandler("stop")
             },
-            handleScroll: function() {
+            handleScroll: function(e) {
+                if (e.simulated)
+                    return;
                 var distance = {
                         left: this.option("direction") !== VERTICAL ? -this._$container.scrollLeft() : 0,
                         top: this.option("direction") !== HORIZONTAL ? -this._$container.scrollTop() : 0
@@ -1532,7 +1551,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 return isWheelEvent(e) ? this._validateWheel(e) : this._validateMove(e)
             },
             _validateWheel: function(e) {
-                var scroller = this._scrollers[this._wheelDirection()];
+                var scroller = this._scrollers[this._wheelDirection(e)];
                 var reachedMin = scroller._reachedMin();
                 var reachedMax = scroller._reachedMax();
                 var contentGreaterThanContainer = !reachedMin || !reachedMax;
@@ -1547,19 +1566,19 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 return this._allowedDirection()
             },
             getDirection: function(e) {
-                return isWheelEvent(e) ? this._wheelDirection() : this._allowedDirection()
+                return isWheelEvent(e) ? this._wheelDirection(e) : this._allowedDirection()
             },
             _wheelProp: function() {
                 return this._wheelDirection() === HORIZONTAL ? "left" : "top"
             },
-            _wheelDirection: function() {
+            _wheelDirection: function(e) {
                 switch (this.option("direction")) {
                     case HORIZONTAL:
                         return HORIZONTAL;
                     case VERTICAL:
                         return VERTICAL;
                     default:
-                        return this._scrollers[VERTICAL]._containerToContentRatio() >= 1 ? HORIZONTAL : VERTICAL
+                        return e && e.shiftKey ? HORIZONTAL : VERTICAL
                 }
             },
             dispose: function() {
@@ -2055,7 +2074,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     this._$icon.css({transform: "rotate(" + angle + "deg)"})
                 },
                 _isPullDown: function() {
-                    return this._pullDownEnabled && this._deltaY >= this._getPullDownHeight() - this._getPullDownStartPosition()
+                    return this._pullDownEnabled && this._state === STATE_PULLED && this._deltaY >= this._getPullDownHeight() - this._getPullDownStartPosition()
                 },
                 _getPullDownHeight: function() {
                     return Math.round(this._$element.outerHeight() * 0.05)
@@ -3558,7 +3577,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
     (function($, DX, undefined) {
         var ui = DX.ui;
         var GOOGLE_MAP_READY = "_googleScriptReady",
-            GOOGLE_URL = "https://maps.google.com/maps/api/js?v=3.18&sensor=false&callback=" + GOOGLE_MAP_READY;
+            GOOGLE_URL = "https://maps.google.com/maps/api/js?sensor=false&callback=" + GOOGLE_MAP_READY;
         var CustomMarker;
         var initCustomMarkerClass = function() {
                 CustomMarker = function(options) {
@@ -4041,8 +4060,12 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this._getAction("onDrag")({jQueryEvent: e})
             },
             _dragStartHandler: function(e) {
-                var $element = this.element(),
-                    $area = this._getArea(),
+                var $element = this.element();
+                if ($element.is(".dx-state-disabled, .dx-state-disabled *")) {
+                    e.cancel = true;
+                    return
+                }
+                var $area = this._getArea(),
                     areaOffset = this._getAreaOffset($area),
                     boundOffset = this._getBoundOffset(),
                     areaWidth = $area.outerWidth(),
@@ -4113,6 +4136,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                         break;
                     case"allowMoveByClick":
                     case"direction":
+                    case"disabled":
                         this._detachEventHandlers();
                         this._attachEventHandlers();
                         break;
@@ -4209,9 +4233,13 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 })
             },
             _dragStartHandler: function(e) {
+                var $element = this.element();
+                if ($element.is(".dx-state-disabled, .dx-state-disabled *")) {
+                    e.cancel = true;
+                    return
+                }
                 this._toggleResizingClass(true);
                 this._movingSides = this._getMovingSides(e);
-                var $element = this.element();
                 this._elementLocation = DX.translator.locate($element);
                 this._elementSize = {
                     width: $element.outerWidth(),
@@ -4347,6 +4375,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             },
             _optionChanged: function(args) {
                 switch (args.name) {
+                    case"disabled":
                     case"handles":
                         this._invalidate();
                         break;
@@ -4461,6 +4490,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                         })
                     })
                 },
+                initSize: $.noop,
                 update: $.noop
             });
         var BOX_EVENTNAMESPACE = "dxBox",
@@ -4636,10 +4666,14 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     return $(item)[FALLBACK_MAIN_SIZE_MAP[this._option("direction")]]()
                 },
                 _parseSize: function(size) {
-                    return String(size).match(/.+%$/) ? 0.01 * parseFloat(size) * this._boxSize() : size
+                    return String(size).match(/.+%$/) ? 0.01 * parseFloat(size) * this._boxSizeValue : size
                 },
-                _boxSize: function() {
-                    return this._$element[FALLBACK_MAIN_SIZE_MAP[this._option("direction")]]()
+                _boxSize: function(value) {
+                    if (!arguments.length) {
+                        this._boxSizeValue = this._boxSizeValue || this._totalBaseSize();
+                        return this._boxSizeValue
+                    }
+                    this._boxSizeValue = value
                 },
                 _totalBaseSize: function() {
                     var result = 0;
@@ -4648,9 +4682,13 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     }, this));
                     return result
                 },
+                initSize: function() {
+                    this._boxSize(this._$element[FALLBACK_MAIN_SIZE_MAP[this._option("direction")]]())
+                },
                 update: function() {
                     if (!this._$items || this._$element.is(":hidden"))
                         return;
+                    this.initSize();
                     this.renderItems(this._$items);
                     this.renderAlign();
                     this.renderCrossAlign();
@@ -4679,7 +4717,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                                 var device = DX.devices.real();
                                 var isOldAndroid = device.platform === "android" && (device.version[0] < 4 || device.version[0] === 4 && device.version[1] < 4),
                                     isOldIos = device.platform === "ios" && device.version[0] < 7;
-                                return DX.browser["msie"] || isOldAndroid || isOldIos
+                                return device.platform === "win8" || DX.browser["msie"] || isOldAndroid || isOldIos
                             },
                             options: {_layoutStrategy: "fallback"}
                         }])
@@ -4712,6 +4750,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this._layout.renderCrossAlign()
             },
             _renderItems: function(items) {
+                this._layout.initSize();
                 this.callBase(items);
                 this._layout.renderItems(this._itemElements());
                 clearTimeout(this._updateTimer);
@@ -4794,6 +4833,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     cols: [],
                     screenByWidth: DEFAULT_SCREEN_FACTOR_FUNC,
                     singleColumnScreen: "xs",
+                    height: "100%",
+                    width: "100%",
                     activeStateEnabled: false,
                     focusStateEnabled: false
                 })
@@ -5267,7 +5308,11 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             _updateAriaLabel: function() {
                 var icon = this.option("icon"),
                     text = this.option("text");
-                icon = utils.getImageSourceType(icon) === "image" ? icon.replace(/.+\/([^\.]+)\..+$/, "$1") : icon;
+                if (utils.getImageSourceType(icon) === "image")
+                    if (icon.indexOf("base64") === -1)
+                        icon = icon.replace(/.+\/([^\.]+)\..+$/, "$1");
+                    else
+                        icon = "Base64";
                 var ariaLabel = text || icon;
                 this.setAria("label", $.trim(ariaLabel))
             },
@@ -5470,8 +5515,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             },
             _init: function() {
                 this.callBase();
-                this._animating = false;
-                this._animationDuration = SWITCH_ANIMATION_DURATION
+                this._animating = false
             },
             _render: function() {
                 var element = this.element();
@@ -5525,6 +5569,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 }, this))
             },
             _clickHandler: function(args) {
+                this.time = new Date;
                 var e = args.jQueryEvent;
                 this._saveValueChangeEvent(e);
                 if (this._animating || this._swiping)
@@ -5548,7 +5593,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 fx.animate(this._$switchInner, {
                     from: fromConfig,
                     to: toConfig,
-                    duration: this._animationDuration,
+                    duration: SWITCH_ANIMATION_DURATION,
                     complete: function() {
                         that._animating = false;
                         that.option("value", endValue)
@@ -5575,7 +5620,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 toConfig["margin" + this._marginDirection()] = this._marginBound * (that.option("value") + offsetDirection * e.jQueryEvent.targetOffset - 1);
                 fx.animate(this._$switchInner, {
                     to: toConfig,
-                    duration: that._animationDuration,
+                    duration: SWITCH_ANIMATION_DURATION,
                     complete: function() {
                         that._swiping = false;
                         var pos = that.option("value") + offsetDirection * e.jQueryEvent.targetOffset;
@@ -5638,7 +5683,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             TEXTEDITOR_CLEAR_ICON_CLASS = "dx-icon-clear",
             TEXTEDITOR_CLEAR_BUTTON_CLASS = "dx-clear-button-area",
             TEXTEDITOR_EMPTY_INPUT_CLASS = "dx-texteditor-empty",
-            TEXTEDITOR_STATE_FOCUSED_CLASS = "dx-state-focused",
             EVENTS_LIST = ["keyDown", "keyPress", "keyUp", "change", "cut", "copy", "paste", "input"];
         DX.registerComponent("dxTextEditor", ui, ui.Editor.inherit({
             _supportedKeys: function() {
@@ -5791,20 +5835,17 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             _togglePlaceholder: function(isEmpty) {
                 if (!this._$placeholder)
                     return;
-                if (DX.browser["msie"])
-                    this._$placeholder.toggle(!this._input().is(":focus") && isEmpty);
-                else
-                    this._$placeholder.toggle(isEmpty)
+                this._$placeholder.toggle(isEmpty)
             },
             _renderProps: function() {
                 this._toggleDisabledState(this.option("disabled"));
                 this._toggleReadOnlyState(this._readOnlyPropValue());
                 this._toggleSpellcheckState()
             },
-            _toggleDisabledState: function() {
+            _toggleDisabledState: function(value) {
                 this.callBase.apply(this, arguments);
                 var $input = this._input();
-                if (this.option("disabled"))
+                if (value)
                     $input.attr("disabled", true).attr("tabindex", -1);
                 else
                     $input.removeAttr("disabled").removeAttr("tabindex")
@@ -5882,13 +5923,13 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     })
                 })
             },
-            _keyUpHandler: function(e) {
+            _keyPressHandler: function(e) {
                 this.option("text", this._input().val())
             },
             _renderValueChangeEvent: function() {
                 var eventNamespace = this.NAME + "ValueChange";
-                var keyUpNamespace = events.addNamespace(this._renderValueEventName(), this.NAME + "TextChange");
-                this._input().off(keyUpNamespace).on(keyUpNamespace, $.proxy(this._keyUpHandler, this));
+                var keyPressNamespace = events.addNamespace(this._renderValueEventName(), this.NAME + "TextChange");
+                this._input().off(keyPressNamespace).on(keyPressNamespace, $.proxy(this._keyPressHandler, this));
                 var valueChangeEventNamespace = events.addNamespace(this.option("valueChangeEvent"), eventNamespace);
                 this._input().off("." + eventNamespace).on(valueChangeEventNamespace, $.proxy(this._executeValueChangeAction, this)).on("paste", $.proxy(this._pasteHandler, this))
             },
@@ -5900,7 +5941,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this._valueChangeEventAction({jQueryEvent: e})
             },
             _renderValueEventName: function() {
-                return "input change keyup"
+                return "input change keypress"
             },
             _focusTarget: function() {
                 return this._input()
@@ -5909,11 +5950,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 clearTimeout(this._pasteTimer);
                 this._pasteTimer = setTimeout($.proxy(this._executeValueChangeAction, this, e))
             },
-            _focusInHandler: function(e) {
-                this.element().addClass(TEXTEDITOR_STATE_FOCUSED_CLASS)
-            },
-            _focusOutHandler: function(e) {
-                this.element().removeClass(TEXTEDITOR_STATE_FOCUSED_CLASS)
+            _toggleFocusClass: function(isFocused) {
+                this.callBase(isFocused, this.element())
             },
             _renderEmptinessEvent: function() {
                 var $input = this._input();
@@ -6050,12 +6088,30 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 "0": /[0-9]/,
                 "9": /[0-9\s]/,
                 "#": /[-+0-9\s]/,
-                L: /[a-zA-Z]/,
-                l: /[a-zA-Z\s]/,
+                L: function(char) {
+                    return isLiteralChar(char)
+                },
+                l: function(char) {
+                    return isLiteralChar(char) || isSpaceChar(char)
+                },
                 C: /\S/,
                 c: /./,
-                A: /[0-9a-zA-Z]/,
-                a: /[0-9a-zA-Z\s]/
+                A: function(char) {
+                    return isLiteralChar(char) || isNumericChar(char)
+                },
+                a: function(char) {
+                    return isLiteralChar(char) || isNumericChar(char) || isSpaceChar(char)
+                }
+            };
+        var isNumericChar = function(char) {
+                return /[0-9]/.test(char)
+            };
+        var isLiteralChar = function(char) {
+                var code = char.charCodeAt();
+                return 64 < code && code < 91 || 96 < code && code < 123 || code > 127
+            };
+        var isSpaceChar = function(char) {
+                return char === " "
             };
         var CONTROL_KEYS = {
                 9: "tab",
@@ -6108,7 +6164,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this._renderMaskedValue()
             },
             _attachMaskEventHandlers: function() {
-                this._input().off("." + MASK_EVENT_NAMESPACE).on(events.addNamespace("focus", MASK_EVENT_NAMESPACE), $.proxy(this._maskFocusHandler, this)).on(events.addNamespace("keypress", MASK_EVENT_NAMESPACE), $.proxy(this._maskKeyPressHandler, this)).on(events.addNamespace("paste", MASK_EVENT_NAMESPACE), $.proxy(this._maskPasteHandler, this)).on(events.addNamespace("cut", MASK_EVENT_NAMESPACE), $.proxy(this._maskCutHandler, this)).on(events.addNamespace("drop", MASK_EVENT_NAMESPACE), $.proxy(this._maskDragHandler, this));
+                this._input().off("." + MASK_EVENT_NAMESPACE).on(events.addNamespace("focus", MASK_EVENT_NAMESPACE), $.proxy(this._maskFocusHandler, this)).on(events.addNamespace("keypress", MASK_EVENT_NAMESPACE), $.proxy(this._maskKeyPressHandler, this)).on(events.addNamespace("input", MASK_EVENT_NAMESPACE), $.proxy(this._maskInputHandler, this)).on(events.addNamespace("paste", MASK_EVENT_NAMESPACE), $.proxy(this._maskPasteHandler, this)).on(events.addNamespace("cut", MASK_EVENT_NAMESPACE), $.proxy(this._maskCutHandler, this)).on(events.addNamespace("drop", MASK_EVENT_NAMESPACE), $.proxy(this._maskDragHandler, this));
                 this._attachChangeEventHandlers()
             },
             _attachChangeEventHandlers: function() {
@@ -6153,7 +6209,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this._maskRulesChain.clear();
                 this._handleChain({
                     value: value,
-                    length: value.length
+                    length: value ? value.length : 0
                 });
                 this._displayMask()
             },
@@ -6181,12 +6237,33 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this._adjustCaret()
             },
             _maskKeyPressHandler: function(e) {
+                this._keyPressHandled = true;
                 if (this._isControlKeyFired(e))
                     return;
                 this._maskKeyHandler(e, function() {
                     this._handleKey(e.which);
                     return true
                 })
+            },
+            _maskInputHandler: function(e) {
+                if (this._keyPressHandled) {
+                    this._keyPressHandled = false;
+                    return
+                }
+                var inputValue = this._input().val();
+                var caret = this._caret();
+                var oldValue = inputValue.substring(0, caret.start) + inputValue.substring(caret.end);
+                var char = inputValue[caret.start];
+                this._input().val(oldValue);
+                this._caret({
+                    start: caret.start,
+                    end: caret.start
+                });
+                this._maskKeyHandler(e, function() {
+                    this._handleKey(char.charCodeAt());
+                    return true
+                });
+                this._keyPressHandled = false
             },
             _isControlKeyFired: function(e) {
                 return CONTROL_KEYS[e.keyCode] && !e.which || e.metaKey
@@ -6436,7 +6513,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 },
                 handle: function(args) {
                     var str = args.hasOwnProperty("value") ? args.value : args.text;
-                    if (!str.length || !args.length)
+                    if (!str || !str.length || !args.length)
                         return 0;
                     if (args.start)
                         return this.next().handle(this._prepareHandlingArgs(args, {start: args.start - 1}));
@@ -6761,10 +6838,10 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     opened: false,
                     fieldEditEnabled: true,
                     applyValueMode: "instantly",
+                    deferRendering: true,
                     fieldTemplate: null,
                     contentTemplate: null,
                     openOnFieldClick: false,
-                    deferRendering: true,
                     showDropButton: true,
                     popupPosition: this._getDefaultPopupPosition(),
                     applyButtonText: Globalize.localize("OK"),
@@ -6901,11 +6978,15 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             _toggleOpenState: function(isVisible) {
                 if (this.option("disabled"))
                     return;
-                this._input().focus();
+                if (this._needFocusOnButtonClick())
+                    this._input().focus();
                 if (!this.option("readOnly")) {
                     isVisible = arguments.length ? isVisible : !this.option("opened");
                     this.option("opened", isVisible)
                 }
+            },
+            _needFocusOnButtonClick: function() {
+                return DX.devices.real().deviceType === "desktop"
             },
             _renderOpenedState: function() {
                 var opened = this.option("opened");
@@ -7145,11 +7226,10 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                         tab: function(e) {
                             if (this.option("opened") === true) {
                                 var $focusedItem = this._list.option("focusedElement");
-                                if ($focusedItem) {
-                                    var $selectedItem = this._listSelectedItemElements();
-                                    this._changeSelectedItem($selectedItem, $focusedItem);
-                                    this.option("value", this._selectedItemValue())
-                                }
+                                if ($focusedItem)
+                                    this._setSelectedElement($focusedItem);
+                                else
+                                    this._selectFirstItem();
                                 this.close()
                             }
                             else
@@ -7159,6 +7239,14 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                         home: $.noop,
                         end: $.noop
                     })
+            },
+            _selectFirstItem: function() {
+                this._setSelectedElement(this._listItemElements().first())
+            },
+            _setSelectedElement: function($element) {
+                var $selectedItem = this._listSelectedItemElements();
+                this._changeSelectedItem($selectedItem, $element);
+                this.option("value", this._selectedItemValue())
             },
             _setDeprecatedOptions: function() {
                 this.callBase();
@@ -7203,6 +7291,9 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                                 return device.platform === "android"
                             },
                             options: {popupWidthExtension: 32}
+                        }, {
+                            device: {platform: "ios"},
+                            options: {popupPosition: {offset: {v: -1}}}
                         }])
             },
             _setOptionsByReference: function() {
@@ -7234,11 +7325,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             },
             _initItemClickAction: function() {
                 this._itemClickAction = this._createActionByOption("onItemClick")
-            },
-            _renderContentImpl: function() {
-                this.callBase();
-                if (this.option("deferRendering"))
-                    this._loadDataSource()
             },
             _renderField: function() {
                 this.callBase();
@@ -7347,12 +7433,15 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this._setListOption("_keyboardProcessor", this._childKeyboardProcessor)
             },
             _fireContentReadyAction: $.noop,
+            _setAriaTargetForList: function() {
+                this._list._getAriaTarget = $.proxy(this._getAriaTarget, this)
+            },
             _renderList: function() {
                 this._listId = (new DevExpress.data.Guid)._value;
                 var $list = this._$list = $("<div>", {id: this._listId}).appendTo(this._popup.content());
                 this._list = this._createComponent($list, "dxList", this._listConfig());
                 this._refreshList();
-                this._list._getAriaTarget = $.proxy(this._getAriaTarget, this)
+                this._setAriaTargetForList()
             },
             _renderOpenedState: function() {
                 this.callBase();
@@ -7524,6 +7613,9 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             },
             _setCollectionWidgetOption: function() {
                 this._setListOption.apply(this, arguments)
+            },
+            _needFocusOnButtonClick: function() {
+                return true
             },
             _optionChanged: function(args) {
                 this._dataExpressionOptionChanged(args);
@@ -7739,25 +7831,22 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this.callBase();
                 this.element().addClass(WIDGET_CLASS);
                 this.setAria("role", "spinbutton");
-                this._keyPressHandlerEvent();
                 this._renderMouseWheelHandler()
             },
-            _keyPressHandlerEvent: function() {
-                var that = this;
-                this._input().keypress(function(e) {
-                    var ch = String.fromCharCode(e.which),
-                        validCharRegExp = /[\d.,eE\-+]/,
-                        isInputCharValid = validCharRegExp.test(ch);
-                    if (!isInputCharValid) {
-                        if (e.metaKey || e.ctrlKey || e.key && $.inArray(e.key, CONTROL_KEYS) >= 0)
-                            return;
-                        e.preventDefault();
-                        return false
-                    }
-                    that._isIncompleteValue = false;
-                    if (that._isValueIncomplete(that._input().val() + ch))
-                        that._isIncompleteValue = true
-                })
+            _keyPressHandler: function(e) {
+                this.callBase(e);
+                var ch = String.fromCharCode(e.which),
+                    validCharRegExp = /[\d.,eE\-+]/,
+                    isInputCharValid = validCharRegExp.test(ch);
+                if (!isInputCharValid) {
+                    if (e.metaKey || e.ctrlKey || e.key && $.inArray(e.key, CONTROL_KEYS) >= 0)
+                        return;
+                    e.preventDefault();
+                    return false
+                }
+                this._isIncompleteValue = false;
+                if (this._isValueIncomplete(this._input().val()))
+                    this._isIncompleteValue = true
             },
             _isValueIncomplete: function(value) {
                 var expRegex = /\d+[eE]$/,
@@ -7787,6 +7876,13 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 }
                 this._renderInputAddons();
                 this.setAria("valuenow", this.option("value"))
+            },
+            _toggleDisabledState: function(value) {
+                if (this._$spinUp)
+                    this._$spinUp.dxSpinButton("option", "disabled", value);
+                if (this._$spinDown)
+                    this._$spinDown.dxSpinButton("option", "disabled", value);
+                this.callBase.apply(this, arguments)
             },
             _forceValueRender: function() {
                 var $input = this._input(),
@@ -8170,8 +8266,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     focusStateEnabled: this.option("focusStateEnabled"),
                     accessKey: this.option("accessKey"),
                     tabIndex: this.option("tabIndex"),
-                    noDataText: "",
-                    disabled: this.option("disabled")
+                    noDataText: ""
                 });
                 this._setCollectionWidgetOption("onContentReady", $.proxy(this._contentReadyHandler, this));
                 this._contentReadyHandler()
@@ -8441,7 +8536,10 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     clearInterval(this._holdInterval)
             },
             _renderSelection: function(addedSelection) {
-                this._scrollable && this._scrollable.scrollToElement(this.itemElements().eq(addedSelection[0]))
+                this._scrollable && this._scrollable.scrollToElement(this.itemElements().eq(addedSelection[0]), {
+                    left: 1,
+                    right: 1
+                })
             },
             _visibilityChanged: function(visible) {
                 if (visible)
@@ -8609,12 +8707,13 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 $section.children().not(TOOLBAR_LABEL_SELECTOR).each(function() {
                     elemsAtSectionWidth += $(this).outerWidth()
                 });
-                var freeSpace = containerWidth - elemsAtSectionWidth;
-                var centeredLabelWidth = freeSpace - Math.max(widthBeforeSection, widthAfterSection) * 2,
+                var freeSpace = containerWidth - elemsAtSectionWidth,
+                    centeredLabelWidth = freeSpace - Math.max(widthBeforeSection, widthAfterSection) * 2,
                     labelLongerThanCenteredWidth = $label.outerWidth() > centeredLabelWidth;
                 $section.css({
                     marginLeft: labelLongerThanCenteredWidth ? widthBeforeSection : "",
-                    marginRight: labelLongerThanCenteredWidth ? widthAfterSection : ""
+                    marginRight: labelLongerThanCenteredWidth ? widthAfterSection : "",
+                    float: labelLongerThanCenteredWidth && widthAfterSection > widthBeforeSection ? "right" : "none"
                 });
                 var labelPaddings = $label.outerWidth() - $label.width();
                 $label.css("max-width", freeSpace - widthBeforeSection - widthAfterSection - labelPaddings)
@@ -8845,6 +8944,13 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             _renderDimensions: function() {
                 this.callBase();
                 this._arrangeTitle()
+            },
+            _itemOptionChanged: function(index, property, value) {
+                var itemData = this.option("items")[index];
+                if (itemData.location === "menu")
+                    this._renderMenuItems();
+                else
+                    this.callBase.apply(this, arguments)
             },
             _optionChanged: function(args) {
                 var name = args.name;
@@ -9608,10 +9714,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             },
             _optionChanged: function(args) {
                 switch (args.name) {
-                    case"items":
-                        this._clearSelectedItems();
-                        this.callBase(args);
-                        break;
                     case"grouped":
                         this._clearSelectedItems();
                         delete this._renderingGroupIndex;
@@ -10249,13 +10351,19 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             },
             _swipeStartHandler: function($itemElement) {
                 this._enablePositioning($itemElement);
-                this._cacheItemData($itemElement)
+                this._cacheItemData($itemElement);
+                this._setPositions(this._getPostions(0))
             },
             _swipeUpdateHandler: function($itemElement, args) {
                 var rtl = this._isRtlEnabled(),
                     signCorrection = rtl ? -1 : 1,
-                    offset = this._cachedItemWidth * args.offset,
-                    startOffset = this._isReadyToDelete($itemElement) ? -this._cachedButtonWidth * signCorrection : 0,
+                    isItemReadyToDelete = this._isReadyToDelete($itemElement);
+                if (!isItemReadyToDelete && args.offset * signCorrection > 0) {
+                    args.cancel = true;
+                    return
+                }
+                var offset = this._cachedItemWidth * args.offset,
+                    startOffset = isItemReadyToDelete ? -this._cachedButtonWidth * signCorrection : 0,
                     correctedOffset = (offset + startOffset) * signCorrection,
                     percent = correctedOffset < 0 ? Math.abs((offset + startOffset) / this._cachedButtonWidth) : 0;
                 this._setPositions(this._getPostions(percent));
@@ -10661,7 +10769,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     $container = config.$container;
                 var $handle = $("<div>").addClass(REORDER_HANDLE_CLASS);
                 $handle.on(DRAG_START_EVENT_NAME, {
-                    direction: "vertical",
+                    direction: "both",
                     immediate: true
                 }, $.proxy(this._dragStartHandler, this, $itemElement));
                 $handle.on(DRAG_UPDATE_EVENT_NAME, $.proxy(this._dragHandler, this, $itemElement));
@@ -11069,8 +11177,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     direction: "horizontal",
                     scrollByContent: true,
                     useKeyboard: false,
-                    showScrollbar: this.option("showScrollbar"),
-                    disabled: this.option("disabled")
+                    showScrollbar: this.option("showScrollbar")
                 });
                 this._$container = this._scrollView.content();
                 this._$container.addClass(TILEVIEW_CONTAINER_CLASS);
@@ -11331,7 +11438,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     return
                 }
                 var ratio = min === max ? 0 : (val - min) / (max - min);
-                this._animateRange({width: ratio * 100 + "%"});
+                !this._needPreventAnimation && this._setRangeStyles({width: ratio * 100 + "%"});
                 this.setAria({
                     valuemin: this.option("min"),
                     valuemax: max,
@@ -11339,17 +11446,15 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 });
                 this._currentRatio = ratio
             },
-            _animateRange: function(configTo) {
+            _setRangeStyles: function(options) {
                 fx.stop(this._$range);
                 if (!this._needPreventAnimation)
                     fx.animate(this._$range, {
                         type: "custom",
                         duration: 100,
-                        to: configTo,
-                        complete: $.proxy(this._rangeAnimationCompleteHandler, this)
+                        to: options
                     })
             },
-            _rangeAnimationCompleteHandler: $.noop,
             _optionChanged: function(args) {
                 switch (args.name) {
                     case"value":
@@ -11535,22 +11640,22 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 top: {
                     my: "bottom center",
                     at: "top center",
-                    collision: "fit none"
+                    collision: "none"
                 },
                 bottom: {
                     my: "top center",
                     at: "bottom center",
-                    collision: "fit none"
+                    collision: "none"
                 },
                 right: {
                     my: "left center",
                     at: "right center",
-                    collision: "none fit"
+                    collision: "none"
                 },
                 left: {
                     my: "right center",
                     at: "left center",
-                    collision: "none fit"
+                    collision: "none"
                 }
             };
         var dxSliderHandle = ui.Widget.inherit({
@@ -11558,7 +11663,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     this.callBase();
                     this.option({
                         hoverStateEnabled: false,
-                        value: 50,
+                        value: 0,
                         tooltipEnabled: false,
                         tooltipFormat: function(v) {
                             return v
@@ -11592,6 +11697,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                                 arrowPosition: null
                             })
                         }
+                        this._$slider = this.element().closest("." + SLIDER_CLASS);
                         this._renderTooltipPosition();
                         this._renderTooltipShowMode();
                         this._renderValue()
@@ -11603,7 +11709,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     this._dimensionChanged()
                 },
                 _dimensionChanged: function() {
-                    this._repaintTooltip()
+                    this._renderTooltipPosition()
                 },
                 _removeTooltip: function() {
                     if (!this._$tooltip)
@@ -11616,19 +11722,65 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     if (!this._tooltip)
                         return;
                     var position = this.option("tooltipPosition");
+                    this._saveTooltipElements();
+                    this._resetTooltipPosition();
                     if ($.type(position) === "string")
                         position = $.extend({
-                            boundary: this.element().closest(".dx-slider"),
+                            boundary: this._$slider,
                             boundaryOffset: {
                                 h: 1,
                                 v: 1
                             }
                         }, POSITION_ALIASES[position]);
-                    this._tooltip.option("position", position)
+                    this._tooltip.option("position", position);
+                    this._saveTooltipLocation();
+                    this._centeredTooltipPosition()
                 },
-                _repaintTooltip: function() {
-                    if (this._tooltip)
-                        this._tooltip.repaint()
+                _saveTooltipElements: function() {
+                    this._$tooltipContent = this._tooltip.content().parent();
+                    this._$tooltipArrow = this._$tooltipContent.find(".dx-popover-arrow")
+                },
+                _resetTooltipPosition: function() {
+                    DX.translator.resetPosition(this._$tooltipContent);
+                    DX.translator.resetPosition(this._$tooltipArrow)
+                },
+                _saveTooltipLocation: function() {
+                    this._contentLocate = DX.translator.locate(this._$tooltipContent);
+                    this._arrowLocate = DX.translator.locate(this._$tooltipArrow)
+                },
+                _centeredTooltipPosition: function() {
+                    if (!this._tooltip)
+                        return;
+                    this._$tooltipContent.outerWidth("auto");
+                    var outerWidthWithoutRounding = this._$tooltipContent.get(0).getBoundingClientRect().width;
+                    var tooltipOuterWidth = Math.ceil(outerWidthWithoutRounding);
+                    var roundedTooltipOuterWidth = tooltipOuterWidth % 2 + tooltipOuterWidth;
+                    this._$tooltipContent.outerWidth(roundedTooltipOuterWidth);
+                    var tooltipCenter = (roundedTooltipOuterWidth - this.element().width()) / 2;
+                    this._contentLocate.left = -tooltipCenter;
+                    this._$tooltipArrow.css({
+                        marginLeft: -this._$tooltipArrow.outerWidth() / 2,
+                        left: "50%"
+                    });
+                    this._fitTooltip()
+                },
+                _fitTooltip: function() {
+                    if (!this._tooltip)
+                        return;
+                    var position = this.option("tooltipPosition");
+                    if ($.type(position) === "string")
+                        position = $.extend({
+                            of: this.element(),
+                            boundary: this._$slider,
+                            boundaryOffset: {
+                                h: 1,
+                                v: 1
+                            }
+                        }, POSITION_ALIASES[position], {collision: 'fit none'});
+                    var calculatePosition = DX.calculatePosition(this._$tooltipContent, position);
+                    var isLeftSide = calculatePosition.h.collisionSide === "left";
+                    DX.translator.move(this._$tooltipContent, {left: this._contentLocate.left + (isLeftSide ? 1 : -1) * calculatePosition.h.oversize});
+                    DX.translator.move(this._$tooltipArrow, {left: this._arrowLocate.left + (isLeftSide ? -1 : 1) * calculatePosition.h.oversize})
                 },
                 _renderValue: function() {
                     if (!this._tooltip)
@@ -11636,7 +11788,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     var format = this.option("tooltipFormat"),
                         value = format(this.option("value"));
                     this._tooltip.content().html(value);
-                    this._repaintTooltip()
+                    this._fitTooltip()
                 },
                 _renderTooltipShowMode: function() {
                     this.element().toggleClass("dx-slider-tooltip-on-hover", /^onhover$/i.test(this.option("tooltipShowMode")))
@@ -11653,6 +11805,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                             break;
                         case"value":
                             this._renderValue();
+                            if (args.value.toString().length === args.previousValue.toString().length)
+                                this._centeredTooltipPosition();
                             this.setAria("valuenow", args.value);
                             break;
                         case"tooltipEnabled":
@@ -11665,7 +11819,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                             this._renderTooltipShowMode();
                             break;
                         case"tooltipFitIn":
-                            this._repaintTooltip();
+                            this._fitTooltip();
                             break;
                         case"_templates":
                         case"templateProvider":
@@ -11675,11 +11829,10 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     }
                 },
                 fitTooltipPosition: function() {
-                    this._repaintTooltip()
+                    this._fitTooltip()
                 },
                 repaint: function() {
                     this._renderTooltipPosition();
-                    this._repaintTooltip();
                     DX.utils.triggerShownEvent(this.element())
                 }
             });
@@ -11776,7 +11929,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this.callBase();
                 this._renderLabels();
                 this._renderStartHandler();
-                this._renderAriaMinAndMax()
+                this._renderAriaMinAndMax();
+                this._repaintHandle()
             },
             _visibilityChanged: function() {
                 this.repaint()
@@ -11931,6 +12085,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 var offsetDirection = this.option("rtlEnabled") ? -1 : 1;
                 var newRatio = this._startOffset + offsetDirection * e.jQueryEvent.offset / this._swipePixelRatio();
                 this._$range.width(newRatio * 100 + "%");
+                this._activeHandle().dxSliderHandle("fitTooltipPosition");
                 this._changeValueOnSwipe(newRatio)
             },
             _swipePixelRatio: function() {
@@ -11976,17 +12131,20 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             },
             _renderValue: function() {
                 this.callBase();
-                this._activeHandle().dxSliderHandle("option", "value", this.option("value"))
+                var value = this.option("value");
+                this._activeHandle().dxSliderHandle("option", "value", value)
             },
-            _rangeAnimationCompleteHandler: function() {
-                this._fitHandleTooltipPosition()
+            _setRangeStyles: function(options) {
+                this._$range.css(options)
             },
-            _fitHandleTooltipPosition: function() {
-                if (this._activeHandle())
-                    this._activeHandle().dxSliderHandle("fitTooltipPosition")
+            _callHandlerMethod: function(name, args) {
+                this._$handle.dxSliderHandle("instance")[name](args)
             },
             _repaintHandle: function() {
-                this._$handle.dxSliderHandle("repaint")
+                this._callHandlerMethod("repaint")
+            },
+            _fitTooltip: function() {
+                this._callHandlerMethod("fitTooltipPosition")
             },
             _optionChanged: function(args) {
                 switch (args.name) {
@@ -12001,6 +12159,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                         this._renderLabels();
                         this._renderAriaMinAndMax();
                         this.callBase(args);
+                        this._fitTooltip();
                         break;
                     case"step":
                         this._renderValue();
@@ -12118,7 +12277,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             },
             _render: function() {
                 this.callBase();
-                this.element().addClass(RANGE_SLIDER_CLASS)
+                this.element().addClass(RANGE_SLIDER_CLASS);
+                this._callHandlerMethod("repaint")
             },
             _renderHandle: function() {
                 this._$handleStart = this._renderHandleImpl(this.option("start"), this._$handleStart).addClass(RANGE_SLIDER_START_HANDLE_CLASS);
@@ -12153,6 +12313,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 newRatio = newRatio.toPrecision(12);
                 var newValue = newRatio * (max - min) + min;
                 this._updateSelectedRangePosition(newRatio, newRatio);
+                this._activeHandle().dxSliderHandle("fitTooltipPosition");
                 this._changeValueOnSwipe(newRatio);
                 var startValue = this.option("start"),
                     endValue = this.option("end"),
@@ -12224,16 +12385,16 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     ratio2 = max === min ? 0 : (valEnd - min) / (max - min);
                 var startOffset = parseFloat((ratio1 * 100).toPrecision(12)) + "%",
                     endOffset = parseFloat(((1 - ratio2) * 100).toPrecision(12)) + "%";
-                this._animateRange({
+                !this._needPreventAnimation && this._setRangeStyles({
                     right: rtlEnabled ? startOffset : endOffset,
                     left: rtlEnabled ? endOffset : startOffset
                 });
                 this._$handleStart.dxSliderHandle("option", "value", valStart);
                 this._$handleEnd.dxSliderHandle("option", "value", valEnd)
             },
-            _repaintHandle: function() {
-                this._$handleStart.dxSliderHandle("repaint");
-                this._$handleEnd.dxSliderHandle("repaint")
+            _callHandlerMethod: function(name, args) {
+                this._$handleStart.dxSliderHandle("instance")[name](args);
+                this._$handleEnd.dxSliderHandle("instance")[name](args)
             },
             _optionChanged: function(args) {
                 switch (args.name) {
@@ -12951,7 +13112,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             TAB_KEY = 9;
         var realDevice = DX.devices.real(),
             realVersion = realDevice.version,
-            iOS7_0andBelow = realDevice.platform === "ios" && DX.compareVersions(realVersion, [7, 1]) < 0,
+            iOS = realDevice.platform === "ios",
+            iOS7_0andBelow = iOS && DX.compareVersions(realVersion, [7, 1]) < 0,
             android4_0nativeBrowser = realDevice.platform === "android" && DX.compareVersions(realVersion, [4, 0], 2) === 0 && navigator.userAgent.indexOf("Chrome") === -1;
         var forceRepaint = function($element) {
                 if (iOS7_0andBelow)
@@ -12977,9 +13139,10 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                             return;
                         e.preventDefault();
                         e.stopPropagation();
+                        var allowedOffsets = this._allowedOffsets();
                         var offset = {
-                                top: top,
-                                left: left
+                                top: utils.fitIntoRange(top, -allowedOffsets.top, allowedOffsets.bottom),
+                                left: utils.fitIntoRange(left, -allowedOffsets.left, allowedOffsets.right)
                             };
                         this._changePosition(offset)
                     };
@@ -12987,8 +13150,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                         escape: function(e) {
                             this.hide()
                         },
-                        downArrow: $.proxy(move, this, offsetSize, 0),
                         upArrow: $.proxy(move, this, -offsetSize, 0),
+                        downArrow: $.proxy(move, this, offsetSize, 0),
                         leftArrow: $.proxy(move, this, 0, -offsetSize),
                         rightArrow: $.proxy(move, this, 0, offsetSize)
                     })
@@ -13171,6 +13334,10 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             _documentDownHandler: function(e) {
                 if (!this._isTopOverlay())
                     return;
+                if (this._showAnimationProcessing) {
+                    this._stopAnimation();
+                    return
+                }
                 var closeOnOutsideClick = this.option("closeOnOutsideClick");
                 if ($.isFunction(closeOnOutsideClick))
                     closeOnOutsideClick = closeOnOutsideClick(e);
@@ -13223,6 +13390,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     deferred = $.Deferred(),
                     animation = that.option("animation") || {},
                     showAnimation = this._normalizeAnimation(animation.show, "to"),
+                    startShowAnimation = showAnimation && showAnimation.start || $.noop,
                     completeShowAnimation = showAnimation && showAnimation.complete || $.noop;
                 if (this._isHidingActionCancelled) {
                     delete this._isHidingActionCancelled;
@@ -13234,8 +13402,12 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                         if (that.option("focusStateEnabled"))
                             that._focusTarget().focus();
                         completeShowAnimation.apply(this, arguments);
+                        that._showAnimationProcessing = false;
                         that._actions.onShown();
                         deferred.resolve()
+                    }, function() {
+                        startShowAnimation.apply(this, arguments);
+                        that._showAnimationProcessing = true
                     })
                 }
                 return deferred.promise()
@@ -13274,10 +13446,10 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 }
                 return deferred.promise()
             },
-            _animate: function(animation, completeCallback) {
+            _animate: function(animation, completeCallback, startCallback) {
                 if (animation) {
-                    var startCallback = animation.start || $.noop,
-                        $content = this._$content;
+                    startCallback = startCallback || animation.start || $.noop;
+                    var $content = this._$content;
                     fx.animate(this._$content, $.extend({}, animation, {
                         start: function() {
                             $content.css("pointer-events", "none");
@@ -13385,26 +13557,28 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             _toggleParentsScrollSubscription: function(subscribe) {
                 if (!this._position)
                     return;
-                var that = this,
-                    target = that._position.of || $(),
+                var target = this._position.of || $(),
                     closeOnScroll = this.option("closeOnTargetScroll"),
-                    $parents = getElement(target).parents();
+                    $parents = getElement(target).parents(),
+                    scrollEvents = events.addNamespace("scroll", this.NAME);
                 if (DX.devices.real().platform === "generic")
                     $parents = $parents.add(window);
-                $().add(this._$prevTargetParents).off(events.addNamespace("scroll dxscroll", that.NAME));
+                this._proxiedTargetParentsScrollHandler = this._proxiedTargetParentsScrollHandler || $.proxy(function(e) {
+                    this._targetParentsScrollHandler(e)
+                }, this);
+                $().add(this._$prevTargetParents).off(scrollEvents, this._proxiedTargetParentsScrollHandler);
                 if (subscribe && closeOnScroll) {
-                    $parents.on(events.addNamespace("scroll dxscroll", that.NAME), function(e) {
-                        if (e.overlayProcessed)
-                            return;
-                        e.overlayProcessed = true;
-                        var closeHandled = false;
-                        if ($.isFunction(closeOnScroll))
-                            closeHandled = closeOnScroll(e);
-                        if (!closeHandled)
-                            that.hide()
-                    });
+                    $parents.on(scrollEvents, this._proxiedTargetParentsScrollHandler);
                     this._$prevTargetParents = $parents
                 }
+            },
+            _targetParentsScrollHandler: function(e) {
+                var closeHandled = false,
+                    closeOnScroll = this.option("closeOnTargetScroll");
+                if ($.isFunction(closeOnScroll))
+                    closeHandled = closeOnScroll(e);
+                if (!closeHandled)
+                    this.hide()
             },
             _renderContent: function() {
                 var shouldDeferRendering = !this.option("visible") && this.option("deferRendering");
@@ -13487,15 +13661,11 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     x: 0,
                     y: 0
                 };
-                var position = translator.locate(this._$content),
-                    allowedOffsets = this._allowedOffsets();
-                var deltaSize = this._deltaSize();
-                var isAllowedDrag = deltaSize.height >= 0 && deltaSize.width >= 0;
-                this._geometryChangeHandled = isAllowedDrag;
-                e.maxLeftOffset = isAllowedDrag ? position.left + allowedOffsets.left : 0;
-                e.maxRightOffset = isAllowedDrag ? -position.left + allowedOffsets.right : 0;
-                e.maxTopOffset = isAllowedDrag ? position.top + allowedOffsets.top : 0;
-                e.maxBottomOffset = isAllowedDrag ? -position.top + allowedOffsets.bottom : 0
+                var allowedOffsets = this._allowedOffsets();
+                e.maxTopOffset = allowedOffsets.top;
+                e.maxBottomOffset = allowedOffsets.bottom;
+                e.maxLeftOffset = allowedOffsets.left;
+                e.maxRightOffset = allowedOffsets.right
             },
             _deltaSize: function() {
                 var $content = this._$content,
@@ -13524,16 +13694,19 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 translator.move(this._$content, {
                     left: position.left + offset.left,
                     top: position.top + offset.top
-                })
+                });
+                this._geometryChangeHandled = true
             },
             _allowedOffsets: function() {
-                var deltaSize = this._deltaSize(),
+                var position = translator.locate(this._$content),
+                    deltaSize = this._deltaSize(),
+                    isAllowedDrag = deltaSize.height >= 0 && deltaSize.width >= 0,
                     boundaryOffset = this.option("boundaryOffset");
                 return {
-                        top: boundaryOffset.v,
-                        bottom: deltaSize.height - boundaryOffset.v,
-                        left: boundaryOffset.h,
-                        right: deltaSize.width - boundaryOffset.h
+                        top: isAllowedDrag ? position.top + boundaryOffset.v : 0,
+                        bottom: isAllowedDrag ? -position.top + deltaSize.height - boundaryOffset.v : 0,
+                        left: isAllowedDrag ? position.left + boundaryOffset.h : 0,
+                        right: isAllowedDrag ? -position.left + deltaSize.width - boundaryOffset.h : 0
                     }
             },
             _fireContentReadyAction: function() {
@@ -13573,7 +13746,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             _renderShading: function() {
                 var $wrapper = this._$wrapper,
                     $container = this._getContainer();
-                $wrapper.css("position", this._isWindow($container) ? "fixed" : "absolute");
+                $wrapper.css("position", this._isWindow($container) && !iOS ? "fixed" : "absolute");
                 if (this.option("shading"))
                     $wrapper.show();
                 this._renderShadingDimensions();
@@ -13627,9 +13800,9 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     $content = this._$content;
                     position = translator.locate($content);
                     allowedOffsets = this._allowedOffsets();
-                    translator.move($content, {
-                        top: utils.fitIntoRange(position.top, -allowedOffsets.top, allowedOffsets.bottom),
-                        left: utils.fitIntoRange(position.left, -allowedOffsets.left, allowedOffsets.right)
+                    this._changePosition({
+                        top: utils.fitIntoRange(0, -allowedOffsets.top, allowedOffsets.bottom),
+                        left: utils.fitIntoRange(0, -allowedOffsets.left, allowedOffsets.right)
                     })
                 }
                 else {
@@ -13675,6 +13848,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this._renderGeometry()
             },
             _clean: function() {
+                if (!this._contentAlreadyRendered)
+                    this.content().empty();
                 this._cleanFocusState()
             },
             _dispose: function() {
@@ -13738,6 +13913,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                         break;
                     case"deferRendering":
                     case"contentTemplate":
+                        this._contentAlreadyRendered = false;
                         this._invalidate();
                         break;
                     case"closeOnBackButton":
@@ -14714,9 +14890,12 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             _setDefaultOptions: function() {
                 this.callBase();
                 this.option({
+                    buttons: [],
+                    showCloseButton: false,
                     showTitle: false,
                     title: undefined,
                     titleTemplate: undefined,
+                    onTitleRendered: undefined,
                     bottomTemplate: undefined
                 })
             },
@@ -14810,7 +14989,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     hoverStateEnabled: true,
                     opened: false,
                     popupPosition: "bottom",
-                    popupAnimation: undefined
+                    popupAnimation: undefined,
+                    onItemRendered: null
                 })
             },
             _defaultOptionsRules: function() {
@@ -14827,7 +15007,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                             options: {
                                 popupPosition: {
                                     my: "top " + (this.option("rtlEnabled") ? "left" : "right"),
-                                    at: "top " + (this.option("rtlEnabled") ? "left" : "right")
+                                    at: "top " + (this.option("rtlEnabled") ? "left" : "right"),
+                                    collision: "flipfit"
                                 },
                                 popupAnimation: {
                                     show: {
@@ -14909,8 +15090,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 var $popup = this._$popup = $("<div>").appendTo(this.element()),
                     config = this._popupOptions(),
                     usePopup = !this.option("usePopover");
-                if (usePopup)
-                    config.boundaryOffset = "0 0";
                 this._popup = this._createComponent($popup, "dxPopover", config);
                 this._popup._wrapper().addClass(DROP_DOWN_MENU_POPUP_WRAPPER_CLASS);
                 this._popup._wrapper().toggleClass(DROP_DOWN_MENU_POPUP_CLASS, usePopup)
@@ -14960,6 +15139,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                         }, this),
                         tabIndex: -1,
                         focusStateEnabled: this.option("focusStateEnabled"),
+                        activeStateEnabled: this.option("activeStateEnabled"),
+                        onItemRendered: this.option("onItemRendered"),
                         _itemAttributes: {role: "menuitem"}
                     }
             },
@@ -15003,6 +15184,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     case"buttonIcon":
                     case"buttonText":
                         this._button.option(BUTTON_OPTION_MAP[name], value);
+                        this._renderPopup();
                         break;
                     case"popupWidth":
                     case"popupHeight":
@@ -15012,9 +15194,14 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                         this._invalidate();
                         break;
                     case"focusStateEnabled":
+                    case"activeStateEnabled":
                         if (this._list)
                             this._list.option(name, value);
                         this.callBase(args);
+                        break;
+                    case"onItemRendered":
+                        if (this._list)
+                            this._list.option(name, value);
                         break;
                     case"opened":
                         this._toggleMenuVisibility(value);
@@ -15369,19 +15556,21 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 else if (LEVEL_COMPARE_MAP[zoomLevel] < LEVEL_COMPARE_MAP[minZoomLevel])
                     this.option("zoomLevel", minZoomLevel)
             },
+            _getMinDate: function() {
+                return this.option("min") || new Date(1000, 0)
+            },
+            _getMaxDate: function() {
+                return this.option("max") || new Date(3000, 0)
+            },
             _updateCurrentDate: function(value) {
-                var min = this.option("min"),
-                    max = this.option("max");
-                if (min && max && min > max) {
+                var min = this._getMinDate(),
+                    max = this._getMaxDate();
+                if (min > max) {
                     this.option("currentDate", new Date);
                     return
                 }
-                if (min)
-                    min = new Date(min);
-                if (max)
-                    max = new Date(max);
                 var date = value || new Date(this.option("currentDate")),
-                    normalizedDate = new Date(utils.normalizeDate(date, min, max));
+                    normalizedDate = new Date(utils.normalizeDate(date, new Date(min), new Date(max)));
                 normalizedDate.setDate(1);
                 this.option("currentDate", normalizedDate);
                 var zoomLevel = this.option("zoomLevel"),
@@ -15438,14 +15627,21 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     this.element().append(body)
                 }
             },
+            _isViewAvailable: function(date) {
+                var min = this._getMinDate(),
+                    max = this._getMaxDate();
+                return utils.dateInRange(date, new Date(min.getFullYear(), min.getMonth(), 1), new Date(max.getFullYear(), max.getMonth(), 1))
+            },
             _renderViews: function() {
                 this._change = "";
                 this.element().addClass("dx-calendar-view-" + this.option("zoomLevel"));
                 var currentDate = this.option("currentDate");
                 this._view = this._renderSpecificView(currentDate);
                 this._view.option("_keyboardProcessor", this._viewKeyboardProcessor);
-                this._beforeView = this._renderSpecificView(this._getDateByOffset(-1, currentDate));
-                this._afterView = this._renderSpecificView(this._getDateByOffset(1, currentDate));
+                var beforeDate = this._getDateByOffset(-1, currentDate);
+                this._beforeView = this._isViewAvailable(beforeDate) ? this._renderSpecificView(beforeDate) : null;
+                var afterDate = this._getDateByOffset(1, currentDate);
+                this._afterView = this._isViewAvailable(afterDate) ? this._renderSpecificView(afterDate) : null;
                 this._translateViews();
                 this._onContouredChanged = this._createActionByOption("onContouredChanged")
             },
@@ -15463,8 +15659,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             _translateViews: function() {
                 var rtlCorrection = this.option("rtlEnabled") && !(DX.browser.msie && DX.browser.version[0] !== "8") ? -1 : 1;
                 translator.move(this._view.element(), {left: 0});
-                translator.move(this._beforeView.element(), {left: -this._viewWidth() * rtlCorrection});
-                translator.move(this._afterView.element(), {left: this._viewWidth() * rtlCorrection})
+                this._beforeView && translator.move(this._beforeView.element(), {left: -100 * rtlCorrection + "%"});
+                this._afterView && translator.move(this._afterView.element(), {left: 100 * rtlCorrection + "%"})
             },
             _renderSpecificView: function(date) {
                 var specificView = ui.dxCalendar.views[this.option("zoomLevel")],
@@ -15475,8 +15671,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             _viewConfig: function(date) {
                 return {
                         date: date,
-                        min: this.option("min"),
-                        max: this.option("max"),
+                        min: this._getMinDate(),
+                        max: this._getMaxDate(),
                         firstDayOfWeek: this.option("firstDayOfWeek"),
                         value: this.option("value"),
                         rtl: this.option("rtlEnabled"),
@@ -15506,6 +15702,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 return this.option("zoomLevel") === this.option("maxZoomLevel")
             },
             _viewValueChangedHandler: function(e) {
+                if (this._isViewValueReseting)
+                    return;
                 if (this._isMaxZoomLevel())
                     this.option("value", e.value)
             },
@@ -15548,8 +15746,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             },
             _swipeStartHandler: function(e) {
                 fx.stop(this._viewsWrapper, true);
-                e.jQueryEvent.maxLeftOffset = 1;
-                e.jQueryEvent.maxRightOffset = 1
+                e.jQueryEvent.maxLeftOffset = this._afterView ? 1 : 0;
+                e.jQueryEvent.maxRightOffset = this._beforeView ? 1 : 0
             },
             _swipeUpdateHandler: function(e) {
                 var offset = e.jQueryEvent.offset;
@@ -15563,7 +15761,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     view = this._beforeView;
                 else if (offset < -0.5)
                     view = this._afterView;
-                this._navigator.option("text", view._getNavigatorCaption())
+                if (view)
+                    this._navigator.option("text", view._getNavigatorCaption())
             },
             _swipeEndHandler: function(e) {
                 var targetOffset = e.jQueryEvent.targetOffset,
@@ -15574,11 +15773,11 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 if (this._isDateInInvalidRange(newDate))
                     if (moveOffset >= 0) {
                         animationTo = 0;
-                        newDate = new Date(this.option("min"))
+                        newDate = new Date(this._getMinDate())
                     }
                     else {
                         animationTo = 0;
-                        newDate = new Date(this.option("max"))
+                        newDate = new Date(this._getMaxDate())
                     }
                 this._isAlreadyNavigated = true;
                 this._animateWrapper(animationTo, ANIMATION_DURATION_SHOW_VIEW).done($.proxy(function() {
@@ -15589,18 +15788,21 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 }, this))
             },
             _updateViews: function(offset) {
+                var dateByOffset;
                 this._view.option("_keyboardProcessor", null);
-                if (offset > 0) {
-                    this._afterView.element().remove();
+                if (offset > 0 && this._beforeView) {
+                    this._afterView && this._afterView.element().remove();
                     this._afterView = this._view;
                     this._view = this._beforeView;
-                    this._beforeView = this._renderSpecificView(this._getDateByOffset(-1, this._view.option("date")))
+                    dateByOffset = this._getDateByOffset(-1, this._view.option("date"));
+                    this._beforeView = this._isViewAvailable(dateByOffset) && this._renderSpecificView(dateByOffset)
                 }
-                else if (offset < 0) {
-                    this._beforeView.element().remove();
+                else if (offset < 0 && this._afterView) {
+                    this._beforeView && this._beforeView.element().remove();
                     this._beforeView = this._view;
                     this._view = this._afterView;
-                    this._afterView = this._renderSpecificView(this._getDateByOffset(1, this._view.option("date")))
+                    dateByOffset = this._getDateByOffset(1, this._view.option("date"));
+                    this._afterView = this._isViewAvailable(dateByOffset) && this._renderSpecificView(dateByOffset)
                 }
                 this._view.option("_keyboardProcessor", this._viewKeyboardProcessor);
                 this._translateViews()
@@ -15608,8 +15810,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             _isDateInInvalidRange: function(date) {
                 if (this._view.isBoundary(date))
                     return;
-                var min = this.option("min"),
-                    max = this.option("max"),
+                var min = this._getMinDate(),
+                    max = this._getMaxDate(),
                     normalizedDate = utils.normalizeDate(date, min, max);
                 return normalizedDate === min || normalizedDate === max
             },
@@ -15656,8 +15858,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     this.option("value", today);
                     return
                 }
-                this._afterView.element().remove();
-                this._beforeView.element().remove();
+                this._afterView && this._afterView.element().remove();
+                this._beforeView && this._beforeView.element().remove();
                 delete this._afterView;
                 delete this._beforeView;
                 var newView = this._renderSpecificView(new Date(today.getFullYear(), today.getMonth(), 1)),
@@ -15694,8 +15896,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this._navigate(e.direction)
             },
             _isMinZoomLevel: function(zoomLevel) {
-                var min = this.option("min"),
-                    max = this.option("max");
+                var min = this._getMinDate(),
+                    max = this._getMaxDate();
                 return utils.sameView(zoomLevel, min, max) || this.option("minZoomLevel") === zoomLevel
             },
             _navigateUp: function() {
@@ -15757,8 +15959,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 if (this._view.isBoundary(date)) {
                     var zoomLevel = this.option("zoomLevel"),
                         $cells = this._view.$body.find("." + CALENDAR_CELL_CLASS).not("." + CALENDAR_EMPTY_CELL_CLASS);
-                    var min = this.option("min"),
-                        max = this.option("max");
+                    var min = this._getMinDate(),
+                        max = this._getMaxDate();
                     if (this._swipeOffset && utils.sameView(zoomLevel, min, max))
                         $cell = this._swipeOffset < 0 ? $cells.last() : $cells.first();
                     else if (utils.sameView(zoomLevel, date, min))
@@ -15771,7 +15973,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 }
                 var currentDate = this.option("currentDate");
                 $cell = this._view._getCellByDate(utils.getShortDate(date));
-                if (!$cell.length && !utils.dateInRange(date, this.option("min"), this.option("max"))) {
+                if (!$cell.length && !utils.dateInRange(date, this._getMinDate(), this._getMaxDate())) {
                     this._view.option("contouredDate", currentDate);
                     return
                 }
@@ -15827,14 +16029,22 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             },
             _disposeViews: function() {
                 this._view.element().remove();
-                this._beforeView.element().remove();
-                this._afterView.element().remove();
+                this._beforeView && this._beforeView.element().remove();
+                this._afterView && this._afterView.element().remove();
                 delete this._view;
                 delete this._beforeView;
                 delete this._afterView
             },
             _visibilityChanged: function() {
                 this._translateViews()
+            },
+            _updateViewsValue: function(value) {
+                var newValue = value ? new Date(value) : null;
+                this._view.option("value", newValue);
+                this._isViewValueReseting = true;
+                this._beforeView && this._beforeView.option("value", newValue);
+                this._afterView && this._afterView.option("value", newValue);
+                delete this._isViewValueReseting
             },
             _optionChanged: function(args) {
                 var value = args.value;
@@ -15847,6 +16057,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                         this._updateCurrentDate(date);
                         this._disposeViews();
                         this._renderViews();
+                        this._updateButtonsVisibility();
                         break;
                     case"currentDate":
                         this._updateCurrentDate(value);
@@ -15866,7 +16077,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                         break;
                     case"value":
                         this._updateCurrentDate(value ? new Date(value) : new Date);
-                        this._view.option("value", value ? new Date(value) : null);
+                        this._updateViewsValue(value);
                         this.callBase(args);
                         break;
                     case"disabled":
@@ -16237,10 +16448,9 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 },
                 moveContouredDate: function(difference) {
                     var circledDate = this.option("contouredDate"),
-                        contouredDate = circledDate || this._calculateContouredDate(circledDate),
-                        newContouredDate = new Date(contouredDate.getFullYear(), contouredDate.getMonth(), contouredDate.getDate() + difference);
-                    utils.fixTimezoneGap(contouredDate, newContouredDate);
-                    this.option("contouredDate", newContouredDate)
+                        contouredDate = new Date(circledDate || this._calculateContouredDate(circledDate));
+                    contouredDate.setDate(contouredDate.getDate() + difference);
+                    this.option("contouredDate", contouredDate)
                 },
                 _calculateContouredDate: function(contouredDate) {
                     var calculatedContouredDate = null,
@@ -18169,6 +18379,9 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                             this._widget = null
                         }, this)
                     }
+            },
+            _updateValue: function() {
+                this._widget && this._widget.option("value", this.dateBoxValue() || new Date)
             }
         })
     })(jQuery, DevExpress);
@@ -18209,7 +18422,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
     /*! Module widgets-base, file ui.dateBox.strategy.list.js */
     (function($, DX, undefined) {
         var ui = DX.ui,
-            dateUtils = ui.dateUtils;
+            dateUtils = ui.dateUtils,
+            utils = DX.utils;
         ui.dxDateBox.renderingStrategies["List"] = ui.dxDateBox.strategy.inherit({
             NAME: "List",
             supportedKeys: function() {
@@ -18283,8 +18497,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             _updateValue: function() {
                 if (!this._widget)
                     return;
-                var value = this.dateBoxValue(),
-                    dateIndex = this._getDateIndex(value);
+                var value = this.dateBoxValue();
+                var dateIndex = this._getDateIndex(value);
                 this._widget.option("selectedIndex", dateIndex)
             },
             _getDateIndex: function(date) {
@@ -18297,7 +18511,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 return result
             },
             _areDatesEqual: function(first, second) {
-                return first.getHours() === second.getHours() && first.getMinutes() === second.getMinutes()
+                return utils.isDate(first) && utils.isDate(second) && first.getHours() === second.getHours() && first.getMinutes() === second.getMinutes()
             },
             _getTimeListItems: function() {
                 var min = this.dateBox.dateOption("min") || new Date(0, 0, 0, 0, 0),
@@ -18505,9 +18719,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 })
             },
             _init: function() {
-                this.callBase.apply(this, arguments);
-                this._$contentWrapper = $("<div>").addClass(LOADPANEL_CONTENT_WRAPPER_CLASS);
-                this._$contentWrapper.appendTo(this._$content)
+                this.callBase.apply(this, arguments)
             },
             _render: function() {
                 this.callBase();
@@ -18517,6 +18729,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             _renderContentImpl: function() {
                 this.callBase();
                 this.content().addClass(LOADPANEL_CONTENT_CLASS);
+                this._$contentWrapper = $("<div>").addClass(LOADPANEL_CONTENT_WRAPPER_CLASS);
+                this._$contentWrapper.appendTo(this._$content);
                 this._togglePaneVisible();
                 this._cleanPreviousContent();
                 this._renderLoadIndicator();
@@ -18544,6 +18758,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 clearTimeout(this._showTimeout)
             },
             _renderMessage: function() {
+                if (!this._$contentWrapper)
+                    return;
                 var message = this.option("message");
                 if (!message)
                     return;
@@ -18551,7 +18767,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this._$contentWrapper.append($message)
             },
             _renderLoadIndicator: function() {
-                if (!this.option("showIndicator"))
+                if (!this._$contentWrapper || !this.option("showIndicator"))
                     return;
                 this._$indicator = $("<div>").addClass(LOADPANEL_INDICATOR_CLASS).appendTo(this._$contentWrapper);
                 this._createComponent(this._$indicator, "dxLoadIndicator", {indicatorSrc: this.option("indicatorSrc")})
@@ -19047,6 +19263,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     placeholder = utils.stringFormat(Globalize.localize("dxLookup-searchPlaceholder"), minSearchLength);
                 this._searchBox.option("placeholder", placeholder)
             },
+            _setAriaTargetForList: $.noop,
             _renderList: function() {
                 this.callBase();
                 this._list.registerKeyHandler("escape", $.proxy(function(e) {
@@ -19365,7 +19582,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             _renderValueEventName: function() {
                 return "input keyup"
             },
-            _keyUpHandler: function(e) {
+            _keyPressHandler: function(e) {
                 if (CONTROL_KEY[e.which || e.keyCode])
                     return;
                 this.callBase.apply(this, arguments);
@@ -19438,6 +19655,10 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                         backspace: clearSelectBox,
                         del: clearSelectBox
                     })
+            },
+            _selectFirstItem: function() {
+                if (this._isEditable())
+                    this.callBase()
             },
             _setDefaultOptions: function() {
                 this.callBase();
@@ -19562,7 +19783,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             _listConfig: function() {
                 var result = $.extend(this.callBase(), {
                         pageLoadMode: "scrollBottom",
-                        noDataText: "",
                         onSelectionChanged: this._getSelectionChangeHandler(),
                         selectionMode: "single"
                     });
@@ -19669,6 +19889,10 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     return this._wasSearchValue;
                 this._wasSearchValue = value
             },
+            _filterDataSource: function(searchValue) {
+                this.callBase(searchValue);
+                this._setCollectionWidgetOption("noDataText", searchValue ? "" : this._list && this._list.initialOption("noDataText"))
+            },
             _optionChanged: function(args) {
                 switch (args.name) {
                     case"_isAdaptablePopupPosition":
@@ -19724,8 +19948,10 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                             this._removeTagWithUpdate(values[values.length - 1])
                         },
                         enter: function(e) {
-                            if (this.option("fieldEditEnabled") && !this._$list.find(".dx-state-focused").length)
-                                this._completeSelection();
+                            if (this.option("fieldEditEnabled") && !this._$list.find(".dx-state-focused").length) {
+                                e.preventDefault();
+                                this._completeSelection()
+                            }
                             else
                                 this._keyboardProcessor._childProcessors[0].process(e)
                         }
@@ -19958,6 +20184,14 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 delete result.previousValue;
                 return $.extend(result, {values: this._values()})
             },
+            _refreshSelected: function() {
+                this._list && this._list.option("selectedItems", this.option("values"));
+                this.callBase()
+            },
+            _setSelectedElement: function($element) {
+                this.callBase($element);
+                this._setValue(this.option("value"))
+            },
             _optionChanged: function(args) {
                 switch (args.name) {
                     case"displayExpr":
@@ -20036,8 +20270,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     swipeEnabled: true,
                     animationEnabled: true,
                     loop: false,
-                    _itemAttributes: {role: "tabpanel"},
                     deferRendering: true,
+                    _itemAttributes: {role: "tabpanel"},
                     loopItemFocus: false,
                     selectOnFocus: true,
                     selectionMode: "single",
@@ -20677,7 +20911,10 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     readyToUploadMessage: Globalize.localize("dxFileUploader-readyToUpload"),
                     uploadedMessage: Globalize.localize("dxFileUploader-uploaded"),
                     uploadFailedMessage: Globalize.localize("dxFileUploader-uploadFailedMessage"),
-                    uploadMode: "instantly"
+                    uploadMode: "instantly",
+                    onUploaded: null,
+                    onProgress: null,
+                    onUploadError: null
                 })
             },
             _defaultOptionsRules: function() {
@@ -20695,6 +20932,9 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this._initFileInput();
                 this._initLabel();
                 this._createFiles();
+                this._createUploadedAction();
+                this._createProgressAction();
+                this._createUploadErrorAction();
                 this.element().addClass(FILEUPLOADER_CLASS)
             },
             _initFileInput: function() {
@@ -20757,6 +20997,15 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     this._files.push(this._createFile(value))
                 }, this))
             },
+            _createUploadedAction: function() {
+                this._uploadedAction = this._createActionByOption("onUploaded")
+            },
+            _createProgressAction: function() {
+                this._progressAction = this._createActionByOption("onProgress")
+            },
+            _createUploadErrorAction: function() {
+                this._uploadErrorAction = this._createActionByOption("onUploadError")
+            },
             _createFile: function(value) {
                 return {
                         value: value,
@@ -20800,7 +21049,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     buttonsWidth = $buttonContainer.width() * (cancelButtonsCount + uploadButtonsCount),
                     $fileSize = this._$filesContainer.find("." + FILEUPLOADER_FILE_SIZE_CLASS).eq(0);
                 var prevFileSize = $fileSize.text();
-                $fileSize.text("1000Mb");
+                $fileSize.text("1000 Mb");
                 var fileSizeWidth = $fileSize.width();
                 $fileSize.text(prevFileSize);
                 this._$filesContainer.find("." + FILEUPLOADER_FILE_NAME_CLASS).css("max-width", filesContainerWidth - buttonsWidth - fileSizeWidth)
@@ -20847,7 +21096,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     size /= 1024;
                     i++
                 }
-                return Math.round(size) + labels[i]
+                return Math.round(size) + " " + labels[i]
             },
             _renderSelectButton: function() {
                 var $button = $("<div>").addClass(FILEUPLOADER_BUTTON_CLASS).appendTo(this._$inputWrapper);
@@ -20935,27 +21184,40 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     file.progressBar = this._createProgressBar(value.size);
                     file.progressBar.element().appendTo($file);
                     this._initStatusMessage(file);
-                    this._initCancelButton(file);
-                    file.onError.add($.proxy(this._onErrorHandler, this, file))
+                    this._initCancelButton(file)
                 }
+                file.onLoad.add($.proxy(this._onLoadedHandler, this, file));
+                file.onError.add($.proxy(this._onErrorHandler, this, file));
                 file.onProgress.add($.proxy(this._onProgressHandler, this, file));
                 file.request.send(this._createFormData(this.option("name"), value))
             },
-            _onErrorHandler: function(file) {
+            _onErrorHandler: function(file, e) {
                 var that = this;
                 setTimeout(function() {
-                    file.$statusMessage.text(that.option("uploadFailedMessage"));
-                    file.$statusMessage.css("display", "");
-                    file.progressBar.element().remove()
-                }, FILEUPLOADER_AFTER_LOAD_DELAY)
+                    if (that.option("showFileList")) {
+                        file.$statusMessage.text(that.option("uploadFailedMessage"));
+                        file.$statusMessage.css("display", "");
+                        file.progressBar.element().remove()
+                    }
+                }, FILEUPLOADER_AFTER_LOAD_DELAY);
+                this._uploadErrorAction({
+                    file: file,
+                    jQueryEvent: e
+                })
             },
-            _onLoadedHandler: function(file) {
+            _onLoadedHandler: function(file, e) {
                 var that = this;
                 setTimeout(function() {
-                    file.$statusMessage.text(that.option("uploadedMessage"));
-                    file.$statusMessage.css("display", "");
-                    file.progressBar.element().remove()
-                }, FILEUPLOADER_AFTER_LOAD_DELAY)
+                    if (that.option("showFileList")) {
+                        file.$statusMessage.text(that.option("uploadedMessage"));
+                        file.$statusMessage.css("display", "");
+                        file.progressBar.element().remove()
+                    }
+                }, FILEUPLOADER_AFTER_LOAD_DELAY);
+                this._uploadedAction({
+                    file: file,
+                    jQueryEvent: e
+                })
             },
             _onProgressHandler: function(file, e) {
                 var totalSize = this._getTotalSize(),
@@ -20964,10 +21226,17 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     progress = 0;
                 if (file) {
                     currentLoadedSize = Math.min(e.loaded, file.value.size);
-                    loadedSize += currentLoadedSize - file.loadedSize;
+                    var segmentSize = currentLoadedSize - file.loadedSize;
+                    loadedSize += segmentSize;
                     file.progressBar && file.progressBar.option({
                         value: currentLoadedSize,
                         showStatus: true
+                    });
+                    this._progressAction({
+                        file: file,
+                        segmentSize: segmentSize,
+                        bytesLoaded: e.loaded,
+                        jQueryEvent: e
                     });
                     file.loadedSize = currentLoadedSize
                 }
@@ -20977,8 +21246,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this._setLoadedSize(loadedSize)
             },
             _initStatusMessage: function(file) {
-                file.$statusMessage.css("display", "none");
-                file.onLoad.add($.proxy(this._onLoadedHandler, this, file))
+                file.$statusMessage.css("display", "none")
             },
             _initCancelButton: function(file) {
                 var cancelClickHandler = $.proxy(function() {
@@ -20995,21 +21263,35 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 file.onError.add(hideCancelButton)
             },
             _initUploadRequest: function(file) {
+                var that = this;
                 file.request = this._createRequest(this.option("uploadUrl"));
                 file.loadedSize = 0;
                 file.request.onreadystatechange = $.proxy(function(e) {
-                    if (e.currentTarget.readyState === 4)
-                        if (e.currentTarget.status === 200)
+                    if (e.currentTarget.readyState === 4) {
+                        var status = e.currentTarget.status;
+                        if (that._isStatusSuccess(status))
                             this.onLoad.fire(e);
-                        else
+                        else if (that._isStatusError(status) || !this._isProgressStarted) {
+                            this._isError = true;
                             this.onError.fire(e)
+                        }
+                    }
                 }, file);
                 file.request.upload.onprogress = $.proxy(function(e) {
+                    if (this._isError)
+                        return;
+                    this._isProgressStarted = true;
                     this.onProgress.fire(e)
                 }, file);
                 file.request.upload.onloadstart = $.proxy(function(e) {
                     this.onLoadStart.fire(e)
                 }, file)
+            },
+            _isStatusSuccess: function(status) {
+                return 200 <= status && status < 300
+            },
+            _isStatusError: function(status) {
+                return 400 <= status && status < 500
             },
             _createRequest: function(url) {
                 var Request = getRequestPrototype(),
@@ -21122,6 +21404,15 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     case"uploadMode":
                         this.reset();
                         this._invalidate();
+                        break;
+                    case"onUploaded":
+                        this._createUploadedAction();
+                        break;
+                    case"onProgress":
+                        this._createProgressAction();
+                        break;
+                    case"onUploadError":
+                        this._createUploadErrorAction();
                         break;
                     default:
                         this.callBase(args)
@@ -22017,6 +22308,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
     /*! Module widgets-base, file ui.colorBox.js */
     (function($, DX, undefined) {
         var ui = DX.ui;
+        var events = ui.events;
         var COLOR_BOX_CLASS = "dx-colorbox",
             COLOR_BOX_INPUT_CLASS = COLOR_BOX_CLASS + "-input",
             COLOR_BOX_INPUT_CONTAINER_CLASS = COLOR_BOX_INPUT_CLASS + "-container",
@@ -22178,6 +22470,11 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             },
             _renderInput: function() {
                 this.callBase();
+                this._input().addClass(COLOR_BOX_INPUT_CLASS);
+                this._renderColorPreview()
+            },
+            _renderColorPreview: function() {
+                var eventName = events.addNamespace("input", "colorPreview");
                 this.element().wrapInner($("<div/>").addClass(COLOR_BOX_INPUT_CONTAINER_CLASS));
                 this._$colorBoxInputContainer = this.element().children().eq(0);
                 this._$colorResultPreview = $("<div>", {
@@ -22188,7 +22485,10 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     this._$colorBoxInputContainer.addClass(COLOR_BOX_COLOR_IS_NOT_DEFINED);
                 else
                     colorUtils.makeTransparentBackground(this._$colorResultPreview, this.option("value"));
-                this._input().addClass(COLOR_BOX_INPUT_CLASS)
+                this._input().off(eventName).on(eventName, $.proxy(function() {
+                    var color = new DX.Color(this._input().val());
+                    colorUtils.makeTransparentBackground(this._$colorResultPreview, color.colorIsInvalid ? this.option("value") : color)
+                }, this))
             },
             _renderValue: function() {
                 var value = this.option("value");

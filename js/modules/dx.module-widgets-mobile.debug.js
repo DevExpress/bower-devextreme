@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Mobile Widgets)
-* Version: 15.1.6
-* Build date: Aug 14, 2015
+* Version: 15.1.7
+* Build date: Sep 22, 2015
 *
 * Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -461,7 +461,7 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
                 this.option({
                     selectedIndex: 0,
                     swipeEnabled: true,
-                    titleTemplate: "title",
+                    itemTitleTemplate: "title",
                     contentTemplate: "content",
                     focusStateEnabled: false,
                     selectionMode: "single",
@@ -516,7 +516,7 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
                 this._$wrapper.append($tabsContainer);
                 this._tabs = this._createComponent($tabsContainer, "dxPivotTabs", {
                     itemTemplateProperty: "titleTemplate",
-                    itemTemplate: this._getTemplateByOption("titleTemplate"),
+                    itemTemplate: this._getTemplateByOption("itemTitleTemplate"),
                     items: this.option("items"),
                     selectedIndex: this.option("selectedIndex"),
                     onPrepare: function() {
@@ -690,7 +690,7 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
                         this._clearItemsCache();
                         this.callBase(args);
                         break;
-                    case"titleTemplate":
+                    case"itemTitleTemplate":
                         this._tabs.option("itemTemplate", this._getTemplate(value));
                         break;
                     case"swipeEnabled":
@@ -1692,6 +1692,7 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
                 })
             },
             _swipeStartHandler: function(e) {
+                animation.complete(this.content());
                 var event = e.jQueryEvent,
                     menuVisible = this.option("menuVisible"),
                     rtl = this.option("rtlEnabled");
@@ -1751,7 +1752,7 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
                 return this.option("rtlEnabled") ? -1 : 1
             },
             _dispose: function() {
-                fx.stop(this.content());
+                animation.complete(this.content());
                 this._toggleHideMenuCallback(false);
                 this.callBase()
             },

@@ -165,7 +165,8 @@
     bottom: 68px;
 }
 
-.dx-theme-generic .navbar-layout .layout-footer {
+.dx-theme-generic .navbar-layout .layout-footer, 
+.dx-theme-generic .navbar-layout .layout-footer .dx-navbar {
     bottom: 0;
     height: 68px;
 }

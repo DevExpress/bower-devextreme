@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Sparklines)
-* Version: 15.1.6
-* Build date: Aug 14, 2015
+* Version: 15.1.7
+* Build date: Sep 22, 2015
 *
 * Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -18,7 +18,7 @@ if (!DevExpress.MOD_VIZ_SPARKLINES) {
             TOUCH_EVENTS_DELAY = 1000,
             _extend = $.extend,
             _abs = Math.abs,
-            core = DX.viz.core,
+            viz = DX.viz,
             _noop = $.noop;
         function generateDefaultCustomizeTooltipCallback(fontOptions, rtlEnabled) {
             var lineSpacing = fontOptions.lineSpacing,
@@ -38,7 +38,7 @@ if (!DevExpress.MOD_VIZ_SPARKLINES) {
                 }
         }
         DX.viz.sparklines = {};
-        DX.viz.sparklines.BaseSparkline = core.BaseWidget.inherit({
+        DX.viz.sparklines.BaseSparkline = viz.BaseWidget.inherit({
             _setDeprecatedOptions: function() {
                 this.callBase();
                 $.extend(this._deprecatedOptions, {
@@ -70,8 +70,7 @@ if (!DevExpress.MOD_VIZ_SPARKLINES) {
                 that._initTooltipEvents()
             },
             _initTooltip: function() {
-                this._initTooltipBase = this.callBase;
-                return
+                this._initTooltipBase = this.callBase
             },
             _getDefaultSize: function() {
                 return this._defaultSize
@@ -118,7 +117,7 @@ if (!DevExpress.MOD_VIZ_SPARKLINES) {
                 return _extend(true, {}, this._themeManager.theme(), this.option())
             },
             _createThemeManager: function() {
-                var themeManager = new DX.viz.core.BaseThemeManager;
+                var themeManager = new viz.BaseThemeManager;
                 themeManager._themeSection = this._widgetType;
                 themeManager._fontFields = ["tooltip.font"];
                 return themeManager
@@ -170,8 +169,8 @@ if (!DevExpress.MOD_VIZ_SPARKLINES) {
                 var that = this,
                     canvas = this._canvas,
                     ranges = this._ranges;
-                that._translatorX = new core.Translator2D(ranges.arg, canvas, {direction: "horizontal"});
-                that._translatorY = new core.Translator2D(ranges.val, canvas)
+                that._translatorX = new viz.Translator2D(ranges.arg, canvas, {direction: "horizontal"});
+                that._translatorY = new viz.Translator2D(ranges.val, canvas)
             },
             _getTooltip: function() {
                 var that = this;
@@ -224,9 +223,9 @@ if (!DevExpress.MOD_VIZ_SPARKLINES) {
             },
             _initLoadingIndicator: _noop,
             _disposeLoadingIndicator: _noop,
-            _handleLoadingIndicatorOptionChanged: _noop,
             _updateLoadingIndicatorOptions: _noop,
-            _updateLoadingIndicatorCanvas: _noop,
+            _updateLoadingIndicatorSize: _noop,
+            _scheduleLoadingIndicatorHiding: _noop,
             showLoadingIndicator: _noop,
             hideLoadingIndicator: _noop
         });
@@ -316,7 +315,6 @@ if (!DevExpress.MOD_VIZ_SPARKLINES) {
     /*! Module viz-sparklines, file sparkline.js */
     (function($, DX, undefined) {
         var viz = DX.viz,
-            core = viz.core,
             utils = DX.utils,
             MIN_BAR_WIDTH = 1,
             MAX_BAR_WIDTH = 50,
@@ -341,7 +339,8 @@ if (!DevExpress.MOD_VIZ_SPARKLINES) {
             _max = _math.max,
             _min = _math.min,
             _isFinite = isFinite,
-            _map = core.utils.map,
+            _map = viz.utils.map,
+            _normalizeEnum = viz.utils.normalizeEnum,
             _isDefined = utils.isDefined,
             _Number = Number,
             _String = String;
@@ -349,6 +348,7 @@ if (!DevExpress.MOD_VIZ_SPARKLINES) {
             _rootClassPrefix: "dxsl",
             _rootClass: "dxsl-sparkline",
             _widgetType: "sparkline",
+            _invalidatingOptions: ["lineColor", "lineWidth", "areaOpacity", "minColor", "maxColor", "barPositiveColor", "barNegativeColor", "winColor", "lessColor", "firstLastColor", "pointSymbol", "pointColor", "pointSize", "type", "argumentField", "valueField", "winlossThreshold", "showFirstLast", "showMinMax", "ignoreEmptyPoints", "minValue", "maxValue"],
             _defaultSize: {
                 width: DEFAULT_CANVAS_WIDTH,
                 height: DEFAULT_CANVAS_HEIGHT,
@@ -406,7 +406,7 @@ if (!DevExpress.MOD_VIZ_SPARKLINES) {
             },
             _prepareOptions: function() {
                 this._allOptions = this.callBase();
-                this._allOptions.type = _String(this._allOptions.type).toLowerCase();
+                this._allOptions.type = _normalizeEnum(this._allOptions.type);
                 if (!ALLOWED_TYPES[this._allOptions.type])
                     this._allOptions.type = "line"
             },
@@ -415,7 +415,7 @@ if (!DevExpress.MOD_VIZ_SPARKLINES) {
                 this._seriesLabelGroup = this._renderer.g().attr({"class": "dxsl-series-labels"})
             },
             _createSeries: function() {
-                this._series = new core.series.Series({
+                this._series = new viz.series.Series({
                     renderer: this._renderer,
                     seriesGroup: this._seriesGroup,
                     labelsGroup: this._seriesLabelGroup
@@ -430,26 +430,24 @@ if (!DevExpress.MOD_VIZ_SPARKLINES) {
             _updateSeries: function() {
                 var that = this,
                     groupSeries,
-                    dataValidator,
                     seriesOptions;
                 that._prepareDataSource();
                 seriesOptions = that._prepareSeriesOptions();
                 that._series.updateOptions(seriesOptions);
                 groupSeries = [[that._series]];
                 groupSeries.argumentOptions = {type: seriesOptions.type === "bar" ? "discrete" : undefined};
-                dataValidator = new core.DataValidator(that._simpleDataSource, groupSeries, that._incidentOccured, {
+                that._simpleDataSource = viz.validateData(that._simpleDataSource, groupSeries, that._incidentOccured, {
                     checkTypeForAllData: false,
                     convertToAxisDataType: true,
                     sortingMethod: true
                 });
-                that._simpleDataSource = dataValidator.validate();
                 that._series.updateData(that._simpleDataSource)
             },
-            _optionChanged: function(args) {
-                if (args.name === "dataSource" && this._allOptions)
-                    this._refreshDataSource();
-                else
-                    this.callBase.apply(this, arguments)
+            _handleChangedOptions: function(options) {
+                var that = this;
+                that.callBase.apply(that, arguments);
+                if ("dataSource" in options && that._allOptions)
+                    that._refreshDataSource()
             },
             _parseNumericDataSource: function(data, argField, valField) {
                 var ignoreEmptyPoints = this.option("ignoreEmptyPoints");
@@ -778,6 +776,7 @@ if (!DevExpress.MOD_VIZ_SPARKLINES) {
             _rootClassPrefix: "dxb",
             _rootClass: "dxb-bullet",
             _widgetType: "bullet",
+            _invalidatingOptions: ["color", "targetColor", "targetWidth", "showTarget", "showZeroLevel", "value", "target", "startScaleValue", "endScaleValue"],
             _defaultSize: {
                 width: DEFAULT_CANVAS_WIDTH,
                 height: DEFAULT_CANVAS_HEIGHT,

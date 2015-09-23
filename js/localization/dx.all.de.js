@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme
-* Version: 15.1.6
-* Build date: Aug 14, 2015
+* Version: 15.1.7
+* Build date: Sep 22, 2015
 *
 * Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -83,6 +83,7 @@ Globalize.addCultureInfo("de", {messages: {
         "dxDataGrid-editingUndeleteRow": "Wiederherstellen",
         "dxDataGrid-editingConfirmDeleteMessage": "Sind Sie sicher, dass Sie diesen Datensatz löschen wollen?",
         "dxDataGrid-editingConfirmDeleteTitle": "",
+        "dxDataGrid-validationCancelChanges": "!TODO!",
         "dxDataGrid-groupPanelEmptyText": "Ziehen Sie eine Spalte hierhin, um danach zu gruppieren",
         "dxDataGrid-noDataText": "Keine Daten",
         "dxDataGrid-searchPanelPlaceholder": "Suchen...",
@@ -156,7 +157,7 @@ Globalize.addCultureInfo("de", {messages: {
         "dxScheduler-editorLabelEndDate": "Endzeit",
         "dxScheduler-editorLabelDescription": "Beschreibung",
         "dxScheduler-editorLabelRecurrence": "Wiederholung",
-        "dxScheduler-openAppointment": "Offenen termin",
+        "dxScheduler-openAppointment": "Termin öffnen",
         "dxScheduler-recurrenceNever": "Nie",
         "dxScheduler-recurrenceDaily": "Täglich",
         "dxScheduler-recurrenceWeekly": "Wöchentlich",

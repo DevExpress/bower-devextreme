@@ -1,7 +1,7 @@
 ﻿/*! 
 * DevExtreme (Vector Map)
-* Version: 15.1.6
-* Build date: Aug 14, 2015
+* Version: 15.1.7
+* Build date: Sep 22, 2015
 *
 * Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -96,7 +96,7 @@ function buildFeatures(shpData, dbfData, roundCoordinates) {
         features[i] = {
             type: "Feature",
             geometry: {
-                type: shape.type || null,
+                type: shape.gj_type || null,
                 coordinates: shape.coordinates ? roundCoordinates(shape.coordinates) : null
             },
             properties: dbfData[i] || null
@@ -193,7 +193,7 @@ function parseShp(stream, errors) {
     }
     try {
         while (stream.pos() < header.fileLength) {
-            record = parseShpRecord(stream, header.shapeType, errors);
+            record = parseShpRecord(stream, header.type, errors);
             if (record) {
                 records.push(record);
             }
@@ -220,57 +220,19 @@ function parseShp(stream, errors) {
     }
 }
 
-function parseShpHeader(stream) {
-    var header = {};
-    header.fileCode = stream.ui32be();
-    stream.skip(20);
-    header.fileLength = stream.ui32be() << 1;
-    header.version = stream.ui32le();
-    header.shapeType = SHP_TYPES[stream.ui32le()];
-    header.bbox_xy = readBBox(stream);
-    header.bbox_zm = readPoints(stream, 2);
-    return header;
-}
-
-var SHP_TYPES = {
-    0: "Null",
-    1: "Point",
-    3: "PolyLine",
-    5: "Polygon",
-    8: "MultiPoint"
-};
-
-function readBBox(stream) {
-    return [stream.f64le(), stream.f64le(), stream.f64le(), stream.f64le()];
-}
-
-function readPoints(stream, count) {
-    var points = [],
-        i;
-    points.length = count;
-    for (i = 0; i < count; ++i) {
-        points[i] = [stream.f64le(), stream.f64le()];
-    }
-    return points;
-}
-
 function readPointShape(stream, record) {
-    record.coordinates = readPoints(stream, 1)[0];
+    record.coordinates = readPointArray(stream, 1)[0];
 }
 
-function readPolylineShape(stream, record) {
+function readPolyLineShape(stream, record) {
     var bbox = readBBox(stream),
-        numParts = stream.ui32le(),
-        numPoints = stream.ui32le(),
-        parts = [],
-        points,
-        i,
-        rings = [];
-    parts.length = rings.length = numParts;
-    for (i = 0; i < numParts; ++i) {
-        parts[i] = stream.ui32le();
-    }
-    points = readPoints(stream, numPoints);
+        numParts = readInteger(stream),
+        numPoints = readInteger(stream),
+        parts = readIntegerArray(stream, numParts),
+        points = readPointArray(stream, numPoints),
+        rings = [],
+        i;
+    rings.length = numParts;
     for (i = 0; i < numParts; ++i) {
         rings[i] = points.slice(parts[i], parts[i + 1] || numPoints);
     }
@@ -278,37 +240,269 @@ function readPolylineShape(stream, record) {
     record.coordinates = rings;
 }
 
-function readMultipointShape(stream, record) {
+function readMultiPointShape(stream, record) {
     record.bbox = readBBox(stream);
-    record.coordinates = readPoints(stream, stream.ui32le());
+    record.coordinates = readPointArray(stream, readInteger(stream));
 }
+
+function readPointMShape(stream, record) {
+    record.coordinates = readPointArray(stream, 1)[0];
+    record.coordinates.push(readDoubleArray(stream, 1)[0]);
+}
+
+function readMultiPointMShape(stream, record) {
+    var bbox = readBBox(stream),
+        numPoints = readInteger(stream),
+        points = readPointArray(stream, numPoints),
+        mbox = readPair(stream),
+        mvalues = readDoubleArray(stream, numPoints);
+    record.bbox = bbox;
+    record.mbox = mbox;
+    record.coordinates = merge_xym(points, mvalues, numPoints);
+}
+
+function readPolyLineMShape(stream, record) {
+    var bbox = readBBox(stream),
+        numParts = readInteger(stream),
+        numPoints = readInteger(stream),
+        parts = readIntegerArray(stream, numParts),
+        points = readPointArray(stream, numPoints),
+        mbox = readPair(stream),
+        mvalues = readDoubleArray(stream, numPoints),
+        rings = [],
+        i,
+        from,
+        to;
+    rings.length = numParts;
+    for (i = 0; i < numParts; ++i) {
+        from = parts[i];
+        to = parts[i + 1] || numPoints;
+        rings[i] = merge_xym(points.slice(from, to), mvalues.slice(from, to), to - from);
+    }
+    record.bbox = bbox;
+    record.mbox = mbox;
+    record.coordinates = rings;
+}
+
+function readPointZShape(stream, record) {
+    record.coordinates = readPointArray(stream, 1)[0];
+    record.push(readDoubleArray(stream, 1)[0], readDoubleArray(stream, 1)[0]);
+}
+
+function readMultiPointZShape(stream, record) {
+    var bbox = readBBox(stream),
+        numPoints = readInteger(stream),
+        points = readPointArray(stream, numPoints),
+        zbox = readPair(stream),
+        zvalues = readDoubleArray(stream, numPoints),
+        mbox = readPair(stream),
+        mvalue = readDoubleArray(stream, numPoints);
+    record.bbox = bbox;
+    record.zbox = zbox;
+    record.mbox = mbox;
+    record.coordinates = merge_xyzm(points, zvalues, mvalue, numPoints);
+}
+
+function readPolyLineZShape(stream, record) {
+    var bbox = readBBox(stream),
+        numParts = readInteger(stream),
+        numPoints = readInteger(stream),
+        parts = readIntegerArray(stream, numParts),
+        points = readPointArray(stream, numPoints),
+        zbox = readPair(stream),
+        zvalues = readDoubleArray(stream, numPoints),
+        mbox = readPair(stream),
+        mvalues = readDoubleArray(stream, numPoints),
+        rings = [],
+        i,
+        from,
+        to;
+    rings.length = numParts;
+    for (i = 0; i < numParts; ++i) {
+        from = parts[i];
+        to = parts[i + 1] || numPoints;
+        rings[i] = merge_xyzm(points.slice(from, to), zvalues.slice(from, to), mvalues.slice(from, to), to - from);
+    }
+    record.bbox = bbox;
+    record.zbox = zbox;
+    record.mbox = mbox;
+    record.coordinates = rings;
+}
+
+function readMultiPatchShape(stream, record) {
+    var bbox = readBBox(stream),
+        numParts = readInteger(stream),
+        numPoints = readInteger(stream),
+        parts = readIntegerArray(stream, numParts),
+        partTypes = readIntegerArray(stream, numParts),
+        points = readPointArray(stream, numPoints),
+        zbox = readPair(stream),
+        zvalues = readDoubleArray(stream, numPoints),
+        mbox = readPair(stream),
+        mvalues = readDoubleArray(stream, numPoints),
+        rings = [],
+        i,
+        from,
+        to;
+    rings.length = numParts;
+    for (i = 0; i < numParts; ++i) {
+        from = parts[i];
+        to = parts[i + 1] || numPoints;
+        rings[i] = merge_xyzm(points.slice(from, to), zvalues.slice(from, to), mvalues.slice(from, to), to - from);
+    }
+    record.bbox = bbox;
+    record.zbox = zbox;
+    record.mbox = mbox;
+    record.types = partTypes;
+    record.coordinates = rings;
+}
+
+var SHP_TYPES = {
+    0: "Null",
+    1: "Point",
+    3: "PolyLine",
+    5: "Polygon",
+    8: "MultiPoint",
+    11: "PointZ",
+    13: "PolyLineZ",
+    15: "PolygonZ",
+    18: "MultiPointZ",
+    21: "PointM",
+    23: "PolyLineM",
+    25: "PolygonM",
+    28: "MultiPointM",
+    31: "MultiPatch"
+};
 
 var SHP_RECORD_PARSERS = {
     0: noop,
     1: readPointShape,
-    3: readPolylineShape,
-    5: readPolylineShape,
-    8: readMultipointShape
+    3: readPolyLineShape,
+    5: readPolyLineShape,
+    8: readMultiPointShape,
+    11: readPointZShape,
+    13: readPolyLineZShape,
+    15: readPolyLineZShape,
+    18: readMultiPointZShape,
+    21: readPointMShape,
+    23: readPolyLineMShape,
+    25: readPolyLineMShape,
+    28: readMultiPointMShape,
+    31: readMultiPatchShape
 };
+
+var SHP_TYPE_TO_GEOJSON_TYPE_MAP = {
+    "Null": "Null",
+    "Point": "Point",
+    "PolyLine": "MultiLineString",
+    "Polygon": "Polygon",
+    "MultiPoint": "MultiPoint",
+    "PointZ": "Point",
+    "PolyLineZ": "MultiLineString",
+    "PolygonZ": "Polygon",
+    "MultiPointZ": "MultiPoint",
+    "PointM": "Point",
+    "PolyLineM": "MultiLineString",
+    "PolygonM": "Polygon",
+    "MultiPointM": "MultiPoint",
+    "MultiPatch": "MultiPatch"
+};
+
+function parseShpHeader(stream) {
+    var header = {};
+    header.fileCode = stream.ui32be();
+    stream.skip(20);
+    header.fileLength = stream.ui32be() << 1;
+    header.version = stream.ui32le();
+    header.type_number = stream.ui32le();
+    header.type = SHP_TYPES[header.type_number];
+    header.bbox_xy = readBBox(stream);
+    header.bbox_zm = readPointArray(stream, 2);
+    return header;
+}
+
+function readInteger(stream) {
+    return stream.ui32le();
+}
+
+function readIntegerArray(stream, length) {
+    var array = [],
+        i;
+    array.length = length;
+    for (i = 0; i < length; ++i) {
+        array[i] = readInteger(stream);
+    }
+    return array;
+}
+
+function readDoubleArray(stream, length) {
+    var array = [],
+        i;
+    array.length = length;
+    for (i = 0; i < length; ++i) {
+        array[i] = stream.f64le();
+    }
+    return array;
+}
+
+function readBBox(stream) {
+    return readDoubleArray(stream, 4);
+}
+
+function readPair(stream) {
+    return [stream.f64le(), stream.f64le()];
+}
+
+function readPointArray(stream, count) {
+    var points = [],
+        i;
+    points.length = count;
+    for (i = 0; i < count; ++i) {
+        points[i] = readPair(stream);
+    }
+    return points;
+}
+
+function merge_xym(xy, m, length) {
+    var array = [],
+        i;
+    array.length = length;
+    for (i = 0; i < length; ++i) {
+        array[i] = [xy[i][0], xy[i][1], m[i]];
+    }
+    return array;
+}
+
+function merge_xyzm(xy, z, m, length) {
+    var array = [],
+        i;
+    array.length = length;
+    for (i = 0; i < length; ++i) {
+        array[i] = [xy[i][0], xy[i][1], z[i], m[i]];
+    }
+    return array;
+}
 
 function parseShpRecord(stream, generalType, errors) {
     var record = { number: stream.ui32be() },
         length = stream.ui32be() << 1,
         pos = stream.pos(),
-        shapeType = stream.ui32le();
+        type = stream.ui32le();
 
-    record.type = SHP_TYPES[shapeType];
+    record.type_number = type;
+    record.type = SHP_TYPES[type];
+    record.gj_type = SHP_TYPE_TO_GEOJSON_TYPE_MAP[record.type];
     if (record.type) {
         if (record.type !== generalType) {
             errors.push("shp: shape #" + record.number + " type: " + record.type + " / expected: " + generalType);
         }
-        SHP_RECORD_PARSERS[shapeType](stream, record);
+        SHP_RECORD_PARSERS[type](stream, record);
         pos = stream.pos() - pos;
         if (pos !== length) {
             errors.push("shp: shape #" + record.number + " length: " + length + " / actual: " + pos);
         }
     } else {
-        errors.push("shp: shape #" + record.number + " type: " + shapeType + " / unknown");
+        errors.push("shp: shape #" + record.number + " type: " + type + " / unknown");
         record = null;
     }
     return record;
