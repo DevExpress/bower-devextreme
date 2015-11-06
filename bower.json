@@ -14,7 +14,6 @@
   "keywords": [ "grid", "datagrid", "widgets", "charts", "gauge", "sparkline", "vector map", "viz", "visualization", "SPA" ],
   "dependencies": {
     "jquery": "2.1.4",
-    "jquery-1.11.3": "http://code.jquery.com/jquery-1.11.3.js",
     "globalize": "0.1.1",
     "jszip": "^2.4.0"
   }
