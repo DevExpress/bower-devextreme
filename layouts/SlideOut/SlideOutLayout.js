@@ -30,7 +30,7 @@
                 this._toggleNavigation()
         },
         _createNavigationWidget: function() {
-            this.$slideOut = $("<div data-bind='dxSlideOut: {  menuItemTemplate: $(\"#slideOutMenuItemTemplate\") }'></div>").dxCommandContainer({id: 'global-navigation'});
+            this.$slideOut = $("<div data-bind='dxSlideOut: {  menuItemTemplate: $(\"#slideOutMenuItemTemplate\"), contentTemplate: \" \" }'></div>").dxCommandContainer({id: 'global-navigation'});
             this._applyTemplate(this.$slideOut, this._layoutModel);
             this.callBase();
             this.slideOut = this.$slideOut.dxSlideOut("instance");

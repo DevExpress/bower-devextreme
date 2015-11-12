@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Mobile Widgets)
-* Version: 15.1.7
-* Build date: Sep 22, 2015
+* Version: 15.1.8
+* Build date: Oct 29, 2015
 *
 * Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -1641,7 +1641,7 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
                             options: {contentOffset: 76}
                         }])
             },
-            _getAnonimousTemplateName: function() {
+            _getAnonymousTemplateName: function() {
                 return ANONYMOUS_TEMPLATE_NAME
             },
             _init: function() {

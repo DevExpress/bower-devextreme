@@ -5,7 +5,8 @@
             this.callBase(options);
             if (!options.childController) {
                 this._ensureChildController("SimpleLayoutController", "SimpleLayout");
-                this.childController = new DX.framework.html.SimpleLayoutController
+                var bestMatches = DX.utils.findBestMatches(DX.devices.current(), layoutSets["simple"] || []);
+                this.childController = bestMatches.length ? bestMatches[0].controller : new DX.framework.html.SimpleLayoutController
             }
             else
                 this.childController = options.childController;

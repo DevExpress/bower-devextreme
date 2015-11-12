@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Charts)
-* Version: 15.1.7
-* Build date: Sep 22, 2015
+* Version: 15.1.8
+* Build date: Oct 29, 2015
 *
 * Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -550,6 +550,10 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                         },
                         overlappingBehavior = options.label.overlappingBehavior ? _extend({}, options.label.overlappingBehavior) : null;
                     if (overlappingBehavior) {
+                        if (that._zoomingOverlappingBehavior) {
+                            overlappingBehavior.mode = that._zoomingOverlappingBehavior.mode;
+                            overlappingBehavior.rotationAngle = that._zoomingOverlappingBehavior.rotationAngle
+                        }
                         if (!that._isHorizontal)
                             overlappingBehavior.mode = constants.validateOverlappingMode(overlappingBehavior.mode);
                         if (overlappingBehavior.mode !== "rotate")
@@ -1754,7 +1758,7 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                 that._axisConstantLineGroup = renderer.g().attr({"class": classSelector + "constant-lines"});
                 that._axisLabelGroup = renderer.g().attr({"class": classSelector + "axis-labels"})
             },
-            _clearAxisGroups: function(adjustAxis) {
+            _clearAxisGroups: function(adjustGroups) {
                 var that = this,
                     classSelector = WIDGET_CLASS + "-" + that._axisClass + "-";
                 that._axisGroup.remove();
@@ -1764,11 +1768,11 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                 that._axisGridGroup.remove();
                 if (that._axisTitleGroup)
                     that._axisTitleGroup.clear();
-                else if (!adjustAxis)
+                else if (!adjustGroups)
                     that._axisTitleGroup = that._renderer.g().attr({"class": classSelector + "title"}).append(that._axisGroup);
                 if (that._axisElementsGroup)
                     that._axisElementsGroup.clear();
-                else if (!adjustAxis)
+                else if (!adjustGroups)
                     that._axisElementsGroup = that._renderer.g().attr({"class": classSelector + "elements"}).append(that._axisGroup);
                 that._axisLineGroup.clear();
                 that._axisStripGroup.clear();
@@ -1830,12 +1834,17 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                     that._drawGrids(that._majorTicks.concat(that._decimatedTicks), borderOptions);
                 options.minorGrid.visible && that._drawGrids(that._minorTicks, borderOptions)
             },
-            draw: function(adjustAxis) {
+            draw: function(adjustGroups, adjustAxes) {
                 var that = this,
                     options = that._options,
+                    overlappingBehavior = that._tickManager.getOverlappingBehavior(),
                     areLabelsVisible;
+                that._zoomingOverlappingBehavior = adjustAxes === false ? {
+                    mode: overlappingBehavior.mode,
+                    rotationAngle: overlappingBehavior.rotationAngle
+                } : null;
                 if (that._axisGroup)
-                    that._clearAxisGroups(adjustAxis);
+                    that._clearAxisGroups(adjustGroups);
                 areLabelsVisible = options.label.visible && that._axisElementsGroup && !that._translator.getBusinessRange().stubData;
                 that._updateTranslatorInterval();
                 that._initAxisPositions();
@@ -2042,8 +2051,9 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
         var MIN_SCROLL_BAR_SIZE = 2,
             isDefined = DX.utils.isDefined,
             _min = math.min,
-            _max = math.max;
-        DX.viz.charts.ScrollBar = function(renderer, group) {
+            _max = math.max,
+            ScrollBar;
+        ScrollBar = DX.viz.charts.ScrollBar = function(renderer, group) {
             this._translator = DX.viz.CoreFactory.createTranslator2D({}, {}, {});
             this._scroll = renderer.rect().append(group);
             this._addEvents()
@@ -2064,7 +2074,7 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                 y = canvas.height - canvas.bottom + width + offset;
             return y
         }
-        DX.viz.charts.ScrollBar.prototype = {
+        ScrollBar.prototype = {
             _addEvents: function() {
                 var that = this,
                     $scroll = $(that._scroll.element),
@@ -2189,10 +2199,11 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                 that._applyPosition(_min(minPoint, maxPoint), _max(minPoint, maxPoint))
             },
             transform: function(translate, scale) {
-                var x = this._translator.getCanvasVisibleArea().min,
+                var translator = this._translator,
+                    x = translator.getCanvasVisibleArea().min,
                     dx = x - (x * scale - translate),
                     lx = this._offset + dx / (this._scale * scale);
-                this._applyPosition(lx, lx + this._translator.canvasLength / (this._scale * scale))
+                this._applyPosition(lx, lx + translator.canvasLength / (this._scale * scale))
             },
             dispose: function() {
                 this._scroll.dispose();
@@ -2231,11 +2242,10 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
             _map = vizUtils.map,
             _each = $.each,
             _extend = $.extend,
-            DEFAULT_ANIMATION_OPTIONS = {asyncSeriesRendering: true},
             _isDefined = utils.isDefined,
             _setCanvasValues = DX.viz.utils.setCanvasValues,
             DEFAULT_OPACITY = 0.3,
-            REINIT_REFRESH_ACTION_OPTIONS = ["adaptiveLayout", "crosshair", "equalBarWidth", "minBubbleSize", "maxBubbleSize", "resolveLabelOverlapping", "seriesSelectionMode", "pointSelectionMode", "adjustOnZoom", "synchronizeMultiAxes", "zoomingMode", "scrollingMode", "useAggregation"];
+            REINIT_REFRESH_ACTION_OPTIONS = ["adaptiveLayout", "diameter", "crosshair", "equalBarWidth", "minBubbleSize", "maxBubbleSize", "resolveLabelOverlapping", "seriesSelectionMode", "pointSelectionMode", "adjustOnZoom", "synchronizeMultiAxes", "zoomingMode", "scrollingMode", "useAggregation"];
         function createEventMapObject(name, deprecatedArgs) {
             return {
                     name: name,
@@ -2523,7 +2533,7 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                 that._createHtmlStructure();
                 that._createLegend();
                 that._needHandleRenderComplete = true;
-                that.layoutManager = new charts.LayoutManager(that._layoutManagerOptions());
+                that.layoutManager = new charts.LayoutManager;
                 that._createScrollBar();
                 that._$element.on('contextmenu', function(event) {
                     that.eventType = 'contextmenu';
@@ -2606,10 +2616,10 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                 disposeObjectsInArray.call(that, "businessRanges", ["arg", "val"]);
                 that.translators = null;
                 disposeObjectsInArray.call(that, "series");
-                disposeObject("layoutManager");
                 disposeObject("tracker");
                 disposeObject("chartTitle");
                 disposeObject("_crosshair");
+                that.layoutManager = null;
                 that.paneAxis = null;
                 that._userOptions = null;
                 that._canvas = null;
@@ -2641,7 +2651,7 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                 disposeObject("_scrollBarGroup")
             },
             _getAnimationOptions: function() {
-                return $.extend({}, DEFAULT_ANIMATION_OPTIONS, this._themeManager.getOptions("animation"))
+                return this._themeManager.getOptions("animation")
             },
             _getDefaultSize: function() {
                 return {
@@ -2735,6 +2745,7 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                 that.DEBUG_dirtyCanvas = dirtyCanvas;
                 if (layoutCanvas)
                     drawElements = that._getDrawElements(drawOptions, isLegendInside);
+                that.layoutManager.setOptions(that._layoutManagerOptions());
                 that.layoutManager.layoutElements(drawElements, that._canvas, that._getAxisDrawingMethods(drawOptions, preparedOptions, isRotated), layoutTargets, isRotated, that._getAxesForTransform(isRotated));
                 layoutCanvas && that._updateCanvasClipRect(dirtyCanvas);
                 that._applyClipRects(preparedOptions);
@@ -2767,14 +2778,7 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                     bottom: that._canvas.height
                 }, trackerCanvases);
                 that._updateLegendPosition(drawOptions, isLegendInside);
-                var timeout = that._getSeriesRenderTimeout(drawOptions);
-                if (timeout >= 0)
-                    that._delayedRedraw = setTimeout(renderSeries, timeout);
-                else
-                    renderSeries();
-                function renderSeries() {
-                    that._renderSeries(drawOptions, isRotated, isLegendInside)
-                }
+                that._renderSeries(drawOptions, isRotated, isLegendInside)
             },
             _createCrosshairCursor: _noop,
             _appendSeriesGroups: function() {
@@ -2786,7 +2790,7 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                 var that = this,
                     themeManager = that._themeManager,
                     resolveLabelOverlapping = themeManager.getOptions("resolveLabelOverlapping");
-                drawOptions.hideLayoutLabels = that.layoutManager.needMoreSpaceForPanesCanvas(that._getLayoutTargets(), that._isRotated()) && !themeManager.getOptions("adaptiveLayout").keepLabels;
+                drawOptions.hideLayoutLabels = that.layoutManager.needMoreSpaceForPanesCanvas(that._getLayoutTargets(), isRotated) && !themeManager.getOptions("adaptiveLayout").keepLabels;
                 that._drawSeries(drawOptions, isRotated);
                 resolveLabelOverlapping !== "none" && that._resolveLabelOverlapping(resolveLabelOverlapping);
                 that._adjustSeries();
@@ -2901,10 +2905,8 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                     adjustAxes: true,
                     drawLegend: true,
                     drawTitle: true,
-                    adjustSeriesLabels: true,
                     animate: animationOptions.enabled,
                     animationPointsLimit: animationOptions.maxPointCountSupported,
-                    asyncSeriesRendering: animationOptions.asyncSeriesRendering,
                     updateTracker: true
                 }, drawOptions, this.__renderOptions);
                 if (!_isDefined(options.recreateCanvas))
@@ -2947,7 +2949,6 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                 this._updateLegend();
                 this._render({
                     force: true,
-                    asyncSeriesRendering: false,
                     updateTracker: false
                 })
             },
@@ -3378,9 +3379,9 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
             },
             _drawAxes: function(panesBorderOptions, drawOptions, adjustUnits) {
                 var that = this,
-                    drawAxes = function(axes) {
+                    drawAxes = function(axes, adjustAxes) {
                         _each(axes, function(_, axis) {
-                            axis.draw(adjustUnits)
+                            axis.draw(adjustUnits, adjustAxes)
                         })
                     },
                     drawStaticAxisElements = function(axes) {
@@ -3612,7 +3613,6 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
             vizUtils = DX.viz.utils,
             MAX_ADJUSTMENT_ATTEMPTS = 5,
             DEFAULT_PANE_NAME = "default",
-            ASYNC_SERIES_RENDERING_DELAY = 25,
             DEFAULT_PANES = [{
                     name: DEFAULT_PANE_NAME,
                     border: {}
@@ -3779,7 +3779,6 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                 this.option({defaultPane: DEFAULT_PANE_NAME})
             },
             _initCore: function() {
-                this.__ASYNC_SERIES_RENDERING_DELAY = ASYNC_SERIES_RENDERING_DELAY;
                 this.paneAxis = {};
                 this._panesClipRects = {};
                 this.callBase()
@@ -4027,20 +4026,18 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                     that._valueAxes[i].applyClipRects(that._getElementsClipRectID(that._valueAxes[i].pane), canvasClipRectID);
                 that._fillPanesBackground()
             },
-            _getSeriesRenderTimeout: function(drawOptions) {
-                return drawOptions.asyncSeriesRendering ? ASYNC_SERIES_RENDERING_DELAY : undefined
-            },
             _updateLegendPosition: function(drawOptions, legendHasInsidePosition) {
                 var that = this;
                 if (drawOptions.drawLegend && that.legend && legendHasInsidePosition) {
                     var panes = that.panes,
                         newCanvas = _extend({}, panes[0].canvas),
-                        layoutManager = new charts.LayoutManager({
-                            width: 0,
-                            height: 0
-                        });
+                        layoutManager = new charts.LayoutManager;
                     newCanvas.right = panes[panes.length - 1].canvas.right;
                     newCanvas.bottom = panes[panes.length - 1].canvas.bottom;
+                    layoutManager.setOptions({
+                        width: 0,
+                        height: 0
+                    });
                     layoutManager.layoutElements([that.legend], newCanvas, $.noop, [{canvas: newCanvas}])
                 }
             },
@@ -4053,7 +4050,6 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                 });
                 _each(that.series, function(_, particularSeries) {
                     that._applyPaneClipRect(particularSeries);
-                    particularSeries.setAdjustSeriesLabels(drawOptions.adjustSeriesLabels);
                     var tr = that._getTranslator(particularSeries.pane, particularSeries.axis),
                         translators = {};
                     translators[rotated ? "x" : "y"] = tr.val;
@@ -4143,7 +4139,8 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                     verticalAxes = rotated ? that._argumentAxes : that._valueAxes,
                     horizontalAxes = rotated ? that._valueAxes : that._argumentAxes,
                     hElements = horizontalAxes,
-                    vElements = verticalAxes;
+                    vElements = verticalAxes,
+                    adjustAxes = drawOptions.adjustAxes;
                 if (that._scrollBar) {
                     that._scrollBar.setPane(layoutTargets);
                     if (rotated)
@@ -4158,14 +4155,14 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                         that._valueAxes[i].resetTicks();
                     if (synchronizeMultiAxes)
                         charts.multiAxesSynchronizer.synchronize(that._valueAxes);
-                    drawAxes(horizontalAxes);
+                    drawAxes(horizontalAxes, adjustAxes);
                     layoutManager.requireAxesRedraw = false;
-                    if (drawOptions.adjustAxes) {
+                    if (adjustAxes) {
                         layoutManager.applyHorizontalAxesLayout(hElements, layoutTargets, rotated);
                         !layoutManager.stopDrawAxes && reinitTranslators(that.translators)
                     }
-                    drawAxes(verticalAxes);
-                    if (drawOptions.adjustAxes && !layoutManager.stopDrawAxes) {
+                    drawAxes(verticalAxes, adjustAxes);
+                    if (adjustAxes && !layoutManager.stopDrawAxes) {
                         layoutManager.applyVerticalAxesLayout(vElements, layoutTargets, rotated);
                         !layoutManager.stopDrawAxes && reinitTranslators(that.translators)
                     }
@@ -4509,8 +4506,6 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                     drawLegend: false,
                     adjustAxes: false,
                     animate: false,
-                    adjustSeriesLabels: false,
-                    asyncSeriesRendering: false,
                     updateTracker: false
                 })
             },
@@ -4822,7 +4817,6 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                 _updateLegendPosition: _noop,
                 _createScrollBar: _noop,
                 _applyClipRects: _noop,
-                _getSeriesRenderTimeout: _noop,
                 _isRotated: _noop,
                 _getCrosshairOptions: _noop,
                 _isLegendInside: _noop,
@@ -4965,9 +4959,7 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
             }
             return offset
         }
-        function LayoutManager(options) {
-            this._options = options
-        }
+        function LayoutManager(){}
         function toLayoutElementCoords(canvas) {
             return new DX.viz.WrapperLayoutElement(null, {
                     x: canvas.left,
@@ -4978,8 +4970,8 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
         }
         LayoutManager.prototype = {
             constructor: LayoutManager,
-            dispose: function() {
-                this._options = null
+            setOptions: function(options) {
+                this._options = options
             },
             applyVerticalAxesLayout: function(axes, panes, rotated) {
                 this._applyAxesLayout(axes, panes, rotated)
@@ -5586,6 +5578,7 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
             SERIES_HOVER_CHANGED = 'seriesHoverChanged',
             POINT_HOVER_CHANGED = 'pointHoverChanged',
             RELEASE_POINT_HOVER_STATE = 'releasePointHoverState',
+            SERIES_SELECTION_CHANGED = "seriesSelectionChanged",
             DELAY = 100;
         function getNonVirtualAxis(axisArray) {
             var axis;
@@ -5776,16 +5769,16 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                     if ($.inArray(series, that._selectedSeries) < 0) {
                         that._selectedSeries.push(series);
                         series.setSelectedState(true, mode, that.legendCallback(series));
-                        that._eventTrigger("seriesSelectionChanged", {target: series})
+                        that._eventTrigger(SERIES_SELECTION_CHANGED, {target: series})
                     }
                 },
                 _setSelectedSeriesSingleMode: function(series, mode) {
                     var that = this;
                     if (series !== that._selectedSeries || series.lastSelectionMode !== mode) {
-                        this._releaseSelectedSeries();
+                        that._releaseSelectedSeries();
                         that._selectedSeries = series;
                         series.setSelectedState(true, mode, that.legendCallback(series));
-                        that._eventTrigger("seriesSelectionChanged", {target: series})
+                        that._eventTrigger(SERIES_SELECTION_CHANGED, {target: series})
                     }
                 },
                 _releaseSelectedSeriesMultipleMode: function(series) {
@@ -5794,7 +5787,7 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                         seriesIndex = $.inArray(series, selectedSeries);
                     if (seriesIndex >= 0) {
                         series.setSelectedState(false, undefined, that.legendCallback(series));
-                        that._eventTrigger("seriesSelectionChanged", {target: series});
+                        that._eventTrigger(SERIES_SELECTION_CHANGED, {target: series});
                         selectedSeries.splice(seriesIndex, 1)
                     }
                     else if (!series)
@@ -5802,12 +5795,12 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                             that._releaseSelectedSeries(series)
                         })
                 },
-                _releaseSelectedSeriesSingleMode: function() {
+                _releaseSelectedSeriesSingleMode: function(series) {
                     var that = this,
-                        series = that._selectedSeries;
-                    if (series) {
-                        series.setSelectedState(false, undefined, that.legendCallback(series));
-                        that._eventTrigger("seriesSelectionChanged", {target: series});
+                        selectedSeries = that._selectedSeries;
+                    if (selectedSeries && (!series || series === selectedSeries)) {
+                        selectedSeries.setSelectedState(false, undefined, that.legendCallback(selectedSeries));
+                        that._eventTrigger(SERIES_SELECTION_CHANGED, {target: selectedSeries});
                         that._selectedSeries = null
                     }
                 },
@@ -5822,13 +5815,13 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                     if (mode === NONE_MODE)
                         $(series).trigger('NoneMode')
                 },
-                _releaseHoveredSeries: function(needSetHoverView) {
+                _releaseHoveredSeries: function(needSetHoverView, hoveredPoint) {
                     var that = this,
                         hoveredSeries = that.hoveredSeries,
                         seriesWithHoverView = that._seriesWithHoverView;
                     if (hoveredSeries) {
                         hoveredSeries.setHoverState(false, undefined, that.legendCallback(hoveredSeries));
-                        if (needSetHoverView)
+                        if (needSetHoverView && hoveredPoint && hoveredPoint.series === hoveredSeries)
                             that._seriesWithHoverView = hoveredSeries.setHoverView();
                         that._eventTrigger(SERIES_HOVER_CHANGED, {target: hoveredSeries});
                         that.hoveredSeries = null
@@ -5856,7 +5849,7 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                 },
                 _clean: function() {
                     var that = this;
-                    that._selectedPoint = that._selectedSeries = that.hoveredPoint = that.hoveredSeries = null;
+                    that._selectedPoint = that._selectedSeries = that.hoveredPoint = that.hoveredSeries = that._seriesWithHoverView = null;
                     that._hideTooltip(that.pointAtShownTooltip)
                 },
                 _clearHover: function() {
@@ -6123,8 +6116,8 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                             scaleDelta = startGesture.scale - zoom.scale;
                         renderer.root.animate({_: 0}, {
                             step: function(pos) {
-                                var translateValue = -startGesture.scroll - translateDelta * pos;
-                                var scaleValue = startGesture.scale - scaleDelta * pos;
+                                var translateValue = -startGesture.scroll - translateDelta * pos,
+                                    scaleValue = startGesture.scale - scaleDelta * pos;
                                 that._chart._transformArgument(-translateValue, scaleValue)
                             },
                             complete: complete,
@@ -6264,7 +6257,7 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                     seriesFromPoint = point.series;
                 that._stickedSeries = seriesFromPoint;
                 that._setHoveredPoint(point);
-                that._releaseHoveredSeries(seriesWithHoverView ? seriesWithHoverView === seriesFromPoint : true);
+                that._releaseHoveredSeries(!seriesWithHoverView || seriesWithHoverView === seriesFromPoint, point);
                 that._pointerComplete(point)
             },
             _pointerComplete: function(point) {
@@ -6491,7 +6484,8 @@ if (!DevExpress.MOD_VIZ_CHARTS) {
                     that._horizontal.lines = that._createLines(horizontalOptions.line, "v", that._horizontalGroup);
                     that._horizontal.labels = that._createLabels(that._axes[1], horizontalOptions, true, that._horizontalGroup)
                 }
-                that._circle = renderer.circle(canvas.left, canvas.top, 0).attr(circleOptions).append(that._crosshairGroup)
+                that._circle = renderer.circle(canvas.left, canvas.top, 0).attr(circleOptions).append(that._crosshairGroup);
+                that.hide()
             },
             _createLabels: function(axes, options, isHorizontal, group) {
                 var that = this,

@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme
-* Version: 15.1.7
-* Build date: Sep 22, 2015
+* Version: 15.1.8
+* Build date: Oct 29, 2015
 *
 * Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -952,6 +952,10 @@
   -moz-backface-visibility: hidden;
   -ms-backface-visibility: hidden;
   backface-visibility: hidden;
+}
+.dx-device-android .dx-scrollable-native.dx-scrollable-scrollbars-hidden ::-webkit-scrollbar
+{
+  display: none;
 }
 .dx-scrollable-native.dx-scrollable-native-generic .dx-scrollview-top-pocket
 {
@@ -2755,6 +2759,7 @@
   -ms-user-drag: none;
   -o-user-drag: none;
   user-drag: none;
+  overflow: hidden;
 }
 .dx-popup-content.dx-dialog-content
 {
@@ -4383,10 +4388,6 @@
 {
   background-color: transparent;
 }
-.dx-datagrid-table tr:nth-of-type(even)
-{
-  background-color: transparent;
-}
 .dx-datagrid
 {
   position: relative;
@@ -4414,6 +4415,7 @@
 }
 .dx-datagrid .dx-datagrid-content-fixed .dx-datagrid-table .dx-row .dx-pointer-events-none
 {
+  visibility: hidden;
   background-color: transparent;
   pointer-events: none;
   border-top-color: transparent;
@@ -4431,13 +4433,17 @@
 {
   margin-top: 1px;
 }
-.dx-datagrid.dx-datagrid-borders>.dx-datagrid-headers .dx-row:last-child
+.dx-datagrid.dx-datagrid-borders>.dx-datagrid-headers .dx-row:last-child td
 {
-  border-bottom: 0;
+  border-bottom-width: 0;
 }
 .dx-datagrid.dx-datagrid-borders>.dx-datagrid-header-panel
 {
   border-bottom: 0;
+}
+.dx-datagrid.dx-datagrid-borders>.dx-datagrid-rowsview.dx-last-row-border .dx-data-row.dx-row-lines:nth-last-child(2) td
+{
+  border-bottom-width: 0;
 }
 .dx-datagrid .dx-menu-horizontal
 {
@@ -4796,6 +4802,10 @@
   white-space: normal;
   display: inline-block;
   vertical-align: top;
+}
+.dx-datagrid-headers .dx-header-row.dx-column-lines>td>.dx-datagrid-text-content
+{
+  display: block;
 }
 .dx-header-row .dx-indicator-alignment-left
 {
@@ -5496,7 +5506,8 @@
 }
 .dx-multiview-item-hidden
 {
-  top: 100%;
+  top: -9999px;
+  left: -9999px;
   visibility: hidden;
 }
 .dx-treeview
@@ -5673,11 +5684,11 @@
 }
 .dx-field-value.dx-datebox
 {
-  width: 60% !important;
+  min-width: 60%;
 }
 .dx-field-value:not(.dx-widget)>.dx-datebox
 {
-  width: 100% !important;
+  min-width: 100%;
 }
 .dx-field-value .dx-selectbox-tag-container
 {
@@ -5896,7 +5907,7 @@
   height: 250px;
   width: 270px;
 }
-.dx-timeview.dx-state-disabled.dx-widget, .dx-timeview.dx-state-disabled .dx-widget
+.dx-timeview.dx-state-disabled.dx-widget, .dx-timeview .dx-state-disabled.dx-widget, .dx-timeview.dx-state-disabled .dx-widget, .dx-timeview .dx-state-disabled .dx-widget
 {
   filter: alpha(opacity=100);
   -khtml-opacity: 1;
@@ -5934,11 +5945,94 @@
 {
   line-height: normal;
 }
-.dx-scheduler-all-day-panel
-{
-  border-collapse: collapse;
-}
 .dx-scheduler-all-day-panel td
 {
   padding: 0;
+}
+.dx-scheduler-dropdown-appointments
+{
+  position: absolute;
+  display: block;
+  height: 20px;
+  text-align: center;
+  cursor: pointer;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  -ms-border-radius: 3px;
+  -o-border-radius: 3px;
+  border-radius: 3px;
+}
+.dx-scheduler-dropdown-appointments .dx-scheduler-dropdown-appointments-content span:last-child
+{
+  display: inline-block;
+  vertical-align: middle;
+  line-height: 10px;
+  height: 20px;
+  padding-left: 2px;
+}
+.dx-scheduler-dropdown-appointments.dx-button
+{
+  padding: 0;
+  max-width: none;
+}
+.dx-dropdownmenu-popup-wrapper .dx-scheduler-dropdown-appointment
+{
+  max-width: 400px;
+  height: 65px;
+  position: relative;
+}
+.dx-dropdownmenu-popup-wrapper .dx-scheduler-dropdown-appointment.dx-list-item-content
+{
+  padding: 5px;
+  width: 100%;
+}
+.dx-scheduler-dropdown-appointment-info-block
+{
+  max-width: 300px;
+  margin-right: 75px;
+  margin-top: 7px;
+}
+.dx-scheduler-dropdown-appointment-buttons-block
+{
+  position: absolute;
+  top: 19.5px;
+  right: 0;
+  width: 75px;
+  text-align: right;
+}
+.dx-scheduler-dropdown-appointment-title
+{
+  overflow: hidden;
+  -o-text-overflow: ellipsis;
+  -ms-text-overflow: ellipsis;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.dx-popup-content .dx-button.dx-scheduler-dropdown-appointment-remove-button, .dx-popup-content .dx-button.dx-scheduler-dropdown-appointment-edit-button
+{
+  padding: 2px;
+  margin: 0 10px 0 0;
+}
+.dx-popup-content .dx-button.dx-scheduler-dropdown-appointment-remove-button .dx-icon, .dx-popup-content .dx-button.dx-scheduler-dropdown-appointment-edit-button .dx-icon
+{
+  font-size: 14px;
+}
+.dx-scheduler-dropdown-appointment-date
+{
+  font-size: 12px;
+}
+.dx-rtl .dx-scheduler-dropdown-appointment-info-block
+{
+  margin-left: 75px;
+  margin-right: auto;
+}
+.dx-rtl .dx-scheduler-dropdown-appointment-buttons-block
+{
+  left: 0;
+  right: auto;
+  text-align: left;
+}
+.dx-rtl .dx-popup-content .dx-button.dx-scheduler-dropdown-appointment-remove-button, .dx-rtl .dx-popup-content .dx-button.dx-scheduler-dropdown-appointment-edit-button
+{
+  margin: 0 0 0 10px;
 }

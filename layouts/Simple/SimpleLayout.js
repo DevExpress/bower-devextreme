@@ -13,15 +13,17 @@
         },
         _onToolbarOptionChanged: function(args) {
             if (args.name === "items") {
-                this._refreshAppbarVisibility(appbar);
+                var appbar = args.component;
+                if (appbar)
+                    this._refreshAppbarVisibility(appbar);
                 this._refreshHasToolbarClass()
             }
         },
         _getAppbar: function($markup) {
             var $appbar = $markup.find(LAYOUT_TOOLBAR_BOTTOM_SELECTOR);
-            if ($appbar.length === 1)
-                appbar = $appbar.dxToolbar("instance");
-            return appbar
+            if ($appbar.length !== 1)
+                return;
+            return $appbar.dxToolbar("instance")
         },
         _getCurrentAppbar: function() {
             return this._getAppbar(this._getViewFrame().find(".dx-active-view "))

@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Range Selector)
-* Version: 15.1.7
-* Build date: Sep 22, 2015
+* Version: 15.1.8
+* Build date: Oct 29, 2015
 *
 * Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -83,13 +83,18 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
                     min,
                     max,
                     valueIndex;
+                if (categories)
+                    categories = DX.viz.utils.map(categories, function(category) {
+                        return dxUtils.isDefined(category) ? category.valueOf() : null
+                    });
                 if (isDiscrete) {
-                    valueIndex = $.inArray(value, categories);
+                    valueIndex = $.inArray(value.valueOf(), categories);
                     return valueIndex < 0 ? startValue : value
                 }
-                else
-                    min = startValue > endValue ? endValue : startValue,
-                    max = startValue > endValue ? startValue : endValue;
+                else {
+                    min = startValue > endValue ? endValue : startValue;
+                    max = startValue > endValue ? startValue : endValue
+                }
                 if (value < min)
                     value = min;
                 if (value > max)
@@ -387,12 +392,13 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
                         showMinorTicks: true,
                         withMinorCorrection: true,
                         stick: stick !== false
-                    });
-                tickManager.getTicks(true);
+                    }),
+                    ticks = tickManager.getTicks(true);
                 return {
                         majorTickInterval: tickManager.getTickInterval(),
                         minorTickInterval: tickManager.getMinorTickInterval(),
-                        bounds: tickManager.getTickBounds()
+                        bounds: tickManager.getTickBounds(),
+                        ticks: ticks
                     }
             };
         var calculateTranslatorRange = function(seriesDataSource, scaleOptions) {
@@ -620,6 +626,8 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
                 rangeContainerCanvas = calculateRangeContainerCanvas(sizeOptions, indents, scaleLabelsAreaHeight, isCompactMode);
                 that.translators = createTranslator(translatorRange, createTranslatorCanvas(sizeOptions, rangeContainerCanvas, scaleLabelsAreaHeight));
                 scaleOptions.ticksInfo = that._getTicksInfo(rangeContainerCanvas.width);
+                if (scaleOptions.valueType === DATETIME && scaleOptions.type === DISCRETE)
+                    sliderMarkerOptions.format = formatHelper.getDateFormatByTicks(scaleOptions.ticksInfo.majorTicks);
                 that._testTicksInfo = scaleOptions.ticksInfo;
                 that._selectedRange = selectedRange;
                 if (seriesDataSource)
@@ -783,7 +791,9 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
                     scaleOptions.minorTickInterval = tickIntervalsInfo.minorTickInterval;
                     scaleOptions.majorTickInterval = tickIntervalsInfo.majorTickInterval;
                     if (scaleOptions.valueType === DATETIME && !_isDefined(scaleOptions.label.format))
-                        if (!scaleOptions.marker.visible)
+                        if (scaleOptions.type === DISCRETE)
+                            scaleOptions.label.format = formatHelper.getDateFormatByTicks(tickIntervalsInfo.ticks);
+                        else if (!scaleOptions.marker.visible)
                             scaleOptions.label.format = formatHelper.getDateFormatByTickInterval(scaleOptions.startValue, scaleOptions.endValue, scaleOptions.majorTickInterval);
                         else
                             scaleOptions.label.format = utils.getDateUnitInterval(scaleOptions.majorTickInterval)
@@ -842,7 +852,6 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
                         axisType: scaleOptions.type,
                         dataType: scaleOptions.valueType
                     },
-                    tickManagerData,
                     startValue = scaleOptions.startValue,
                     endValue = scaleOptions.endValue,
                     tickManagerOptions = that._getTickManagerOptions(scaleOptions, isEmpty, startValue, endValue),
@@ -850,13 +859,13 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
                     customBoundaryTicks,
                     tickManager,
                     fullTicks,
-                    noInfoFromMinMax;
-                tickManagerData = {
-                    min: isEmpty ? businessRange.min : startValue,
-                    max: isEmpty ? businessRange.max : endValue,
-                    screenDelta: screenDelta,
-                    customTicks: categoriesInfo && categoriesInfo.categories
-                };
+                    noInfoFromMinMax,
+                    tickManagerData = {
+                        min: isEmpty ? businessRange.min : startValue,
+                        max: isEmpty ? businessRange.max : endValue,
+                        screenDelta: screenDelta,
+                        customTicks: categoriesInfo && categoriesInfo.categories
+                    };
                 tickManager = viz.CoreFactory.createTickManager(tickManagerTypes, tickManagerData, tickManagerOptions);
                 if (scaleOptions.type === DISCRETE)
                     noInfoFromMinMax = !_isDefined(tickManagerData.min) || !_isDefined(tickManagerData.max);
@@ -1073,11 +1082,16 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
             rangeSelectorUtils = rangeSelector.utils,
             utils = DX.utils,
             _isDefined = utils.isDefined,
+            getDatesDifferences = utils.getDatesDifferences,
             HALF_TICK_LENGTH = 6,
             MINOR_TICK_OPACITY_COEF = 0.6,
             Scale,
             baseVisualElementMethods = rangeSelector.baseVisualElementMethods,
             addInterval = rangeSelectorUtils.addInterval,
+            dateUnitIntervals = utils.dateUnitIntervals,
+            CANVAS_POSITION = "canvas_position_",
+            CANVAS_POSITION_LEFT = CANVAS_POSITION + "left",
+            CANVAS_POSITION_RIGHT = CANVAS_POSITION + "right",
             _extend = $.extend;
         function calculateRangeByMarkerPosition(posX, markerDatePositions, scaleOptions) {
             var selectedRange = {},
@@ -1100,30 +1114,31 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
             selectedRange.endValue = selectedRange.endValue || scaleOptions.endValue;
             return selectedRange
         }
-        var dateSetters = {};
-        dateSetters.millisecond = function(date) {
-            date.setMilliseconds(0)
-        };
-        dateSetters.second = function(date) {
-            date.setSeconds(0, 0)
-        };
-        dateSetters.minute = function(date) {
-            date.setMinutes(0, 0, 0)
-        };
-        dateSetters.hour = function(date) {
-            date.setHours(0, 0, 0, 0)
-        };
+        var dateSetters = {
+                millisecond: function(date) {
+                    date.setMilliseconds(0)
+                },
+                second: function(date) {
+                    date.setSeconds(0, 0)
+                },
+                minute: function(date) {
+                    date.setMinutes(0, 0, 0)
+                },
+                hour: function(date) {
+                    date.setHours(0, 0, 0, 0)
+                },
+                month: function(date) {
+                    date.setMonth(0);
+                    dateSetters.day(date)
+                },
+                quarter: function(date) {
+                    date.setMonth(formatHelper.getFirstQuarterMonth(date.getMonth()));
+                    dateSetters.day(date)
+                }
+            };
         dateSetters.week = dateSetters.day = function(date) {
             date.setDate(1);
             dateSetters.hour(date)
-        };
-        dateSetters.month = function(date) {
-            date.setMonth(0);
-            dateSetters.day(date)
-        };
-        dateSetters.quarter = function(date) {
-            date.setMonth(formatHelper.getFirstQuarterMonth(date.getMonth()));
-            dateSetters.day(date)
         };
         function getMarkerDate(date, tickInterval) {
             var markerDate = new Date(date.getTime()),
@@ -1140,8 +1155,8 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
             if (deleteDifferent === 'quarter')
                 deleteDifferent = 'month';
             if (datesDifferences[deleteDifferent])
-                for (i = 0; i < utils.dateUnitIntervals.length; i++) {
-                    dateUnitInterval = utils.dateUnitIntervals[i];
+                for (i = 0; i < dateUnitIntervals.length; i++) {
+                    dateUnitInterval = dateUnitIntervals[i];
                     if (datesDifferences[dateUnitInterval]) {
                         datesDifferences[dateUnitInterval] = false;
                         datesDifferences.count--
@@ -1157,116 +1172,151 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
                 };
             return String(utils.isFunction(options.customizeText) ? options.customizeText.call(formatObject, formatObject) : formatObject.valueText)
         }
+        function checkMarkersPosition(dateMarker, prevDateMarker) {
+            return prevDateMarker === undefined || dateMarker.x1 > prevDateMarker.x2 || dateMarker.x2 < prevDateMarker.x1
+        }
+        function deleteDrawnDateMarker(marker) {
+            marker.path && marker.path.dispose();
+            marker.text.dispose();
+            marker.path = marker.text = null
+        }
+        function getLabelFormatOptions(label, datesDifferences) {
+            var formatString = formatHelper.getDateFormatByDifferences(datesDifferences);
+            if (!_isDefined(label.format))
+                return _extend({}, label, {format: formatString});
+            return label
+        }
+        function setupDateUnitInterval(scaleOptions) {
+            var key,
+                millisecTickInterval,
+                majorTickInterval = scaleOptions.ticksInfo.majorTickInterval,
+                majorTicks = scaleOptions.ticksInfo.majorTicks;
+            if (scaleOptions.valueType === 'datetime') {
+                if (majorTicks && majorTicks.autoArrangementStep > 1) {
+                    if (utils.isString(majorTickInterval))
+                        majorTickInterval = utils.getDateIntervalByString(majorTickInterval);
+                    for (key in majorTickInterval)
+                        if (majorTickInterval.hasOwnProperty(key)) {
+                            majorTickInterval[key] *= majorTicks.autoArrangementStep;
+                            millisecTickInterval = utils.dateToMilliseconds(majorTickInterval)
+                        }
+                    majorTickInterval = utils.convertMillisecondsToDateUnits(millisecTickInterval)
+                }
+                return utils.getDateUnitInterval(majorTickInterval)
+            }
+        }
         Scale = function() {
             baseVisualElementMethods.init.apply(this, arguments)
         };
         Scale.prototype = _extend({}, baseVisualElementMethods, {
             constructor: Scale,
-            _setupDateUnitInterval: function(scaleOptions) {
-                var key,
-                    millisecTickInterval,
-                    majorTickInterval = scaleOptions.ticksInfo.majorTickInterval,
-                    majorTicks = scaleOptions.ticksInfo.majorTicks;
-                if (scaleOptions.valueType === 'datetime') {
-                    if (majorTicks && majorTicks.autoArrangementStep > 1) {
-                        if (utils.isString(majorTickInterval))
-                            majorTickInterval = utils.getDateIntervalByString(majorTickInterval);
-                        for (key in majorTickInterval)
-                            if (majorTickInterval.hasOwnProperty(key)) {
-                                majorTickInterval[key] *= majorTicks.autoArrangementStep;
-                                millisecTickInterval = utils.dateToMilliseconds(majorTickInterval)
-                            }
-                        majorTickInterval = utils.convertMillisecondsToDateUnits(millisecTickInterval)
-                    }
-                    this.dateUnitInterval = utils.getDateUnitInterval(majorTickInterval)
-                }
-            },
             _getDrawnDateMarker: function(date, options) {
                 var that = this,
                     labelPosX,
                     labelPosY,
                     scaleOptions = that._options.scale,
+                    markerOptions = scaleOptions.marker,
+                    renderer = that._renderer,
                     textElement,
                     textElementWidth,
                     textIndent,
-                    pathElement;
+                    pathElement,
+                    x1,
+                    x2;
                 if (options.x === null)
                     return;
                 that.textOptions.align = "left";
-                pathElement = that._renderer.path([options.x, options.y, options.x, options.y + scaleOptions.marker.separatorHeight], "line").attr(that._majorTickStyle).append(options.group);
-                textElement = that._renderer.text(getLabel(date, options.label), 0, 0).attr(that.textOptions).css(that.fontOptions).append(options.group);
+                if (!options.skipStick)
+                    pathElement = renderer.path([options.x, options.y, options.x, options.y + markerOptions.separatorHeight], "line").attr(that._majorTickStyle).append(options.group);
+                textElement = renderer.text(getLabel(date, options.label), 0, 0).attr(that.textOptions).css(that.fontOptions).append(options.group);
                 textElementWidth = textElement.getBBox().width;
-                textIndent = scaleOptions.tick.width + scaleOptions.marker.textLeftIndent;
-                labelPosX = scaleOptions.inverted ? options.x - textIndent - textElementWidth : options.x + textIndent;
-                labelPosY = options.y + scaleOptions.marker.textTopIndent + that.fontOptions["font-size"];
+                textIndent = scaleOptions.tick.width + markerOptions.textLeftIndent;
+                if (scaleOptions.inverted) {
+                    labelPosX = options.x - textIndent - textElementWidth;
+                    x1 = labelPosX;
+                    x2 = options.x
+                }
+                else {
+                    labelPosX = options.x + textIndent;
+                    x1 = options.x;
+                    x2 = labelPosX + textElementWidth
+                }
+                labelPosY = options.y + markerOptions.textTopIndent + that.fontOptions["font-size"];
                 textElement.move(labelPosX, labelPosY);
                 return {
-                        x1: labelPosX,
-                        x2: labelPosX + textElementWidth,
+                        x1: x1,
+                        x2: x2,
                         path: pathElement,
                         text: textElement
                     }
             },
-            _deleteDrawnDateMarker: function(marker) {
-                marker.path.dispose();
-                marker.path = null;
-                marker.text.dispose();
-                marker.text = null
-            },
             _drawDateMarkers: function(dates, group) {
                 var that = this,
                     i,
-                    options = that._options,
-                    datesLength = dates.length,
-                    datesDifferences,
-                    markerDate,
-                    posX,
                     markerDatePositions = [],
                     prevDateMarker,
-                    dateMarker;
-                if (options.scale.valueType !== 'datetime' || !that.visibleMarkers)
-                    return;
-                if (dates.length > 1) {
-                    for (i = 1; i < datesLength; i++) {
-                        datesDifferences = utils.getDatesDifferences(dates[i - 1], dates[i]);
-                        prepareDatesDifferences(datesDifferences, that.dateUnitInterval);
-                        if (datesDifferences.count > 0) {
-                            markerDate = getMarkerDate(dates[i], that.dateUnitInterval);
-                            that.markerDates = that.markerDates || [];
-                            that.markerDates.push(markerDate);
-                            posX = that.translator.translate(markerDate);
-                            dateMarker = that._getDrawnDateMarker(markerDate, {
-                                group: group,
-                                y: options.canvas.top + options.canvas.height - that.markersAreaHeight + options.scale.marker.topIndent,
-                                x: posX,
-                                label: that._getLabelFormatOptions(formatHelper.getDateFormatByDifferences(datesDifferences))
-                            });
-                            if (prevDateMarker === undefined || dateMarker.x1 > prevDateMarker.x2 || dateMarker.x2 < prevDateMarker.x1) {
-                                posX !== null && markerDatePositions.push({
+                    leftDateMarker,
+                    res;
+                for (i = 1; i < dates.length; i++) {
+                    res = that._drawMarker(dates[i - 1], dates[i], prevDateMarker, group);
+                    if (res) {
+                        markerDatePositions.push(res.pos);
+                        prevDateMarker = res.marker;
+                        if (!leftDateMarker)
+                            leftDateMarker = res.marker
+                    }
+                }
+                if (markerDatePositions.length)
+                    that._drawMarker(dates[0], markerDatePositions[0].date, leftDateMarker, group, that._options.scale.inverted ? CANVAS_POSITION_RIGHT : CANVAS_POSITION_LEFT);
+                that._initializeMarkersEvents(markerDatePositions, group)
+            },
+            _drawMarker: function(prevDate, date, prevDateMarker, group, customPosition) {
+                var that = this,
+                    options = that._options,
+                    markerOptions = options.scale.marker,
+                    datesDifferences = getDatesDifferences(prevDate, date),
+                    markerDate,
+                    dateUnitInterval = that.dateUnitInterval,
+                    dateMarker,
+                    canvas = options.canvas,
+                    posX,
+                    result;
+                prepareDatesDifferences(datesDifferences, dateUnitInterval);
+                if (datesDifferences.count > 0) {
+                    markerDate = getMarkerDate(customPosition ? prevDate : date, dateUnitInterval);
+                    that.markerDates = that.markerDates || [];
+                    that.markerDates.push(markerDate);
+                    posX = that.translator.translate(customPosition || markerDate);
+                    dateMarker = that._getDrawnDateMarker(markerDate, {
+                        group: group,
+                        y: canvas.top + canvas.height - that.markersAreaHeight + markerOptions.topIndent,
+                        x: posX,
+                        skipStick: !!customPosition,
+                        label: getLabelFormatOptions(markerOptions.label, datesDifferences)
+                    });
+                    if (checkMarkersPosition(dateMarker, prevDateMarker)) {
+                        if (posX !== null)
+                            result = {
+                                marker: dateMarker,
+                                pos: {
                                     date: markerDate,
                                     posX: posX
-                                });
-                                prevDateMarker = dateMarker
+                                }
                             }
-                            else
-                                that._deleteDrawnDateMarker(dateMarker)
-                        }
                     }
-                    that._initializeMarkersEvents(markerDatePositions, group)
+                    else
+                        deleteDrawnDateMarker(dateMarker)
                 }
-            },
-            _getLabelFormatOptions: function(formatString) {
-                if (!_isDefined(this._options.scale.marker.label.format))
-                    return _extend({}, this._options.scale.marker.label, {format: formatString});
-                return this._options.scale.marker.label
+                return result
             },
             _initializeMarkersEvents: function(markerDatePositions, group) {
                 var that = this,
                     options = that._options,
                     scaleOptions = options.scale,
                     startValue,
+                    endValue,
                     maxValue,
-                    markersAreaTop = options.canvas.top + options.canvas.height - this.markersAreaHeight + scaleOptions.marker.topIndent,
+                    markersAreaTop = options.canvas.top + options.canvas.height - that.markersAreaHeight + scaleOptions.marker.topIndent,
                     markersTracker,
                     svgOffsetLeft,
                     posX,
@@ -1277,15 +1327,22 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
                         svgOffsetLeft = that._renderer.getRootOffset().left;
                         posX = rangeSelectorUtils.getEventPageX(e) - svgOffsetLeft;
                         selectedRange = calculateRangeByMarkerPosition(posX, markerDatePositions, scaleOptions);
-                        startValue = selectedRange.startValue;
+                        if (scaleOptions.inverted) {
+                            startValue = selectedRange.endValue;
+                            endValue = selectedRange.startValue
+                        }
+                        else {
+                            startValue = selectedRange.startValue;
+                            endValue = selectedRange.endValue
+                        }
                         if (scaleOptions.minRange) {
                             maxValue = addInterval(startValue, scaleOptions.minRange, false, scaleOptions);
-                            if (maxValue > selectedRange.endValue)
+                            if (maxValue > endValue)
                                 return
                         }
                         if (scaleOptions.maxRange) {
                             maxValue = addInterval(startValue, scaleOptions.maxRange, false, scaleOptions);
-                            if (maxValue < selectedRange.endValue)
+                            if (maxValue < endValue)
                                 return
                         }
                         options.setSelectedRange(selectedRange)
@@ -1328,8 +1385,6 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
                     ticksGroup = renderer.g(),
                     ticksInfo = scaleOptions.ticksInfo,
                     majorTicks = ticksInfo.majorTicks,
-                    minorTicks = ticksInfo.minorTicks,
-                    customBoundaryTicks = ticksInfo.customBoundaryTicks,
                     hideLabels = scaleOptions.isEmpty || !scaleOptions.label.visible,
                     isDiscrete = scaleOptions.type === "discrete",
                     directionOffset = isDiscrete ? -1 : 0,
@@ -1339,16 +1394,29 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
                     center = canvas.top + (bottom - canvas.top) / 2,
                     coords = isCompactMode ? [center - HALF_TICK_LENGTH, center + HALF_TICK_LENGTH] : [canvas.top, bottom],
                     categoriesInfo = scaleOptions._categoriesInfo,
-                    majorTickStyle = that._majorTickStyle;
+                    majorTickStyle = that._majorTickStyle,
+                    customBoundaryTicks = scaleOptions.ticksInfo.customBoundaryTicks;
                 that._drawTicks(majorTicks, ticksGroup, directionOffset, coords, majorTickStyle, !hideLabels && labelsGroup);
                 if (scaleOptions.showMinorTicks || isDiscrete)
-                    that._drawTicks(minorTicks, ticksGroup, directionOffset, coords, that._minorTickStyle);
-                that._drawTicks(customBoundaryTicks, ticksGroup, 0, coords, majorTickStyle);
+                    that._drawTicks(ticksInfo.minorTicks, ticksGroup, directionOffset, coords, that._minorTickStyle);
+                that._drawTicks(ticksInfo.customBoundaryTicks, ticksGroup, 0, coords, majorTickStyle);
                 isDiscrete && categoriesInfo && _isDefined(categoriesInfo.end) && that._drawTicks([categoriesInfo.end], ticksGroup, 1, coords, majorTickStyle);
                 if (isCompactMode)
                     that._createLine([canvas.left, center, canvas.width + canvas.left, center], group, _extend({}, majorTickStyle, {sharp: "v"}));
                 ticksGroup.append(group);
-                that._drawDateMarkers(majorTicks, labelsGroup)
+                if (majorTicks.length > 1 && scaleOptions.valueType === 'datetime' && scaleOptions.type !== 'discrete' && that.visibleMarkers) {
+                    if (customBoundaryTicks.length === 1)
+                        if (customBoundaryTicks[0] < majorTicks[0])
+                            majorTicks = [customBoundaryTicks[0]].concat(majorTicks);
+                        else
+                            majorTicks = majorTicks.concat(customBoundaryTicks[0]);
+                    else if (customBoundaryTicks.length === 2) {
+                        majorTicks = [customBoundaryTicks[0]].concat(majorTicks);
+                        if (customBoundaryTicks[1])
+                            majorTicks = majorTicks.concat([customBoundaryTicks[1]])
+                    }
+                    that._drawDateMarkers(majorTicks, labelsGroup)
+                }
             },
             _applyOptions: function(options) {
                 var that = this,
@@ -1364,7 +1432,7 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
                     sharp: "h"
                 };
                 that._minorTickStyle = _extend({}, that._majorTickStyle, {"stroke-opacity": tick.opacity * MINOR_TICK_OPACITY_COEF});
-                that._setupDateUnitInterval(scaleOptions);
+                that.dateUnitInterval = setupDateUnitInterval(scaleOptions);
                 that.visibleMarkers = scaleOptions.marker.visible === undefined ? true : scaleOptions.marker.visible;
                 labelsAreaHeight = scaleOptions.label.visible ? scaleOptions.label.topIndent + that.fontOptions["font-size"] : 0;
                 that.scaleLabelsAreaHeight = options.scaleLabelsAreaHeight;

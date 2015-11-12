@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Core Library)
-* Version: 15.1.7
-* Build date: Sep 22, 2015
+* Version: 15.1.8
+* Build date: Oct 29, 2015
 *
 * Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -13,7 +13,7 @@ if (!window.DevExpress) {
     (function($, global, undefined) {
         global.DevExpress = global.DevExpress || {};
         $.extend(global.DevExpress, {
-            VERSION: "15.1.7",
+            VERSION: "15.1.8",
             abstract: function() {
                 throw global.DevExpress.Error("E0001");
             },
@@ -1349,6 +1349,8 @@ if (!window.DevExpress) {
             };
         var normalizeDate = function(date, min, max) {
                 var normalizedDate = date;
+                if (!isDefined(date))
+                    return date;
                 if (isDefined(min) && date < min)
                     normalizedDate = min;
                 if (isDefined(max) && date > max)
@@ -3035,6 +3037,8 @@ if (!window.DevExpress) {
                     };
                     this._completeAnimationCallback($element, config).done(function() {
                         config.transitionAnimation.finish()
+                    }).fail(function() {
+                        deferred.rejectWith($element, [config, $element])
                     });
                     if (!config.duration)
                         config.transitionAnimation.finish();
@@ -3051,7 +3055,8 @@ if (!window.DevExpress) {
                     return config.transitionAnimation.deferred.promise()
                 },
                 _completeAnimationCallback: function($element, config) {
-                    var startTime = $.now() + config.delay,
+                    var that = this,
+                        startTime = $.now() + config.delay,
                         deferred = $.Deferred(),
                         transitionEndFired = $.Deferred(),
                         simulatedTransitionEndFired = $.Deferred(),
@@ -3059,13 +3064,16 @@ if (!window.DevExpress) {
                         waitForJSCompleteTimer;
                     config.transitionAnimation.cleanup = function() {
                         clearTimeout(simulatedEndEventTimer);
-                        clearTimeout(waitForJSCompleteTimer)
+                        clearTimeout(waitForJSCompleteTimer);
+                        $element.off(transitionEndEventName);
+                        $element.off(removeEventName)
                     };
                     $element.one(transitionEndEventName, function() {
                         if ($.now() - startTime >= config.duration)
                             transitionEndFired.reject()
                     }).off(removeEventName).on(removeEventName, function() {
-                        config.transitionAnimation.cleanup()
+                        that.stop($element, config);
+                        deferred.reject()
                     });
                     waitForJSCompleteTimer = setTimeout(function() {
                         simulatedEndEventTimer = setTimeout(function() {
@@ -3087,7 +3095,6 @@ if (!window.DevExpress) {
                     $element.css("transition", "none")
                 },
                 _cleanup: function($element, config) {
-                    $element.off(transitionEndEventName);
                     config.transitionAnimation.cleanup();
                     if (typeof config.from === "string") {
                         $element.removeClass(config.from);
@@ -3524,6 +3531,8 @@ if (!window.DevExpress) {
                 animation.isStarted = true;
                 return animation.strategy.animate($element, config).done(function() {
                         onElementAnimationComplete(animation)
+                    }).fail(function() {
+                        animation.deferred.rejectWith(this, [$element, config])
                     })
             };
         var stopAnimationOnElement = function(jumpToEnd) {
@@ -4908,6 +4917,7 @@ if (!window.DevExpress) {
             "dxDataGrid-ariaSearchInGrid": "Search in data grid",
             "dxDataGrid-ariaSelectAll": "Select all",
             "dxDataGrid-ariaSelectRow": "Select row",
+            "dxFileSaver-fileExported": "File exported",
             "dxPager-infoText": "Page {0} of {1}",
             "dxPivotGrid-grandTotal": "Grand Total",
             "dxPivotGrid-total": "{0} Total",
@@ -5026,7 +5036,7 @@ if (!window.DevExpress) {
                 },
                 stringLength: {
                     validate: function(value, rule) {
-                        value = String(value);
+                        value = utils.isDefined(value) ? String(value) : "";
                         if (rule.trim || !utils.isDefined(rule.trim))
                             value = $.trim(value);
                         return rulesValidators.range.validate(value.length, $.extend({}, rule))
@@ -5334,7 +5344,7 @@ if (!window.DevExpress) {
                     compiledGetters[this] = compileGetter(this)
                 });
                 return function(obj, options) {
-                        var result = {};
+                        var result;
                         $.each(compiledGetters, function(name) {
                             var value = this(obj, options),
                                 current,
@@ -5343,7 +5353,7 @@ if (!window.DevExpress) {
                                 i;
                             if (value === undefined)
                                 return;
-                            current = result;
+                            current = result || (result = {});
                             path = name.split(".");
                             last = path.length - 1;
                             for (i = 0; i < last; i++)
@@ -5864,6 +5874,10 @@ if (!window.DevExpress) {
                             xValue = toComparable(rule.getter(x)),
                             yValue = toComparable(rule.getter(y)),
                             factor = rule.desc ? -1 : 1;
+                        if (xValue === null || yValue === undefined)
+                            return -factor;
+                        if (yValue === null || xValue === undefined)
+                            return factor;
                         if (xValue < yValue)
                             return -factor;
                         if (xValue > yValue)
@@ -7633,9 +7647,9 @@ if (!window.DevExpress) {
         function generateStoreLoadOptionAccessor(optionName) {
             return function() {
                     var args = normalizeStoreLoadOptionAccessorArguments(arguments);
-                    if (args !== undefined)
-                        this._storeLoadOptions[optionName] = args;
-                    return this._storeLoadOptions[optionName]
+                    if (args === undefined)
+                        return this._storeLoadOptions[optionName];
+                    this._storeLoadOptions[optionName] = args
                 }
         }
         function mapDataRespectingGrouping(items, mapper, groupInfo) {
@@ -7721,11 +7735,10 @@ if (!window.DevExpress) {
                     return this._items
                 },
                 pageIndex: function(newIndex) {
-                    if (newIndex !== undefined) {
-                        this._pageIndex = newIndex;
-                        this._isLastPage = !this._paginate
-                    }
-                    return this._pageIndex
+                    if (newIndex === undefined)
+                        return this._pageIndex;
+                    this._pageIndex = newIndex;
+                    this._isLastPage = !this._paginate
                 },
                 paginate: function(value) {
                     if (arguments.length < 1)
@@ -7747,38 +7760,34 @@ if (!window.DevExpress) {
                 sort: generateStoreLoadOptionAccessor("sort"),
                 filter: function() {
                     var newFilter = normalizeStoreLoadOptionAccessorArguments(arguments);
-                    if (newFilter !== undefined) {
-                        this._storeLoadOptions.filter = newFilter;
-                        this.pageIndex(0)
-                    }
-                    return this._storeLoadOptions.filter
+                    if (newFilter === undefined)
+                        return this._storeLoadOptions.filter;
+                    this._storeLoadOptions.filter = newFilter;
+                    this.pageIndex(0)
                 },
                 group: generateStoreLoadOptionAccessor("group"),
                 select: generateStoreLoadOptionAccessor("select"),
                 requireTotalCount: generateStoreLoadOptionAccessor("requireTotalCount"),
                 searchValue: function(value) {
-                    if (value !== undefined) {
-                        this.pageIndex(0);
-                        this._searchValue = value
-                    }
-                    return this._searchValue
+                    if (value === undefined)
+                        return this._searchValue;
+                    this.pageIndex(0);
+                    this._searchValue = value
                 },
                 searchOperation: function(op) {
-                    if (op !== undefined) {
-                        this.pageIndex(0);
-                        this._searchOperation = op
-                    }
-                    return this._searchOperation
+                    if (op === undefined)
+                        return this._searchOperation;
+                    this.pageIndex(0);
+                    this._searchOperation = op
                 },
                 searchExpr: function(expr) {
                     var argc = arguments.length;
-                    if (argc) {
-                        if (argc > 1)
-                            expr = $.makeArray(arguments);
-                        this.pageIndex(0);
-                        this._searchExpr = expr
-                    }
-                    return this._searchExpr
+                    if (argc === 0)
+                        return this._searchExpr;
+                    if (argc > 1)
+                        expr = $.makeArray(arguments);
+                    this.pageIndex(0);
+                    this._searchExpr = expr
                 },
                 store: function() {
                     return this._store
@@ -8470,7 +8479,11 @@ if (!window.DevExpress) {
                     }
                     else {
                         var animationDeferreds = $.map(this._animations, function(animation) {
-                                return animation.deferred
+                                var result = $.Deferred();
+                                animation.deferred.always(function() {
+                                    result.resolve()
+                                });
+                                return result.promise()
                             });
                         result = $.when.apply($, animationDeferreds).always(function() {
                             that._completeDeferred.resolve();
@@ -8742,7 +8755,9 @@ if (!window.DevExpress) {
                 },
                 ctor: function(element, options) {
                     this._$element = $(element);
-                    this.element().data(this.NAME, this);
+                    this.element().data(this.NAME, this).one("dxremove", $.proxy(function() {
+                        this._dispose()
+                    }, this));
                     this._attachInstanceToElement(this._$element);
                     this.callBase(options)
                 },
@@ -8926,27 +8941,6 @@ if (!window.DevExpress) {
                     return result
                 }
             };
-        var getComponents = function(element) {
-                if (!element)
-                    return [];
-                var names = $.data(element, COMPONENT_NAMES_DATA_KEY);
-                if (!names)
-                    return [];
-                return $.map(names, function(name) {
-                        return $.data(element, name)
-                    })
-            };
-        var disposeComponents = function(element) {
-                var components = getComponents(element);
-                for (var i = 0; i < components.length; i++)
-                    components[i]._dispose()
-            };
-        var originalCleanData = $.cleanData;
-        $.cleanData = function(elements) {
-            for (var i = 0; i < elements.length; i++)
-                disposeComponents(elements[i]);
-            return originalCleanData.apply(this, arguments)
-        };
         DX.DOMComponent = DOMComponent;
         DX.registerComponent = registerComponent
     })(jQuery, DevExpress);
@@ -9246,7 +9240,10 @@ if (!window.DevExpress) {
                 return $groupContent
             }
         };
-        TEMPLATE_GENERATORS.dxDropDownMenu = {item: TEMPLATE_GENERATORS.dxList.item};
+        TEMPLATE_GENERATORS.dxDropDownMenu = {
+            item: TEMPLATE_GENERATORS.dxList.item,
+            content: TEMPLATE_GENERATORS.dxButton.content
+        };
         TEMPLATE_GENERATORS.dxDropDownList = {item: TEMPLATE_GENERATORS.dxList.item};
         TEMPLATE_GENERATORS.dxRadioGroup = {item: TEMPLATE_GENERATORS.CollectionWidget.item};
         TEMPLATE_GENERATORS.dxScheduler = {item: function(itemData) {
@@ -9574,43 +9571,6 @@ if (!window.DevExpress) {
                 registerComponentKoBinding(componentName, componentClass)
             };
         DX.registerComponent = registerKoComponent;
-        var cleanKoData = function(element, andSelf) {
-                var cleanNode = function() {
-                        ko.cleanNode(this)
-                    };
-                if (andSelf)
-                    element.each(cleanNode);
-                else
-                    element.find("*").each(cleanNode)
-            };
-        var originalEmpty = $.fn.empty;
-        $.fn.empty = function() {
-            cleanKoData(this, false);
-            return originalEmpty.apply(this, arguments)
-        };
-        var originalRemove = $.fn.remove;
-        $.fn.remove = function(selector, keepData) {
-            if (!keepData) {
-                var subject = this;
-                if (selector)
-                    subject = subject.filter(selector);
-                cleanKoData(subject, true)
-            }
-            return originalRemove.call(this, selector, keepData)
-        };
-        var originalHtml = $.fn.html;
-        $.fn.html = function(value) {
-            if (typeof value === "string")
-                cleanKoData(this, false);
-            return originalHtml.apply(this, arguments)
-        };
-        var originalReplaceWith = $.fn.replaceWith;
-        $.fn.replaceWith = function(value) {
-            var result = originalReplaceWith.apply(this, arguments);
-            if (!this.parent().length)
-                cleanKoData(this, true);
-            return result
-        };
         ko.bindingHandlers.dxAction = {update: function(element, valueAccessor, allBindingsAccessor, viewModel) {
                 var $element = $(element);
                 var unwrappedValue = ko.utils.unwrapObservable(valueAccessor()),
@@ -9925,15 +9885,13 @@ if (!window.DevExpress) {
                         });
                     that._optionChangedCallbacks = $.Callbacks().add(function(args) {
                         var optionName = args.name,
-                            optionValue = args.value;
+                            component = args.component;
                         if (that._scope.$root.$$phase === "$digest" || !optionDependencies || !optionDependencies[optionName])
                             return;
                         safeApply(function(scope) {
                             $.each(optionDependencies[optionName], function(optionPath, valuePath) {
-                                var getter = compileGetter(optionPath);
-                                var tmpData = {};
-                                tmpData[optionName] = optionValue;
-                                that._parse(valuePath).assign(that._scope, getter(tmpData))
+                                var value = component.option(optionPath);
+                                that._parse(valuePath).assign(that._scope, value)
                             })
                         }, that._scope)
                     });
@@ -10113,7 +10071,9 @@ if (!window.DevExpress) {
                     return wrappedAction
                 },
                 _createComponent: function(element, name, config) {
-                    return this.callBase(element, name, $.extend({templateCompiler: this.option("templateCompiler")}, config))
+                    config = config || {};
+                    this._extendConfig(config, {templateCompiler: this.option("templateCompiler")});
+                    return this.callBase(element, name, config)
                 }
             });
         var registeredComponents = {};
@@ -10259,7 +10219,7 @@ if (!window.DevExpress) {
                 var htmlBinding = createElementWithBindAttr("div", {html: "html"}),
                     textBinding = createElementWithBindAttr("div", {text: "text"}),
                     primitiveBinding = createElementWithBindAttr("div", {text: "String($data)"});
-                var markup = ["<div>", "<!-- ko if: $data.html && !$data.text -->", htmlBinding, "<!-- /ko -->", "<!-- ko if: !$data.html && $data.text -->", textBinding, "<!-- /ko -->", "<!-- ko ifnot: $.isPlainObject($data) -->", primitiveBinding, "<!-- /ko -->", "</div>"];
+                var markup = ["<div>", "<!-- ko if: $data.html -->", htmlBinding, "<!-- /ko -->", "<!-- ko if: !$data.html && $data.text -->", textBinding, "<!-- /ko -->", "<!-- ko ifnot: $.isPlainObject($data) -->", primitiveBinding, "<!-- /ko -->", "</div>"];
                 return markup.join("")
             }
         };
@@ -10297,7 +10257,10 @@ if (!window.DevExpress) {
                 return markup.join("")
             }
         };
-        TEMPLATE_GENERATORS.dxDropDownMenu = {item: TEMPLATE_GENERATORS.dxList.item};
+        TEMPLATE_GENERATORS.dxDropDownMenu = {
+            item: TEMPLATE_GENERATORS.dxList.item,
+            content: TEMPLATE_GENERATORS.dxButton.content
+        };
         TEMPLATE_GENERATORS.dxDropDownList = {item: TEMPLATE_GENERATORS.dxList.item};
         TEMPLATE_GENERATORS.dxRadioGroup = {item: TEMPLATE_GENERATORS.CollectionWidget.item};
         TEMPLATE_GENERATORS.dxScheduler = {item: function() {
@@ -10394,8 +10357,9 @@ if (!window.DevExpress) {
         TEMPLATE_GENERATORS.dxTabPanel = {
             item: TEMPLATE_GENERATORS.CollectionWidget.item,
             title: function() {
-                var template = TEMPLATE_GENERATORS.dxTabs.item();
-                return template.replace(/\$data\.text/g, '$data.title').replace(/\!\$data\.html\ \&\&\ /, "")
+                var template = TEMPLATE_GENERATORS.dxTabs.item(),
+                    htmlBinding = "<!-- ko if: $data.html -->" + createElementWithBindAttr("div", {html: "html"}) + "<!-- /ko -->";
+                return template.replace(/\$data\.text/g, '$data.title').replace(/\!\$data\.html\ \&\&\ /, "").replace(htmlBinding, "")
             }
         };
         var NAVBAR_ITEM_BADGE_CLASS = "dx-navbar-item-badge";
@@ -10511,8 +10475,9 @@ if (!window.DevExpress) {
                 html: function() {
                     return $("<div>").attr("ng-if", "html").attr("ng-bind-html", "html")
                 },
-                text: function() {
-                    return $("<div>").attr("ng-if", "text").attr("ng-bind", "text")
+                text: function(element) {
+                    element = element || "<div>";
+                    return $(element).attr("ng-if", "text").attr("ng-if", "!html").attr("ng-bind", "text")
                 },
                 primitive: function() {
                     return $("<div>").attr("ng-if", "scopeValue").attr("ng-bind", "'' + scopeValue")
@@ -10560,7 +10525,10 @@ if (!window.DevExpress) {
                 return baseElements.container().append($keyBinding).append(baseElements.primitive())
             }
         };
-        TEMPLATE_GENERATORS.dxDropDownMenu = {item: TEMPLATE_GENERATORS.dxList.item};
+        TEMPLATE_GENERATORS.dxDropDownMenu = {
+            item: TEMPLATE_GENERATORS.dxList.item,
+            content: TEMPLATE_GENERATORS.dxButton.content
+        };
         TEMPLATE_GENERATORS.dxDropDownList = {item: TEMPLATE_GENERATORS.dxList.item};
         TEMPLATE_GENERATORS.dxRadioGroup = {item: TEMPLATE_GENERATORS.CollectionWidget.item};
         TEMPLATE_GENERATORS.dxScheduler = {item: function() {
@@ -10624,8 +10592,8 @@ if (!window.DevExpress) {
         TEMPLATE_GENERATORS.dxTabs = {
             item: function() {
                 var container = baseElements.container();
-                var text = $("<span>").addClass(TABS_ITEM_TEXT_CLASS).attr("ng-bind", "text").attr("ng-if", "text"),
-                    icon = $("<dx-icon>");
+                var icon = $("<dx-icon>"),
+                    text = baseElements.text("<span>").addClass(TABS_ITEM_TEXT_CLASS);
                 return container.append(baseElements.html()).append(icon).append(text).append(baseElements.primitive().addClass(TABS_ITEM_TEXT_CLASS))
             },
             itemFrame: function() {
@@ -12383,13 +12351,45 @@ if (!window.DevExpress) {
     /*! Module core, file ui.events.emitter.feedback.js */
     (function($, DX, undefined) {
         var ui = DX.ui,
+            utils = DX.utils,
+            Class = DX.Class,
             events = ui.events,
             ACTIVE_EVENT_NAME = "dxactive",
             INACTIVE_EVENT_NAME = "dxinactive",
             ACTIVE_TIMEOUT = 30,
             INACTIVE_TIMEOUT = 400;
+        var FeedbackEvent = Class.inherit({
+                ctor: function(timeout, fire) {
+                    this._timeout = timeout;
+                    this._fire = fire
+                },
+                start: function() {
+                    var that = this;
+                    this._timer = window.setTimeout(function() {
+                        that.force()
+                    }, this._timeout)
+                },
+                stop: function() {
+                    clearTimeout(this._timer)
+                },
+                force: function() {
+                    if (this._fired)
+                        return;
+                    this.stop();
+                    this._fire();
+                    this._fired = true
+                },
+                fired: function() {
+                    return this._fired
+                }
+            });
         var activeEmitter;
         var FeedbackEmitter = events.Emitter.inherit({
+                ctor: function() {
+                    this.callBase.apply(this, arguments);
+                    this._active = new FeedbackEvent(0, $.noop);
+                    this._inactive = new FeedbackEvent(0, $.noop)
+                },
                 configurate: function(data, eventName) {
                     switch (eventName) {
                         case ACTIVE_EVENT_NAME:
@@ -12405,18 +12405,29 @@ if (!window.DevExpress) {
                     var element = this.getElement().get(0);
                     var activeElement = activeEmitter && activeEmitter.getElement().get(0);
                     var activeChildExists = $.contains(element, activeElement);
-                    var childJustActivated = activeEmitter && activeEmitter._activeTimer !== null;
+                    var childJustActivated = activeEmitter && !activeEmitter._active.fired();
                     if (activeChildExists && childJustActivated)
                         this._cancel();
                     else {
                         if (activeEmitter)
-                            activeEmitter._forceInactiveTimer();
+                            activeEmitter._inactive.force();
                         activeEmitter = this;
-                        var eventTarget = this._getEmitterTarget(e);
-                        this._forceActiveTimer = $.proxy(this._fireActive, this, e, eventTarget);
-                        this._forceInactiveTimer = $.proxy(this._fireInctive, this, e, eventTarget);
-                        this._startActiveTimer(e)
+                        this._initEvents(e);
+                        this._active.start()
                     }
+                },
+                _initEvents: function(e) {
+                    var that = this,
+                        eventTarget = this._getEmitterTarget(e),
+                        activeTimeout = utils.ensureDefined(this.activeTimeout, ACTIVE_TIMEOUT),
+                        inactiveTimeout = utils.ensureDefined(this.inactiveTimeout, INACTIVE_TIMEOUT);
+                    this._active = new FeedbackEvent(activeTimeout, function() {
+                        that._fireEvent(ACTIVE_EVENT_NAME, e, {target: eventTarget})
+                    });
+                    this._inactive = new FeedbackEvent(inactiveTimeout, function() {
+                        that._fireEvent(INACTIVE_EVENT_NAME, e, {target: eventTarget});
+                        activeEmitter = null
+                    })
                 },
                 cancel: function(e) {
                     this.end(e)
@@ -12424,51 +12435,24 @@ if (!window.DevExpress) {
                 end: function(e) {
                     var skipTimers = e.type !== "dxpointerup";
                     if (skipTimers)
-                        this._stopActiveTimer();
+                        this._active.stop();
                     else
-                        this._forceActiveTimer();
-                    this._startInactiveTimer(e);
+                        this._active.force();
+                    this._inactive.start();
                     if (skipTimers)
-                        this._forceInactiveTimer()
+                        this._inactive.force()
                 },
                 dispose: function() {
-                    this._stopActiveTimer();
-                    this._stopInactiveTimer();
+                    this._active.stop();
+                    this._inactive.stop();
                     this.callBase()
                 },
-                _startActiveTimer: function(e) {
-                    var activeTimeout = "activeTimeout" in this ? this.activeTimeout : ACTIVE_TIMEOUT;
-                    this._activeTimer = window.setTimeout(this._forceActiveTimer, activeTimeout)
-                },
-                _fireActive: function(e, eventTarget) {
-                    this._stopActiveTimer();
-                    this._fireEvent(ACTIVE_EVENT_NAME, e, {target: eventTarget})
-                },
-                _stopActiveTimer: function() {
-                    clearTimeout(this._activeTimer);
-                    this._activeTimer = null
-                },
-                _forceActiveTimer: $.noop,
-                _startInactiveTimer: function(e) {
-                    var inactiveTimeout = "inactiveTimeout" in this ? this.inactiveTimeout : INACTIVE_TIMEOUT;
-                    this._inactiveTimer = window.setTimeout(this._forceInactiveTimer, inactiveTimeout)
-                },
-                _fireInctive: function(e, eventTarget) {
-                    this._stopInactiveTimer();
-                    activeEmitter = null;
-                    this._fireEvent(INACTIVE_EVENT_NAME, e, {target: eventTarget})
-                },
-                _stopInactiveTimer: function() {
-                    clearTimeout(this._inactiveTimer);
-                    this._inactiveTimer = null
-                },
-                _forceInactiveTimer: $.noop,
                 lockInactive: function() {
-                    this._forceActiveTimer();
-                    this._stopInactiveTimer();
+                    this._active.force();
+                    this._inactive.stop();
                     activeEmitter = null;
                     this._cancel();
-                    return this._forceInactiveTimer
+                    return $.proxy(this._inactive.force, this._inactive)
                 }
             });
         ui.events = $.extend(ui.events, {lockFeedback: function(deferred) {
@@ -13448,14 +13432,114 @@ if (!window.DevExpress) {
     })(jQuery, DevExpress);
     /*! Module core, file ui.events.remove.js */
     (function($) {
+        var eventName = "dxremove",
+            eventPropName = "dxRemoveEvent";
         (function(cleanData) {
             $.cleanData = function(elements) {
-                for (var i = 0; i < elements.length; i++)
-                    $(elements[i]).triggerHandler("dxremove");
+                var $element;
+                for (var i = 0; i < elements.length; i++) {
+                    $element = $(elements[i]);
+                    if ($element.prop(eventPropName)) {
+                        $element.removeProp(eventPropName);
+                        $element.triggerHandler(eventName)
+                    }
+                }
                 return cleanData.apply(this, arguments)
             }
-        })($.cleanData)
+        })($.cleanData);
+        var RemoveEvent = DevExpress.Class.inherit({
+                noBubble: true,
+                setup: function(element) {
+                    $(element).prop(eventPropName, true)
+                }
+            });
+        DevExpress.ui.events.registerEvent(eventName, new RemoveEvent)
     })(jQuery);
+    /*! Module core, file ko.cleanNode.js */
+    (function($, DX, window) {
+        if (!DX.support.hasKo || DX.compareVersions($.fn.jquery, [2, 0]) < 0)
+            return;
+        var ko = window.ko,
+            nodesToCleanByJquery,
+            cleanData = $.cleanData,
+            cleanNode = ko.cleanNode;
+        $.cleanData = function(nodes) {
+            var result = cleanData(nodes);
+            for (var i = 0; i < nodes.length; i++) {
+                if (!nodes[i].cleanedByKo)
+                    cleanNode(nodes[i]);
+                delete nodes[i].cleanedByKo
+            }
+            nodesToCleanByJquery = null;
+            return result
+        };
+        ko.cleanNode = function(node) {
+            var result = cleanNode(node);
+            if (nodesToCleanByJquery)
+                cleanData(nodesToCleanByJquery);
+            return result
+        };
+        ko.utils.domNodeDisposal.cleanExternalData = function(node) {
+            node.cleanedByKo = true;
+            nodesToCleanByJquery = nodesToCleanByJquery || [];
+            nodesToCleanByJquery.push(node)
+        };
+        DX.__internals = $.extend({
+            cleanData: function(value) {
+                if (value)
+                    cleanData = value;
+                return cleanData
+            },
+            cleanNode: function(value) {
+                if (value)
+                    cleanNode = value;
+                return cleanNode
+            }
+        }, DX.__internals)
+    })($, DevExpress, window);
+    /*! Module core, file ko.cleanNodeIE8.js */
+    (function($, DX, window) {
+        if (!DX.support.hasKo || DX.compareVersions($.fn.jquery, [2, 0]) >= 0)
+            return;
+        var ko = window.ko;
+        var cleanKoData = function(element, andSelf) {
+                var cleanNode = function() {
+                        ko.cleanNode(this)
+                    };
+                if (andSelf)
+                    element.each(cleanNode);
+                else
+                    element.find("*").each(cleanNode)
+            };
+        var originalEmpty = $.fn.empty;
+        $.fn.empty = function() {
+            cleanKoData(this, false);
+            return originalEmpty.apply(this, arguments)
+        };
+        var originalRemove = $.fn.remove;
+        $.fn.remove = function(selector, keepData) {
+            if (!keepData) {
+                var subject = this;
+                if (selector)
+                    subject = subject.filter(selector);
+                cleanKoData(subject, true)
+            }
+            return originalRemove.call(this, selector, keepData)
+        };
+        var originalHtml = $.fn.html;
+        $.fn.html = function(value) {
+            if (typeof value === "string")
+                cleanKoData(this, false);
+            return originalHtml.apply(this, arguments)
+        };
+        var originalReplaceWith = $.fn.replaceWith;
+        $.fn.replaceWith = function(value) {
+            var result = originalReplaceWith.apply(this, arguments);
+            if (!this.parent().length)
+                cleanKoData(this, true);
+            return result
+        }
+    })($, DevExpress, window);
     /*! Module core, file ui.events.contextmenu.js */
     (function($, DX, undefined) {
         var ui = DX.ui,
@@ -13586,7 +13670,7 @@ if (!window.DevExpress) {
             },
             _initTemplates: function() {
                 this._extractTemplates();
-                this._extractAnonimousTemplate()
+                this._extractAnonymousTemplate()
             },
             _extractTemplates: function() {
                 var templates = this.option("_templates"),
@@ -13618,23 +13702,23 @@ if (!window.DevExpress) {
                 });
                 return suitableTemplate
             },
-            _extractAnonimousTemplate: function() {
+            _extractAnonymousTemplate: function() {
                 var templates = this.option("_templates"),
-                    anonimiousTemplateName = this._getAnonimousTemplateName(),
-                    $anonimiousTemplate = this.element().contents().detach();
-                var $notJunkTemplateContent = $anonimiousTemplate.filter(function(_, element) {
+                    anonymiousTemplateName = this._getAnonymousTemplateName(),
+                    $anonymiousTemplate = this.element().contents().detach();
+                var $notJunkTemplateContent = $anonymiousTemplate.filter(function(_, element) {
                         var isTextNode = element.nodeType === TEXT_NODE,
                             isEmptyText = $.trim($(element).text()).length < 1;
                         return !(isTextNode && isEmptyText)
                     }),
                     onlyJunkTemplateContent = $notJunkTemplateContent.length < 1;
-                if (!templates[anonimiousTemplateName] && !onlyJunkTemplateContent)
-                    templates[anonimiousTemplateName] = this._createTemplate($anonimiousTemplate, this)
+                if (!templates[anonymiousTemplateName] && !onlyJunkTemplateContent)
+                    templates[anonymiousTemplateName] = this._createTemplate($anonymiousTemplate, this)
             },
             _getAriaTarget: function() {
                 return this._focusTarget()
             },
-            _getAnonimousTemplateName: function() {
+            _getAnonymousTemplateName: function() {
                 return ANONYMOUS_TEMPLATE_NAME
             },
             _getTemplateByOption: function(optionName) {
@@ -13810,6 +13894,10 @@ if (!window.DevExpress) {
             _toggleFocusClass: function(isFocused, element) {
                 var $focusTarget = $(element || this._focusTarget());
                 $focusTarget.toggleClass(FOCUSED_STATE_CLASS, isFocused)
+            },
+            _hasFocusClass: function(element) {
+                var $focusTarget = $(element || this._focusTarget());
+                return $focusTarget.hasClass(FOCUSED_STATE_CLASS)
             },
             _attachKeyboardEvents: function() {
                 var processor = this.option("_keyboardProcessor") || new ui.KeyboardProcessor({
@@ -13988,7 +14076,6 @@ if (!window.DevExpress) {
                         break;
                     case"_templates":
                     case"templateProvider":
-                        this._refresh();
                         break;
                     default:
                         this.callBase(args)
@@ -14350,7 +14437,7 @@ if (!window.DevExpress) {
                         focusedElement: null
                     })
                 },
-                _getAnonimousTemplateName: function() {
+                _getAnonymousTemplateName: function() {
                     return "item"
                 },
                 _init: function() {
@@ -14509,8 +14596,8 @@ if (!window.DevExpress) {
                     return result
                 },
                 _itemOptionChanged: function(index, property, value) {
-                    var itemData = this.option("items")[index],
-                        $item = this._findItemElementByIndex(index);
+                    var $item = this._findItemElementByIndex(index),
+                        itemData = this._getItemData($item);
                     switch (property) {
                         case"visible":
                             this._renderItemVisibleState($item, value);
@@ -14864,7 +14951,7 @@ if (!window.DevExpress) {
                 _extendActionArgs: function($itemElement) {
                     return {
                             itemElement: $itemElement,
-                            itemIndex: $itemElement.index(this._itemSelector()),
+                            itemIndex: this._itemElements().index($itemElement),
                             itemData: this._getItemData($itemElement)
                         }
                 },

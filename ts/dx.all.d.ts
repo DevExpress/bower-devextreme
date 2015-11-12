@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme
-* Version: 15.1.7
-* Build date: Sep 22, 2015
+* Version: 15.1.8
+* Build date: Oct 29, 2015
 *
 * Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -227,10 +227,14 @@ declare module DevExpress {
         endUpdate(): void;
         /** Returns an instance of this component class. */
         instance(): Component;
-        /** Sets one or more options of this component. */
-        option(options: Object): void;
         /** Returns the configuration options of this component. */
-        option(): Object;
+        option(): {
+            [optionKey: string]: any;
+        };
+        /** Sets one or more options of this component. */
+        option(options: {
+            [optionKey: string]: any;
+        }): void;
         /** Gets the value of the specified configuration option of this component. */
         option(optionName: string): any;
         /** Sets a value to the specified configuration option of this component. */
@@ -1379,81 +1383,71 @@ declare module DevExpress.ui {
     export interface dxMapOptions extends WidgetOptions {
         /** Specifies whether or not the widget automatically adjusts center and zoom option values when adding a new marker or route. */
         autoAdjust?: boolean;
-        bounds?: {
-            northEast?: {
-                lat?: number;
-                lng?: number;
-            };
-            southWest?: {
-                lat?: number;
-                lng?: number;
-            };
-            /** An object, a string, or an array specifying the location displayed at the center of the widget. */
-            center?: {
-                /** The latitude location displayed in the center of the widget. */
-                lat?: number;
-                /** The longitude location displayed in the center of the widget. */
-                lng?: number;
-            };
-            /** A handler for the click event. */
-            onClick?: any;
-            clickAction?: any;
-            /** Specifies whether or not map widget controls are available. */
-            controls?: boolean;
-            /** Specifies the height of the widget. */
-            height?: number;
-            /** A key used to authenticate the application within the required map provider. */
-            key?: {
-                /** A key used to authenticate the application within the "Bing" map provider. */
-                bing?: string;
-                /** A key used to authenticate the application within the "Google" map provider. */
-                google?: string;
-                /** A key used to authenticate the application within the "Google Static" map provider. */
-                googleStatic?: string;
-            }
-            /** A handler for the markerAdded event. */
-            onMarkerAdded?: Function;
-            markerAddedAction?: Function;
-            /** A URL pointing to the custom icon to be used for map markers. */
-            markerIconSrc?: string;
-            /** A handler for the markerRemoved event. */
-            onMarkerRemoved?: Function;
-            markerRemovedAction?: Function;
-            /** An array of markers displayed on a map. */
-            markers?: Array<any>;
-            /** The name of the current map data provider. */
-            provider?: string;
-            /** A handler for the ready event. */
-            onReady?: Function;
-            readyAction?: Function;
-            /** A handler for the routeAdded event. */
-            onRouteAdded?: Function;
-            routeAddedAction?: Function;
-            /** A handler for the routeRemoved event. */
-            onRouteRemoved?: Function;
-            routeRemovedAction?: Function;
-            /** An array of routes shown on the map. */
-            routes?: Array<any>;
-            /** The type of a map to display. */
-            type?: string;
-            /** Specifies the width of the widget. */
-            width?: number;
-            /** The zoom level of the map. */
-            zoom?: number;
-            /** Adds a marker to the map. */
-            addMarker(markerOptions: Object): JQueryPromise<Object>;
-            /** Adds a route to the map. */
-            addRoute(options: Object): JQueryPromise<Object>;
-            /** Removes a marker from the map. */
-            removeMarker(marker: Object): JQueryPromise<void>;
-            /** Removes a route from the map. */
-            removeRoute(route: any): JQueryPromise<void>;
+        /** An object, a string, or an array specifying the location displayed at the center of the widget. */
+        center?: {
+            /** The latitude location displayed in the center of the widget. */
+            lat?: number;
+            /** The longitude location displayed in the center of the widget. */
+            lng?: number;
         };
+        /** A handler for the click event. */
+        onClick?: any;
+            clickAction?: any;
+        /** Specifies whether or not map widget controls are available. */
+        controls?: boolean;
+        /** Specifies the height of the widget. */
+        height?: any;
+        /** A key used to authenticate the application within the required map provider. */
+        key?: {
+            /** A key used to authenticate the application within the "Bing" map provider. */
+            bing?: string;
+            /** A key used to authenticate the application within the "Google" map provider. */
+            google?: string;
+            /** A key used to authenticate the application within the "Google Static" map provider. */
+            googleStatic?: string;
+        }
+        /** A handler for the markerAdded event. */
+        onMarkerAdded?: Function;
+            markerAddedAction?: Function;
+        /** A URL pointing to the custom icon to be used for map markers. */
+        markerIconSrc?: string;
+        /** A handler for the markerRemoved event. */
+        onMarkerRemoved?: Function;
+            markerRemovedAction?: Function;
+        /** An array of markers displayed on a map. */
+        markers?: Array<any>;
+        /** The name of the current map data provider. */
+        provider?: string;
+        /** A handler for the ready event. */
+        onReady?: Function;
+            readyAction?: Function;
+        /** A handler for the routeAdded event. */
+        onRouteAdded?: Function;
+            routeAddedAction?: Function;
+        /** A handler for the routeRemoved event. */
+        onRouteRemoved?: Function;
+            routeRemovedAction?: Function;
+        /** An array of routes shown on the map. */
+        routes?: Array<any>;
+        /** The type of a map to display. */
+        type?: string;
+        /** Specifies the width of the widget. */
+        width?: any;
+        /** The zoom level of the map. */
+        zoom?: number;
     }
     /** An interactive map widget. */
     export class dxMap extends Widget {
         constructor(element: JQuery, options?: dxMapOptions);
         constructor(element: Element, options?: dxMapOptions);
+        /** Adds a marker to the map. */
+        addMarker(markerOptions: Object): JQueryPromise<Object>;
+        /** Adds a route to the map. */
+        addRoute(routeOptions: Object): JQueryPromise<Object>;
+        /** Removes a marker from the map. */
+        removeMarker(marker: Object): JQueryPromise<void>;
+        /** Removes a route from the map. */
+        removeRoute(route: any): JQueryPromise<void>;
     }
     export interface dxLookupOptions extends dxDropDownListOptions {
         /** An object defining widget animation options. */
@@ -1990,6 +1984,8 @@ declare module DevExpress.ui {
         onProgress?: Function;
         /** A handler for the uploadError event. */
         onUploadError?: Function;
+        /** A handler for the valueChanged event. */
+        onValueChanged?: Function;
     }
     /** A widget used to select and upload a file or multiple files. */
     export class dxFileUploader extends Editor {
@@ -2159,6 +2155,11 @@ interface JQuery {
     dxSelectBox(options: string): any;
     dxSelectBox(options: string, ...params: any[]): any;
     dxSelectBox(options: DevExpress.ui.dxSelectBoxOptions): JQuery;
+    dxTagBox(): JQuery;
+    dxTagBox(options: "instance"): DevExpress.ui.dxTagBox;
+    dxTagBox(options: string): any;
+    dxTagBox(options: string, ...params: any[]): any;
+    dxTagBox(options: DevExpress.ui.dxTagBoxOptions): JQuery;
     dxScrollView(): JQuery;
     dxScrollView(options: "instance"): DevExpress.ui.dxScrollView;
     dxScrollView(options: string): any;
@@ -2269,6 +2270,11 @@ interface JQuery {
     dxAccordion(options: string): any;
     dxAccordion(options: string, ...params: any[]): any;
     dxAccordion(options: DevExpress.ui.dxAccordionOptions): JQuery;
+    dxResponsiveBox(): JQuery;
+    dxResponsiveBox(options: "instance"): DevExpress.ui.dxResponsiveBox;
+    dxResponsiveBox(options: string): any;
+    dxResponsiveBox(options: string, ...params: any[]): any;
+    dxResponsiveBox(options: DevExpress.ui.dxResponsiveBoxOptions): JQuery;
     dxAutocomplete(): JQuery;
     dxAutocomplete(options: "instance"): DevExpress.ui.dxAutocomplete;
     dxAutocomplete(options: string): any;
@@ -2629,13 +2635,17 @@ declare module DevExpress.data {
         /** Sets the fields option. */
         fields(fields: Array<PivotGridField>): void;
         /** Gets current options of a specified field. */
-        field(id: number): PivotGridField;
+        field(id: any): PivotGridField;
         /** Sets one or more options of a specified field. */
-        field(id: number, field: PivotGridField): void;
+        field(id: any, field: PivotGridField): void;
         /** Collapses a specified header item. */
         collapseHeaderItem(area: string, path: Array<any>): void;
         /** Expands a specified header item. */
         expandHeaderItem(area: string, path: Array<any>): void;
+        /** Expands all header items of a field. */
+        expandAll(id: any): void;
+        /** Collapses all header items of a field. */
+        collapseAll(id: any): void;
         /** Disposes of all resources associated with this PivotGridDataSource. */
         dispose(): void;
         on(eventName: string, eventHandler: Function): PivotGridDataSource;
@@ -3563,9 +3573,9 @@ declare module DevExpress.ui {
         /** Returns the number of data columns in a grid. */
         columnCount(): number;
         /** Returns the value of a specific column option. */
-        columnOption(id: number, optionName: string): any;
+        columnOption(id: any, optionName: string): any;
         /** Sets an option of a specific column. */
-        columnOption(id: number, optionName: string, optionValue: any): void;
+        columnOption(id: any, optionName: string, optionValue: any): void;
         /** Returns the options of a column by an identifier. */
         columnOption(id: any): Object;
         /** Sets several options of a column at once. */
@@ -4187,6 +4197,7 @@ declare module DevExpress.viz.core {
         color?: string;
         /** Specifies the z-index for tooltips. */
         zIndex?: number;
+        container?: any;
         /** Specifies text and appearance of a set of tooltips. */
         customizeTooltip?: (arg: Object) => { color?: string; text?: string };
         /** Specifies whether or not the tooltip is enabled. */
@@ -5195,9 +5206,9 @@ declare module DevExpress.viz.charts {
     export interface BaseChartOptions<TPoint> extends viz.core.BaseWidgetOptions {
         /** Specifies adaptive layout options. */
         adaptiveLayout?: {
-            /** Specifies the width of the widget container that is small enough for the layout to begin adapting. */
+            /** Specifies the width of the widget that is small enough for the layout to begin adapting. */
             width?: number;
-            /** Specifies the height of the widget container that is small enough for the layout to begin adapting. */
+            /** Specifies the height of the widget that is small enough for the layout to begin adapting. */
             height?: number;
             /** Specifies whether or not point labels can be hidden when the layout is adapting. */
             keepLabels?: boolean;
@@ -5535,7 +5546,7 @@ declare module DevExpress.viz.charts {
         /** A handler for the legendClick event. */
         onLegendClick?: any;
         legendClick?: any;
-        /** Specifies how the chart must behave when series point labels overlap. */
+        /** Specifies how a chart must behave when series point labels overlap. */
         resolveLabelOverlapping?: string;
     }
     /** A circular chart widget for HTML JS applications. */

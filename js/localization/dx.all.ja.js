@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme
-* Version: 15.1.7
-* Build date: Sep 22, 2015
+* Version: 15.1.8
+* Build date: Oct 29, 2015
 *
 * Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -137,6 +137,7 @@ Globalize.addCultureInfo("ja", {messages: {
         "dxDataGrid-ariaSearchInGrid": "データ グリッド内で検索",
         "dxDataGrid-ariaSelectAll": "すべてを選択",
         "dxDataGrid-ariaSelectRow": "行の選択",
+        "dxFileSaver-fileExported": "!TODO!",
         "dxPager-infoText": "ページ {0} / {1}",
         "dxPivotGrid-grandTotal": "総計",
         "dxPivotGrid-total": "{0} 合計",

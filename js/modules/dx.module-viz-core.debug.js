@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Visualization Core Library)
-* Version: 15.1.7
-* Build date: Sep 22, 2015
+* Version: 15.1.8
+* Build date: Oct 29, 2015
 *
 * Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -453,6 +453,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
             utils = DX.utils,
             _isDefined = utils.isDefined,
             _adjustValue = utils.adjustValue,
+            applyPrecisionByMinDelta = utils.applyPrecisionByMinDelta,
             _math = Math,
             _abs = _math.abs,
             _ceil = _math.ceil,
@@ -460,113 +461,115 @@ if (!DevExpress.MOD_VIZ_CORE) {
             _noop = $.noop,
             MINOR_TICKS_COUNT_LIMIT = 200,
             DEFAULT_MINOR_NUMBER_MULTIPLIERS = [2, 4, 5, 8, 10];
+        function adjustNumericTickValue(value, interval, min) {
+            return utils.isExponential(value) ? _adjustValue(value) : applyPrecisionByMinDelta(min, interval, value)
+        }
         viz.outOfScreen = {
             x: -1000,
             y: -1000
         };
-        viz.tickManager = {};
-        viz.tickManager.continuous = {
-            _hasUnitBeginningTickCorrection: _noop,
-            _removeBoundedOverlappingDates: _noop,
-            _correctInterval: function(step) {
-                this._tickInterval *= step
-            },
-            _correctMax: function(tickInterval) {
-                this._max = this._adjustNumericTickValue(_ceil(this._max / tickInterval) * tickInterval, tickInterval, this._min)
-            },
-            _correctMin: function(tickInterval) {
-                this._min = this._adjustNumericTickValue(_floor(this._min / tickInterval) * tickInterval, tickInterval, this._min)
-            },
-            _findBusinessDelta: function(min, max) {
-                return _adjustValue(_abs(min - max))
-            },
-            _findTickIntervalForCustomTicks: function() {
-                return _abs(this._customTicks[1] - this._customTicks[0])
-            },
-            _getBoundInterval: function() {
-                var that = this,
-                    boundCoef = that._options.boundCoef;
-                return _isDefined(boundCoef) && isFinite(boundCoef) ? that._tickInterval * _abs(boundCoef) : that._tickInterval / 2
-            },
-            _getInterval: function(deltaCoef, numberMultipliers) {
-                var interval = deltaCoef || this._getDeltaCoef(this._screenDelta, this._businessDelta, this._options.gridSpacingFactor),
-                    multipliers = numberMultipliers || this._options.numberMultipliers,
-                    factor,
-                    result = 0,
-                    newResult,
-                    hasResult = false,
-                    i;
-                if (interval > 1.0)
-                    for (factor = 1; !hasResult; factor *= 10)
-                        for (i = 0; i < multipliers.length; i++) {
-                            result = multipliers[i] * factor;
-                            if (interval <= result) {
-                                hasResult = true;
-                                break
+        viz.tickManager = {continuous: {
+                _hasUnitBeginningTickCorrection: _noop,
+                _removeBoundedOverlappingDates: _noop,
+                _correctInterval: function(step) {
+                    this._tickInterval *= step
+                },
+                _correctMax: function(tickInterval) {
+                    this._max = adjustNumericTickValue(_ceil(this._max / tickInterval) * tickInterval, tickInterval, this._min)
+                },
+                _correctMin: function(tickInterval) {
+                    this._min = adjustNumericTickValue(_floor(this._min / tickInterval) * tickInterval, tickInterval, this._min)
+                },
+                _findBusinessDelta: function(min, max) {
+                    return _adjustValue(_abs(min - max))
+                },
+                _findTickIntervalForCustomTicks: function() {
+                    return _abs(this._customTicks[1] - this._customTicks[0])
+                },
+                _getBoundInterval: function() {
+                    var that = this,
+                        boundCoef = that._options.boundCoef;
+                    return _isDefined(boundCoef) && isFinite(boundCoef) ? that._tickInterval * _abs(boundCoef) : that._tickInterval / 2
+                },
+                _getInterval: function(deltaCoef, numberMultipliers) {
+                    var interval = deltaCoef || this._getDeltaCoef(this._screenDelta, this._businessDelta, this._options.gridSpacingFactor),
+                        multipliers = numberMultipliers || this._options.numberMultipliers,
+                        factor,
+                        result = 0,
+                        newResult,
+                        hasResult = false,
+                        i;
+                    if (interval > 1.0)
+                        for (factor = 1; !hasResult; factor *= 10)
+                            for (i = 0; i < multipliers.length; i++) {
+                                result = multipliers[i] * factor;
+                                if (interval <= result) {
+                                    hasResult = true;
+                                    break
+                                }
                             }
-                        }
-                else if (interval > 0) {
-                    result = 1;
-                    for (factor = 0.1; !hasResult; factor /= 10)
-                        for (i = multipliers.length - 1; i >= 0; i--) {
-                            newResult = multipliers[i] * factor;
-                            if (interval > newResult) {
-                                hasResult = true;
-                                break
+                    else if (interval > 0) {
+                        result = 1;
+                        for (factor = 0.1; !hasResult; factor /= 10)
+                            for (i = multipliers.length - 1; i >= 0; i--) {
+                                newResult = multipliers[i] * factor;
+                                if (interval > newResult) {
+                                    hasResult = true;
+                                    break
+                                }
+                                result = newResult
                             }
-                            result = newResult
-                        }
+                    }
+                    return _adjustValue(result)
+                },
+                _getMarginValue: function(min, max, margin) {
+                    return applyPrecisionByMinDelta(min, margin, _abs(max - min) * margin)
+                },
+                _getDefaultMinorInterval: function(screenDelta, businessDelta) {
+                    var deltaCoef = this._getDeltaCoef(screenDelta, businessDelta, this._options.minorGridSpacingFactor),
+                        multipliers = DEFAULT_MINOR_NUMBER_MULTIPLIERS,
+                        i = multipliers.length - 1,
+                        result;
+                    for (i; i >= 0; i--) {
+                        result = businessDelta / multipliers[i];
+                        if (deltaCoef <= result)
+                            return _adjustValue(result)
+                    }
+                    return 0
+                },
+                _getMinorInterval: function(screenDelta, businessDelta) {
+                    var that = this,
+                        options = that._options,
+                        minorTickInterval = options.minorTickInterval,
+                        minorTickCount = options.minorTickCount,
+                        interval,
+                        intervalsCount,
+                        count;
+                    if (isFinite(minorTickInterval) && that._isTickIntervalCorrect(minorTickInterval, MINOR_TICKS_COUNT_LIMIT, businessDelta)) {
+                        interval = minorTickInterval;
+                        count = interval < businessDelta ? _ceil(businessDelta / interval) - 1 : 0
+                    }
+                    else if (_isDefined(minorTickCount)) {
+                        intervalsCount = _isDefined(minorTickCount) ? minorTickCount + 1 : _floor(screenDelta / options.minorGridSpacingFactor);
+                        count = intervalsCount - 1;
+                        interval = count > 0 ? businessDelta / intervalsCount : 0
+                    }
+                    else {
+                        interval = that._getDefaultMinorInterval(screenDelta, businessDelta);
+                        count = interval < businessDelta ? _floor(businessDelta / interval) - 1 : 0
+                    }
+                    that._minorTickInterval = interval;
+                    that._minorTickCount = count
+                },
+                _getNextTickValue: function(value, tickInterval, isTickIntervalNegative) {
+                    tickInterval = _isDefined(isTickIntervalNegative) && isTickIntervalNegative ? -tickInterval : tickInterval;
+                    value += tickInterval;
+                    return adjustNumericTickValue(value, tickInterval, this._min)
+                },
+                _isTickIntervalValid: function(tickInterval) {
+                    return _isDefined(tickInterval) && isFinite(tickInterval) && tickInterval !== 0
                 }
-                return _adjustValue(result)
-            },
-            _getMarginValue: function(min, max, margin) {
-                return utils.applyPrecisionByMinDelta(min, margin, _abs(max - min) * margin)
-            },
-            _getDefaultMinorInterval: function(screenDelta, businessDelta) {
-                var deltaCoef = this._getDeltaCoef(screenDelta, businessDelta, this._options.minorGridSpacingFactor),
-                    multipliers = DEFAULT_MINOR_NUMBER_MULTIPLIERS,
-                    i = multipliers.length - 1,
-                    result;
-                for (i; i >= 0; i--) {
-                    result = businessDelta / multipliers[i];
-                    if (deltaCoef <= result)
-                        return _adjustValue(result)
-                }
-                return 0
-            },
-            _getMinorInterval: function(screenDelta, businessDelta) {
-                var that = this,
-                    options = that._options,
-                    minorTickInterval = options.minorTickInterval,
-                    minorTickCount = options.minorTickCount,
-                    interval,
-                    intervalsCount,
-                    count;
-                if (isFinite(minorTickInterval) && that._isTickIntervalCorrect(minorTickInterval, MINOR_TICKS_COUNT_LIMIT, businessDelta)) {
-                    interval = minorTickInterval;
-                    count = interval < businessDelta ? _ceil(businessDelta / interval) - 1 : 0
-                }
-                else if (_isDefined(minorTickCount)) {
-                    intervalsCount = _isDefined(minorTickCount) ? minorTickCount + 1 : _floor(screenDelta / options.minorGridSpacingFactor);
-                    count = intervalsCount - 1;
-                    interval = count > 0 ? businessDelta / intervalsCount : 0
-                }
-                else {
-                    interval = that._getDefaultMinorInterval(screenDelta, businessDelta);
-                    count = interval < businessDelta ? _floor(businessDelta / interval) - 1 : 0
-                }
-                that._minorTickInterval = interval;
-                that._minorTickCount = count
-            },
-            _getNextTickValue: function(value, tickInterval, isTickIntervalNegative) {
-                tickInterval = _isDefined(isTickIntervalNegative) && isTickIntervalNegative ? -tickInterval : tickInterval;
-                value += tickInterval;
-                return this._adjustNumericTickValue(value, tickInterval, this._min)
-            },
-            _isTickIntervalValid: function(tickInterval) {
-                return _isDefined(tickInterval) && isFinite(tickInterval) && tickInterval !== 0
-            }
-        }
+            }}
     })(jQuery, DevExpress);
     /*! Module viz-core, file datetimeTickManager.js */
     (function($, DX, undefined) {
@@ -591,18 +594,21 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 day: [1, 2, 3, 5, 7, 10, 14],
                 month: [1, 2, 3, 6]
             };
+        function correctDate(date, tickInterval, correctionMethod) {
+            var interval = _dateToMilliseconds(tickInterval),
+                timezoneOffset = date.getTimezoneOffset() * 60 * 1000;
+            return new Date(Math[correctionMethod]((date - 0 - timezoneOffset) / interval) * interval + timezoneOffset)
+        }
         tickManager.datetime = $.extend({}, tickManager.continuous, {
             _correctInterval: function(step) {
                 var tickIntervalInMs = _dateToMilliseconds(this._tickInterval);
                 this._tickInterval = _convertMillisecondsToDateUnits(tickIntervalInMs * step)
             },
             _correctMax: function(tickInterval) {
-                var interval = _dateToMilliseconds(tickInterval);
-                this._max = new Date(_ceil(this._max / interval) * interval)
+                this._max = correctDate(this._max, tickInterval, "ceil")
             },
             _correctMin: function(tickInterval) {
-                var interval = _dateToMilliseconds(tickInterval);
-                this._min = new Date(_floor(this._min / interval) * interval);
+                this._min = correctDate(this._min, tickInterval, "floor");
                 if (this._options.setTicksAtUnitBeginning)
                     _correctDateWithUnitBeginning(this._min, tickInterval)
             },
@@ -1105,11 +1111,11 @@ if (!DevExpress.MOD_VIZ_CORE) {
     (function($, DX, undefined) {
         var viz = DX.viz,
             coreTickManager = viz.tickManager,
+            TickManager,
             utils = DX.utils,
             _isDefined = utils.isDefined,
             _isNumber = utils.isNumber,
             _addInterval = utils.addInterval,
-            _adjustValue = utils.adjustValue,
             _map = viz.utils.map,
             _each = $.each,
             _inArray = $.inArray,
@@ -1129,6 +1135,26 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 if (_isDefined(array[i]) && _isDefined(array[i - 1]) && array[i].valueOf() === array[i - 1].valueOf())
                     array.splice(i, 1);
             return array
+        }
+        function checkBoundedTickInArray(value, array) {
+            var arrayValues = _map(array || [], function(item) {
+                    return item.valueOf()
+                }),
+                minorTicksIndex = _inArray(value.valueOf(), arrayValues);
+            if (minorTicksIndex !== -1)
+                array.splice(minorTicksIndex, 1)
+        }
+        function getDataType(value) {
+            return utils.isDate(value) ? 'datetime' : 'numeric'
+        }
+        function validateAxisType(type) {
+            var defaultType = "continuous",
+                allowedTypes = {
+                    continuous: true,
+                    discrete: true,
+                    logarithmic: true
+                };
+            return allowedTypes[type] ? type : defaultType
         }
         coreTickManager.discrete = $.extend({}, coreTickManager.continuous, {
             _getMinorTicks: _noop,
@@ -1152,18 +1178,16 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 return 1
             }
         });
-        coreTickManager.TickManager = DX.Class.inherit({
-            ctor: function(types, data, options) {
-                options = options || {};
-                this.update(types || {}, data || {}, options);
-                this._initOverlappingMethods(options.overlappingBehaviorType)
-            },
+        TickManager = coreTickManager.TickManager = function(types, data, options) {
+            options = options || {};
+            this.update(types || {}, data || {}, options);
+            this._initOverlappingMethods(options.overlappingBehaviorType)
+        };
+        TickManager.prototype = {
+            constructor: TickManager,
             dispose: function() {
-                this._ticks = null;
-                this._minorTicks = null;
-                this._decimatedTicks = null;
-                this._boundaryTicks = null;
-                this._options = null
+                var that = this;
+                that._ticks = that._minorTicks = that._decimatedTicks = that._boundaryTicks = that._options = null
             },
             update: function(types, data, options) {
                 this._updateOptions(options || {});
@@ -1184,7 +1208,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
             },
             _updateTypes: function(types) {
                 var that = this,
-                    axisType = that._validateAxisType(types.axisType),
+                    axisType = validateAxisType(types.axisType),
                     dataType = that._validateDataType(types.dataType);
                 that._resetMethods();
                 this._axisType = axisType;
@@ -1296,14 +1320,6 @@ if (!DevExpress.MOD_VIZ_CORE) {
                         max: newMax
                     }
             },
-            _checkBoundedTickInArray: function(value, array) {
-                var arrayValues = _map(array || [], function(item) {
-                        return item.valueOf()
-                    }),
-                    minorTicksIndex = _inArray(value.valueOf(), arrayValues);
-                if (minorTicksIndex !== -1)
-                    array.splice(minorTicksIndex, 1)
-            },
             _checkLabelFormat: function() {
                 var options = this._options;
                 if (this._dataType === "datetime" && !options.hasLabelFormat && this._ticks.length)
@@ -1335,14 +1351,14 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 if (addMinMax.min && _inArray(min.valueOf(), tickValues) === -1) {
                     that._ticks.splice(0, 0, min);
                     that._boundaryTicks.push(min);
-                    that._checkBoundedTickInArray(min, that._minorTicks);
-                    that._checkBoundedTickInArray(min, that._decimatedTicks)
+                    checkBoundedTickInArray(min, that._minorTicks);
+                    checkBoundedTickInArray(min, that._decimatedTicks)
                 }
                 if (addMinMax.max && _inArray(max.valueOf(), tickValues) === -1) {
                     that._ticks.push(max);
                     that._boundaryTicks.push(max);
-                    that._checkBoundedTickInArray(max, that._minorTicks);
-                    that._checkBoundedTickInArray(max, that._decimatedTicks)
+                    checkBoundedTickInArray(max, that._minorTicks);
+                    checkBoundedTickInArray(max, that._decimatedTicks)
                 }
             },
             _getCorrectionEnabled: function(value, marginSelector) {
@@ -1351,15 +1367,6 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     hasValueMargin = options[marginSelector + "ValueMargin"];
                 return !hasPercentStick && !hasValueMargin
             },
-            _validateAxisType: function(type) {
-                var defaultType = "continuous",
-                    allowedTypes = {
-                        continuous: true,
-                        discrete: true,
-                        logarithmic: true
-                    };
-                return allowedTypes[type] ? type : defaultType
-            },
             _validateDataType: function(type) {
                 var allowedTypes = {
                         numeric: true,
@@ -1367,11 +1374,8 @@ if (!DevExpress.MOD_VIZ_CORE) {
                         string: true
                     };
                 if (!allowedTypes[type])
-                    type = _isDefined(this._min) ? this._getDataType(this._min) : "numeric";
+                    type = _isDefined(this._min) ? getDataType(this._min) : "numeric";
                 return type
-            },
-            _getDataType: function(value) {
-                return utils.isDate(value) ? 'datetime' : 'numeric'
             },
             _getMethods: function() {
                 var methods;
@@ -1404,9 +1408,6 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 count = screenDelta / gridSpacingFactor;
                 count = count <= 1 ? MIN_ARRANGEMENT_TICKS_COUNT : count;
                 return businessDelta / count
-            },
-            _adjustNumericTickValue: function(value, interval, min) {
-                return utils.isExponential(value) ? _adjustValue(value) : utils.applyPrecisionByMinDelta(min, interval, value)
             },
             _isTickIntervalCorrect: function(tickInterval, tickCountLimit, businessDelta) {
                 var date;
@@ -1574,7 +1575,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                         screenDelta: this._screenDelta
                     }
             }
-        })
+        }
     })(jQuery, DevExpress);
     /*! Module viz-core, file numericTranslator.js */
     (function($, DX, undefined) {
@@ -1613,8 +1614,9 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     endPoint = canvasOptions.endPoint,
                     newStart = (startPoint + translate) / scale,
                     newEnd = (endPoint + translate) / scale,
-                    minPoint = Math.min(that.translate(that._getValue(canvasOptions.rangeMin)), that.translate(that._getValue(canvasOptions.rangeMax))),
-                    maxPoint = Math.max(that.translate(that._getValue(canvasOptions.rangeMin)), that.translate(that._getValue(canvasOptions.rangeMax)));
+                    translatedRangeMinMax = [that.translate(that._getValue(canvasOptions.rangeMin)), that.translate(that._getValue(canvasOptions.rangeMax))],
+                    minPoint = Math.min(translatedRangeMinMax[0], translatedRangeMinMax[1]),
+                    maxPoint = Math.max(translatedRangeMinMax[0], translatedRangeMinMax[1]);
                 if (minPoint > newStart) {
                     newEnd -= newStart - minPoint;
                     newStart = minPoint
@@ -3012,7 +3014,9 @@ if (!DevExpress.MOD_VIZ_CORE) {
                         "stroke-width": null,
                         stroke: null
                     },
-                    borderOptions = options.border || {};
+                    borderOptions = options.border || {},
+                    container = $(options.container);
+                that._container = (container.length ? container : $("body")).get(0);
                 that._shadowSettigns = $.extend({
                     x: "-50%",
                     y: "-50%",
@@ -3088,7 +3092,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     return false;
                 that._state = state;
                 state.tc = {};
-                that._wrapper.appendTo($("body"));
+                that._wrapper.appendTo(that._container);
                 that._cloud.attr({
                     fill: state.color,
                     stroke: state.borderColor
@@ -3104,8 +3108,8 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     bBox = {
                         x: 0,
                         y: 0,
-                        width: mathCeil(bBox.right - bBox.left),
-                        height: mathCeil(bBox.bottom - bBox.top)
+                        width: bBox.width ? mathCeil(bBox.width) : mathCeil(bBox.right - bBox.left),
+                        height: bBox.height ? mathCeil(bBox.height) : mathCeil(bBox.bottom - bBox.top)
                     };
                     textGroupHtml.width(bBox.width);
                     textGroupHtml.height(bBox.height)
@@ -7356,11 +7360,6 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     }
                 }
             },
-            setAdjustSeriesLabels: function(adjustSeriesLabels) {
-                _each(this._points || [], function(_, point) {
-                    point.setAdjustSeriesLabels(adjustSeriesLabels)
-                })
-            },
             setClippingParams: function(baseId, wideId, forceClipping) {
                 this._paneClipRectID = baseId;
                 this._widePaneClipRectID = wideId;
@@ -11081,9 +11080,6 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 var graphic = this.graphic;
                 graphic && graphic.attr(this._emptySettings)
             },
-            setAdjustSeriesLabels: function(adjustSeriesLabels) {
-                this.adjustSeriesLabels = adjustSeriesLabels
-            },
             _createLabel: function() {
                 this._label = viz.CoreFactory.createLabel({
                     renderer: this.series._renderer,
@@ -11162,26 +11158,18 @@ if (!DevExpress.MOD_VIZ_CORE) {
             },
             _createSymbolMarker: function(renderer, pointSettings) {
                 var marker,
-                    options = this._options;
-                switch (options.symbol) {
-                    case"circle":
-                        delete pointSettings.points;
-                        marker = renderer.circle().attr(pointSettings);
-                        break;
-                    case"square":
-                    case"polygon":
-                    case"triangle":
-                    case"triangleDown":
-                    case"triangleUp":
-                    case"cross":
-                        marker = renderer.path([], "area").attr(pointSettings).sharp();
-                        break
+                    symbol = this._options.symbol;
+                if (symbol === "circle") {
+                    delete pointSettings.points;
+                    marker = renderer.circle().attr(pointSettings)
                 }
+                else if (symbol === "square" || symbol === "polygon" || symbol === "triangle" || symbol === "triangleDown" || symbol === "triangleUp" || symbol === "cross")
+                    marker = renderer.path([], "area").attr(pointSettings).sharp();
                 return marker
             },
             _createMarker: function(renderer, group, image, settings, animationEnabled) {
                 var that = this,
-                    marker = that._checkImage(image) ? that._createImageMarker(renderer, settings, image) : that._createSymbolMarker(renderer, settings, animationEnabled);
+                    marker = that._checkImage(image) ? that._createImageMarker(renderer, settings, image) : that._createSymbolMarker(renderer, settings);
                 if (marker)
                     marker.data({point: that}).append(group);
                 return marker
@@ -11290,9 +11278,9 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     offset = LABEL_OFFSET;
                 if (that._isPointInVisibleArea(visibleArea, graphicBbox))
                     if (!that._options.rotated) {
-                        if (visibleArea.minX > coord.x && that.adjustSeriesLabels)
+                        if (visibleArea.minX > coord.x)
                             coord.x = visibleArea.minX;
-                        if (visibleArea.maxX < coord.x + labelBbox.width && that.adjustSeriesLabels)
+                        if (visibleArea.maxX < coord.x + labelBbox.width)
                             coord.x = visibleArea.maxX - labelBbox.width;
                         if (visibleArea.minY > coord.y)
                             coord.y = graphicBbox.y + graphicBbox.height + offset;
@@ -11304,9 +11292,9 @@ if (!DevExpress.MOD_VIZ_CORE) {
                             coord.x = graphicBbox.x + graphicBbox.width + offset;
                         if (visibleArea.maxX < coord.x + labelBbox.width)
                             coord.x = graphicBbox.x - offset - labelBbox.width;
-                        if (visibleArea.minY > coord.y && that.adjustSeriesLabels)
+                        if (visibleArea.minY > coord.y)
                             coord.y = visibleArea.minY;
-                        if (visibleArea.maxY < coord.y + labelBbox.height && that.adjustSeriesLabels)
+                        if (visibleArea.maxY < coord.y + labelBbox.height)
                             coord.y = visibleArea.maxY - labelBbox.height
                     }
                 return coord
@@ -11635,12 +11623,9 @@ if (!DevExpress.MOD_VIZ_CORE) {
             },
             _checkLabelPosition: function(label, coord) {
                 var that = this,
-                    visibleArea = that._getVisibleArea(),
-                    rotated = that._options.rotated,
-                    graphicBbox = that._getGraphicBbox(),
-                    labelBbox = label.getBoundingRect();
-                if (that._isPointInVisibleArea(visibleArea, graphicBbox))
-                    return that._moveLabelOnCanvas(coord, visibleArea, labelBbox, that.adjustSeriesLabels || rotated, that.adjustSeriesLabels || !rotated);
+                    visibleArea = that._getVisibleArea();
+                if (that._isPointInVisibleArea(visibleArea, that._getGraphicBbox()))
+                    return that._moveLabelOnCanvas(coord, visibleArea, label.getBoundingRect());
                 return coord
             },
             _isLabelInsidePoint: function(label) {
@@ -11654,16 +11639,16 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     }
                 return false
             },
-            _moveLabelOnCanvas: function(coord, visibleArea, labelBbox, horizontalAdjust, verticalAdjust) {
+            _moveLabelOnCanvas: function(coord, visibleArea, labelBbox) {
                 var x = coord.x,
                     y = coord.y;
-                if (visibleArea.minX > x && horizontalAdjust)
+                if (visibleArea.minX > x)
                     x = visibleArea.minX;
-                if (visibleArea.maxX < x + labelBbox.width && horizontalAdjust)
+                if (visibleArea.maxX < x + labelBbox.width)
                     x = visibleArea.maxX - labelBbox.width;
-                if (visibleArea.minY > y && verticalAdjust)
+                if (visibleArea.minY > y)
                     y = visibleArea.minY;
-                if (visibleArea.maxY < y + labelBbox.height && verticalAdjust)
+                if (visibleArea.maxY < y + labelBbox.height)
                     y = visibleArea.maxY - labelBbox.height;
                 return {
                         x: x,
@@ -13186,7 +13171,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     visibleArea = that._getVisibleArea(),
                     graphicBbox = that._getGraphicBbox();
                 if (that._isPointInVisibleArea(visibleArea, graphicBbox))
-                    coord = that._moveLabelOnCanvas(coord, visibleArea, label.getBoundingRect(), true, true);
+                    coord = that._moveLabelOnCanvas(coord, visibleArea, label.getBoundingRect());
                 return coord
             },
             _getErrorBarSettings: function(errorBarOptions, animationEnabled) {
@@ -13263,7 +13248,7 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     x = that.centerX + that.defaultRadius * angleFunctions.cos,
                     y = that.centerY - that.defaultRadius * angleFunctions.sin;
                 if (x > visibleArea.minX && x < visibleArea.maxX && y > visibleArea.minY && y < visibleArea.maxY)
-                    coord = that._moveLabelOnCanvas(coord, visibleArea, label.getBoundingRect(), true, true);
+                    coord = that._moveLabelOnCanvas(coord, visibleArea, label.getBoundingRect());
                 return coord
             },
             _addLabelAlignmentAndOffset: function(label, coord) {
@@ -13570,14 +13555,16 @@ if (!DevExpress.MOD_VIZ_CORE) {
                 })
         }
         function checkAxisType(groups, userArgumentCategories, incidentOccurred) {
-            var argumentOptions = groups.argumentOptions || {};
+            var argumentOptions = groups.argumentOptions || {},
+                argumentAxisType = correctAxisType(groups.argumentType, argumentOptions.type, !!userArgumentCategories.length, incidentOccurred);
             _each(groups, function(_, group) {
+                var valueOptions = group.valueOptions || {},
+                    valueCategories = valueOptions.categories || [],
+                    valueAxisType = correctAxisType(group.valueType, valueOptions.type, !!valueCategories.length, incidentOccurred);
                 _each(group, function(_, series) {
-                    var optionsSeries = {},
-                        valueOptions = group.valueOptions || {},
-                        valueCategories = valueOptions.categories || [];
-                    optionsSeries.argumentAxisType = correctAxisType(groups.argumentType, argumentOptions.type, !!userArgumentCategories.length, incidentOccurred);
-                    optionsSeries.valueAxisType = correctAxisType(group.valueType, valueOptions.type, !!valueCategories.length, incidentOccurred);
+                    var optionsSeries = {};
+                    optionsSeries.argumentAxisType = argumentAxisType;
+                    optionsSeries.valueAxisType = valueAxisType;
                     groups.argumentAxisType = groups.argumentAxisType || optionsSeries.argumentAxisType;
                     group.valueAxisType = group.valueAxisType || optionsSeries.valueAxisType;
                     optionsSeries.argumentType = groups.argumentType;
@@ -13585,11 +13572,13 @@ if (!DevExpress.MOD_VIZ_CORE) {
                     optionsSeries.showZero = valueOptions.showZero;
                     series.updateDataType(optionsSeries)
                 });
+                group.valueAxisType = group.valueAxisType || valueAxisType;
                 if (group.valueAxis) {
                     group.valueAxis.setTypes(group.valueAxisType, group.valueType, VALUE_TYPE);
                     group.valueAxis.validate(false)
                 }
             });
+            groups.argumentAxisType = groups.argumentAxisType || argumentAxisType;
             if (groups.argumentAxes)
                 _each(groups.argumentAxes, function(_, axis) {
                     axis.setTypes(groups.argumentAxisType, groups.argumentType, ARGUMENT_TYPE);

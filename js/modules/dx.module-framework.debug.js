@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Single Page App Framework)
-* Version: 15.1.7
-* Build date: Sep 22, 2015
+* Version: 15.1.8
+* Build date: Oct 29, 2015
 *
 * Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -1329,10 +1329,10 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 var isRoot = options.root,
                     forceIsRoot = isRoot,
                     forceToRoot = false,
-                    stackKey = options.stack || this._getViewTargetStackKey(uri, isRoot),
                     previousStack = this.currentStack,
                     keepPositionInStack = options.keepPositionInStack !== undefined ? options.keepPositionInStack : this._keepPositionInStack;
-                this._setCurrentStack(stackKey);
+                options.stack = options.stack || this._getViewTargetStackKey(uri, isRoot);
+                this._setCurrentStack(options.stack);
                 if (isRoot || !this.currentStack.items.length) {
                     forceToRoot = this.currentStack === previousStack;
                     forceIsRoot = true
@@ -1860,7 +1860,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
                     this.viewCache.setView(viewInfoKey, viewInfo)
                 }
                 else
-                    viewInfo.routeData = routeData;
+                    this._updateViewInfo(viewInfo, navigationItem, navigateOptions);
                 return viewInfo
             },
             _getViewInfoKey: function(navigationItem, routeData) {
@@ -1879,18 +1879,21 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 if (modelMethod)
                     modelMethod.call(model, args)
             },
-            _createViewInfo: function(navigationItem, navigateOptions) {
+            _updateViewInfo: function(viewInfo, navigationItem, navigateOptions) {
                 var uri = navigationItem.uri,
                     routeData = this.router.parse(uri);
-                var viewInfo = {
-                        viewName: routeData.view,
-                        routeData: routeData,
-                        uri: uri,
-                        key: this._getViewInfoKey(navigationItem, routeData),
-                        canBack: this.canBack(),
-                        navigateOptions: navigateOptions,
-                        previousViewInfo: this._getPreviousViewInfo(navigateOptions)
-                    };
+                viewInfo.viewName = routeData.view;
+                viewInfo.routeData = routeData;
+                viewInfo.uri = uri;
+                viewInfo.navigateOptions = navigateOptions;
+                viewInfo.canBack = this.canBack(navigateOptions.stack);
+                viewInfo.previousViewInfo = this._getPreviousViewInfo(navigateOptions)
+            },
+            _createViewInfo: function(navigationItem, navigateOptions) {
+                var uri = navigationItem.uri,
+                    routeData = this.router.parse(uri),
+                    viewInfo = {key: this._getViewInfoKey(navigationItem, routeData)};
+                this._updateViewInfo(viewInfo, navigationItem, navigateOptions);
                 return viewInfo
             },
             _createViewModel: function(viewInfo) {
@@ -1911,7 +1914,6 @@ if (!DevExpress.MOD_FRAMEWORK) {
             _appendBackCommand: function(viewInfo) {
                 var commands = viewInfo.commands,
                     that = this,
-                    stackKey = this.navigationManager.currentStackKey,
                     backTitle = BACK_COMMAND_TITLE;
                 if (that._options.useViewTitleAsBackText)
                     backTitle = ((viewInfo.previousViewInfo || {}).model || {}).title || backTitle;
@@ -1920,7 +1922,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
                             title: backTitle,
                             behavior: "back",
                             onExecute: function() {
-                                that.back({stack: stackKey})
+                                that.back({stack: viewInfo.navigateOptions.stack})
                             },
                             icon: "arrowleft",
                             type: "back",
@@ -3063,8 +3065,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
                     transitionExecutor.leave(item.$element, item.animation, animationModifier)
                 })
             },
-            _doTransition: function(oldViewInfo, newViewInfo, direction) {
-                var animationModifier = {direction: direction};
+            _doTransition: function(oldViewInfo, newViewInfo, animationModifier) {
                 if (oldViewInfo)
                     this._leave(oldViewInfo.renderResult.animationItems, animationModifier);
                 this._enter(newViewInfo.renderResult.animationItems, animationModifier);
@@ -3074,15 +3075,15 @@ if (!DevExpress.MOD_FRAMEWORK) {
             _showViewImpl: function(viewInfo, direction, previousViewTemplateId) {
                 var that = this,
                     result,
-                    previousViewInfo = this._getPreviousViewInfo(viewInfo);
-                if (!previousViewInfo || previousViewInfo === viewInfo) {
-                    this._showView(viewInfo);
-                    result = that._changeView(viewInfo, previousViewTemplateId)
-                }
-                else
-                    result = that._doTransition(previousViewInfo, viewInfo, direction).then(function() {
-                        return that._changeView(viewInfo)
-                    });
+                    previousViewInfo = this._getPreviousViewInfo(viewInfo),
+                    animationModifier = {direction: direction};
+                if (previousViewInfo === viewInfo)
+                    previousViewInfo = undefined;
+                if (!previousViewInfo)
+                    animationModifier.duration = 0;
+                result = that._doTransition(previousViewInfo, viewInfo, animationModifier).then(function() {
+                    return that._changeView(viewInfo, previousViewTemplateId)
+                });
                 return result
             },
             _releaseView: function(viewInfo) {
@@ -3729,12 +3730,16 @@ if (!DevExpress.MOD_FRAMEWORK) {
                     previousLayoutController = that._activeLayoutController();
                 if (previousLayoutController === layoutController)
                     return $.Deferred().resolve().promise();
-                return layoutController.activate(targetNode).then($.proxy(this._deactivatePreviousLayoutControllers, this, layoutController))
+                return layoutController.activate(targetNode).then($.proxy(this._deactivatePreviousLayoutControllers, this, layoutController)).then(function() {
+                        that._activeLayoutControllersStack.push(layoutController)
+                    })
             },
             _deactivatePreviousLayoutControllers: function(layoutController) {
                 var that = this,
                     tasks = [],
                     controllerToDeactivate = that._activeLayoutControllersStack.pop();
+                if (!controllerToDeactivate)
+                    return $.Deferred().resolve().promise();
                 if (layoutController.isOverlay) {
                     that._activeLayoutControllersStack.push(controllerToDeactivate);
                     tasks.push(controllerToDeactivate.disable())
@@ -3744,9 +3749,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
                         tasks.push(controllerToDeactivate.deactivate());
                         controllerToDeactivate = that._activeLayoutControllersStack.pop()
                     }
-                return $.when.apply($, tasks).then(function() {
-                        that._activeLayoutControllersStack.push(layoutController)
-                    })
+                return $.when.apply($, tasks)
             },
             init: function() {
                 var that = this,

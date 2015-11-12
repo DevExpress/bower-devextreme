@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Common Widgets)
-* Version: 15.1.7
-* Build date: Sep 22, 2015
+* Version: 15.1.8
+* Build date: Oct 29, 2015
 *
 * Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -5159,11 +5159,24 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             _update: function() {
                 var $existingRoot = this._$root;
                 this._renderItems();
-                $existingRoot && $existingRoot.remove()
+                $existingRoot && $existingRoot.detach();
+                this._saveAssistantRoot($existingRoot)
+            },
+            _saveAssistantRoot: function($root) {
+                this._assistantRoots = this._assistantRoots || [];
+                this._assistantRoots.push($root)
             },
             _dispose: function() {
                 clearTimeout(this._updateTimer);
+                this._cleanUnusedRoots();
                 this.callBase.apply(this, arguments)
+            },
+            _cleanUnusedRoots: function() {
+                if (!this._assistantRoots)
+                    return;
+                $.each(this._assistantRoots, function() {
+                    $(this).remove()
+                })
             },
             _optionChanged: function(args) {
                 switch (args.name) {
@@ -5250,7 +5263,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                             }
                         }])
             },
-            _getAnonimousTemplateName: function() {
+            _getAnonymousTemplateName: function() {
                 return ANONYMOUS_TEMPLATE_NAME
             },
             _init: function() {
@@ -5835,11 +5848,11 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             _togglePlaceholder: function(isEmpty) {
                 if (!this._$placeholder)
                     return;
-                this._$placeholder.toggle(isEmpty)
+                this._$placeholder.toggleClass("dx-state-invisible", !isEmpty)
             },
             _renderProps: function() {
                 this._toggleDisabledState(this.option("disabled"));
-                this._toggleReadOnlyState(this._readOnlyPropValue());
+                this._toggleReadOnlyState();
                 this._toggleSpellcheckState()
             },
             _toggleDisabledState: function(value) {
@@ -5850,8 +5863,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 else
                     $input.removeAttr("disabled").removeAttr("tabindex")
             },
-            _toggleReadOnlyState: function(value) {
-                this._input().prop("readOnly", value);
+            _toggleReadOnlyState: function() {
+                this._input().prop("readOnly", this._readOnlyPropValue());
                 this.callBase()
             },
             _readOnlyPropValue: function() {
@@ -5953,6 +5966,9 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             _toggleFocusClass: function(isFocused) {
                 this.callBase(isFocused, this.element())
             },
+            _hasFocusClass: function(element) {
+                return this.callBase($(element || this.element()))
+            },
             _renderEmptinessEvent: function() {
                 var $input = this._input();
                 $input.on("input blur", $.proxy(this._toggleEmptinessEventHandler, this));
@@ -5970,10 +5986,10 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             _renderEnterKeyAction: function() {
                 if (this.option("onEnterKey")) {
                     this._enterKeyAction = this._createActionByOption("onEnterKey", {excludeValidators: ["readOnly"]});
-                    this._input().on("keyup.onEnterKey.dxTextEditor", $.proxy(this._enterKeyHandlerUp, this))
+                    this._input().on("keydown.onEnterKey.dxTextEditor", $.proxy(this._enterKeyHandlerUp, this))
                 }
                 else {
-                    this._input().off("keyup.onEnterKey.dxTextEditor");
+                    this._input().off("keydown.onEnterKey.dxTextEditor");
                     this._enterKeyAction = undefined
                 }
             },
@@ -6011,7 +6027,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                         this._createValueChangeAction();
                         break;
                     case"readOnly":
-                        this._toggleReadOnlyState(args.value);
                         this.callBase(args);
                         this._renderInputAddons();
                         break;
@@ -6205,11 +6220,11 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             _renderMaskedValue: function() {
                 if (!this._maskRulesChain)
                     return;
-                var value = this.option("value");
+                var value = this.option("value") || "";
                 this._maskRulesChain.clear();
                 this._handleChain({
                     value: value,
-                    length: value ? value.length : 0
+                    length: value.length
                 });
                 this._displayMask()
             },
@@ -6229,8 +6244,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     return
                 }
                 this._saveValueChangeEvent(e);
-                this.option("value", (this._value || "").replace(/\s+$/, ""));
-                this._validateMask()
+                this.option("value", (this._value || "").replace(/\s+$/, ""))
             },
             _maskFocusHandler: function() {
                 this._direction(FORWARD_DIRECTION);
@@ -6252,18 +6266,21 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 }
                 var inputValue = this._input().val();
                 var caret = this._caret();
+                caret.start = caret.end - 1;
                 var oldValue = inputValue.substring(0, caret.start) + inputValue.substring(caret.end);
                 var char = inputValue[caret.start];
                 this._input().val(oldValue);
-                this._caret({
-                    start: caret.start,
-                    end: caret.start
-                });
-                this._maskKeyHandler(e, function() {
-                    this._handleKey(char.charCodeAt());
-                    return true
-                });
-                this._keyPressHandled = false
+                this._inputHandlerTimer = setTimeout($.proxy(function() {
+                    this._caret({
+                        start: caret.start,
+                        end: caret.start
+                    });
+                    this._maskKeyHandler(e, function() {
+                        this._handleKey(char.charCodeAt());
+                        return true
+                    });
+                    this._keyPressHandled = false
+                }, this))
             },
             _isControlKeyFired: function(e) {
                 return CONTROL_KEYS[e.keyCode] && !e.which || e.metaKey
@@ -6330,6 +6347,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 return text.replace(new RegExp(this.option("maskChar"), "g"), EMPTY_CHAR)
             },
             _maskKeyHandler: function(e, tryHandleKeyCallback) {
+                if (this.option("readOnly"))
+                    return;
                 this._direction(FORWARD_DIRECTION);
                 e.preventDefault();
                 this._handleSelection();
@@ -6423,6 +6442,10 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     }
                 })
             },
+            _dispose: function() {
+                clearTimeout(this._inputHandlerTimer);
+                this.callBase()
+            },
             _optionChanged: function(args) {
                 switch (args.name) {
                     case"mask":
@@ -6434,6 +6457,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     case"value":
                         this._renderMaskedValue();
                         this.callBase(args);
+                        this._validateMask();
                         break;
                     case"maskInvalidMessage":
                         break;
@@ -7047,7 +7071,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                         focusStateEnabled: false,
                         showCloseButton: false,
                         buttons: this._getPopupButtons(),
-                        onPositioned: $.proxy(this._popupPositionedHandler, this)
+                        onPositioned: $.proxy(this._popupPositionedHandler, this),
+                        fullScreen: false
                     }
             },
             _popupPositionedHandler: function(e) {
@@ -7147,6 +7172,10 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             _cancelButtonHandler: function() {
                 this.close();
                 this.option("focusStateEnabled") && this.focus()
+            },
+            _toggleReadOnlyState: function() {
+                this.callBase();
+                this._$dropButton && this._$dropButton.dxButton("option", "disabled", this.option("readOnly"))
             },
             _optionChanged: function(args) {
                 switch (args.name) {
@@ -7358,7 +7387,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             },
             _setSelectedItem: function(item) {
                 var displayValue = this._displayValue(item);
-                this.option("selectedItem", item);
+                this.option("selectedItem", utils.ensureDefined(item, null));
                 this.option("displayValue", displayValue)
             },
             _displayValue: function(item) {
@@ -7434,7 +7463,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             },
             _fireContentReadyAction: $.noop,
             _setAriaTargetForList: function() {
-                this._list._getAriaTarget = $.proxy(this._getAriaTarget, this)
+                this._list._getAriaTarget = $.proxy(this._getAriaTarget, this);
+                this._list.setAria("role", "combobox")
             },
             _renderList: function() {
                 this._listId = (new DevExpress.data.Guid)._value;
@@ -7553,7 +7583,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 var resultItems = this._dataSource && this._dataSource.items() || [];
                 var resultAmount = resultItems.length;
                 var isMinFilterLengthExceeded = this._isMinFilterLengthExceeded();
-                return isMinFilterLengthExceeded && resultAmount && this.element().hasClass("dx-state-focused")
+                return isMinFilterLengthExceeded && resultAmount && this._hasFocusClass()
             },
             _clearSearchTimer: function() {
                 clearTimeout(this._searchTimer);
@@ -8949,8 +8979,10 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 var itemData = this.option("items")[index];
                 if (itemData.location === "menu")
                     this._renderMenuItems();
-                else
-                    this.callBase.apply(this, arguments)
+                else {
+                    var itemIndex = $.inArray(itemData, this._getToolbarItems());
+                    this.callBase.apply(this, [itemIndex, property, value])
+                }
             },
             _optionChanged: function(args) {
                 var name = args.name;
@@ -9151,7 +9183,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this._$container = this.element();
                 this._initScrollView();
                 this._feedbackShowTimeout = LIST_FEEDBACK_SHOW_TIMEOUT;
-                this._createGroupRenderAction()
+                this._createGroupRenderAction();
+                this.setAria("role", "listbox")
             },
             _dataSourceOptions: function() {
                 this._suppressDeprecatedWarnings();
@@ -9319,8 +9352,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             },
             _render: function() {
                 this.element().addClass(LIST_CLASS);
-                this.callBase();
-                this.setAria("role", "listbox")
+                this.callBase()
             },
             _postprocessRenderItem: function(args) {
                 this.callBase.apply(this, arguments);
@@ -12520,28 +12552,28 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             _itemDataKey: function() {
                 return GALLERY_ITEM_DATA_KEY
             },
-            _itemWidth: function() {
-                if (!this._itemWidthCache)
-                    this._itemWidthCache = this.option("initialItemWidth") || this.element().outerWidth();
-                return this._itemWidthCache
-            },
             _actualItemWidth: function() {
                 var itemPerPage = this.option("wrapAround") ? this._itemsPerPage() + 1 : this._itemsPerPage();
                 if (this.option("stretchImages"))
-                    return this.element().outerWidth() / itemPerPage;
+                    return 1 / itemPerPage;
                 if (this.option("wrapAround"))
-                    return this._itemWidth() * this._itemsPerPage() / (this._itemsPerPage() + 1);
-                return this._itemWidth()
+                    return this._itemPercentWidth() * this._itemsPerPage() / (this._itemsPerPage() + 1);
+                return this._itemPercentWidth()
+            },
+            _itemPercentWidth: function() {
+                var percentWidth;
+                if (this.option("initialItemWidth"))
+                    percentWidth = this.option("initialItemWidth") / this.element().outerWidth();
+                else
+                    percentWidth = 1;
+                return percentWidth
             },
             _itemsPerPage: function() {
-                var itemsPerPage = Math.floor(this.element().outerWidth() / this._itemWidth()) || 1;
+                var itemsPerPage = Math.floor(1 / this._itemPercentWidth());
                 return Math.min(itemsPerPage, this._itemsCount())
             },
             _pagesCount: function() {
                 return Math.ceil(this._itemsCount() / this._itemsPerPage())
-            },
-            _clearItemWidthCache: function() {
-                delete this._itemWidthCache
             },
             _itemsCount: function() {
                 return (this.option("items") || []).length
@@ -12572,7 +12604,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             },
             _dimensionChanged: function() {
                 var selectedIndex = this.option("selectedIndex") || 0;
-                this._clearItemWidthCache();
+                this._clearCacheWidth();
                 this._renderDuplicateItems();
                 this._renderItemSizes();
                 this._renderItemPositions();
@@ -12621,7 +12653,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 if (startIndex !== undefined)
                     $items = $items.slice(startIndex);
                 $items.each(function(index) {
-                    $($items[index]).outerWidth(itemWidth)
+                    $($items[index]).outerWidth(itemWidth * 100 + "%")
                 })
             },
             _renderItemPositions: function() {
@@ -12638,7 +12670,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     if (index > itemsCount + itemsPerPage - 1)
                         realIndex = lastItemDuplicateIndex - realIndex - itemsPerPage;
                     var itemPosition = offsetDirection * (itemWidth * (realIndex + offsetRatio) + freeSpace * (realIndex + 1 - offsetRatio));
-                    translator.move($(this), {left: itemPosition})
+                    $(this).css("left", itemPosition * 100 + "%")
                 });
                 this._relocateItems(this.option("selectedIndex"), this.option("selectedIndex"), true)
             },
@@ -12646,7 +12678,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 var itemsPerPage = this._itemsPerPage();
                 if (this.option("wrapAround"))
                     itemsPerPage = itemsPerPage + 1;
-                return (this.element().outerWidth() - this._actualItemWidth() * itemsPerPage) / (itemsPerPage + 1)
+                return (1 - this._actualItemWidth() * itemsPerPage) / (itemsPerPage + 1)
             },
             _renderContainerPosition: function(offset, animate) {
                 offset = offset || 0;
@@ -12664,7 +12696,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     positionReady = that._animate(targetPosition).done($.proxy(that._endSwipe, that))
                 }
                 else {
-                    translator.move(this._$container, {left: targetPosition});
+                    translator.move(this._$container, {left: targetPosition * this._elementWidth()});
                     positionReady = $.Deferred().resolveWith(that)
                 }
                 if (this._deferredAnimate)
@@ -12681,26 +12713,27 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             },
             _animate: function(targetPosition, extraConfig) {
                 var that = this,
+                    $container = this._$container,
                     animationComplete = $.Deferred();
                 fx.animate(this._$container, $.extend({
                     type: "slide",
-                    to: {left: targetPosition},
+                    to: {left: targetPosition * this._elementWidth()},
                     duration: that.option("animationDuration"),
                     complete: function() {
                         if (that._needMoveContainerForward())
-                            translator.move(that._$container, {left: 0});
+                            translator.move($container, {left: 0});
                         if (that._needMoveContainerBack())
-                            translator.move(that._$container, {left: that._maxContainerOffset()});
+                            translator.move($container, {left: that._maxContainerOffset() * that._elementWidth()});
                         animationComplete.resolveWith(that)
                     }
                 }, extraConfig || {}));
                 return animationComplete
             },
             _needMoveContainerForward: function() {
-                return this._$container.position().left * this._offsetDirection() <= -this._maxItemWidth() * this._itemsCount()
+                return this._$container.position().left * this._offsetDirection() <= -this._maxItemWidth() * this._elementWidth() * this._itemsCount()
             },
             _needMoveContainerBack: function() {
-                return this._$container.position().left * this._offsetDirection() >= this._actualItemWidth()
+                return this._$container.position().left * this._offsetDirection() >= this._actualItemWidth() * this._elementWidth()
             },
             _maxContainerOffset: function() {
                 return -this._maxItemWidth() * (this._itemsCount() - this._itemsPerPage()) * this._offsetDirection()
@@ -12746,15 +12779,14 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this._$indicator.find(GALLERY_INDICATOR_ITEM_SELECTOR).removeClass(GALLERY_INDICATOR_ITEM_SELECTED_CLASS).eq(pageIndex).addClass(GALLERY_INDICATOR_ITEM_SELECTED_CLASS)
             },
             _renderUserInteraction: function() {
-                var that = this,
-                    rootElement = that.element(),
-                    swipeEnabled = that.option("swipeEnabled") && this._itemsCount() > 1;
+                var rootElement = this.element(),
+                    swipeEnabled = this.option("swipeEnabled") && this._itemsCount() > 1;
                 this._createComponent(rootElement, "dxSwipeable", {
                     disabled: this.option("disabled") || !swipeEnabled,
-                    onStart: $.proxy(that._swipeStartHandler, that),
-                    onUpdated: $.proxy(that._swipeUpdateHandler, that),
-                    onEnd: $.proxy(that._swipeEndHandler, that),
-                    itemSizeFunc: $.proxy(that._actualItemWidth(), that)
+                    onStart: $.proxy(this._swipeStartHandler, this),
+                    onUpdated: $.proxy(this._swipeUpdateHandler, this),
+                    onEnd: $.proxy(this._swipeEndHandler, this),
+                    itemSizeFunc: $.proxy(this._elementWidth, this)
                 });
                 var indicatorSelectAction = this._createAction(this._indicatorSelectHandler);
                 rootElement.off(events.addNamespace("dxclick", this.NAME), GALLERY_INDICATOR_ITEM_SELECTOR).on(events.addNamespace("dxclick", this.NAME), GALLERY_INDICATOR_ITEM_SELECTOR, function(e) {
@@ -12886,7 +12918,17 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     that.nextItem(true).done(that._setupSlideShow)
                 }, slideshowDelay)
             },
+            _elementWidth: function() {
+                if (!this._cacheElementWidth)
+                    this._cacheElementWidth = this.element().width();
+                return this._cacheElementWidth
+            },
+            _clearCacheWidth: function() {
+                delete this._cacheElementWidth
+            },
             _swipeStartHandler: function(e) {
+                this._clearCacheWidth();
+                this._elementWidth();
                 var itemsCount = this._itemsCount();
                 if (!itemsCount) {
                     e.jQueryEvent.cancel = true;
@@ -13261,7 +13303,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this.callBase();
                 $.extend(this._optionsByReference, {animation: true})
             },
-            _getAnonimousTemplateName: function() {
+            _getAnonymousTemplateName: function() {
                 return ANONYMOUS_TEMPLATE_NAME
             },
             _wrapper: function() {
@@ -14944,7 +14986,10 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             };
         var BUTTON_OPTION_MAP = {
                 buttonIcon: "icon",
-                buttonText: "text"
+                buttonText: "text",
+                buttonWidth: "width",
+                buttonHeight: "height",
+                buttonTemplate: "template"
             };
         DX.registerComponent("dxDropDownMenu", ui, ui.Widget.inherit({
             _supportedKeys: function() {
@@ -14982,6 +15027,9 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     itemTemplate: "item",
                     buttonText: "",
                     buttonIcon: "overflow",
+                    buttonWidth: undefined,
+                    buttonHeight: undefined,
+                    buttonTemplate: "content",
                     onButtonClick: null,
                     usePopover: false,
                     popupWidth: "auto",
@@ -15073,12 +15121,14 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 return {
                         text: this.option("buttonText"),
                         icon: this.option("buttonIcon"),
+                        width: this.option("buttonWidth"),
+                        height: this.option("buttonHeight"),
+                        template: this.option("buttonTemplate"),
                         focusStateEnabled: false,
                         onClick: $.proxy(function(e) {
                             this.option("opened", !this.option("opened"));
                             this._buttonClickAction(e)
-                        }, this),
-                        _templates: {}
+                        }, this)
                     }
             },
             _toggleMenuVisibility: function(opened) {
@@ -15183,6 +15233,9 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                         break;
                     case"buttonIcon":
                     case"buttonText":
+                    case"buttonWidth":
+                    case"buttonHeight":
+                    case"buttonTemplate":
                         this._button.option(BUTTON_OPTION_MAP[name], value);
                         this._renderPopup();
                         break;
@@ -15427,11 +15480,11 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             CALENDAR_CLASS = "dx-calendar",
             CALENDAR_BODY_CLASS = "dx-calendar-body",
             CALENDAR_CELL_CLASS = "dx-calendar-cell",
-            CALENDAR_EMPTY_CELL_CLASS = "dx-calendar-empty-cell",
             CALENDAR_FOOTER_CLASS = "dx-calendar-footer",
             CALENDAR_TODAY_BUTTON_CLASS = "dx-calendar-today-button",
             CALENDAR_HAS_FOOTER_CLASS = "dx-calendar-with-footer",
             CALENDAR_VIEWS_WRAPPER_CLASS = "dx-calendar-views-wrapper",
+            CALENDAR_VIEW_CLASS = "dx-calendar-view",
             ANIMATION_DURATION_SHOW_VIEW = 250,
             POP_ANIMATION_FROM = 0.6,
             POP_ANIMATION_TO = 1,
@@ -15445,13 +15498,12 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
         DX.registerComponent("dxCalendar", ui, ui.Editor.inherit({
             _activeStateUnit: "." + CALENDAR_CELL_CLASS,
             _supportedKeys: function() {
-                var isRTL = this.option("rtlEnabled"),
-                    offset = utils.getDifferenceInMonth(this.option("zoomLevel"));
+                var offset = utils.getDifferenceInMonth(this.option("zoomLevel"));
                 return $.extend(this.callBase(), {
                         rightArrow: function(e) {
                             if (e.ctrlKey) {
                                 e.preventDefault();
-                                this._waitRenderView(offset, isRTL ? -1 : 1)
+                                this._waitRenderView(offset)
                             }
                             else {
                                 this._change = "key";
@@ -15461,7 +15513,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                         leftArrow: function(e) {
                             if (e.ctrlKey) {
                                 e.preventDefault();
-                                this._waitRenderView(offset, isRTL ? 1 : -1)
+                                this._waitRenderView(-offset)
                             }
                             else {
                                 this._change = "key";
@@ -15494,11 +15546,11 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                         },
                         pageUp: function(e) {
                             e.preventDefault();
-                            this._waitRenderView(offset, -1)
+                            this._waitRenderView(-offset)
                         },
                         pageDown: function(e) {
                             e.preventDefault();
-                            this._waitRenderView(offset, 1)
+                            this._waitRenderView(offset)
                         },
                         tab: $.noop,
                         enter: function(e) {
@@ -15539,15 +15591,12 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             _init: function() {
                 this.callBase();
                 this._correctZoomLevel();
-                this._updateCurrentDate(this.option("value"));
+                this._initCurrentDate();
                 this._initActions()
             },
-            _initActions: function() {
-                this._cellClickOptionAction = this._createActionByOption("onCellClick")
-            },
             _correctZoomLevel: function() {
-                var maxZoomLevel = this.option("maxZoomLevel"),
-                    minZoomLevel = this.option("minZoomLevel"),
+                var minZoomLevel = this.option("minZoomLevel"),
+                    maxZoomLevel = this.option("maxZoomLevel"),
                     zoomLevel = this.option("zoomLevel");
                 if (LEVEL_COMPARE_MAP[maxZoomLevel] < LEVEL_COMPARE_MAP[minZoomLevel])
                     return;
@@ -15556,46 +15605,90 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 else if (LEVEL_COMPARE_MAP[zoomLevel] < LEVEL_COMPARE_MAP[minZoomLevel])
                     this.option("zoomLevel", minZoomLevel)
             },
-            _getMinDate: function() {
-                return this.option("min") || new Date(1000, 0)
+            _initCurrentDate: function() {
+                this.option("currentDate", this._getNormalizedDate(this.option("value")) || this._getNormalizedDate(this.option("currentDate")))
             },
-            _getMaxDate: function() {
-                return this.option("max") || new Date(3000, 0)
+            _getNormalizedDate: function(date) {
+                date = utils.normalizeDate(date, this._getMinDate(), this._getMaxDate());
+                return utils.isDefined(date) ? new Date(date) : date
             },
-            _updateCurrentDate: function(value) {
+            _initActions: function() {
+                this._cellClickOptionAction = this._createActionByOption("onCellClick");
+                this._onContouredChanged = this._createActionByOption("onContouredChanged")
+            },
+            _updateCurrentDate: function(date) {
                 var min = this._getMinDate(),
                     max = this._getMaxDate();
                 if (min > max) {
                     this.option("currentDate", new Date);
                     return
                 }
-                var date = value || new Date(this.option("currentDate")),
-                    normalizedDate = new Date(utils.normalizeDate(date, new Date(min), new Date(max)));
-                normalizedDate.setDate(1);
-                this.option("currentDate", normalizedDate);
-                var zoomLevel = this.option("zoomLevel"),
-                    isNewView = this._view && !utils.sameView(zoomLevel, normalizedDate, this._view.option("date"));
-                if (isNewView) {
-                    this._disposeViews();
-                    this._renderViews()
+                var normalizedDate = this._getNormalizedDate(date);
+                if (date.getTime() !== normalizedDate.getTime()) {
+                    this.option("currentDate", new Date(normalizedDate));
+                    return
                 }
+                var offset = this._getViewsOffset(this._view.option("date"), normalizedDate);
+                if (this._view)
+                    this._navigate(offset, normalizedDate);
+                this._renderNavigator()
             },
-            _waitRenderView: function(offset, direction) {
+            _getMinDate: function() {
+                return this.option("min") || new Date(1000, 0)
+            },
+            _getMaxDate: function() {
+                return this.option("max") || new Date(3000, 0)
+            },
+            _getViewsOffset: function(startDate, endDate) {
+                var zoomLevel = this.option("zoomLevel");
+                if (zoomLevel === "month")
+                    return this._getMonthsOffset(startDate, endDate);
+                var yearsDifference = endDate.getFullYear() - startDate.getFullYear(),
+                    zoomCorrection;
+                switch (zoomLevel) {
+                    case"century":
+                        zoomCorrection = 100;
+                        break;
+                    case"decade":
+                        zoomCorrection = 10;
+                        break;
+                    default:
+                        zoomCorrection = 1;
+                        break
+                }
+                return parseInt(yearsDifference / zoomCorrection)
+            },
+            _getMonthsOffset: function(startDate, endDate) {
+                var yearOffset = endDate.getFullYear() - startDate.getFullYear(),
+                    monthOffset = endDate.getMonth() - startDate.getMonth();
+                return yearOffset * 12 + monthOffset
+            },
+            _waitRenderView: function(offset) {
                 if (this._alreadyViewRender)
                     return;
                 this._alreadyViewRender = true;
                 this._change = "";
-                this._navigate(offset * direction);
+                var date = this._getDateByOffset(offset * this._getRtlCorrection());
+                this.option("currentDate", date);
                 setTimeout($.proxy(function() {
                     this._alreadyViewRender = false
                 }, this))
+            },
+            _getRtlCorrection: function() {
+                return this.option("rtlEnabled") ? -1 : 1
+            },
+            _getDateByOffset: function(offset, date) {
+                date = new Date(date || this.option("currentDate"));
+                var difference = utils.getDifferenceInMonth(this.option("zoomLevel")) * offset;
+                date.setMonth(date.getMonth() + difference);
+                return date
             },
             _focusTarget: function() {
                 return this.element()
             },
             _focusOutHandler: function() {
                 this.callBase.apply(this, arguments);
-                this._view.option("contouredDate", undefined)
+                this._view.option("contouredDate", null)
             },
             _focusInHandler: function() {
                 this.callBase.apply(this, arguments);
@@ -15620,21 +15713,16 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 })
             },
             _renderBody: function() {
-                if (!this._viewsWrapper) {
-                    var body = $("<div>").addClass(CALENDAR_BODY_CLASS);
-                    this._viewsWrapper = $("<div>").addClass(CALENDAR_VIEWS_WRAPPER_CLASS);
-                    body.append(this._viewsWrapper);
-                    this.element().append(body)
+                if (!this._$viewsWrapper) {
+                    var $body = $("<div>").addClass(CALENDAR_BODY_CLASS);
+                    this._$viewsWrapper = $("<div>").addClass(CALENDAR_VIEWS_WRAPPER_CLASS);
+                    $body.append(this._$viewsWrapper);
+                    this.element().append($body)
                 }
-            },
-            _isViewAvailable: function(date) {
-                var min = this._getMinDate(),
-                    max = this._getMaxDate();
-                return utils.dateInRange(date, new Date(min.getFullYear(), min.getMonth(), 1), new Date(max.getFullYear(), max.getMonth(), 1))
             },
             _renderViews: function() {
                 this._change = "";
-                this.element().addClass("dx-calendar-view-" + this.option("zoomLevel"));
+                this.element().addClass(CALENDAR_VIEW_CLASS + "-" + this.option("zoomLevel"));
                 var currentDate = this.option("currentDate");
                 this._view = this._renderSpecificView(currentDate);
                 this._view.option("_keyboardProcessor", this._viewKeyboardProcessor);
@@ -15642,29 +15730,11 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this._beforeView = this._isViewAvailable(beforeDate) ? this._renderSpecificView(beforeDate) : null;
                 var afterDate = this._getDateByOffset(1, currentDate);
                 this._afterView = this._isViewAvailable(afterDate) ? this._renderSpecificView(afterDate) : null;
-                this._translateViews();
-                this._onContouredChanged = this._createActionByOption("onContouredChanged")
-            },
-            _viewWidth: function() {
-                if (!this._viewWidthValue)
-                    this._viewWidthValue = this.element().width();
-                return this._viewWidthValue
-            },
-            _getDateByOffset: function(offset, date) {
-                date = new Date(date || this.option("currentDate"));
-                var difference = utils.getDifferenceInMonth(this.option("zoomLevel")) * offset;
-                date.setMonth(date.getMonth() + difference);
-                return date
-            },
-            _translateViews: function() {
-                var rtlCorrection = this.option("rtlEnabled") && !(DX.browser.msie && DX.browser.version[0] !== "8") ? -1 : 1;
-                translator.move(this._view.element(), {left: 0});
-                this._beforeView && translator.move(this._beforeView.element(), {left: -100 * rtlCorrection + "%"});
-                this._afterView && translator.move(this._afterView.element(), {left: 100 * rtlCorrection + "%"})
+                this._translateViews()
             },
             _renderSpecificView: function(date) {
                 var specificView = ui.dxCalendar.views[this.option("zoomLevel")],
-                    $view = $("<div>").appendTo(this._viewsWrapper),
+                    $view = $("<div>").appendTo(this._$viewsWrapper),
                     config = this._viewConfig(date);
                 return new specificView($view, config)
             },
@@ -15687,6 +15757,20 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                         allowValueSelection: this._isMaxZoomLevel()
                     }
             },
+            _isViewAvailable: function(date) {
+                var min = utils.getFirstMonthDate(this._getMinDate()),
+                    max = utils.getLastMonthDate(this._getMaxDate());
+                return utils.dateInRange(date, min, max)
+            },
+            _translateViews: function() {
+                translator.move(this._view.element(), {left: 0});
+                this._beforeView && translator.move(this._beforeView.element(), {left: this._getViewPosition(-1)});
+                this._afterView && translator.move(this._afterView.element(), {left: this._getViewPosition(1)})
+            },
+            _getViewPosition: function(coefficient) {
+                var rtlCorrection = this.option("rtlEnabled") && !(DX.browser.msie && DX.browser.version[0] !== "8") ? -1 : 1;
+                return coefficient * 100 * rtlCorrection + "%"
+            },
             _cellClickHandler: function(e) {
                 var zoomLevel = this.option("zoomLevel"),
                     nextView = utils.getViewDown(zoomLevel);
@@ -15700,218 +15784,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             },
             _isMaxZoomLevel: function() {
                 return this.option("zoomLevel") === this.option("maxZoomLevel")
-            },
-            _viewValueChangedHandler: function(e) {
-                if (this._isViewValueReseting)
-                    return;
-                if (this._isMaxZoomLevel())
-                    this.option("value", e.value)
-            },
-            _viewContouredChangedHandler: function(e) {
-                var date = e.value,
-                    currentDate = this.option("currentDate"),
-                    zoomLevel = this.option("zoomLevel"),
-                    isSameView = utils.sameView(zoomLevel, currentDate, date);
-                this.setAria("activedescendant", e.ariaId);
-                this._onContouredChanged && this._onContouredChanged(e.ariaId);
-                if (date && !isSameView && !this._isAlreadyNavigated && (this._isMaxZoomLevel() || this._change === "key" || this._change === "upDownArrow")) {
-                    var dir = utils.getFirstMonthDate(date) > currentDate ? 1 : -1;
-                    this._isAlreadyNavigated = true;
-                    this._navigate(dir)
-                }
-            },
-            _renderNavigator: function() {
-                if (!this._navigator) {
-                    var $navigator = $("<div>").prependTo(this.element());
-                    this._navigator = new ui.dxCalendar.Navigator($navigator, this._navigatorConfig())
-                }
-                this._navigator.option("text", this._view._getNavigatorCaption());
-                this._updateButtonsVisibility()
-            },
-            _renderSwipeable: function() {
-                var that = this;
-                if (!this._swipeable)
-                    this._swipeable = this._createComponent(this.element(), "dxSwipeable", {
-                        onStart: function(e) {
-                            that._swipeStartHandler(e)
-                        },
-                        onUpdated: function(e) {
-                            that._swipeUpdateHandler(e)
-                        },
-                        onEnd: function(e) {
-                            that._swipeEndHandler(e)
-                        },
-                        itemSizeFunc: $.proxy(this._viewWidth, this)
-                    })
-            },
-            _swipeStartHandler: function(e) {
-                fx.stop(this._viewsWrapper, true);
-                e.jQueryEvent.maxLeftOffset = this._afterView ? 1 : 0;
-                e.jQueryEvent.maxRightOffset = this._beforeView ? 1 : 0
-            },
-            _swipeUpdateHandler: function(e) {
-                var offset = e.jQueryEvent.offset;
-                translator.move(this._viewsWrapper, {left: offset * this._viewWidth()});
-                this._updateNavigatorCaption(offset)
-            },
-            _updateNavigatorCaption: function(offset) {
-                offset *= this.option("rtlEnabled") ? -1 : 1;
-                var view = this._view;
-                if (offset > 0.5)
-                    view = this._beforeView;
-                else if (offset < -0.5)
-                    view = this._afterView;
-                if (view)
-                    this._navigator.option("text", view._getNavigatorCaption())
-            },
-            _swipeEndHandler: function(e) {
-                var targetOffset = e.jQueryEvent.targetOffset,
-                    moveOffset = !targetOffset ? 0 : targetOffset / Math.abs(targetOffset),
-                    animationTo = moveOffset * this._viewWidth();
-                var rtlCorrection = this.option("rtlEnabled") ? -1 : 1,
-                    newDate = this._getDateByOffset(-moveOffset * rtlCorrection);
-                if (this._isDateInInvalidRange(newDate))
-                    if (moveOffset >= 0) {
-                        animationTo = 0;
-                        newDate = new Date(this._getMinDate())
-                    }
-                    else {
-                        animationTo = 0;
-                        newDate = new Date(this._getMaxDate())
-                    }
-                this._isAlreadyNavigated = true;
-                this._animateWrapper(animationTo, ANIMATION_DURATION_SHOW_VIEW).done($.proxy(function() {
-                    this._updateViews(moveOffset * rtlCorrection);
-                    this.option("currentDate", new Date(this._view.option("date")));
-                    this._view.option("contouredDate", newDate);
-                    this._resetLocation()
-                }, this))
-            },
-            _updateViews: function(offset) {
-                var dateByOffset;
-                this._view.option("_keyboardProcessor", null);
-                if (offset > 0 && this._beforeView) {
-                    this._afterView && this._afterView.element().remove();
-                    this._afterView = this._view;
-                    this._view = this._beforeView;
-                    dateByOffset = this._getDateByOffset(-1, this._view.option("date"));
-                    this._beforeView = this._isViewAvailable(dateByOffset) && this._renderSpecificView(dateByOffset)
-                }
-                else if (offset < 0 && this._afterView) {
-                    this._beforeView && this._beforeView.element().remove();
-                    this._beforeView = this._view;
-                    this._view = this._afterView;
-                    dateByOffset = this._getDateByOffset(1, this._view.option("date"));
-                    this._afterView = this._isViewAvailable(dateByOffset) && this._renderSpecificView(dateByOffset)
-                }
-                this._view.option("_keyboardProcessor", this._viewKeyboardProcessor);
-                this._translateViews()
-            },
-            _isDateInInvalidRange: function(date) {
-                if (this._view.isBoundary(date))
-                    return;
-                var min = this._getMinDate(),
-                    max = this._getMaxDate(),
-                    normalizedDate = utils.normalizeDate(date, min, max);
-                return normalizedDate === min || normalizedDate === max
-            },
-            _animateWrapper: function(to, duration) {
-                return fx.animate(this._viewsWrapper, {
-                        type: "slide",
-                        from: {left: this._viewsWrapper.position().left},
-                        to: {left: to},
-                        duration: duration
-                    })
-            },
-            _renderFooter: function() {
-                var that = this,
-                    showTodayButton = this.option("showTodayButton");
-                if (showTodayButton) {
-                    var $todayButton = this._createComponent($("<a>"), "dxButton", {
-                            focusStateEnabled: false,
-                            text: Globalize.localize("dxCalendar-todayButtonText"),
-                            onClick: function() {
-                                that._toTodayView()
-                            },
-                            _templates: {}
-                        }).element().addClass(CALENDAR_TODAY_BUTTON_CLASS);
-                    this._$footer = $("<div>").addClass(CALENDAR_FOOTER_CLASS).append($todayButton);
-                    this.element().append(this._$footer)
-                }
-                this.element().toggleClass(CALENDAR_HAS_FOOTER_CLASS, showTodayButton)
-            },
-            _toTodayView: function() {
-                var today = new Date;
-                if (!this._isMaxZoomLevel()) {
-                    this.option("currentDate", today);
-                    this.option("zoomLevel", this.option("maxZoomLevel"));
-                    this._animateShowView();
-                    this.option("value", today);
-                    this._renderNavigator();
-                    return
-                }
-                var currentDate = this._view.option("date"),
-                    offset = 0;
-                offset += (today.getFullYear() - currentDate.getFullYear()) * 12;
-                offset += today.getMonth() - currentDate.getMonth();
-                if (!offset) {
-                    this.option("value", today);
-                    return
-                }
-                this._afterView && this._afterView.element().remove();
-                this._beforeView && this._beforeView.element().remove();
-                delete this._afterView;
-                delete this._beforeView;
-                var newView = this._renderSpecificView(new Date(today.getFullYear(), today.getMonth(), 1)),
-                    sideSign = offset > 0 ? 1 : -1;
-                translator.move(newView.element(), {left: this._viewWidth() * sideSign});
-                var endPosition = this._viewWidth() * -sideSign * (this.option("rtlEnabled") ? -1 : 1);
-                this._animateWrapper(endPosition, ANIMATION_DURATION_SHOW_VIEW).done($.proxy(function() {
-                    this._view.element().remove();
-                    this._view = newView;
-                    this._beforeView = this._renderSpecificView(this._getDateByOffset(-1, new Date(today.getFullYear(), today.getMonth(), 1)));
-                    this._afterView = this._renderSpecificView(this._getDateByOffset(1, new Date(today.getFullYear(), today.getMonth(), 1)));
-                    this._translateViews();
-                    this.option("value", new Date(today));
-                    this._renderNavigator();
-                    this._resetLocation()
-                }, this))
-            },
-            _updateButtonsVisibility: function() {
-                var viewType = this.option("zoomLevel"),
-                    isRTL = this.option("rtlEnabled"),
-                    difference = (isRTL ? -1 : 1) * utils.getDifferenceInMonth(viewType);
-                this._navigator.toggleButton("next", !this._view.canNavigate(difference));
-                this._navigator.toggleButton("prev", !this._view.canNavigate(-difference))
-            },
-            _navigatorConfig: function() {
-                return {
-                        text: this._view._getNavigatorCaption(),
-                        onClick: $.proxy(this._navigatorClickHandler, this),
-                        onCaptionClick: $.proxy(this._navigateUp, this),
-                        rtlEnabled: this.option("rtlEnabled")
-                    }
-            },
-            _navigatorClickHandler: function(e) {
-                this._navigate(e.direction)
-            },
-            _isMinZoomLevel: function(zoomLevel) {
-                var min = this._getMinDate(),
-                    max = this._getMaxDate();
-                return utils.sameView(zoomLevel, min, max) || this.option("minZoomLevel") === zoomLevel
-            },
-            _navigateUp: function() {
-                var zoomLevel = this.option("zoomLevel"),
-                    nextView = utils.getViewUp(zoomLevel);
-                if (!nextView || this._isMinZoomLevel(zoomLevel))
-                    return;
-                this._contouredStack = this._contouredStack || [];
-                var contouredDate = this._view.option("contouredDate");
-                contouredDate && this._contouredStack.push(contouredDate);
-                this.option("currentDate", contouredDate || this._view.option("date"));
-                this.option("zoomLevel", nextView);
-                this._renderNavigator();
-                this._animateShowView()
             },
             _navigateDown: function(cell) {
                 var zoomLevel = this.option("zoomLevel");
@@ -15927,18 +15799,149 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this.option("zoomLevel", nextView);
                 this._renderNavigator();
                 this._animateShowView();
-                if (this._contouredStack && this._contouredStack.length > 0) {
-                    var contouredDate = this._view.getContouredDate(newCurrentDate, this._contouredStack);
-                    this._normalizeContouredDate(contouredDate);
+                this._view.option("contouredDate", this._getNormalizedDate(newCurrentDate))
+            },
+            _viewValueChangedHandler: function(e) {
+                if (this._isViewValueReseting)
+                    return;
+                if (this._isMaxZoomLevel())
+                    this.option("value", e.value)
+            },
+            _viewContouredChangedHandler: function(e) {
+                var date = e.value,
+                    currentDate = this.option("currentDate"),
+                    zoomLevel = this.option("zoomLevel"),
+                    areViewsSame = utils.sameView(zoomLevel, currentDate, date),
+                    isArrowKey = this._change === "key" || this._change === "upDownArrow",
+                    shouldViewBeChanged = utils.isDefined(date) && !areViewsSame && !this._isAlreadyNavigated && (this._isMaxZoomLevel() || isArrowKey);
+                this.setAria("activedescendant", e.ariaId);
+                this._onContouredChanged && this._onContouredChanged(e.ariaId);
+                if (shouldViewBeChanged) {
+                    var offset = utils.getFirstMonthDate(date) > currentDate ? 1 : -1;
+                    this._isAlreadyNavigated = true;
+                    this.option("currentDate", this._getDateByOffset(offset))
+                }
+            },
+            _renderNavigator: function() {
+                if (!this._navigator) {
+                    var $navigator = $("<div>").prependTo(this.element());
+                    this._navigator = new ui.dxCalendar.Navigator($navigator, this._navigatorConfig())
+                }
+                this._navigator.option("text", this._view.getNavigatorCaption());
+                this._updateButtonsVisibility()
+            },
+            _navigatorConfig: function() {
+                return {
+                        text: this._view.getNavigatorCaption(),
+                        onClick: $.proxy(this._navigatorClickHandler, this),
+                        onCaptionClick: $.proxy(this._navigateUp, this),
+                        rtlEnabled: this.option("rtlEnabled")
+                    }
+            },
+            _navigatorClickHandler: function(e) {
+                var currentDate = this._getDateByOffset(e.direction, this.option("currentDate"));
+                this.option("currentDate", currentDate)
+            },
+            _navigateUp: function() {
+                var zoomLevel = this.option("zoomLevel"),
+                    nextView = utils.getViewUp(zoomLevel);
+                if (!nextView || this._isMinZoomLevel(zoomLevel))
+                    return;
+                var contouredDate = this._view.option("contouredDate");
+                this.option("zoomLevel", nextView);
+                this.option("currentDate", contouredDate || this._view.option("date"));
+                this._renderNavigator();
+                this._animateShowView().done($.proxy(function() {
+                    this._view.option("contouredDate", contouredDate)
+                }, this))
+            },
+            _isMinZoomLevel: function(zoomLevel) {
+                var min = this._getMinDate(),
+                    max = this._getMaxDate();
+                return utils.sameView(zoomLevel, min, max) || this.option("minZoomLevel") === zoomLevel
+            },
+            _updateButtonsVisibility: function() {
+                var viewType = this.option("zoomLevel"),
+                    difference = this._getRtlCorrection() * utils.getDifferenceInMonth(viewType);
+                this._navigator.toggleButton("next", !this._view.canNavigate(difference));
+                this._navigator.toggleButton("prev", !this._view.canNavigate(-difference))
+            },
+            _renderSwipeable: function() {
+                if (!this._swipeable)
+                    this._swipeable = this._createComponent(this.element(), "dxSwipeable", {
+                        onStart: $.proxy(this._swipeStartHandler, this),
+                        onUpdated: $.proxy(this._swipeUpdateHandler, this),
+                        onEnd: $.proxy(this._swipeEndHandler, this),
+                        itemSizeFunc: $.proxy(this._viewWidth, this)
+                    })
+            },
+            _swipeStartHandler: function(e) {
+                fx.stop(this._$viewsWrapper, true);
+                e.jQueryEvent.maxLeftOffset = this._afterView ? 1 : 0;
+                e.jQueryEvent.maxRightOffset = this._beforeView ? 1 : 0
+            },
+            _swipeUpdateHandler: function(e) {
+                var offset = e.jQueryEvent.offset;
+                translator.move(this._$viewsWrapper, {left: offset * this._viewWidth()});
+                this._updateNavigatorCaption(offset)
+            },
+            _swipeEndHandler: function(e) {
+                var targetOffset = e.jQueryEvent.targetOffset,
+                    moveOffset = !targetOffset ? 0 : targetOffset / Math.abs(targetOffset);
+                if (moveOffset === 0) {
+                    this._animateWrapper(0, ANIMATION_DURATION_SHOW_VIEW);
                     return
                 }
-                this._normalizeContouredDate(newCurrentDate)
+                var date = this._getDateByOffset(-moveOffset * this._getRtlCorrection());
+                if (this._isDateInInvalidRange(date))
+                    if (moveOffset >= 0)
+                        date = new Date(this._getMinDate());
+                    else
+                        date = new Date(this._getMaxDate());
+                this._isAlreadyNavigated = true;
+                this.option("currentDate", date)
+            },
+            _viewWidth: function() {
+                if (!this._viewWidthValue)
+                    this._viewWidthValue = this.element().width();
+                return this._viewWidthValue
+            },
+            _updateNavigatorCaption: function(offset) {
+                offset *= this._getRtlCorrection();
+                var view = this._view;
+                if (offset > 0.5 && this._beforeView)
+                    view = this._beforeView;
+                else if (offset < -0.5 && this._afterView)
+                    view = this._afterView;
+                this._navigator.option("text", view.getNavigatorCaption())
+            },
+            _isDateInInvalidRange: function(date) {
+                if (this._view.isBoundary(date))
+                    return;
+                var min = this._getMinDate(),
+                    max = this._getMaxDate(),
+                    normalizedDate = utils.normalizeDate(date, min, max);
+                return normalizedDate === min || normalizedDate === max
+            },
+            _renderFooter: function() {
+                var showTodayButton = this.option("showTodayButton");
+                if (showTodayButton) {
+                    var $todayButton = this._createComponent($("<a>"), "dxButton", {
+                            focusStateEnabled: false,
+                            text: Globalize.localize("dxCalendar-todayButtonText"),
+                            onClick: $.proxy(function() {
+                                this._toTodayView()
+                            }, this),
+                            _templates: {}
+                        }).element().addClass(CALENDAR_TODAY_BUTTON_CLASS);
+                    this._$footer = $("<div>").addClass(CALENDAR_FOOTER_CLASS).append($todayButton);
+                    this.element().append(this._$footer)
+                }
+                this.element().toggleClass(CALENDAR_HAS_FOOTER_CLASS, showTodayButton)
             },
             _animateShowView: function() {
                 fx.stop(this._view.element(), true);
-                this._popAnimationView(this._view, POP_ANIMATION_FROM, POP_ANIMATION_TO, ANIMATION_DURATION_SHOW_VIEW).done($.proxy(function() {
-                    this._view.moveContouredDate(0)
-                }, this))
+                return this._popAnimationView(this._view, POP_ANIMATION_FROM, POP_ANIMATION_TO, ANIMATION_DURATION_SHOW_VIEW).promise()
             },
             _popAnimationView: function(view, from, to, duration) {
                 return fx.animate(view.element(), {
@@ -15954,53 +15957,65 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                         duration: duration
                     })
             },
-            _normalizeContouredDate: function(date) {
-                var $cell;
-                if (this._view.isBoundary(date)) {
-                    var zoomLevel = this.option("zoomLevel"),
-                        $cells = this._view.$body.find("." + CALENDAR_CELL_CLASS).not("." + CALENDAR_EMPTY_CELL_CLASS);
-                    var min = this._getMinDate(),
-                        max = this._getMaxDate();
-                    if (this._swipeOffset && utils.sameView(zoomLevel, min, max))
-                        $cell = this._swipeOffset < 0 ? $cells.last() : $cells.first();
-                    else if (utils.sameView(zoomLevel, date, min))
-                        $cell = $cells.first();
-                    else if (utils.sameView(zoomLevel, date, max))
-                        $cell = $cells.last();
-                    date = $cell ? $cell.data(CALENDAR_DATE_VALUE_KEY) : date;
-                    this._view.option("contouredDate", date);
-                    return
+            _navigate: function(offset, value) {
+                if (fx.isAnimating(this._$viewsWrapper))
+                    fx.stop(this._$viewsWrapper, true);
+                var currentDate = this._view.option("date");
+                value = value || this._getDateByOffset(offset, currentDate);
+                if (offset !== 0 && this._view.canNavigate(offset) && Math.abs(offset) !== 1) {
+                    var newView = this._renderSpecificView(value);
+                    if (offset > 0) {
+                        this._afterView && this._afterView.element().remove();
+                        this._afterView = newView
+                    }
+                    else {
+                        this._beforeView && this._beforeView.element().remove();
+                        this._beforeView = newView
+                    }
+                    this._translateViews()
                 }
-                var currentDate = this.option("currentDate");
-                $cell = this._view._getCellByDate(utils.getShortDate(date));
-                if (!$cell.length && !utils.dateInRange(date, this._getMinDate(), this._getMaxDate())) {
-                    this._view.option("contouredDate", currentDate);
-                    return
-                }
-                this._view.option("contouredDate", date)
-            },
-            _navigate: function(difference) {
-                if (this._view.canNavigate(difference)) {
-                    if (fx.isAnimating(this._viewsWrapper))
-                        fx.stop(this._viewsWrapper, true);
-                    var currentDate = this.option("currentDate"),
-                        newDate = this._getDateByOffset(difference, currentDate);
-                    utils.fixTimezoneGap(currentDate, newDate);
-                    var contouredDate = this._getNextContoured(newDate, difference);
-                    var isRTL = this.option("rtlEnabled") ? 1 : -1;
+                var rtlCorrection = this._getRtlCorrection(),
+                    offsetSign = offset > 0 ? 1 : offset < 0 ? -1 : 0,
+                    endPosition = -rtlCorrection * offsetSign * this._viewWidth();
+                var viewsWrapperPosition = this._$viewsWrapper.position().left;
+                if (viewsWrapperPosition !== endPosition) {
                     this._isAlreadyNavigated = true;
-                    this._animateWrapper(isRTL * difference * this._viewWidth(), ANIMATION_DURATION_SHOW_VIEW).done($.proxy(function() {
-                        this._updateViews(difference);
-                        this.option("currentDate", new Date(newDate));
-                        this._normalizeContouredDate(contouredDate);
-                        this._isAlreadyNavigated = false;
-                        this._resetLocation();
-                        this._renderNavigator()
-                    }, this))
+                    if (this._preventViewChangeAnimation)
+                        this._wrapperAnimationEndHandler(offset, value);
+                    else
+                        this._animateWrapper(endPosition, ANIMATION_DURATION_SHOW_VIEW).done($.proxy(this._wrapperAnimationEndHandler, this, offset, value))
                 }
             },
-            _resetLocation: function() {
-                DX.translator.move(this._viewsWrapper, {left: 0})
+            _animateWrapper: function(to, duration) {
+                return fx.animate(this._$viewsWrapper, {
+                        type: "slide",
+                        from: {left: this._$viewsWrapper.position().left},
+                        to: {left: to},
+                        duration: duration,
+                        complete: $.proxy(function() {
+                            this._isAlreadyNavigated = false
+                        }, this)
+                    })
+            },
+            _toTodayView: function() {
+                var today = new Date;
+                if (this._isMaxZoomLevel()) {
+                    this.option("value", today);
+                    return
+                }
+                this._preventViewChangeAnimation = true;
+                this.option("zoomLevel", this.option("maxZoomLevel"));
+                this.option("value", today);
+                this._animateShowView();
+                this._preventViewChangeAnimation = false
+            },
+            _wrapperAnimationEndHandler: function(offset, newDate) {
+                var contouredDate = this._getNextContoured(newDate, offset);
+                this._updateViews(offset);
+                if (offset !== 0)
+                    this._view.option("contouredDate", this._getNormalizedDate(contouredDate));
+                this._resetLocation();
+                this._renderNavigator()
             },
             _getNextContoured: function(newDate, difference) {
                 var contouredDate = this._view.getNextContouredDate(difference);
@@ -16012,10 +16027,50 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 }
                 return contouredDate
             },
+            _updateViews: function(offset) {
+                this._view.option("_keyboardProcessor", null);
+                this._rearrangeViews(offset);
+                this._view.option("_keyboardProcessor", this._viewKeyboardProcessor);
+                this._translateViews()
+            },
+            _rearrangeViews: function(offset) {
+                if (offset === 0)
+                    return;
+                var viewOffset,
+                    viewToCreateKey,
+                    viewToRemoveKey;
+                if (offset < 0) {
+                    viewOffset = 1;
+                    viewToCreateKey = "_beforeView";
+                    viewToRemoveKey = "_afterView"
+                }
+                else {
+                    viewOffset = -1;
+                    viewToCreateKey = "_afterView";
+                    viewToRemoveKey = "_beforeView"
+                }
+                if (!this[viewToCreateKey])
+                    return;
+                var destinationDate = this[viewToCreateKey].option("date");
+                if (this[viewToRemoveKey])
+                    this[viewToRemoveKey].element().remove();
+                if (offset === viewOffset)
+                    this[viewToRemoveKey] = this._view;
+                else {
+                    this[viewToRemoveKey] = this._renderSpecificView(this._getDateByOffset(viewOffset, destinationDate));
+                    this._view.element().remove()
+                }
+                this._view = this[viewToCreateKey];
+                var dateByOffset = this._getDateByOffset(-viewOffset, destinationDate);
+                this[viewToCreateKey] = this._isViewAvailable(dateByOffset) ? this._renderSpecificView(dateByOffset) : null
+            },
+            _resetLocation: function() {
+                DX.translator.move(this._$viewsWrapper, {left: 0})
+            },
             _clean: function() {
                 this.callBase();
                 this._clearViewWidthCache();
-                delete this._viewsWrapper;
+                delete this._$viewsWrapper;
                 delete this._navigator;
                 delete this._$footer
             },
@@ -16035,6 +16090,10 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 delete this._beforeView;
                 delete this._afterView
             },
+            _refreshViews: function() {
+                this._disposeViews();
+                this._renderViews()
+            },
             _visibilityChanged: function() {
                 this._translateViews()
             },
@@ -16051,24 +16110,22 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 switch (args.name) {
                     case"min":
                     case"max":
+                        this.option("currentDate", this._getNormalizedDate(this.option("value")) || this._getNormalizedDate(this.option("currentDate")));
+                        this._refreshViews();
+                        this._updateButtonsVisibility();
+                        break;
                     case"firstDayOfWeek":
-                        var date = this.option("value");
-                        date = date ? new Date(date) : new Date;
-                        this._updateCurrentDate(date);
-                        this._disposeViews();
-                        this._renderViews();
+                        this._refreshViews();
                         this._updateButtonsVisibility();
                         break;
                     case"currentDate":
                         this._updateCurrentDate(value);
-                        this._renderNavigator();
                         break;
                     case"zoomLevel":
-                        this.element().removeClass("dx-calendar-view-" + args.previousValue);
+                        this.element().removeClass(CALENDAR_VIEW_CLASS + "-" + args.previousValue);
                         this._correctZoomLevel();
-                        this._disposeViews();
-                        this._renderViews();
-                        this._updateButtonsVisibility();
+                        this._refreshViews();
+                        this._renderNavigator();
                         break;
                     case"minZoomLevel":
                     case"maxZoomLevel":
@@ -16076,7 +16133,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                         this._updateButtonsVisibility();
                         break;
                     case"value":
-                        this._updateCurrentDate(value ? new Date(value) : new Date);
+                        this.option("currentDate", utils.isDefined(value) ? new Date(value) : new Date);
                         this._updateViewsValue(value);
                         this.callBase(args);
                         break;
@@ -16333,13 +16390,23 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this._selectedCell = selectedCell
             },
             _getCellAriaLabel: $.noop,
+            _calculateContouredDate: DX.abstract,
+            _getFirstAvailableDate: function() {
+                var date = this.option("date"),
+                    min = this.option("min");
+                date = utils.getFirstDateView(this._getViewName(), date);
+                return new Date(min && date < min ? min : date)
+            },
             getNextContouredDate: function(difference) {
                 var circledDate = this.option("contouredDate") && new Date(this.option("contouredDate"));
                 if (circledDate)
                     circledDate.setMonth(circledDate.getMonth() + difference);
                 return circledDate
             },
-            focusInHandler: DX.abstract,
+            focusInHandler: function() {
+                var contouredDate = this.option("contouredDate");
+                this.option("contouredDate", this._calculateContouredDate(contouredDate))
+            },
             canNavigate: DX.abstract,
             moveContouredDate: DX.abstract,
             isBoundary: DX.abstract,
@@ -16347,13 +16414,13 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 var name = args.name;
                 switch (name) {
                     case"value":
-                        this.option("contouredDate", args.value);
                         this._renderValue();
                         this._valueChangedAction({
                             jQueryEvent: undefined,
                             value: args.value,
                             previousValue: args.previousValue
                         });
+                        this.option("contouredDate", args.value);
                         break;
                     case"contouredDate":
                         this._fitContouredCell(args.value, args.previousValue);
@@ -16410,7 +16477,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                         $("<th>").text(that._getDayCaption(that._getFirstDayOfWeek() + i)).appendTo($headerRow)
                     })
                 },
-                _getNavigatorCaption: function() {
+                getNavigatorCaption: function() {
                     var navigatorMonth = Globalize.culture().calendar.months.names[this.option("date").getMonth()],
                         navigatorYear = this.option("date").getFullYear();
                     return this.option("rtl") ? navigatorYear + " " + navigatorMonth : navigatorMonth + " " + navigatorYear
@@ -16453,17 +16520,16 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     this.option("contouredDate", contouredDate)
                 },
                 _calculateContouredDate: function(contouredDate) {
-                    var calculatedContouredDate = null,
+                    var value = this.option("value"),
                         date = this.option("date"),
-                        value = this.option("value");
-                    if (utils.sameMonthAndYear(contouredDate, date))
-                        calculatedContouredDate = contouredDate;
-                    else if (utils.sameMonthAndYear(value, date))
-                        calculatedContouredDate = value;
-                    return calculatedContouredDate || utils.getFirstMonthDate(date)
-                },
-                focusInHandler: function() {
-                    this.option("contouredDate", this._calculateContouredDate(this.option("contouredDate")))
+                        calculatedContouredDate;
+                    if (utils.isDefined(contouredDate))
+                        calculatedContouredDate = new Date(contouredDate);
+                    else if (utils.sameMonth(date, value))
+                        calculatedContouredDate = new Date(value);
+                    else
+                        calculatedContouredDate = this._getFirstAvailableDate();
+                    return calculatedContouredDate
                 },
                 canNavigate: function(difference) {
                     var date = new Date(this.option("date"));
@@ -16524,7 +16590,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 _getCellAriaLabel: function(date) {
                     return Globalize.format(date, "Y")
                 },
-                _getNavigatorCaption: function() {
+                getNavigatorCaption: function() {
                     return this.option("date").getFullYear()
                 },
                 moveContouredDate: function(difference) {
@@ -16533,9 +16599,19 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     utils.fixTimezoneGap(contouredDate, newContouredDate);
                     this.option("contouredDate", newContouredDate)
                 },
-                focusInHandler: function() {
-                    var date = this.option("date");
-                    this.option("contouredDate", new Date(date.getFullYear(), date.getMonth(), 1))
+                _calculateContouredDate: function(contouredDate) {
+                    var value = this.option("value"),
+                        date = this.option("date"),
+                        calculatedContouredDate;
+                    if (utils.isDefined(contouredDate))
+                        calculatedContouredDate = new Date(contouredDate);
+                    else if (utils.sameYear(date, value)) {
+                        calculatedContouredDate = new Date(value);
+                        calculatedContouredDate.setDate(1)
+                    }
+                    else
+                        calculatedContouredDate = this._getFirstAvailableDate();
+                    return calculatedContouredDate
                 },
                 canNavigate: function(difference) {
                     var date = new Date(this.option("date"));
@@ -16580,20 +16656,44 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 _getCellAriaLabel: function(date) {
                     return this._getCellText(date)
                 },
-                _getNavigatorCaption: function() {
+                getNavigatorCaption: function() {
                     var year = utils.getFirstYearInDecade(this.option("date"));
                     return year + "-" + (year + 9)
                 },
                 moveContouredDate: function(difference) {
                     var contouredDate = new Date(this.option("contouredDate") || this.option("date"));
                     contouredDate.setMonth(0);
-                    var newContouredDate = new Date(contouredDate.getFullYear(), contouredDate.getMonth() + difference, contouredDate.getDate());
+                    var newContouredDate = new Date(contouredDate.getFullYear(), contouredDate.getMonth() + difference, contouredDate.getDate()),
+                        differenceSign = difference > 0 ? 1 : -1,
+                        duplicatedYearsOffset = 2;
+                    if (Math.abs(difference) !== this._difference && !utils.sameDecade(contouredDate, newContouredDate))
+                        newContouredDate.setFullYear(newContouredDate.getFullYear() - differenceSign * duplicatedYearsOffset);
                     utils.fixTimezoneGap(contouredDate, newContouredDate);
                     this.option("contouredDate", newContouredDate)
                 },
-                focusInHandler: function() {
-                    var date = this.option("date");
-                    this.option("contouredDate", new Date(date.getFullYear(), 0, 1))
+                _isValueOnCurrentView: function(currentDate, value) {
+                    return utils.sameDecade(currentDate, value)
+                },
+                _getCountouredDate: function(value) {
+                    var contouredDate = new Date(value);
+                    contouredDate.setMonth(0);
+                    contouredDate.setDate(1);
+                    return contouredDate
+                },
+                _calculateContouredDate: function(contouredDate) {
+                    var value = this.option("value"),
+                        date = this.option("date"),
+                        calculatedContouredDate;
+                    if (utils.isDefined(contouredDate))
+                        calculatedContouredDate = new Date(contouredDate);
+                    else if (utils.sameDecade(date, value)) {
+                        calculatedContouredDate = new Date(value);
+                        calculatedContouredDate.setMonth(0);
+                        calculatedContouredDate.setDate(1)
+                    }
+                    else
+                        calculatedContouredDate = this._getFirstAvailableDate();
+                    return calculatedContouredDate
                 },
                 _getCellByDate: function(date) {
                     var foundDate = new Date(date);
@@ -16654,34 +16754,35 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     foundDate.setFullYear(utils.getFirstYearInDecade(foundDate));
                     return this._$table.find("td[data-value='" + utils.getShortDate(foundDate) + "']")
                 },
-                _getNavigatorCaption: function() {
+                getNavigatorCaption: function() {
                     var decade = utils.getFirstDecadeInCentury(this.option("date"));
                     return decade + "-" + (decade + 99)
                 },
                 moveContouredDate: function(difference) {
                     var contouredDate = this._calculateContouredDate(this.option("contouredDate")),
-                        newContouredDate = new Date(contouredDate.getFullYear(), contouredDate.getMonth() + difference, contouredDate.getDate());
+                        newContouredDate = new Date(contouredDate.getFullYear(), contouredDate.getMonth() + difference, contouredDate.getDate()),
+                        differenceSign = difference > 0 ? 1 : -1,
+                        duplicatedYearsOffset = 20;
+                    if (Math.abs(difference) !== this._difference && !utils.sameCentury(contouredDate, newContouredDate))
+                        newContouredDate.setFullYear(newContouredDate.getFullYear() - differenceSign * duplicatedYearsOffset);
                     utils.fixTimezoneGap(contouredDate, newContouredDate);
                     this.option("contouredDate", newContouredDate)
                 },
                 _calculateContouredDate: function(contouredDate) {
-                    var calculatedContouredDate = null;
-                    if (!utils.isDefined(contouredDate)) {
-                        var date = this.option("date");
-                        calculatedContouredDate = new Date(date);
-                        calculatedContouredDate.setFullYear(utils.getFirstYearInDecade(date));
+                    var value = this.option("value"),
+                        date = this.option("date"),
+                        calculatedContouredDate;
+                    if (utils.isDefined(contouredDate))
+                        calculatedContouredDate = new Date(contouredDate);
+                    else if (utils.sameCentury(date, value)) {
+                        calculatedContouredDate = new Date(value);
+                        calculatedContouredDate.setFullYear(utils.getFirstYearInDecade(calculatedContouredDate));
+                        calculatedContouredDate.setMonth(0);
                         calculatedContouredDate.setDate(1)
                     }
-                    else {
-                        calculatedContouredDate = new Date(contouredDate);
-                        calculatedContouredDate.setFullYear(utils.getFirstYearInDecade(this.option("contouredDate")))
-                    }
-                    calculatedContouredDate.setMonth(0);
+                    else
+                        calculatedContouredDate = this._getFirstAvailableDate();
                     return calculatedContouredDate
-                },
-                focusInHandler: function() {
-                    var date = this.option("date");
-                    this.option("contouredDate", new Date(utils.getFirstYearInDecade(date), 0, 1))
                 },
                 canNavigate: function(difference) {
                     var date = new Date(this.option("date"));
@@ -16985,6 +17086,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
         var ui = DX.ui,
             events = ui.events,
             dateUtils = ui.dateUtils,
+            utils = DX.utils,
             DATEVIEW_CLASS = "dx-dateview",
             DATEVIEW_WRAPPER_CLASS = "dx-dateview-wrapper",
             DATEVIEW_ROLLER_CONTAINER_CLASS = "dx-dateview-rollers",
@@ -16994,9 +17096,17 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             DATEVIEW_ROLLER_ITEM_CLASS = "dx-dateview-item",
             DATEVIEW_ROLLER_ITEM_SELECTED_CLASS = "dx-dateview-item-selected",
             DATEVIEW_ROLLER_ITEM_SELECTED_FRAME_CLASS = "dx-dateview-item-selected-frame",
-            DATEVIEW_ROLLER_ITEM_SELECTED_BORDER_CLASS = "dx-dateview-item-selected-border",
-            DATEVIEW_ROLLER_BUTTON_UP_CLASS = "dx-dateview-button-up",
-            DATEVIEW_ROLLER_BUTTON_DOWN_CLASS = "dx-dateview-button-down";
+            DATEVIEW_ROLLER_ITEM_SELECTED_BORDER_CLASS = "dx-dateview-item-selected-border";
+        var FORMAT = {
+                date: 'date',
+                datetime: 'datetime',
+                time: 'time'
+            };
+        var ROLLER_TYPE = {
+                year: 'year',
+                month: 'month',
+                day: 'day'
+            };
         DX.registerComponent("dxDateViewRoller", ui, ui.dxScrollable.inherit({
             _setDefaultOptions: function() {
                 this.callBase();
@@ -17022,8 +17132,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             },
             _init: function() {
                 this.callBase();
-                this._renderSelectedItemFrame();
-                this._renderControlButtons()
+                this._renderSelectedItemFrame()
             },
             _render: function() {
                 this.callBase();
@@ -17072,22 +17181,9 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             _renderSelectedItemFrame: function() {
                 $("<div>").addClass(DATEVIEW_ROLLER_ITEM_SELECTED_FRAME_CLASS).append($("<div>").addClass(DATEVIEW_ROLLER_ITEM_SELECTED_BORDER_CLASS)).appendTo(this._$container)
             },
-            _renderControlButtons: function() {
-                this._createComponent($("<div>").addClass(DATEVIEW_ROLLER_BUTTON_UP_CLASS).insertAfter(this._$container), "dxButton", {
-                    onClick: $.proxy(this._upButtonClickHandler, this),
-                    _templates: {}
-                });
-                this._createComponent($("<div>").addClass(DATEVIEW_ROLLER_BUTTON_DOWN_CLASS).insertAfter(this._$container), "dxButton", {
-                    onClick: $.proxy(this._downButtonClickHandler, this),
-                    _templates: {}
-                })
-            },
             _renderSelectedValue: function(selectedIndex) {
-                if (selectedIndex === undefined)
-                    selectedIndex = this.option("selectedIndex");
-                selectedIndex = this._fitIndex(selectedIndex);
-                var correctedPosition = this._getItemPosition(selectedIndex);
-                this._moveTo({top: correctedPosition});
+                var index = this._fitIndex(selectedIndex || this.option("selectedIndex"));
+                this._moveTo({top: this._getItemPosition(index)});
                 this._renderActiveStateItem()
             },
             _fitIndex: function(index) {
@@ -17099,40 +17195,32 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     return 0;
                 return index
             },
+            _getItemPosition: function(index) {
+                return Math.round(this._itemHeight() * index)
+            },
             _renderItemsClick: function() {
-                var itemSelector = "." + DATEVIEW_ROLLER_ITEM_CLASS,
+                var itemSelector = this._getItemSelector(),
                     eventName = events.addNamespace("dxclick", this.NAME);
                 this.element().off(eventName, itemSelector);
                 this.element().on(eventName, itemSelector, $.proxy(this._itemClickHandler, this))
             },
+            _getItemSelector: function() {
+                return "." + DATEVIEW_ROLLER_ITEM_CLASS
+            },
             _itemClickHandler: function(e) {
-                this.option("selectedIndex", this._itemElementIndex(this._closestItemElement(e)))
+                this.option("selectedIndex", this._itemElementIndex(e.currentTarget))
             },
             _itemElementIndex: function(itemElement) {
                 return this._itemElements().index(itemElement)
             },
-            _closestItemElement: function(e) {
-                return e.currentTarget
-            },
             _itemElements: function() {
-                return this.element().find("." + DATEVIEW_ROLLER_ITEM_CLASS)
+                return this.element().find(this._getItemSelector())
             },
             _renderActiveStateItem: function() {
                 var selectedIndex = this.option("selectedIndex");
                 $.each(this._$items, function(index) {
                     $(this).toggleClass(DATEVIEW_ROLLER_ITEM_SELECTED_CLASS, selectedIndex === index)
                 })
-            },
-            _upButtonClickHandler: function() {
-                this._animation = true;
-                this.option("selectedIndex", this.option("selectedIndex") - 1)
-            },
-            _downButtonClickHandler: function() {
-                this._animation = true;
-                this.option("selectedIndex", this.option("selectedIndex") + 1)
-            },
-            _getItemPosition: function(index) {
-                return Math.round(this._itemHeight() * index)
             },
             _moveTo: function(targetLocation) {
                 targetLocation = this._normalizeLocation(targetLocation);
@@ -17187,6 +17275,21 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     jQueryEvent: undefined
                 })
             },
+            _visibilityChanged: function(visible) {
+                this.callBase(visible);
+                if (visible)
+                    this._renderSelectedValue(this.option("selectedIndex"));
+                else
+                    this.toggleActiveState(false)
+            },
+            toggleActiveState: function(state) {
+                this.element().toggleClass(DATEVIEW_ROLLER_CURRENT_CLASS, state)
+            },
+            _refreshSelectedIndex: function() {
+                var selectedIndex = this.option("selectedIndex");
+                var fitIndex = this._fitIndex(selectedIndex);
+                fitIndex === selectedIndex ? this._renderActiveStateItem() : this.option("selectedIndex", fitIndex)
+            },
             _optionChanged: function(args) {
                 switch (args.name) {
                     case"selectedIndex":
@@ -17195,7 +17298,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                         break;
                     case"items":
                         this._renderItems();
-                        this.option("selectedIndex", this._fitIndex(this.option("selectedIndex")));
+                        this._refreshSelectedIndex();
                         break;
                     case"onClick":
                     case"showOnClick":
@@ -17218,7 +17321,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this.option({
                     minDate: dateUtils.MIN_DATEVIEW_DEFAULT_DATE,
                     maxDate: dateUtils.MAX_DATEVIEW_DEFAULT_DATE,
-                    format: "date",
+                    format: FORMAT.date,
                     value: new Date,
                     culture: Globalize.culture().name,
                     activeStateEnabled: true,
@@ -17244,16 +17347,17 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 return this._$wrapper
             },
             _renderContentImpl: function() {
-                this._$wrapper = $("<div>").appendTo(this.element()).addClass(DATEVIEW_WRAPPER_CLASS);
-                this._renderRollers()
+                this._$wrapper = $("<div>").addClass(DATEVIEW_WRAPPER_CLASS);
+                this._renderRollers();
+                this._$wrapper.appendTo(this.element())
             },
             _renderRollers: function() {
+                if (!this._$rollersContainer)
+                    this._$rollersContainer = $("<div>").addClass(DATEVIEW_ROLLER_CONTAINER_CLASS);
+                this._$rollersContainer.empty();
+                this._createRollerConfigs();
+                this._rollers = {};
                 var that = this;
-                if (!that._$rollersContainer)
-                    that._$rollersContainer = $("<div>").appendTo(that._wrapper()).addClass(DATEVIEW_ROLLER_CONTAINER_CLASS);
-                that._$rollersContainer.empty();
-                that._createRollerConfigs();
-                that._rollers = {};
                 $.each(that._rollerConfigs, function(name) {
                     var $roller = $("<div>").appendTo(that._$rollersContainer).addClass(DATEVIEW_ROLLER_CLASS + "-" + that._rollerConfigs[name].type);
                     that._rollers[that._rollerConfigs[name].type] = that._createComponent($roller, "dxDateViewRoller", {
@@ -17281,66 +17385,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                             that._setRollerState(that._rollerConfigs[name], roller.option("selectedIndex"))
                         }
                     })
-                })
-            },
-            _setActiveRoller: function(currentRoller) {
-                var activeRoller = currentRoller && this._rollers[currentRoller.type];
-                $.each(this._rollers, function() {
-                    this._$element.toggleClass(DATEVIEW_ROLLER_CURRENT_CLASS, this === activeRoller)
-                })
-            },
-            _updateRollersPosition: function() {
-                var that = this;
-                $.each(this._rollers, function(type) {
-                    var correctIndex = that._rollerConfigs[type].getIndex(that._getCurrentDate());
-                    this.option("selectedIndex", correctIndex)
-                })
-            },
-            _setRollerState: function(roller, selectedIndex) {
-                if (selectedIndex !== roller.selectedIndex) {
-                    var rollerValue = roller.valueItems[selectedIndex],
-                        setValue = roller.setValue,
-                        currentValue = new Date(this._getCurrentDate()),
-                        currentDate = currentValue.getDate();
-                    if (roller.type === "month")
-                        currentDate = Math.min(currentDate, dateUtils.getMaxMonthDay(currentValue.getFullYear(), rollerValue));
-                    else if (roller.type === "year")
-                        currentDate = Math.min(currentDate, dateUtils.getMaxMonthDay(rollerValue, currentValue.getMonth()));
-                    currentValue.setDate(currentDate);
-                    currentValue[setValue](rollerValue);
-                    this.option("value", currentValue);
-                    roller.selectedIndex = selectedIndex
-                }
-                if (roller.type === "year") {
-                    this._refreshMonthRoller();
-                    this._refreshDayRoller()
-                }
-                if (roller.type === "month")
-                    this._refreshDayRoller()
-            },
-            _refreshMonthRoller: function() {
-                var monthRoller = this._rollers["month"];
-                if (monthRoller) {
-                    this._createRollerConfig("month");
-                    var monthRollerConfig = this._rollerConfigs["month"];
-                    if (monthRollerConfig.displayItems.length !== monthRoller.option("items").length)
-                        monthRoller.option({
-                            items: monthRollerConfig.displayItems,
-                            selectedIndex: monthRollerConfig.selectedIndex
-                        })
-                }
-            },
-            _refreshDayRoller: function() {
-                var dayRoller = this._rollers["day"];
-                if (dayRoller) {
-                    this._createRollerConfig("day");
-                    var dayRollerConfig = this._rollerConfigs["day"];
-                    if (dayRollerConfig.displayItems.length !== dayRoller.option("items").length)
-                        dayRoller.option({
-                            items: dayRollerConfig.displayItems,
-                            selectedIndex: dayRollerConfig.selectedIndex
-                        })
-                }
+                });
+                that._$rollersContainer.appendTo(that._wrapper())
             },
             _createRollerConfigs: function(format) {
                 var that = this;
@@ -17352,17 +17398,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                             that._createRollerConfig(componentName)
                     })
                 })
-            },
-            _getFormatPattern: function(format) {
-                var culture = Globalize.culture(this.option("culture")),
-                    result = "";
-                if (format === "date")
-                    result = culture.calendar.patterns.d;
-                else if (format === "time")
-                    result = culture.calendar.patterns.t;
-                else if (format === "datetime")
-                    result = [culture.calendar.patterns.d, culture.calendar.patterns.t].join(" ");
-                return result
             },
             _createRollerConfig: function(componentName) {
                 var componentInfo = dateUtils.DATE_COMPONENTS_INFO[componentName],
@@ -17388,6 +17423,74 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 config.selectedIndex = config.getIndex(curDate);
                 this._rollerConfigs[componentName] = config
             },
+            _setActiveRoller: function(currentRoller) {
+                var activeRoller = currentRoller && this._rollers[currentRoller.type];
+                $.each(this._rollers, function() {
+                    this.toggleActiveState(this === activeRoller)
+                })
+            },
+            _updateRollersPosition: function() {
+                var that = this;
+                $.each(this._rollers, function(type) {
+                    var correctIndex = that._rollerConfigs[type].getIndex(that._getCurrentDate());
+                    this.option("selectedIndex", correctIndex)
+                })
+            },
+            _setRollerState: function(roller, selectedIndex) {
+                if (selectedIndex !== roller.selectedIndex) {
+                    var rollerValue = roller.valueItems[selectedIndex],
+                        setValue = roller.setValue,
+                        currentValue = new Date(this._getCurrentDate()),
+                        currentDate = currentValue.getDate();
+                    if (roller.type === ROLLER_TYPE.month)
+                        currentDate = Math.min(currentDate, dateUtils.getMaxMonthDay(currentValue.getFullYear(), rollerValue));
+                    else if (roller.type === ROLLER_TYPE.year)
+                        currentDate = Math.min(currentDate, dateUtils.getMaxMonthDay(rollerValue, currentValue.getMonth()));
+                    currentValue.setDate(currentDate);
+                    currentValue[setValue](rollerValue);
+                    this.option("value", currentValue);
+                    roller.selectedIndex = selectedIndex
+                }
+                if (roller.type === ROLLER_TYPE.year) {
+                    this._refreshMonthRoller();
+                    this._refreshDayRoller()
+                }
+                if (roller.type === ROLLER_TYPE.month)
+                    this._refreshDayRoller()
+            },
+            _refreshMonthRoller: function() {
+                var monthRoller = this._rollers[ROLLER_TYPE.month];
+                if (monthRoller) {
+                    this._createRollerConfig(ROLLER_TYPE.month);
+                    var monthRollerConfig = this._rollerConfigs[ROLLER_TYPE.month];
+                    if (monthRollerConfig.displayItems.length !== monthRoller.option("items").length)
+                        monthRoller.option({
+                            items: monthRollerConfig.displayItems,
+                            selectedIndex: monthRollerConfig.selectedIndex
+                        })
+                }
+            },
+            _refreshDayRoller: function() {
+                var dayRoller = this._rollers[ROLLER_TYPE.day];
+                if (dayRoller) {
+                    this._createRollerConfig(ROLLER_TYPE.day);
+                    var dayRollerConfig = this._rollerConfigs[ROLLER_TYPE.day];
+                    dayRoller.option({
+                        items: dayRollerConfig.displayItems,
+                        selectedIndex: dayRollerConfig.selectedIndex
+                    })
+                }
+            },
+            _getFormatPattern: function(format) {
+                var culture = Globalize.culture(this.option("culture"));
+                if (format === FORMAT.date)
+                    return culture.calendar.patterns.d;
+                if (format === FORMAT.time)
+                    return culture.calendar.patterns.t;
+                if (format === FORMAT.datetime)
+                    return [culture.calendar.patterns.d, culture.calendar.patterns.t].join(" ");
+                return ""
+            },
             _getCurrentDate: function() {
                 var curDate = this.option("value"),
                     minDate = this.option("minDate"),
@@ -17402,24 +17505,24 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 var curDate = this._getCurrentDate(),
                     minDate = this.option("minDate"),
                     maxDate = this.option("maxDate"),
-                    minYear = curDate.getFullYear() === minDate.getFullYear(),
+                    minYear = utils.sameYear(curDate, minDate),
                     minMonth = minYear && curDate.getMonth() === minDate.getMonth(),
-                    maxYear = curDate.getFullYear() === maxDate.getFullYear(),
+                    maxYear = utils.sameYear(curDate, maxDate),
                     maxMonth = maxYear && curDate.getMonth() === maxDate.getMonth(),
                     componentInfo = dateUtils.DATE_COMPONENTS_INFO[componentName],
                     startValue = componentInfo.startValue,
                     endValue = componentInfo.endValue;
-                if (componentName === "year") {
+                if (componentName === ROLLER_TYPE.year) {
                     startValue = minDate.getFullYear();
                     endValue = maxDate.getFullYear()
                 }
-                if (componentName === "month") {
+                if (componentName === ROLLER_TYPE.month) {
                     if (minYear)
                         startValue = minDate.getMonth();
                     if (maxYear)
                         endValue = maxDate.getMonth()
                 }
-                if (componentName === "day") {
+                if (componentName === ROLLER_TYPE.day) {
                     endValue = dateUtils.getMaxMonthDay(curDate.getFullYear(), curDate.getMonth());
                     if (minYear && minMonth)
                         startValue = minDate.getDate();
@@ -17804,7 +17907,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     modelValue = new Date(value && value.valueOf()),
                     mode = this.option("mode"),
                     newValue = (mode !== "text" ? dateUtils.mergeDates(modelValue, date, mode) : date) || null;
-                this._text = text;
                 this._textHasBeenChanged = true;
                 if (this._validateValue(date))
                     this.dateOption("value", newValue);
@@ -17851,10 +17953,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             },
             _isNativeView: function() {
                 return this.option("pickerType") === "native"
-            },
-            _popupShownHandler: function(e) {
-                this.callBase.apply(this, arguments);
-                this._text = this.option("text")
             },
             _getPopupTitle: function() {
                 var result = this.option("placeholder");
@@ -18073,10 +18171,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                         enter: $.proxy(function(e) {
                             if (this.dateBox.option("opened")) {
                                 e.preventDefault();
-                                if (this.dateBox._text !== e.target.value) {
-                                    this.dateBox._valueChangeEventHandler(e);
-                                    return false
-                                }
                                 if (this._widget.option("zoomLevel") === this._widget.option("maxZoomLevel")) {
                                     var contouredDate = this._widget._view.option("contouredDate");
                                     contouredDate && this.dateBoxValue(contouredDate);
@@ -18133,7 +18227,10 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                             type: "today"
                         }
                     });
-                return $.extend(popupConfig, {buttons: buttons})
+                return $.extend(true, popupConfig, {
+                        buttons: buttons,
+                        position: {collision: "flipfit flip"}
+                    })
             },
             _valueChangedHandler: function(e) {
                 if (this.dateBox._openedStateRendering)
@@ -18261,7 +18358,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             _preventFocusOnPopup: function(e) {
                 if (!$(e.target).hasClass("dx-texteditor-input")) {
                     this.callBase.apply(this, arguments);
-                    if (!this.dateBox.element().hasClass("dx-state-focused"))
+                    if (!this.dateBox._hasFocusClass())
                         this.dateBox.focus()
                 }
             },
@@ -18284,12 +18381,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             dateUtils = ui.dateUtils;
         ui.dxDateBox.renderingStrategies["DateView"] = ui.dxDateBox.strategy.inherit({
             NAME: "DateView",
-            popupShowingHandler: function() {
-                this._widget.option("visible", true)
-            },
-            popupHiddenHandler: function() {
-                this._widget.option("visible", false)
-            },
             getDefaultOptions: function() {
                 return {
                         openOnFieldClick: true,
@@ -18374,7 +18465,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                         format: this.dateBox.option("format"),
                         minDate: this.dateBox.dateOption("min") || new Date(1900, 1, 1),
                         maxDate: this.dateBox.dateOption("max") || new Date($.now() + 50 * dateUtils.ONE_YEAR),
-                        visible: false,
                         onDisposing: $.proxy(function() {
                             this._widget = null
                         }, this)
@@ -19111,7 +19201,9 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     shading: false,
                     closeOnTargetScroll: true,
                     closeOnOutsideClick: true,
-                    width: this._isInitialOptionValue("popupWidth") ? this.element().width() : this._popupConfig().width
+                    width: this._isInitialOptionValue("popupWidth") ? $.proxy(function() {
+                        return this.element().outerWidth()
+                    }, this) : this._popupConfig().width
                 }));
                 this._popup.on({
                     showing: $.proxy(this._popupShowingHandler, this),
@@ -19539,13 +19631,6 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 this.callBase();
                 this._setPopupOption("width")
             },
-            _hasItemsToShow: function() {
-                var resultItems = this._dataSource && this._dataSource.items() || [];
-                var value = this.option("value");
-                var firstResultValue = this._displayGetter(resultItems[0]) || "";
-                var firstResultValueShorterThanValue = firstResultValue.length < (value || "").length;
-                return this.callBase() && !firstResultValueShorterThanValue
-            },
             _popupWrapperClass: function() {
                 return this.callBase() + " " + AUTOCOMPLETE_POPUP_WRAPPER_CLASS
             },
@@ -19649,6 +19734,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                             }
                         },
                         enter: function(e) {
+                            if (this.option("fieldEditEnabled"))
+                                e.preventDefault();
                             if (parent.enter.apply(this, arguments))
                                 return this.option("opened")
                         },
@@ -19761,13 +19848,28 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 return value
             },
             _setNextValue: function(step) {
-                if (!this._dataSource.isLoaded())
-                    this._loadDataSource();
-                var item = this.option("selectedItem"),
-                    items = this._dataSource.items(),
-                    itemIndex = $.inArray(item, items),
-                    nextIndex = this._fitIntoRange(itemIndex + step, 0, items.length - 1);
-                this._setValue(this._valueGetter(items[nextIndex]))
+                var dataSourceIsLoaded = this._dataSource.isLoaded() ? $.Deferred().resolve() : this._dataSource.load();
+                dataSourceIsLoaded.done($.proxy(function() {
+                    var value = this._valueGetter(this._calcNextItem(step));
+                    this._setValue(value)
+                }, this))
+            },
+            _calcNextItem: function(step) {
+                var items = this._dataSource.items();
+                var nextIndex = this._fitIntoRange(this._getSelectedIndex() + step, 0, items.length - 1);
+                return items[nextIndex]
+            },
+            _getSelectedIndex: function() {
+                var items = this._dataSource.items();
+                var selectedItem = this.option("selectedItem");
+                var result = -1;
+                $.each(items, $.proxy(function(index, item) {
+                    if (this._isValueEquals(item, selectedItem)) {
+                        result = index;
+                        return false
+                    }
+                }, this));
+                return result
             },
             _setSelectedItem: function(item) {
                 var isUnknownItem = !this._isCustomValueAllowed() && item === undefined;
@@ -19846,7 +19948,10 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 return this._isValueEquals(value, this.option("value"))
             },
             _listItemClickHandler: function(e) {
-                this._completeSelection(this._valueGetter(e.itemData))
+                var previousValue = this.option("value");
+                this._completeSelection(this._valueGetter(e.itemData));
+                if (this.option("searchEnabled") && previousValue === this._valueGetter(e.itemData))
+                    this._renderDisplayText(this._displayGetter(e.itemData))
             },
             _completeSelection: function(value) {
                 if (value === undefined)
@@ -19952,8 +20057,10 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                                 e.preventDefault();
                                 this._completeSelection()
                             }
-                            else
+                            else {
+                                this.option("opened") && e.preventDefault();
                                 this._keyboardProcessor._childProcessors[0].process(e)
+                            }
                         }
                     })
             },
@@ -20113,7 +20220,9 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                     this._addTag(this._valueGetter(addedItem))
                 }, this));
                 this.callBase(e);
-                this.option("values", this._values());
+                this._suppressingSelectionChanged(function() {
+                    this.option("values", this._values())
+                });
                 this._valuesChangedAction(e)
             },
             _removeTag: function(value) {
@@ -20185,8 +20294,10 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
                 return $.extend(result, {values: this._values()})
             },
             _refreshSelected: function() {
-                this._list && this._list.option("selectedItems", this.option("values"));
-                this.callBase()
+                this._list && this._suppressingSelectionChanged(function() {
+                    this._setListOption("selectedItems", this._selectedItems);
+                    this.callBase()
+                })
             },
             _setSelectedElement: function($element) {
                 this.callBase($element);
@@ -20432,7 +20543,7 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             _swipeUpdateHandler: function(e) {
                 var offset = e.offset,
                     swipeDirection = utils.sign(offset) * this._getRTLSignCorrection();
-                move(this._$itemContainer, offset * 100 + "%");
+                move(this._$itemContainer, offset * this._itemWidth());
                 if (swipeDirection !== this._swipeDirection) {
                     this._swipeDirection = swipeDirection;
                     var selectedIndex = this.option("selectedIndex"),
@@ -20878,8 +20989,8 @@ if (!DevExpress.MOD_WIDGETS_BASE) {
             _supportedKeys: function() {
                 var click = function(e) {
                         e.preventDefault();
-                        if (this._$button)
-                            this._$button.click()
+                        var $selectButton = this._selectButton.element();
+                        $selectButton.trigger("dxclick")
                     };
                 return $.extend(this.callBase(), {
                         space: click,

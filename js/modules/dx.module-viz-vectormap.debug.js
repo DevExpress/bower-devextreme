@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Vector Map)
-* Version: 15.1.7
-* Build date: Sep 22, 2015
+* Version: 15.1.8
+* Build date: Oct 29, 2015
 *
 * Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -2997,12 +2997,15 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
             return groups
         }
         function findGroupPosition(value, groups) {
-            var i = 0,
-                ii = groups.length;
-            for (; i < ii; ++i)
-                if (groups[i].start <= value && value <= groups[i].end)
-                    return i;
-            return -1
+            var i,
+                ii = groups.length,
+                k = -1;
+            for (i = 0; i < ii && k === -1; ++i)
+                if (groups[i].start <= value && value < groups[i].end)
+                    k = i;
+            if (k === -1 && value === groups[ii - 1].end)
+                k = ii - 1;
+            return k
         }
         _extend(DX.viz.map._tests, {
             MapItemsManager: MapItemsManager,
@@ -3520,7 +3523,7 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                     opacity: style.selectedOpacity
                 };
                 that._bubble = renderer.circle(0, 0, 0).sharp().attr(that._default).data(that._ctx.dataKey, that._data).append(root);
-                that.setSize(style.size / that._maxSize || 1)
+                that.setSize(((style.size || that._maxSize) - that._minSize) / (that._maxSize - that._minSize))
             },
             _applyDefault: function() {
                 this._bubble.attr(this._default)
