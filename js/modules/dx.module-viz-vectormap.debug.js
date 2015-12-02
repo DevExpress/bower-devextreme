@@ -1,156 +1,113 @@
 /*! 
 * DevExtreme (Vector Map)
-* Version: 15.1.8
-* Build date: Oct 29, 2015
+* Version: 15.2.3
+* Build date: Dec 2, 2015
 *
 * Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
 */
 
 "use strict";
-if (!DevExpress.MOD_VIZ_VECTORMAP) {
-    if (!DevExpress.MOD_VIZ_CORE)
+if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
+    if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE)
         throw Error('Required module is not referenced: viz-core');
     /*! Module viz-vectormap, file map.js */
     (function(DX, $, undefined) {
-        DX.viz.map = {};
-        var _parseScalar = DX.viz.utils.parseScalar,
+        var map = DX.viz.map = {},
+            _parseScalar = DX.viz.utils.parseScalar,
+            registerComponent = DX.require("/componentRegistrator"),
+            _noop = $.noop,
+            _extend = $.extend,
             DEFAULT_WIDTH = 800,
             DEFAULT_HEIGHT = 400,
             TOOLTIP_OFFSET = 12,
-            _extend = $.extend,
-            nextDataKey = 1;
+            nextDataKey = 1,
+            RE_LAYERS = /^layers/,
+            RE_LAYERS_I = /^layers\[\d+\]$/,
+            RE_LAYERS_I_DATA = /^layers\[\d+\].data$/,
+            RE_LAYERS_DATA = /^layers.data$/;
         function generateDataKey() {
             return "vectormap-data-" + nextDataKey++
         }
         var Map = DX.viz.BaseWidget.inherit({
                 _eventsMap: _extend({}, DX.viz.BaseWidget.prototype._eventsMap, {
-                    onClick: {
-                        name: "click",
-                        deprecated: "click",
-                        deprecatedContext: function(arg) {
-                            return arg.component
-                        },
-                        deprecatedArgs: function(arg) {
-                            return [arg.jQueryEvent]
-                        }
-                    },
-                    click: {newName: "onClick"},
-                    onCenterChanged: {
-                        name: "centerChanged",
-                        deprecated: "centerChanged",
-                        deprecatedContext: function(arg) {
-                            return arg.component
-                        },
-                        deprecatedArgs: function(arg) {
-                            return [arg.center]
-                        }
-                    },
-                    centerChanged: {newName: "onCenterChanged"},
-                    onZoomFactorChanged: {
-                        name: "zoomFactorChanged",
-                        deprecated: "zoomFactorChanged",
-                        deprecatedContext: function(arg) {
-                            return arg.component
-                        },
-                        deprecatedArgs: function(arg) {
-                            return [arg.zoomFactor]
-                        }
-                    },
-                    zoomFactorChanged: {newName: "onZoomFactorChanged"},
-                    onAreaClick: {
-                        name: "areaClick",
-                        deprecated: "areaSettings.click",
-                        deprecatedContext: function(arg) {
-                            return arg.target
-                        },
-                        deprecatedArgs: function(arg) {
-                            return [arg.target, arg.jQueryEvent]
-                        }
-                    },
+                    onClick: {name: "click"},
+                    onCenterChanged: {name: "centerChanged"},
+                    onZoomFactorChanged: {name: "zoomFactorChanged"},
+                    onAreaClick: {name: "areaClick"},
                     onAreaHoverChanged: {name: "areaHoverChanged"},
-                    onAreaSelectionChanged: {
-                        name: "areaSelectionChanged",
-                        deprecated: "areaSettings.selectionChanged",
-                        deprecatedContext: function(arg) {
-                            return arg.target
-                        },
-                        deprecatedArgs: function(arg) {
-                            return [arg.target]
-                        }
-                    },
-                    onMarkerClick: {
-                        name: "markerClick",
-                        deprecated: "markerSettings.click",
-                        deprecatedContext: function(arg) {
-                            return arg.target
-                        },
-                        deprecatedArgs: function(arg) {
-                            return [arg.target, arg.jQueryEvent]
-                        }
-                    },
+                    onAreaSelectionChanged: {name: "areaSelectionChanged"},
+                    onMarkerClick: {name: "markerClick"},
                     onMarkerHoverChanged: {name: "markerHoverChanged"},
-                    onMarkerSelectionChanged: {
-                        name: "markerSelectionChanged",
-                        deprecated: "markerSettings.selectionChanged",
-                        deprecatedContext: function(arg) {
-                            return arg.target
-                        },
-                        deprecatedArgs: function(arg) {
-                            return [arg.target]
-                        }
-                    }
+                    onMarkerSelectionChanged: {name: "markerSelectionChanged"},
+                    onHoverChanged: {name: "hoverChanged"},
+                    onSelectionChanged: {name: "selectionChanged"}
                 }),
                 _setDeprecatedOptions: function() {
-                    this.callBase();
-                    $.extend(this._deprecatedOptions, {
-                        click: {
-                            since: "14.2",
-                            message: 'Use the "onClick" option instead'
+                    this.callBase.apply(this, arguments);
+                    _extend(this._deprecatedOptions, {
+                        areaSettings: {
+                            since: "15.2",
+                            message: "Use the 'layers' option instead"
                         },
-                        centerChanged: {
-                            since: "14.2",
-                            message: 'Use the "onCenterChanged" option instead'
+                        markerSettings: {
+                            since: "15.2",
+                            message: "Use the 'layers' option instead"
                         },
-                        zoomFactorChanged: {
-                            since: "14.2",
-                            message: 'Use the "onZoomFactorChanged" option instead'
+                        mapData: {
+                            since: "15.2",
+                            message: "Use the 'layers' option instead"
                         },
-                        "areaSettings.click": {
-                            since: "14.2",
-                            message: 'Use the "onAreaClick" option instead'
+                        markers: {
+                            since: "15.2",
+                            message: "Use the 'layers' option instead"
                         },
-                        "areaSettings.selectionChanged": {
-                            since: "14.2",
-                            message: 'Use the "onAreaSelectionChanged" option instead'
+                        onAreaClick: {
+                            since: "15.2",
+                            message: "Use the 'onClick' option instead"
                         },
-                        "markerSettings.click": {
-                            since: "14.2",
-                            message: 'Use the "onMarkerClick" option instead'
+                        onMarkerClick: {
+                            since: "15.2",
+                            message: "Use the 'onClick' option instead"
                         },
-                        "markerSettings.selectionChanged": {
-                            since: "14.2",
-                            message: 'Use the "onMarkerSelectionChanged" option instead'
+                        onAreaHoverChanged: {
+                            since: "15.2",
+                            message: "Use the 'onHoverChanged' option instead"
                         },
-                        "markerSettings.font": {
-                            since: "14.2",
-                            message: 'Use the "label.font" option instead'
+                        onMarkerHoverChanged: {
+                            since: "15.2",
+                            message: "Use the 'onHoverChanged' option instead"
+                        },
+                        onAreaSelectionChanged: {
+                            since: "15.2",
+                            message: "Use the 'onSelectionChanged' option instead"
+                        },
+                        onMarkerSelectionChanged: {
+                            since: "15.2",
+                            message: "Use the 'onSelectionChanged' option instead"
                         }
+                    })
+                },
+                _setOptionsByReference: function() {
+                    this.callBase.apply(this, arguments);
+                    _extend(this._optionsByReference, {
+                        layers: true,
+                        mapData: true,
+                        markers: true
                     })
                 },
                 _rootClassPrefix: "dxm",
                 _rootClass: "dxm-vector-map",
                 _createThemeManager: function() {
-                    return this._factory.createThemeManager()
+                    return new map.ThemeManager
                 },
                 _initBackground: function(dataKey) {
-                    this._background = this._renderer.rect(0, 0, 0, 0).attr({"class": "dxm-background"}).data(dataKey, {type: "background"}).append(this._root)
+                    this._background = this._renderer.rect(0, 0, 0, 0).attr({"class": "dxm-background"}).data(dataKey, {name: "background"}).append(this._root)
                 },
-                _initAreasManager: function(dataKey, notifyDirty, notifyReady) {
+                _initLayerCollection: function(dataKey, notifyDirty, notifyReady) {
                     var that = this;
-                    that._areasManager = that._factory.createAreasManager({
+                    that._layerCollection = new map.MapLayerCollection({
                         renderer: that._renderer,
-                        container: that._root,
                         projection: that._projection,
                         themeManager: that._themeManager,
                         tracker: that._tracker,
@@ -159,35 +116,27 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                         dataExchanger: that._dataExchanger,
                         notifyDirty: notifyDirty,
                         notifyReady: notifyReady
-                    })
+                    });
+                    if (that._options.layers === undefined && (that._options.mapData || that._options.markers))
+                        applyDeprecatedMode(that);
+                    else
+                        suspendLayersData(that._layerCollection, that._options.layers)
                 },
-                _initMarkersManager: function(dataKey, notifyDirty, notifyReady) {
+                _initLegendsControl: function(notifyDirty, notifyReady) {
                     var that = this;
-                    that._markersManager = that._factory.createMarkersManager({
-                        renderer: that._renderer,
-                        container: that._root,
-                        projection: that._projection,
-                        themeManager: that._themeManager,
-                        tracker: that._tracker,
-                        eventTrigger: that._eventTrigger,
-                        dataExchanger: that._dataExchanger,
-                        dataKey: dataKey,
-                        notifyDirty: notifyDirty,
-                        notifyReady: notifyReady
-                    })
-                },
-                _initLegendsControl: function() {
-                    var that = this;
-                    that._legendsControl = that._factory.createLegendsControl({
+                    that._legendsControl = new map.LegendsControl({
                         renderer: that._renderer,
                         container: that._root,
                         layoutControl: that._layoutControl,
-                        dataExchanger: that._dataExchanger
+                        themeManager: that._themeManager,
+                        dataExchanger: that._dataExchanger,
+                        notifyDirty: notifyDirty,
+                        notifyReady: notifyReady
                     })
                 },
                 _initControlBar: function(dataKey) {
                     var that = this;
-                    that._controlBar = that._factory.createControlBar({
+                    that._controlBar = new map.ControlBar({
                         renderer: that._renderer,
                         container: that._root,
                         layoutControl: that._layoutControl,
@@ -201,18 +150,18 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                         notifyCounter = 0;
                     that._dataExchanger = new DataExchanger;
                     that._initCenterHandler();
-                    that._projection = that._factory.createProjection();
-                    that._tracker = that._factory.createTracker({
+                    that._projection = new map.Projection;
+                    that._tracker = new map.Tracker({
                         root: that._root,
                         projection: that._projection,
                         dataKey: dataKey
                     });
-                    that._layoutControl = that._factory.createLayoutControl();
+                    that._layoutControl = new map.LayoutControl;
+                    that._layoutControl.suspend();
                     that._initBackground(dataKey);
-                    that._initAreasManager(dataKey, notifyDirty, notifyReady);
-                    that._initMarkersManager(dataKey, notifyDirty, notifyReady);
+                    that._initLayerCollection(dataKey, notifyDirty, notifyReady);
                     that._initControlBar(dataKey);
-                    that._initLegendsControl();
+                    that._initLegendsControl(notifyDirty, notifyReady);
                     function notifyDirty() {
                         that._resetIsReady();
                         ++notifyCounter
@@ -224,23 +173,25 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                         }
                     }
                 },
+                _init: function() {
+                    this.callBase.apply(this, arguments);
+                    this._afterInit();
+                    this._layoutControl.resume()
+                },
+                _afterInit: function() {
+                    resumeLayersData(this._layerCollection, this._options.layers, this._renderer)
+                },
                 _initCore: function() {
                     var that = this;
                     that._root = that._renderer.root.attr({
-                        align: 'center',
-                        cursor: 'default'
+                        align: "center",
+                        cursor: "default"
                     });
                     that._initElements();
-                    that._projection.setBounds(that.option("bounds")).setMaxZoom(that.option("maxZoomFactor")).setZoom(that.option("zoomFactor"), true).setCenter(that.option("center"), true);
+                    that._projection.setEngine(that.option("projection")).setBounds(that.option("bounds")).setMaxZoom(that.option("maxZoomFactor")).setZoom(that.option("zoomFactor"), true).setCenter(that.option("center"), true);
                     that._setTrackerCallbacks();
                     that._setControlBarCallbacks();
                     that._setProjectionCallbacks()
-                },
-                _init: function() {
-                    var that = this;
-                    that.callBase.apply(that, arguments);
-                    that._areasManager.setData(that.option("mapData"));
-                    that._markersManager.setData(that.option("markers"))
                 },
                 _disposeCore: function() {
                     var that = this;
@@ -249,15 +200,13 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                     that._resetControlBarCallbacks();
                     that._tracker.dispose();
                     that._legendsControl.dispose();
-                    that._background.remove();
-                    that._areasManager.dispose();
-                    that._markersManager.dispose();
+                    that._layerCollection.dispose();
                     that._controlBar.dispose();
                     that._layoutControl.dispose();
                     that._disposeCenterHandler();
                     that._dataExchanger.dispose();
                     that._projection.dispose();
-                    that._dataExchanger = that._projection = that._tracker = that._layoutControl = that._root = that._background = that._areasManager = that._markersManager = that._controlBar = that._legendsControl = null
+                    that._dataExchanger = that._projection = that._tracker = that._layoutControl = that._root = that._background = that._layerCollection = that._controlBar = that._legendsControl = null
                 },
                 _initCenterHandler: function() {
                     var that = this,
@@ -314,27 +263,23 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                     var that = this,
                         centerHandler = that._centerHandler,
                         renderer = that._renderer,
-                        managers = {
-                            area: that._areasManager,
-                            marker: that._markersManager
-                        },
+                        layerCollection = that._layerCollection,
                         controlBar = that._controlBar,
                         tooltip = that._tooltip,
                         isControlDrag = false;
                     that._tracker.setCallbacks({
                         click: function(arg) {
                             var offset = renderer.getRootOffset(),
-                                manager;
+                                layer = layerCollection.byName(arg.data.name);
                             arg.$event.x = arg.x - offset.left;
                             arg.$event.y = arg.y - offset.top;
-                            manager = managers[arg.data.type];
-                            if (manager)
-                                manager.raiseClick(arg.data.index, arg.$event);
-                            if (manager || arg.data.type === "background")
+                            if (layer)
+                                layer.raiseClick(arg.data.index, arg.$event);
+                            else if (arg.data.name === "background")
                                 that._eventTrigger("click", {jQueryEvent: arg.$event})
                         },
                         start: function(arg) {
-                            isControlDrag = arg.data.type === "control-bar";
+                            isControlDrag = arg.data.name === "control-bar";
                             if (isControlDrag) {
                                 arg.data = arg.data.index;
                                 controlBar.processStart(arg)
@@ -363,20 +308,22 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                             controlBar.processZoom(arg)
                         },
                         "hover-on": function(arg) {
-                            var manager = managers[arg.data.type];
-                            if (manager)
-                                manager.hoverItem(arg.data.index, true)
+                            var layer = layerCollection.byName(arg.data.name);
+                            if (layer)
+                                layer.hoverItem(arg.data.index, true)
                         },
                         "hover-off": function(arg) {
-                            var manager = managers[arg.data.type];
-                            if (manager)
-                                manager.hoverItem(arg.data.index, false)
+                            var layer = layerCollection.byName(arg.data.name);
+                            if (layer)
+                                layer.hoverItem(arg.data.index, false)
                         },
                         "focus-on": function(arg, done) {
                             var result = false,
+                                layer,
                                 proxy;
                             if (tooltip.isEnabled()) {
-                                proxy = managers[arg.data.type] ? managers[arg.data.type].getProxyItem(arg.data.index) : null;
+                                layer = layerCollection.byName(arg.data.name);
+                                proxy = layer && layer.getProxy(arg.data.index);
                                 if (proxy && tooltip.show(proxy, {
                                     x: 0,
                                     y: 0,
@@ -396,7 +343,7 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                         }
                     });
                     that._resetTrackerCallbacks = function() {
-                        that._resetTrackerCallbacks = that = centerHandler = renderer = managers = controlBar = tooltip = null
+                        that._resetTrackerCallbacks = that = centerHandler = renderer = layerCollection = controlBar = tooltip = null
                     }
                 },
                 _setControlBarCallbacks: function() {
@@ -457,47 +404,63 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                             height: DEFAULT_HEIGHT
                         }
                 },
+                _getTitleLayoutSize: function() {
+                    var canvas = this._canvas,
+                        title = this._title,
+                        layout = title.getVerticalCuttedSize(canvas),
+                        layoutOptions = title.getLayoutOptions();
+                    layoutOptions && title.position({
+                        at: layoutOptions.position,
+                        my: layoutOptions.position,
+                        of: {getLayoutOptions: function() {
+                                return {
+                                        width: canvas.width,
+                                        height: canvas.height,
+                                        x: 0,
+                                        y: 0
+                                    }
+                            }}
+                    });
+                    return layout
+                },
                 _applySize: function() {
                     var that = this,
-                        width = that._canvas.width,
-                        height = that._canvas.height;
-                    that._projection.setSize(width, height);
-                    that._layoutControl.setSize(width, height);
+                        layout;
+                    that._renderer.lock();
+                    layout = that._getTitleLayoutSize();
+                    that._projection.setSize(layout);
+                    that._layoutControl.setSize(layout);
+                    that._renderer.unlock();
                     that._background.attr({
-                        x: 0,
-                        y: 0,
-                        width: width,
-                        height: height
-                    })
+                        x: layout.left,
+                        y: layout.top,
+                        height: layout.height,
+                        width: layout.width
+                    });
+                    that._layerCollection.setRect([layout.left, layout.top, layout.width, layout.height])
                 },
-                _resize: $.noop,
-                _clean: function() {
-                    var that = this;
-                    that._tracker.reset();
-                    that._layoutControl.stop();
-                    that._areasManager.clean();
-                    that._markersManager.clean();
-                    that._controlBar.clean();
-                    that._legendsControl.clean()
-                },
-                _render: function() {
-                    var that = this;
-                    that._scheduleLoadingIndicatorHiding();
-                    that._legendsControl.render();
-                    that._controlBar.render();
-                    that._markersManager.render();
-                    that._areasManager.render();
-                    that._layoutControl.start()
+                _resize: _noop,
+                _initDataSource: _noop,
+                _disposeDataSource: _noop,
+                _optionValuesEqual: function(name, oldValue, newValue) {
+                    if (RE_LAYERS.test(name) && newValue && oldValue)
+                        if (RE_LAYERS_I.test(name)) {
+                            if (newValue.data && oldValue.data)
+                                oldValue.data = undefined
+                        }
+                        else if (RE_LAYERS_I_DATA.test(name))
+                            this.option(name.substr(0, 9)).data = undefined;
+                        else if (RE_LAYERS_DATA.test(name))
+                            this.option("layers").data = undefined;
+                    return this.callBase.apply(this, arguments)
                 },
                 _handleChangedOptions: function(options) {
                     var that = this;
                     that.callBase.apply(that, arguments);
                     if ("background" in options)
                         that._setBackgroundOptions();
-                    if ("areaSettings" in options)
-                        that._setAreasManagerOptions();
-                    if ("markerSettings" in options)
-                        that._setMarkersManagerOptions();
+                    if ("layers" in options || "areaSettings" in options || "markerSettings" in options || "mapData" in options || "markers" in options)
+                        that._setLayerCollectionOptions();
                     if ("controlBar" in options)
                         that._setControlBarOptions();
                     if ("legends" in options)
@@ -506,10 +469,8 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                         that._setTrackerOptions();
                     if ("panningEnabled" in options || "zoomingEnabled" in options)
                         that._setupInteraction();
-                    if ("mapData" in options)
-                        that._areasManager.setData(options.mapData);
-                    if ("markers" in options)
-                        that._markersManager.setData(options.markers);
+                    if ("projection" in options)
+                        that._projection.setEngine(options.projection);
                     if ("bounds" in options)
                         that._projection.setBounds(options.bounds);
                     if ("maxZoomFactor" in options)
@@ -523,12 +484,13 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                     var that = this;
                     that._scheduleLoadingIndicatorHiding();
                     that._setBackgroundOptions();
-                    that._setAreasManagerOptions();
-                    that._setMarkersManagerOptions();
+                    that._setLayerCollectionOptions();
+                    that._layoutControl.suspend();
                     that._setControlBarOptions();
                     that._setLegendsOptions();
                     that._setTrackerOptions();
-                    that._setupInteraction()
+                    that._setupInteraction();
+                    that._layoutControl.resume()
                 },
                 _setBackgroundOptions: function() {
                     var settings = this._getOption("background");
@@ -536,23 +498,17 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                         "stroke-width": settings.borderWidth,
                         stroke: settings.borderColor,
                         fill: settings.color
-                    })
+                    });
+                    this._layerCollection.setBorderWidth(settings.borderWidth)
                 },
-                _setAreasManagerOptions: function() {
-                    this._areasManager.setOptions(this.option("areaSettings"));
-                    this._eventTrigger.update("onAreaClick");
-                    this._eventTrigger.update("onAreaSelectionChanged")
-                },
-                _setMarkersManagerOptions: function() {
-                    this._markersManager.setOptions(this.option("markerSettings"));
-                    this._eventTrigger.update("onMarkerClick");
-                    this._eventTrigger.update("onMarkerSelectionChanged")
+                _setLayerCollectionOptions: function() {
+                    this._layerCollection.setOptions(this.option("layers"))
                 },
                 _setControlBarOptions: function() {
                     this._controlBar.setOptions(this._getOption("controlBar"))
                 },
                 _setLegendsOptions: function() {
-                    this._legendsControl.setOptions(this.option("legends"), this._themeManager.theme("legend"))
+                    this._legendsControl.setOptions(this.option("legends"))
                 },
                 _setTrackerOptions: function() {
                     this._tracker.setOptions({
@@ -566,23 +522,35 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                 _raiseZoomFactorChanged: function() {
                     !this._noZoomFactorChanged && this._eventTrigger("zoomFactorChanged", {zoomFactor: this._projection.getZoom()})
                 },
-                getAreas: function() {
-                    return this._areasManager.getProxyItems()
+                getLayers: function() {
+                    var layers = this._layerCollection.items(),
+                        list = [],
+                        i,
+                        ii = list.length = layers.length;
+                    for (i = 0; i < ii; ++i)
+                        list[i] = layers[i].proxy;
+                    return list
                 },
-                getMarkers: function() {
-                    return this._markersManager.getProxyItems()
+                getLayerByIndex: function(index) {
+                    var layer = this._layerCollection.byIndex(index);
+                    return layer ? layer.proxy : null
                 },
-                clearAreaSelection: function(_noEvent) {
-                    this._areasManager.clearSelection(_noEvent);
-                    return this
-                },
-                clearMarkerSelection: function(_noEvent) {
-                    this._markersManager.clearSelection(_noEvent);
-                    return this
+                getLayerByName: function(name) {
+                    var layer = this._layerCollection.byName(name);
+                    return layer ? layer.proxy : null
                 },
                 clearSelection: function(_noEvent) {
-                    return this.clearAreaSelection(_noEvent).clearMarkerSelection(_noEvent)
+                    var layers = this._layerCollection.items(),
+                        i,
+                        ii = layers.length;
+                    for (i = 0; i < ii; ++i)
+                        layers[i].clearSelection(_noEvent);
+                    return this
                 },
+                getAreas: _noop,
+                getMarkers: _noop,
+                clearAreaSelection: _noop,
+                clearMarkerSelection: _noop,
                 center: function(value, _noEvent) {
                     var that = this;
                     if (value === undefined)
@@ -618,9 +586,108 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                 },
                 convertCoordinates: function(x, y) {
                     return this._projection.fromScreenPoint(x, y)
-                },
-                _factory: {}
+                }
             });
+        function suspendLayersData(layerCollection, options) {
+            if (options)
+                layerCollection.__data = options.length ? $.map(options, patch) : patch(options);
+            function patch(ops) {
+                ops = ops || {};
+                var data = ops.data;
+                ops.data = undefined;
+                return {data: data}
+            }
+        }
+        function resumeLayersData(layerCollection, options, renderer) {
+            var data = layerCollection.__data;
+            if (data) {
+                layerCollection.__data = undefined;
+                if (data.length)
+                    $.each(data, function(i, item) {
+                        options[i].data = item.data
+                    });
+                else
+                    options.data = data.data;
+                renderer.lock();
+                layerCollection.setOptions(options);
+                renderer.unlock()
+            }
+        }
+        function applyDeprecatedMode(map) {
+            var log = DX.require("/errors").log;
+            var mapData = map._options.mapData,
+                markers = map._options.markers;
+            map._options.mapData = map._options.markers = undefined;
+            map._afterInit = function() {
+                this._options.mapData = mapData;
+                this._options.markers = markers;
+                this._renderer.lock();
+                this._setLayerCollectionOptions();
+                this._renderer.unlock();
+                mapData = markers = undefined
+            };
+            map._setLayerCollectionOptions = function() {
+                var options = this._options,
+                    mapData = options.mapData,
+                    markers = options.markers;
+                mapData = mapData && mapData.features ? _extend({}, mapData) : mapData;
+                markers = markers && markers.features ? _extend({}, markers) : markers;
+                this._layerCollection.setOptions([_extend({}, options.areaSettings, {
+                        name: "areas",
+                        _deprecated: true,
+                        data: mapData,
+                        type: "area"
+                    }), _extend({}, options.markerSettings, {
+                        name: "markers",
+                        _deprecated: true,
+                        data: markers,
+                        type: "marker",
+                        elementType: options.markerSettings && options.markerSettings.type
+                    })])
+            };
+            map.getAreas = function() {
+                log("W0002", this.NAME, "getAreas", "15.2", "Use the 'getLayerByName('areas').getElements()' instead");
+                return this.getLayerByName("areas").getElements()
+            };
+            map.getMarkers = function() {
+                log("W0002", this.NAME, "getMarkers", "15.2", "Use the 'getLayerByName('markers').getElements()' instead");
+                return this.getLayerByName("markers").getElements()
+            };
+            map.clearAreaSelection = function(_noEvent) {
+                log("W0002", this.NAME, "clearAreaSelection", "15.2", "Use the 'getLayerByName('areas').clearSelection()' instead");
+                this.getLayerByName("areas").clearSelection(_noEvent);
+                return this
+            };
+            map.clearMarkerSelection = function(_noEvent) {
+                log("W0002", this.NAME, "clearMarkerSelection", "15.2", "Use the 'getLayerByName('markers').clearSelection()' instead");
+                this.getLayerByName("markers").clearSelection(_noEvent);
+                return this
+            };
+            var clickMap = {
+                    areas: "areaClick",
+                    markers: "markerClick"
+                },
+                hoverChangedMap = {
+                    areas: "areaHoverChanged",
+                    markers: "markerHoverChanged"
+                },
+                selectionChangedMap = {
+                    areas: "areaSelectionChanged",
+                    markers: "markerSelectionChanged"
+                };
+            map.on("click", function(e) {
+                if (e.target)
+                    this._eventTrigger(clickMap[e.target.layer.name], e)
+            });
+            map.on("hoverChanged", function(e) {
+                if (e.target)
+                    this._eventTrigger(hoverChangedMap[e.target.layer.name], e)
+            });
+            map.on("selectionChanged", function(e) {
+                if (e.target)
+                    this._eventTrigger(selectionChangedMap[e.target.layer.name], e)
+            })
+        }
         var DataExchanger = function() {
                 this._store = {}
             };
@@ -652,10 +719,13 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                 return this
             }
         };
-        DX.registerComponent("dxVectorMap", DX.viz.map, Map);
+        registerComponent("dxVectorMap", DX.viz.map, Map);
         DX.viz.map._internal = {};
         DX.viz.map.sources = {};
         DX.viz.map._tests = {};
+        DX.viz.map._tests.resetDataKey = function() {
+            nextDataKey = 1
+        };
         DX.viz.map._tests.DataExchanger = DataExchanger;
         DX.viz.map._tests.stubDataExchanger = function(stub) {
             DataExchanger = stub
@@ -664,97 +734,27 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
     /*! Module viz-vectormap, file projection.js */
     (function(DX, $, undefined) {
         var _Number = Number,
-            _isArray = DX.utils.isArray,
-            _math = Math,
-            _min = _math.min,
-            _max = _math.max,
-            _abs = _math.abs,
-            _tan = _math.tan,
-            _atan = _math.atan,
-            _exp = _math.exp,
-            _round = _math.round,
-            _ln = _math.log,
-            _pow = _math.pow,
-            PI = _math.PI,
-            QUARTER_PI = PI / 4,
-            PI_TO_360 = PI / 360,
-            TWO_TO_LN2 = 2 / _math.LN2,
+            _min = Math.min,
+            _max = Math.max,
+            _abs = Math.abs,
+            _round = Math.round,
+            _ln = Math.log,
+            _pow = Math.pow,
+            TWO_TO_LN2 = 2 / Math.LN2,
             MIN_BOUNDS_RANGE = 1 / 3600 / 180 / 10,
             DEFAULT_MIN_ZOOM = 1,
             DEFAULT_MAX_ZOOM = 1 << 8,
-            MERCATOR_MIN_LON = -180,
-            MERCATOR_MAX_LON = 180,
-            MERCATOR_MIN_LAT = -85.0511,
-            MERCATOR_MAX_LAT = 85.0511;
-        var mercator = {
-                aspectRatio: 1,
-                project: function(coordinates) {
-                    var lon = coordinates[0],
-                        lat = coordinates[1];
-                    return [lon <= MERCATOR_MIN_LON ? -1 : lon >= MERCATOR_MAX_LON ? +1 : lon / 180, lat <= MERCATOR_MIN_LAT ? +1 : lat >= MERCATOR_MAX_LAT ? -1 : -_ln(_tan(QUARTER_PI + lat * PI_TO_360)) / PI]
-                },
-                unproject: function(coordinates) {
-                    var x = coordinates[0],
-                        y = coordinates[1];
-                    return [x <= -1 ? MERCATOR_MIN_LON : x >= +1 ? MERCATOR_MAX_LON : 180 * x, y <= -1 ? MERCATOR_MAX_LAT : y >= +1 ? MERCATOR_MIN_LAT : (_atan(_exp(-PI * coordinates[1])) - QUARTER_PI) / PI_TO_360]
-                }
-            };
-        function createProjectUnprojectMethods(p1, p2, delta) {
-            var x0 = (p1[0] + p2[0]) / 2 - delta / 2,
-                y0 = (p1[1] + p2[1]) / 2 - delta / 2,
-                k = 2 / delta;
-            return {
-                    project: function(coordinates) {
-                        var p = mercator.project(coordinates);
-                        return [-1 + (p[0] - x0) * k, -1 + (p[1] - y0) * k]
-                    },
-                    unproject: function(coordinates) {
-                        var p = [x0 + (coordinates[0] + 1) / k, y0 + (coordinates[1] + 1) / k];
-                        return mercator.unproject(p)
-                    }
-                }
-        }
+            DEFAULT_CENTER = [NaN, NaN],
+            DEFAULT_ENGINE_NAME = "mercator";
         function floatsEqual(f1, f2) {
             return _abs(f1 - f2) < 1E-8
         }
-        function truncate(value, min, max, fallback) {
-            var _value = _Number(value);
-            if (_value < min)
-                _value = min;
-            else if (_value > max)
-                _value = max;
-            else if (!(min <= _value && _value <= max))
-                _value = fallback;
-            return _value
+        function parseAndClamp(value, minValue, maxValue, defaultValue) {
+            var val = _Number(value);
+            return isFinite(val) ? _min(_max(val, minValue), maxValue) : defaultValue
         }
-        function truncateQuad(quad, min, max) {
-            return {
-                    lt: [truncate(quad[0], min[0], max[0], min[0]), truncate(quad[1], min[1], max[1], min[1])],
-                    rb: [truncate(quad[2], min[0], max[0], max[0]), truncate(quad[3], min[1], max[1], max[1])]
-                }
-        }
-        function parseBounds(bounds) {
-            var p1 = mercator.unproject([-1, -1]),
-                p2 = mercator.unproject([+1, +1]),
-                min = [_min(p1[0], p2[0]), _min(p1[1], p2[1])],
-                max = [_max(p1[0], p2[0]), _max(p1[1], p2[1])],
-                quad = bounds;
-            if (quad)
-                quad = truncateQuad(quad, min, max);
-            return {
-                    min: quad ? [_min(quad.lt[0], quad.rb[0]), _min(quad.lt[1], quad.rb[1])] : min,
-                    max: quad ? [_max(quad.lt[0], quad.rb[0]), _max(quad.lt[1], quad.rb[1])] : max
-                }
-        }
-        function selectCenterValue(value1, value2, center1, center2) {
-            var result;
-            if (value1 > -1 && value2 >= +1)
-                result = center1;
-            else if (value1 <= -1 && value2 < +1)
-                result = center2;
-            else
-                result = (center1 + center2) / 2;
-            return result
+        function parseAndClampArray(value, minValue, maxValue, defaultValue) {
+            return [parseAndClamp(value[0], minValue[0], maxValue[0], defaultValue[0]), parseAndClamp(value[1], minValue[1], maxValue[1], defaultValue[1])]
         }
         function Projection() {
             this._events = {
@@ -763,53 +763,59 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                 center: $.Callbacks(),
                 zoom: $.Callbacks(),
                 "max-zoom": $.Callbacks()
-            };
-            this.setBounds(null)
+            }
         }
         Projection.prototype = {
             constructor: Projection,
             _minZoom: DEFAULT_MIN_ZOOM,
             _maxZoom: DEFAULT_MAX_ZOOM,
             _zoom: DEFAULT_MIN_ZOOM,
-            _center: [NaN, NaN],
+            _center: DEFAULT_CENTER,
+            _canvas: {},
             dispose: function() {
+                var name;
+                for (name in this._events)
+                    this._events[name].empty();
                 this._events = null;
                 return this
             },
-            setSize: function(width, height) {
-                var that = this;
-                that._x0 = width / 2;
-                that._y0 = height / 2;
-                if (width / height <= mercator.aspectRatio) {
-                    that._xradius = width / 2;
-                    that._yradius = width / 2 / mercator.aspectRatio
+            setEngine: function(engine) {
+                var that = this,
+                    eng = isEngine(engine) ? engine : projection.get(DEFAULT_ENGINE_NAME);
+                if (that._engine !== eng) {
+                    that._engine = eng;
+                    that._setupScreen();
+                    that._events.project.fire();
+                    that.setCenter(null);
+                    that.setZoom(null)
                 }
-                else {
-                    that._xradius = height / 2 * mercator.aspectRatio;
-                    that._yradius = height / 2
-                }
-                that._events["transform"].fire(that.getTransform());
                 return that
             },
             setBounds: function(bounds) {
+                return bounds ? this.setEngine(this._engine.original().bounds(bounds)) : this
+            },
+            _setupScreen: function() {
                 var that = this,
-                    _bounds = parseBounds(bounds),
-                    p1,
-                    p2,
-                    delta,
-                    methods;
-                that._minBound = _bounds.min;
-                that._maxBound = _bounds.max;
-                p1 = mercator.project(_bounds.min);
-                p2 = mercator.project(_bounds.max);
-                delta = [_abs(p2[0] - p1[0]), _abs(p2[1] - p1[1])];
-                delta = _min(delta[0] > MIN_BOUNDS_RANGE ? delta[0] : 2, delta[1] > MIN_BOUNDS_RANGE ? delta[1] : 2);
-                methods = delta < 2 ? createProjectUnprojectMethods(p1, p2, delta) : mercator;
-                that._project = methods.project;
-                that._unproject = methods.unproject;
-                that._defaultCenter = that._unproject([0, 0]);
-                that.setCenter(that._defaultCenter);
-                that._events.project.fire();
+                    canvas = that._canvas,
+                    width = canvas.width,
+                    height = canvas.height,
+                    aspectRatio = that._engine.ar();
+                that._x0 = canvas.left + width / 2;
+                that._y0 = canvas.top + height / 2;
+                if (width / height <= aspectRatio) {
+                    that._xradius = width / 2;
+                    that._yradius = width / 2 / aspectRatio
+                }
+                else {
+                    that._xradius = height / 2 * aspectRatio;
+                    that._yradius = height / 2
+                }
+            },
+            setSize: function(canvas) {
+                var that = this;
+                that._canvas = canvas;
+                that._setupScreen();
+                that._events.transform.fire(that.getTransform());
                 return that
             },
             _toScreen: function(coordinates) {
@@ -829,56 +835,18 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
             },
             _adjustCenter: function() {
                 var that = this,
-                    center = that._project(that._center);
-                that._dxcenter = -center[0] * that._zoom;
-                that._dycenter = -center[1] * that._zoom
+                    center = that._engine.project(that._center);
+                that._dxcenter = -center[0] * that._zoom || 0;
+                that._dycenter = -center[1] * that._zoom || 0
             },
-            projectArea: function(coordinates) {
-                var i = 0,
-                    ii = _isArray(coordinates) ? coordinates.length : 0,
-                    subcoords,
-                    j,
-                    jj,
-                    subresult,
-                    result = [];
-                for (; i < ii; ++i) {
-                    subcoords = coordinates[i];
-                    subresult = [];
-                    for (j = 0, jj = _isArray(subcoords) ? subcoords.length : 0; j < jj; ++j)
-                        subresult.push(this._project(subcoords[j]));
-                    result.push(subresult)
-                }
-                return result
+            project: function(coordinates) {
+                return this._engine.project(coordinates)
             },
-            projectPoint: function(coordinates) {
-                return coordinates ? this._project(coordinates) : []
+            transform: function(coordinates) {
+                return this._toScreen(this._toTransformedFast(coordinates))
             },
-            getAreaCoordinates: function(data) {
-                var k = 0,
-                    kk = data.length,
-                    partialData,
-                    i,
-                    ii,
-                    list = [],
-                    partialPath,
-                    point;
-                for (; k < kk; ++k) {
-                    partialData = data[k];
-                    partialPath = [];
-                    for (i = 0, ii = partialData.length; i < ii; ++i) {
-                        point = this._toScreen(this._toTransformedFast(partialData[i]));
-                        partialPath.push(point[0], point[1])
-                    }
-                    list.push(partialPath)
-                }
-                return list
-            },
-            getPointCoordinates: function(data) {
-                var point = this._toScreen(this._toTransformedFast(data));
-                return {
-                        x: _round(point[0]),
-                        y: _round(point[1])
-                    }
+            isInvertible: function() {
+                return this._engine.isinv()
             },
             getSquareSize: function(size) {
                 return [size[0] * this._zoom * this._xradius, size[1] * this._zoom * this._yradius]
@@ -888,11 +856,13 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
             },
             setZoom: function(zoom, _forceEvent) {
                 var that = this,
-                    zoom__ = that._zoom;
-                that._zoom = truncate(zoom, that._minZoom, that._maxZoom, that._minZoom);
+                    oldZoom = that._zoom,
+                    newZoom;
+                that._zoom = that._engine.isinv() ? parseAndClamp(zoom, that._minZoom, that._maxZoom, that._minZoom) : that._minZoom;
                 that._adjustCenter();
-                if (!floatsEqual(zoom__, that._zoom) || _forceEvent)
-                    that._events.zoom.fire(that.getZoom(), that.getTransform());
+                newZoom = that.getZoom();
+                if (!floatsEqual(oldZoom, newZoom) || _forceEvent)
+                    that._events.zoom.fire(newZoom, that.getTransform());
                 return that
             },
             getScaledZoom: function() {
@@ -920,7 +890,7 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
             setMaxZoom: function(maxZoom) {
                 var that = this;
                 that._minZoom = DEFAULT_MIN_ZOOM;
-                that._maxZoom = truncate(maxZoom, that._minZoom, _Number.MAX_VALUE, DEFAULT_MAX_ZOOM);
+                that._maxZoom = parseAndClamp(maxZoom, that._minZoom, _Number.MAX_VALUE, DEFAULT_MAX_ZOOM);
                 that._setupScaling();
                 if (that._zoom > that._maxZoom)
                     that.setZoom(that._maxZoom);
@@ -934,50 +904,46 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                 return this._maxZoom
             },
             getCenter: function() {
-                return [this._center[0], this._center[1]]
+                return this._center.slice()
             },
             setCenter: function(center, _forceEvent) {
                 var that = this,
-                    _center = _isArray(center) ? center : [],
-                    center__ = that._center;
-                that._center = [truncate(_center[0], that._minBound[0], that._maxBound[0], that._defaultCenter[0]), truncate(_center[1], that._minBound[1], that._maxBound[1], that._defaultCenter[1])];
+                    engine = that._engine,
+                    oldCenter = that._center,
+                    newCenter;
+                that._center = engine.isinv() ? parseAndClampArray(center || [], engine.min(), engine.max(), engine.center()) : DEFAULT_CENTER;
                 that._adjustCenter();
-                if (!floatsEqual(center__[0], that._center[0]) || !floatsEqual(center__[1], that._center[1]) || _forceEvent)
-                    that._events.center.fire(that.getCenter(), that.getTransform());
+                newCenter = that.getCenter();
+                if (!floatsEqual(oldCenter[0], newCenter[0]) || !floatsEqual(oldCenter[1], newCenter[1]) || _forceEvent)
+                    that._events.center.fire(newCenter, that.getTransform());
                 return that
             },
             setCenterByPoint: function(coordinates, screenPosition) {
                 var that = this,
-                    p = that._project(coordinates),
+                    p = that._engine.project(coordinates),
                     q = that._fromScreen(screenPosition);
-                return that.setCenter(that._unproject([-q[0] / that._zoom + p[0], -q[1] / that._zoom + p[1]]))
+                return that.setCenter(that._engine.unproject([-q[0] / that._zoom + p[0], -q[1] / that._zoom + p[1]]))
             },
             moveCenter: function(screenDx, screenDy) {
                 var that = this,
-                    current = that._toScreen(that._toTransformed(that._project(that._center))),
-                    center = that._unproject(that._fromTransformed(that._fromScreen([current[0] + screenDx, current[1] + screenDy])));
+                    current = that._toScreen(that._toTransformed(that._engine.project(that._center))),
+                    center = that._engine.unproject(that._fromTransformed(that._fromScreen([current[0] + screenDx, current[1] + screenDy])));
                 return that.setCenter(center)
             },
             getViewport: function() {
-                var p1 = this._unproject(this._fromTransformed([-1, -1])),
-                    p2 = this._unproject(this._fromTransformed([+1, +1]));
-                return [p1[0], p1[1], p2[0], p2[1]]
+                var that = this,
+                    unproject = that._engine.unproject,
+                    lt = unproject(that._fromTransformed([-1, -1])),
+                    lb = unproject(that._fromTransformed([-1, +1])),
+                    rt = unproject(that._fromTransformed([+1, -1])),
+                    rb = unproject(that._fromTransformed([+1, +1])),
+                    minmax = findMinMax([selectFarthestPoint(lt[0], lb[0], rt[0], rb[0]), selectFarthestPoint(lt[1], rt[1], lb[1], rb[1])], [selectFarthestPoint(rt[0], rb[0], lt[0], lb[0]), selectFarthestPoint(lb[1], rb[1], lt[1], rt[1])]);
+                return [].concat(minmax.min, minmax.max)
             },
             setViewport: function(viewport) {
-                var that = this;
-                if (!_isArray(viewport))
-                    return that.setZoom(that._minZoom).setCenter(that._defaultCenter);
-                var _viewport = truncateQuad(viewport, that._minBound, that._maxBound),
-                    lt = that._project(_viewport.lt),
-                    rb = that._project(_viewport.rb),
-                    l = _min(lt[0], rb[0]),
-                    t = _min(lt[1], rb[1]),
-                    r = _max(lt[0], rb[0]),
-                    b = _max(lt[1], rb[1]),
-                    zoom = 2 / _max(r - l, b - t),
-                    xc = selectCenterValue(l, r, -1 - zoom * l, +1 - zoom * r),
-                    yc = selectCenterValue(t, b, -1 - zoom * t, +1 - zoom * b);
-                return that.setZoom(zoom).setCenter(that._unproject([-xc / zoom, -yc / zoom]))
+                var engine = this._engine,
+                    data = viewport ? getZoomAndCenterFromViewport(engine.project, engine.unproject, viewport) : [this._minZoom, engine.center()];
+                return this.setZoom(data[0]).setCenter(data[1])
             },
             getTransform: function() {
                 return {
@@ -986,31 +952,201 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                     }
             },
             fromScreenPoint: function(x, y) {
-                return this._unproject(this._fromTransformed(this._fromScreen([x, y])))
+                return this._engine.unproject(this._fromTransformed(this._fromScreen([x, y])))
             },
-            on: function(obj) {
-                $.each(this._events, function(name, list) {
-                    obj[name] && list.add(obj[name])
-                });
-                return this
+            on: function(handlers) {
+                var events = this._events,
+                    name;
+                for (name in handlers)
+                    events[name].add(handlers[name]);
+                return dispose;
+                function dispose() {
+                    for (name in handlers)
+                        events[name].remove(handlers[name])
+                }
             }
         };
-        DX.viz.map._tests.Projection = Projection;
-        DX.viz.map._tests.mercator = mercator;
-        DX.viz.map._tests._DEBUG_stubMercator = function(stub) {
-            mercator = stub
-        };
-        DX.viz.map._tests._DEBUG_restoreMercator = function() {
-            mercator = DX.viz.map._tests.mercator
-        };
-        DX.viz.map.dxVectorMap.prototype._factory.createProjection = function() {
-            return new Projection
+        function selectFarthestPoint(point1, point2, basePoint1, basePoint2) {
+            var basePoint = (basePoint1 + basePoint2) / 2;
+            return _abs(point1 - basePoint) > _abs(point2 - basePoint) ? point1 : point2
         }
+        function selectClosestPoint(point1, point2, basePoint1, basePoint2) {
+            var basePoint = (basePoint1 + basePoint2) / 2;
+            return _abs(point1 - basePoint) < _abs(point2 - basePoint) ? point1 : point2
+        }
+        function getZoomAndCenterFromViewport(project, unproject, viewport) {
+            var lt = project([viewport[0], viewport[3]]),
+                lb = project([viewport[0], viewport[1]]),
+                rt = project([viewport[2], viewport[3]]),
+                rb = project([viewport[2], viewport[1]]),
+                l = selectClosestPoint(lt[0], lb[0], rt[0], rb[0]),
+                r = selectClosestPoint(rt[0], rb[0], lt[0], lb[0]),
+                t = selectClosestPoint(lt[1], rt[1], lb[1], rb[1]),
+                b = selectClosestPoint(lb[1], rb[1], lt[1], rt[1]);
+            return [2 / _max(_abs(l - r), _abs(t - b)), unproject([(l + r) / 2, (t + b) / 2])]
+        }
+        function Engine(parameters, _original) {
+            var that = this,
+                aspectRatio = parameters.aspectRatio > 0 ? _Number(parameters.aspectRatio) : 1,
+                project = createProjectMethod(parameters.to),
+                unproject = parameters.from ? createUnprojectMethod(parameters.from) : returnValue(DEFAULT_CENTER),
+                center = unproject([0, 0]),
+                minmax = findMinMax([unproject([-1, 0])[0], unproject([0, +1])[1]], [unproject([+1, 0])[0], unproject([0, -1])[1]]);
+            that.project = project;
+            that.unproject = unproject;
+            that.original = returnValue(_original || that);
+            that.source = function() {
+                return $.extend({}, parameters)
+            };
+            that.isinv = returnValue(!!parameters.from);
+            that.ar = returnValue(aspectRatio);
+            that.center = returnArray(center);
+            that.min = returnArray(minmax.min);
+            that.max = returnArray(minmax.max)
+        }
+        Engine.prototype.aspectRatio = function(aspectRatio) {
+            var parameters = this.source();
+            parameters.aspectRatio = aspectRatio;
+            return new Engine(parameters, this)
+        };
+        Engine.prototype.bounds = function(bounds) {
+            bounds = bounds || [];
+            var parameters = this.source(),
+                min = this.min(),
+                max = this.max(),
+                p1 = parameters.to(parseAndClampArray([bounds[0], bounds[1]], min, max, min)),
+                p2 = parameters.to(parseAndClampArray([bounds[2], bounds[3]], min, max, max)),
+                delta = _min(_abs(p2[0] - p1[0]) > MIN_BOUNDS_RANGE ? _abs(p2[0] - p1[0]) : 2, _abs(p2[1] - p1[1]) > MIN_BOUNDS_RANGE ? _abs(p2[1] - p1[1]) : 2);
+            if (delta < 2)
+                $.extend(parameters, createProjectUnprojectMethods(parameters.to, parameters.from, p1, p2, delta));
+            return new Engine(parameters, this)
+        };
+        function isEngine(engine) {
+            return engine instanceof Engine
+        }
+        function invertVerticalAxis(pair) {
+            return [pair[0], -pair[1]]
+        }
+        function createProjectMethod(method) {
+            return function(arg) {
+                    return invertVerticalAxis(method(arg))
+                }
+        }
+        function createUnprojectMethod(method) {
+            return function(arg) {
+                    return method(invertVerticalAxis(arg))
+                }
+        }
+        function returnValue(value) {
+            return function() {
+                    return value
+                }
+        }
+        function returnArray(value) {
+            return function() {
+                    return value.slice()
+                }
+        }
+        function projection(parameters) {
+            return parameters && parameters.to ? new Engine(parameters) : null
+        }
+        function findMinMax(p1, p2) {
+            return {
+                    min: [_min(p1[0], p2[0]), _min(p1[1], p2[1])],
+                    max: [_max(p1[0], p2[0]), _max(p1[1], p2[1])]
+                }
+        }
+        var projectionsCache = {};
+        projection.get = function(name) {
+            return projectionsCache[name] || null
+        };
+        projection.add = function(name, engine) {
+            if (!projectionsCache[name] && isEngine(engine))
+                projectionsCache[name] = engine;
+            return projection
+        };
+        function createProjectUnprojectMethods(project, unproject, p1, p2, delta) {
+            var x0 = (p1[0] + p2[0]) / 2 - delta / 2,
+                y0 = (p1[1] + p2[1]) / 2 - delta / 2,
+                k = 2 / delta;
+            return {
+                    to: function(coordinates) {
+                        var p = project(coordinates);
+                        return [-1 + (p[0] - x0) * k, -1 + (p[1] - y0) * k]
+                    },
+                    from: function(coordinates) {
+                        var p = [x0 + (coordinates[0] + 1) / k, y0 + (coordinates[1] + 1) / k];
+                        return unproject(p)
+                    }
+                }
+        }
+        DX.viz.map._tests.Engine = Engine;
+        DX.viz.map.Projection = Projection;
+        DX.viz.map.projection = projection
     })(DevExpress, jQuery);
+    /*! Module viz-vectormap, file projection.engines.js */
+    (function(DX, undefined) {
+        var projection = DX.viz.map.projection,
+            _min = Math.min,
+            _max = Math.max,
+            _sin = Math.sin,
+            _asin = Math.asin,
+            _tan = Math.tan,
+            _atan = Math.atan,
+            _exp = Math.exp,
+            _log = Math.log,
+            PI = Math.PI,
+            PI_DIV_4 = PI / 4,
+            GEO_LON_BOUND = 180,
+            GEO_LAT_BOUND = 90,
+            RADIANS = PI / 180,
+            MERCATOR_LAT_BOUND = (2 * _atan(_exp(PI)) - PI / 2) / RADIANS,
+            MILLER_LAT_BOUND = (2.5 * _atan(_exp(0.8 * PI)) - 0.625 * PI) / RADIANS;
+        function clamp(value, threshold) {
+            return _max(_min(value, +threshold), -threshold)
+        }
+        projection.add("mercator", projection({
+            aspectRatio: 1,
+            to: function(coordinates) {
+                return [coordinates[0] / GEO_LON_BOUND, _log(_tan(PI_DIV_4 + clamp(coordinates[1], MERCATOR_LAT_BOUND) * RADIANS / 2)) / PI]
+            },
+            from: function(coordinates) {
+                return [coordinates[0] * GEO_LON_BOUND, (2 * _atan(_exp(coordinates[1] * PI)) - PI / 2) / RADIANS]
+            }
+        }));
+        projection.add("equirectangular", projection({
+            aspectRatio: 2,
+            to: function(coordinates) {
+                return [coordinates[0] / GEO_LON_BOUND, coordinates[1] / GEO_LAT_BOUND]
+            },
+            from: function(coordinates) {
+                return [coordinates[0] * GEO_LON_BOUND, coordinates[1] * GEO_LAT_BOUND]
+            }
+        }));
+        projection.add("lambert", projection({
+            aspectRatio: 2,
+            to: function(coordinates) {
+                return [coordinates[0] / GEO_LON_BOUND, _sin(clamp(coordinates[1], GEO_LAT_BOUND) * RADIANS)]
+            },
+            from: function(coordinates) {
+                return [coordinates[0] * GEO_LON_BOUND, _asin(clamp(coordinates[1], 1)) / RADIANS]
+            }
+        }));
+        projection.add("miller", projection({
+            aspectRatio: 1,
+            to: function(coordinates) {
+                return [coordinates[0] / GEO_LON_BOUND, 1.25 * _log(_tan(PI_DIV_4 + clamp(coordinates[1], MILLER_LAT_BOUND) * RADIANS * 0.4)) / PI]
+            },
+            from: function(coordinates) {
+                return [coordinates[0] * GEO_LON_BOUND, (2.5 * _atan(_exp(0.8 * coordinates[1] * PI)) - 0.625 * PI) / RADIANS]
+            }
+        }))
+    })(DevExpress);
     /*! Module viz-vectormap, file controlBar.js */
     (function(DX, undefined) {
-        var _Number = Number,
-            _math = Math,
+        var _math = Math,
+            _min = _math.min,
+            _max = _math.max,
             _round = _math.round,
             _floor = _math.floor,
             _pow = _math.pow,
@@ -1055,246 +1191,226 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
         COMMAND_TO_TYPE_MAP[COMMAND_MOVE_UP] = COMMAND_TO_TYPE_MAP[COMMAND_MOVE_RIGHT] = COMMAND_TO_TYPE_MAP[COMMAND_MOVE_DOWN] = COMMAND_TO_TYPE_MAP[COMMAND_MOVE_LEFT] = MoveCommand;
         COMMAND_TO_TYPE_MAP[COMMAND_ZOOM_IN] = COMMAND_TO_TYPE_MAP[COMMAND_ZOOM_OUT] = ZoomCommand;
         COMMAND_TO_TYPE_MAP[COMMAND_ZOOM_DRAG] = ZoomDragCommand;
-        var ControlBar = DX.Class.inherit({
-                _flags: 0,
-                ctor: function(parameters) {
-                    var that = this;
-                    that._params = parameters;
-                    that._createElements(parameters.renderer, parameters.container, parameters.dataKey);
-                    parameters.layoutControl.addItem(that);
-                    that._subscribeToProjection(parameters.projection);
-                    that._setVisibility(false)
-                },
-                setCallbacks: function(callbacks) {
-                    this._callbacks = callbacks;
-                    return this
-                },
-                _createElements: function(renderer, container, dataKey) {
-                    var that = this,
-                        buttonsGroups,
-                        trackersGroup;
-                    that._root = renderer.g().attr({"class": "dxm-control-bar"}).linkOn(container, "control-bar");
-                    buttonsGroups = that._buttonsGroup = renderer.g().attr({"class": "dxm-control-buttons"}).append(that._root);
-                    trackersGroup = renderer.g().attr({
-                        stroke: "none",
-                        "stroke-width": 0,
-                        fill: "#000000",
-                        opacity: 0.0001
-                    }).css({cursor: "pointer"}).append(that._root);
-                    that._createButtons(renderer, dataKey, buttonsGroups);
-                    that._createTrackers(renderer, dataKey, trackersGroup)
-                },
-                _createButtons: function(renderer, dataKey, group) {
-                    var that = this,
-                        options = SIZE_OPTIONS,
-                        size = options.buttonSize / 2,
-                        offset1 = options.arrowButtonOffset - size,
-                        offset2 = options.arrowButtonOffset,
-                        incdecButtonSize = options.incdecButtonSize / 2,
-                        directionOptions = {
-                            "stroke-linecap": "square",
-                            fill: "none"
-                        },
-                        line = "line";
-                    renderer.circle(0, 0, options.bigCircleSize / 2).append(group);
-                    renderer.circle(0, 0, size).attr({fill: "none"}).append(group);
-                    renderer.path([-size, -offset1, 0, -offset2, size, -offset1], line).attr(directionOptions).append(group);
-                    renderer.path([offset1, -size, offset2, 0, offset1, size], line).attr(directionOptions).append(group);
-                    renderer.path([size, offset1, 0, offset2, -size, offset1], line).attr(directionOptions).append(group);
-                    renderer.path([-offset1, size, -offset2, 0, -offset1, -size], line).attr(directionOptions).append(group);
-                    renderer.circle(0, options.incButtonOffset, options.smallCircleSize / 2).append(group);
-                    renderer.path([[-incdecButtonSize, options.incButtonOffset, incdecButtonSize, options.incButtonOffset], [0, options.incButtonOffset - incdecButtonSize, 0, options.incButtonOffset + incdecButtonSize]], "area").append(group);
-                    renderer.circle(0, options.decButtonOffset, options.smallCircleSize / 2).append(group);
-                    renderer.path([-incdecButtonSize, options.decButtonOffset, incdecButtonSize, options.decButtonOffset], "area").append(group);
-                    that._progressBar = renderer.path([], "area").append(group);
-                    that._zoomDrag = renderer.rect(_floor(-options.sliderLength / 2), _floor(options.sliderLineEndOffset - options.sliderWidth / 2), options.sliderLength, options.sliderWidth).append(group);
-                    that._sliderLineLength = options.sliderLineEndOffset - options.sliderLineStartOffset
-                },
-                _createTrackers: function(renderer, dataKey, group) {
-                    var options = SIZE_OPTIONS,
-                        size = _round((options.arrowButtonOffset - options.trackerGap) / 2),
-                        offset1 = options.arrowButtonOffset - size,
-                        offset2 = _round(_pow(options.bigCircleSize * options.bigCircleSize / 4 - size * size, 0.5)),
-                        size2 = offset2 - offset1;
-                    renderer.rect(-size, -size, size * 2, size * 2).data(dataKey, {
-                        index: COMMAND_RESET,
-                        type: EVENT_TARGET_TYPE
-                    }).append(group);
-                    renderer.rect(-size, -offset2, size * 2, size2).data(dataKey, {
-                        index: COMMAND_MOVE_UP,
-                        type: EVENT_TARGET_TYPE
-                    }).append(group);
-                    renderer.rect(offset1, -size, size2, size * 2).data(dataKey, {
-                        index: COMMAND_MOVE_RIGHT,
-                        type: EVENT_TARGET_TYPE
-                    }).append(group);
-                    renderer.rect(-size, offset1, size * 2, size2).data(dataKey, {
-                        index: COMMAND_MOVE_DOWN,
-                        type: EVENT_TARGET_TYPE
-                    }).append(group);
-                    renderer.rect(-offset2, -size, size2, size * 2).data(dataKey, {
-                        index: COMMAND_MOVE_LEFT,
-                        type: EVENT_TARGET_TYPE
-                    }).append(group);
-                    renderer.circle(0, options.incButtonOffset, options.smallCircleSize / 2).data(dataKey, {
-                        index: COMMAND_ZOOM_IN,
-                        type: EVENT_TARGET_TYPE
-                    }).append(group);
-                    renderer.circle(0, options.decButtonOffset, options.smallCircleSize / 2).data(dataKey, {
-                        index: COMMAND_ZOOM_OUT,
-                        type: EVENT_TARGET_TYPE
-                    }).append(group);
-                    renderer.rect(-2, options.sliderLineStartOffset - 2, 4, options.sliderLineEndOffset - options.sliderLineStartOffset + 4).css({cursor: "default"}).data(dataKey, {
-                        index: COMMAND_ZOOM_DRAG_LINE,
-                        type: EVENT_TARGET_TYPE
-                    }).append(group);
-                    this._zoomDragCover = renderer.rect(-options.sliderLength / 2, options.sliderLineEndOffset - options.sliderWidth / 2, options.sliderLength, options.sliderWidth).data(dataKey, {
-                        index: COMMAND_ZOOM_DRAG,
-                        type: EVENT_TARGET_TYPE
-                    }).append(group)
-                },
-                _subscribeToProjection: function(projection) {
-                    var that = this;
-                    projection.on({
-                        zoom: function() {
-                            that._adjustZoom(projection.getScaledZoom())
-                        },
-                        "max-zoom": function() {
-                            that._zoomPartition = projection.getZoomScalePartition();
-                            that._sliderUnitLength = that._sliderLineLength / that._zoomPartition;
-                            that._adjustZoom(projection.getScaledZoom())
-                        }
-                    })
-                },
-                dispose: function() {
-                    var that = this;
-                    that._params.layoutControl.removeItem(that);
-                    that._root.clear().linkOff();
-                    that._params = that._root = that._callbacks = that._buttonsGroup = that._zoomDrag = that._zoomDragCover = that._progressBar = null;
-                    return that
-                },
-                resize: function(size) {
-                    this._setVisibility(size !== null && this._options.enabled && this._flags);
-                    return this
-                },
-                _setVisibility: function(state) {
-                    this._root.attr({visibility: state ? null : "hidden"})
-                },
-                getLayoutOptions: function() {
-                    var options = this._options;
-                    return this._rendered && options.enabled && this._flags ? {
-                            width: 2 * options.margin + TOTAL_WIDTH,
-                            height: 2 * options.margin + TOTAL_HEIGHT,
-                            horizontalAlignment: options.horizontalAlignment,
-                            verticalAlignment: options.verticalAlignment
-                        } : null
-                },
-                locate: function(x, y) {
-                    this._root.attr({
-                        translateX: x + this._options.margin + OFFSET_X,
-                        translateY: y + this._options.margin + OFFSET_Y
-                    });
-                    return this
-                },
-                setInteraction: function(interaction) {
-                    var that = this;
-                    that.processEnd();
-                    if (_parseScalar(interaction.centeringEnabled, true))
-                        that._flags |= FLAG_CENTERING;
-                    else
-                        that._flags &= ~FLAG_CENTERING;
-                    if (_parseScalar(interaction.zoomingEnabled, true))
-                        that._flags |= FLAG_ZOOMING;
-                    else
-                        that._flags &= ~FLAG_ZOOMING;
-                    if (that._rendered)
-                        that._refresh();
-                    return that
-                },
-                setOptions: function(options) {
-                    var that = this;
-                    that.processEnd();
-                    that._buttonsGroup.attr({
-                        "stroke-width": options.borderWidth,
-                        stroke: options.borderColor,
-                        fill: options.color,
-                        "fill-opacity": options.opacity
-                    });
-                    that._options = {
-                        enabled: !!_parseScalar(options.enabled, true),
-                        margin: options.margin > 0 ? _Number(options.margin) : 0,
-                        horizontalAlignment: parseHorizontalAlignment(options.horizontalAlignment, "left"),
-                        verticalAlignment: parseVerticalAlignment(options.verticalAlignment, "top")
-                    };
-                    that._rendered && that._refresh();
-                    return that
-                },
-                _refresh: function() {
-                    var isVisible = this._flags && this._options.enabled;
-                    this._setVisibility(isVisible);
-                    if (isVisible)
-                        this.updateLayout()
-                },
-                clean: function() {
-                    var that = this;
-                    that._rendered = null;
-                    that._root.linkRemove();
-                    return that
-                },
-                render: function() {
-                    var that = this;
-                    that._rendered = true;
-                    that._root.linkAppend();
-                    that._refresh();
-                    return that
-                },
-                _adjustZoom: function(zoom) {
-                    var that = this,
-                        transform,
-                        y,
-                        start = SIZE_OPTIONS.sliderLineStartOffset,
-                        end = SIZE_OPTIONS.sliderLineEndOffset,
-                        h = SIZE_OPTIONS.sliderWidth;
-                    that._zoomFactor = _round(zoom);
-                    that._zoomFactor >= 0 || (that._zoomFactor = 0);
-                    that._zoomFactor <= that._zoomPartition || (that._zoomFactor = that._zoomPartition);
-                    transform = {translateY: -that._zoomFactor * that._sliderUnitLength};
-                    y = end - h / 2 + transform.translateY;
-                    that._progressBar.attr({points: [[0, start, 0, _math.max(start, y)], [0, _math.min(end, y + h), 0, end]]});
-                    that._zoomDrag.attr(transform);
-                    that._zoomDragCover.attr(transform)
-                },
-                _applyZoom: function(center) {
-                    this._callbacks.zoom(this._zoomFactor, this._flags & FLAG_CENTERING ? center : undefined)
-                },
-                processStart: function(arg) {
-                    var commandType = COMMAND_TO_TYPE_MAP[arg.data];
-                    this._command = commandType && this._options.enabled && commandType.flags & this._flags ? new commandType(this, arg) : null;
-                    return this
-                },
-                processMove: function(arg) {
-                    this._command && this._command.update(arg);
-                    return this
-                },
-                processEnd: function() {
-                    this._command && this._command.finish();
-                    this._command = null;
-                    return this
-                },
-                processZoom: function(arg) {
-                    var that = this,
-                        zoomFactor;
-                    if (that._flags & FLAG_ZOOMING) {
-                        if (arg.delta)
-                            zoomFactor = arg.delta;
-                        else if (arg.ratio)
-                            zoomFactor = _ln(arg.ratio) / _LN2;
-                        that._adjustZoom(that._zoomFactor + zoomFactor);
-                        that._applyZoom([arg.x, arg.y])
+        function ControlBar(parameters) {
+            var that = this;
+            that._params = parameters;
+            that._createElements(parameters.renderer, parameters.container, parameters.dataKey);
+            parameters.layoutControl.addItem(that);
+            that._subscribeToProjection(parameters.projection)
+        }
+        ControlBar.prototype = {
+            constructor: ControlBar,
+            _flags: 0,
+            setCallbacks: function(callbacks) {
+                this._callbacks = callbacks;
+                return this
+            },
+            _createElements: function(renderer, container, dataKey) {
+                var that = this,
+                    buttonsGroups,
+                    trackersGroup;
+                that._root = renderer.g().attr({"class": "dxm-control-bar"}).linkOn(container, "control-bar");
+                buttonsGroups = that._buttonsGroup = renderer.g().attr({"class": "dxm-control-buttons"}).append(that._root);
+                trackersGroup = renderer.g().attr({
+                    stroke: "none",
+                    "stroke-width": 0,
+                    fill: "#000000",
+                    opacity: 0.0001
+                }).css({cursor: "pointer"}).append(that._root);
+                that._createButtons(renderer, dataKey, buttonsGroups);
+                that._createTrackers(renderer, dataKey, trackersGroup)
+            },
+            _createButtons: function(renderer, dataKey, group) {
+                var that = this,
+                    options = SIZE_OPTIONS,
+                    size = options.buttonSize / 2,
+                    offset1 = options.arrowButtonOffset - size,
+                    offset2 = options.arrowButtonOffset,
+                    incdecButtonSize = options.incdecButtonSize / 2,
+                    directionOptions = {
+                        "stroke-linecap": "square",
+                        fill: "none"
+                    },
+                    line = "line";
+                renderer.circle(0, 0, options.bigCircleSize / 2).append(group);
+                renderer.circle(0, 0, size).attr({fill: "none"}).append(group);
+                renderer.path([-size, -offset1, 0, -offset2, size, -offset1], line).attr(directionOptions).append(group);
+                renderer.path([offset1, -size, offset2, 0, offset1, size], line).attr(directionOptions).append(group);
+                renderer.path([size, offset1, 0, offset2, -size, offset1], line).attr(directionOptions).append(group);
+                renderer.path([-offset1, size, -offset2, 0, -offset1, -size], line).attr(directionOptions).append(group);
+                renderer.circle(0, options.incButtonOffset, options.smallCircleSize / 2).append(group);
+                renderer.path([[-incdecButtonSize, options.incButtonOffset, incdecButtonSize, options.incButtonOffset], [0, options.incButtonOffset - incdecButtonSize, 0, options.incButtonOffset + incdecButtonSize]], "area").append(group);
+                renderer.circle(0, options.decButtonOffset, options.smallCircleSize / 2).append(group);
+                renderer.path([-incdecButtonSize, options.decButtonOffset, incdecButtonSize, options.decButtonOffset], "area").append(group);
+                that._progressBar = renderer.path([], "area").append(group);
+                that._zoomDrag = renderer.rect(_floor(-options.sliderLength / 2), _floor(options.sliderLineEndOffset - options.sliderWidth / 2), options.sliderLength, options.sliderWidth).append(group);
+                that._sliderLineLength = options.sliderLineEndOffset - options.sliderLineStartOffset
+            },
+            _createTrackers: function(renderer, dataKey, group) {
+                var options = SIZE_OPTIONS,
+                    size = _round((options.arrowButtonOffset - options.trackerGap) / 2),
+                    offset1 = options.arrowButtonOffset - size,
+                    offset2 = _round(_pow(options.bigCircleSize * options.bigCircleSize / 4 - size * size, 0.5)),
+                    size2 = offset2 - offset1;
+                renderer.rect(-size, -size, size * 2, size * 2).data(dataKey, {
+                    index: COMMAND_RESET,
+                    name: EVENT_TARGET_TYPE
+                }).append(group);
+                renderer.rect(-size, -offset2, size * 2, size2).data(dataKey, {
+                    index: COMMAND_MOVE_UP,
+                    name: EVENT_TARGET_TYPE
+                }).append(group);
+                renderer.rect(offset1, -size, size2, size * 2).data(dataKey, {
+                    index: COMMAND_MOVE_RIGHT,
+                    name: EVENT_TARGET_TYPE
+                }).append(group);
+                renderer.rect(-size, offset1, size * 2, size2).data(dataKey, {
+                    index: COMMAND_MOVE_DOWN,
+                    name: EVENT_TARGET_TYPE
+                }).append(group);
+                renderer.rect(-offset2, -size, size2, size * 2).data(dataKey, {
+                    index: COMMAND_MOVE_LEFT,
+                    name: EVENT_TARGET_TYPE
+                }).append(group);
+                renderer.circle(0, options.incButtonOffset, options.smallCircleSize / 2).data(dataKey, {
+                    index: COMMAND_ZOOM_IN,
+                    name: EVENT_TARGET_TYPE
+                }).append(group);
+                renderer.circle(0, options.decButtonOffset, options.smallCircleSize / 2).data(dataKey, {
+                    index: COMMAND_ZOOM_OUT,
+                    name: EVENT_TARGET_TYPE
+                }).append(group);
+                renderer.rect(-2, options.sliderLineStartOffset - 2, 4, options.sliderLineEndOffset - options.sliderLineStartOffset + 4).css({cursor: "default"}).data(dataKey, {
+                    index: COMMAND_ZOOM_DRAG_LINE,
+                    name: EVENT_TARGET_TYPE
+                }).append(group);
+                this._zoomDragCover = renderer.rect(-options.sliderLength / 2, options.sliderLineEndOffset - options.sliderWidth / 2, options.sliderLength, options.sliderWidth).data(dataKey, {
+                    index: COMMAND_ZOOM_DRAG,
+                    name: EVENT_TARGET_TYPE
+                }).append(group)
+            },
+            _subscribeToProjection: function(projection) {
+                var that = this;
+                projection.on({
+                    project: function() {
+                        that._update()
+                    },
+                    zoom: function() {
+                        that._adjustZoom(projection.getScaledZoom())
+                    },
+                    "max-zoom": function() {
+                        that._zoomPartition = projection.getZoomScalePartition();
+                        that._sliderUnitLength = that._sliderLineLength / that._zoomPartition;
+                        that._adjustZoom(projection.getScaledZoom())
                     }
-                    return that
+                })
+            },
+            dispose: function() {
+                var that = this;
+                that._params.layoutControl.removeItem(that);
+                that._root.linkRemove().linkOff();
+                that._params = that._root = that._callbacks = that._buttonsGroup = that._zoomDrag = that._zoomDragCover = that._progressBar = null;
+                return that
+            },
+            resize: function(size) {
+                if (this._isActive)
+                    this._root.attr({visibility: size !== null ? null : "hidden"})
+            },
+            getLayoutOptions: function() {
+                return this._isActive ? this._layoutOptions : null
+            },
+            locate: function(x, y) {
+                this._root.attr({
+                    translateX: x + this._margin + OFFSET_X,
+                    translateY: y + this._margin + OFFSET_Y
+                })
+            },
+            _update: function() {
+                var that = this;
+                that._isActive = that._isEnabled && that._flags && that._params.projection.isInvertible();
+                if (that._isActive)
+                    that._root.linkAppend();
+                else
+                    that._root.linkRemove();
+                that.processEnd();
+                that.updateLayout()
+            },
+            setInteraction: function(interaction) {
+                var that = this;
+                if (_parseScalar(interaction.centeringEnabled, true))
+                    that._flags |= FLAG_CENTERING;
+                else
+                    that._flags &= ~FLAG_CENTERING;
+                if (_parseScalar(interaction.zoomingEnabled, true))
+                    that._flags |= FLAG_ZOOMING;
+                else
+                    that._flags &= ~FLAG_ZOOMING;
+                that._update()
+            },
+            setOptions: function(options) {
+                var that = this;
+                that._isEnabled = !!_parseScalar(options.enabled, true);
+                that._margin = options.margin || 0;
+                that._layoutOptions = {
+                    width: 2 * that._margin + TOTAL_WIDTH,
+                    height: 2 * that._margin + TOTAL_HEIGHT,
+                    horizontalAlignment: parseHorizontalAlignment(options.horizontalAlignment, "left"),
+                    verticalAlignment: parseVerticalAlignment(options.verticalAlignment, "top")
+                };
+                that._buttonsGroup.attr({
+                    "stroke-width": options.borderWidth,
+                    stroke: options.borderColor,
+                    fill: options.color,
+                    "fill-opacity": options.opacity
+                });
+                that._update()
+            },
+            _adjustZoom: function(zoom) {
+                var that = this,
+                    transform,
+                    y,
+                    start = SIZE_OPTIONS.sliderLineStartOffset,
+                    end = SIZE_OPTIONS.sliderLineEndOffset,
+                    h = SIZE_OPTIONS.sliderWidth;
+                that._zoomFactor = _round(zoom);
+                that._zoomFactor >= 0 || (that._zoomFactor = 0);
+                that._zoomFactor <= that._zoomPartition || (that._zoomFactor = that._zoomPartition);
+                transform = {translateY: -that._zoomFactor * that._sliderUnitLength};
+                y = end - h / 2 + transform.translateY;
+                that._progressBar.attr({points: [[0, start, 0, _max(start, y)], [0, _min(end, y + h), 0, end]]});
+                that._zoomDrag.attr(transform);
+                that._zoomDragCover.attr(transform)
+            },
+            _applyZoom: function(center) {
+                this._callbacks.zoom(this._zoomFactor, this._flags & FLAG_CENTERING ? center : undefined)
+            },
+            processStart: function(arg) {
+                var commandType;
+                if (this._isActive) {
+                    commandType = COMMAND_TO_TYPE_MAP[arg.data];
+                    this._command = commandType && commandType.flags & this._flags ? new commandType(this, arg) : null
                 }
-            });
+            },
+            processMove: function(arg) {
+                this._command && this._command.update(arg)
+            },
+            processEnd: function() {
+                this._command && this._command.finish();
+                this._command = null
+            },
+            processZoom: function(arg) {
+                var that = this,
+                    zoomFactor;
+                if (that._flags & FLAG_ZOOMING) {
+                    if (arg.delta)
+                        zoomFactor = arg.delta;
+                    else if (arg.ratio)
+                        zoomFactor = _ln(arg.ratio) / _LN2;
+                    that._adjustZoom(that._zoomFactor + zoomFactor);
+                    that._applyZoom([arg.x, arg.y])
+                }
+            }
+        };
         function disposeCommand(command) {
             delete command._owner;
             command.update = function(){};
@@ -1396,16 +1512,13 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
             this._owner._applyZoom();
             disposeCommand(this)
         };
-        DX.viz.map._tests.ControlBar = ControlBar;
+        DX.viz.map.ControlBar = ControlBar;
         var COMMAND_TO_TYPE_MAP__ORIGINAL = COMMAND_TO_TYPE_MAP;
         DX.viz.map._tests.stubCommandToTypeMap = function(map) {
             COMMAND_TO_TYPE_MAP = map
         };
         DX.viz.map._tests.restoreCommandToTypeMap = function() {
             COMMAND_TO_TYPE_MAP = COMMAND_TO_TYPE_MAP__ORIGINAL
-        };
-        DX.viz.map.dxVectorMap.prototype._factory.createControlBar = function(parameters) {
-            return new ControlBar(parameters)
         }
     })(DevExpress);
     /*! Module viz-vectormap, file tracker.js */
@@ -1414,10 +1527,11 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
             _abs = _math.abs,
             _sqrt = _math.sqrt,
             _round = _math.round,
-            _addNamespace = DX.ui.events.addNamespace,
+            eventUtils = DX.require("/ui/events/ui.events.utils"),
+            _addNamespace = eventUtils.addNamespace,
             _parseScalar = DX.viz.utils.parseScalar,
             _now = $.now,
-            _NAME = DX.viz.map.dxVectorMap.prototype.NAME,
+            _NAME = DX.viz.map.dxVectorMap.publicName(),
             EVENTS = {};
         setupEvents();
         var EVENT_START = "start",
@@ -1682,7 +1796,7 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                 that._rootHandlers = {};
                 that._docHandlers[EVENTS.start] = function(event) {
                     var isTouch = isTouchEvent(event),
-                        data = $(event.target).data(DATA_KEY);
+                        data = getData(event);
                     if (isTouch && !that._isTouchEnabled)
                         return;
                     data && event.preventDefault();
@@ -1694,7 +1808,7 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                 };
                 that._docHandlers[EVENTS.move] = function(event) {
                     var isTouch = isTouchEvent(event),
-                        data = $(event.target).data(DATA_KEY);
+                        data = getData(event);
                     if (isTouch && !that._isTouchEnabled)
                         return;
                     that._moveDrag(event, data);
@@ -1704,7 +1818,7 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                 };
                 that._docHandlers[EVENTS.end] = function(event) {
                     var isTouch = isTouchEvent(event),
-                        data = $(event.target).data(DATA_KEY);
+                        data = getData(event);
                     if (isTouch && !that._isTouchEnabled)
                         return;
                     that._endClick(event, data);
@@ -1716,14 +1830,18 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                     that._cancelFocus();
                     if (!that._isWheelEnabled)
                         return;
-                    var data = $(event.target).data(DATA_KEY);
+                    var data = getData(event);
                     if (data) {
                         event.preventDefault();
                         event.stopPropagation();
                         that._wheelZoom(event, data)
                     }
                 };
-                that._wheelLock = {dir: 0}
+                that._wheelLock = {dir: 0};
+                function getData(event) {
+                    var target = event.target;
+                    return (target.tagName === "tspan" ? target.parentNode : target)[DATA_KEY]
+                }
             },
             _createProjectionHandlers: function(projection) {
                 var that = this;
@@ -1869,7 +1987,7 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                     _onTimer = null
                 }
             };
-        DX.viz.map._tests.Tracker = Tracker;
+        DX.viz.map.Tracker = Tracker;
         DX.viz.map._tests._DEBUG_forceEventMode = function(mode) {
             setupEvents(mode)
         };
@@ -1879,9 +1997,6 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
         };
         DX.viz.map._tests._DEBUG_restoreFocusType = function() {
             Focus = DX.viz.map._tests.Focus
-        };
-        DX.viz.map.dxVectorMap.prototype._factory.createTracker = function(parameters) {
-            return new Tracker(parameters)
         };
         function getDistance(x1, y1, x2, y2) {
             return _sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2))
@@ -1956,168 +2071,17 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
     })(DevExpress, jQuery);
     /*! Module viz-vectormap, file themeManager.js */
     (function(DX, $, undefined) {
-        var viz = DX.viz,
-            _Number = Number,
-            _extend = $.extend,
-            _each = $.each;
-        var ThemeManager = viz.BaseThemeManager.inherit({
-                _themeSection: "map",
-                _fontFields: ["areaSettings.label.font", "markerSettings.label.font", "tooltip.font", "legend.font", "loadingIndicator.font"],
-                getCommonAreaSettings: function(options) {
-                    var settings = _extend(true, {}, this._theme.areaSettings, options),
-                        palette,
-                        i,
-                        colors;
-                    if (settings.paletteSize > 0) {
-                        palette = this.createGradientPalette(settings.palette, settings.paletteSize);
-                        for (i = 0, colors = []; i < settings.paletteSize; ++i)
-                            colors.push(palette.getColor(i));
-                        settings._colors = colors
-                    }
-                    return settings
-                },
-                getAreaSettings: function(commonSettings, options) {
-                    var settings = _extend(true, {}, commonSettings, options);
-                    settings.borderWidth = _Number(settings.borderWidth) || 0;
-                    settings.borderColor = settings.borderColor || null;
-                    if (options.color === undefined && options.paletteIndex >= 0)
-                        settings.color = commonSettings._colors[options.paletteIndex];
-                    settings.color = settings.color || null;
-                    settings.hoveredBorderWidth = _Number(settings.hoveredBorderWidth) || settings.borderWidth;
-                    settings.hoveredBorderColor = settings.hoveredBorderColor || settings.borderColor;
-                    settings.hoveredColor = settings.hoveredColor || settings.color;
-                    settings.selectedBorderWidth = _Number(settings.selectedBorderWidth) || settings.borderWidth;
-                    settings.selectedBorderColor = settings.selectedBorderColor || settings.borderColor;
-                    settings.selectedColor = settings.selectedColor || settings.color;
-                    return settings
-                },
-                getCommonMarkerSettings: function(options) {
-                    options && !options.label && options.font && (options.label = {font: options.font}) && (options.font = undefined);
-                    var theme = _extend({}, this._theme.markerSettings),
-                        _options = _extend({}, options),
-                        themeParts = {},
-                        optionsParts = {},
-                        settings;
-                    _each(theme, function(name, themePart) {
-                        if (name[0] === "_") {
-                            themeParts[name] = themePart;
-                            optionsParts[name] = _options[name];
-                            theme[name] = _options[name] = undefined
-                        }
-                    });
-                    settings = _extend(true, {}, theme, _options);
-                    _each(themeParts, function(name, themePart) {
-                        settings[name] = _extend(true, {}, theme, themePart, _options, optionsParts[name])
-                    });
-                    return settings
-                },
-                getMarkerSettings: function(commonSettings, options, type) {
-                    var settings = _extend(true, {}, commonSettings["_" + type], options);
-                    settings.borderWidth = _Number(settings.borderWidth) || 0;
-                    settings.borderColor = settings.borderColor || null;
-                    settings.color = settings.color || null;
-                    settings.opacity = settings.opacity || null;
-                    settings.hoveredBorderWidth = _Number(settings.hoveredBorderWidth) || settings.borderWidth;
-                    settings.hoveredBorderColor = settings.hoveredBorderColor || settings.borderColor;
-                    settings.hoveredColor = settings.hoveredColor || settings.color;
-                    settings.hoveredOpacity = settings.hoveredOpacity || settings.opacity;
-                    settings.selectedBorderWidth = _Number(settings.selectedBorderWidth) || settings.borderWidth;
-                    settings.selectedBorderColor = settings.selectedBorderColor || settings.borderColor;
-                    settings.selectedColor = settings.selectedColor || settings.color;
-                    settings.selectedOpacity = settings.selectedOpacity || settings.opacity;
-                    return settings
-                },
-                getPieColors: function(commonSettings, count) {
-                    var colors = commonSettings._pie._colors || [],
-                        palette,
-                        i,
-                        _count = count > 8 ? count : 8;
-                    if (colors.length < _count) {
-                        palette = this.createPalette(commonSettings._pie.palette, {useHighlight: true});
-                        for (i = 0, colors = []; i < _count; ++i)
-                            colors.push(palette.getNextColor());
-                        commonSettings._pie._colors = colors
-                    }
-                    return colors
-                }
-            });
-        DX.viz.map._tests.ThemeManager = ThemeManager;
-        DX.viz.map.dxVectorMap.prototype._factory.createThemeManager = function() {
-            return new ThemeManager
-        }
+        DX.viz.map.ThemeManager = DX.viz.BaseThemeManager.inherit({
+            _themeSection: "map",
+            _fontFields: ["layer:area.label.font", "layer:marker:dot.label.font", "layer:marker:bubble.label.font", "layer:marker:pie.label.font", "layer:marker:image.label.font", "tooltip.font", "legend.font", "title.font", "title.subtitle.font", "loadingIndicator.font"]
+        })
     })(DevExpress, jQuery);
     /*! Module viz-vectormap, file legend.js */
     (function(DX, $, undefined) {
         var viz = DX.viz,
-            _utils = DX.utils,
-            _isArray = _utils.isArray,
             _extend = $.extend,
             _each = $.each,
-            _normalizeEnum = viz.utils.normalizeEnum,
             _BaseLegend = viz.Legend;
-        function Legend(parameters) {
-            var that = this;
-            that._params = parameters;
-            that._root = parameters.renderer.g().attr({"class": "dxm-legend"}).linkOn(parameters.container, {
-                name: "legend",
-                after: "legend-base"
-            });
-            parameters.layoutControl.addItem(that);
-            _BaseLegend.apply(that, [{
-                    renderer: parameters.renderer,
-                    group: that._root,
-                    backgroundClass: null,
-                    itemsGroupClass: null,
-                    textField: "text",
-                    getFormatObject: function(data) {
-                        return data
-                    }
-                }]);
-            that._onDataChanged = function(items) {
-                var itemsForUpdate = viz.utils.map(items, function(item) {
-                        return _extend(true, {states: {normal: {fill: item.color}}}, item)
-                    });
-                that.update(itemsForUpdate, that._options);
-                that._refresh()
-            }
-        }
-        var legendPrototype = Legend.prototype = _utils.clone(_BaseLegend.prototype);
-        legendPrototype.constructor = Legend;
-        legendPrototype.dispose = function() {
-            var that = this;
-            that._params.layoutControl.removeItem(that);
-            that._unbindData();
-            that._root.linkOff();
-            that._params = that._root = that._onDataChanged = null;
-            return _BaseLegend.prototype.dispose.apply(that, arguments)
-        };
-        legendPrototype.clean = function() {
-            this._rendered = false;
-            this._root.linkRemove();
-            return this
-        };
-        legendPrototype.render = function() {
-            var that = this;
-            that._root.linkAppend();
-            that._rendered = true;
-            that._refresh();
-            return that
-        };
-        legendPrototype.resize = function(size) {
-            if (size === null)
-                this.erase();
-            else
-                this.draw(size.width, size.height);
-            return this
-        };
-        legendPrototype.locate = _BaseLegend.prototype.shift;
-        legendPrototype._unbindData = function() {
-            if (this._dataCategory)
-                this._params.dataExchanger.unbind(this._dataCategory, this._dataName)
-        };
-        legendPrototype._bindData = function(info) {
-            this._params.dataExchanger.bind(this._dataCategory = info.category, this._dataName = info.name, this._onDataChanged)
-        };
         var sourceMap = {
                 areacolorgroups: {
                     category: "areas",
@@ -2136,74 +2100,133 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                 category: "UNKNOWN",
                 name: "UNKNOWN"
             };
-        legendPrototype.setOptions = function(options) {
+        function parseSource(source) {
+            var ret;
+            if (typeof source === "string")
+                ret = sourceMap[source.toLowerCase()] || unknownSource;
+            else
+                ret = {
+                    category: source.layer,
+                    name: source.grouping
+                };
+            return ret
+        }
+        function Legend(parameters) {
             var that = this;
-            that.update(that._data, options);
-            that._unbindData();
-            that._bindData(sourceMap[_normalizeEnum(options.source)] || unknownSource);
-            that._refresh();
-            return that
-        };
-        legendPrototype._refresh = function() {
-            if (this._rendered)
+            that._params = parameters;
+            that._root = parameters.renderer.g().attr({"class": "dxm-legend"}).linkOn(parameters.container, {
+                name: "legend",
+                after: "legend-base"
+            }).linkAppend();
+            parameters.layoutControl.addItem(that);
+            _BaseLegend.call(that, {
+                renderer: parameters.renderer,
+                group: that._root,
+                backgroundClass: null,
+                itemsGroupClass: null,
+                textField: "text",
+                getFormatObject: function(data) {
+                    return data
+                }
+            });
+            that._onDataChanged = function(data) {
+                that._updateData(data)
+            }
+        }
+        function buildData(partition, values, field) {
+            var i,
+                ii = values.length,
+                list = [],
+                item;
+            for (i = 0; i < ii; ++i) {
+                list[i] = item = {
+                    start: partition[i],
+                    end: partition[i + 1],
+                    index: i
+                };
+                item[field] = values[i];
+                item.states = {normal: {fill: item.color}}
+            }
+            return list
+        }
+        Legend.prototype = _extend(DX.require("/utils/utils.object").clone(_BaseLegend.prototype), {
+            constructor: Legend,
+            dispose: function() {
+                var that = this;
+                that._params.layoutControl.removeItem(that);
+                that._unbindData();
+                that._root.linkRemove().linkOff();
+                that._params = that._root = that._onDataChanged = null;
+                return _BaseLegend.prototype.dispose.apply(that, arguments)
+            },
+            resize: function(size) {
+                this._params.notifyDirty();
+                if (size === null)
+                    this.erase();
+                else
+                    this.draw(size.width, size.height);
+                this._params.notifyReady()
+            },
+            locate: _BaseLegend.prototype.shift,
+            _updateData: function(data) {
+                this.update(data ? buildData(data.partition, data.values, this._dataName) : [], this._options);
                 this.updateLayout()
-        };
+            },
+            _unbindData: function() {
+                if (this._dataCategory)
+                    this._params.dataExchanger.unbind(this._dataCategory, this._dataName)
+            },
+            _bindData: function(arg) {
+                this._params.dataExchanger.bind(this._dataCategory = arg.category, this._dataName = arg.name, this._onDataChanged)
+            },
+            setOptions: function(options) {
+                var that = this;
+                that.update(that._data, options);
+                that._unbindData();
+                that._bindData(options.source && parseSource(options.source) || unknownSource);
+                that.updateLayout();
+                return that
+            }
+        });
         function LegendsControl(parameters) {
-            this._parameters = parameters;
+            this._params = parameters;
             this._items = [];
             parameters.container.virtualLink("legend-base")
         }
         LegendsControl.prototype = {
             constructor: LegendsControl,
             dispose: function() {
-                var that = this;
-                _each(that._items, function(_, item) {
+                _each(this._items, function(_, item) {
                     item.dispose()
                 });
-                that._parameters = that._items = null;
-                return that
+                this._params = this._items = null
             },
-            setOptions: function(options, theme) {
-                var optionList = _isArray(options) ? options : [],
-                    i = 0,
+            setOptions: function(options) {
+                var optionList = options && options.length ? options : [],
+                    items = this._items,
+                    i,
                     ii = optionList.length,
-                    item,
-                    newItems = [],
-                    items = this._items;
-                for (; i < ii; ++i) {
-                    item = (items[i] || new Legend(this._parameters)).setOptions(_extend(true, {}, theme, optionList[i]));
-                    newItems.push(item)
+                    params = this._params,
+                    theme = params.themeManager.theme("legend");
+                for (i = items.length; i < ii; ++i)
+                    items[i] = new Legend(params);
+                for (i = items.length - 1; i >= ii; --i) {
+                    items[i].dispose();
+                    items.splice(i, 1)
                 }
-                for (ii = items.length; i < ii; ++i)
-                    items[i].clean().dispose();
-                this._items = newItems
-            },
-            clean: function() {
-                _each(this._items, function(_, item) {
-                    item.clean()
-                });
-                return this
-            },
-            render: function() {
-                _each(this._items, function(_, item) {
-                    item.render()
-                });
-                return this
+                params.layoutControl.suspend();
+                for (i = 0; i < ii; ++i)
+                    items[i].setOptions(_extend(true, {}, theme, optionList[i]));
+                params.layoutControl.resume()
             }
         };
-        DX.viz.map.dxVectorMap.prototype._factory.createLegendsControl = function(parameters) {
-            return new LegendsControl(parameters)
-        };
+        DX.viz.map.LegendsControl = LegendsControl;
         DX.viz.map._tests.Legend = Legend;
-        DX.viz.map._tests.LegendsControl = LegendsControl;
         DX.viz.map._tests.stubLegendType = function(stub) {
             Legend = stub
         };
         DX.viz.map._tests.restoreLegendType = function() {
             Legend = DX.viz.map._tests.Legend
-        };
-        DX.viz.map._tests.extendLegendSourceMap = function(name, value) {
-            sourceMap[name] = value
         }
     })(DevExpress, jQuery);
     /*! Module viz-vectormap, file layout.js */
@@ -2396,7 +2419,7 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
         function LayoutControl() {
             var that = this;
             that._items = [];
-            that._suspended = true;
+            that._suspended = 0;
             that._updateLayout = function() {
                 that._update()
             }
@@ -2404,72 +2427,73 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
         LayoutControl.prototype = {
             constructor: LayoutControl,
             dispose: function() {
-                this._items = this._updateLayout = null;
-                return this
+                this._items = this._updateLayout = null
             },
-            setSize: function(width, height) {
-                this._size = {
-                    width: width,
-                    height: height
-                };
-                this._update();
-                return this
+            setSize: function(canvas) {
+                this._canvas = canvas;
+                this._update()
             },
-            stop: function() {
-                this._suspended = true;
-                return this
+            suspend: function() {
+                ++this._suspended
             },
-            start: function() {
-                this._suspended = null;
-                this._update();
-                return this
+            resume: function() {
+                if (--this._suspended === 0)
+                    this._update()
             },
             addItem: function(item) {
                 this._items.push(item);
-                item.updateLayout = this._updateLayout;
-                return this
+                item.updateLayout = this._updateLayout
             },
             removeItem: function(item) {
                 this._items.splice(_inArray(item, this._items), 1);
-                item.updateLayout = null;
-                return this
+                item.updateLayout = null
             },
             _update: function() {
-                if (this._suspended)
-                    return;
-                var size = this._size;
-                _each(this._items, function(_, item) {
-                    item.resize(size)
-                });
-                applyLayout({
-                    left: 0,
-                    top: 0,
-                    right: size.width,
-                    bottom: size.height
-                }, this._items)
+                var canvas;
+                if (this._suspended === 0) {
+                    canvas = this._canvas;
+                    _each(this._items, function(_, item) {
+                        item.resize(canvas)
+                    });
+                    applyLayout({
+                        left: canvas.left,
+                        top: canvas.top,
+                        right: canvas.width + canvas.left,
+                        bottom: canvas.height + canvas.top
+                    }, this._items)
+                }
             }
         };
-        DX.viz.map.dxVectorMap.prototype._factory.createLayoutControl = function() {
-            return new LayoutControl
-        };
-        DX.viz.map._tests.LayoutControl = LayoutControl
+        DX.viz.map.LayoutControl = LayoutControl
     })(DevExpress, jQuery);
-    /*! Module viz-vectormap, file mapItemsManager.js */
+    /*! Module viz-vectormap, file mapLayer.js */
     (function(DX, $, undefined) {
-        var viz = DX.viz,
-            _isFinite = isFinite,
-            _utils = DX.utils,
-            _coreUtils = viz.utils,
-            _map = _coreUtils.map,
-            _isString = _utils.isString,
-            _isArray = _utils.isArray,
+        var _Number = Number,
+            _String = String,
+            _abs = Math.abs,
+            _round = Math.round,
+            _min = Math.min,
+            _max = Math.max,
+            _sqrt = Math.sqrt,
+            _utils = DX.require("/utils/utils.common"),
             _isFunction = _utils.isFunction,
-            _patchFontOptions = _coreUtils.patchFontOptions,
-            _parseScalar = _coreUtils.parseScalar,
-            _normalizeEnum = _coreUtils.normalizeEnum,
+            _isArray = _utils.isArray,
+            _parseScalar = DX.viz.utils.parseScalar,
+            _patchFontOptions = DX.viz.utils.patchFontOptions,
+            _normalizeEnum = DX.viz.utils.normalizeEnum,
+            _noop = $.noop,
             _extend = $.extend,
-            _each = $.each;
-        var SELECTIONS = {
+            _each = $.each,
+            _concat = Array.prototype.concat,
+            TYPE_AREA = "area",
+            TYPE_LINE = "line",
+            TYPE_MARKER = "marker",
+            STATE_DEFAULT = 0,
+            STATE_HOVERED = 1,
+            STATE_SELECTED = 2,
+            STATE_TO_INDEX = [0, 1, 2, 2],
+            TOLERANCE = 1,
+            SELECTIONS = {
                 none: null,
                 single: -1,
                 multiple: NaN
@@ -2484,687 +2508,1182 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                 };
             return selection
         }
-        function createEventTriggers(context, trigger, names) {
-            context.raiseHoverChanged = function(handle, state) {
-                trigger(names.hoverChanged, {
-                    target: handle.proxy,
-                    state: state
-                })
-            };
-            context.raiseSelectionChanged = function(handle) {
-                trigger(names.selectionChanged, {target: handle.proxy})
-            }
-        }
-        function EmptyMapItemsSource(){}
-        EmptyMapItemsSource.prototype.count = function() {
+        function EmptySource(){}
+        EmptySource.prototype.count = function() {
             return 0
         };
-        function DeprecatedMapItemsSource(raw) {
+        function ArraySource(raw) {
             this.raw = raw
         }
-        DeprecatedMapItemsSource.prototype.count = function() {
-            return this.raw.length
+        ArraySource.prototype = {
+            constructor: ArraySource,
+            count: function() {
+                return this.raw.length
+            },
+            item: function(index) {
+                return this.raw[index]
+            },
+            geometry: function(item) {
+                return {coordinates: item.coordinates}
+            },
+            attributes: function(item) {
+                return item.attributes
+            }
         };
-        DeprecatedMapItemsSource.prototype.item = function(index) {
-            return this.raw[index]
-        };
-        DeprecatedMapItemsSource.prototype.geometry = function(item) {
-            return {coordinates: item.coordinates}
-        };
-        DeprecatedMapItemsSource.prototype.attributes = function(item) {
-            return item.attributes
-        };
-        function MapItemsSource(raw) {
+        function GeoJsonSource(raw) {
             this.raw = raw
         }
-        MapItemsSource.prototype.count = function() {
-            return this.raw.features.length
+        GeoJsonSource.prototype = {
+            constructor: GeoJsonSource,
+            count: function() {
+                return this.raw.features.length
+            },
+            item: function(index) {
+                return this.raw.features[index]
+            },
+            geometry: function(item) {
+                return item.geometry
+            },
+            attributes: function(item) {
+                return item.properties
+            }
         };
-        MapItemsSource.prototype.item = function(index) {
-            return this.raw.features[index]
-        };
-        MapItemsSource.prototype.geometry = function(item) {
-            return item.geometry
-        };
-        MapItemsSource.prototype.attributes = function(item) {
-            return item.properties
-        };
-        function wrapSource(rawSource) {
-            var sourceType = EmptyMapItemsSource;
-            if (rawSource)
-                if (_isArray(rawSource.features))
-                    sourceType = MapItemsSource;
-                else if (_isArray(rawSource))
-                    sourceType = DeprecatedMapItemsSource;
-            return new sourceType(rawSource)
+        function isGeoJsonObject(obj) {
+            return _isArray(obj.features)
         }
-        var MapItemsManager = DX.Class.inherit({
-                _rootClass: null,
-                ctor: function(parameters) {
-                    var that = this;
-                    that._params = parameters;
-                    that._init();
-                    parameters.projection.on({
-                        project: function() {
-                            that._reproject()
-                        },
-                        transform: function(transform) {
-                            that._transform(transform);
-                            that._relocate()
-                        },
-                        center: function(_, transform) {
-                            that._transform(transform)
-                        },
-                        zoom: function(_, transform) {
-                            that._transform(transform);
-                            that._relocate()
-                        }
-                    })
-                },
-                _init: function() {
-                    var that = this;
-                    that._context = {
-                        renderer: that._params.renderer,
-                        projection: that._params.projection,
-                        dataKey: that._params.dataKey,
-                        selection: null,
-                        getItemSettings: that._createItemSettingsBuilder()
-                    };
-                    that._initRoot();
-                    createEventTriggers(that._context, that._params.eventTrigger, that._eventNames)
-                },
-                _createItemSettingsBuilder: function() {
-                    var that = this;
-                    return function(proxy, settings) {
-                            var result = {};
-                            _each(that._grouping, function(settingField, grouping) {
-                                var value,
-                                    index;
-                                if (_isFinite(value = grouping.callback(proxy)) && (index = findGroupPosition(value, grouping.groups)) >= 0)
-                                    result[settingField] = grouping.groups[index][settingField]
-                            });
-                            return that._getItemSettings(proxy, _extend({}, settings, result))
-                        }
-                },
-                _initRoot: function() {
-                    this._context.root = this._root = this._params.renderer.g().attr({"class": this._rootClass}).linkOn(this._params.container, "mapitems-" + this._dataCategory)
-                },
-                dispose: function() {
-                    var that = this;
-                    that._destroyHandles();
-                    that._params = that._context = that._grouping = null;
-                    that._disposeRoot();
-                    return that
-                },
-                _disposeRoot: function() {
-                    this._root.linkOff();
-                    this._root = null
-                },
-                clean: function() {
-                    var that = this;
-                    that._destroyItems();
-                    that._removeRoot();
-                    that._rendered = false;
-                    return that
-                },
-                _removeRoot: function() {
-                    this._root.linkRemove()
-                },
-                setOptions: function(options) {
-                    var that = this;
-                    that._processOptions(options || {});
-                    that._params.notifyDirty();
-                    that._destroyItems();
-                    that._createItems(that._params.notifyReady);
-                    return that
-                },
-                render: function() {
-                    var that = this;
-                    that._rendered = true;
-                    that._params.notifyDirty();
-                    that._appendRoot();
-                    that._createItems(that._params.notifyReady, true);
-                    return that
-                },
-                _processOptions: function(options) {
-                    var that = this,
-                        settings = that._commonSettings = that._getCommonSettings(options),
-                        context = that._context;
-                    that._customizeCallback = _isFunction(settings.customize) ? settings.customize : $.noop;
-                    context.hover = !!_parseScalar(settings.hoverEnabled, true);
-                    if (context.selection)
-                        _each(context.selection.state, function(_, handle) {
-                            handle && handle.resetSelected()
-                        });
-                    context.selection = getSelection(settings.selectionMode);
-                    that._grouping = {};
-                    that._updateGrouping()
-                },
-                _appendRoot: function() {
-                    this._root.linkAppend()
-                },
-                _destroyItems: function() {
-                    var that = this;
-                    that._clearRoot();
-                    clearTimeout(that._labelsTimeout);
-                    that._rendered && that._handles && _each(that._handles, function(_, handle) {
-                        if (handle.item) {
-                            handle.item.dispose();
-                            handle.item = null
-                        }
-                    })
-                },
-                _clearRoot: function() {
-                    this._root.clear()
-                },
-                _destroyHandles: function() {
-                    var that = this;
-                    that._handles && _each(that._handles, function(_, handle) {
-                        handle.dispose()
-                    });
-                    if (that._context.selection)
-                        that._context.selection.state = {};
-                    that._handles = null
-                },
-                _createHandles: function(source) {
-                    var that = this,
-                        handles = [],
-                        i,
-                        ii = handles.length = source.count(),
-                        context = that._context,
-                        itemType = that._itemType,
-                        initProxy = that._initProxy,
-                        customizeCallback = that._customizeCallback,
-                        geometry = source.geometry,
-                        attributes = source.attributes,
-                        item,
-                        handle,
-                        proxy;
-                    for (i = 0; i < ii; ++i) {
-                        item = source.item(i);
-                        handles[i] = handle = new MapItemHandle(context, geometry(item), attributes(item), i, itemType);
-                        proxy = handle.proxy;
-                        initProxy(proxy, item);
-                        handle.settings = customizeCallback.call(proxy, proxy) || {};
-                        if (handle.settings.isSelected)
-                            proxy.selected(true)
-                    }
-                    that._handles = handles
-                },
-                _createItems: function(notifyReady) {
-                    var that = this,
-                        selectedItems = [],
-                        immediateReady = true;
-                    if (that._rendered && that._handles) {
-                        _each(that._handles, function(_, handle) {
-                            handle.item = that._createItem(handle.proxy).init(that._context, handle.proxy).project().update(handle.settings).locate();
-                            if (handle.proxy.selected())
-                                selectedItems.push(handle.item)
-                        });
-                        _each(selectedItems, function(_, item) {
-                            item.setSelectedState()
-                        });
-                        that._arrangeItems();
-                        if (that._commonSettings.label.enabled) {
-                            immediateReady = false;
-                            clearTimeout(that._labelsTimeout);
-                            that._labelsTimeout = setTimeout(function() {
-                                _each(that._handles, function(_, handle) {
-                                    handle.item.createLabel()
-                                });
-                                notifyReady()
-                            })
-                        }
-                    }
-                    immediateReady && notifyReady()
-                },
-                setData: function(data) {
-                    var that = this;
-                    that._params.notifyDirty();
-                    if (_isString(data))
-                        $.getJSON(data).done(updateSource).fail(function() {
-                            updateSource(null)
-                        });
-                    else
-                        updateSource(data);
-                    return that;
-                    function updateSource(source) {
-                        if (that._rendered)
-                            that._params.tracker.reset();
-                        that._destroyItems();
-                        that._destroyHandles();
-                        that._createHandles(wrapSource(source));
-                        that._createItems(that._params.notifyReady)
-                    }
-                },
-                _transform: function(transform) {
-                    this._root.attr(transform)
-                },
-                _reproject: function() {
-                    this._rendered && this._handles && _each(this._handles, function(_, handle) {
-                        handle.item.project().locate()
-                    })
-                },
-                _relocate: function() {
-                    this._rendered && this._handles && _each(this._handles, function(_, handle) {
-                        handle.item.locate()
-                    })
-                },
-                hoverItem: function(index, state) {
-                    this._handles[index].setHovered(state);
-                    return this
-                },
-                selectItem: function(index, state, noCallback) {
-                    this._handles[index].setSelected(state, noCallback);
-                    return this
-                },
-                clearSelection: function() {
-                    var selection = this._context.selection;
-                    if (selection) {
-                        _each(selection.state, function(_, handle) {
-                            handle && handle.setSelected(false)
-                        });
-                        selection.state = {}
-                    }
-                    return this
-                },
-                raiseClick: function(index, $event) {
-                    this._params.eventTrigger(this._eventNames.click, {
-                        target: this._handles[index].proxy,
-                        jQueryEvent: $event
-                    });
-                    return this
-                },
-                getProxyItems: function() {
-                    return _map(this._handles, function(handle) {
-                            return handle.proxy
-                        })
-                },
-                getProxyItem: function(index) {
-                    return this._handles[index].proxy
-                },
-                _performGrouping: function(partition, settingField, valueCallback, valuesCallback) {
-                    var groups = createGroups(partition),
-                        values;
-                    if (groups) {
-                        values = valuesCallback(groups.length);
-                        _each(groups, function(i, group) {
-                            group.index = i;
-                            group[settingField] = values[i]
-                        });
-                        this._grouping[settingField] = {
-                            callback: valueCallback,
-                            groups: groups
-                        }
-                    }
-                    else {
-                        delete this._grouping[settingField];
-                        groups = []
-                    }
-                    this._params.dataExchanger.set(this._dataCategory, settingField, groups)
-                },
-                _groupByColor: function(colorGroups, palette, valueCallback) {
-                    var that = this;
-                    that._performGrouping(colorGroups, "color", valueCallback, function(count) {
-                        var _palette = that._params.themeManager.createGradientPalette(palette, count),
-                            i = 0,
-                            list = [];
-                        for (; i < count; ++i)
-                            list.push(_palette.getColor(i));
-                        return list
+        function unwrapFromDataSource(source) {
+            var sourceType;
+            if (source)
+                if (isGeoJsonObject(source))
+                    sourceType = GeoJsonSource;
+                else if (source.length === 1 && source[0] && isGeoJsonObject(source[0])) {
+                    sourceType = GeoJsonSource;
+                    source = source[0]
+                }
+                else if (_isArray(source))
+                    sourceType = ArraySource;
+            sourceType = sourceType || EmptySource;
+            return new sourceType(source)
+        }
+        function wrapToDataSource(option) {
+            return option ? isGeoJsonObject(option) ? [option] : option : []
+        }
+        function customizeHandles(proxies, callback, widget) {
+            callback.call(widget, proxies)
+        }
+        function customizeHandles_deprecated(proxies, callback) {
+            var i,
+                ii = proxies.length,
+                proxy,
+                settings;
+            for (i = 0; i < ii; ++i) {
+                proxy = proxies[i];
+                settings = callback.call(proxy, proxy) || {};
+                proxy.applySettings(settings);
+                if (settings.isSelected)
+                    proxy.selected(true)
+            }
+        }
+        function patchProxies(handles, name, data) {
+            var type = {
+                    areas: "area",
+                    markers: "marker"
+                }[name],
+                i,
+                ii = handles.length,
+                dataItem;
+            for (i = 0; i < ii; ++i)
+                handles[i].proxy.type = type;
+            if (type === "marker")
+                for (i = 0; i < ii; ++i) {
+                    dataItem = data.item(i);
+                    _extend(handles[i].proxy, {
+                        text: dataItem.text,
+                        value: dataItem.value,
+                        values: dataItem.values,
+                        url: dataItem.url
                     })
                 }
-            });
-        MapItemsManager.prototype.TEST_getContext = function() {
-            return this._context
+        }
+        function setAreaLabelVisibility(label) {
+            label.text.attr({visibility: label.size[0] / label.spaceSize[0] < TOLERANCE && label.size[1] / label.spaceSize[1] < TOLERANCE ? null : "hidden"})
+        }
+        function setLineLabelVisibility(label) {
+            label.text.attr({visibility: label.size[0] / label.spaceSize[0] < TOLERANCE || label.size[1] / label.spaceSize[1] < TOLERANCE ? null : "hidden"})
+        }
+        function getDataValue(proxy, dataField, deprecatedField) {
+            return proxy.attribute(dataField) || proxy[deprecatedField]
+        }
+        var TYPE_TO_TYPE_MAP = {
+                Point: TYPE_MARKER,
+                MultiPoint: TYPE_LINE,
+                LineString: TYPE_LINE,
+                MultiLineString: TYPE_LINE,
+                Polygon: TYPE_AREA,
+                MultiPolygon: TYPE_AREA
+            };
+        function guessTypeByData(sample) {
+            var type = TYPE_TO_TYPE_MAP[sample.type],
+                coordinates = sample.coordinates;
+            if (!type)
+                if (typeof coordinates[0] === "number")
+                    type = TYPE_MARKER;
+                else if (typeof coordinates[0][0] === "number")
+                    type = TYPE_LINE;
+                else
+                    type = TYPE_AREA;
+            return type
+        }
+        var selectStrategy = function(options, data) {
+                var type = _normalizeEnum(options.type),
+                    elementType = _normalizeEnum(options.elementType),
+                    sample,
+                    strategy = _extend({}, emptyStrategy);
+                if (data.count() > 0) {
+                    sample = data.geometry(data.item(0));
+                    type = strategiesByType[type] ? type : guessTypeByData(sample);
+                    _extend(strategy, strategiesByType[type]);
+                    strategy.fullType = strategy.type = type;
+                    if (strategiesByGeometry[type])
+                        _extend(strategy, strategiesByGeometry[type](sample));
+                    if (strategiesByElementType[type]) {
+                        elementType = strategiesByElementType[type][elementType] ? elementType : strategiesByElementType[type]._default;
+                        _extend(strategy, strategiesByElementType[type][elementType]);
+                        strategy.elementType = elementType;
+                        strategy.fullType += ":" + elementType
+                    }
+                }
+                return strategy
+            };
+        function applyElementState(figure, styles, state, field) {
+            figure[field].attr(styles[field][state])
+        }
+        var emptyStrategy = {
+                setup: _noop,
+                reset: _noop,
+                arrange: _noop,
+                updateGrouping: _noop
+            };
+        var strategiesByType = {};
+        strategiesByType[TYPE_AREA] = {
+            projectLabel: projectAreaLabel,
+            transform: transformPointList,
+            transformLabel: transformAreaLabel,
+            draw: function(context, figure, data) {
+                figure.root = context.renderer.path([], "area").data(context.dataKey, data)
+            },
+            refresh: _noop,
+            getLabelOffset: function(label) {
+                setAreaLabelVisibility(label);
+                return [0, 0]
+            },
+            getStyles: function(settings) {
+                var color = settings.color || null,
+                    borderColor = settings.borderColor || null,
+                    borderWidth = settings.borderWidth || null,
+                    opacity = settings.opacity || null;
+                return {root: [{
+                                "class": "dxm-area",
+                                stroke: borderColor,
+                                "stroke-width": borderWidth,
+                                fill: color,
+                                opacity: opacity
+                            }, {
+                                "class": "dxm-area dxm-area-hovered",
+                                stroke: settings.hoveredBorderColor || borderColor,
+                                "stroke-width": settings.hoveredBorderWidth || borderWidth,
+                                fill: settings.hoveredColor || color,
+                                opacity: settings.hoveredOpacity || opacity
+                            }, {
+                                "class": "dxm-area dxm-area-selected",
+                                stroke: settings.selectedBorderColor || borderColor,
+                                "stroke-width": settings.selectedBorderWidth || borderWidth,
+                                fill: settings.selectedColor || color,
+                                opacity: settings.selectedOpacity || opacity
+                            }]}
+            },
+            setState: function(figure, styles, state) {
+                applyElementState(figure, styles, state, "root")
+            },
+            hasLabelsGroup: true,
+            updateGrouping: function(context) {
+                groupByColor(context)
+            }
         };
-        MapItemsManager.prototype.TEST_performGrouping = MapItemsManager.prototype._performGrouping;
-        MapItemsManager.prototype.TEST_groupByColor = MapItemsManager.prototype._groupByColor;
-        DX.viz.map._internal.mapItemBehavior = {
-            init: function(ctx, proxy) {
-                var that = this;
-                that._ctx = ctx;
-                that._data = {
-                    index: proxy.index,
-                    type: proxy.type
-                };
-                that._proxy = proxy;
-                that._root = that._createRoot().append(that._ctx.root);
-                return that
+        strategiesByType[TYPE_LINE] = {
+            projectLabel: projectLineLabel,
+            transform: transformPointList,
+            transformLabel: transformLineLabel,
+            draw: function(context, figure, data) {
+                figure.root = context.renderer.path([], "line").data(context.dataKey, data)
             },
-            dispose: function() {
-                disposeItem(this);
-                return this
+            refresh: _noop,
+            getLabelOffset: function(label) {
+                setLineLabelVisibility(label);
+                return [0, 0]
             },
-            project: function() {
-                var that = this;
-                that._coords = that._project(that._ctx.projection, that._proxy.geometry());
-                return this
+            getStyles: function(settings) {
+                var color = settings.color || settings.borderColor || null,
+                    width = settings.borderWidth || null,
+                    opacity = settings.opacity || null;
+                return {root: [{
+                                "class": "dxm-line",
+                                stroke: color,
+                                "stroke-width": width,
+                                opacity: opacity
+                            }, {
+                                "class": "dxm-line dxm-line-hovered",
+                                stroke: settings.hoveredColor || settings.hoveredBorderColor || color,
+                                "stroke-width": settings.hoveredBorderWidth || width,
+                                opacity: settings.hoveredOpacity || opacity
+                            }, {
+                                "class": "dxm-line dxm-line-selected",
+                                stroke: settings.selectedColor || settings.selectedBorderColor || color,
+                                "stroke-width": settings.selectedBorderWidth || width,
+                                opacity: settings.selectedOpacity || opacity
+                            }]}
             },
-            locate: function() {
-                var that = this;
-                that._locate(that._transform(that._ctx.projection, that._coords));
-                that._label && that._label.value && that._locateLabel();
-                return that
+            setState: function(figure, styles, state) {
+                applyElementState(figure, styles, state, "root")
             },
-            update: function(settings) {
-                var that = this;
-                that._settings = that._ctx.getItemSettings(that._proxy, settings);
-                that._update(that._settings);
-                that._label && that._updateLabel();
-                return that
+            hasLabelsGroup: true,
+            updateGrouping: function(context) {
+                groupByColor(context)
+            }
+        };
+        strategiesByType[TYPE_MARKER] = {
+            project: projectPoint,
+            transform: transformPoint,
+            draw: function(context, figure, data) {
+                figure.root = context.renderer.g();
+                this._draw(context, figure, data)
             },
-            createLabel: function() {
-                var that = this;
-                that._label = {
-                    root: that._createLabelRoot(),
-                    text: that._ctx.renderer.text(),
-                    tracker: that._ctx.renderer.rect().attr({
-                        stroke: "none",
-                        "stroke-width": 0,
-                        fill: "#000000",
-                        opacity: 0.0001
-                    }).data(that._ctx.dataKey, that._data)
-                };
-                that._updateLabel();
-                return that
+            refresh: _noop,
+            hasLabelsGroup: false,
+            getLabelOffset: function(label, settings) {
+                return [_round((label.size[0] + _max(settings.size || 0, 0)) / 2) + 2, 0]
             },
-            _updateLabel: function() {
-                var that = this,
-                    settings = that._settings.label;
-                that._label.value = String(this._proxy.text || this._proxy.attribute(this._settings.label.dataField) || "");
-                if (that._label.value) {
-                    that._label.text.attr({
-                        text: that._label.value,
-                        x: 0,
-                        y: 0
-                    }).css(_patchFontOptions(settings.font)).attr({
-                        align: "center",
-                        stroke: settings.stroke,
-                        "stroke-width": settings["stroke-width"],
-                        "stroke-opacity": settings["stroke-opacity"]
-                    }).append(that._label.root);
-                    that._label.tracker.append(that._label.root);
-                    that._adjustLabel();
-                    that._locateLabel()
+            getStyles: function(settings) {
+                var styles = {root: [{"class": "dxm-marker"}, {"class": "dxm-marker dxm-marker-hovered"}, {"class": "dxm-marker dxm-marker-selected"}]};
+                this._getStyles(styles, settings);
+                return styles
+            },
+            setState: function(figure, styles, state) {
+                applyElementState(figure, styles, state, "root");
+                this._setState(figure, styles, state)
+            },
+            updateGrouping: function(context) {
+                groupByColor(context);
+                groupBySize(context)
+            }
+        };
+        var strategiesByGeometry = {};
+        strategiesByGeometry[TYPE_AREA] = function(sample) {
+            var coordinates = sample.coordinates;
+            return {project: coordinates[0] && coordinates[0][0] && coordinates[0][0][0] && typeof coordinates[0][0][0][0] === "number" ? projectMultiPolygon : projectPolygon}
+        };
+        strategiesByGeometry[TYPE_LINE] = function(sample) {
+            var coordinates = sample.coordinates;
+            return {project: coordinates[0] && coordinates[0][0] && typeof coordinates[0][0][0] === "number" ? projectPolygon : projectLineString}
+        };
+        var strategiesByElementType = {};
+        strategiesByElementType[TYPE_MARKER] = {
+            _default: "dot",
+            dot: {
+                setup: function(context) {
+                    context.filter = context.renderer.shadowFilter("-40%", "-40%", "180%", "200%", 0, 1, 1, "#000000", 0.2)
+                },
+                reset: function(context) {
+                    context.filter.dispose();
+                    context.filter = null
+                },
+                _draw: function(ctx, figure, data) {
+                    figure.back = ctx.renderer.circle().sharp().data(ctx.dataKey, data).append(figure.root);
+                    figure.dot = ctx.renderer.circle().sharp().data(ctx.dataKey, data).append(figure.root)
+                },
+                refresh: function(ctx, figure, data, proxy, settings) {
+                    figure.dot.attr({filter: settings.shadow ? ctx.filter.ref : null})
+                },
+                _getStyles: function(styles, style) {
+                    var size = style.size > 0 ? _Number(style.size) : 0,
+                        hoveredSize = size,
+                        selectedSize = size + (style.selectedStep > 0 ? _Number(style.selectedStep) : 0),
+                        hoveredBackSize = hoveredSize + (style.backStep > 0 ? _Number(style.backStep) : 0),
+                        selectedBackSize = selectedSize + (style.backStep > 0 ? _Number(style.backStep) : 0),
+                        color = style.color || null,
+                        borderColor = style.borderColor || null,
+                        borderWidth = style.borderWidth || null,
+                        opacity = style.opacity || null,
+                        backColor = style.backColor || null,
+                        backOpacity = style.backOpacity || null;
+                    styles.dot = [{
+                            r: size / 2,
+                            stroke: borderColor,
+                            "stroke-width": borderWidth,
+                            fill: color,
+                            opacity: opacity
+                        }, {
+                            r: hoveredSize / 2,
+                            stroke: style.hoveredBorderColor || borderColor,
+                            "stroke-width": style.hoveredBorderWidth || borderWidth,
+                            fill: style.hoveredColor || color,
+                            opacity: style.hoveredOpacity || opacity
+                        }, {
+                            r: selectedSize / 2,
+                            stroke: style.selectedBorderColor || borderColor,
+                            "stroke-width": style.selectedBorderWidth || borderWidth,
+                            fill: style.selectedColor || color,
+                            opacity: style.selectedOpacity || opacity
+                        }];
+                    styles.back = [{
+                            r: size / 2,
+                            stroke: "none",
+                            "stroke-width": 0,
+                            fill: backColor,
+                            opacity: backOpacity
+                        }, {
+                            r: hoveredBackSize / 2,
+                            stroke: "none",
+                            "stroke-width": 0,
+                            fill: backColor,
+                            opacity: backOpacity
+                        }, {
+                            r: selectedBackSize / 2,
+                            stroke: "none",
+                            "stroke-width": 0,
+                            fill: backColor,
+                            opacity: backOpacity
+                        }]
+                },
+                _setState: function(figure, styles, state) {
+                    applyElementState(figure, styles, state, "dot");
+                    applyElementState(figure, styles, state, "back")
+                }
+            },
+            bubble: {
+                _draw: function(ctx, figure, data) {
+                    figure.bubble = ctx.renderer.circle().sharp().data(ctx.dataKey, data).append(figure.root)
+                },
+                refresh: function(ctx, figure, data, proxy, settings) {
+                    figure.bubble.attr({r: settings.size / 2})
+                },
+                _getStyles: function(styles, style) {
+                    var color = style.color || null,
+                        borderColor = style.borderColor || null,
+                        borderWidth = style.borderWidth || null,
+                        opacity = style.opacity || null;
+                    styles.bubble = [{
+                            stroke: borderColor,
+                            "stroke-width": borderWidth,
+                            fill: color,
+                            opacity: opacity
+                        }, {
+                            stroke: style.hoveredBorderColor || borderColor,
+                            "stroke-width": style.hoveredBorderWidth || borderWidth,
+                            fill: style.hoveredColor || style.color,
+                            opacity: style.hoveredOpacity || opacity
+                        }, {
+                            stroke: style.selectedBorderColor || borderColor,
+                            "stroke-width": style.selectedBorderWidth || borderWidth,
+                            fill: style.selectedColor || style.color,
+                            opacity: style.selectedOpacity || opacity
+                        }]
+                },
+                _setState: function(figure, styles, state) {
+                    applyElementState(figure, styles, state, "bubble")
+                },
+                arrange: function(context, handles) {
+                    var values = [],
+                        i,
+                        ii = values.length = handles.length,
+                        settings = context.settings,
+                        dataField = settings.dataField,
+                        minSize = settings.minSize > 0 ? _Number(settings.minSize) : 0,
+                        maxSize = settings.maxSize > minSize ? _Number(settings.maxSize) : minSize,
+                        minValue,
+                        maxValue,
+                        deltaValue,
+                        deltaSize;
+                    if (settings.sizeGroups)
+                        return;
+                    for (i = 0; i < ii; ++i)
+                        values[i] = _max(getDataValue(handles[i].proxy, dataField, "value") || 0, 0);
+                    minValue = _min.apply(null, values);
+                    maxValue = _max.apply(null, values);
+                    deltaValue = maxValue - minValue || 1;
+                    deltaSize = maxSize - minSize;
+                    for (i = 0; i < ii; ++i)
+                        handles[i]._settings.size = minSize + deltaSize * (values[i] - minValue) / deltaValue
+                },
+                updateGrouping: function(context) {
+                    var dataField = context.settings.dataField;
+                    strategiesByType[TYPE_MARKER].updateGrouping(context);
+                    groupBySize(context, function(proxy) {
+                        return getDataValue(proxy, dataField, "value")
+                    })
+                }
+            },
+            pie: {
+                _draw: function(ctx, figure, data) {
+                    figure.pie = ctx.renderer.g().append(figure.root);
+                    figure.border = ctx.renderer.circle().sharp().data(ctx.dataKey, data).append(figure.root)
+                },
+                refresh: function(ctx, figure, data, proxy, settings) {
+                    var values = getDataValue(proxy, ctx.settings.dataField, "values") || [],
+                        i,
+                        ii = values.length || 0,
+                        colors = settings._colors,
+                        sum = 0,
+                        pie = figure.pie,
+                        renderer = ctx.renderer,
+                        dataKey = ctx.dataKey,
+                        r = (settings.size > 0 ? _Number(settings.size) : 0) / 2,
+                        start = 90,
+                        end = start;
+                    for (i = 0; i < ii; ++i)
+                        sum += values[i] || 0;
+                    for (i = 0; i < ii; ++i) {
+                        start = end;
+                        end += (values[i] || 0) / sum * 360;
+                        renderer.arc(0, 0, 0, r, start, end).attr({
+                            "stroke-linejoin": "round",
+                            fill: colors[i]
+                        }).data(dataKey, data).append(pie)
+                    }
+                    figure.border.attr({r: r})
+                },
+                _getStyles: function(styles, style) {
+                    var opacity = style.opacity || null,
+                        borderColor = style.borderColor || null,
+                        borderWidth = style.borderWidth || null;
+                    styles.pie = [{opacity: opacity}, {opacity: style.hoveredOpacity || opacity}, {opacity: style.selectedOpacity || opacity}];
+                    styles.border = [{
+                            stroke: borderColor,
+                            "stroke-width": borderWidth
+                        }, {
+                            stroke: style.hoveredBorderColor || borderColor,
+                            "stroke-width": style.hoveredBorderWidth || borderWidth
+                        }, {
+                            stroke: style.selectedBorderColor || borderColor,
+                            "stroke-width": style.selectedBorderWidth || borderWidth
+                        }]
+                },
+                _setState: function(figure, styles, state) {
+                    applyElementState(figure, styles, state, "pie");
+                    applyElementState(figure, styles, state, "border")
+                },
+                arrange: function(context, handles) {
+                    var i,
+                        ii = handles.length,
+                        dataField = context.settings.dataField,
+                        values,
+                        count = 0,
+                        palette;
+                    for (i = 0; i < ii; ++i) {
+                        values = getDataValue(handles[i].proxy, dataField, "values");
+                        if (values && values.length > count)
+                            count = values.length
+                    }
+                    if (count > 0) {
+                        values = [];
+                        palette = context.params.themeManager.createPalette(context.settings.palette, {useHighlight: true});
+                        for (i = 0; i < count; ++i)
+                            values.push(palette.getNextColor());
+                        context.settings._colors = values;
+                        context.grouping.color = {
+                            callback: _noop,
+                            field: "",
+                            partition: [],
+                            values: []
+                        };
+                        context.params.dataExchanger.set(context.name, "color", {
+                            partition: [],
+                            values: values
+                        })
+                    }
+                }
+            },
+            image: {
+                _draw: function(ctx, figure, data) {
+                    figure.image = ctx.renderer.image().attr({location: "center"}).data(ctx.dataKey, data).append(figure.root)
+                },
+                refresh: function(ctx, figure, data, proxy, settings) {
+                    figure.image.attr({href: getDataValue(proxy, ctx.settings.dataField, "url")})
+                },
+                _getStyles: function(styles, style) {
+                    var size = style.size > 0 ? _Number(style.size) : 0,
+                        hoveredSize = size + (style.hoveredStep > 0 ? _Number(style.hoveredStep) : 0),
+                        selectedSize = size + (style.selectedStep > 0 ? _Number(style.selectedStep) : 0),
+                        opacity = style.opacity || null;
+                    styles.image = [{
+                            x: -size / 2,
+                            y: -size / 2,
+                            width: size,
+                            height: size,
+                            opacity: opacity
+                        }, {
+                            x: -hoveredSize / 2,
+                            y: -hoveredSize / 2,
+                            width: hoveredSize,
+                            height: hoveredSize,
+                            opacity: style.hoveredOpacity || opacity
+                        }, {
+                            x: -selectedSize / 2,
+                            y: -selectedSize / 2,
+                            width: selectedSize,
+                            height: selectedSize,
+                            opacity: style.selectedOpacity || opacity
+                        }]
+                },
+                _setState: function(figure, styles, state) {
+                    applyElementState(figure, styles, state, "image")
                 }
             }
         };
-        var MapItemHandle = function(context, geometry, attributes, index, type) {
-                var handle = this;
-                handle._ctx = context;
-                handle._idx = index;
-                handle._hovered = handle._selected = false;
-                attributes = _extend({}, attributes);
-                handle.proxy = {
+        function projectPoint(projection, coordinates) {
+            return projection.project(coordinates)
+        }
+        function projectPointList(projection, coordinates) {
+            var output = [],
+                i,
+                ii = output.length = coordinates.length;
+            for (i = 0; i < ii; ++i)
+                output[i] = projection.project(coordinates[i]);
+            return output
+        }
+        function projectLineString(projection, coordinates) {
+            return [projectPointList(projection, coordinates)]
+        }
+        function projectPolygon(projection, coordinates) {
+            var output = [],
+                i,
+                ii = output.length = coordinates.length;
+            for (i = 0; i < ii; ++i)
+                output[i] = projectPointList(projection, coordinates[i]);
+            return output
+        }
+        function projectMultiPolygon(projection, coordinates) {
+            var output = [],
+                i,
+                ii = output.length = coordinates.length;
+            for (i = 0; i < ii; ++i)
+                output[i] = projectPolygon(projection, coordinates[i]);
+            return _concat.apply([], output)
+        }
+        function transformPoint(content, projection, coordinates) {
+            var data = projection.transform(coordinates);
+            content.root.attr({
+                translateX: data[0],
+                translateY: data[1]
+            })
+        }
+        function transformList(projection, coordinates) {
+            var output = [],
+                i,
+                ii = output.length = coordinates.length;
+            for (i = 0; i < ii; ++i)
+                output[i] = projection.transform(coordinates[i]);
+            return output
+        }
+        function transformPointList(content, projection, coordinates) {
+            var output = [],
+                i,
+                ii = output.length = coordinates.length;
+            for (i = 0; i < ii; ++i)
+                output[i] = transformList(projection, coordinates[i]);
+            content.root.attr({points: output})
+        }
+        function transformAreaLabel(label, projection, coordinates) {
+            var data = projection.transform(coordinates[0]);
+            label.spaceSize = projection.getSquareSize(coordinates[1]);
+            label.text.attr({
+                translateX: data[0],
+                translateY: data[1]
+            });
+            setAreaLabelVisibility(label)
+        }
+        function transformLineLabel(label, projection, coordinates) {
+            var data = projection.transform(coordinates[0]);
+            label.spaceSize = projection.getSquareSize(coordinates[1]);
+            label.text.attr({
+                translateX: data[0],
+                translateY: data[1]
+            });
+            setLineLabelVisibility(label)
+        }
+        function getItemSettings(context, proxy, settings) {
+            var result = combineSettings(context.settings, settings);
+            proxy.text = proxy.text || settings.text;
+            applyGrouping(context.grouping, proxy, result);
+            if (settings.color === undefined && settings.paletteIndex >= 0)
+                result.color = result._colors[settings.paletteIndex];
+            return result
+        }
+        function applyGrouping(grouping, proxy, settings) {
+            _each(grouping, function(name, data) {
+                var index = findGroupingIndex(data.callback(proxy, data.field), data.partition);
+                if (index >= 0)
+                    settings[name] = data.values[index]
+            })
+        }
+        function findGroupingIndex(value, partition) {
+            var start = 0,
+                end = partition.length - 1,
+                index = -1,
+                middle;
+            if (partition[start] <= value && value <= partition[end])
+                if (value === partition[end])
+                    index = end - 1;
+                else {
+                    while (end - start > 1) {
+                        middle = start + end >> 1;
+                        if (value < partition[middle])
+                            end = middle;
+                        else
+                            start = middle
+                    }
+                    index = start
+                }
+            return index
+        }
+        function raiseChanged(context, handle, state, name) {
+            context.params.eventTrigger(name, {
+                target: handle.proxy,
+                state: state
+            })
+        }
+        function combineSettings(common, partial) {
+            var obj = _extend({}, common, partial);
+            obj.label = _extend({}, common.label, obj.label);
+            obj.label.font = _extend({}, common.label.font, obj.label.font);
+            return obj
+        }
+        function processCommonSettings(type, options, themeManager) {
+            var settings = combineSettings(themeManager.theme("layer:" + type) || {label: {}}, options),
+                colors,
+                i,
+                palette;
+            if (settings.paletteSize > 0) {
+                palette = themeManager.createGradientPalette(settings.palette, settings.paletteSize);
+                for (i = 0, colors = []; i < settings.paletteSize; ++i)
+                    colors.push(palette.getColor(i));
+                settings._colors = colors
+            }
+            return settings
+        }
+        function valueCallback(proxy, dataField) {
+            return proxy.attribute(dataField)
+        }
+        var performGrouping = function(context, partition, settingField, dataField, valuesCallback) {
+                var values;
+                if (dataField && partition && partition.length > 1) {
+                    values = valuesCallback(partition.length - 1);
+                    context.grouping[settingField] = {
+                        callback: _isFunction(dataField) ? dataField : valueCallback,
+                        field: dataField,
+                        partition: partition,
+                        values: values
+                    };
+                    context.params.dataExchanger.set(context.name, settingField, {
+                        partition: partition,
+                        values: values
+                    })
+                }
+            };
+        function dropGrouping(context) {
+            var name = context.name,
+                dataExchanger = context.params.dataExchanger;
+            _each(context.grouping, function(field) {
+                dataExchanger.set(name, field, null)
+            });
+            context.grouping = {}
+        }
+        var groupByColor = function(context) {
+                performGrouping(context, context.settings.colorGroups, "color", context.settings.colorGroupingField, function(count) {
+                    var _palette = context.params.themeManager.createGradientPalette(context.settings.palette, count),
+                        i,
+                        list = [];
+                    for (i = 0; i < count; ++i)
+                        list.push(_palette.getColor(i));
+                    return list
+                })
+            };
+        var groupBySize = function(context, valueCallback) {
+                var settings = context.settings;
+                performGrouping(context, settings.sizeGroups, "size", valueCallback || settings.sizeGroupingField, function(count) {
+                    var minSize = settings.minSize > 0 ? _Number(settings.minSize) : 0,
+                        maxSize = settings.maxSize >= minSize ? _Number(settings.maxSize) : 0,
+                        i = 0,
+                        sizes = [];
+                    if (count > 1)
+                        for (i = 0; i < count; ++i)
+                            sizes.push((minSize * (count - i - 1) + maxSize * i) / (count - 1));
+                    else if (count === 1)
+                        sizes.push((minSize + maxSize) / 2);
+                    return sizes
+                })
+            };
+        function setFlag(flags, flag, state) {
+            if (state)
+                flags |= flag;
+            else
+                flags &= ~flag;
+            return flags
+        }
+        function hasFlag(flags, flag) {
+            return !!(flags & flag)
+        }
+        function createLayerProxy(layer, name, index) {
+            var proxy = {
                     index: index,
-                    type: type,
-                    geometry: function() {
-                        return geometry
+                    name: name,
+                    getElements: function() {
+                        return layer.getProxies()
                     },
+                    clearSelection: function(_noEvent) {
+                        layer.clearSelection(_noEvent);
+                        return proxy
+                    }
+                };
+            return proxy
+        }
+        var MapLayer = function(params, container, name, index) {
+                var that = this;
+                that._params = params;
+                that._onProjection();
+                that.proxy = createLayerProxy(that, name, index);
+                that._context = {
+                    name: name,
+                    layer: that.proxy,
+                    renderer: params.renderer,
+                    projection: params.projection,
+                    params: params,
+                    dataKey: params.dataKey,
+                    str: emptyStrategy,
+                    hover: false,
+                    selection: null,
+                    grouping: {},
+                    root: params.renderer.g().attr({"class": "dxm-layer"}).linkOn(container, name).linkAppend()
+                };
+                that._container = container;
+                that._dataSource = new DX.viz.DataSource(function() {
+                    that._data = unwrapFromDataSource(that._dataSource.items());
+                    that._update(true)
+                });
+                that._options = {};
+                that._handles = [];
+                that._data = new EmptySource
+            };
+        MapLayer.prototype = {
+            constructor: MapLayer,
+            _onProjection: function() {
+                var that = this;
+                that._removeHandlers = that._params.projection.on({
+                    project: function() {
+                        that._project()
+                    },
+                    transform: function() {
+                        that._transform()
+                    },
+                    center: function() {
+                        that._transformCore()
+                    },
+                    zoom: function() {
+                        that._transform()
+                    }
+                })
+            },
+            _offProjection: function() {
+                this._removeHandlers();
+                this._removeHandlers = null
+            },
+            dispose: function() {
+                var that = this;
+                that._dataSource.dispose();
+                that._destroyHandles();
+                dropGrouping(that._context);
+                that._context.root.linkRemove().linkOff();
+                that._context.labelRoot && that._context.labelRoot.linkRemove().linkOff();
+                that._context.str.reset(that._context);
+                that._offProjection();
+                that._params = that._container = that._context = that._dataSource = that.proxy = null;
+                return that
+            },
+            TESTS_getContext: function() {
+                return this._context
+            },
+            setOptions: function(options) {
+                var that = this;
+                options = that._options = options || {};
+                if ("data" in options && options.data !== that._options_data) {
+                    that._options_data = options.data;
+                    that._params.notifyDirty();
+                    that._dataSource.update(wrapToDataSource(options.data))
+                }
+                else if (that._data.count() > 0) {
+                    that._params.notifyDirty();
+                    that._update(options.type !== undefined && options.type !== that._context.str.type || options.elementType !== undefined && options.elementType !== that._context.str.elementType)
+                }
+            },
+            _update: function(isContextChanged) {
+                var that = this,
+                    context = that._context;
+                if (isContextChanged) {
+                    context.str.reset(context);
+                    context.root.clear();
+                    context.labelRoot && context.labelRoot.clear();
+                    that._params.tracker.reset();
+                    that._destroyHandles();
+                    context.str = selectStrategy(that._options, that._data);
+                    context.str.setup(context);
+                    that.proxy.type = context.str.type;
+                    that.proxy.elementType = context.str.elementType
+                }
+                context.settings = processCommonSettings(context.str.fullType, that._options, that._params.themeManager);
+                context.hasSeparateLabel = !!(context.settings.label.enabled && context.str.hasLabelsGroup);
+                context.hover = !!_parseScalar(context.settings.hoverEnabled, true);
+                if (context.selection)
+                    _each(context.selection.state, function(_, handle) {
+                        handle && handle.resetSelected()
+                    });
+                context.selection = getSelection(context.settings.selectionMode);
+                if (context.hasSeparateLabel) {
+                    if (!context.labelRoot) {
+                        context.labelRoot = context.renderer.g().attr({"class": "dxm-layer-labels"}).linkOn(that._container, {
+                            name: context.name + "-labels",
+                            after: context.name
+                        }).linkAppend();
+                        that._transformCore()
+                    }
+                }
+                else if (context.labelRoot) {
+                    context.labelRoot.linkRemove().linkOff();
+                    context.labelRoot = null
+                }
+                if (isContextChanged)
+                    that._createHandles();
+                dropGrouping(context);
+                context.str.arrange(context, that._handles);
+                context.str.updateGrouping(context);
+                that._updateHandles();
+                that._params.notifyReady()
+            },
+            _destroyHandles: function() {
+                var handles = this._handles,
+                    i,
+                    ii = handles.length;
+                for (i = 0; i < ii; ++i)
+                    handles[i].dispose();
+                if (this._context.selection)
+                    this._context.selection.state = {};
+                this._handles = []
+            },
+            _createHandles: function() {
+                var that = this,
+                    handles = that._handles = [],
+                    data = that._data,
+                    i,
+                    ii = handles.length = data.count(),
+                    context = that._context,
+                    geometry = data.geometry,
+                    attributes = data.attributes,
+                    handle,
+                    dataItem;
+                for (i = 0; i < ii; ++i) {
+                    dataItem = data.item(i);
+                    handles[i] = new MapLayerElement(context, i, geometry(dataItem), attributes(dataItem))
+                }
+                if (_isFunction(that._options.customize))
+                    (that._options._deprecated ? customizeHandles_deprecated : customizeHandles)(that.getProxies(), that._options.customize, that._params.widget);
+                if (that._options._deprecated)
+                    patchProxies(handles, context.name, data);
+                for (i = 0; i < ii; ++i) {
+                    handle = handles[i];
+                    handle.project();
+                    handle.draw();
+                    handle.transform()
+                }
+                if (context.selection)
+                    _each(context.selection.state, function(_, handle) {
+                        handle && handle.restoreSelected()
+                    })
+            },
+            _updateHandles: function() {
+                var handles = this._handles,
+                    i,
+                    ii = handles.length;
+                for (i = 0; i < ii; ++i)
+                    handles[i].refresh();
+                if (this._context.settings.label.enabled) {
+                    for (i = 0; i < ii; ++i)
+                        handles[i].measureLabel();
+                    for (i = 0; i < ii; ++i)
+                        handles[i].adjustLabel()
+                }
+            },
+            _transformCore: function() {
+                var transform = this._params.projection.getTransform();
+                this._context.root.attr(transform);
+                this._context.labelRoot && this._context.labelRoot.attr(transform)
+            },
+            _project: function() {
+                var handles = this._handles,
+                    i,
+                    ii = handles.length;
+                for (i = 0; i < ii; ++i)
+                    handles[i].project();
+                this._transformHandles()
+            },
+            _transformHandles: function() {
+                var handles = this._handles,
+                    i,
+                    ii = handles.length;
+                for (i = 0; i < ii; ++i)
+                    handles[i].transform()
+            },
+            _transform: function() {
+                this._transformCore();
+                this._transformHandles()
+            },
+            getProxies: function() {
+                var handles = this._handles,
+                    proxies = [],
+                    i,
+                    ii = proxies.length = handles.length;
+                for (i = 0; i < ii; ++i)
+                    proxies[i] = handles[i].proxy;
+                return proxies
+            },
+            getProxy: function(index) {
+                return this._handles[index].proxy
+            },
+            raiseClick: function(i, jQueryEvent) {
+                this._params.eventTrigger("click", {
+                    target: this._handles[i].proxy,
+                    jQueryEvent: jQueryEvent
+                })
+            },
+            hoverItem: function(i, state) {
+                this._handles[i].setHovered(state)
+            },
+            selectItem: function(i, state, _noEvent) {
+                this._handles[i].setSelected(state, _noEvent)
+            },
+            clearSelection: function() {
+                var selection = this._context.selection;
+                if (selection) {
+                    _each(selection.state, function(_, handle) {
+                        handle && handle.setSelected(false)
+                    });
+                    selection.state = {}
+                }
+            }
+        };
+        function createProxy(handle, coords, attrs) {
+            var proxy = {
                     coordinates: function() {
-                        return geometry.coordinates
+                        return coords
                     },
                     attribute: function(name, value) {
                         if (arguments.length > 1) {
-                            attributes[name] = value;
-                            return this
+                            attrs[name] = value;
+                            return proxy
                         }
                         else
-                            return arguments.length > 0 ? attributes[name] : attributes
+                            return arguments.length > 0 ? attrs[name] : attrs
                     },
                     selected: function(state, _noEvent) {
                         if (arguments.length > 0) {
-                            handle.setSelected(!!state, _noEvent);
-                            return this
+                            handle.setSelected(state, _noEvent);
+                            return proxy
                         }
                         else
-                            return handle._selected
+                            return handle.isSelected()
                     },
                     applySettings: function(settings) {
-                        _extend(true, handle.settings, settings);
-                        handle.item && handle.item.update(handle.settings);
-                        return this
+                        handle.update(settings);
+                        return proxy
                     }
+                };
+            return proxy
+        }
+        var MapLayerElement = function(context, index, geometry, attributes) {
+                var that = this,
+                    proxy = that.proxy = createProxy(that, geometry.coordinates, _extend({}, attributes));
+                that._ctx = context;
+                that._idx = index;
+                that._fig = that._lbl = null;
+                that._state = STATE_DEFAULT;
+                that._coordinates = geometry.coordinates;
+                that._settings = {label: {}};
+                proxy.index = index;
+                proxy.layer = context.layer;
+                that._data = {
+                    name: context.name,
+                    index: index
                 }
             };
-        MapItemHandle.prototype = {
-            constructor: MapItemHandle,
+        MapLayerElement.prototype = {
+            constructor: MapLayerElement,
             dispose: function() {
-                disposeItem(this.proxy);
-                disposeItem(this);
-                return this
-            },
-            setHovered: function(state) {
-                state = !!state;
                 var that = this;
-                if (that._ctx.hover && that._hovered !== state) {
-                    that._hovered = state;
-                    if (that.item) {
-                        if (that._hovered)
-                            that.item.onHover();
-                        if (!that._selected) {
-                            that.item[that._hovered ? "setHoveredState" : "setDefaultState"]();
-                            that._ctx.raiseHoverChanged(that, that._hovered)
+                that._ctx = that.proxy = that._settings = that._fig = that._lbl = that.data = null;
+                return that
+            },
+            project: function() {
+                var context = this._ctx;
+                this._prj = context.str.project(context.projection, this._coordinates);
+                if (context.hasSeparateLabel && this._lbl)
+                    this._projectLabel()
+            },
+            _projectLabel: function() {
+                this._labelPrj = this._ctx.str.projectLabel(this._prj)
+            },
+            draw: function() {
+                var that = this,
+                    context = this._ctx;
+                context.str.draw(context, that._fig = {}, that._data);
+                that._fig.root.append(context.root)
+            },
+            transform: function() {
+                var that = this,
+                    context = that._ctx;
+                context.str.transform(that._fig, context.projection, that._prj);
+                if (context.hasSeparateLabel && that._lbl)
+                    that._transformLabel()
+            },
+            _transformLabel: function() {
+                this._ctx.str.transformLabel(this._lbl, this._ctx.projection, this._labelPrj)
+            },
+            refresh: function() {
+                var that = this,
+                    strategy = that._ctx.str,
+                    settings = getItemSettings(that._ctx, that.proxy, that._settings);
+                that._styles = strategy.getStyles(settings);
+                strategy.refresh(that._ctx, that._fig, that._data, that.proxy, settings);
+                that._refreshLabel(settings);
+                that._setState()
+            },
+            _refreshLabel: function(settings) {
+                var that = this,
+                    context = that._ctx,
+                    labelSettings = settings.label,
+                    label = that._lbl;
+                if (labelSettings.enabled) {
+                    if (!label) {
+                        label = that._lbl = {
+                            root: context.labelRoot || that._fig.root,
+                            text: context.renderer.text().attr({"class": "dxm-label"}),
+                            size: [0, 0]
+                        };
+                        if (context.hasSeparateLabel) {
+                            that._projectLabel();
+                            that._transformLabel()
                         }
                     }
+                    label.value = _String(that.proxy.text || that.proxy.attribute(labelSettings.dataField) || "");
+                    if (label.value) {
+                        label.text.attr({
+                            text: label.value,
+                            x: 0,
+                            y: 0
+                        }).css(_patchFontOptions(labelSettings.font)).attr({
+                            align: "center",
+                            stroke: labelSettings.stroke,
+                            "stroke-width": labelSettings["stroke-width"],
+                            "stroke-opacity": labelSettings["stroke-opacity"]
+                        }).data(context.dataKey, that._data).append(label.root);
+                        label.settings = settings
+                    }
+                }
+                else if (label) {
+                    label.text.remove();
+                    that._lbl = null
+                }
+            },
+            measureLabel: function() {
+                var label = this._lbl,
+                    bbox;
+                if (label.value) {
+                    bbox = label.text.getBBox();
+                    label.size = [bbox.width, bbox.height, -bbox.y - bbox.height / 2]
+                }
+            },
+            adjustLabel: function() {
+                var label = this._lbl,
+                    offset;
+                if (label.value) {
+                    offset = this._ctx.str.getLabelOffset(label, label.settings);
+                    label.settings = null;
+                    label.text.attr({
+                        x: offset[0],
+                        y: offset[1] + label.size[2]
+                    })
+                }
+            },
+            update: function(settings) {
+                var that = this;
+                that._settings = combineSettings(that._settings, settings);
+                if (that._fig) {
+                    that.refresh();
+                    if (that._lbl && that._lbl.value) {
+                        that.measureLabel();
+                        that.adjustLabel()
+                    }
+                }
+            },
+            _setState: function() {
+                this._ctx.str.setState(this._fig, this._styles, STATE_TO_INDEX[this._state])
+            },
+            _setForeground: function() {
+                var root = this._fig.root;
+                this._state ? root.toForeground() : root.toBackground()
+            },
+            setHovered: function(state) {
+                var that = this,
+                    currentState = hasFlag(that._state, STATE_HOVERED),
+                    newState = !!state;
+                if (that._ctx.hover && currentState !== newState) {
+                    that._state = setFlag(that._state, STATE_HOVERED, newState);
+                    that._setState();
+                    that._setForeground();
+                    raiseChanged(that._ctx, that, newState, "hoverChanged")
                 }
                 return that
             },
-            resetSelected: function() {
-                this._selected = false;
-                return this
-            },
             setSelected: function(state, _noEvent) {
-                state = !!state;
                 var that = this,
-                    context = that._ctx,
+                    currentState = hasFlag(that._state, STATE_SELECTED),
+                    newState = !!state,
                     selection = that._ctx.selection,
                     tmp;
-                if (selection && that._selected !== state) {
-                    that._selected = state;
+                if (selection && currentState !== newState) {
+                    that._state = setFlag(that._state, STATE_SELECTED, newState);
                     tmp = selection.state[selection.single];
                     selection.state[selection.single] = null;
                     if (tmp)
                         tmp.setSelected(false);
                     selection.state[selection.single || that._idx] = state ? that : null;
-                    if (that.item) {
-                        that.item[state ? "setSelectedState" : that._hovered ? "setHoveredState" : "setDefaultState"]();
+                    if (that._fig) {
+                        that._setState();
+                        that._setForeground();
                         if (!_noEvent)
-                            context.raiseSelectionChanged(that)
+                            raiseChanged(that._ctx, that, newState, "selectionChanged")
                     }
                 }
-                return that
+            },
+            isSelected: function() {
+                return hasFlag(this._state, STATE_SELECTED)
+            },
+            resetSelected: function() {
+                this._state = setFlag(this._state, STATE_SELECTED, false)
+            },
+            restoreSelected: function() {
+                this._fig.root.toForeground()
             }
         };
-        function disposeItem(item) {
-            _each(item, function(name) {
-                item[name] = null
-            })
-        }
-        function createGroups(partition) {
-            var i,
-                ii,
-                groups = null;
-            if (_isArray(partition) && partition.length > 1) {
-                groups = [];
-                for (i = 0, ii = partition.length - 1; i < ii; ++i)
-                    groups.push({
-                        start: Number(partition[i]),
-                        end: Number(partition[i + 1])
-                    })
-            }
-            return groups
-        }
-        function findGroupPosition(value, groups) {
-            var i,
-                ii = groups.length,
-                k = -1;
-            for (i = 0; i < ii && k === -1; ++i)
-                if (groups[i].start <= value && value < groups[i].end)
-                    k = i;
-            if (k === -1 && value === groups[ii - 1].end)
-                k = ii - 1;
-            return k
-        }
-        _extend(DX.viz.map._tests, {
-            MapItemsManager: MapItemsManager,
-            MapItemHandle: MapItemHandle,
-            stubMapItemHandle: function(mapItemHandleType) {
-                MapItemHandle = mapItemHandleType
-            },
-            restoreMapItemHandle: function() {
-                MapItemHandle = DX.viz.map._tests.MapItemHandle
-            }
-        });
-        DX.viz.map.dxVectorMap.prototype._factory.MapItemsManager = MapItemsManager
-    })(DevExpress, jQuery);
-    /*! Module viz-vectormap, file areasManager.js */
-    (function(DX, $, undefined) {
-        var _abs = Math.abs,
-            _sqrt = Math.sqrt,
-            _noop = $.noop,
-            _concat = Array.prototype.concat,
-            TOLERANCE = 1;
-        var AreasManager = DX.viz.map.dxVectorMap.prototype._factory.MapItemsManager.inherit({
-                _rootClass: "dxm-areas",
-                _dataCategory: "areas",
-                _eventNames: {
-                    click: "areaClick",
-                    hoverChanged: "areaHoverChanged",
-                    selectionChanged: "areaSelectionChanged"
-                },
-                _initRoot: function() {
-                    var that = this;
-                    that.callBase.apply(that, arguments);
-                    that._context.labelRoot = that._labelRoot = that._params.renderer.g().attr({"class": "dxm-area-labels"}).linkOn(that._params.container, "mapitems-areas-labels")
-                },
-                _disposeRoot: function() {
-                    this.callBase.apply(this, arguments);
-                    this._labelRoot.linkOff();
-                    this._labelRoot = null
-                },
-                _getCommonSettings: function(options) {
-                    return this._params.themeManager.getCommonAreaSettings(options)
-                },
-                _itemType: "area",
-                _removeRoot: function() {
-                    this.callBase.apply(this, arguments);
-                    this._labelRoot.linkRemove()
-                },
-                _appendRoot: function() {
-                    var that = this;
-                    that.callBase.apply(that, arguments);
-                    if (that._commonSettings.label.enabled)
-                        that._labelRoot.linkAppend()
-                },
-                _clearRoot: function() {
-                    this.callBase.apply(this, arguments);
-                    this._labelRoot.clear()
-                },
-                _initProxy: _noop,
-                _getItemSettings: function(_, options) {
-                    return this._params.themeManager.getAreaSettings(this._commonSettings, options)
-                },
-                _transform: function(transform) {
-                    this.callBase.apply(this, arguments);
-                    this._labelRoot.attr(transform)
-                },
-                _createItem: function() {
-                    return new Area
-                },
-                _updateGrouping: function() {
-                    var commonSettings = this._commonSettings,
-                        attributeName = commonSettings.colorGroupingField;
-                    this._groupByColor(commonSettings.colorGroups, commonSettings.palette, function(proxy) {
-                        return proxy.attribute(attributeName)
-                    })
-                },
-                _arrangeItems: _noop
-            });
-        function Area(){}
-        $.extend(Area.prototype, DX.viz.map._internal.mapItemBehavior, {
-            _project: function(projection, geometry) {
-                var coordinates = geometry.coordinates;
-                if (geometry.type === "MultiPolygon")
-                    coordinates = _concat.apply([], coordinates);
-                return projection.projectArea(coordinates)
-            },
-            _createRoot: function() {
-                return this._ctx.renderer.path([], "area").data(this._ctx.dataKey, this._data)
-            },
-            _update: function(settings) {
-                this._styles = {
-                    normal: {
-                        "class": "dxm-area",
-                        stroke: settings.borderColor,
-                        "stroke-width": settings.borderWidth,
-                        fill: settings.color
-                    },
-                    hovered: {
-                        "class": "dxm-area dxm-area-hovered",
-                        stroke: settings.hoveredBorderColor,
-                        "stroke-width": settings.hoveredBorderWidth,
-                        fill: settings.hoveredColor
-                    },
-                    selected: {
-                        "class": "dxm-area dxm-area-selected",
-                        stroke: settings.selectedBorderColor,
-                        "stroke-width": settings.selectedBorderWidth,
-                        fill: settings.selectedColor
-                    }
-                };
-                this._root.attr(this._styles.normal);
-                return this
-            },
-            _transform: function(projection, coords) {
-                return projection.getAreaCoordinates(coords)
-            },
-            _locate: function(coords) {
-                this._root.attr({points: coords})
-            },
-            onHover: _noop,
-            setDefaultState: function() {
-                this._root.attr(this._styles.normal).toBackground()
-            },
-            setHoveredState: function() {
-                this._root.attr(this._styles.hovered).toForeground()
-            },
-            setSelectedState: function() {
-                this._root.attr(this._styles.selected).toForeground()
-            },
-            _createLabelRoot: function() {
-                return this._ctx.renderer.g().attr({"class": "dxm-area-label"}).append(this._ctx.labelRoot)
-            },
-            _adjustLabel: function() {
-                var that = this,
-                    centroid = calculateAreaCentroid(that._coords),
-                    bbox = that._label.text.getBBox(),
-                    offset = -bbox.y - bbox.height / 2;
-                that._centroid = centroid.coords;
-                that._areaSize = _sqrt(centroid.area);
-                that._labelSize = [bbox.width, bbox.height];
-                that._label.text.attr({y: offset});
-                that._label.tracker.attr({
-                    x: bbox.x,
-                    y: bbox.y + offset,
-                    width: bbox.width,
-                    height: bbox.height
-                })
-            },
-            _locateLabel: function() {
-                var that = this,
-                    coords = that._ctx.projection.getPointCoordinates(that._centroid),
-                    size = that._ctx.projection.getSquareSize([that._areaSize, that._areaSize]);
-                that._label.root.attr({
-                    translateX: coords.x,
-                    translateY: coords.y,
-                    visibility: that._labelSize[0] / size[0] < TOLERANCE && that._labelSize[1] / size[1] < TOLERANCE ? null : "hidden"
-                })
-            }
-        });
         function calculatePolygonCentroid(coordinates) {
-            var i = 0,
+            var i,
                 ii = coordinates.length,
                 v1,
                 v2 = coordinates[ii - 1],
@@ -3172,7 +3691,7 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                 cx = 0,
                 cy = 0,
                 area = 0;
-            for (; i < ii; ++i) {
+            for (i = 0; i < ii; ++i) {
                 v1 = v2;
                 v2 = coordinates[i];
                 cross = v1[0] * v2[1] - v2[0] * v1[1];
@@ -3180,517 +3699,179 @@ if (!DevExpress.MOD_VIZ_VECTORMAP) {
                 cx += (v1[0] + v2[0]) * cross;
                 cy += (v1[1] + v2[1]) * cross
             }
-            area /= 2;
-            cx /= 6 * area;
-            cy /= 6 * area;
-            return {
-                    coords: [cx, cy],
-                    area: _abs(area)
-                }
+            return [[cx / 3 / area, cy / 3 / area], _abs(area) / 2]
         }
-        function calculateAreaCentroid(coordinates) {
-            var i = 0,
+        function calculateLineStringData(coordinates) {
+            var i,
+                ii = coordinates.length,
+                v1,
+                v2 = coordinates[0],
+                totalLength = 0,
+                items = [0],
+                min0 = v2[0],
+                max0 = v2[0],
+                min1 = v2[1],
+                max1 = v2[1],
+                t;
+            for (i = 1; i < ii; ++i) {
+                v1 = v2;
+                v2 = coordinates[i];
+                totalLength += _sqrt((v1[0] - v2[0]) * (v1[0] - v2[0]) + (v1[1] - v2[1]) * (v1[1] - v2[1]));
+                items[i] = totalLength;
+                min0 = _min(min0, v2[0]);
+                max0 = _max(max0, v2[0]);
+                min1 = _min(min1, v2[1]);
+                max1 = _max(max1, v2[1])
+            }
+            i = findGroupingIndex(totalLength / 2, items);
+            v1 = coordinates[i];
+            v2 = coordinates[i + 1];
+            t = (totalLength / 2 - items[i]) / (items[i + 1] - items[i]);
+            return [[v1[0] * (1 - t) + v2[0] * t, v1[1] * (1 - t) + v2[1] * t], [max0 - min0, max1 - min1], totalLength]
+        }
+        function projectAreaLabel(coordinates) {
+            var i,
                 ii = coordinates.length,
                 centroid,
                 resultCentroid,
                 maxArea = 0;
-            for (; i < ii; ++i) {
+            for (i = 0; i < ii; ++i) {
                 centroid = calculatePolygonCentroid(coordinates[i]);
-                if (centroid.area > maxArea) {
-                    maxArea = centroid.area;
+                if (centroid[1] > maxArea) {
+                    maxArea = centroid[1];
                     resultCentroid = centroid
                 }
             }
-            return resultCentroid
+            return [resultCentroid[0], [_sqrt(resultCentroid[1]), _sqrt(resultCentroid[1])]]
         }
-        DX.viz.map._internal.AreasManager = AreasManager;
-        DX.viz.map._internal.Area = Area;
-        DX.viz.map._tests.AreasManager = AreasManager;
-        DX.viz.map._tests.Area = Area;
-        DX.viz.map.dxVectorMap.prototype._factory.createAreasManager = function(parameters) {
-            return new AreasManager(parameters)
-        }
-    })(DevExpress, jQuery);
-    /*! Module viz-vectormap, file markersManager.js */
-    (function(DX, $, undefined) {
-        var _Number = Number,
-            _isFinite = isFinite,
-            _math = Math,
-            _round = _math.round,
-            _max = _math.max,
-            _min = _math.min,
-            _extend = $.extend,
-            _each = $.each,
-            utils = DX.utils,
-            _isArray = utils.isArray,
-            _normalizeEnum = DX.viz.utils.normalizeEnum,
-            CLASS_DEFAULT = "dxm-marker",
-            CLASS_HOVERED = "dxm-marker dxm-marker-hovered",
-            CLASS_SELECTED = "dxm-marker dxm-marker-selected",
-            DOT = "dot",
-            BUBBLE = "bubble",
-            PIE = "pie",
-            IMAGE = "image",
-            DEFAULT_MARKER_TYPE = null,
-            MARKER_TYPES = {};
-        var MarkersManager = DX.viz.map.dxVectorMap.prototype._factory.MapItemsManager.inherit({
-                _rootClass: "dxm-markers",
-                _dataCategory: "markers",
-                _eventNames: {
-                    click: "markerClick",
-                    hoverChanged: "markerHoverChanged",
-                    selectionChanged: "markerSelectionChanged"
-                },
-                _init: function() {
-                    var that = this;
-                    that.callBase.apply(that, arguments);
-                    that._context.getPieColors = function(count) {
-                        return that._params.themeManager.getPieColors(that._commonSettings, count)
-                    };
-                    that._filter = that._params.renderer.shadowFilter("-40%", "-40%", "180%", "200%", 0, 1, 1, "#000000", 0.2)
-                },
-                _dispose: function() {
-                    this.callBase.apply(this, arguments);
-                    this._filter.dispose();
-                    this._filter = null
-                },
-                _getCommonSettings: function(options) {
-                    return this._params.themeManager.getCommonMarkerSettings(options)
-                },
-                _processOptions: function(options) {
-                    var that = this;
-                    that._commonType = parseMarkerType(options && options.type, DEFAULT_MARKER_TYPE);
-                    that.callBase.apply(that, arguments);
-                    that._commonSettings._filter = that._filter.ref
-                },
-                _arrangeBubbles: function() {
-                    var markers = this._handles,
-                        bubbles = [],
-                        i,
-                        ii = markers.length,
-                        marker,
-                        values = [],
-                        minValue,
-                        maxValue,
-                        deltaValue;
-                    if (this._commonSettings._bubble.sizeGroups)
-                        return;
-                    for (i = 0; i < ii; ++i) {
-                        marker = markers[i];
-                        if (marker.item.type === BUBBLE) {
-                            bubbles.push(marker);
-                            if (_isFinite(marker.proxy.value))
-                                values.push(marker.proxy.value)
-                        }
-                    }
-                    minValue = _min.apply(null, values);
-                    maxValue = _max.apply(null, values);
-                    deltaValue = maxValue - minValue || 1;
-                    for (i = 0, ii = bubbles.length; i < ii; ++i) {
-                        marker = bubbles[i];
-                        marker.item.setSize(_isFinite(marker.proxy.value) ? (marker.proxy.value - minValue) / deltaValue : 0)
-                    }
-                },
-                _itemType: "marker",
-                _initProxy: function(proxy, dataItem) {
-                    _each(dataItem, function(name, value) {
-                        if (proxy[name] === undefined)
-                            proxy[name] = value
-                    });
-                    proxy._TYPE = parseMarkerType(dataItem.type, null)
-                },
-                _getItemSettings: function(proxy, options) {
-                    var type = proxy._TYPE || this._commonType,
-                        settings = this._params.themeManager.getMarkerSettings(this._commonSettings, _extend({}, proxy.style, options), type);
-                    proxy.text = proxy.text || settings.text;
-                    return settings
-                },
-                _createItem: function(proxy) {
-                    return new MARKER_TYPES[proxy._TYPE || this._commonType]
-                },
-                _updateGrouping: function() {
-                    var that = this,
-                        markerType = that._commonType,
-                        colorDataField,
-                        sizeDataField,
-                        commonSettings = that._commonSettings["_" + markerType];
-                    if (markerType === DOT || markerType === BUBBLE) {
-                        colorDataField = commonSettings.colorGroupingField;
-                        that._groupByColor(commonSettings.colorGroups, commonSettings.palette, function(proxy) {
-                            return !proxy._TYPE || proxy._TYPE === markerType ? proxy.attribute(colorDataField) : NaN
-                        })
-                    }
-                    sizeDataField = commonSettings.sizeGroupingField;
-                    that._performGrouping(commonSettings.sizeGroups, "size", function(proxy) {
-                        return !proxy._TYPE || proxy._TYPE === markerType ? proxy.value || proxy.attribute(sizeDataField) : NaN
-                    }, function(count) {
-                        var minSize = commonSettings.minSize > 0 ? _Number(commonSettings.minSize) : 0,
-                            maxSize = commonSettings.maxSize >= minSize ? _Number(commonSettings.maxSize) : 0,
-                            i = 0,
-                            sizes = [];
-                        for (i = 0; i < count; ++i)
-                            sizes.push((minSize * (count - i - 1) + maxSize * i) / (count - 1));
-                        return sizes
-                    })
-                },
-                _updateLegendForPies: function() {
-                    var count = 0;
-                    _each(this._handles, function(_, handle) {
-                        var proxy = handle.proxy,
-                            values;
-                        if (!proxy._TYPE || proxy._TYPE === PIE) {
-                            values = proxy.values;
-                            if (values && values.length > count)
-                                count = values.length
-                        }
-                    });
-                    if (count > 0)
-                        this._params.dataExchanger.set(this._dataCategory, "color", DX.viz.utils.map(this._context.getPieColors(count).slice(0, count), function(color, i) {
-                            return {
-                                    index: i,
-                                    color: color
-                                }
-                        }))
-                },
-                _arrangeItems: function() {
-                    this._arrangeBubbles();
-                    this._updateLegendForPies()
+        function projectLineLabel(coordinates) {
+            var i,
+                ii = coordinates.length,
+                maxLength = 0,
+                data,
+                resultData;
+            for (i = 0; i < ii; ++i) {
+                data = calculateLineStringData(coordinates[i]);
+                if (data[2] > maxLength) {
+                    maxLength = data[2];
+                    resultData = data
                 }
-            });
-        var baseMarkerBehavior = _extend({}, DX.viz.map._internal.mapItemBehavior, {
-                _project: function(projection, geometry) {
-                    return projection.projectPoint(geometry.coordinates)
-                },
-                _createRoot: function() {
-                    return this._ctx.renderer.g()
-                },
-                _update: function(settings) {
-                    var that = this;
-                    that._root.attr({"class": CLASS_DEFAULT}).clear();
-                    that._create(settings, that._ctx.renderer, that._root);
-                    return that
-                },
-                _transform: function(projection, coords) {
-                    return projection.getPointCoordinates(coords)
-                },
-                _locate: function(coords) {
-                    this._root.attr({
-                        translateX: coords.x,
-                        translateY: coords.y
-                    })
-                },
-                onHover: function() {
-                    this._root.toForeground()
-                },
-                setDefaultState: function() {
-                    this._root.attr({"class": CLASS_DEFAULT}).toBackground();
-                    this._applyDefault()
-                },
-                setHoveredState: function() {
-                    this._root.attr({"class": CLASS_HOVERED});
-                    this._applyHovered()
-                },
-                setSelectedState: function() {
-                    this._root.attr({"class": CLASS_SELECTED}).toForeground();
-                    this._applySelected()
-                },
-                _createLabelRoot: function() {
-                    return this._root
-                },
-                _adjustLabel: function() {
-                    var bbox = this._label.text.getBBox(),
-                        x = _round(-bbox.x + this._size / 2) + 2,
-                        y = _round(-bbox.y - bbox.height / 2) - 1;
-                    this._label.text.attr({
-                        x: x,
-                        y: y
-                    });
-                    this._label.tracker.attr({
-                        x: x + bbox.x - 1,
-                        y: y + bbox.y - 1,
-                        width: bbox.width + 2,
-                        height: bbox.height + 2
-                    })
-                },
-                _locateLabel: $.noop
-            });
-        function DotMarker(){}
-        _extend(DotMarker.prototype, baseMarkerBehavior, {
-            type: DOT,
-            _create: function(style, renderer, root) {
-                var that = this,
-                    size = that._size = style.size > 0 ? _Number(style.size) : 0,
-                    hoveredSize = size,
-                    selectedSize = size + (style.selectedStep > 0 ? _Number(style.selectedStep) : 0),
-                    hoveredBackSize = hoveredSize + (style.backStep > 0 ? _Number(style.backStep) : 0),
-                    selectedBackSize = selectedSize + (style.backStep > 0 ? _Number(style.backStep) : 0),
-                    r = size / 2;
-                that._dotDefault = {
-                    cx: 0,
-                    cy: 0,
-                    r: r,
-                    stroke: style.borderColor,
-                    "stroke-width": style.borderWidth,
-                    fill: style.color,
-                    filter: style.shadow ? style._filter : null
-                };
-                that._dotHovered = {
-                    cx: 0,
-                    cy: 0,
-                    r: hoveredSize / 2,
-                    stroke: style.hoveredBorderColor,
-                    "stroke-width": style.hoveredBorderWidth,
-                    fill: style.hoveredColor
-                };
-                that._dotSelected = {
-                    cx: 0,
-                    cy: 0,
-                    r: selectedSize / 2,
-                    stroke: style.selectedBorderColor,
-                    "stroke-width": style.selectedBorderWidth,
-                    fill: style.selectedColor
-                };
-                that._backDefault = {
-                    cx: 0,
-                    cy: 0,
-                    r: r,
-                    stroke: "none",
-                    "stroke-width": 0,
-                    fill: style.backColor,
-                    opacity: style.backOpacity
-                };
-                that._backHovered = {
-                    cx: 0,
-                    cy: 0,
-                    r: hoveredBackSize / 2,
-                    stroke: "none",
-                    "stroke-width": 0,
-                    fill: style.backColor,
-                    opacity: style.backOpacity
-                };
-                that._backSelected = {
-                    cx: 0,
-                    cy: 0,
-                    r: selectedBackSize / 2,
-                    stroke: "none",
-                    "stroke-width": 0,
-                    fill: style.backColor,
-                    opacity: style.backOpacity
-                };
-                that._back = renderer.circle().sharp().attr(that._backDefault).data(that._ctx.dataKey, that._data).append(root);
-                that._dot = renderer.circle().sharp().attr(that._dotDefault).data(that._ctx.dataKey, that._data).append(root)
-            },
-            _destroy: function() {
-                this._back = this._dot = null
-            },
-            _applyDefault: function() {
-                this._back.attr(this._backDefault);
-                this._dot.attr(this._dotDefault)
-            },
-            _applyHovered: function() {
-                this._back.attr(this._backHovered);
-                this._dot.attr(this._dotHovered)
-            },
-            _applySelected: function() {
-                this._back.attr(this._backSelected);
-                this._dot.attr(this._dotSelected)
             }
-        });
-        function BubbleMarker(){}
-        _extend(BubbleMarker.prototype, baseMarkerBehavior, {
-            type: BUBBLE,
-            _create: function(style, renderer, root) {
+            return resultData
+        }
+        function MapLayerCollection(params) {
+            var that = this;
+            that._params = params;
+            that._layers = [];
+            that._layerByName = {};
+            that._rect = [0, 0, 0, 0];
+            that._clip = params.renderer.clipRect();
+            that._container = params.renderer.g().attr({
+                "class": "dxm-layers",
+                clipId: that._clip.id
+            }).linkOn(params.renderer.root, "layers").linkAppend().enableLinks()
+        }
+        MapLayerCollection.prototype = {
+            constructor: MapLayerCollection,
+            dispose: function() {
                 var that = this;
-                that._minSize = style.minSize > 0 ? _Number(style.minSize) : 0;
-                that._maxSize = style.maxSize > that._minSize ? _Number(style.maxSize) : that._minSize;
-                that.value = _isFinite(that._proxy.value) ? _Number(that._proxy.value) : null;
-                that._default = {
-                    stroke: style.borderColor,
-                    "stroke-width": style.borderWidth,
-                    fill: style.color,
-                    opacity: style.opacity
-                };
-                that._hovered = {
-                    stroke: style.hoveredBorderColor,
-                    "stroke-width": style.hoveredBorderWidth,
-                    fill: style.hoveredColor,
-                    opacity: style.hoveredOpacity
-                };
-                that._selected = {
-                    stroke: style.selectedBorderColor,
-                    "stroke-width": style.selectedBorderWidth,
-                    fill: style.selectedColor,
-                    opacity: style.selectedOpacity
-                };
-                that._bubble = renderer.circle(0, 0, 0).sharp().attr(that._default).data(that._ctx.dataKey, that._data).append(root);
-                that.setSize(((style.size || that._maxSize) - that._minSize) / (that._maxSize - that._minSize))
+                that._clip.dispose();
+                that._container.linkRemove().linkOff();
+                that._params = that._layers = that._layerByName = that._clip = that._container = null
             },
-            _applyDefault: function() {
-                this._bubble.attr(this._default)
-            },
-            _applyHovered: function() {
-                this._bubble.attr(this._hovered)
-            },
-            _applySelected: function() {
-                this._bubble.attr(this._selected)
-            },
-            setSize: function(ratio) {
-                var that = this,
-                    r = (that._minSize + ratio * (that._maxSize - that._minSize)) / 2;
-                that._default.r = that._hovered.r = that._selected.r = r;
-                that._size = 2 * r;
-                that._bubble.attr({r: r});
-                return that
-            }
-        });
-        function PieMarker(){}
-        _extend(PieMarker.prototype, baseMarkerBehavior, {
-            type: PIE,
-            _create: function(style, renderer, root) {
-                var that = this,
-                    r = (style.size > 0 ? _Number(style.size) : 0) / 2,
-                    srcValues,
-                    i = 0,
-                    ii,
-                    values,
-                    value,
-                    sum = 0,
-                    translator,
-                    startAngle,
-                    endAngle,
-                    colors;
-                that._size = 2 * r;
-                that._pieDefault = {opacity: style.opacity};
-                that._pieHovered = {opacity: style.hoveredOpacity};
-                that._pieSelected = {opacity: style.selectedOpacity};
-                that._borderDefault = {
-                    stroke: style.borderColor,
-                    "stroke-width": style.borderWidth
-                };
-                that._borderHovered = {
-                    stroke: style.hoveredBorderColor,
-                    "stroke-width": style.hoveredBorderWidth
-                };
-                that._borderSelected = {
-                    stroke: style.selectedBorderColor,
-                    "stroke-width": style.selectedBorderWidth
-                };
-                srcValues = that._proxy.values;
-                ii = _isArray(srcValues) ? srcValues.length : 0;
-                values = [];
+            _addLayers: function(optionList) {
+                var layers = this._layers,
+                    i = layers.length,
+                    ii = optionList.length,
+                    name,
+                    layer;
                 for (; i < ii; ++i) {
-                    value = _Number(srcValues[i]);
-                    if (_isFinite(value)) {
-                        values.push(value);
-                        sum += value
-                    }
+                    name = (optionList[i] || {}).name || "map-layer-" + i;
+                    layers[i] = layer = new MapLayer(this._params, this._container, name, i);
+                    this._layerByName[name] = layer
                 }
-                that._pie = renderer.g().attr(that._pieDefault);
-                translator = new DX.viz.Translator1D(0, sum, 90, 450);
-                startAngle = translator.translate(0);
-                colors = that._ctx.getPieColors(values.length);
-                for (value = 0, i = 0, ii = values.length; i < ii; ++i) {
-                    value += values[i];
-                    endAngle = translator.translate(value);
-                    renderer.arc(0, 0, 0, r, startAngle, endAngle).attr({
-                        "stroke-linejoin": "round",
-                        fill: colors[i]
-                    }).data(that._ctx.dataKey, that._data).append(that._pie);
-                    startAngle = endAngle
+            },
+            _removeLayers: function(count) {
+                var layers = this._layers,
+                    i = layers.length - 1,
+                    ii = i - count,
+                    layer;
+                for (; i > ii; --i) {
+                    layer = layers[i];
+                    delete this._layerByName[layer.proxy.name];
+                    layer.dispose();
+                    layers.splice(i, 1)
                 }
-                that._pie.append(root);
-                that._border = renderer.circle(0, 0, r).sharp().attr(that._borderDefault).data(that._ctx.dataKey, that._data).append(root)
             },
-            _applyDefault: function() {
-                this._pie.attr(this._pieDefault);
-                this._border.attr(this._borderDefault)
+            setOptions: function(options) {
+                var optionList = options ? options.length ? options : [options] : [],
+                    layers = this._layers,
+                    i,
+                    ii;
+                if (layers.length < optionList.length)
+                    this._addLayers(optionList);
+                if (layers.length > optionList.length)
+                    this._removeLayers(layers.length - optionList.length);
+                for (i = 0, ii = layers.length; i < ii; ++i)
+                    layers[i].setOptions(optionList[i])
             },
-            _applyHovered: function() {
-                this._pie.attr(this._pieHovered);
-                this._border.attr(this._borderHovered)
+            _updateClip: function() {
+                var rect = this._rect,
+                    bw = this._bw;
+                this._clip.attr({
+                    x: rect[0] + bw,
+                    y: rect[1] + bw,
+                    width: _max(rect[2] - bw * 2, 0),
+                    height: _max(rect[3] - bw * 2, 0)
+                })
             },
-            _applySelected: function() {
-                this._pie.attr(this._pieSelected);
-                this._border.attr(this._borderSelected)
+            setRect: function(rect) {
+                this._rect = rect;
+                this._updateClip()
+            },
+            setBorderWidth: function(borderWidth) {
+                this._bw = _max(borderWidth, 0);
+                this._updateClip()
+            },
+            byIndex: function(index) {
+                return this._layers[index]
+            },
+            byName: function(name) {
+                return this._layerByName[name]
+            },
+            items: function() {
+                return this._layers
             }
-        });
-        function ImageMarker(){}
-        _extend(ImageMarker.prototype, baseMarkerBehavior, {
-            type: IMAGE,
-            _create: function(style, renderer, root) {
-                var that = this,
-                    size = that._size = style.size > 0 ? _Number(style.size) : 0,
-                    hoveredSize = size + (style.hoveredStep > 0 ? _Number(style.hoveredStep) : 0),
-                    selectedSize = size + (style.selectedStep > 0 ? _Number(style.selectedStep) : 0);
-                that._default = {
-                    x: -size / 2,
-                    y: -size / 2,
-                    width: size,
-                    height: size
-                };
-                that._hovered = {
-                    x: -hoveredSize / 2,
-                    y: -hoveredSize / 2,
-                    width: hoveredSize,
-                    height: hoveredSize
-                };
-                that._selected = {
-                    x: -selectedSize / 2,
-                    y: -selectedSize / 2,
-                    width: selectedSize,
-                    height: selectedSize
-                };
-                that._image = renderer.image().attr(that._default).attr({
-                    href: that._proxy.url,
-                    location: "center"
-                }).append(root);
-                that._tracker = renderer.rect().attr(that._default).attr({
-                    stroke: "none",
-                    "stroke-width": 0,
-                    fill: "#000000",
-                    opacity: 0.0001
-                }).data(that._ctx.dataKey, that._data).append(root)
-            },
-            _applyDefault: function() {
-                this._image.attr(this._default);
-                this._tracker.attr(this._default)
-            },
-            _applyHovered: function() {
-                this._image.attr(this._hovered);
-                this._tracker.attr(this._hovered)
-            },
-            _applySelected: function() {
-                this._image.attr(this._selected);
-                this._tracker.attr(this._selected)
-            }
-        });
-        _each([DotMarker, BubbleMarker, PieMarker, ImageMarker], function(_, markerType) {
-            DEFAULT_MARKER_TYPE = DEFAULT_MARKER_TYPE || markerType.prototype.type;
-            MARKER_TYPES[markerType.prototype.type] = markerType
-        });
-        function parseMarkerType(type, defaultType) {
-            var _type = _normalizeEnum(type);
-            return MARKER_TYPES[_type] ? _type : defaultType
-        }
-        var __originalDefaultMarkerType = DEFAULT_MARKER_TYPE,
-            __originalMarkerTypes = _extend({}, MARKER_TYPES);
-        DX.viz.map._tests.stubMarkerTypes = function(markerTypes, defaultMarkerType) {
-            DEFAULT_MARKER_TYPE = defaultMarkerType;
-            MARKER_TYPES = markerTypes
         };
-        DX.viz.map._tests.restoreMarkerTypes = function() {
-            DEFAULT_MARKER_TYPE = __originalDefaultMarkerType;
-            MARKER_TYPES = __originalMarkerTypes
-        };
-        DX.viz.map._tests.baseMarkerBehavior = baseMarkerBehavior;
-        DX.viz.map._tests.MarkersManager = MarkersManager;
-        DX.viz.map._tests.DotMarker = DotMarker;
-        DX.viz.map._tests.BubbleMarker = BubbleMarker;
-        DX.viz.map._tests.PieMarker = PieMarker;
-        DX.viz.map._tests.ImageMarker = ImageMarker;
-        DX.viz.map.dxVectorMap.prototype._factory.createMarkersManager = function(parameters) {
-            return new MarkersManager(parameters)
-        }
+        DX.viz.map.MapLayerCollection = MapLayerCollection;
+        _extend(DX.viz.map._tests, {
+            MapLayer: MapLayer,
+            stub_MapLayer: function(stub) {
+                MapLayer = stub
+            },
+            selectStrategy: selectStrategy,
+            stub_selectStrategy: function(stub) {
+                selectStrategy = stub
+            },
+            MapLayerElement: MapLayerElement,
+            stub_MapLayerElement: function(stub) {
+                MapLayerElement = stub
+            },
+            createProxy: createProxy,
+            stub_performGrouping: function(stub) {
+                performGrouping = stub
+            },
+            performGrouping: performGrouping,
+            stub_groupByColor: function(stub) {
+                groupByColor = stub
+            },
+            groupByColor: groupByColor,
+            stub_groupBySize: function(stub) {
+                groupBySize = stub
+            },
+            groupBySize: groupBySize,
+            findGroupingIndex: findGroupingIndex
+        })
     })(DevExpress, jQuery);
     DevExpress.MOD_VIZ_VECTORMAP = true
 }

@@ -2,7 +2,7 @@
     <div data-bind="visible: visible, css: { 'dx-state-disabled': disabled }" data-options="dxTemplate : { name: 'item' } ">
         <div>
             <!-- ko dxIcon: $data.icon || $data.iconSrc --><!-- /ko -->
-            <div class="dx-navigation-item" data-bind="text: title"></div>
+            <div class="dx-navigation-item" data-bind="text: text"></div>
         </div>
     </div>
 </script>
@@ -60,7 +60,7 @@
     </div>
 </div>
 
-<div class="slideout-layout" data-options="dxLayout : { name: 'slideout', platform: 'win8', phone: true } ">
+<div class="slideout-layout" data-options="dxLayout : { name: 'slideout', platform: 'win' } ">
     <div class="layout-frame" data-options="dxTransition: { name: 'main', animation: 'view-content-change' }">
         <div class="layout-header">
             <div class="layout-toolbar" data-bind="dxToolbar: { items: [{ location: 'before', template: 'nav-button', visible: false }, { location: 'center', text: title }] }">

@@ -1,18 +1,19 @@
 /*! 
 * DevExtreme (Single Page App Framework)
-* Version: 15.1.8
-* Build date: Oct 29, 2015
+* Version: 15.2.3
+* Build date: Dec 2, 2015
 *
 * Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
 */
 
 "use strict";
-if (!DevExpress.MOD_FRAMEWORK) {
-    if (!window.DevExpress)
+if (!window.DevExpress || !DevExpress.MOD_FRAMEWORK) {
+    if (!window.DevExpress || !DevExpress.MOD_CORE)
         throw Error('Required module is not referenced: core');
     /*! Module framework, file framework.js */
     (function($, DX, undefined) {
+        var KoTemplateProvider = DX.require("/integration/knockout/ko.templateProvider");
         var mergeWithReplace = function(targetArray, arrayToMerge, needReplaceFn) {
                 var result = [];
                 for (var i = 0, length = targetArray.length; i < length; i++)
@@ -66,45 +67,46 @@ if (!DevExpress.MOD_FRAMEWORK) {
                     resolvePropertyValue: resolvePropertyValue
                 }
             },
-            templateProvider: DX.ui.KoTemplateProvider
+            templateProvider: KoTemplateProvider
         }
     })(jQuery, DevExpress);
     /*! Module framework, file framework.errors.js */
-    (function($, DX) {
-        $.extend(DX.ERROR_MESSAGES, {
-            E3001: "Routing rule is not found for the '{0}' URI.",
-            E3002: "The passed object cannot be formatted into a URI string by the application's router. An appropriate route should be registered.",
-            E3003: "Unable to navigate. Application is being initialized.",
-            E3004: "Cannot execute the command: {0}.",
-            E3005: "The '{0}' command {1} is not registered in the application's command mapping. Go to http://dxpr.es/1bTjfj1 for more details.",
-            E3006: "Unknown navigation target: '{0}'. Use the 'current', 'back' or 'blank' values.",
-            E3007: "Error while restoring the application state. The state has been cleared. Refresh the page.",
-            E3008: "Unable to go back.",
-            E3009: "Unable to go forward.",
-            E3010: "The command's 'id' option should be specified.\r\nProcessed markup: {0}\n",
-            E3011: "Layout controller cannot be resolved. There are no appropriate layout controllers for the current context. Check browser console for details.",
-            E3012: "Layout controller cannot be resolved. Two or more layout controllers suit the current context. Check browser console for details.",
-            E3013: "The '{0}' template with the '{1}' name is not found. Make sure the case is correct in the specified view name and the template fits the current context.",
-            E3014: "All the children of the dxView element should be either of the dxCommand or dxContent type.\r\nProcessed markup: {0}",
-            E3015: "The 'exec' method should be called before the 'finalize' method.",
-            E3016: "Unknown transition type '{0}'.",
-            E3018: "Unable to parse options.\nMessage: {0};\nOptions value: {1}.",
-            E3019: "View templates should be updated according to the 13.1 changes. Go to http://dxpr.es/15ikrJA for more details.",
-            E3020: "Concurrent templates are found:\r\n{0}Target device:\r\n{1}.",
-            E3021: "Remote template cannot be loaded.\r\nUrl:{0}\r\nError:{1}.",
-            E3022: "Cannot initialize the HtmlApplication component.",
-            E3023: "Navigation item is not found",
-            W3001: "A view with the '{0}' key doesn't exist.",
-            W3002: "A view with the '{0}' key has already been released.",
-            W3003: "Layout resolving context:\n{0}\nAvailable layout controller registrations:\n{1}\n",
-            W3004: "Layout resolving context:\n{0}\nConcurent layout controller registrations for the context:\n{1}\n",
-            W3005: "Direct hash-based navigation is detected in a mobile application. Use data-bind=\"dxAction: url\" instead of href=\"#url\" to avoid navigation issues.\nFound markup:\n{0}\n"
-        })
-    })(jQuery, DevExpress);
+    DevExpress.define("/framework/framework.errors", ["/utils/utils.error", "/errors"], function(errorUtils, errors) {
+        return errorUtils(errors.ERROR_MESSAGES, {
+                E3001: "Routing rule is not found for the '{0}' URI.",
+                E3002: "The passed object cannot be formatted into a URI string by the application's router. An appropriate route should be registered.",
+                E3003: "Unable to navigate. Application is being initialized.",
+                E3004: "Cannot execute the command: {0}.",
+                E3005: "The '{0}' command {1} is not registered in the application's command mapping. Go to http://dxpr.es/1bTjfj1 for more details.",
+                E3006: "Unknown navigation target: '{0}'. Use the 'current', 'back' or 'blank' values.",
+                E3007: "Error while restoring the application state. The state has been cleared. Refresh the page.",
+                E3008: "Unable to go back.",
+                E3009: "Unable to go forward.",
+                E3010: "The command's 'id' option should be specified.\r\nProcessed markup: {0}\n",
+                E3011: "Layout controller cannot be resolved. There are no appropriate layout controllers for the current context. Check browser console for details.",
+                E3012: "Layout controller cannot be resolved. Two or more layout controllers suit the current context. Check browser console for details.",
+                E3013: "The '{0}' template with the '{1}' name is not found. Make sure the case is correct in the specified view name and the template fits the current context.",
+                E3014: "All the children of the dxView element should be either of the dxCommand or dxContent type.\r\nProcessed markup: {0}",
+                E3015: "The 'exec' method should be called before the 'finalize' method.",
+                E3016: "Unknown transition type '{0}'.",
+                E3018: "Unable to parse options.\nMessage: {0};\nOptions value: {1}.",
+                E3019: "View templates should be updated according to the 13.1 changes. Go to http://dxpr.es/15ikrJA for more details.",
+                E3020: "Concurrent templates are found:\r\n{0}Target device:\r\n{1}.",
+                E3021: "Remote template cannot be loaded.\r\nUrl:{0}\r\nError:{1}.",
+                E3022: "Cannot initialize the HtmlApplication component.",
+                E3023: "Navigation item is not found",
+                E3024: "Layout controller is not initialized",
+                W3001: "A view with the '{0}' key doesn't exist.",
+                W3002: "A view with the '{0}' key has already been released.",
+                W3003: "Layout resolving context:\n{0}\nAvailable layout controller registrations:\n{1}\n",
+                W3004: "Layout resolving context:\n{0}\nConcurent layout controller registrations for the context:\n{1}\n",
+                W3005: "Direct hash-based navigation is detected in a mobile application. Use data-bind=\"dxAction: url\" instead of href=\"#url\" to avoid navigation issues.\nFound markup:\n{0}\n"
+            })
+    });
     /*! Module framework, file framework.routing.js */
     (function($, DX) {
         var JSON_URI_PREFIX = encodeURIComponent("json:");
-        var Class = DX.Class;
+        var Class = DevExpress.require("/class");
         DX.framework.Route = Class.inherit({
             _trimSeparators: function(str) {
                 return str.replace(/^[\/.]+|\/+$/g, "")
@@ -264,7 +266,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 return decodeURIComponent(value)
             }
         });
-        DX.framework.Router = DX.Class.inherit({
+        DX.framework.Router = Class.inherit({
             ctor: function() {
                 this._registry = []
             },
@@ -324,48 +326,41 @@ if (!DevExpress.MOD_FRAMEWORK) {
     })(jQuery, DevExpress);
     /*! Module framework, file framework.command.js */
     (function($, DX) {
-        var Command = DX.DOMComponent.inherit({
+        var errors = DevExpress.require("/framework/framework.errors"),
+            registerComponent = DX.require("/componentRegistrator"),
+            DOMComponent = DX.require("/domComponent");
+        var Command = DOMComponent.inherit({
                 ctor: function(element, options) {
                     if ($.isPlainObject(element)) {
                         options = element;
                         element = $("<div />")
                     }
-                    this.beforeExecute = $.Callbacks();
-                    this.afterExecute = $.Callbacks();
-                    this._callbacksToEvents("Command", ["beforeExecute", "afterExecute"]);
                     this.callBase(element, options)
                 },
                 _setDeprecatedOptions: function() {
                     this.callBase();
-                    $.extend(this._deprecatedOptions, {
-                        action: {
-                            since: "14.2",
-                            alias: "onExecute"
-                        },
-                        iconSrc: {
+                    $.extend(this._deprecatedOptions, {iconSrc: {
                             since: "15.1",
                             alias: "icon"
-                        }
-                    })
+                        }})
                 },
-                _setDefaultOptions: function() {
-                    this.callBase();
-                    this.option({
-                        onExecute: null,
-                        id: null,
-                        title: "",
-                        icon: "",
-                        visible: true,
-                        disabled: false,
-                        renderStage: "onViewShown"
-                    })
+                _getDefaultOptions: function() {
+                    return $.extend(this.callBase(), {
+                            onExecute: null,
+                            id: null,
+                            title: "",
+                            icon: "",
+                            visible: true,
+                            disabled: false,
+                            renderStage: "onViewShown"
+                        })
                 },
                 execute: function() {
                     var isDisabled = this._options.disabled;
                     if ($.isFunction(isDisabled))
                         isDisabled = !!isDisabled.apply(this, arguments);
                     if (isDisabled)
-                        throw DX.Error("E3004", this._options.id);
+                        throw errors.Error("E3004", this._options.id);
                     this.fireEvent("beforeExecute", arguments);
                     this._createActionByOption("onExecute").apply(this, arguments);
                     this.fireEvent("afterExecute", arguments)
@@ -377,16 +372,16 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 _renderDisabledState: $.noop,
                 _dispose: function() {
                     this.callBase();
-                    this.element().removeData(this.NAME);
-                    this.beforeExecute.empty();
-                    this.afterExecute.empty()
+                    this.element().removeData(this.NAME)
                 }
             });
-        DX.registerComponent("dxCommand", DX.framework, Command)
+        registerComponent("dxCommand", DX.framework, Command)
     })(jQuery, DevExpress);
     /*! Module framework, file framework.commandMapping.js */
     (function($, DX) {
-        DX.framework.CommandMapping = DX.Class.inherit({
+        var Class = DevExpress.require("/class"),
+            errors = DevExpress.require("/framework/framework.errors");
+        DX.framework.CommandMapping = Class.inherit({
             ctor: function() {
                 this._commandMappings = {};
                 this._containerDefaults = {}
@@ -429,7 +424,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
                         return $.inArray(commandName, that._existingCommands) < 0 && $.inArray(commandName, commands) === index
                     });
                 if (result.length !== 0)
-                    throw DX.Error("E3005", result.join("', '"), result.length === 1 ? " is" : "s are");
+                    throw errors.Error("E3005", result.join("', '"), result.length === 1 ? " is" : "s are");
             },
             load: function(config) {
                 if (!config)
@@ -674,12 +669,11 @@ if (!DevExpress.MOD_FRAMEWORK) {
     })(jQuery, DevExpress);
     /*! Module framework, file framework.viewCache.js */
     (function($, DX, undefined) {
-        var Class = DX.Class;
+        var Class = DevExpress.require("/class"),
+            EventsMixin = DX.require("/eventsMixin");
         DX.framework.ViewCache = Class.inherit({
             ctor: function() {
-                this._cache = {};
-                this.viewRemoved = $.Callbacks();
-                this._callbacksToEvents("ViewCache", ["viewRemoved"])
+                this._cache = {}
             },
             setView: function(key, viewInfo) {
                 this._cache[key] = viewInfo
@@ -704,7 +698,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
             hasView: function(key) {
                 return key in this._cache
             }
-        }).include(DX.EventsMixin);
+        }).include(EventsMixin);
         DX.framework.NullViewCache = DX.framework.ViewCache.inherit({setView: function(key, viewInfo) {
                 this.callBase(key, viewInfo);
                 this.removeView(key)
@@ -733,8 +727,8 @@ if (!DevExpress.MOD_FRAMEWORK) {
             hasView: function(key) {
                 return this._viewCache.hasView(key)
             }
-        }).include(DX.EventsMixin);
-        var DEFAULT_VIEW_CACHE_CAPACITY = 10;
+        }).include(EventsMixin);
+        var DEFAULT_VIEW_CACHE_CAPACITY = 5;
         DX.framework.CapacityViewCacheDecorator = Class.inherit({
             ctor: function(options) {
                 this._keys = [];
@@ -772,7 +766,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
             hasView: function(key) {
                 return this._viewCache.hasView(key)
             }
-        }).include(DX.EventsMixin);
+        }).include(EventsMixin);
         DX.framework.HistoryDependentViewCacheDecorator = Class.inherit({
             ctor: function(options) {
                 this._viewCache = options.viewCache || new DX.framework.ViewCache;
@@ -799,11 +793,11 @@ if (!DevExpress.MOD_FRAMEWORK) {
             hasView: function(key) {
                 return this._viewCache.hasView(key)
             }
-        }).include(DX.EventsMixin)
+        }).include(EventsMixin)
     })(jQuery, DevExpress);
     /*! Module framework, file framework.stateManager.js */
     (function($, DX, undefined) {
-        var Class = DX.Class;
+        var Class = DevExpress.require("/class");
         DX.framework.MemoryKeyValueStorage = Class.inherit({
             ctor: function() {
                 this.storage = {}
@@ -856,7 +850,8 @@ if (!DevExpress.MOD_FRAMEWORK) {
     })(jQuery, DevExpress);
     /*! Module framework, file framework.browserAdapters.js */
     (function($, DX, undefined) {
-        var Class = DX.Class;
+        var Class = DevExpress.require("/class"),
+            queue = DX.require("/utils/utils.queue");
         var ROOT_PAGE_URL = "__root__",
             BUGGY_ANDROID_BUFFER_PAGE_URL = "__buffer__";
         DX.framework.DefaultBrowserAdapter = Class.inherit({
@@ -865,7 +860,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 this._window = options.window || window;
                 this.popState = $.Callbacks();
                 $(this._window).on("hashchange", $.proxy(this._onHashChange, this));
-                this._tasks = DX.createQueue();
+                this._tasks = queue.create();
                 this.canWorkInPureBrowser = true
             },
             replaceState: function(uri) {
@@ -1004,7 +999,9 @@ if (!DevExpress.MOD_FRAMEWORK) {
     })(jQuery, DevExpress);
     /*! Module framework, file framework.navigationDevices.js */
     (function($, DX, undefined) {
-        var Class = DX.Class;
+        var Class = DevExpress.require("/class"),
+            storageUtils = DX.require("/utils/utils.storage"),
+            devices = DX.require("/devices");
         var SESSION_KEY = "dxPhoneJSApplication";
         DX.framework.HistoryBasedNavigationDevice = Class.inherit({
             ctor: function(options) {
@@ -1032,18 +1029,18 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 this.uriChanged.fire(this.getUri())
             },
             _isBuggyAndroid2: function() {
-                var realDevice = DX.devices.real();
+                var realDevice = devices.real();
                 var version = realDevice.version;
                 return realDevice.platform === "android" && version.length > 1 && (version[0] === 2 && version[1] < 4 || version[0] < 2)
             },
             _isBuggyAndroid4: function() {
-                var realDevice = DX.devices.real();
+                var realDevice = devices.real();
                 var version = realDevice.version;
                 return realDevice.platform === "android" && version.length > 1 && version[0] === 4 && version[1] === 0
             },
             _isWindowsPhone8: function() {
-                var realDevice = DX.devices.real();
-                return realDevice.platform === "win8" && realDevice.phone
+                var realDevice = devices.real();
+                return realDevice.platform === "win" && realDevice.phone
             },
             _createBrowserAdapter: function(options) {
                 var sourceWindow = options.window || window,
@@ -1083,13 +1080,13 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 return this.callBase(uri, !this._browserAdapter.isRootPage())
             },
             _saveBrowserState: function() {
-                var sessionStorage = DX.utils.getSessionStorage();
+                var sessionStorage = storageUtils.sessionStorage();
                 if (sessionStorage)
                     sessionStorage.setItem(SESSION_KEY, true)
             },
             _initRootPage: function() {
                 var hash = this.getUri(),
-                    sessionStorage = DX.utils.getSessionStorage();
+                    sessionStorage = storageUtils.sessionStorage();
                 if (!sessionStorage || sessionStorage.getItem(SESSION_KEY))
                     return $.Deferred().resolve().promise();
                 sessionStorage.removeItem(SESSION_KEY);
@@ -1119,7 +1116,12 @@ if (!DevExpress.MOD_FRAMEWORK) {
     })(jQuery, DevExpress);
     /*! Module framework, file framework.navigationManager.js */
     (function($, DX, undefined) {
-        var Class = DX.Class;
+        var Class = DX.require("/class"),
+            EventsMixin = DX.require("/eventsMixin"),
+            errors = DX.require("/framework/framework.errors"),
+            commonUtils = DX.require("/utils/utils.common"),
+            hardwareBackButton = DX.require("/utils/utils.hardwareBack").processCallback,
+            hideTopOverlay = DX.require("/utils/utils.topOverlay").hide;
         var NAVIGATION_TARGETS = {
                 current: "current",
                 blank: "blank",
@@ -1131,12 +1133,6 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 options = options || {};
                 this._currentItem = undefined;
                 this._previousItem = undefined;
-                this.navigating = $.Callbacks();
-                this.navigated = $.Callbacks();
-                this.navigationCanceled = $.Callbacks();
-                this.navigatingBack = $.Callbacks();
-                this.itemRemoved = $.Callbacks();
-                this._callbacksToEvents("DefaultLayoutController", ["navigating", "navigated", "navigationCanceled", "navigatingBack", "itemRemoved"]);
                 this._createNavigationDevice(options)
             },
             _createNavigationDevice: function(options) {
@@ -1144,8 +1140,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 this._navigationDevice.uriChanged.add($.proxy(this._uriChangedHandler, this))
             },
             _uriChangedHandler: function(uri) {
-                while (DX.hideTopOverlay());
-                this._forceNavigate = true;
+                while (hideTopOverlay());
                 this.navigate(uri)
             },
             _syncUriWithCurrentNavigationItem: function() {
@@ -1206,7 +1201,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 else {
                     that._forceNavigate = false;
                     $.when.apply($, args.navigateWhen).done(function() {
-                        DX.utils.executeAsync(function() {
+                        commonUtils.executeAsync(function() {
                             that._updateHistory(uri, options);
                             that.fireEvent("navigated", [{
                                     uri: uri,
@@ -1227,7 +1222,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
             currentItem: function(item) {
                 if (arguments.length > 0) {
                     if (!item)
-                        throw DX.Error("E3023");
+                        throw errors.Error("E3023");
                     this._setCurrentItem(item)
                 }
                 else
@@ -1242,13 +1237,13 @@ if (!DevExpress.MOD_FRAMEWORK) {
             saveState: $.noop,
             restoreState: $.noop,
             removeState: $.noop
-        }).include(DX.EventsMixin);
+        }).include(EventsMixin);
         DX.framework.StackBasedNavigationManager = DX.framework.HistoryBasedNavigationManager.inherit({
             ctor: function(options) {
                 options = options || {};
                 this.callBase(options);
                 this._createNavigationStacks(options);
-                DX.hardwareBackButton.add($.proxy(this._deviceBackInitiated, this));
+                hardwareBackButton.add($.proxy(this._deviceBackInitiated, this));
                 this._stateStorageKey = options.stateStorageKey || STORAGE_HISTORY_KEY
             },
             init: function() {
@@ -1269,7 +1264,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 this.currentStack = new DX.framework.NavigationStack
             },
             _deviceBackInitiated: function() {
-                if (!DX.hideTopOverlay())
+                if (!hideTopOverlay())
                     this.back({isHardwareButton: true});
                 else
                     this._syncUriWithCurrentNavigationItem()
@@ -1362,7 +1357,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
                                 this.currentStack.navigate(uri, true);
                             break;
                         default:
-                            throw DX.Error("E3006", options.target);
+                            throw errors.Error("E3006", options.target);
                     }
                     if (options.direction === undefined) {
                         var indexDelta = this.currentStack.currentIndex - prevIndex;
@@ -1458,7 +1453,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
                     }
                     catch(e) {
                         this.removeState(storage);
-                        throw DX.Error("E3007");
+                        throw errors.Error("E3007");
                     }
             },
             removeState: function(storage) {
@@ -1532,7 +1527,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
             back: function(uri) {
                 this.currentIndex--;
                 if (this.currentIndex < 0)
-                    throw DX.Error("E3008");
+                    throw errors.Error("E3008");
                 var currentItem = this.currentItem();
                 if (currentItem.uri !== uri)
                     this._updateItem(this.currentIndex, uri)
@@ -1540,7 +1535,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
             forward: function() {
                 this.currentIndex++;
                 if (this.currentIndex >= this.items.length)
-                    throw DX.Error("E3009");
+                    throw errors.Error("E3009");
             },
             navigate: function(uri, replaceCurrent) {
                 if (this.currentIndex < this.items.length && this.currentIndex > -1 && this.items[this.currentIndex].uri === uri)
@@ -1647,7 +1642,13 @@ if (!DevExpress.MOD_FRAMEWORK) {
     })(jQuery, DevExpress);
     /*! Module framework, file framework.application.js */
     (function($, DX) {
-        var Class = DX.Class,
+        var Class = DX.require("/class"),
+            abstract = Class.abstract,
+            EventsMixin = DX.require("/eventsMixin"),
+            Action = DX.require("/action"),
+            storageUtils = DX.require("/utils/utils.storage"),
+            commonUtils = DX.require("/utils/utils.common"),
+            errors = DX.require("/framework/framework.errors"),
             BACK_COMMAND_TITLE,
             INIT_IN_PROGRESS = "InProgress",
             INIT_COMPLETE = "Inited",
@@ -1670,25 +1671,14 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 this.navigationManager.on("navigatingBack", $.proxy(this._onNavigatingBack, this));
                 this.navigationManager.on("navigated", $.proxy(this._onNavigated, this));
                 this.navigationManager.on("navigationCanceled", $.proxy(this._onNavigationCanceled, this));
-                this.stateManager = options.stateManager || new DX.framework.StateManager({storage: options.stateStorage || DX.utils.getSessionStorage()});
+                this.stateManager = options.stateManager || new DX.framework.StateManager({storage: options.stateStorage || storageUtils.sessionStorage()});
                 this.stateManager.addStateSource(this.navigationManager);
                 this.viewCache = this._createViewCache(options);
                 this.commandMapping = this._createCommandMapping(options.commandMapping);
                 this.createNavigation(options.navigation);
-                this.beforeViewSetup = $.Callbacks();
-                this.afterViewSetup = $.Callbacks();
-                this.viewShowing = $.Callbacks();
-                this.viewShown = $.Callbacks();
-                this.viewHidden = $.Callbacks();
-                this.viewDisposing = $.Callbacks();
-                this.viewDisposed = $.Callbacks();
-                this.navigating = $.Callbacks();
-                this.navigatingBack = $.Callbacks();
-                this.initialized = $.Callbacks();
-                this._callbacksToEvents("HtmlApplication", ["beforeViewSetup", "afterViewSetup", "viewShowing", "viewShown", "viewHidden", "viewDisposing", "viewDisposed", "navigating", "navigatingBack", "initialized"]);
                 this._isNavigating = false;
                 this._viewLinksHash = {};
-                DX.registerActionExecutor(DX.framework.createActionExecutors(this));
+                Action.registerExecutor(DX.framework.createActionExecutors(this));
                 this.components.push(this.router);
                 this.components.push(this.navigationManager)
             },
@@ -1759,7 +1749,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
                         that._initState = INIT_COMPLETE;
                         that._processEvent("initialized")
                     }).fail(function(error) {
-                        throw error || DX.Error("E3022");
+                        throw error || errors.Error("E3022");
                     })
             },
             _onNavigatingBack: function(args) {
@@ -1778,12 +1768,12 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 }
                 var routeData = this.router.parse(args.uri);
                 if (!routeData)
-                    throw DX.Error("E3001", args.uri);
+                    throw errors.Error("E3001", args.uri);
                 var uri = this.router.format(routeData);
                 if (args.uri !== uri && uri) {
                     args.cancel = true;
                     args.cancelReason = "redirect";
-                    DX.utils.executeAsync(function() {
+                    commonUtils.executeAsync(function() {
                         that.navigate(uri, args.options)
                     })
                 }
@@ -1806,7 +1796,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
                     that._isNavigating = false;
                     var pendingArgs = that._pendingNavigationArgs;
                     if (pendingArgs)
-                        DX.utils.executeAsync(function() {
+                        commonUtils.executeAsync(function() {
                             that.navigate(pendingArgs.uri, pendingArgs.options)
                         })
                 });
@@ -1820,7 +1810,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 if (!that._pendingNavigationArgs || that._pendingNavigationArgs.uri !== args.uri) {
                     var currentItem = that.navigationManager.currentItem();
                     if (currentItem)
-                        DX.utils.executeAsync(function() {
+                        commonUtils.executeAsync(function() {
                             var viewInfo = that._acquireViewInfo(currentItem, args.options);
                             that._highlightCurrentNavigationCommand(viewInfo, true)
                         });
@@ -1939,12 +1929,10 @@ if (!DevExpress.MOD_FRAMEWORK) {
                         direction: direction,
                         params: viewInfo.routeData
                     };
-                if (that._processRequestResultLockEnabled)
-                    DX.data.utils.processRequestResultLock.obtain();
+                DX.data.utils.processRequestResultLock.obtain();
                 return that._showViewImpl(eventArgs.viewInfo, eventArgs.direction).done(function() {
-                        DX.utils.executeAsync(function() {
-                            if (that._processRequestResultLockEnabled)
-                                DX.data.utils.processRequestResultLock.release();
+                        commonUtils.executeAsync(function() {
+                            DX.data.utils.processRequestResultLock.release();
                             that._processEvent("viewShown", eventArgs, viewInfo.model);
                             that._disposeRemovedViews()
                         })
@@ -1964,7 +1952,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 if (!selectedCommand)
                     $.each(this.navigation, function(index, command) {
                         var commandUri = command.option("onExecute");
-                        if (DX.utils.isString(commandUri)) {
+                        if (commonUtils.isString(commandUri)) {
                             commandUri = commandUri.replace(/^#+/, "");
                             if (commandUri === that.navigationManager.rootUri()) {
                                 selectedCommand = command;
@@ -1982,7 +1970,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
                     command.option("highlighted", command === selectedCommand)
                 })
             },
-            _showViewImpl: DX.abstract,
+            _showViewImpl: abstract,
             _obtainViewLink: function(viewInfo) {
                 var key = viewInfo.key;
                 if (!this._viewLinksHash[key])
@@ -1995,9 +1983,9 @@ if (!DevExpress.MOD_FRAMEWORK) {
             },
             _releaseViewLink: function(viewInfo) {
                 if (this._viewLinksHash[viewInfo.key] === undefined)
-                    DX.log("W3001", viewInfo.key);
+                    errors.log("W3001", viewInfo.key);
                 if (this._viewLinksHash[viewInfo.key].linkCount === 0)
-                    DX.log("W3002", viewInfo.key);
+                    errors.log("W3002", viewInfo.key);
                 this._viewLinksHash[viewInfo.key].linkCount--
             },
             navigate: function(uri, options) {
@@ -2005,7 +1993,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 if ($.isPlainObject(uri)) {
                     uri = that.router.format(uri);
                     if (uri === false)
-                        throw DX.Error("E3002");
+                        throw errors.Error("E3002");
                 }
                 if (!that._initState)
                     that.init().done(function() {
@@ -2017,7 +2005,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
                         that.navigationManager.navigate(uri, options)
                 }
                 else
-                    throw DX.Error("E3003");
+                    throw errors.Error("E3003");
             },
             canBack: function(stackKey) {
                 return this.navigationManager.canBack(stackKey)
@@ -2043,7 +2031,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
             clearState: function() {
                 this.stateManager.clearState()
             }
-        }).include(DX.EventsMixin)
+        }).include(EventsMixin)
     })(jQuery, DevExpress);
     /*! Module framework, file framework.html.js */
     (function($, DX, undefined) {
@@ -2073,6 +2061,19 @@ if (!DevExpress.MOD_FRAMEWORK) {
                         }]
                 },
                 "default": {
+                    "layout-change": [{animation: "none"}, {
+                            animation: "ios7-slide",
+                            device: {platform: "ios"}
+                        }, {
+                            animation: "pop",
+                            device: {platform: "android"}
+                        }, {
+                            animation: "openDoor",
+                            device: {
+                                deviceType: "phone",
+                                platform: "win"
+                            }
+                        }],
                     "view-content-change": [{animation: "slide"}, {
                             animation: "ios7-slide",
                             device: {platform: "ios"}
@@ -2276,11 +2277,64 @@ if (!DevExpress.MOD_FRAMEWORK) {
             }
         }
     })(jQuery, DevExpress);
+    /*! Module framework, file framework.markupComponent.js */
+    (function($, DX, undefined) {
+        var Class = DX.require("/class"),
+            publicComponentUtils = DX.require("/utils/utils.publicComponent"),
+            removeEvent = DX.require("/ui/events/ui.events.remove");
+        var MarkupComponent = Class.inherit({
+                ctor: function(element, options) {
+                    this.NAME = this.constructor.publicName();
+                    options = options || {};
+                    this._$element = $(element).one(removeEvent.name, $.proxy(function() {
+                        this._dispose()
+                    }, this));
+                    publicComponentUtils.attachInstanceToElement(this._$element, this.NAME, this);
+                    if (options.fromCache)
+                        this._options = options;
+                    else {
+                        this._options = {};
+                        this._setDefaultOptions();
+                        if (options)
+                            this.option(options);
+                        this._render()
+                    }
+                },
+                _setDefaultOptions: $.noop,
+                _render: $.noop,
+                _dispose: $.noop,
+                element: function() {
+                    return this._$element
+                },
+                option: function(name, value) {
+                    if (arguments.length === 0)
+                        return this._options;
+                    else if (arguments.length === 1)
+                        if (typeof name === "string")
+                            return this._options[name];
+                        else {
+                            value = name;
+                            $.extend(this._options, value)
+                        }
+                    else
+                        this._options[name] = value
+                },
+                instance: function() {
+                    return this
+                }
+            });
+        MarkupComponent.publicName = publicComponentUtils.getName;
+        MarkupComponent.getInstance = function($element) {
+            return publicComponentUtils.getInstanceByElement($element, this.publicName())
+        };
+        $.extend(DX.framework.html, {MarkupComponent: MarkupComponent})
+    })(jQuery, DevExpress);
     /*! Module framework, file framework.widgetCommandAdapters.js */
     (function($, DX) {
-        var commandToContainer = DX.framework.utils.commandToContainer,
+        var Class = DevExpress.require("/class"),
+            commandToContainer = DX.framework.utils.commandToContainer,
             DX_COMMAND_TO_WIDGET_ADAPTER = "dxCommandToWidgetAdapter";
-        var WidgetItemWrapperBase = DX.Class.inherit({
+        var WidgetItemWrapperBase = Class.inherit({
                 ctor: function(command, containerOptions) {
                     this.command = command;
                     this.widgetItem = this._createWidgetItem(command, containerOptions)
@@ -2307,7 +2361,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
                     delete this.widgetItem
                 }
             });
-        var WidgetAdapterBase = DX.Class.inherit({
+        var WidgetAdapterBase = Class.inherit({
                 ctor: function($widgetElement) {
                     this._commandToWidgetItemOptionNames = {};
                     this.$widgetElement = $widgetElement;
@@ -2337,8 +2391,8 @@ if (!DevExpress.MOD_FRAMEWORK) {
                     return this.animationDeferred
                 },
                 _onWidgetItemRendered: function(e) {
-                    if (e.itemData.isJustAdded && e.itemElement.is(":visible")) {
-                        this._transitionExecutor.enter(e.itemElement, "command-rendered");
+                    if (e.itemData.isJustAdded && e.itemData.command && e.itemData.command.option("visible") && this._commandRenderedAnimation) {
+                        this._transitionExecutor.enter(e.itemElement, this._commandRenderedAnimation);
                         delete e.itemData.isJustAdded
                     }
                 },
@@ -2402,7 +2456,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
                     }
                 }
             });
-        var CommandToWidgetAdapter = DX.Class.inherit({
+        var CommandToWidgetAdapter = Class.inherit({
                 ctor: function(createAdapter) {
                     this.createAdapter = createAdapter
                 },
@@ -2449,7 +2503,8 @@ if (!DevExpress.MOD_FRAMEWORK) {
         var dxToolbarAdapter = WidgetAdapterBase.inherit({
                 ctor: function($widgetElement) {
                     this.callBase($widgetElement);
-                    this._commandToWidgetItemOptionNames = {title: "text"}
+                    this._commandToWidgetItemOptionNames = {title: "text"};
+                    this._commandRenderedAnimation = "command-rendered"
                 },
                 _getWidgetByElement: function($element) {
                     return $element.dxToolbar("instance")
@@ -2458,8 +2513,8 @@ if (!DevExpress.MOD_FRAMEWORK) {
                     return new dxToolbarItemWrapper(command, containerOptions)
                 },
                 addCommand: function(command, containerOptions) {
-                    this.callBase(command, containerOptions);
-                    this.widget.option("visible", true)
+                    this.widget.option("visible", true);
+                    this.callBase(command, containerOptions)
                 }
             });
         var dxListItemWrapper = WidgetItemWrapperBase.inherit({_createWidgetItemCore: function(itemOptions, executeCommandCallback) {
@@ -2635,8 +2690,10 @@ if (!DevExpress.MOD_FRAMEWORK) {
     })(jQuery, DevExpress);
     /*! Module framework, file framework.commandManager.js */
     (function($, DX, undefined) {
-        var Class = DX.Class;
-        var CommandContainer = DX.DOMComponent.inherit({
+        var Class = DevExpress.require("/class"),
+            errors = DevExpress.require("/framework/framework.errors"),
+            registerComponent = DX.require("/componentRegistrator");
+        var CommandContainer = DX.framework.html.MarkupComponent.inherit({
                 ctor: function(element, options) {
                     if ($.isPlainObject(element)) {
                         options = element;
@@ -2653,7 +2710,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
                     this.element().addClass("dx-command-container")
                 }
             });
-        DX.registerComponent("dxCommandContainer", DX.framework, CommandContainer);
+        registerComponent("dxCommandContainer", DX.framework, CommandContainer);
         DX.framework.html.CommandManager = Class.inherit({
             ctor: function(options) {
                 options = options || {};
@@ -2691,7 +2748,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
             },
             _checkCommandId: function(id, command) {
                 if (id === null)
-                    throw DX.Error("E3010", command.element().get(0).outerHTML);
+                    throw errors.Error("E3010", command.element().get(0).outerHTML);
             },
             renderCommandsToContainers: function(commands, containers) {
                 var that = this,
@@ -2730,7 +2787,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 adapter.clearContainer($container)
             },
             _arrangeCommandsToContainers: function(commands, containers) {
-                DX.log("W0002", "CommandManager", "_arrangeCommandsToContainers", "14.1", "Use the 'renderCommandsToContainers' method instead.");
+                errors.log("W0002", "CommandManager", "_arrangeCommandsToContainers", "14.1", "Use the 'renderCommandsToContainers' method instead.");
                 this.renderCommandsToContainers(commands, containers)
             },
             _attachCommandsToContainer: function($container, commandInfos) {
@@ -2749,11 +2806,18 @@ if (!DevExpress.MOD_FRAMEWORK) {
     })(jQuery, DevExpress);
     /*! Module framework, file framework.layoutController.js */
     (function($, DX, undefined) {
-        var Class = DX.Class,
+        var Class = DevExpress.require("/class"),
+            EventsMixin = DX.require("/eventsMixin"),
+            errors = DevExpress.require("/framework/framework.errors"),
+            commonUtils = DX.require("/utils/utils.common"),
+            domUtils = DX.require("/utils/utils.dom"),
             HIDDEN_BAG_ID = "__hidden-bag",
             TRANSITION_SELECTOR = ".dx-transition:not(.dx-transition .dx-transition)",
             CONTENT_SELECTOR = ".dx-content",
-            DEFAULT_COMMAND_RENDER_STAGE = "onViewShown";
+            DEFAULT_COMMAND_RENDER_STAGE = "onViewShown",
+            CONTENT_RENDERED_EVENT_NAME = "dxcontentrendered.layoutController",
+            PENDING_RENDERING_SELECTOR = ".dx-pending-rendering",
+            PENDING_RENDERING_MANUAL_SELECTOR = ".dx-pending-rendering-manual";
         var transitionSelector = function(transitionName) {
                 return ".dx-transition-" + transitionName
             };
@@ -2763,12 +2827,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 this.name = options.name || "";
                 this._layoutModel = options.layoutModel || {};
                 this._defaultPaneName = options.defaultPaneName || "content";
-                this._transitionDuration = options.transitionDuration === undefined ? 400 : options.transitionDuration;
-                this.viewReleased = $.Callbacks();
-                this.viewHidden = $.Callbacks();
-                this.viewShowing = $.Callbacks();
-                this.viewRendered = $.Callbacks();
-                this._callbacksToEvents("DefaultLayoutController", ["viewReleased", "viewHidden", "viewShowing", "viewRendered"])
+                this._transitionDuration = options.transitionDuration === undefined ? 400 : options.transitionDuration
             },
             init: function(options) {
                 options = options || {};
@@ -2778,8 +2837,8 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 this._viewEngine = options.viewEngine;
                 this.transitionExecutor = new DX.TransitionExecutor;
                 this._prepareTemplates();
-                this._$viewPort.append(this._getRootElement());
-                this._hideElements(this._getRootElement());
+                this._$viewPort.append(this.element());
+                this._hideElements(this.element());
                 if (options.templateContext) {
                     this._templateContext = options.templateContext;
                     this._proxiedTemplateContextChangedHandler = $.proxy(this._templateContextChangedHandler, this)
@@ -2791,7 +2850,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
                     this._notifyShowing();
                     return $.Deferred().resolve().promise()
                 }
-                var $rootElement = this._getRootElement();
+                var $rootElement = this.element();
                 this._showElements($rootElement);
                 this._attachRefreshViewRequiredHandler();
                 return $.Deferred().resolve().promise()
@@ -2799,7 +2858,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
             deactivate: function() {
                 this._disabledState = false;
                 this._releaseVisibleViews();
-                this._hideElements(this._getRootElement());
+                this._hideElements(this.element());
                 this._detachRefreshViewRequiredHandler();
                 return $.Deferred().resolve().promise()
             },
@@ -2813,13 +2872,13 @@ if (!DevExpress.MOD_FRAMEWORK) {
             _notifyShowing: function() {
                 var that = this;
                 $.each(this._visibleViews, function(index, viewInfo) {
-                    that.viewShowing.fireWith(that, [viewInfo])
+                    that.fireEvent("viewShowing", [viewInfo])
                 })
             },
             _notifyHidden: function() {
                 var that = this;
                 $.each(this._visibleViews, function(index, viewInfo) {
-                    that.viewHidden.fireWith(that, [viewInfo])
+                    that.fireEvent("viewHidden", [viewInfo])
                 })
             },
             _applyTemplate: function($elements, model) {
@@ -2882,7 +2941,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 if (this._$navigationWidget)
                     this._commandManager.clearContainer(this._$navigationWidget.dxCommandContainer("instance"))
             },
-            _getRootElement: function() {
+            element: function() {
                 return this._$mainLayout
             },
             _getViewFrame: function(viewInfo) {
@@ -2923,7 +2982,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 if (previousViewTemplateId && previousViewTemplateId === viewInfo.currentViewTemplateId && viewInfo === previousViewInfo)
                     return $.Deferred().resolve().promise();
                 that._ensureViewRendered(viewInfo);
-                that.viewShowing.fireWith(that, [viewInfo, direction]);
+                that.fireEvent("viewShowing", [viewInfo, direction]);
                 return this._showViewImpl(viewInfo, direction, previousViewTemplateId).done(function() {
                         that._onViewShown(viewInfo)
                     })
@@ -2960,7 +3019,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
                         outOfContentItems = outOfContentItems.add($item)
                 });
                 if (outOfContentItems.length && !isSimplifiedMarkup)
-                    throw DX.Error("E3014", outOfContentItems[0].outerHTML);
+                    throw errors.Error("E3014", outOfContentItems[0].outerHTML);
                 viewInfo.renderResult = viewInfo.renderResult || {};
                 viewInfo.renderResult.$viewItems = $viewItems;
                 viewInfo.renderResult.$markup = $layout
@@ -2995,7 +3054,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 return result
             },
             _findCommandContainers: function($markup) {
-                return DX.utils.createComponents($markup, ["dxCommandContainer"])
+                return domUtils.createComponents($markup, ["dxCommandContainer"])
             },
             _defineCurrentViewTemplateId: function(viewInfo) {
                 var viewTemplateInstance = viewInfo.$viewTemplate ? viewInfo.$viewTemplate.dxView("instance") : this._viewEngine.getViewTemplateInfo(viewInfo.viewName),
@@ -3040,8 +3099,9 @@ if (!DevExpress.MOD_FRAMEWORK) {
                             animation: $transition.attr("data-dx-transition-type")
                         };
                     animationItems.push(animationItem);
-                    that._hideViewElements($viewElement);
                     $transition.append($viewElement);
+                    that._showViewElements($viewElement);
+                    domUtils.triggerShownEvent($viewElement);
                     $transitionContentElements = $transitionContentElements.add($viewElement)
                 });
                 that._$mainLayout.append(viewInfo.renderResult.$viewItems.filter(".dx-command"));
@@ -3087,7 +3147,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 return result
             },
             _releaseView: function(viewInfo) {
-                this.viewReleased.fireWith(this, [viewInfo])
+                this.fireEvent("viewReleased", [viewInfo])
             },
             _getReadyForRenderDeferredItems: function(viewInfo) {
                 return $.Deferred().resolve().promise()
@@ -3114,22 +3174,28 @@ if (!DevExpress.MOD_FRAMEWORK) {
             _subscribeToDeferredItems: function(viewInfo) {
                 var that = this,
                     $markup = viewInfo.renderResult.$markup;
-                $markup.find(".dx-pending-rendering").add($markup.filter(".dx-pending-rendering")).each(function() {
-                    var $element = $(this),
-                        promise = $element.data("dx-rendered-promise");
-                    if (promise)
-                        promise.done(function() {
-                            that._renderCommands($element, viewInfo.commands)
-                        })
+                $markup.find(PENDING_RENDERING_SELECTOR).add($markup.filter(PENDING_RENDERING_SELECTOR)).each(function() {
+                    var eventData = {
+                            viewInfo: viewInfo,
+                            context: that
+                        };
+                    $(this).on(CONTENT_RENDERED_EVENT_NAME, eventData, that._onDeferredContentRendered)
                 })
+            },
+            _onDeferredContentRendered: function(event) {
+                var $element = $(event.target),
+                    viewInfo = event.data.viewInfo,
+                    that = event.data.context;
+                $element.off(CONTENT_RENDERED_EVENT_NAME, that._onDeferredContentRendered);
+                that._renderCommands($element, viewInfo.commands)
             },
             _renderDeferredItems: function($items) {
                 var that = this,
                     result = $.Deferred();
-                var $pendingItem = $items.find(".dx-pending-rendering-manual").add($items.filter(".dx-pending-rendering-manual")).first();
+                var $pendingItem = $items.find(PENDING_RENDERING_MANUAL_SELECTOR).add($items.filter(PENDING_RENDERING_MANUAL_SELECTOR)).first();
                 if ($pendingItem.length) {
                     var render = $pendingItem.data("dx-render-delegate");
-                    setTimeout(function() {
+                    commonUtils.executeAsync(function() {
                         render().then(function() {
                             return that._renderDeferredItems($items)
                         }).then(function() {
@@ -3145,14 +3211,12 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 return this._defaultPaneName
             },
             _hideElements: function($elements) {
-                $elements.addClass("dx-hidden")
+                $elements.addClass("dx-fast-hidden")
             },
             _showElements: function($elements) {
-                $elements.removeClass("dx-hidden");
-                DX.utils.triggerShownEvent($elements)
+                $elements.removeClass("dx-fast-hidden")
             },
             _hideViewElements: function($elements) {
-                DX.utils.triggerHidingEvent($elements);
                 this._patchIDs($elements);
                 this._disableInputs($elements);
                 $elements.removeClass("dx-active-view").addClass("dx-inactive-view")
@@ -3161,18 +3225,24 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 if (viewInfo.renderResult) {
                     var $markupToHide = templateId === undefined ? viewInfo.renderResult.$markup : viewInfo.renderResult.markupCache[templateId];
                     this._hideViewElements($markupToHide);
-                    this.viewHidden.fireWith(this, [viewInfo])
+                    this.fireEvent("viewHidden", [viewInfo])
                 }
             },
             _showViewElements: function($elements) {
                 this._unpatchIDs($elements);
                 this._enableInputs($elements);
                 $elements.removeClass("dx-inactive-view").addClass("dx-active-view");
-                DX.utils.triggerShownEvent($elements)
+                this._skipAnimation($elements)
             },
             _showView: function(viewInfo) {
                 if (viewInfo.renderResult)
                     this._showViewElements(viewInfo.renderResult.$markup)
+            },
+            _skipAnimation: function($elements) {
+                $elements.addClass("dx-skip-animation");
+                for (var i = 0; i < $elements.length; i++)
+                    $elements.eq(i).css("transform");
+                $elements.removeClass("dx-skip-animation")
             },
             _patchIDs: function($markup) {
                 this._processIDs($markup, function(id) {
@@ -3213,18 +3283,24 @@ if (!DevExpress.MOD_FRAMEWORK) {
                     })
                 })
             }
-        }).include(DX.EventsMixin);
+        }).include(EventsMixin);
         var layoutSets = DX.framework.html.layoutSets;
         layoutSets["default"] = layoutSets["default"] || [];
         layoutSets["default"].push({controller: new DX.framework.html.DefaultLayoutController})
     })(jQuery, DevExpress);
     /*! Module framework, file framework.viewEngine.js */
     (function($, DX, undefined) {
-        var Class = DX.Class,
+        var Class = DevExpress.require("/class"),
+            errors = DevExpress.require("/framework/framework.errors"),
+            domUtils = DX.require("/utils/utils.dom"),
+            commonUtils = DX.require("/utils/utils.common"),
+            registerComponent = DX.require("/componentRegistrator"),
             framework = DX.framework,
+            MarkupComponent = DX.framework.html.MarkupComponent,
+            MARKUP_TEMPLATE_MARKER = "MarkupTemplate:",
             _VIEW_ROLE = "dxView",
             _LAYOUT_ROLE = "dxLayout";
-        DX.registerComponent(_VIEW_ROLE, framework, DX.DOMComponent.inherit({
+        registerComponent(_VIEW_ROLE, framework, MarkupComponent.inherit({
             _setDefaultOptions: function() {
                 this.callBase();
                 this.option({
@@ -3233,8 +3309,8 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 })
             },
             ctor: function() {
-                this.callBase.apply(this, arguments);
-                this._id = DX.utils.uniqueId()
+                this._id = domUtils.uniqueId();
+                this.callBase.apply(this, arguments)
             },
             _render: function() {
                 this.callBase();
@@ -3245,7 +3321,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 return this._id
             }
         }), framework);
-        DX.registerComponent(_LAYOUT_ROLE, framework, DX.DOMComponent.inherit({
+        registerComponent(_LAYOUT_ROLE, framework, MarkupComponent.inherit({
             _setDefaultOptions: function() {
                 this.callBase();
                 this.option({name: null})
@@ -3255,7 +3331,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 this.element().addClass("dx-layout")
             }
         }));
-        DX.registerComponent("dxViewPlaceholder", framework, DX.DOMComponent.inherit({
+        registerComponent("dxViewPlaceholder", framework, MarkupComponent.inherit({
             _setDefaultOptions: function() {
                 this.callBase();
                 this.option({viewName: null})
@@ -3275,7 +3351,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
         var setupTransitionInnerElement = function($element) {
                 $element.addClass("dx-transition-inner-wrapper")
             };
-        DX.registerComponent("dxTransition", framework, DX.DOMComponent.inherit({
+        registerComponent("dxTransition", framework, MarkupComponent.inherit({
             _setDefaultOptions: function() {
                 this.callBase();
                 this.option({
@@ -3291,7 +3367,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 element.wrapInner("<div/>");
                 setupTransitionInnerElement(element.children());
                 if (this.option("type"))
-                    DX.log("W0003", "dxTransition", "type", "15.1", "Use the 'animation' property instead")
+                    errors.log("W0003", "dxTransition", "type", "15.1", "Use the 'animation' property instead")
             },
             _clean: function() {
                 this.callBase();
@@ -3304,7 +3380,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 $element.children().dxContent({targetPlaceholder: targetPlaceholderName})
             }
         };
-        DX.registerComponent("dxContentPlaceholder", framework, DX.DOMComponent.inherit({
+        registerComponent("dxContentPlaceholder", framework, MarkupComponent.inherit({
             _setDefaultOptions: function() {
                 this.callBase();
                 this.option({
@@ -3321,13 +3397,13 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 $element.attr("data-dx-content-placeholder-name", this.option("name"));
                 setupTransitionElement($element, this.option("transition") || this.option("animation"), this.option("name"), this.option("contentCssPosition"));
                 if (this.option("transition"))
-                    DX.log("W0003", "dxContentPlaceholder", "transition", "15.1", "Use the 'animation' property instead")
+                    errors.log("W0003", "dxContentPlaceholder", "transition", "15.1", "Use the 'animation' property instead")
             },
             prepareTransition: function() {
                 DX.framework.prepareTransition(this.element(), this.option("name"))
             }
         }));
-        DX.registerComponent("dxContent", framework, DX.DOMComponent.inherit({
+        registerComponent("dxContent", framework, MarkupComponent.inherit({
             _setDefaultOptions: function() {
                 this.callBase();
                 this.option({targetPlaceholder: null})
@@ -3358,7 +3434,14 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 this._templateMap = {};
                 this._pendingViewContainer = null;
                 this.markupLoaded = $.Callbacks();
-                this._templateContext = options.templateContext
+                this._templateContext = options.templateContext;
+                this._$skippedMarkup = $();
+                if (options.templatesVersion !== undefined && options.templateCacheStorage) {
+                    this._templateCacheEnabled = true;
+                    this._templatesVersion = "v_" + options.templatesVersion;
+                    this._templateCacheStorage = options.templateCacheStorage;
+                    this._templateCacheKey = "dxTemplateCache_" + DevExpress.VERSION + "_" + JSON.stringify(this.device)
+                }
             },
             _enumerateTemplates: function(processFn) {
                 var that = this;
@@ -3380,11 +3463,11 @@ if (!DevExpress.MOD_FRAMEWORK) {
             _findTemplate: function(name, role) {
                 var component = this._findComponent(name, role);
                 if (!component)
-                    throw DX.Error("E3013", role, name);
+                    throw errors.Error("E3013", role, name);
                 var $template = component.element(),
                     $result;
                 if (!component._isStaticComponentsCreated) {
-                    DX.utils.createComponents($template, ["dxContent", "dxContentPlaceholder", "dxTransition"]);
+                    domUtils.createComponents($template, ["dxContent", "dxContentPlaceholder", "dxTransition"]);
                     component._isStaticComponentsCreated = true
                 }
                 $result = $template.clone().removeClass("dx-hidden");
@@ -3393,16 +3476,18 @@ if (!DevExpress.MOD_FRAMEWORK) {
             _loadTemplatesFromMarkupCore: function($markup) {
                 var that = this;
                 if ($markup.find("[data-dx-role]").length)
-                    throw DX.Error("E3019");
+                    throw errors.Error("E3019");
                 that.markupLoaded.fire({markup: $markup});
-                $markup.appendTo(that.$root);
-                var components = DX.utils.createComponents($markup, [_VIEW_ROLE, _LAYOUT_ROLE]);
+                var components = domUtils.createComponents($markup, [_VIEW_ROLE, _LAYOUT_ROLE]);
                 $.each(components, function(index, component) {
                     var $element = component.element();
                     $element.addClass("dx-hidden");
                     that._registerTemplateComponent(component);
                     component.element().detach()
-                })
+                });
+                var $skipped = $markup.filter("script");
+                $skipped.appendTo(that.$root);
+                that._$skippedMarkup = that._$skippedMarkup.add($skipped)
             },
             _registerTemplateComponent: function(component) {
                 var role = component.NAME,
@@ -3415,7 +3500,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
             },
             _applyPartialViews: function($render) {
                 var that = this;
-                DX.utils.createComponents($render, ["dxViewPlaceholder"]);
+                domUtils.createComponents($render, ["dxViewPlaceholder"]);
                 $.each($render.find(".dx-view-placeholder"), function() {
                     var $partialPlaceholder = $(this);
                     if ($partialPlaceholder.children().length)
@@ -3440,10 +3525,10 @@ if (!DevExpress.MOD_FRAMEWORK) {
                     isLocal: options.isLocal,
                     dataType: "html"
                 }).done(function(data) {
-                    that._loadTemplatesFromMarkupCore(DX.utils.createMarkupFromString(data));
+                    that._loadTemplatesFromMarkupCore(domUtils.createMarkupFromString(data));
                     deferred.resolve()
                 }).fail(function(jqXHR, textStatus, errorThrown) {
-                    var error = DX.Error("E3021", url, errorThrown);
+                    var error = errors.Error("E3021", url, errorThrown);
                     deferred.reject(error)
                 });
                 return deferred.promise()
@@ -3482,16 +3567,14 @@ if (!DevExpress.MOD_FRAMEWORK) {
             _filterTemplatesByDevice: function(components) {
                 var filteredComponents = this._filterTemplates(this.device, components);
                 $.each(components, function(index, component) {
-                    if ($.inArray(component, filteredComponents) < 0) {
-                        component._dispose();
+                    if ($.inArray(component, filteredComponents) < 0)
                         component.element().remove()
-                    }
                 });
                 components.length = 0;
                 components.push.apply(components, filteredComponents)
             },
             _filterTemplates: function(filter, components) {
-                return DX.utils.findBestMatches(filter, components, function(component) {
+                return commonUtils.findBestMatches(filter, components, function(component) {
                         return component.option()
                     })
             },
@@ -3501,7 +3584,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
                     $.each(bestMatches, function(index, match) {
                         message += match.element().attr("data-options") + "\r\n"
                     });
-                    throw DX.Error("E3020", message, JSON.stringify(this.device));
+                    throw errors.Error("E3020", message, JSON.stringify(this.device));
                 }
             },
             _wrapViewDefaultContent: function($viewTemplate) {
@@ -3510,7 +3593,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
             },
             _initDefaultLayout: function() {
                 this._$defaultLayoutTemplate = $("<div class=\"dx-full-height\" data-options=\"dxLayout : { name: 'default' } \"> \n" + "    <div class=\"dx-full-height\" data-options=\"dxContentPlaceholder : { name: 'content' } \" ></div> \n" + "</div>");
-                DX.utils.createComponents(this._$defaultLayoutTemplate)
+                domUtils.createComponents(this._$defaultLayoutTemplate)
             },
             _getDefaultLayoutTemplate: function() {
                 return this._$defaultLayoutTemplate.clone()
@@ -3532,13 +3615,71 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 $placeholderContents.filter(":not(.dx-content-placeholder .dx-content)").remove();
                 return $layout
             },
+            _loadTemplatesFromCache: function() {
+                if (!this._templateCacheEnabled)
+                    return;
+                var cache;
+                var fromJSONInterceptor = function(key, value) {
+                        if (typeof value === "string" && value.indexOf(MARKUP_TEMPLATE_MARKER) === 0) {
+                            var data = JSON.parse(value.substr(MARKUP_TEMPLATE_MARKER.length)),
+                                type = data.type,
+                                options = data.options,
+                                $markup = $(data.markup);
+                            options.fromCache = true;
+                            return $markup[type](options)[type]("instance")
+                        }
+                        else if (key === "skippedMarkup")
+                            return $("<div>").append($(value)).contents();
+                        return value
+                    };
+                var toParse = this._templateCacheStorage.getItem(this._templateCacheKey);
+                if (toParse)
+                    try {
+                        var cacheContainer = JSON.parse(toParse, fromJSONInterceptor);
+                        cache = cacheContainer[this._templatesVersion]
+                    }
+                    catch(e) {
+                        this._templateCacheStorage.removeItem(this._templateCacheKey)
+                    }
+                if (!cache)
+                    return;
+                this._templateMap = cache.templates;
+                this.$root.append(cache.skippedMarkup);
+                return true
+            },
+            _putTemplatesToCache: function() {
+                if (!this._templateCacheEnabled)
+                    return;
+                var toJSONInterceptor = function(key, value) {
+                        if (value && value.element)
+                            return MARKUP_TEMPLATE_MARKER + JSON.stringify({
+                                    markup: value.element().prop("outerHTML"),
+                                    options: value.option(),
+                                    type: value.NAME
+                                });
+                        else if (key === "skippedMarkup")
+                            return $("<div>").append(value.clone()).html();
+                        return value
+                    };
+                var cacheContainer = {};
+                cacheContainer[this._templatesVersion] = {
+                    templates: this._templateMap,
+                    skippedMarkup: this._$skippedMarkup
+                };
+                this._templateCacheStorage.setItem(this._templateCacheKey, JSON.stringify(cacheContainer, toJSONInterceptor, 4))
+            },
             init: function() {
                 var that = this;
                 this._initDefaultLayout();
-                return this._loadExternalTemplates().done(function() {
-                        that._loadTemplatesFromMarkupCore(that.$root.children());
-                        that._processTemplates()
-                    })
+                if (!this._loadTemplatesFromCache()) {
+                    that._loadTemplatesFromMarkupCore(that.$root.children());
+                    return this._loadExternalTemplates().done(function() {
+                            that._processTemplates();
+                            that._putTemplatesToCache()
+                        })
+                }
+                else
+                    return $.Deferred().resolve().promise()
             },
             getViewTemplate: function(viewName) {
                 return this._findTemplate(viewName, _VIEW_ROLE)
@@ -3568,9 +3709,18 @@ if (!DevExpress.MOD_FRAMEWORK) {
     })(jQuery, DevExpress);
     /*! Module framework, file framework.htmlApplication.js */
     (function($, DX, undefined) {
-        var frameworkNS = DX.framework,
+        var Component = DX.require("/component"),
+            errors = DX.require("/framework/framework.errors"),
+            viewPort = DX.require("/utils/utils.viewPort").value,
+            objectUtils = DX.require("/utils/utils.object"),
+            domUtils = DX.require("/utils/utils.dom"),
+            commonUtils = DX.require("/utils/utils.common"),
+            devices = DX.require("/devices"),
+            feedbackEvents = DX.require("/ui/events/ui.events.emitter.feedback"),
+            frameworkNS = DX.framework,
             htmlNS = frameworkNS.html;
-        var VIEW_PORT_CLASSNAME = "dx-viewport";
+        var VIEW_PORT_CLASSNAME = "dx-viewport",
+            LAYOUT_CHANGE_ANIMATION_NAME = "layout-change";
         htmlNS.HtmlApplication = frameworkNS.Application.inherit({
             ctor: function(options) {
                 options = options || {};
@@ -3578,24 +3728,24 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 this._$root = $(options.rootNode || document.body);
                 this._initViewport(options.viewPort);
                 if (this._applicationMode === "mobileApp")
-                    DX.utils.initMobileViewport(options.viewPort);
-                this.device = options.device || DX.devices.current();
+                    domUtils.initMobileViewport(options.viewPort);
+                this.device = options.device || devices.current();
                 this.commandManager = options.commandManager || new DX.framework.html.CommandManager({commandMapping: this.commandMapping});
                 this._initTemplateContext();
                 this.viewEngine = options.viewEngine || new htmlNS.ViewEngine({
                     $root: this._$root,
                     device: this.device,
+                    templateCacheStorage: options.templateCacheStorage || window.localStorage,
+                    templatesVersion: options.templatesVersion,
                     templateContext: this._templateContext
                 });
                 this.components.push(this.viewEngine);
                 this._initMarkupFilters(this.viewEngine);
-                this.viewRendered = $.Callbacks();
                 this._layoutSet = options.layoutSet || DX.framework.html.layoutSets["default"];
                 this._animationSet = options.animationSet || DX.framework.html.animationSets["default"];
                 this._availableLayoutControllers = [];
                 this._activeLayoutControllersStack = [];
-                this.resolveLayoutController = $.Callbacks();
-                this._callbacksToEvents("HtmlApplication", ["viewRendered", "resolveLayoutController"]);
+                this.transitionExecutor = new DX.TransitionExecutor;
                 this._initAnimations(this._animationSet)
             },
             _initAnimations: function(animationSet) {
@@ -3615,7 +3765,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 $markup.each(function() {
                     var html = $(this).html();
                     if (/href="#/.test(html))
-                        DX.log("W3005", html)
+                        errors.log("W3005", html)
                 })
             },
             _initMarkupFilters: function(viewEngine) {
@@ -3643,7 +3793,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
             },
             _initViewport: function() {
                 this._$viewPort = this._getViewPort();
-                DX.viewPort(this._$viewPort)
+                viewPort(this._$viewPort)
             },
             _getViewPort: function() {
                 var $viewPort = $("." + VIEW_PORT_CLASSNAME);
@@ -3652,8 +3802,8 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 return $viewPort
             },
             _initTemplateContext: function() {
-                this._templateContext = new DX.Component({orientation: DX.devices.orientation()});
-                DX.devices.on("orientationChanged", $.proxy(function(args) {
+                this._templateContext = new Component({orientation: devices.orientation()});
+                devices.on("orientationChanged", $.proxy(function(args) {
                     this._templateContext.option("orientation", args.orientation)
                 }, this))
             },
@@ -3664,11 +3814,11 @@ if (!DevExpress.MOD_FRAMEWORK) {
                     layoutController = viewInfo.layoutController;
                 that._obtainViewLink(viewInfo);
                 layoutController.showView(viewInfo, direction).done(function() {
-                    that._activateLayoutController(layoutController, that._getTargetNode(viewInfo)).done(function() {
+                    that._activateLayoutController(layoutController, that._getTargetNode(viewInfo), direction).done(function() {
                         deferred.resolve()
                     })
                 });
-                DX.ui.events.lockFeedback(result);
+                feedbackEvents.lock(result);
                 return result
             },
             _resolveLayoutController: function(viewInfo) {
@@ -3678,7 +3828,21 @@ if (!DevExpress.MOD_FRAMEWORK) {
                         availableLayoutControllers: this._availableLayoutControllers
                     };
                 this._processEvent("resolveLayoutController", args, viewInfo.model);
+                this._checkLayoutControllerIsInitialized(args.layoutController);
                 return args.layoutController || this._resolveLayoutControllerImpl(viewInfo)
+            },
+            _checkLayoutControllerIsInitialized: function(layoutController) {
+                if (layoutController) {
+                    var isControllerInited = false;
+                    $.each(this._layoutSet, function(_, controllerInfo) {
+                        if (controllerInfo.controller === layoutController) {
+                            isControllerInited = true;
+                            return false
+                        }
+                    });
+                    if (!isControllerInited)
+                        throw errors.Error("E3024");
+                }
             },
             _ensureOneLayoutControllerFound: function(target, matches) {
                 var toJSONInterceptor = function(key, value) {
@@ -3687,12 +3851,12 @@ if (!DevExpress.MOD_FRAMEWORK) {
                         return value
                     };
                 if (!matches.length) {
-                    DX.log("W3003", JSON.stringify(target, null, 4), JSON.stringify(this._availableLayoutControllers, toJSONInterceptor, 4));
-                    throw DX.Error("E3011");
+                    errors.log("W3003", JSON.stringify(target, null, 4), JSON.stringify(this._availableLayoutControllers, toJSONInterceptor, 4));
+                    throw errors.Error("E3011");
                 }
                 if (matches.length > 1) {
-                    DX.log("W3004", JSON.stringify(target, null, 4), JSON.stringify(matches, toJSONInterceptor, 4));
-                    throw DX.Error("E3012");
+                    errors.log("W3004", JSON.stringify(target, null, 4), JSON.stringify(matches, toJSONInterceptor, 4));
+                    throw errors.Error("E3012");
                 }
             },
             _resolveLayoutControllerImpl: function(viewInfo) {
@@ -3703,8 +3867,8 @@ if (!DevExpress.MOD_FRAMEWORK) {
                         customResolveRequired: false,
                         pane: templateInfo.pane,
                         modal: navigateOptions.modal !== undefined ? navigateOptions.modal : templateInfo.modal || false
-                    }, DX.devices.current());
-                var matches = DX.utils.findBestMatches(target, this._availableLayoutControllers);
+                    }, devices.current());
+                var matches = commonUtils.findBestMatches(target, this._availableLayoutControllers);
                 this._ensureOneLayoutControllerFound(target, matches);
                 return matches[0].controller
             },
@@ -3714,7 +3878,7 @@ if (!DevExpress.MOD_FRAMEWORK) {
                     var previousActiveLayoutController = this._activeLayoutControllersStack[this._activeLayoutControllersStack.length - 2],
                         previousViewInfo = previousActiveLayoutController.activeViewInfo();
                     args.cancel = true;
-                    this._activateLayoutController(previousActiveLayoutController);
+                    this._activateLayoutController(previousActiveLayoutController, undefined, "backward");
                     this.navigationManager.currentItem(previousViewInfo.key)
                 }
             },
@@ -3725,16 +3889,16 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 var jQueryEvent = (viewInfo.navigateOptions || {}).jQueryEvent;
                 return jQueryEvent ? $(jQueryEvent.target) : undefined
             },
-            _activateLayoutController: function(layoutController, targetNode) {
+            _activateLayoutController: function(layoutController, targetNode, direction) {
                 var that = this,
                     previousLayoutController = that._activeLayoutController();
                 if (previousLayoutController === layoutController)
                     return $.Deferred().resolve().promise();
-                return layoutController.activate(targetNode).then($.proxy(this._deactivatePreviousLayoutControllers, this, layoutController)).then(function() {
+                return layoutController.activate(targetNode).then($.proxy(this._deactivatePreviousLayoutControllers, this, layoutController, direction)).then(function() {
                         that._activeLayoutControllersStack.push(layoutController)
                     })
             },
-            _deactivatePreviousLayoutControllers: function(layoutController) {
+            _deactivatePreviousLayoutControllers: function(layoutController, direction) {
                 var that = this,
                     tasks = [],
                     controllerToDeactivate = that._activeLayoutControllersStack.pop();
@@ -3744,11 +3908,35 @@ if (!DevExpress.MOD_FRAMEWORK) {
                     that._activeLayoutControllersStack.push(controllerToDeactivate);
                     tasks.push(controllerToDeactivate.disable())
                 }
-                else
+                else {
+                    var transitionDeferred = $.Deferred(),
+                        skipAnimation = false;
+                    var getControllerDeactivator = function(controllerToDeactivate, d) {
+                            return function() {
+                                    controllerToDeactivate.deactivate().done(function() {
+                                        d.resolve()
+                                    })
+                                }
+                        };
                     while (controllerToDeactivate && controllerToDeactivate !== layoutController) {
-                        tasks.push(controllerToDeactivate.deactivate());
+                        var d = $.Deferred();
+                        if (controllerToDeactivate.isOverlay)
+                            skipAnimation = true;
+                        else
+                            that.transitionExecutor.leave(controllerToDeactivate.element(), LAYOUT_CHANGE_ANIMATION_NAME, {direction: direction});
+                        transitionDeferred.promise().done(getControllerDeactivator(controllerToDeactivate, d));
+                        tasks.push(d.promise());
                         controllerToDeactivate = that._activeLayoutControllersStack.pop()
                     }
+                    if (skipAnimation)
+                        transitionDeferred.resolve();
+                    else {
+                        that.transitionExecutor.enter(layoutController.element(), LAYOUT_CHANGE_ANIMATION_NAME, {direction: direction});
+                        that.transitionExecutor.start().done(function() {
+                            transitionDeferred.resolve()
+                        })
+                    }
+                }
                 return $.when.apply($, tasks)
             },
             init: function() {
@@ -3772,21 +3960,21 @@ if (!DevExpress.MOD_FRAMEWORK) {
                 var viewInfo = this.callBase.apply(this, arguments),
                     templateInfo = this.getViewTemplateInfo(viewInfo.viewName);
                 if (!templateInfo)
-                    throw DX.Error("E3013", "dxView", viewInfo.viewName);
+                    throw errors.Error("E3013", "dxView", viewInfo.viewName);
                 viewInfo.viewTemplateInfo = templateInfo;
                 viewInfo.layoutController = this._resolveLayoutController(viewInfo);
                 return viewInfo
             },
             _createViewModel: function(viewInfo) {
                 this.callBase(viewInfo);
-                DX.utils.extendFromObject(viewInfo.model, viewInfo.viewTemplateInfo)
+                objectUtils.extendFromObject(viewInfo.model, viewInfo.viewTemplateInfo)
             },
             _initLayoutControllers: function() {
                 var that = this;
                 $.each(that._layoutSet, function(index, controllerInfo) {
                     var controller = controllerInfo.controller,
-                        target = DX.devices.current();
-                    if (DX.utils.findBestMatches(target, [controllerInfo]).length) {
+                        target = devices.current();
+                    if (commonUtils.findBestMatches(target, [controllerInfo]).length) {
                         that._availableLayoutControllers.push(controllerInfo);
                         if (controller.init)
                             controller.init({

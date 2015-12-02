@@ -1,22 +1,23 @@
 /*! 
 * DevExtreme (Mobile Widgets)
-* Version: 15.1.8
-* Build date: Oct 29, 2015
+* Version: 15.2.3
+* Build date: Dec 2, 2015
 *
 * Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
 */
 
 "use strict";
-if (!DevExpress.MOD_WIDGETS_MOBILE) {
-    if (!DevExpress.MOD_WIDGETS_BASE)
+if (!window.DevExpress || !DevExpress.MOD_WIDGETS_MOBILE) {
+    if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE)
         throw Error('Required module is not referenced: widgets-base');
     /*! Module widgets-mobile, file ui.pivotTabs.js */
     (function($, DX, undefined) {
         var ui = DX.ui,
             fx = DX.fx,
-            translator = DX.translator,
-            events = ui.events;
+            translator = DX.require("/utils/utils.translator"),
+            registerComponent = DX.require("/componentRegistrator"),
+            eventUtils = DX.require("/ui/events/ui.events.utils");
         var PIVOT_TABS_CLASS = "dx-pivottabs",
             PIVOT_TAB_CLASS = "dx-pivottabs-tab",
             PIVOT_TAB_SELECTED_CLASS = "dx-pivottabs-tab-selected",
@@ -71,19 +72,18 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
                     })
                 }
             };
-        DX.registerComponent("dxPivotTabs", ui, ui.CollectionWidget.inherit({
-            _setDefaultOptions: function() {
-                this.callBase();
-                this.option({
-                    selectedIndex: 0,
-                    onPrepare: null,
-                    onUpdatePosition: null,
-                    onRollback: null,
-                    focusStateEnabled: false,
-                    selectionMode: "single",
-                    selectionRequired: true,
-                    swipeEnabled: true
-                })
+        registerComponent("dxPivotTabs", ui, ui.CollectionWidget.inherit({
+            _getDefaultOptions: function() {
+                return $.extend(this.callBase(), {
+                        selectedIndex: 0,
+                        onPrepare: null,
+                        onUpdatePosition: null,
+                        onRollback: null,
+                        focusStateEnabled: false,
+                        selectionMode: "single",
+                        selectionRequired: true,
+                        swipeEnabled: true
+                    })
             },
             _itemClass: function() {
                 return PIVOT_TAB_CLASS
@@ -289,7 +289,7 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
                 return this._itemContainer().find("." + PIVOT_TAB_CLASS + ", ." + PIVOT_GHOST_TAB_CLASS)
             },
             _initSwipeHandlers: function() {
-                this.element().on(events.addNamespace("dxswipestart", this.NAME), {itemSizeFunc: $.proxy(this._elementWidth, this)}, $.proxy(this._swipeStartHandler, this)).on(events.addNamespace("dxswipe", this.NAME), $.proxy(this._swipeUpdateHandler, this)).on(events.addNamespace("dxswipeend", this.NAME), $.proxy(this._swipeEndHandler, this))
+                this.element().on(eventUtils.addNamespace("dxswipestart", this.NAME), {itemSizeFunc: $.proxy(this._elementWidth, this)}, $.proxy(this._swipeStartHandler, this)).on(eventUtils.addNamespace("dxswipe", this.NAME), $.proxy(this._swipeUpdateHandler, this)).on(eventUtils.addNamespace("dxswipeend", this.NAME), $.proxy(this._swipeEndHandler, this))
             },
             _swipeStartHandler: function(e) {
                 this._prepareAnimation();
@@ -410,10 +410,12 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
     /*! Module widgets-mobile, file ui.pivot.js */
     (function($, DX, undefined) {
         var ui = DX.ui,
-            utils = DX.utils,
-            events = ui.events,
             fx = DX.fx,
-            translator = DX.translator;
+            translator = DX.require("/utils/utils.translator"),
+            domUtils = DX.require("/utils/utils.dom"),
+            commonUtils = DX.require("/utils/utils.common"),
+            registerComponent = DX.require("/componentRegistrator"),
+            eventUtils = DX.require("/ui/events/ui.events.utils");
         var PIVOT_CLASS = "dx-pivot",
             PIVOT_AUTOHEIGHT_CLASS = "dx-pivot-autoheight",
             PIVOT_WRAPPER_CLASS = "dx-pivot-wrapper",
@@ -455,19 +457,18 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
                     fx.stop($element, true)
                 }
             };
-        DX.registerComponent("dxPivot", ui, ui.CollectionWidget.inherit({
-            _setDefaultOptions: function() {
-                this.callBase();
-                this.option({
-                    selectedIndex: 0,
-                    swipeEnabled: true,
-                    itemTitleTemplate: "title",
-                    contentTemplate: "content",
-                    focusStateEnabled: false,
-                    selectionMode: "single",
-                    selectionRequired: true,
-                    selectionByClick: false
-                })
+        registerComponent("dxPivot", ui, ui.CollectionWidget.inherit({
+            _getDefaultOptions: function() {
+                return $.extend(this.callBase(), {
+                        selectedIndex: 0,
+                        swipeEnabled: true,
+                        itemTitleTemplate: "title",
+                        contentTemplate: "content",
+                        focusStateEnabled: false,
+                        selectionMode: "single",
+                        selectionRequired: true,
+                        selectionByClick: false
+                    })
             },
             _itemClass: function() {
                 return PIVOT_ITEM_CLASS
@@ -541,7 +542,7 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
                 this._renderCurrentContent(selectedIndex, selectedIndex)
             },
             _renderContentTemplate: function() {
-                if (utils.isDefined(this._singleContent))
+                if (commonUtils.isDefined(this._singleContent))
                     return;
                 this._getTemplateByOption("contentTemplate").render(this._$itemWrapper);
                 this._singleContent = !this._$itemWrapper.is(":empty")
@@ -550,16 +551,20 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
                 this.callBase();
                 this.element().toggleClass(PIVOT_AUTOHEIGHT_CLASS, this.option("height") === "auto")
             },
+            _visibilityChanged: function(visible) {
+                if (visible)
+                    this._tabs._dimensionChanged()
+            },
             _renderCurrentContent: function(currentIndex, previousIndex) {
                 var itemsCache = this._itemsCache;
                 itemsCache[previousIndex] = this._selectedItemElement();
                 var $hidingItem = itemsCache[previousIndex],
                     $showingItem = itemsCache[currentIndex];
-                utils.triggerHidingEvent($hidingItem);
+                domUtils.triggerHidingEvent($hidingItem);
                 $hidingItem.addClass(PIVOT_ITEM_HIDDEN_CLASS);
                 if ($showingItem) {
                     $showingItem.removeClass(PIVOT_ITEM_HIDDEN_CLASS);
-                    utils.triggerShownEvent($showingItem)
+                    domUtils.triggerShownEvent($showingItem)
                 }
                 else
                     this._renderContent();
@@ -592,7 +597,7 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
                 return rtl ^ wrapperOffset > 0 && wrapperOffset !== 0
             },
             _initSwipeHandlers: function() {
-                this.element().on(events.addNamespace("dxswipestart", this.NAME), {itemSizeFunc: $.proxy(this._elementWidth, this)}, $.proxy(this._swipeStartHandler, this)).on(events.addNamespace("dxswipe", this.NAME), $.proxy(this._swipeUpdateHandler, this)).on(events.addNamespace("dxswipeend", this.NAME), $.proxy(this._swipeEndHandler, this))
+                this.element().on(eventUtils.addNamespace("dxswipestart", this.NAME), {itemSizeFunc: $.proxy(this._elementWidth, this)}, $.proxy(this._swipeStartHandler, this)).on(eventUtils.addNamespace("dxswipe", this.NAME), $.proxy(this._swipeUpdateHandler, this)).on(eventUtils.addNamespace("dxswipeend", this.NAME), $.proxy(this._swipeEndHandler, this))
             },
             _swipeStartHandler: function(e) {
                 this._prepareAnimation();
@@ -709,7 +714,10 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
     })(jQuery, DevExpress);
     /*! Module widgets-mobile, file ui.actionSheet.js */
     (function($, DX, undefined) {
-        var ui = DX.ui;
+        var ui = DX.ui,
+            support = DX.require("/utils/utils.support"),
+            registerComponent = DX.require("/componentRegistrator"),
+            Button = DX.require("/ui/widgets/ui.button");
         var ACTION_SHEET_CLASS = "dx-actionsheet",
             ACTION_SHEET_CONTAINER_CLASS = "dx-actionsheet-container",
             ACTION_SHEET_POPUP_WRAPPER_CLASS = "dx-actionsheet-popup-wrapper",
@@ -718,29 +726,21 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
             ACTION_SHEET_ITEM_CLASS = "dx-actionsheet-item",
             ACTION_SHEET_ITEM_DATA_KEY = "dxActionSheetItemData",
             ACTION_SHEET_WITHOUT_TITLE_CLASS = "dx-actionsheet-without-title";
-        DX.registerComponent("dxActionSheet", ui, ui.CollectionWidget.inherit({
-            _setDeprecatedOptions: function() {
-                this.callBase();
-                $.extend(this._deprecatedOptions, {cancelClickAction: {
-                        since: "14.2",
-                        alias: "onCancelClick"
-                    }})
-            },
-            _setDefaultOptions: function() {
-                this.callBase();
-                this.option({
-                    usePopover: false,
-                    target: null,
-                    title: "",
-                    showTitle: true,
-                    showCancelButton: true,
-                    cancelText: Globalize.localize("Cancel"),
-                    onCancelClick: null,
-                    visible: false,
-                    noDataText: "",
-                    focusStateEnabled: false,
-                    selectionByClick: false
-                })
+        registerComponent("dxActionSheet", ui, ui.CollectionWidget.inherit({
+            _getDefaultOptions: function() {
+                return $.extend(this.callBase(), {
+                        usePopover: false,
+                        target: null,
+                        title: "",
+                        showTitle: true,
+                        showCancelButton: true,
+                        cancelText: Globalize.localize("Cancel"),
+                        onCancelClick: null,
+                        visible: false,
+                        noDataText: "",
+                        focusStateEnabled: false,
+                        selectionByClick: false
+                    })
             },
             _defaultOptionsRules: function() {
                 return this.callBase().concat([{
@@ -776,7 +776,7 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
             },
             _renderPopup: function() {
                 this._$popup = $("<div>").appendTo(this.element());
-                this._popup = this._isPopoverMode() ? this._createPopover() : this._createPopup();
+                this._isPopoverMode() ? this._createPopover() : this._createPopup();
                 this._renderPopupTitle();
                 this._mapPopupOption("visible")
             },
@@ -795,72 +795,70 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
                     this._$popup.remove();
                 this.callBase()
             },
-            _createPopover: function() {
-                var popover = this._createComponent(this._$popup, "dxPopover", {
+            _overlayConfig: function() {
+                return {
+                        onInitialized: $.proxy(function(args) {
+                            this._popup = args.component
+                        }, this),
                         disabled: false,
                         showTitle: true,
                         title: this.option("title"),
-                        width: this.option("width") || 200,
-                        height: this.option("height") || "auto",
-                        target: this.option("target"),
-                        onHidden: $.proxy(this.hide, this),
-                        onContentReady: $.proxy(this._popupContentReadyAction, this)
-                    });
-                popover._wrapper().addClass(ACTION_SHEET_POPOVER_WRAPPER_CLASS);
-                return popover
+                        deferRendering: !support.hasNg,
+                        onContentReady: $.proxy(this._popupContentReadyAction, this),
+                        onHidden: $.proxy(this.hide, this)
+                    }
+            },
+            _createPopover: function() {
+                this._createComponent(this._$popup, "dxPopover", $.extend(this._overlayConfig(), {
+                    width: this.option("width") || 200,
+                    height: this.option("height") || "auto",
+                    target: this.option("target")
+                }));
+                this._popup._wrapper().addClass(ACTION_SHEET_POPOVER_WRAPPER_CLASS)
             },
             _createPopup: function() {
-                var popup = this._createComponent(this._$popup, "dxPopup", {
-                        disabled: false,
-                        dragEnabled: false,
-                        title: this.option("title"),
-                        width: this.option("width") || "100%",
-                        height: this.option("height") || "auto",
-                        onContentReady: $.proxy(this._popupContentReadyAction, this),
-                        showCloseButton: false,
-                        position: {
-                            my: "bottom",
-                            at: "bottom",
-                            of: window
+                this._createComponent(this._$popup, "dxPopup", $.extend(this._overlayConfig(), {
+                    dragEnabled: false,
+                    width: this.option("width") || "100%",
+                    height: this.option("height") || "auto",
+                    showCloseButton: false,
+                    position: {
+                        my: "bottom",
+                        at: "bottom",
+                        of: window
+                    },
+                    animation: {
+                        show: {
+                            type: "slide",
+                            duration: 400,
+                            from: {position: {
+                                    my: "top",
+                                    at: "bottom",
+                                    of: window
+                                }},
+                            to: {position: {
+                                    my: "bottom",
+                                    at: "bottom",
+                                    of: window
+                                }}
                         },
-                        animation: {
-                            show: {
-                                type: "slide",
-                                duration: 400,
-                                from: {position: {
-                                        my: "top",
-                                        at: "bottom",
-                                        of: window
-                                    }},
-                                to: {position: {
-                                        my: "bottom",
-                                        at: "bottom",
-                                        of: window
-                                    }}
-                            },
-                            hide: {
-                                type: "slide",
-                                duration: 400,
-                                from: {position: {
-                                        my: "bottom",
-                                        at: "bottom",
-                                        of: window
-                                    }},
-                                to: {position: {
-                                        my: "top",
-                                        at: "bottom",
-                                        of: window
-                                    }}
-                            }
+                        hide: {
+                            type: "slide",
+                            duration: 400,
+                            from: {position: {
+                                    my: "bottom",
+                                    at: "bottom",
+                                    of: window
+                                }},
+                            to: {position: {
+                                    my: "top",
+                                    at: "bottom",
+                                    of: window
+                                }}
                         }
-                    });
-                popup.on("optionChanged", $.proxy(function(args) {
-                    if (args.name !== "visible")
-                        return;
-                    this.option("visible", args.value)
-                }, this));
-                popup._wrapper().addClass(ACTION_SHEET_POPUP_WRAPPER_CLASS);
-                return popup
+                    }
+                }));
+                this._popup._wrapper().addClass(ACTION_SHEET_POPUP_WRAPPER_CLASS)
             },
             _popupContentReadyAction: function() {
                 this._popup.content().append(this._$itemContainer);
@@ -878,7 +876,7 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
                     var cancelClickAction = this._createActionByOption("onCancelClick") || $.noop,
                         that = this;
                     this._$cancelButton = $("<div>").addClass(ACTION_SHEET_CANCEL_BUTTON_CLASS).appendTo(this._popup.content());
-                    this._createComponent(this._$cancelButton, "dxButton", {
+                    this._createComponent(this._$cancelButton, Button, {
                         disabled: false,
                         text: this.option("cancelText"),
                         onClick: function(e) {
@@ -953,9 +951,12 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
     /*! Module widgets-mobile, file ui.panorama.js */
     (function($, DX, undefined) {
         var ui = DX.ui,
-            events = ui.events,
             fx = DX.fx,
-            translator = DX.translator;
+            translator = DX.require("/utils/utils.translator"),
+            Class = DevExpress.require("/class"),
+            abstract = Class.abstract,
+            registerComponent = DX.require("/componentRegistrator"),
+            eventUtils = DX.require("/ui/events/ui.events.utils");
         var PANORAMA_CLASS = "dx-panorama",
             PANORAMA_WRAPPER_CLASS = "dx-panorama-wrapper",
             PANORAMA_TITLE_CLASS = "dx-panorama-title",
@@ -1020,7 +1021,7 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
                     fx.stop(element, true)
                 })
             };
-        var PanoramaItemsRenderStrategy = DX.Class.inherit({
+        var PanoramaItemsRenderStrategy = Class.inherit({
                 ctor: function(panorama) {
                     this._panorama = panorama
                 },
@@ -1029,10 +1030,10 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
                 allItemElements: function() {
                     return this._panorama._itemElements()
                 },
-                updatePositions: DX.abstract,
-                animateRollback: DX.abstract,
-                detectBoundsTransition: DX.abstract,
-                animateComplete: DX.abstract,
+                updatePositions: abstract,
+                animateRollback: abstract,
+                detectBoundsTransition: abstract,
+                animateComplete: abstract,
                 _getRTLSignCorrection: function() {
                     return this._panorama._getRTLSignCorrection()
                 },
@@ -1290,22 +1291,21 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
                     return positions
                 }
             });
-        DX.registerComponent("dxPanorama", ui, ui.CollectionWidget.inherit({
-            _setDefaultOptions: function() {
-                this.callBase();
-                this.option({
-                    selectedIndex: 0,
-                    title: "panorama",
-                    backgroundImage: {
-                        url: null,
-                        width: 0,
-                        height: 0
-                    },
-                    focusStateEnabled: false,
-                    selectionMode: "single",
-                    selectionRequired: true,
-                    selectionByClick: false
-                })
+        registerComponent("dxPanorama", ui, ui.CollectionWidget.inherit({
+            _getDefaultOptions: function() {
+                return $.extend(this.callBase(), {
+                        selectedIndex: 0,
+                        title: "panorama",
+                        backgroundImage: {
+                            url: null,
+                            width: 0,
+                            height: 0
+                        },
+                        focusStateEnabled: false,
+                        selectionMode: "single",
+                        selectionRequired: true,
+                        selectionByClick: false
+                    })
             },
             _itemClass: function() {
                 return PANORAMA_ITEM_CLASS
@@ -1521,7 +1521,7 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
                 return this.element().height() * this.option("backgroundImage.width") / (this.option("backgroundImage.height") || 1)
             },
             _initSwipeHandlers: function() {
-                this.element().on(events.addNamespace("dxswipestart", this.NAME), {itemSizeFunc: $.proxy(this._elementWidth, this)}, $.proxy(this._swipeStartHandler, this)).on(events.addNamespace("dxswipe", this.NAME), $.proxy(this._swipeUpdateHandler, this)).on(events.addNamespace("dxswipeend", this.NAME), $.proxy(this._swipeEndHandler, this))
+                this.element().on(eventUtils.addNamespace("dxswipestart", this.NAME), {itemSizeFunc: $.proxy(this._elementWidth, this)}, $.proxy(this._swipeStartHandler, this)).on(eventUtils.addNamespace("dxswipe", this.NAME), $.proxy(this._swipeUpdateHandler, this)).on(eventUtils.addNamespace("dxswipeend", this.NAME), $.proxy(this._swipeEndHandler, this))
             },
             _swipeStartHandler: function(e) {
                 this._stopAnimations();
@@ -1591,7 +1591,10 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
     (function($, DX, undefined) {
         var ui = DX.ui,
             fx = DX.fx,
-            translator = DX.translator;
+            translator = DX.require("/utils/utils.translator"),
+            hideTopOverlayCallback = DX.require("/utils/utils.topOverlay").hideCallback,
+            registerComponent = DX.require("/componentRegistrator"),
+            Widget = DX.require("/ui/ui.widget");
         var SLIDEOUTVIEW_CLASS = "dx-slideoutview",
             SLIDEOUTVIEW_WRAPPER_CLASS = "dx-slideoutview-wrapper",
             SLIDEOUTVIEW_MENU_CONTENT_CLASS = "dx-slideoutview-menu-content",
@@ -1613,16 +1616,16 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
                     fx.stop($element, true)
                 }
             };
-        DX.registerComponent("dxSlideOutView", ui, ui.Widget.inherit({
-            _setDefaultOptions: function() {
-                this.callBase();
-                this.option({
-                    menuVisible: false,
-                    swipeEnabled: true,
-                    menuTemplate: "menu",
-                    contentTemplate: "content",
-                    contentOffset: 45
-                })
+        registerComponent("dxSlideOutView", ui, Widget.inherit({
+            _getDefaultOptions: function() {
+                return $.extend(this.callBase(), {
+                        menuPosition: "normal",
+                        menuVisible: false,
+                        swipeEnabled: true,
+                        menuTemplate: "menu",
+                        contentTemplate: "content",
+                        contentOffset: 45
+                    })
             },
             _defaultOptionsRules: function() {
                 return this.callBase().concat([{
@@ -1635,7 +1638,7 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
                             options: {contentOffset: 56}
                         }, {
                             device: {
-                                win8: true,
+                                win: true,
                                 phone: false
                             },
                             options: {contentOffset: 76}
@@ -1656,6 +1659,7 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
             _render: function() {
                 this.callBase();
                 this._renderShield();
+                this._toggleMenuPositionClass();
                 this._initSwipeHandlers();
                 this._dimensionChanged()
             },
@@ -1691,11 +1695,16 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
                     onEnd: $.proxy(this._swipeEndHandler, this)
                 })
             },
+            _isRightMenuPosition: function() {
+                var invertedPosition = this.option("menuPosition") === "inverted",
+                    rtl = this.option("rtlEnabled");
+                return rtl && !invertedPosition || !rtl && invertedPosition
+            },
             _swipeStartHandler: function(e) {
                 animation.complete(this.content());
                 var event = e.jQueryEvent,
                     menuVisible = this.option("menuVisible"),
-                    rtl = this.option("rtlEnabled");
+                    rtl = this._isRightMenuPosition();
                 event.maxLeftOffset = +(rtl ? !menuVisible : menuVisible);
                 event.maxRightOffset = +(rtl ? menuVisible : !menuVisible);
                 this._toggleShieldVisibility(true)
@@ -1713,6 +1722,13 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
                     this._renderPosition(this.option("menuVisible"), true);
                 else
                     this.option("menuVisible", menuVisible)
+            },
+            _toggleMenuPositionClass: function() {
+                var left = SLIDEOUTVIEW_CLASS + "-left",
+                    right = SLIDEOUTVIEW_CLASS + "-right",
+                    menuPosition = this._isRightMenuPosition() ? "right" : "left";
+                this._$menu.removeClass(left + " " + right);
+                this._$menu.addClass(SLIDEOUTVIEW_CLASS + "-" + menuPosition)
             },
             _renderPosition: function(offset, animate) {
                 var pos = this._calculatePixelOffset(offset) * this._getRTLSignCorrection();
@@ -1744,12 +1760,12 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
             },
             _toggleHideMenuCallback: function(subscribe) {
                 if (subscribe)
-                    DX.hideTopOverlayCallback.add(this._hideMenuHandler);
+                    hideTopOverlayCallback.add(this._hideMenuHandler);
                 else
-                    DX.hideTopOverlayCallback.remove(this._hideMenuHandler)
+                    hideTopOverlayCallback.remove(this._hideMenuHandler)
             },
             _getRTLSignCorrection: function() {
-                return this.option("rtlEnabled") ? -1 : 1
+                return this._isRightMenuPosition() ? -1 : 1
             },
             _dispose: function() {
                 animation.complete(this.content());
@@ -1778,6 +1794,10 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
                         break;
                     case"menuVisible":
                         this._renderPosition(args.value, true);
+                        break;
+                    case"menuPosition":
+                        this._renderPosition(this.option("menuVisible"), true);
+                        this._toggleMenuPositionClass();
                         break;
                     case"swipeEnabled":
                         this._initSwipeHandlers();
@@ -1814,41 +1834,29 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
     /*! Module widgets-mobile, file ui.slideOut.js */
     (function($, DX, undefined) {
         var ui = DX.ui,
-            utils = DX.utils;
+            commonUtils = DX.require("/utils/utils.common"),
+            registerComponent = DX.require("/componentRegistrator");
         var SLIDEOUT_CLASS = "dx-slideout",
             SLIDEOUT_ITEM_CONTAINER_CLASS = "dx-slideout-item-container",
             SLIDEOUT_MENU = "dx-slideout-menu",
             SLIDEOUT_ITEM_CLASS = "dx-slideout-item",
             SLIDEOUT_ITEM_DATA_KEY = "dxSlideoutItemData";
-        DX.registerComponent("dxSlideOut", ui, ui.CollectionWidget.inherit({
-            _setDeprecatedOptions: function() {
-                this.callBase();
-                $.extend(this._deprecatedOptions, {
-                    menuItemRender: {
-                        since: "14.2",
-                        alias: "menuItemTemplate"
-                    },
-                    menuGroupRender: {
-                        since: "14.2",
-                        alias: "menuGroupTemplate"
-                    }
-                })
-            },
-            _setDefaultOptions: function() {
-                this.callBase();
-                this.option({
-                    activeStateEnabled: false,
-                    menuItemTemplate: "menuItem",
-                    swipeEnabled: true,
-                    menuVisible: false,
-                    menuGrouped: false,
-                    menuGroupTemplate: "menuGroup",
-                    onMenuItemRendered: null,
-                    onMenuGroupRendered: null,
-                    contentTemplate: "content",
-                    selectionMode: "single",
-                    selectionRequired: true
-                })
+        registerComponent("dxSlideOut", ui, ui.CollectionWidget.inherit({
+            _getDefaultOptions: function() {
+                return $.extend(this.callBase(), {
+                        activeStateEnabled: false,
+                        menuItemTemplate: "menuItem",
+                        swipeEnabled: true,
+                        menuVisible: false,
+                        menuPosition: "normal",
+                        menuGrouped: false,
+                        menuGroupTemplate: "menuGroup",
+                        onMenuItemRendered: null,
+                        onMenuGroupRendered: null,
+                        contentTemplate: "content",
+                        selectionMode: "single",
+                        selectionRequired: true
+                    })
             },
             _itemClass: function() {
                 return SLIDEOUT_ITEM_CLASS
@@ -1881,6 +1889,7 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
                     _templates: [],
                     menuVisible: this.option("menuVisible"),
                     swipeEnabled: this.option("swipeEnabled"),
+                    menuPosition: this.option("menuPosition"),
                     onOptionChanged: $.proxy(this._slideOutViewOptionChanged, this)
                 });
                 this._itemContainer().addClass(SLIDEOUT_ITEM_CONTAINER_CLASS)
@@ -1924,7 +1933,7 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
                 this._itemClickAction(e)
             },
             _renderContentTemplate: function() {
-                if (utils.isDefined(this._singleContent))
+                if (commonUtils.isDefined(this._singleContent))
                     return;
                 var $result = this._getTemplateByOption("contentTemplate").render(this._itemContainer());
                 this._singleContent = !!$result.length || $result.is(":empty")
@@ -1962,6 +1971,14 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
                     return;
                 this.callBase()
             },
+            beginUpdate: function() {
+                this.callBase();
+                this._$list && this._$list.dxList("beginUpdate")
+            },
+            endUpdate: function() {
+                this._$list && this._$list.dxList("endUpdate");
+                this.callBase()
+            },
             _optionChanged: function(args) {
                 var name = args.name;
                 var value = args.value;
@@ -1969,6 +1986,7 @@ if (!DevExpress.MOD_WIDGETS_MOBILE) {
                     case"menuVisible":
                     case"swipeEnabled":
                     case"rtlEnabled":
+                    case"menuPosition":
                         this._slideOutView.option(name, value);
                         break;
                     case"width":

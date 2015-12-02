@@ -1,4 +1,7 @@
 (function($, DX, undefined) {
+    var Class = DevExpress.require("/class"),
+        errors = DevExpress.require("/framework/framework.errors"),
+        ko = window.ko;
     var APPBAR_TOUCH_AREA_HEIGHT = 50,
         APPBAR_TOUCH_THRESHOLD = 50,
         EVENTS_NAMESPACE = ".dxSplitLayout",
@@ -22,7 +25,7 @@
         POINTER_UP_EVENT_NAME = "mouseup";
         POINTER_MOVE_EVENT_NAME = "mousemove"
     }
-    var SplitLayoutEventHelper = DX.Class.inherit({
+    var SplitLayoutEventHelper = Class.inherit({
             ctor: function(splitLayout) {
                 this.root = splitLayout
             },
@@ -131,7 +134,7 @@
             $.each(this._panesConfig, function(_, paneConfig) {
                 tasks.push(paneConfig.controller.deactivate())
             });
-            this._navigationManager.navigated.remove(this._onNavigatedHandler);
+            this._navigationManager.off("navigated", this._onNavigatedHandler);
             this.callBase();
             return $.when.apply($, tasks).done(function() {
                     that._activeViews = {}
@@ -177,8 +180,8 @@
             })
         },
         _onNavigating: function(args) {
-            var options = args.options;
-            $sourceElement = this._getEventSourceElement(args.options.jQueryEvent);
+            var options = args.options,
+                $sourceElement = this._getEventSourceElement(args.options.jQueryEvent);
             var routeValues = this._router.parse(args.uri),
                 viewTemplateInfo = this._viewEngine.getViewTemplateInfo(routeValues.view).option(),
                 pane = this._getViewPaneName(viewTemplateInfo);
@@ -237,7 +240,7 @@
                 }
                 catch(e) {
                     this.removeState(storage);
-                    throw DX.Error("E3007");
+                    throw errors.Error("E3007");
                 }
         },
         removeState: function(storage) {
@@ -257,7 +260,7 @@
                     }
                 }
         }});
-    DX.framework.html.ToolbarController = DX.Class.inherit({
+    DX.framework.html.ToolbarController = Class.inherit({
         ctor: function($toolbar, commandManager) {
             this._commandManager = commandManager;
             this._$toolbar = $toolbar;
@@ -267,17 +270,17 @@
         showViews: function(viewInfos) {
             var that = this,
                 commands = this._mergeCommands(viewInfos),
-                toolbarItems = that._toolbar.option("items"),
-                newItems;
-            newItems = $.map(toolbarItems, function(item) {
-                return item.command ? undefined : item
-            });
+                toolbarItems = that._toolbar.option("items");
+            var newItems = $.map(toolbarItems, function(item) {
+                    return item.command ? undefined : item
+                });
             that._toolbar.option("items", newItems);
-            that._commandManager.renderCommandsToContainers(commands, [that._commandContainer])
+            DX.fx.off = true;
+            that._commandManager.renderCommandsToContainers(commands, [that._commandContainer]);
+            DX.fx.off = false
         },
         _mergeCommands: function(viewInfos) {
-            var that = this,
-                result = [],
+            var result = [],
                 idHash = {};
             $.each(viewInfos, function(_, viewInfo) {
                 if (viewInfo.commands)
@@ -386,7 +389,7 @@
         controller: new DX.framework.html.IOSSplitLayoutController
     });
     layoutSets["split"].push({
-        platform: "win8",
+        platform: "win",
         phone: false,
         controller: new DX.framework.html.Win8SplitLayoutController
     })

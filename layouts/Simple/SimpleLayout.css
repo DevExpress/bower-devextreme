@@ -87,20 +87,20 @@
 }
 
 /* Windows Phone 8*/
-.win8phone-layout {
+.dx-theme-win8 .simple-layout {
     height: 100%;
     width: 100%;
     overflow: hidden;
     position: relative;
 }
 
-.win8phone-layout .layout-header {
+.dx-theme-win8 .simple-layout .layout-header {
     height: 20px;
     margin-left: 10px;
     text-transform: uppercase;
 }
 
-.win8phone-layout .layout-content {
+.dx-theme-win8 .simple-layout .layout-content {
     position: absolute;
     top: 20px;
     bottom: 0;
@@ -108,41 +108,103 @@
     overflow: hidden;
 }
 
-.win8phone-layout .layout-content > div {
+.dx-theme-win8 .simple-layout .layout-content > div {
     height: 100%;
     width: 100%;
 }
 
-.win8phone-layout .view-content {
+.dx-theme-win8 .simple-layout .view-content {
     position: absolute;
     height: 100%;
     width: 100%;
 }
 
-.win8phone-layout .layout-frame {
+.dx-theme-win8 .simple-layout .layout-frame {
     top: 0;
     bottom: 0;
     position: absolute;
     width: 100%;
 }
-.win8phone-layout.has-toolbar-bottom .layout-frame,
-.win8phone-layout .has-toolbar-bottom.layout-frame {
+.dx-theme-win8 .simple-layout.has-toolbar-bottom .layout-frame,
+.dx-theme-win8 .simple-layout .has-toolbar-bottom.layout-frame {
     bottom: 40px;
 }
 
-.win8phone-layout .dx-toolbar.layout-toolbar-bottom {
+.dx-theme-win8 .simple-layout .dx-toolbar.layout-toolbar-bottom {
     position: absolute;
     bottom: 0;
     margin-bottom: 0;
 }
 
-.win8phone-layout .layout-footer {
+.dx-theme-win8 .simple-layout .layout-footer {
     position: absolute;
     bottom: 0;
     height: 0;
     width: 100%;
 }
 
-.win8phone-layout.has-toolbar-bottom .layout-footer {
+.dx-theme-win8 .simple-layout.has-toolbar-bottom .layout-footer {
     height: 40px;
+}
+
+
+/* Windows Phone 10 */
+.dx-theme-win10 .simple-layout {
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+}
+
+.dx-theme-win10 .simple-layout .layout-header {
+    height: 20px;
+    margin-left: 10px;
+    text-transform: uppercase;
+}
+
+.dx-theme-win10 .simple-layout .layout-content {
+    position: absolute;
+    top: 60px;
+    bottom: 0;
+    width: 100%;
+    overflow: hidden;
+}
+
+.dx-theme-win10 .simple-layout .layout-content > div {
+    height: 100%;
+    width: 100%;
+}
+
+.dx-theme-win10 .simple-layout .view-content {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+}
+
+.dx-theme-win10 .simple-layout .layout-frame {
+    top: 0;
+    bottom: 0;
+    position: absolute;
+    width: 100%;
+}
+.dx-theme-win10 .simple-layout.has-toolbar-bottom .layout-frame,
+.dx-theme-win10 .simple-layout .has-toolbar-bottom.layout-frame {
+    bottom: 60px;
+}
+
+.dx-theme-win10 .simple-layout .dx-toolbar.layout-toolbar-bottom {
+    position: absolute;
+    bottom: 0;
+    margin-bottom: 0;
+}
+
+.dx-theme-win10 .simple-layout .layout-footer {
+    position: absolute;
+    bottom: 0;
+    height: 0;
+    width: 100%;
+}
+
+.dx-theme-win10 .simple-layout.has-toolbar-bottom .layout-footer {
+    height: 60px;
 }

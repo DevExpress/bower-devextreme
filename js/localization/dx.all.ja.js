@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme
-* Version: 15.1.8
-* Build date: Oct 29, 2015
+* Version: 15.2.3
+* Build date: Dec 2, 2015
 *
 * Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -68,7 +68,8 @@ Globalize.addCultureInfo("ja", {messages: {
         "dxRangeSlider-ariaFrom": "{0} から",
         "dxRangeSlider-ariaTill": "{0} まで",
         "dxSwitch-onText": "オン",
-        "dxSwitch-offText": "オフ"
+        "dxSwitch-offText": "オフ",
+        "dxForm-optionalMark": "任意"
     }});
 
 Globalize.addCultureInfo("ja", {messages: {
@@ -82,7 +83,7 @@ Globalize.addCultureInfo("ja", {messages: {
         "dxDataGrid-editingDeleteRow": "削除",
         "dxDataGrid-editingUndeleteRow": "復元",
         "dxDataGrid-editingConfirmDeleteMessage": "このレコードを削 除してもよろしいですか?",
-        "dxDataGrid-validationCancelChanges": "!TODO!",
+        "dxDataGrid-validationCancelChanges": "変更をキャンセル",
         "dxDataGrid-editingConfirmDeleteTitle": "",
         "dxDataGrid-groupPanelEmptyText": "グループ化したい列のヘッダーをここにドラッグしてください。",
         "dxDataGrid-noDataText": "データがありません",
@@ -99,6 +100,9 @@ Globalize.addCultureInfo("ja", {messages: {
         "dxDataGrid-filterRowOperationContains": "指定の値を含む",
         "dxDataGrid-filterRowOperationNotContains": "指定の値を含まない",
         "dxDataGrid-filterRowOperationEndsWith": "指定の値で終わる",
+        "dxDataGrid-filterRowOperationBetween": "～から～の間",
+        "dxDataGrid-filterRowOperationBetweenStartText": "開始値",
+        "dxDataGrid-filterRowOperationBetweenEndText": "終了値",
         "dxDataGrid-applyFilterText": "フィルターを適用",
         "dxDataGrid-trueText": "true",
         "dxDataGrid-falseText": "false",
@@ -137,8 +141,7 @@ Globalize.addCultureInfo("ja", {messages: {
         "dxDataGrid-ariaSearchInGrid": "データ グリッド内で検索",
         "dxDataGrid-ariaSelectAll": "すべてを選択",
         "dxDataGrid-ariaSelectRow": "行の選択",
-        "dxFileSaver-fileExported": "!TODO!",
-        "dxPager-infoText": "ページ {0} / {1}",
+        "dxPager-infoText": "ページ {0} / {1} ({2} アイテム)",
         "dxPivotGrid-grandTotal": "総計",
         "dxPivotGrid-total": "{0} 合計",
         "dxPivotGrid-fieldChooserTitle": "フィールドの選択",
@@ -176,9 +179,19 @@ Globalize.addCultureInfo("ja", {messages: {
         "dxScheduler-switcherWeek": "週ビュー",
         "dxScheduler-switcherWorkWeek": "稼働週ビュー",
         "dxScheduler-switcherMonth": "月ビュー",
+        "dxScheduler-switcherTimelineDay": "タイムライン 日ビュー",
+        "dxScheduler-switcherTimelineWeek": "タイムライン 週ビュー",
+        "dxScheduler-switcherTimelineWorkWeek": "タイムライン 稼働週ビュー",
+        "dxScheduler-switcherTimelineMonth": "タイムライン 月ビュー",
         "dxScheduler-recurrenceRepeatOnDate": "次の日付に終了",
         "dxScheduler-recurrenceRepeatCount": "出現",
         "dxScheduler-allDay": "終日イベント",
+        "dxScheduler-confirmRecurrenceEditMessage": "この予定のみを編集しますか、または定期的な予定を編集しますか？",
+        "dxScheduler-confirmRecurrenceDeleteMessage": "この予定のみを削除しますか、または定期的な予定を削除しますか？",
+        "dxScheduler-confirmRecurrenceEditSeries": "定期的なアイテムを編集",
+        "dxScheduler-confirmRecurrenceDeleteSeries": "定期的なアイテムを削除",
+        "dxScheduler-confirmRecurrenceEditOccurrence": "予定を編集",
+        "dxScheduler-confirmRecurrenceDeleteOccurrence": "予定を削除",
         "dxCalendar-todayButtonText": "今日",
         "dxCalendar-ariaWidgetName": "カレンダー",
         "dxColorView-ariaRed": "赤",

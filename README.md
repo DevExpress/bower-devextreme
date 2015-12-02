@@ -23,13 +23,13 @@ bower install devextreme
 
 To start with DevExtreme, go through the steps given on the [start page](http://js.devexpress.com/Documentation/) of the documentation.
 
-While using DevExtreme, the [videos](http://js.devexpress.com/Documentation/Videos), [tutorials](http://js.devexpress.com/Documentation/Tutorials/?version=15_1), [guides](http://js.devexpress.com/Documentation/Howto/?version=15_1) and [API reference](http://js.devexpress.com/Documentation/ApiReference/?version=15_1) provided with the documentation will be helpful.
+While using DevExtreme, the [videos](http://js.devexpress.com/Documentation/Videos), [tutorials](http://js.devexpress.com/Documentation/Tutorials/?version=15_2), [guides](http://js.devexpress.com/Documentation/Guide/?version=15_2) and [API reference](http://js.devexpress.com/Documentation/ApiReference/?version=15_2) provided with the documentation will be helpful.
 
 ## Demos
 
 Take a look at the DevExtreme demos.
 
-- [Web apps](http://js.devexpress.com/WebDevelopment/Demos/) and [Cross-Platform Mobile applications](http://js.devexpress.com/MobileDevelopment/Demos/)  
+- [Web apps](http://js.devexpress.com/Demos/)  
 Sample real-world apps built using the DevExtreme tools.
 
 

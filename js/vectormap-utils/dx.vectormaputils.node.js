@@ -1,7 +1,7 @@
 ﻿/*! 
 * DevExtreme (Vector Map)
-* Version: 15.1.8
-* Build date: Oct 29, 2015
+* Version: 15.2.3
+* Build date: Dec 2, 2015
 *
 * Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml

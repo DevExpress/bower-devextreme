@@ -1,15 +1,15 @@
 /*! 
 * DevExtreme (Range Selector)
-* Version: 15.1.8
-* Build date: Oct 29, 2015
+* Version: 15.2.3
+* Build date: Dec 2, 2015
 *
 * Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
 */
 
 "use strict";
-if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
-    if (!DevExpress.MOD_VIZ_CORE)
+if (!window.DevExpress || !DevExpress.MOD_VIZ_RANGESELECTOR) {
+    if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE)
         throw Error('Required module is not referenced: viz-core');
     /*! Module viz-rangeselector, file namespaces.js */
     (function(DevExpress) {
@@ -17,8 +17,9 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
     })(DevExpress);
     /*! Module viz-rangeselector, file utils.js */
     (function($, DX, undefined) {
-        var dxUtils = DX.utils,
-            utilsAddInterval = dxUtils.addInterval;
+        var commonUtils = DX.require("/utils/utils.common"),
+            mathUtils = DX.require("/utils/utils.math"),
+            utilsAddInterval = DX.require("/utils/utils.date").addInterval;
         var findLessOrEqualValueIndex = function(values, value) {
                 if (!values || values.length === 0)
                     return -1;
@@ -43,7 +44,7 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
                 var index = findLessOrEqualValueIndex(values, value);
                 if (values && index >= 0 && index < values.length) {
                     if (index + 1 < values.length)
-                        if (dxUtils.isDate(value)) {
+                        if (commonUtils.isDate(value)) {
                             if (values[index + 1].getTime() - value.getTime() < value.getTime() - values[index].getTime())
                                 index++
                         }
@@ -85,7 +86,7 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
                     valueIndex;
                 if (categories)
                     categories = DX.viz.utils.map(categories, function(category) {
-                        return dxUtils.isDefined(category) ? category.valueOf() : null
+                        return commonUtils.isDefined(category) ? category.valueOf() : null
                     });
                 if (isDiscrete) {
                     valueIndex = $.inArray(value.valueOf(), categories);
@@ -119,7 +120,7 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
                     base = type === "logarithmic" && scaleOptions.logarithmBase,
                     power;
                 if (base) {
-                    power = utilsAddInterval(dxUtils.getLog(value, base), interval, isNegative);
+                    power = utilsAddInterval(mathUtils.getLog(value, base), interval, isNegative);
                     result = Math.pow(base, power)
                 }
                 else
@@ -166,30 +167,33 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
     /*! Module viz-rangeselector, file rangeSelector.js */
     (function($, DX, undefined) {
         var rangeSelector = DX.viz.rangeSelector,
-            utils = DX.utils,
+            commonUtils = DX.require("/utils/utils.common"),
+            mathUtils = DX.require("/utils/utils.math"),
+            dateUtils = DX.require("/utils/utils.date"),
             viz = DX.viz,
             vizUtils = viz.utils,
             patchFontOptions = vizUtils.patchFontOptions,
             parseUtils = viz.parseUtils,
             _normalizeEnum = vizUtils.normalizeEnum,
-            formatHelper = DX.formatHelper,
+            formatHelper = DX.require("/utils/utils.formatHelper"),
+            registerComponent = DX.require("/componentRegistrator"),
             SCALE_TEXT_SPACING = 5,
             HEIGHT_COMPACT_MODE = 24,
             POINTER_SIZE = 4,
-            EMPTY_SLIDER_MARKER_TEXT = '. . .',
-            _isDefined = utils.isDefined,
-            _isNumber = utils.isNumber,
-            _isDate = utils.isDate,
+            EMPTY_SLIDER_MARKER_TEXT = ". . .",
+            _isDefined = commonUtils.isDefined,
+            _isNumber = commonUtils.isNumber,
+            _isDate = commonUtils.isDate,
             _max = Math.max,
             _ceil = Math.ceil,
             _noop = $.noop,
-            START_VALUE = 'startValue',
-            END_VALUE = 'endValue',
-            DATETIME = 'datetime',
-            SELECTED_RANGE = 'selectedRange',
-            DISCRETE = 'discrete',
-            STRING = 'string',
-            SELECTED_RANGE_CHANGED = SELECTED_RANGE + 'Changed',
+            START_VALUE = "startValue",
+            END_VALUE = "endValue",
+            DATETIME = "datetime",
+            SELECTED_RANGE = "selectedRange",
+            DISCRETE = "discrete",
+            STRING = "string",
+            SELECTED_RANGE_CHANGED = SELECTED_RANGE + "Changed",
             CONTAINER_BACKGROUND_COLOR = "containerBackgroundColor",
             SLIDER_MARKER = "sliderMarker",
             BACKGROUND = "background",
@@ -213,11 +217,11 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
                         value: value,
                         valueText: formatHelper.format(value, formatOptions.format, formatOptions.precision)
                     };
-                return String(utils.isFunction(formatOptions.customizeText) ? formatOptions.customizeText.call(formatObject, formatObject) : formatObject.valueText)
+                return String(commonUtils.isFunction(formatOptions.customizeText) ? formatOptions.customizeText.call(formatObject, formatObject) : formatObject.valueText)
             };
         var createTranslator = function(range, canvas) {
                 return {
-                        x: viz.CoreFactory.createTranslator2D(range.arg, canvas, {direction: "horizontal"}),
+                        x: viz.CoreFactory.createTranslator2D(range.arg, canvas, {isHorizontal: true}),
                         y: viz.CoreFactory.createTranslator2D(range.val, canvas)
                     }
             };
@@ -241,12 +245,12 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
                     textBBox = getTextBBox(renderer, formattedText, scaleOptions.label.font);
                 return _ceil(textBBox.width / 2)
             };
-        var calculateRangeContainerCanvas = function(size, indents, scaleLabelsAreaHeight, isCompactMode) {
+        var calculateRangeContainerCanvas = function(originalCanvas, size, indents, scaleLabelsAreaHeight, title, isCompactMode) {
                 var canvas = {
                         left: size.left + indents.left,
                         top: size.top + indents.top,
-                        width: size.width - size.left - size.right - indents.left - indents.right,
-                        height: !isCompactMode ? size.height - size.top - size.bottom - indents.top : HEIGHT_COMPACT_MODE + scaleLabelsAreaHeight
+                        width: size.width - indents.left - indents.right,
+                        height: !isCompactMode ? size.height - indents.top - indents.bottom : HEIGHT_COMPACT_MODE + scaleLabelsAreaHeight
                     };
                 if (canvas.width <= 0)
                     canvas.width = 1;
@@ -326,7 +330,7 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
                     validType = function(type) {
                         return typeFirstValue === type || typeSecondValue === type
                     };
-                return validType('date') ? DATETIME : validType('number') ? 'numeric' : validType(STRING) ? STRING : ''
+                return validType("date") ? DATETIME : validType("number") ? "numeric" : validType(STRING) ? STRING : ""
             };
         var showScaleMarkers = function(scaleOptions) {
                 return scaleOptions.valueType === DATETIME && scaleOptions.marker.visible
@@ -334,7 +338,7 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
         var updateTranslatorRangeInterval = function(translatorRange, scaleOptions) {
                 var intervalX = scaleOptions.minorTickInterval || scaleOptions.majorTickInterval;
                 if (scaleOptions.valueType === "datetime")
-                    intervalX = utils.dateToMilliseconds(intervalX);
+                    intervalX = dateUtils.dateToMilliseconds(intervalX);
                 translatorRange = translatorRange.arg.addRange({interval: intervalX})
             };
         var createRange = function(options) {
@@ -347,7 +351,7 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
                 logarithmBase = options.logarithmBase;
                 if (options.type === LOGARITHMIC && logarithmBase <= 0 || logarithmBase && !_isNumber(logarithmBase)) {
                     options.logarithmBase = defaultLogarithmBase;
-                    incidentOccured('E2104')
+                    incidentOccured("E2104")
                 }
                 else if (options.type !== LOGARITHMIC)
                     options.logarithmBase = undefined
@@ -363,7 +367,7 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
                     markerScaleOPtions = scaleOptions.marker,
                     customizeText = labelScaleOptions.customizeText,
                     placeholderHeight = scaleOptions.placeholderHeight,
-                    text = utils.isFunction(customizeText) ? customizeText.call(formatObject, formatObject) : value,
+                    text = commonUtils.isFunction(customizeText) ? customizeText.call(formatObject, formatObject) : value,
                     visibleLabels = labelScaleOptions.visible;
                 if (placeholderHeight)
                     return placeholderHeight;
@@ -455,7 +459,7 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
                 });
                 if (!translatorRange.arg.isDefined()) {
                     if (isEqualDates)
-                        scaleOptions.valueType = 'numeric';
+                        scaleOptions.valueType = "numeric";
                     translatorRange.arg.setStubData(scaleOptions.valueType)
                 }
                 return translatorRange
@@ -484,27 +488,21 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
                 resultValue = parsedValue;
             return rangeSelector.utils.truncateSelectedRange(resultValue, scaleOptions)
         }
-        DX.registerComponent("dxRangeSelector", rangeSelector, viz.BaseWidget.inherit({
-            _eventsMap: $.extend({}, viz.BaseWidget.prototype._eventsMap, {
-                onSelectedRangeChanged: {
-                    name: SELECTED_RANGE_CHANGED,
-                    deprecated: SELECTED_RANGE_CHANGED,
-                    deprecatedContext: function() {
-                        return null
-                    },
-                    deprecatedArgs: function(arg) {
-                        return [cloneSelectedRange(arg)]
-                    }
-                },
-                selectedRangeChanged: {newName: "onSelectedRangeChanged"}
-            }),
+        function prepareCanvas(canvas) {
+            return {
+                    top: canvas.top,
+                    bottom: canvas.bottom,
+                    left: canvas.left,
+                    right: canvas.right,
+                    width: canvas.width - canvas.left - canvas.right,
+                    height: canvas.height - canvas.top - canvas.bottom
+                }
+        }
+        registerComponent("dxRangeSelector", rangeSelector, viz.BaseWidget.inherit({
+            _eventsMap: $.extend({}, viz.BaseWidget.prototype._eventsMap, {onSelectedRangeChanged: {name: SELECTED_RANGE_CHANGED}}),
             _setDeprecatedOptions: function() {
                 this.callBase();
                 $.extend(this._deprecatedOptions, {
-                    selectedRangeChanged: {
-                        since: "14.2",
-                        message: "Use the 'onSelectedRangeChanged' option instead"
-                    },
                     "sliderMarker.padding": {
                         since: "15.1",
                         message: "Use the 'paddingTopBottom' and 'paddingLeftRight' options instead"
@@ -518,15 +516,13 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
             _rootClassPrefix: "dxrs",
             _rootClass: "dxrs-range-selector",
             _invalidatingOptions: ["scale", "selectedRangeColor", "containerBackgroundColor", "sliderMarker", "sliderHandle", "shutter", "background", "behavior", "chart"],
-            _dataSourceOptions: function() {
-                return {paginate: false}
-            },
             _dataIsReady: function() {
-                return this._isDataSourceReady()
+                return this._dataSource.isLoaded()
             },
             _init: function() {
-                this.callBase();
-                this._reinitDataSource()
+                var that = this;
+                that.callBase();
+                that._updateDataSource()
             },
             _initCore: function() {
                 this._renderer.root.css({
@@ -540,9 +536,6 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
                         width: 400,
                         height: 160
                     }
-            },
-            _reinitDataSource: function() {
-                this._refreshDataSource()
             },
             _disposeCore: function() {
                 var that = this,
@@ -563,6 +556,7 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
                     currentAnimationEnabled,
                     renderer = that._renderer;
                 isResizing = isResizing || that.__isResizing;
+                renderer.lock();
                 that._applyOptions();
                 if (isResizing) {
                     currentAnimationEnabled = renderer.animationEnabled();
@@ -572,7 +566,8 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
                 }
                 else
                     that.rangeContainer.redraw();
-                if (!isResizing && (!that._dataSource || that._dataSource.isLoaded()))
+                renderer.unlock();
+                if (!isResizing && that._dataSource.isLoaded())
                     that.hideLoadingIndicator();
                 that._drawn();
                 that.__rendered && that.__rendered()
@@ -581,7 +576,7 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
                 var that = this;
                 that.callBase.apply(that, arguments);
                 if ("dataSource" in options)
-                    that._reinitDataSource();
+                    that._updateDataSource();
                 if (SELECTED_RANGE in options)
                     that.setSelectedRange(options[SELECTED_RANGE])
             },
@@ -598,11 +593,11 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
                     seriesDataSource,
                     translatorRange,
                     scaleLabelsAreaHeight,
-                    sizeOptions = that._canvas,
+                    sizeOptions = that._title.getVerticalCuttedSize(prepareCanvas(that._canvas)),
                     indents,
                     sliderMarkerOptions,
                     selectedRange,
-                    chartOptions = that.option('chart'),
+                    chartOptions = that.option("chart"),
                     shutterOptions = that._getOption("shutter"),
                     background = that._getOption(BACKGROUND),
                     isCompactMode,
@@ -623,10 +618,11 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
                 selectedRange = that._initSelection();
                 indents = calculateIndents(that._renderer, sizeOptions, scaleOptions, sliderMarkerOptions, that.option("indent"));
                 scaleLabelsAreaHeight = calculateScaleAreaHeight(that._renderer, scaleOptions, showScaleMarkers(scaleOptions));
-                rangeContainerCanvas = calculateRangeContainerCanvas(sizeOptions, indents, scaleLabelsAreaHeight, isCompactMode);
+                rangeContainerCanvas = calculateRangeContainerCanvas(that._canvas, sizeOptions, indents, scaleLabelsAreaHeight, that._title, isCompactMode);
+                that._applyTitleLayout(rangeContainerCanvas, indents);
                 that.translators = createTranslator(translatorRange, createTranslatorCanvas(sizeOptions, rangeContainerCanvas, scaleLabelsAreaHeight));
                 scaleOptions.ticksInfo = that._getTicksInfo(rangeContainerCanvas.width);
-                if (scaleOptions.valueType === DATETIME && scaleOptions.type === DISCRETE)
+                if (scaleOptions.valueType === DATETIME && scaleOptions.type === DISCRETE && !sliderMarkerOptions.format)
                     sliderMarkerOptions.format = formatHelper.getDateFormatByTicks(scaleOptions.ticksInfo.majorTicks);
                 that._testTicksInfo = scaleOptions.ticksInfo;
                 that._selectedRange = selectedRange;
@@ -641,12 +637,12 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
                     translators: that.translators,
                     selectedRange: selectedRange,
                     scale: scaleOptions,
-                    behavior: that._getOption('behavior'),
+                    behavior: that._getOption("behavior"),
                     background: background,
                     chart: chartOptions,
                     seriesDataSource: seriesDataSource,
                     sliderMarker: sliderMarkerOptions,
-                    sliderHandle: that._getOption('sliderHandle'),
+                    sliderHandle: that._getOption("sliderHandle"),
                     shutter: shutterOptions,
                     selectedRangeColor: that._getOption("selectedRangeColor", true),
                     selectedRangeChanged: function(selectedRange, blockSelectedRangeChanged) {
@@ -660,6 +656,22 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
                 });
                 that._isUpdating = false;
                 chartThemeManager && chartThemeManager.dispose()
+            },
+            _applyTitleLayout: function(rangeContainerCanvas, indents) {
+                var layoutOptions = this._title.getLayoutOptions(),
+                    canvas = this._canvas;
+                layoutOptions && this._title.position({
+                    at: layoutOptions.position,
+                    my: layoutOptions.position,
+                    of: {getLayoutOptions: function() {
+                            return {
+                                    width: rangeContainerCanvas.width + indents.left + indents.right,
+                                    height: rangeContainerCanvas.height + layoutOptions.height + indents.top + indents.bottom,
+                                    x: canvas.left,
+                                    y: canvas.top
+                                }
+                        }}
+                })
             },
             _initSelection: function() {
                 var that = this,
@@ -677,8 +689,8 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
             _createSeriesDataSource: function(chartOptions) {
                 var that = this,
                     seriesDataSource,
-                    dataSource = that._dataSource && that._dataSource.items(),
-                    scaleOptions = that._getOption('scale'),
+                    dataSource = that._dataSource.items(),
+                    scaleOptions = that._getOption("scale"),
                     valueType = scaleOptions.valueType,
                     backgroundOption = that.option(BACKGROUND);
                 if (!valueType)
@@ -691,7 +703,7 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
                         valueType: _normalizeEnum(valueType),
                         axisType: scaleOptions.type,
                         chart: chartOptions,
-                        dataSourceField: that.option('dataSourceField'),
+                        dataSourceField: that.option("dataSourceField"),
                         backgroundColor: backgroundOption && backgroundOption.color,
                         incidentOccured: that._incidentOccured,
                         categories: scaleOptions.categories
@@ -701,12 +713,12 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
             },
             _prepareScaleOptions: function(seriesDataSource) {
                 var that = this,
-                    scaleOptions = that._getOption('scale'),
+                    scaleOptions = that._getOption("scale"),
                     parsedValue = 0,
                     valueType = parseUtils.correctValueType(_normalizeEnum(scaleOptions.valueType)),
                     parser,
                     validateStartEndValues = function(field, parser) {
-                        var messageToIncidentOccured = field === START_VALUE ? 'start' : 'end';
+                        var messageToIncidentOccured = field === START_VALUE ? "start" : "end";
                         if (_isDefined(scaleOptions[field])) {
                             parsedValue = parser(scaleOptions[field]);
                             if (_isDefined(parsedValue))
@@ -720,7 +732,7 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
                 if (seriesDataSource)
                     valueType = seriesDataSource.getCalculatedValueType() || valueType;
                 if (!valueType)
-                    valueType = calculateValueType(scaleOptions.startValue, scaleOptions.endValue) || 'numeric';
+                    valueType = calculateValueType(scaleOptions.startValue, scaleOptions.endValue) || "numeric";
                 if (valueType === STRING || scaleOptions.categories) {
                     scaleOptions.type = DISCRETE;
                     valueType = STRING
@@ -731,7 +743,7 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
                 validateStartEndValues(END_VALUE, parser);
                 checkLogarithmicOptions(scaleOptions, logarithmBase, that._incidentOccured);
                 if (!scaleOptions.type)
-                    scaleOptions.type = 'continuous';
+                    scaleOptions.type = "continuous";
                 scaleOptions.parser = parser;
                 return scaleOptions
             },
@@ -747,18 +759,18 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
                     sliderMarkerUserOption = that.option(SLIDER_MARKER) || {};
                 sliderMarkerOptions.borderColor = that._getOption(CONTAINER_BACKGROUND_COLOR, true);
                 if (!sliderMarkerOptions.format) {
-                    if (!that._getOption('behavior').snapToTicks && _isNumber(scaleOptions.startValue)) {
+                    if (!that._getOption("behavior").snapToTicks && _isNumber(scaleOptions.startValue)) {
                         businessInterval = Math.abs(endValue - startValue);
-                        sliderMarkerOptions.format = 'fixedPoint';
-                        sliderMarkerOptions.precision = utils.getSignificantDigitPosition(businessInterval / screenDelta)
+                        sliderMarkerOptions.format = "fixedPoint";
+                        sliderMarkerOptions.precision = mathUtils.getSignificantDigitPosition(businessInterval / screenDelta)
                     }
-                    if (scaleOptions.valueType === DATETIME)
+                    if (scaleOptions.valueType === DATETIME && scaleOptions.type !== DISCRETE)
                         if (!scaleOptions.marker.visible) {
                             if (_isDefined(startValue) && _isDefined(endValue))
                                 sliderMarkerOptions.format = formatHelper.getDateFormatByTickInterval(startValue, endValue, minorTickInterval !== 0 ? minorTickInterval : majorTickInterval)
                         }
                         else
-                            sliderMarkerOptions.format = utils.getDateUnitInterval(_isDefined(minorTickInterval) && minorTickInterval !== 0 ? minorTickInterval : majorTickInterval)
+                            sliderMarkerOptions.format = dateUtils.getDateUnitInterval(_isDefined(minorTickInterval) && minorTickInterval !== 0 ? minorTickInterval : majorTickInterval)
                 }
                 if (sliderMarkerUserOption.padding !== undefined && sliderMarkerUserOption.paddingLeftRight === undefined && sliderMarkerUserOption.paddingTopBottom === undefined)
                     sliderMarkerOptions.paddingLeftRight = sliderMarkerOptions.paddingTopBottom = sliderMarkerUserOption.padding;
@@ -796,7 +808,7 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
                         else if (!scaleOptions.marker.visible)
                             scaleOptions.label.format = formatHelper.getDateFormatByTickInterval(scaleOptions.startValue, scaleOptions.endValue, scaleOptions.majorTickInterval);
                         else
-                            scaleOptions.label.format = utils.getDateUnitInterval(scaleOptions.majorTickInterval)
+                            scaleOptions.label.format = dateUtils.getDateUnitInterval(scaleOptions.majorTickInterval)
                 }
             },
             _getStubTicks: function(scaleOptions) {
@@ -807,7 +819,7 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
                 var that = this;
                 return {
                         labelOptions: {},
-                        minorTickInterval: isEmpty ? 0 : that._getOption('scale').minorTickInterval,
+                        minorTickInterval: isEmpty ? 0 : that._getOption("scale").minorTickInterval,
                         tickInterval: scaleOptions.majorTickInterval,
                         addMinMax: scaleOptions.showCustomBoundaryTicks ? {
                             min: true,
@@ -815,7 +827,7 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
                         } : undefined,
                         minorTickCount: scaleOptions.minorTickCount,
                         textOptions: {
-                            align: 'center',
+                            align: "center",
                             font: scaleOptions.label.font
                         },
                         textFontStyles: patchFontOptions(scaleOptions.label.font),
@@ -837,8 +849,7 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
                         useTicksAutoArrangement: scaleOptions.useTicksAutoArrangement,
                         base: scaleOptions.logarithmBase,
                         stick: true,
-                        showMinorTicks: true,
-                        withMinorCorrection: true
+                        showMinorTicks: true
                     }
             },
             _getTicksInfo: function(screenDelta) {
@@ -874,12 +885,6 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
                 majorTicks = noInfoFromMinMax && !_isDefined(tickManagerData.customTicks) ? that._getStubTicks(scaleOptions) : tickManager.getTicks(true);
                 customBoundaryTicks = tickManager.getBoundaryTicks();
                 fullTicks = tickManager.getFullTicks();
-                if (customBoundaryTicks.length) {
-                    if (majorTicks[0].valueOf() === customBoundaryTicks[0].valueOf())
-                        majorTicks.splice(0, 1);
-                    if (majorTicks[majorTicks.length - 1].valueOf() === customBoundaryTicks[customBoundaryTicks.length - 1].valueOf())
-                        majorTicks.pop()
-                }
                 return {
                         majorTicks: majorTicks,
                         minorTicks: tickManager.getMinorTicks(),
@@ -917,7 +922,7 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
             _setTooltipRendererOptions: _noop,
             _setTooltipOptions: _noop,
             _hideTooltip: _noop
-        }).include(DX.ui.DataHelperMixin))
+        }))
     })(jQuery, DevExpress);
     /*! Module viz-rangeselector, file rangeContainer.js */
     (function($, DX, undefined) {
@@ -1078,17 +1083,18 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
     (function($, DX, undefined) {
         var viz = DX.viz,
             rangeSelector = viz.rangeSelector,
-            formatHelper = DX.formatHelper,
+            dateUtils = DX.require("/utils/utils.date"),
+            formatHelper = DX.require("/utils/utils.formatHelper"),
             rangeSelectorUtils = rangeSelector.utils,
-            utils = DX.utils,
-            _isDefined = utils.isDefined,
-            getDatesDifferences = utils.getDatesDifferences,
+            commonUtils = DX.require("/utils/utils.common"),
+            _isDefined = commonUtils.isDefined,
+            getDatesDifferences = dateUtils.getDatesDifferences,
             HALF_TICK_LENGTH = 6,
             MINOR_TICK_OPACITY_COEF = 0.6,
             Scale,
             baseVisualElementMethods = rangeSelector.baseVisualElementMethods,
             addInterval = rangeSelectorUtils.addInterval,
-            dateUnitIntervals = utils.dateUnitIntervals,
+            dateUnitIntervals = dateUtils.dateUnitIntervals,
             CANVAS_POSITION = "canvas_position_",
             CANVAS_POSITION_LEFT = CANVAS_POSITION + "left",
             CANVAS_POSITION_RIGHT = CANVAS_POSITION + "right",
@@ -1132,7 +1138,7 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
                     dateSetters.day(date)
                 },
                 quarter: function(date) {
-                    date.setMonth(formatHelper.getFirstQuarterMonth(date.getMonth()));
+                    date.setMonth(dateUtils.getFirstQuarterMonth(date.getMonth()));
                     dateSetters.day(date)
                 }
             };
@@ -1170,7 +1176,7 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
                     value: value,
                     valueText: formatHelper.format(value, options.format, options.precision)
                 };
-            return String(utils.isFunction(options.customizeText) ? options.customizeText.call(formatObject, formatObject) : formatObject.valueText)
+            return String(commonUtils.isFunction(options.customizeText) ? options.customizeText.call(formatObject, formatObject) : formatObject.valueText)
         }
         function checkMarkersPosition(dateMarker, prevDateMarker) {
             return prevDateMarker === undefined || dateMarker.x1 > prevDateMarker.x2 || dateMarker.x2 < prevDateMarker.x1
@@ -1193,16 +1199,16 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
                 majorTicks = scaleOptions.ticksInfo.majorTicks;
             if (scaleOptions.valueType === 'datetime') {
                 if (majorTicks && majorTicks.autoArrangementStep > 1) {
-                    if (utils.isString(majorTickInterval))
-                        majorTickInterval = utils.getDateIntervalByString(majorTickInterval);
+                    if (commonUtils.isString(majorTickInterval))
+                        majorTickInterval = dateUtils.getDateIntervalByString(majorTickInterval);
                     for (key in majorTickInterval)
                         if (majorTickInterval.hasOwnProperty(key)) {
                             majorTickInterval[key] *= majorTicks.autoArrangementStep;
-                            millisecTickInterval = utils.dateToMilliseconds(majorTickInterval)
+                            millisecTickInterval = dateUtils.dateToMilliseconds(majorTickInterval)
                         }
-                    majorTickInterval = utils.convertMillisecondsToDateUnits(millisecTickInterval)
+                    majorTickInterval = dateUtils.convertMillisecondsToDateUnits(millisecTickInterval)
                 }
-                return utils.getDateUnitInterval(majorTickInterval)
+                return dateUtils.getDateUnitInterval(majorTickInterval)
             }
         }
         Scale = function() {
@@ -1490,11 +1496,11 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
     /*! Module viz-rangeselector, file slidersContainer.js */
     (function($, DX, undefined) {
         var rangeSelector = DX.viz.rangeSelector,
-            utils = DX.utils,
-            msPointerEnabled = DX.support.pointer,
-            isNumber = utils.isNumber,
-            isDate = utils.isDate,
-            isString = utils.isString,
+            msPointerEnabled = DX.require("/utils/utils.support").pointer,
+            commonUtils = DX.require("/utils/utils.common"),
+            isNumber = commonUtils.isNumber,
+            isDate = commonUtils.isDate,
+            isString = commonUtils.isString,
             _normalizeEnum = DX.viz.utils.normalizeEnum,
             rangeSelectorUtils = rangeSelector.utils,
             baseVisualElementMethods = rangeSelector.baseVisualElementMethods,
@@ -1665,7 +1671,6 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
     (function($, DX, undefined) {
         var rangeSelector = DX.viz.rangeSelector,
             createSlider = rangeSelector.rangeSelectorFactory.createSlider,
-            utils = DX.utils,
             rangeSelectorUtils = rangeSelector.utils,
             _SliderController,
             START_VALUE_INDEX = 0,
@@ -1813,7 +1818,8 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
                 movingSlider.applyPosition(true)
             },
             applySelectedRange: function(selectedRange) {
-                utils.debug.assertParam(selectedRange, 'selectedRange not passed');
+                var debug = DX.require("/utils/utils.console").debug;
+                debug.assertParam(selectedRange, 'selectedRange not passed');
                 var that = this,
                     scaleoptions = that._options.scale,
                     inverted = scaleoptions.inverted,
@@ -1934,18 +1940,20 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
     /*! Module viz-rangeselector, file slidersEventsManager.js */
     (function($, DX, undefined) {
         var rangeSelector = DX.viz.rangeSelector,
+            pointerEvents = DX.require("/ui/events/pointer/ui.events.pointer"),
             MIN_MANUAL_SELECTING_WIDTH = 10,
             START_VALUE_INDEX = 0,
             END_VALUE_INDEX = 1,
-            addNamespace = DX.ui.events.addNamespace,
+            eventUtils = DX.require("/ui/events/ui.events.utils"),
+            addNamespace = eventUtils.addNamespace,
             _SlidersEventManager,
             rangeSelectorUtils = rangeSelector.utils,
             getEventPageX = rangeSelectorUtils.getEventPageX,
             rangeSelectorCount = 0;
         rangeSelector.events = {
-            start: "dxpointerdown",
-            move: "dxpointermove",
-            end: "dxpointerup"
+            start: pointerEvents.down,
+            move: pointerEvents.move,
+            end: pointerEvents.up
         };
         var isLeftButtonPressed = function(event) {
                 var e = event || window.event,
@@ -2178,9 +2186,10 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
     /*! Module viz-rangeselector, file slider.js */
     (function($, DX, undefined) {
         var rangeSelector = DX.viz.rangeSelector,
-            utils = DX.utils,
             rangeSelectorUtils = rangeSelector.utils,
-            dxSupport = DX.support,
+            dxSupport = DX.require("/utils/utils.support"),
+            dateUtils = DX.require("/utils/utils.date"),
+            commonUtils = DX.require("/utils/utils.common"),
             touchSupport = dxSupport.touchEvents,
             msPointerEnabled = dxSupport.pointer,
             SPLITTER_WIDTH = 8,
@@ -2288,7 +2297,7 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
                     getNextValue = function(value, isNegative, reverseValueDirection) {
                         var curValueDirection = !reverseValueDirection ? valueDirection : valueDirectionAnotherSlider,
                             curAnotherValueDirection = reverseValueDirection ? valueDirection : valueDirectionAnotherSlider;
-                        return translator.untranslate(that._correctBounds(utils.addInterval(translator.translate(value, curValueDirection), interval, isNegative)), curAnotherValueDirection)
+                        return translator.untranslate(that._correctBounds(dateUtils.addInterval(translator.translate(value, curValueDirection), interval, isNegative)), curAnotherValueDirection)
                     };
                 startPosition = that._correctBounds(startPosition);
                 startValue = translator.untranslate(startPosition, valueDirection);
@@ -2586,7 +2595,7 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
                     text = rangeSelector.consts.emptySliderMarkerText
                 }
                 else {
-                    that._value = that._correctValue(value, correctByMinMaxRange, utils.isDefined(skipCorrection) ? !!skipCorrection : true);
+                    that._value = that._correctValue(value, correctByMinMaxRange, commonUtils.isDefined(skipCorrection) ? !!skipCorrection : true);
                     position = options.translator.translate(that._value, that._getValueDirection());
                     text = rangeSelector.formatValue(that._value, options.sliderMarker)
                 }
@@ -2937,13 +2946,13 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
             charts = DX.viz.charts,
             viz = DX.viz,
             coreFactory = viz.CoreFactory,
-            utils = DX.utils,
+            commonUtils = DX.require("/utils/utils.common"),
             _SeriesDatasource;
         var createThemeManager = function(chartOptions) {
                 return charts.factory.createThemeManager(chartOptions, 'rangeSelector.chart')
             };
         var isArrayOfSimpleTypes = function(data) {
-                return $.isArray(data) && data.length > 0 && (utils.isNumber(data[0]) || utils.isDate(data[0]))
+                return $.isArray(data) && data.length > 0 && (commonUtils.isNumber(data[0]) || commonUtils.isDate(data[0]))
             };
         var convertToArrayOfObjects = function(data) {
                 return viz.utils.map(data, function(item, i) {
@@ -2953,7 +2962,7 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
                             }
                     })
             };
-        var processSeriesFamilies = function(series, equalBarWidth, minBubbleSize, maxBubbleSize) {
+        var processSeriesFamilies = function(series, equalBarWidth, minBubbleSize, maxBubbleSize, barWidth) {
                 var families = [],
                     types = [];
                 $.each(series, function(i, item) {
@@ -2965,7 +2974,8 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
                             type: type,
                             equalBarWidth: equalBarWidth,
                             minBubbleSize: minBubbleSize,
-                            maxBubbleSize: maxBubbleSize
+                            maxBubbleSize: maxBubbleSize,
+                            barWidth: barWidth
                         });
                     family.add(series);
                     family.adjustSeriesValues();
@@ -3015,7 +3025,7 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
             if (options.dataSource && seriesTemplate)
                 templatedSeries = viz.utils.processSeriesTemplate(seriesTemplate, options.dataSource);
             that._series = that._calculateSeries(options, templatedSeries);
-            that._seriesFamilies = processSeriesFamilies(that._series, themeManager.getOptions('equalBarWidth'), themeManager.getOptions('minBubbleSize'), themeManager.getOptions('maxBubbleSize'))
+            that._seriesFamilies = processSeriesFamilies(that._series, themeManager.getOptions('equalBarWidth'), themeManager.getOptions('minBubbleSize'), themeManager.getOptions('maxBubbleSize'), themeManager.getOptions('barWidth'))
         };
         _SeriesDatasource.prototype = {
             constructor: _SeriesDatasource,
@@ -3120,11 +3130,11 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
                     maxIndent = that._valueAxis.inverted ? that._indent.bottom : that._indent.top;
                     rangeYSize = valRange.max - valRange.min;
                     rangeVisibleSizeY = ($.isNumeric(valRange.maxVisible) ? valRange.maxVisible : valRange.max) - ($.isNumeric(valRange.minVisible) ? valRange.minVisible : valRange.min);
-                    if (utils.isDate(valRange.min))
+                    if (commonUtils.isDate(valRange.min))
                         valRange.min = new Date(valRange.min.valueOf() - rangeYSize * minIndent);
                     else
                         valRange.min -= rangeYSize * minIndent;
-                    if (utils.isDate(valRange.max))
+                    if (commonUtils.isDate(valRange.max))
                         valRange.max = new Date(valRange.max.valueOf() + rangeYSize * maxIndent);
                     else
                         valRange.max += rangeYSize * maxIndent;
@@ -3169,8 +3179,8 @@ if (!DevExpress.MOD_VIZ_RANGESELECTOR) {
     /*! Module viz-rangeselector, file themeManager.js */
     (function($, DX, undefined) {
         DX.viz.rangeSelector.ThemeManager = DX.viz.BaseThemeManager.inherit({
-            _themeSection: 'rangeSelector',
-            _fontFields: ['scale.label.font', 'sliderMarker.font', 'loadingIndicator.font']
+            _themeSection: "rangeSelector",
+            _fontFields: ["scale.label.font", "sliderMarker.font", "loadingIndicator.font", "title.font", "title.subtitle.font"]
         })
     })(jQuery, DevExpress);
     DevExpress.MOD_VIZ_RANGESELECTOR = true

@@ -177,7 +177,36 @@
     top: 60px;
 }
 
+
+/* Windows phone 10 */
+
+.dx-theme-win10 .slideout-layout .layout-header {
+    height: 60px;
+}
+
+.dx-theme-win10 .slideout-layout .layout-content,
+.dx-theme-win10 .dx-slideout .dx-slideout-item-container .dx-slideoutview-shield {
+    top: 60px;
+}
+
+.dx-theme-win10 .slideout-layout .layout-content.has-toolbar-bottom {
+    overflow: hidden;
+    bottom: 60px;
+}
+
+.dx-theme-win10 .slideout-layout .dx-toolbar.layout-toolbar-bottom {
+    position: absolute;
+    bottom: 0;
+    margin-bottom: 0;
+}
+
+.dx-theme-win10 .slideout-layout .layout-header .dx-toolbar {
+    opacity: 1;
+}
+
+
 /* generic theme */
+
 .dx-theme-generic .slideout-layout .layout-header {
     height: 56px;
 }

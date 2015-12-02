@@ -1,8 +1,7 @@
 (function($, DX, undefined) {
     var HAS_TOOLBAR_BOTTOM_CLASS = "has-toolbar-bottom",
         TOOLBAR_BOTTOM_SELECTOR = ".layout-toolbar-bottom",
-        ACTIVE_PIVOT_ITEM_SELECTOR = ".dx-pivot-item:not(.dx-pivot-item-hidden)",
-        LAYOUT_FOOTER_SELECTOR = ".layout-footer";
+        ACTIVE_PIVOT_ITEM_SELECTOR = ".dx-pivot-item:not(.dx-pivot-item-hidden)";
     DX.framework.html.PivotLayoutController = DX.framework.html.DefaultLayoutController.inherit({
         ctor: function(options) {
             options = options || {};
@@ -41,7 +40,7 @@
             var container = this.$pivot.dxCommandContainer("instance");
             this._commandManager.renderCommandsToContainers(navigationCommands, [container])
         },
-        _getRootElement: function() {
+        element: function() {
             return this.$root
         },
         _getViewFrame: function(viewInfo) {
@@ -81,7 +80,7 @@
     var layoutSets = DX.framework.html.layoutSets;
     layoutSets["navbar"] = layoutSets["navbar"] || [];
     layoutSets["navbar"].push({
-        platform: "win8",
+        platform: "win",
         phone: true,
         root: true,
         controller: new DX.framework.html.PivotLayoutController

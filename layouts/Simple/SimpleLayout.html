@@ -1,14 +1,29 @@
-﻿<div class="win8phone-layout" data-options="dxLayout : { name: 'simple', platform: 'win8' } " >
+﻿<div class="simple-layout" data-options="dxLayout : { name: 'simple', platform: 'win', phone: false } ">
+    <div class="layout-frame" data-options="dxTransition: { name: 'main', animation: 'view-content-change' }">
+        <div class="layout-header">
+            <div data-bind="dxToolbar: { items: [{ text: title, location: 'center' }] }"
+                 data-options="dxCommandContainer : { id: 'win8-master-detail-toolbar' }">
+            </div>
+        </div>
+        <div class="layout-content" data-options="dxContentPlaceholder : { name: 'content', animation: 'view-content-change' } ">
+        </div>
+    </div>
+    <div class="layout-footer" data-options="dxContentPlaceholder : { name: 'footer' }">
+        <div class="layout-toolbar-bottom win8" data-bind="dxToolbar: { items: [], renderAs: 'bottomToolbar' }" data-options="dxCommandContainer : { id: 'win8-phone-appbar' } "></div>
+    </div>
+</div>
+
+<div class="simple-layout" data-options="dxLayout : { name: 'simple', platform: 'win', phone: true } ">
     <div class="layout-frame">
         <div class="layout-header" data-options="dxContentPlaceholder : { name: 'header' }">
             <div data-bind="text: title">
             </div>
         </div>
-        <div class="layout-content" data-options="dxContentPlaceholder : { name: 'content', animation: 'view-content-change' } " >
+        <div class="layout-content" data-options="dxContentPlaceholder : { name: 'content', animation: 'view-content-change' } ">
         </div>
     </div>
     <div class="layout-footer" data-options="dxContentPlaceholder : { name: 'footer' }">
-        <div class="layout-toolbar-bottom win8" data-bind="dxToolbar: { items: [], renderAs: 'bottomToolbar' }" data-options="dxCommandContainer : { id: 'win8-phone-appbar' } " ></div>
+        <div class="layout-toolbar-bottom win8" data-bind="dxToolbar: { items: [], renderAs: 'bottomToolbar' }" data-options="dxCommandContainer : { id: 'win8-phone-appbar' } "></div>
     </div>
 </div>
 

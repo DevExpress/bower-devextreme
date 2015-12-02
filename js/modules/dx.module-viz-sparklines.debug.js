@@ -1,21 +1,23 @@
 /*! 
 * DevExtreme (Sparklines)
-* Version: 15.1.8
-* Build date: Oct 29, 2015
+* Version: 15.2.3
+* Build date: Dec 2, 2015
 *
 * Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
 */
 
 "use strict";
-if (!DevExpress.MOD_VIZ_SPARKLINES) {
-    if (!DevExpress.MOD_VIZ_CORE)
+if (!window.DevExpress || !DevExpress.MOD_VIZ_SPARKLINES) {
+    if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE)
         throw Error('Required module is not referenced: viz-core');
     /*! Module viz-sparklines, file baseSparkline.js */
     (function($, DX, undefined) {
         var DEFAULT_LINE_SPACING = 2,
             DEFAULT_EVENTS_DELAY = 200,
             TOUCH_EVENTS_DELAY = 1000,
+            eventUtils = DX.require("/ui/events/ui.events.utils"),
+            wheelEvent = DX.require("/ui/events/ui.events.wheel"),
             _extend = $.extend,
             _abs = Math.abs,
             viz = DX.viz,
@@ -75,18 +77,16 @@ if (!DevExpress.MOD_VIZ_SPARKLINES) {
             _getDefaultSize: function() {
                 return this._defaultSize
             },
-            _isContainerVisible: function() {
-                return true
-            },
             _disposeCore: function() {
                 this._disposeWidgetElements();
                 this._disposeTooltipEvents();
                 this._ranges = null
             },
             _render: function() {
-                this._prepareOptions();
-                this._updateWidgetElements();
-                this._drawWidgetElements()
+                var that = this;
+                that._prepareOptions();
+                that._updateWidgetElements();
+                that._drawWidgetElements()
             },
             _updateWidgetElements: function() {
                 this._updateRange();
@@ -169,7 +169,7 @@ if (!DevExpress.MOD_VIZ_SPARKLINES) {
                 var that = this,
                     canvas = this._canvas,
                     ranges = this._ranges;
-                that._translatorX = new viz.Translator2D(ranges.arg, canvas, {direction: "horizontal"});
+                that._translatorX = new viz.Translator2D(ranges.arg, canvas, {isHorizontal: true});
                 that._translatorY = new viz.Translator2D(ranges.val, canvas)
             },
             _getTooltip: function() {
@@ -221,6 +221,8 @@ if (!DevExpress.MOD_VIZ_SPARKLINES) {
             _endLoading: function(complete) {
                 complete()
             },
+            _initTitle: _noop,
+            _updateTitle: _noop,
             _initLoadingIndicator: _noop,
             _disposeLoadingIndicator: _noop,
             _updateLoadingIndicatorOptions: _noop,
@@ -231,7 +233,7 @@ if (!DevExpress.MOD_VIZ_SPARKLINES) {
         });
         var menuEvents = {
                 "contextmenu.sparkline-tooltip": function(event) {
-                    if (DX.ui.events.isTouchEvent(event) || DX.ui.events.isPointerEvent(event))
+                    if (eventUtils.isTouchEvent(event) || eventUtils.isPointerEvent(event))
                         event.preventDefault()
                 },
                 "MSHoldVisual.sparkline-tooltip": function(event) {
@@ -255,9 +257,10 @@ if (!DevExpress.MOD_VIZ_SPARKLINES) {
                     widget._hideTooltip(DEFAULT_EVENTS_DELAY)
                 }
             };
-        var mouseWheelEvents = {"dxmousewheel.sparkline-tooltip": function(event) {
-                    event.data.widget._hideTooltip()
-                }};
+        var mouseWheelEvents = {};
+        mouseWheelEvents[wheelEvent.name + ".sparkline-tooltip"] = function(event) {
+            event.data.widget._hideTooltip()
+        };
         var mouseMoveEvents = {"mousemove.sparkline-tooltip": function(event) {
                     var widget = event.data.widget;
                     if (widget._showTooltipTimeout && (_abs(widget._x - event.pageX) > 3 || _abs(widget._y - event.pageY) > 3)) {
@@ -315,7 +318,8 @@ if (!DevExpress.MOD_VIZ_SPARKLINES) {
     /*! Module viz-sparklines, file sparkline.js */
     (function($, DX, undefined) {
         var viz = DX.viz,
-            utils = DX.utils,
+            commonUtils = DX.require("/utils/utils.common"),
+            registerComponent = DX.require("/componentRegistrator"),
             MIN_BAR_WIDTH = 1,
             MAX_BAR_WIDTH = 50,
             DEFAULT_BAR_INTERVAL = 4,
@@ -341,10 +345,10 @@ if (!DevExpress.MOD_VIZ_SPARKLINES) {
             _isFinite = isFinite,
             _map = viz.utils.map,
             _normalizeEnum = viz.utils.normalizeEnum,
-            _isDefined = utils.isDefined,
+            _isDefined = commonUtils.isDefined,
             _Number = Number,
             _String = String;
-        DX.registerComponent("dxSparkline", viz.sparklines, viz.sparklines.BaseSparkline.inherit({
+        registerComponent("dxSparkline", viz.sparklines, viz.sparklines.BaseSparkline.inherit({
             _rootClassPrefix: "dxsl",
             _rootClass: "dxsl-sparkline",
             _widgetType: "sparkline",
@@ -359,7 +363,7 @@ if (!DevExpress.MOD_VIZ_SPARKLINES) {
             },
             _initCore: function() {
                 this.callBase();
-                this._refreshDataSource();
+                this._updateDataSource();
                 this._createSeries()
             },
             _dataSourceChangedHandler: function() {
@@ -373,24 +377,20 @@ if (!DevExpress.MOD_VIZ_SPARKLINES) {
                 this._updateSeries();
                 this.callBase()
             },
-            _dataSourceOptions: function() {
-                return {paginate: false}
-            },
             _redrawWidgetElements: function() {
-                this._updateTranslator();
-                this._correctPoints();
-                this._series.draw({
-                    x: this._translatorX,
-                    y: this._translatorY
+                var that = this;
+                that._updateTranslator();
+                that._correctPoints();
+                that._series.draw({
+                    x: that._translatorX,
+                    y: that._translatorY
                 });
-                this._seriesGroup.append(this._renderer.root)
+                that._seriesGroup.append(that._renderer.root)
             },
             _disposeWidgetElements: function() {
                 var that = this;
-                delete that._seriesGroup;
-                delete that._seriesLabelGroup;
                 that._series && that._series.dispose();
-                that._series = null
+                that._series = that._seriesGroup = that._seriesLabelGroup = null
             },
             _cleanWidgetElements: function() {
                 this._seriesGroup.remove();
@@ -399,16 +399,17 @@ if (!DevExpress.MOD_VIZ_SPARKLINES) {
                 this._seriesLabelGroup.clear()
             },
             _drawWidgetElements: function() {
-                if (this._isDataSourceReady()) {
+                if (this._dataSource.isLoaded()) {
                     this._drawSeries();
                     this._drawn()
                 }
             },
             _prepareOptions: function() {
-                this._allOptions = this.callBase();
-                this._allOptions.type = _normalizeEnum(this._allOptions.type);
-                if (!ALLOWED_TYPES[this._allOptions.type])
-                    this._allOptions.type = "line"
+                var that = this;
+                that._allOptions = that.callBase();
+                that._allOptions.type = _normalizeEnum(that._allOptions.type);
+                if (!ALLOWED_TYPES[that._allOptions.type])
+                    that._allOptions.type = "line"
             },
             _createHtmlElements: function() {
                 this._seriesGroup = this._renderer.g().attr({"class": "dxsl-series"});
@@ -447,7 +448,7 @@ if (!DevExpress.MOD_VIZ_SPARKLINES) {
                 var that = this;
                 that.callBase.apply(that, arguments);
                 if ("dataSource" in options && that._allOptions)
-                    that._refreshDataSource()
+                    that._updateDataSource()
             },
             _parseNumericDataSource: function(data, argField, valField) {
                 var ignoreEmptyPoints = this.option("ignoreEmptyPoints");
@@ -489,7 +490,7 @@ if (!DevExpress.MOD_VIZ_SPARKLINES) {
                     options = that._allOptions,
                     argField = options.argumentField,
                     valField = options.valueField,
-                    dataSource = that._dataSource ? that._dataSource.items() : [],
+                    dataSource = that._dataSource.items() || [],
                     data = that._parseNumericDataSource(dataSource, argField, valField);
                 if (options.type === "winloss") {
                     that._winlossDataSource = data;
@@ -758,11 +759,12 @@ if (!DevExpress.MOD_VIZ_SPARKLINES) {
                 }
                 return customizeObject
             }
-        }).include(DX.ui.DataHelperMixin))
+        }))
     })(jQuery, DevExpress);
     /*! Module viz-sparklines, file bullet.js */
     (function($, DX, undefined) {
-        var TARGET_MIN_Y = 0.02,
+        var registerComponent = DX.require("/componentRegistrator"),
+            TARGET_MIN_Y = 0.02,
             TARGET_MAX_Y = 0.98,
             BAR_VALUE_MIN_Y = 0.1,
             BAR_VALUE_MAX_Y = 0.9,
@@ -772,7 +774,7 @@ if (!DevExpress.MOD_VIZ_SPARKLINES) {
             DEFAULT_VERTICAL_MARGIN = 2,
             _Number = Number,
             _isFinite = isFinite;
-        DX.registerComponent("dxBullet", DX.viz.sparklines, DX.viz.sparklines.BaseSparkline.inherit({
+        registerComponent("dxBullet", DX.viz.sparklines, DX.viz.sparklines.BaseSparkline.inherit({
             _rootClassPrefix: "dxb",
             _rootClass: "dxb-bullet",
             _widgetType: "bullet",
@@ -979,7 +981,9 @@ if (!DevExpress.MOD_VIZ_SPARKLINES) {
             },
             _isTooltipEnabled: function() {
                 return this._tooltipEnabled
-            }
+            },
+            _initDataSource: $.noop,
+            _disposeDataSource: $.noop
         }))
     })(jQuery, DevExpress);
     DevExpress.MOD_VIZ_SPARKLINES = true

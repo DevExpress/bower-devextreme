@@ -1,11 +1,6 @@
 (function($, DX, undefined) {
     var HAS_NAVBAR_CLASS = "has-navbar",
         HAS_TOOLBAR_CLASS = "has-toolbar",
-        HAS_TOOLBAR_BOTTOM_CLASS = "has-toolbar-bottom",
-        TOOLBAR_BOTTOM_ACTIVE_CLASS = "dx-appbar-active",
-        SEMI_HIDDEN_CLASS = "semi-hidden",
-        TOOLBAR_BOTTOM_SELECTOR = ".layout-toolbar-bottom.win8",
-        ACTIVE_PIVOT_ITEM_SELECTOR = ".dx-pivot-item:not(.dx-pivot-item-hidden)",
         LAYOUT_FOOTER_SELECTOR = ".layout-footer",
         ACTIVE_TOOLBAR_SELECTOR = ".dx-active-view .dx-toolbar";
     DX.framework.html.NavBarController = DX.framework.html.DefaultLayoutController.inherit({
@@ -49,7 +44,7 @@
     });
     layoutSets["split"] = layoutSets["split"] || [];
     layoutSets["split"].push({
-        platform: "win8",
+        platform: "win",
         phone: false,
         root: true,
         pane: "master",

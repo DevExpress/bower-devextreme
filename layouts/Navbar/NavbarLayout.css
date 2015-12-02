@@ -146,6 +146,64 @@
     /* end for IE */
 }
 
+.dx-theme-win8 .navbar-layout-tablet.dx-animating:not(.dx-enter):not(.dx-leave) {
+    display: none;
+}
+
+/* win10 */
+
+.dx-theme-win10 .navbar-layout-tablet {
+    height: 100%;
+}
+
+.dx-theme-win10 .navbar-layout-tablet .layout-header,
+.dx-theme-win10 .navbar-layout-tablet .layout-content {
+    position: static;
+    width: auto;
+}
+
+.dx-theme-win10 .navbar-layout-tablet .layout-content,
+.dx-theme-win10 .navbar-layout-tablet .layout-content .dx-content {
+    height: 100%;
+}
+
+.dx-theme-win10 .navbar-layout-tablet  {
+    display: -ms-grid;
+    -ms-grid-columns: 1fr;
+    -ms-grid-rows: 300px 1fr;
+    overflow: hidden;
+}
+
+.dx-theme-win10 .navbar-layout-tablet .layout-header {
+    -ms-grid-column: 1;
+    -ms-grid-row: 1;
+}
+
+.dx-theme-win10 .navbar-layout-tablet .layout-header .dx-content-placeholder-header {
+    padding: 60px 60px 0;
+}
+
+.dx-theme-win10 .navbar-layout-tablet .layout-header .navbar-container {
+    height: 80px;
+}
+
+.dx-theme-win10 .navbar-layout-tablet .layout-header h1 {
+    margin-bottom: 60px;
+}
+
+.dx-theme-win10 .navbar-layout-tablet .layout-content-wrapper {
+    padding: 0 60px 60px 60px;
+    /* for IE */
+    -ms-grid-column: 1;
+    -ms-grid-row: 2;
+    /* end for IE */
+}
+
+.dx-theme-win10 .navbar-layout-tablet.dx-animating:not(.dx-enter):not(.dx-leave) {
+    display: none;
+}
+
+
 /* generic */
 
 .dx-theme-generic .navbar-layout .layout-content {

@@ -1,42 +1,50 @@
 /*! 
 * DevExtreme (Gauges)
-* Version: 15.1.8
-* Build date: Oct 29, 2015
+* Version: 15.2.3
+* Build date: Dec 2, 2015
 *
 * Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
 */
 
 "use strict";
-if (!DevExpress.MOD_VIZ_GAUGES) {
-    if (!DevExpress.MOD_VIZ_CORE)
+if (!window.DevExpress || !DevExpress.MOD_VIZ_GAUGES) {
+    if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE)
         throw Error('Required module is not referenced: viz-core');
     /*! Module viz-gauges, file baseGauge.js */
     (function(DX, $, undefined) {
         DX.viz.gauges = {};
         var _Number = Number,
-            _isString = DX.utils.isString,
-            _getAppropriateFormat = DX.utils.getAppropriateFormat,
+            _getAppropriateFormat = DX.require("/utils/utils.math").getAppropriateFormat,
             _extend = $.extend,
             _each = $.each,
+            _normalizeEnum = DX.viz.utils.normalizeEnum,
+            commonUtils = DX.require("/utils/utils.common"),
+            _isString = commonUtils.isString,
             internals = DX.viz.gauges.__internals = {};
         DX.viz.gauges.__tests = {};
+        function processTitleOptions(options) {
+            return _isString(options) ? {text: options} : options || {}
+        }
         DX.viz.gauges.dxBaseGauge = DX.viz.BaseWidget.inherit({
             _rootClassPrefix: "dxg",
             _invalidatingOptions: ["title", "subtitle", "indicator", "geometry", "startValue", "endValue"],
             _createThemeManager: function() {
                 return new this._factory.ThemeManager
             },
+            _setDeprecatedOptions: function() {
+                this.callBase();
+                _extend(this._deprecatedOptions, {subtitle: {
+                        since: '15.2',
+                        message: "Use the 'title.subtitle' option instead"
+                    }})
+            },
             _initCore: function() {
                 var that = this,
-                    root = that._renderer.root.virtualLink("elements").virtualLink("peripheral");
+                    root = that._renderer.root;
                 that._translator = that._factory.createTranslator();
                 that._initNotifiers();
                 that._layoutManager = that._factory.createLayoutManager();
-                that._title = that._factory.createTitle({
-                    renderer: that._renderer,
-                    container: root
-                });
                 that._deltaIndicator = that._factory.createDeltaIndicator({
                     renderer: that._renderer,
                     container: root
@@ -47,6 +55,21 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
                 });
                 that._setupDomain();
                 that._setTrackerCallbacks()
+            },
+            _updateTitle: function() {
+                var titleOptions = processTitleOptions(this.option("title")),
+                    options,
+                    position;
+                this._suppressDeprecatedWarnings();
+                titleOptions.subtitle = $.extend(processTitleOptions(titleOptions.subtitle), processTitleOptions(this.option("subtitle")));
+                this._resumeDeprecatedWarnings();
+                options = _extend(true, {}, this._themeManager.theme("title"), titleOptions);
+                if (options.position) {
+                    position = _normalizeEnum(options.position).split('-');
+                    options.verticalAlignment = position[0];
+                    options.horizontalAlignment = position[1]
+                }
+                this._title.update(options)
             },
             _setTrackerCallbacks: function() {
                 var that = this,
@@ -97,9 +120,8 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
                 var that = this;
                 that._themeManager.dispose();
                 that._tracker.dispose();
-                that._title.dispose();
                 that._deltaIndicator && that._deltaIndicator.dispose();
-                that._translator = that._notifiers = that._tracker = that._layoutManager = that._title = null
+                that._translator = that._notifiers = that._tracker = that._layoutManager = null
             },
             _clean: function() {
                 this._cleanCore()
@@ -114,7 +136,6 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
             },
             _cleanCore: function() {
                 var that = this;
-                that._title.clean();
                 that._deltaIndicator && that._deltaIndicator.clean();
                 that._tracker.deactivate();
                 that._cleanContent()
@@ -123,11 +144,10 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
                 var that = this;
                 if (!that._isValidDomain)
                     return;
-                var theme = that._themeManager.theme(),
-                    titleTheme = _extend(true, {}, theme.title, processTitleOptions(that.option("title"))),
-                    subTitleTheme = _extend(true, {}, theme.subtitle, processTitleOptions(that.option("subtitle")));
-                that._title.render(titleTheme, subTitleTheme);
-                that._deltaIndicator && that._deltaIndicator.render(_extend(true, {}, theme.indicator, that.option("indicator")));
+                var theme = that._themeManager.theme();
+                that._renderer.lock();
+                that._title.getLayoutOptions() && that._title.draw(that._width, that._height);
+                that._deltaIndicator && that._deltaIndicator.draw(_extend(true, {}, theme.indicator, that.option("indicator")));
                 that._layoutManager.beginLayout(that._rootRect);
                 _each([that._deltaIndicator, that._title], function(_, item) {
                     item && that._layoutManager.applyLayout(item)
@@ -137,6 +157,7 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
                 that._layoutManager.endLayout();
                 that._tracker.setTooltipState(that._tooltip.isEnabled());
                 that._tracker.activate();
+                that._renderer.unlock();
                 that._noAnimation = null;
                 that.option("debugMode") === true && that._renderDebugInfo();
                 that._debug_rendered && that._debug_rendered()
@@ -250,18 +271,14 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
                 createLayoutManager: function() {
                     return new internals.LayoutManager
                 },
-                createTitle: function(parameters) {
-                    return new internals.Title(parameters)
-                },
                 createDeltaIndicator: function(parameters) {
                     return internals.DeltaIndicator ? new internals.DeltaIndicator(parameters) : null
                 }
-            }
+            },
+            _initDataSource: $.noop,
+            _disposeDataSource: $.noop
         });
-        function processTitleOptions(options) {
-            return _isString(options) ? {text: options} : options || {}
-        }
-        var _formatHelper = DX.formatHelper;
+        var _formatHelper = DX.require("/utils/utils.formatHelper");
         internals.formatValue = function(value, options, extra) {
             options = options || {};
             var text = _formatHelper.format(value, options.format, options.precision),
@@ -283,54 +300,74 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
     })(DevExpress, jQuery);
     /*! Module viz-gauges, file gauge.js */
     (function(DX, $, undefined) {
-        var _utils = DX.utils,
-            _isDefined = _utils.isDefined,
-            _isArray = _utils.isArray,
-            _isNumber = _utils.isNumber,
-            _map = DX.viz.utils.map,
-            _normalizeEnum = DX.viz.utils.normalizeEnum,
+        var commonUtils = DX.require("/utils/utils.common"),
+            _isDefined = commonUtils.isDefined,
+            viz = DX.viz,
+            _isArray = commonUtils.isArray,
+            _isNumber = commonUtils.isNumber,
+            _map = viz.utils.map,
+            _normalizeEnum = viz.utils.normalizeEnum,
             _isFinite = isFinite,
             _Number = Number,
             _abs = Math.abs,
+            _min = Math.min,
+            _max = Math.max,
             _extend = $.extend,
             _each = $.each,
             _noop = $.noop,
-            OPTION_VALUE = 'value',
-            OPTION_SUBVALUES = 'subvalues';
+            OPTION_VALUE = "value",
+            OPTION_SUBVALUES = "subvalues",
+            DEFAULT_MINOR_AXIS_DIVISION_FACTOR = 5,
+            DEFAULT_NUMBER_MULTIPLIERS = [1, 2, 5];
         function processValue(value, fallbackValue) {
             return _isFinite(value) ? _Number(value) : fallbackValue
         }
         function parseArrayOfNumbers(arg) {
             return _isArray(arg) ? arg : _isNumber(arg) ? [arg] : null
         }
-        DX.viz.gauges.dxGauge = DX.viz.gauges.dxBaseGauge.inherit({
-            _invalidatingOptions: DX.viz.gauges.dxBaseGauge.prototype._invalidatingOptions.concat(["scale", "rangeContainer", "valueIndicator", "subvalueIndicator", "valueIndicators", "containerBackgroundColor"]),
+        viz.gauges.dxGauge = viz.gauges.dxBaseGauge.inherit({
+            _invalidatingOptions: viz.gauges.dxBaseGauge.prototype._invalidatingOptions.concat(["scale", "rangeContainer", "valueIndicator", "subvalueIndicator", "valueIndicators", "containerBackgroundColor"]),
             _initCore: function() {
-                var that = this;
+                var that = this,
+                    renderer = that._renderer;
                 that._setupValue(that.option(OPTION_VALUE));
                 that.__subvalues = parseArrayOfNumbers(that.option(OPTION_SUBVALUES));
                 that._setupSubvalues(that.__subvalues);
                 selectMode(that);
                 that.callBase.apply(that, arguments);
                 that._rangeContainer = new that._factory.RangeContainer({
-                    renderer: that._renderer,
-                    container: that._renderer.root,
+                    renderer: renderer,
+                    container: renderer.root,
                     translator: that._translator,
                     themeManager: that._themeManager
                 });
-                that._scale = new that._factory.Scale({
+                that._initScale()
+            },
+            _initScale: function() {
+                var that = this;
+                that._scaleGroup = that._renderer.g().attr({"class": "dxg-scale"}).linkOn(that._renderer.root, "scale");
+                that._scale = new viz.axes.Axis({
+                    incidentOccured: that._incidentOccured,
                     renderer: that._renderer,
-                    container: that._renderer.root,
-                    translator: that._translator
-                })
+                    axesContainerGroup: that._scaleGroup,
+                    axisType: that._scaleTypes.type,
+                    drawingType: that._scaleTypes.drawingType,
+                    widgetClass: "dxg"
+                });
+                that._scaleTranslator = that._initScaleTranslator(new viz.Range({
+                    axisType: "continuous",
+                    dataType: "numeric",
+                    stick: true
+                }))
             },
             _disposeCore: function() {
                 var that = this;
                 that.callBase.apply(that, arguments);
                 that._scale.dispose();
+                that._scaleGroup.linkOff();
                 that._rangeContainer.dispose();
                 that._disposeValueIndicators();
-                that._scale = that._rangeContainer = null
+                that._scale = that._scaleGroup = that._scaleTranslators = that._rangeContainer = null
             },
             _disposeValueIndicators: function() {
                 var that = this;
@@ -340,9 +377,9 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
             },
             _setupDomainCore: function() {
                 var that = this,
-                    scaleOption = that.option('scale') || {},
-                    startValue = that.option('startValue'),
-                    endValue = that.option('endValue');
+                    scaleOption = that.option("scale") || {},
+                    startValue = that.option("startValue"),
+                    endValue = that.option("endValue");
                 startValue = _isNumber(startValue) ? _Number(startValue) : _isNumber(scaleOption.startValue) ? _Number(scaleOption.startValue) : 0;
                 endValue = _isNumber(endValue) ? _Number(endValue) : _isNumber(scaleOption.endValue) ? _Number(scaleOption.endValue) : 100;
                 that._baseValue = startValue < endValue ? startValue : endValue;
@@ -351,27 +388,122 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
             _cleanContent: function() {
                 var that = this;
                 that._rangeContainer.clean();
-                that._scale.clean();
                 that._cleanValueIndicators()
+            },
+            _measureScale: function(scaleOptions) {
+                var that = this,
+                    majorTick = scaleOptions.tick,
+                    majorTickEnabled = majorTick.visible && majorTick.length > 0 && majorTick.width > 0,
+                    minorTick = scaleOptions.minorTick,
+                    minorTickEnabled = minorTick.visible && minorTick.length > 0 && minorTick.width > 0,
+                    label = scaleOptions.label,
+                    indentFromTick = Number(label.indentFromTick),
+                    textParams,
+                    layoutValue,
+                    result,
+                    coefs,
+                    innerCoef,
+                    outerCoef;
+                if (!majorTickEnabled && !minorTickEnabled && !label.visible)
+                    return {};
+                textParams = that._scale.measureLabels();
+                layoutValue = that._getScaleLayoutValue();
+                result = {
+                    min: layoutValue,
+                    max: layoutValue
+                };
+                coefs = that._getTicksCoefficients(scaleOptions);
+                innerCoef = coefs.inner;
+                outerCoef = coefs.outer;
+                if (majorTickEnabled) {
+                    result.min = _min(result.min, layoutValue - innerCoef * majorTick.length);
+                    result.max = _max(result.max, layoutValue + outerCoef * majorTick.length)
+                }
+                if (minorTickEnabled) {
+                    result.min = _min(result.min, layoutValue - innerCoef * minorTick.length);
+                    result.max = _max(result.max, layoutValue + outerCoef * minorTick.length)
+                }
+                label.visible && that._correctScaleIndents(result, indentFromTick, textParams);
+                return result
             },
             _renderContent: function() {
                 var that = this,
+                    scaleOptions = that._prepareScaleSettings(),
                     elements;
                 that._rangeContainer.render(_extend(that._getOption("rangeContainer"), {vertical: that._area.vertical}));
-                that._scale.render(_extend(that._getOption("scale"), {
-                    rangeContainer: that._rangeContainer.enabled ? that._rangeContainer : null,
-                    approximateScreenDelta: that._getApproximateScreenRange(),
-                    offset: 0,
-                    vertical: that._area.vertical
-                }));
-                elements = _map([that._scale, that._rangeContainer].concat(that._prepareValueIndicators()), function(element) {
+                that._renderScale(scaleOptions);
+                elements = _map([that._rangeContainer].concat(that._prepareValueIndicators()), function(element) {
                     return element && element.enabled ? element : null
                 });
-                that._applyMainLayout(elements);
+                that._applyMainLayout(elements, that._measureScale(scaleOptions));
                 _each(elements, function(_, element) {
                     element.resize(that._getElementLayout(element.getOffset()))
                 });
+                that._shiftScale(that._getElementLayout(0), scaleOptions);
                 that._updateActiveElements()
+            },
+            _prepareScaleSettings: function() {
+                var that = this,
+                    scaleOptions = $.extend(true, {}, that._themeManager.theme("scale"), that.option("scale")),
+                    useAutoArrangement = scaleOptions.label.overlappingBehavior.useAutoArrangement,
+                    scaleMajorTick = scaleOptions.majorTick,
+                    scaleMinorTick = scaleOptions.minorTick,
+                    overlappingBehavior = scaleOptions.label.overlappingBehavior;
+                if (scaleMajorTick) {
+                    scaleOptions.tick = _extend(scaleOptions.tick, scaleMajorTick);
+                    useAutoArrangement = scaleMajorTick.useTickAutoArrangement !== undefined ? scaleMajorTick.useTickAutoArrangement : true;
+                    scaleMajorTick.tickInterval !== undefined && (scaleOptions.tickInterval = scaleMajorTick.tickInterval);
+                    scaleMajorTick.customTickValues !== undefined && (scaleOptions.customTicks = scaleMajorTick.customTickValues);
+                    if (scaleOptions.customTicks)
+                        scaleOptions.tick.showCalculatedTicks = scaleMajorTick.showCalculatedTicks !== undefined ? scaleMajorTick.showCalculatedTicks : true;
+                    else
+                        scaleOptions.tick.showCalculatedTicks = false
+                }
+                overlappingBehavior.hideFirstTick = scaleOptions.hideFirstTick;
+                overlappingBehavior.hideFirstLabel = scaleOptions.hideFirstLabel;
+                overlappingBehavior.hideLastTick = scaleOptions.hideLastTick;
+                overlappingBehavior.hideLastLabel = scaleOptions.hideLastLabel;
+                scaleMinorTick.customTickValues !== undefined && (scaleOptions.customMinorTicks = scaleOptions.minorTick.customTickValues);
+                scaleMinorTick.tickInterval !== undefined && (scaleOptions.minorTickInterval = scaleOptions.minorTick.tickInterval);
+                if (scaleOptions.customMinorTicks)
+                    scaleMinorTick.showCalculatedTicks = scaleMinorTick.showCalculatedTicks !== undefined ? scaleMinorTick.showCalculatedTicks : true;
+                else
+                    scaleMinorTick.showCalculatedTicks = false;
+                scaleOptions.label.indentFromAxis = 0;
+                scaleOptions.isHorizontal = !that._area.vertical;
+                overlappingBehavior.mode = useAutoArrangement ? "enlargeTickInterval" : "ignore";
+                scaleOptions.axisDivisionFactor = that._gridSpacingFactor;
+                scaleOptions.minorAxisDivisionFactor = DEFAULT_MINOR_AXIS_DIVISION_FACTOR;
+                scaleOptions.numberMultipliers = DEFAULT_NUMBER_MULTIPLIERS;
+                if (scaleOptions.label.useRangeColors)
+                    scaleOptions.label.customizeColor = function() {
+                        return that._rangeContainer.getColorForValue(this.value)
+                    };
+                return scaleOptions
+            },
+            _renderScale: function(scaleOptions) {
+                var that = this,
+                    bounds = that._translator.getDomain(),
+                    startValue = bounds[0],
+                    endValue = bounds[1];
+                scaleOptions.min = startValue;
+                scaleOptions.max = endValue;
+                that._scale.updateOptions(scaleOptions);
+                that._updateScaleTranslator(startValue, endValue);
+                that._updateScaleTickIndent(scaleOptions);
+                that._scaleGroup.linkAppend();
+                that._scale.draw()
+            },
+            _updateScaleTranslator: function(startValue, endValue) {
+                var that = this,
+                    argTranslator = that._getScaleTranslatorComponent("arg");
+                that._updateScaleAngles();
+                argTranslator.updateBusinessRange(_extend(argTranslator.getBusinessRange(), {
+                    minVisible: startValue,
+                    maxVisible: endValue,
+                    invert: startValue > endValue
+                }));
+                that._scale.setTranslator(argTranslator, that._getScaleTranslatorComponent("val"))
             },
             _updateIndicatorSettings: function(settings) {
                 var that = this;
@@ -410,13 +542,13 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
             _prepareValueIndicator: function() {
                 var that = this,
                     target = that._valueIndicator,
-                    settings = that._prepareIndicatorSettings(that.option("valueIndicator") || {}, 'valueIndicatorType');
+                    settings = that._prepareIndicatorSettings(that.option("valueIndicator") || {}, "valueIndicatorType");
                 if (target && target.type !== settings.type) {
                     target.dispose();
                     target = null
                 }
                 if (!target)
-                    target = that._valueIndicator = that._createIndicator(settings.type, that._renderer.root, 'dxg-value-indicator', 'value-indicator');
+                    target = that._valueIndicator = that._createIndicator(settings.type, that._renderer.root, "dxg-value-indicator", "value-indicator");
                 target.render(settings)
             },
             _createSubvalueIndicatorsSet: function() {
@@ -424,7 +556,7 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
                     root = that._renderer.root;
                 return new ValueIndicatorsSet({
                         createIndicator: function(type, i) {
-                            return that._createIndicator(type, root, 'dxg-subvalue-indicator', 'subvalue-indicator', i)
+                            return that._createIndicator(type, root, "dxg-subvalue-indicator", "subvalue-indicator", i)
                         },
                         createPalette: function(palette) {
                             return that._themeManager.createPalette(palette)
@@ -434,7 +566,7 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
             _prepareSubvalueIndicators: function() {
                 var that = this,
                     target = that._subvalueIndicatorsSet,
-                    settings = that._prepareIndicatorSettings(that.option("subvalueIndicator") || {}, 'subvalueIndicatorType'),
+                    settings = that._prepareIndicatorSettings(that.option("subvalueIndicator") || {}, "subvalueIndicatorType"),
                     isRecreate,
                     dummy;
                 if (!target)
@@ -563,7 +695,7 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
         }
         function selectMode(gauge) {
             if (gauge.option(OPTION_VALUE) === undefined && gauge.option(OPTION_SUBVALUES) === undefined)
-                if (gauge.option('valueIndicators') !== undefined) {
+                if (gauge.option("valueIndicators") !== undefined) {
                     disableDefaultMode(gauge);
                     selectHardMode(gauge)
                 }
@@ -574,7 +706,7 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
         }
         function selectHardMode(that) {
             that._indicatorValues = [];
-            setupValues(that, '_indicatorValues', that.option('valueIndicators'));
+            setupValues(that, "_indicatorValues", that.option("valueIndicators"));
             that._valueIndicators = [];
             that._valueChangedHandler = valueChangedHandler_hardMode;
             that._updateActiveElements = updateActiveElements_hardMode;
@@ -585,7 +717,7 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
         }
         function valueChangedHandler_hardMode(options) {
             if ("valueIndicators" in options) {
-                setupValues(this, '_indicatorValues', options.valueIndicators);
+                setupValues(this, "_indicatorValues", options.valueIndicators);
                 this._invalidate()
             }
         }
@@ -598,7 +730,7 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
         function prepareValueIndicators_hardMode() {
             var that = this,
                 valueIndicators = that._valueIndicators || [],
-                userOptions = that.option('valueIndicators'),
+                userOptions = that.option("valueIndicators"),
                 optionList = [],
                 i = 0,
                 ii;
@@ -619,7 +751,7 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
                     valueIndicator = null
                 }
                 if (!valueIndicator)
-                    valueIndicator = that._createIndicator(settings.type, that._renderer.root, 'dxg-value-indicator', 'value-indicator', i, true);
+                    valueIndicator = that._createIndicator(settings.type, that._renderer.root, "dxg-value-indicator", "value-indicator", i, true);
                 if (valueIndicator) {
                     valueIndicator.index = i;
                     valueIndicator.render(settings);
@@ -784,7 +916,7 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
                     })
             }
         };
-        DX.viz.gauges.__internals.createIndicatorCreator = function(indicators) {
+        viz.gauges.__internals.createIndicatorCreator = function(indicators) {
             return function(parameters, type, _strict) {
                     var indicatorType = indicators[_normalizeEnum(type)] || !_strict && indicators._default;
                     return indicatorType ? new indicatorType(parameters) : null
@@ -793,15 +925,19 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
     })(DevExpress, jQuery);
     /*! Module viz-gauges, file circularGauge.js */
     (function(DX, $, undefined) {
-        var _isFinite = isFinite,
-            _Number = Number,
-            _normalizeAngle = DX.utils.normalizeAngle,
-            _getCosAndSin = DX.utils.getCosAndSin,
+        var viz = DX.viz,
+            _isFinite = isFinite,
+            objectUtils = DX.require("/utils/utils.object"),
+            mathUtils = DX.require("/utils/utils.math"),
+            _normalizeAngle = mathUtils.normalizeAngle,
+            _getCosAndSin = mathUtils.getCosAndSin,
+            registerComponent = DX.require("/componentRegistrator"),
             _abs = Math.abs,
             _max = Math.max,
             _min = Math.min,
             _round = Math.round,
             _each = $.each,
+            SHIFT_ANGLE = 90,
             PI = Math.PI;
         function getSides(startAngle, endAngle) {
             var startCosSin = _getCosAndSin(startAngle),
@@ -817,12 +953,36 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
                     down: startCos >= 0 && endCos <= 0 || startCos >= 0 && endCos >= 0 && startSin <= endSin || startCos <= 0 && endCos <= 0 && startSin >= endSin ? 1 : -_min(startSin, endSin, 0)
                 }
         }
-        DX.registerComponent("dxCircularGauge", DX.viz.gauges, DX.viz.gauges.dxGauge.inherit({
+        registerComponent("dxCircularGauge", viz.gauges, viz.gauges.dxGauge.inherit({
             _rootClass: "dxg-circular-gauge",
             _factoryMethods: {
-                scale: 'createCircularScale',
                 rangeContainer: 'createCircularRangeContainer',
                 indicator: 'createCircularIndicator'
+            },
+            _gridSpacingFactor: 17,
+            _scaleTypes: {
+                type: "polarAxes",
+                drawingType: "circular"
+            },
+            _initScaleTranslator: function(range) {
+                return new viz.PolarTranslator({
+                        arg: range,
+                        val: {}
+                    }, this._canvas, {})
+            },
+            _getScaleTranslatorComponent: function(name) {
+                return this._scaleTranslator.getComponent(name)
+            },
+            _updateScaleTickIndent: function(scaleOptions) {
+                var indentFromTick = scaleOptions.label.indentFromTick,
+                    length = scaleOptions.tick.length,
+                    textParams = this._scale.measureLabels();
+                scaleOptions.label.indentFromAxis = indentFromTick >= 0 ? indentFromTick + length / 2 : indentFromTick - length / 2 - _max(textParams.width, textParams.height);
+                this._scale.updateOptions(scaleOptions)
+            },
+            _updateScaleAngles: function() {
+                var angles = this._translator.getCodomain();
+                this._scaleTranslator.setAngles(SHIFT_ANGLE - angles[0], SHIFT_ANGLE - angles[1])
             },
             _setupCodomain: function() {
                 var that = this,
@@ -851,12 +1011,55 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
                     radius: 100,
                     startCoord: startAngle,
                     endCoord: endAngle,
-                    scaleRadius: geometry.scaleRadius > 0 ? _Number(geometry.scaleRadius) : undefined,
                     sides: sides
                 };
                 that._translator.setCodomain(startAngle, endAngle)
             },
-            _measureMainElements: function(elements) {
+            _shiftScale: function(layout) {
+                var scaleTranslator = this._scaleTranslator,
+                    scale = this._scale,
+                    options = scale.getOptions(),
+                    tickCorrection = 1,
+                    centerCoords;
+                if (options.orientation === "inside")
+                    tickCorrection = -1;
+                else if (options.orientation === "center")
+                    tickCorrection = 0;
+                scaleTranslator.setCanvasDimension(layout.radius * 2 + options.tick.length * tickCorrection);
+                scale.setTranslator(scaleTranslator.getComponent("arg"), scaleTranslator.getComponent("val"));
+                scale.draw();
+                centerCoords = scaleTranslator.getCenter();
+                scale.shift(layout.x - centerCoords.x, layout.y - centerCoords.y)
+            },
+            _getScaleLayoutValue: function() {
+                return this._area.radius
+            },
+            _getTicksCoefficients: function(options) {
+                var coefs = {
+                        inner: 0,
+                        outer: 1
+                    };
+                if (options.orientation === "inside") {
+                    coefs.inner = 1;
+                    coefs.outer = 0
+                }
+                else if (options.orientation === "center")
+                    coefs.inner = coefs.outer = 0.5;
+                return coefs
+            },
+            _correctScaleIndents: function(result, indentFromTick, textParams) {
+                if (indentFromTick >= 0) {
+                    result.horizontalOffset = indentFromTick + textParams.width;
+                    result.verticalOffset = indentFromTick + textParams.height
+                }
+                else {
+                    result.horizontalOffset = result.verticalOffset = 0;
+                    result.min -= -indentFromTick + _max(textParams.width, textParams.height)
+                }
+                result.inverseHorizontalOffset = textParams.width / 2;
+                result.inverseVerticalOffset = textParams.height / 2
+            },
+            _measureMainElements: function(elements, scaleMeasurement) {
                 var that = this,
                     radius = that._area.radius,
                     maxRadius = 0,
@@ -864,9 +1067,10 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
                     maxHorizontalOffset = 0,
                     maxVerticalOffset = 0,
                     maxInverseHorizontalOffset = 0,
-                    maxInverseVerticalOffset = 0;
-                _each(elements, function(_, element) {
-                    var bounds = element.measure({radius: radius - element.getOffset()});
+                    maxInverseVerticalOffset = 0,
+                    scale = that._scale;
+                _each(elements.concat(scale), function(_, element) {
+                    var bounds = element.measure ? element.measure({radius: radius - element.getOffset()}) : scaleMeasurement;
                     bounds.min > 0 && (minRadius = _min(minRadius, bounds.min));
                     bounds.max > 0 && (maxRadius = _max(maxRadius, bounds.max));
                     bounds.horizontalOffset > 0 && (maxHorizontalOffset = _max(maxHorizontalOffset, bounds.max + bounds.horizontalOffset));
@@ -885,9 +1089,9 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
                         inverseVerticalMargin: maxInverseVerticalOffset
                     }
             },
-            _applyMainLayout: function(elements) {
+            _applyMainLayout: function(elements, scaleMeasurement) {
                 var that = this,
-                    measurements = that._measureMainElements(elements),
+                    measurements = that._measureMainElements(elements, scaleMeasurement),
                     area = that._area,
                     sides = area.sides,
                     margins = {
@@ -899,12 +1103,7 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
                     rect = that._layoutManager.selectRectByAspectRatio((sides.down - sides.up) / (sides.right - sides.left), margins),
                     radius = _min(rect.width() / (sides.right - sides.left), rect.height() / (sides.down - sides.up)),
                     x,
-                    y,
-                    scaler = (measurements.maxRadius - area.radius + area.scaleRadius) / radius;
-                if (0 < scaler && scaler < 1) {
-                    rect = rect.scale(scaler);
-                    radius *= scaler
-                }
+                    y;
                 radius = radius - measurements.maxRadius + area.radius;
                 x = rect.left - rect.width() * sides.left / (sides.right - sides.left);
                 y = rect.top - rect.height() * sides.up / (sides.down - sides.up);
@@ -938,23 +1137,77 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
                         height: 300
                     }
             },
-            _factory: DX.utils.clone(DX.viz.gauges.dxBaseGauge.prototype._factory)
+            _factory: objectUtils.clone(viz.gauges.dxBaseGauge.prototype._factory)
         }))
     })(DevExpress, jQuery);
     /*! Module viz-gauges, file linearGauge.js */
     (function(DX, $, undefined) {
-        var _Number = Number,
+        var viz = DX.viz,
             _max = Math.max,
             _min = Math.min,
             _round = Math.round,
             _each = $.each,
-            _normalizeEnum = DX.viz.utils.normalizeEnum;
-        DX.registerComponent("dxLinearGauge", DX.viz.gauges, DX.viz.gauges.dxGauge.inherit({
+            objectUtils = DX.require("/utils/utils.object"),
+            registerComponent = DX.require("/componentRegistrator"),
+            _normalizeEnum = viz.utils.normalizeEnum;
+        registerComponent("dxLinearGauge", viz.gauges, viz.gauges.dxGauge.inherit({
             _rootClass: 'dxg-linear-gauge',
             _factoryMethods: {
-                scale: 'createLinearScale',
                 rangeContainer: 'createLinearRangeContainer',
                 indicator: 'createLinearIndicator'
+            },
+            _gridSpacingFactor: 25,
+            _scaleTypes: {
+                type: "xyAxes",
+                drawingType: "linear"
+            },
+            _initScaleTranslator: function(range) {
+                var canvas = $.extend({}, this._canvas);
+                return {
+                        val: new viz.Translator2D(range, canvas),
+                        arg: new viz.Translator2D(range, canvas, {isHorizontal: true})
+                    }
+            },
+            _getScaleTranslatorComponent: function(name) {
+                return this._scaleTranslator[name === "arg" !== this._area.vertical ? "arg" : "val"]
+            },
+            _updateScaleAngles: $.noop,
+            _updateScaleTickIndent: function(scaleOptions) {
+                var indentFromTick = scaleOptions.label.indentFromTick,
+                    length = scaleOptions.tick.length,
+                    textParams = this._scale.measureLabels(),
+                    verticalTextCorrection = scaleOptions.isHorizontal ? textParams.height + textParams.y : 0;
+                if (indentFromTick > 0)
+                    scaleOptions.label.indentFromAxis = -(indentFromTick + length / 2 + (scaleOptions.isHorizontal ? -textParams.y : textParams.width));
+                else
+                    scaleOptions.label.indentFromAxis = -indentFromTick + length / 2 - verticalTextCorrection;
+                this._scale.updateOptions(scaleOptions)
+            },
+            _shiftScale: function(layout, scaleOptions) {
+                var that = this,
+                    canvas = $.extend({}, that._canvas),
+                    isHorizontal = scaleOptions.isHorizontal,
+                    halfLength = scaleOptions.tick.length / 2,
+                    horOrientationDelta = {
+                        center: 0,
+                        left: -1,
+                        right: 1
+                    },
+                    verOrientationDelta = {
+                        middle: 0,
+                        top: -1,
+                        bottom: 1
+                    },
+                    xDelta = isHorizontal ? 0 : halfLength * horOrientationDelta[scaleOptions.horizontalOrientation],
+                    yDelta = isHorizontal ? halfLength * verOrientationDelta[scaleOptions.verticalOrientation] : 0,
+                    translator = that._getScaleTranslatorComponent("arg"),
+                    scale = that._scale;
+                canvas[isHorizontal ? "left" : "top"] = that._area[isHorizontal ? "startCoord" : "endCoord"];
+                canvas[isHorizontal ? "right" : "bottom"] = canvas[isHorizontal ? "width" : "height"] - that._area[isHorizontal ? "endCoord" : "startCoord"];
+                translator.updateCanvas(canvas);
+                scale.setTranslator(translator, that._getScaleTranslatorComponent("val"));
+                scale.draw();
+                scale.shift(layout.x + xDelta, layout.y + yDelta)
             },
             _setupCodomain: function() {
                 var that = this,
@@ -965,26 +1218,57 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
                     x: 0,
                     y: 0,
                     startCoord: -100,
-                    endCoord: 100,
-                    scaleSize: geometry.scaleSize > 0 ? _Number(geometry.scaleSize) : undefined
+                    endCoord: 100
                 };
-                that._scale.vertical = vertical;
                 that._rangeContainer.vertical = vertical
             },
-            _measureMainElements: function(elements) {
+            _getScaleLayoutValue: function() {
+                return this._area[this._area.vertical ? "x" : "y"]
+            },
+            _getTicksCoefficients: function(options) {
+                var coefs = {
+                        inner: 0,
+                        outer: 1
+                    };
+                if (this._area.vertical) {
+                    if (options.horizontalOrientation === "left") {
+                        coefs.inner = 1;
+                        coefs.outer = 0
+                    }
+                    else if (options.horizontalOrientation === "center")
+                        coefs.inner = coefs.outer = 0.5
+                }
+                else if (options.verticalOrientation === "top") {
+                    coefs.inner = 1;
+                    coefs.outer = 0
+                }
+                else if (options.verticalOrientation === "middle")
+                    coefs.inner = coefs.outer = 0.5;
+                return coefs
+            },
+            _correctScaleIndents: function(result, indentFromTick, textParams) {
+                var vertical = this._area.vertical;
+                if (indentFromTick >= 0)
+                    result.max += indentFromTick + textParams[vertical ? "width" : "height"];
+                else
+                    result.min -= -indentFromTick + textParams[vertical ? "width" : "height"];
+                result.indent = textParams[vertical ? "height" : "width"] / 2
+            },
+            _measureMainElements: function(elements, scaleMeasurement) {
                 var that = this,
                     x = that._area.x,
                     y = that._area.y,
                     minBound = 1000,
                     maxBound = 0,
-                    indent = 0;
-                _each(elements, function(_, element) {
-                    var bounds = element.measure({
+                    indent = 0,
+                    scale = that._scale;
+                _each(elements.concat(scale), function(_, element) {
+                    var bounds = element.measure ? element.measure({
                             x: x + element.getOffset(),
                             y: y + element.getOffset()
-                        });
-                    maxBound = _max(maxBound, bounds.max);
-                    minBound = _min(minBound, bounds.min);
+                        }) : scaleMeasurement;
+                    bounds.max !== undefined && (maxBound = _max(maxBound, bounds.max));
+                    bounds.min !== undefined && (minBound = _min(minBound, bounds.min));
                     bounds.indent > 0 && (indent = _max(indent, bounds.indent))
                 });
                 return {
@@ -993,28 +1277,21 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
                         indent: indent
                     }
             },
-            _applyMainLayout: function(elements) {
+            _applyMainLayout: function(elements, scaleMeasurement) {
                 var that = this,
-                    measurements = that._measureMainElements(elements),
+                    measurements = that._measureMainElements(elements, scaleMeasurement),
                     area = that._area,
                     rect,
-                    offset,
-                    counterSize = area.scaleSize + 2 * measurements.indent;
+                    offset;
                 if (area.vertical) {
-                    rect = that._layoutManager.selectRectBySizes({
-                        width: measurements.maxBound - measurements.minBound,
-                        height: counterSize
-                    });
+                    rect = that._layoutManager.selectRectBySizes({width: measurements.maxBound - measurements.minBound});
                     offset = rect.horizontalMiddle() - (measurements.minBound + measurements.maxBound) / 2;
                     area.startCoord = rect.bottom - measurements.indent;
                     area.endCoord = rect.top + measurements.indent;
                     area.x = _round(area.x + offset)
                 }
                 else {
-                    rect = that._layoutManager.selectRectBySizes({
-                        height: measurements.maxBound - measurements.minBound,
-                        width: counterSize
-                    });
+                    rect = that._layoutManager.selectRectBySizes({height: measurements.maxBound - measurements.minBound});
                     offset = rect.verticalMiddle() - (measurements.minBound + measurements.maxBound) / 2;
                     area.startCoord = rect.left + measurements.indent;
                     area.endCoord = rect.right - measurements.indent;
@@ -1050,7 +1327,7 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
                             height: 100
                         }
             },
-            _factory: DX.utils.clone(DX.viz.gauges.dxBaseGauge.prototype._factory)
+            _factory: objectUtils.clone(viz.gauges.dxBaseGauge.prototype._factory)
         }))
     })(DevExpress, jQuery);
     /*! Module viz-gauges, file barGauge.js */
@@ -1061,9 +1338,13 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
             _floor = Math.floor,
             _min = Math.min,
             _max = Math.max,
-            _isArray = DX.utils.isArray,
-            _convertAngleToRendererSpace = DX.utils.convertAngleToRendererSpace,
-            _getCosAndSin = DX.utils.getCosAndSin,
+            objectUtils = DX.require("/utils/utils.object"),
+            commonUtils = DX.require("/utils/utils.common"),
+            _isArray = commonUtils.isArray,
+            mathUtils = DX.require("/utils/utils.math"),
+            registerComponent = DX.require("/componentRegistrator"),
+            _convertAngleToRendererSpace = mathUtils.convertAngleToRendererSpace,
+            _getCosAndSin = mathUtils.getCosAndSin,
             _patchFontOptions = DX.viz.utils.patchFontOptions,
             _Number = Number,
             _isFinite = isFinite,
@@ -1072,16 +1353,13 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
             _getSampleText = DX.viz.gauges.__internals.getSampleText,
             _formatValue = DX.viz.gauges.__internals.formatValue,
             OPTION_VALUES = "values";
-        DX.registerComponent("dxBarGauge", DX.viz.gauges, DX.viz.gauges.dxBaseGauge.inherit({
+        registerComponent("dxBarGauge", DX.viz.gauges, DX.viz.gauges.dxBaseGauge.inherit({
             _rootClass: "dxbg-bar-gauge",
             _invalidatingOptions: DX.viz.gauges.dxBaseGauge.prototype._invalidatingOptions.concat(["backgroundColor", "relativeInnerRadius", "barSpacing", "label"]),
             _initCore: function() {
                 var that = this;
                 that.callBase.apply(that, arguments);
-                that._barsGroup = that._renderer.g().attr({"class": "dxbg-bars"}).linkOn(that._renderer.root, {
-                    name: "bars",
-                    after: "elements"
-                });
+                that._barsGroup = that._renderer.g().attr({"class": "dxbg-bars"}).linkOn(that._renderer.root, "bars");
                 that._values = [];
                 that._context = {
                     renderer: that._renderer,
@@ -1342,7 +1620,7 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
                 else
                     return this.callBase.apply(this, arguments)
             },
-            _factory: DX.utils.clone(DX.viz.gauges.dxBaseGauge.prototype._factory)
+            _factory: objectUtils.clone(DX.viz.gauges.dxBaseGauge.prototype._factory)
         }));
         var BarWrapper = function(index, context) {
                 var that = this;
@@ -1514,8 +1792,9 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
             _round = Math.round,
             _formatValue = internals.formatValue,
             _getSampleText = internals.getSampleText,
-            _patchFontOptions = DX.viz.utils.patchFontOptions;
-        internals.BaseElement = DX.Class.inherit({
+            _patchFontOptions = DX.viz.utils.patchFontOptions,
+            Class = DevExpress.require("/class");
+        internals.BaseElement = Class.inherit({
             ctor: function(parameters) {
                 var that = this;
                 $.each(parameters, function(name, value) {
@@ -1540,7 +1819,7 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
                     var that = this;
                     that._rootElement = that._createRoot().linkOn(that._owner, {
                         name: "value-indicator",
-                        after: "elements"
+                        after: "core"
                     });
                     that._trackerElement = that._createTracker()
                 },
@@ -1894,9 +2173,10 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
     (function(DX, undefined) {
         var indicators = DX.viz.gauges.dxCircularGauge.prototype._factory.indicators = {},
             internals = DX.viz.gauges.__internals,
+            mathUtils = DX.require("/utils/utils.math"),
             _Number = Number,
-            _getCosAndSin = DX.utils.getCosAndSin,
-            _convertAngleToRendererSpace = DX.utils.convertAngleToRendererSpace;
+            _getCosAndSin = mathUtils.getCosAndSin,
+            _convertAngleToRendererSpace = mathUtils.convertAngleToRendererSpace;
         DX.viz.gauges.dxCircularGauge.prototype._factory.createIndicator = internals.createIndicatorCreator(indicators);
         var SimpleIndicator = internals.BaseIndicator.inherit({
                 _move: function() {
@@ -2110,7 +2390,7 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
             _getTextCloudOptions: function() {
                 var that = this,
                     cossin = _getCosAndSin(that._actualPosition),
-                    nangle = DX.utils.normalizeAngle(that._actualPosition);
+                    nangle = mathUtils.normalizeAngle(that._actualPosition);
                 return {
                         x: that._options.x + cossin.cos * that._options.radius,
                         y: that._options.y - cossin.sin * that._options.radius,
@@ -2795,557 +3075,22 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
         });
         indicators._default = indicators.rangebar
     })(DevExpress);
-    /*! Module viz-gauges, file scale.js */
-    (function(DX, $, undefined) {
-        var internals = DX.viz.gauges.__internals,
-            _Number = Number,
-            _String = String,
-            _isFinite = isFinite,
-            _math = Math,
-            _min = _math.min,
-            _max = _math.max,
-            _abs = _math.abs,
-            PI_DIV_180 = _math.PI / 180,
-            utils = DX.utils,
-            _isFunction = utils.isFunction,
-            _isArray = utils.isArray,
-            _getCosAndSin = utils.getCosAndSin,
-            _convertAngleToRendererSpace = utils.convertAngleToRendererSpace,
-            _map = $.map,
-            _patchFontOptions = DX.viz.utils.patchFontOptions,
-            _formatHelper = DX.formatHelper,
-            _createTickManager = DX.viz.CoreFactory.createTickManager;
-        function binarySearch(x, list) {
-            var a = 0,
-                b = list.length - 1,
-                flag = list[a] - list[b] < 0,
-                c,
-                k = -1;
-            if (list[a] === x)
-                k = a;
-            if (list[b] === x)
-                k = b;
-            while (k < 0 && a <= b) {
-                c = ~~((a + b) / 2);
-                if (list[c] === x)
-                    k = c;
-                else if (list[c] - x < 0 === flag)
-                    a = c + 1;
-                else
-                    b = c - 1
-            }
-            return k
-        }
-        function sortAsc(x, y) {
-            return x - y
-        }
-        internals.BaseScale = internals.BaseElement.inherit({
-            _init: function() {
-                var that = this;
-                that._root = that._renderer.g().attr({'class': 'dxg-scale'}).linkOn(that._container, {
-                    name: "scale",
-                    after: "elements"
-                });
-                that._majorTicks = that._renderer.g().attr({'class': 'dxg-major-ticks'});
-                that._minorTicks = that._renderer.g().attr({'class': 'dxg-minor-ticks'});
-                that._labels = that._renderer.g().attr({'class': 'dxg-labels'})
-            },
-            _dispose: function() {
-                this._root.linkOff()
-            },
-            clean: function() {
-                var that = this;
-                that._root.linkRemove();
-                that._majorTicks.remove().clear();
-                that._minorTicks.remove().clear();
-                that._labels.remove().clear();
-                that._majorTicksEnabled = that._minorTicksEnabled = that._labelsEnabled = that._options = that.enabled = null;
-                return that
-            },
-            render: function(options) {
-                var that = this;
-                that._options = options;
-                that._processOptions(options);
-                if (that._majorTicksEnabled || that._minorTicksEnabled || that._labelsEnabled) {
-                    that.enabled = true;
-                    that._root.linkAppend();
-                    if (that._majorTicksEnabled)
-                        that._majorTicks.append(that._root);
-                    if (that._minorTicksEnabled)
-                        that._minorTicks.append(that._root);
-                    if (that._labelsEnabled) {
-                        that._labels.append(that._root);
-                        that._measureText()
-                    }
-                }
-                return that
-            },
-            _processOptions: function(options) {
-                var that = this;
-                that._majorTicksEnabled = options.majorTick.visible && options.majorTick.length > 0 && options.majorTick.width > 0;
-                that._minorTicksEnabled = options.minorTick.visible && options.minorTick.length > 0 && options.minorTick.width > 0;
-                that._labelsEnabled = options.label.visible && _Number(options.label.indentFromTick) !== 0;
-                that._setupOrientation()
-            },
-            _measureText: function() {
-                var that = this,
-                    domain = that._translator.getDomain(),
-                    options = that._options,
-                    tickManager = _createTickManager({}, {
-                        min: domain[0],
-                        max: domain[1],
-                        screenDelta: options.approximateScreenDelta
-                    }, {
-                        tickInterval: options.majorTick.tickInterval > 0 ? _Number(options.majorTick.tickInterval) : undefined,
-                        stick: true,
-                        textFontStyles: _patchFontOptions(options.label.font),
-                        gridSpacingFactor: that._getGridSpacingFactor().majorTicks,
-                        renderText: function(text, x, y, options) {
-                            return that._renderer.text(text, x, y, options).append(that._renderer.root)
-                        },
-                        getText: function(value) {
-                            return that._formatValue(value)
-                        },
-                        overlappingBehaviorType: that._overlappingBehaviorType
-                    }),
-                    maxTextParams = tickManager.getMaxLabelParams();
-                that._textVerticalOffset = -maxTextParams.y - maxTextParams.height / 2;
-                that._textWidth = maxTextParams.width;
-                that._textHeight = maxTextParams.height;
-                that._textLength = maxTextParams.length
-            },
-            _formatValue: function(value) {
-                var options = this._options.label,
-                    text = _formatHelper.format(value, options.format, options.precision);
-                if (_isFunction(options.customizeText)) {
-                    text = {
-                        value: value,
-                        valueText: text
-                    };
-                    text = _String(options.customizeText.call(text, text))
-                }
-                return text
-            },
-            _setupOrientation: null,
-            _getCustomValues: function(values, compare) {
-                var translator = this._translator,
-                    result = [];
-                if (_isArray(values)) {
-                    result = _map(values, function(x) {
-                        return _isFinite(translator.translate(x)) ? _Number(x) : null
-                    }).sort(compare);
-                    result = _map(result, function(x, i) {
-                        return x !== result[i - 1] ? x : null
-                    })
-                }
-                return result
-            },
-            _getLabelPosition: function(layout) {
-                return this._getAxisLabelPosition(_Number(this._options.majorTick.length), _Number(this._options.label.indentFromTick), layout)
-            },
-            _generateTicks: function(layout) {
-                var that = this,
-                    scaleOptions = that._options,
-                    translatorDomains = that._translator.getDomain(),
-                    data = {
-                        min: translatorDomains[0],
-                        max: translatorDomains[1],
-                        screenDelta: that._getScreenDelta(layout)
-                    },
-                    gridSpacingFactors = that._getGridSpacingFactor(),
-                    options = {
-                        tickInterval: scaleOptions.majorTick.tickInterval > 0 ? _Number(scaleOptions.majorTick.tickInterval) : undefined,
-                        minorTickInterval: scaleOptions.minorTick.tickInterval > 0 ? _Number(scaleOptions.minorTick.tickInterval) : undefined,
-                        gridSpacingFactor: gridSpacingFactors.majorTicks,
-                        minorGridSpacingFactor: gridSpacingFactors.minorTicks,
-                        numberMultipliers: [1, 2, 5],
-                        textFontStyles: _patchFontOptions(scaleOptions.label.font),
-                        labelOptions: scaleOptions.label,
-                        getText: function(value) {
-                            return that._formatValue(value)
-                        },
-                        isHorizontal: !that.vertical,
-                        stick: true,
-                        showMinorTicks: true
-                    },
-                    tickManager;
-                if (scaleOptions.majorTick.useTicksAutoArrangement) {
-                    options.useTicksAutoArrangement = true;
-                    options.renderText = function(text, x, y, options) {
-                        return that._renderer.text(text, x, y, options).append(that._renderer.root)
-                    };
-                    options.translate = that._getTranslateFunction(layout);
-                    that._applyOverlappingOptions(options, layout)
-                }
-                tickManager = _createTickManager({}, data, options);
-                return {
-                        majorTicks: tickManager.getTicks(true),
-                        minorTicks: tickManager.getMinorTicks()
-                    }
-            },
-            _getTicks: function(layout) {
-                var that = this,
-                    options = that._options,
-                    info = that._generateTicks(layout),
-                    majorValues = options.majorTick.showCalculatedTicks ? info.majorTicks : [],
-                    customMajorValues = _map(that._getCustomValues(options.majorTick.customTickValues, sortAsc), function(value) {
-                        return binarySearch(value, majorValues) === -1 ? value : null
-                    }),
-                    minorValues = _map(options.minorTick.showCalculatedTicks ? info.minorTicks : [], function(value) {
-                        return binarySearch(value, customMajorValues) === -1 ? value : null
-                    }),
-                    customMinorValues = that._getCustomValues(options.minorTick.customTickValues, sortAsc),
-                    list = majorValues.concat(minorValues, customMajorValues).sort(sortAsc);
-                customMinorValues = _map(customMinorValues, function(value) {
-                    return binarySearch(value, list) === -1 ? value : null
-                });
-                return {
-                        major: _map(majorValues.concat(customMajorValues), function(value) {
-                            return {
-                                    value: value,
-                                    position: that._translator.translate(value)
-                                }
-                        }),
-                        minor: _map(minorValues.concat(customMinorValues), function(value) {
-                            return {
-                                    value: value,
-                                    position: that._translator.translate(value)
-                                }
-                        })
-                    }
-            },
-            _createMajorTicks: function(ticks, layout) {
-                var that = this,
-                    points,
-                    i = 0,
-                    ii = ticks.length,
-                    element;
-                that._majorTicks.clear().attr({fill: that._options.majorTick.color});
-                points = that._getTickPoints(_Number(that._options.majorTick.length), _Number(that._options.majorTick.width), layout);
-                if (points) {
-                    that._options.hideFirstTick && ++i;
-                    that._options.hideLastTick && --ii;
-                    for (; i < ii; ++i) {
-                        element = that._renderer.path(points, "area");
-                        that._moveTick(element, ticks[i], layout);
-                        element.append(that._majorTicks)
-                    }
-                }
-            },
-            _createMinorTicks: function(ticks, layout) {
-                var that = this,
-                    points,
-                    i = 0,
-                    ii = ticks.length,
-                    element;
-                that._minorTicks.clear().attr({fill: that._options.minorTick.color});
-                points = that._getTickPoints(_Number(that._options.minorTick.length), _Number(that._options.minorTick.width), layout);
-                if (points)
-                    for (; i < ii; ++i) {
-                        element = that._renderer.path(points, "area");
-                        that._moveTick(element, ticks[i], layout);
-                        element.append(that._minorTicks)
-                    }
-            },
-            _createLabels: function(ticks, layout) {
-                var that = this,
-                    indentFromTick = _Number(that._options.label.indentFromTick),
-                    textPosition,
-                    i = 0,
-                    ii = ticks.length,
-                    points,
-                    text,
-                    fontStyles = {},
-                    rangeContainer;
-                that._labels.clear().attr({align: that._getLabelAlign(indentFromTick)}).css(_patchFontOptions(that._options.label.font));
-                textPosition = that._getLabelPosition(layout);
-                if (textPosition) {
-                    rangeContainer = that._options.label.useRangeColors ? that._options.rangeContainer : null;
-                    that._options.hideFirstLabel && ++i;
-                    that._options.hideLastLabel && --ii;
-                    for (; i < ii; ++i) {
-                        text = that._formatValue(ticks[i].value);
-                        fontStyles.fill = rangeContainer ? rangeContainer.getColorForValue(ticks[i].value) : null;
-                        points = that._getLabelOptions(text, textPosition, indentFromTick, ticks[i], layout);
-                        that._renderer.text(text, points.x, points.y + that._textVerticalOffset).css(fontStyles).append(that._labels)
-                    }
-                }
-            },
-            resize: function(layout) {
-                var that = this,
-                    ticks = that._getTicks(layout);
-                if (that._majorTicksEnabled)
-                    that._createMajorTicks(ticks.major, layout);
-                if (that._minorTicksEnabled)
-                    that._createMinorTicks(ticks.minor, layout);
-                if (that._labelsEnabled)
-                    that._createLabels(ticks.major, layout);
-                return that
-            }
-        });
-        var CircularScale = internals.BaseScale.inherit({
-                _getGridSpacingFactor: function() {
-                    return {
-                            majorTicks: 17,
-                            minorTicks: 5
-                        }
-                },
-                _getTranslateFunction: function(layout) {
-                    var that = this,
-                        indent = _Number(that._options.label.indentFromTick),
-                        translator = this._translator;
-                    layout = layout || {
-                        x: 0,
-                        y: 0,
-                        radius: 0
-                    };
-                    return function(value) {
-                            var position = that._getLabelPosition(layout),
-                                text = that._formatValue(value);
-                            return that._getLabelOptions(text, position, indent, {position: translator.translate(value)}, layout)
-                        }
-                },
-                _overlappingBehaviorType: "circular",
-                _getScreenDelta: function(layout) {
-                    return (this._translator.getCodomainStart() - this._translator.getCodomainEnd()) * layout.radius * PI_DIV_180
-                },
-                _setupOrientation: function() {
-                    var that = this;
-                    that._inner = that._outer = 0;
-                    switch (that._options.orientation) {
-                        case'inside':
-                            that._inner = 1;
-                            break;
-                        case'center':
-                            that._inner = that._outer = 0.5;
-                            break;
-                        default:
-                            that._outer = 1;
-                            break
-                    }
-                },
-                _getTickPoints: function(length, width, layout) {
-                    var x1 = layout.x - width / 2,
-                        x2 = layout.x + width / 2,
-                        y1 = layout.y - layout.radius - length * this._outer,
-                        y2 = layout.y - layout.radius + length * this._inner;
-                    return y1 > 0 && y2 > 0 ? [x1, y1, x2, y1, x2, y2, x1, y2] : null
-                },
-                _moveTick: function(element, tick, layout) {
-                    element.rotate(_convertAngleToRendererSpace(tick.position), layout.x, layout.y)
-                },
-                _getAxisLabelPosition: function(tickLength, textIndent, layout) {
-                    var position = layout.radius + tickLength * (textIndent >= 0 ? this._outer : -this._inner) + textIndent;
-                    return position > 0 ? position : null
-                },
-                _getLabelAlign: function() {
-                    return 'center'
-                },
-                _applyOverlappingOptions: function(options, layout) {
-                    options.circularRadius = this._getLabelPosition(layout);
-                    options.circularStartAngle = this._translator.getCodomainStart();
-                    options.circularEndAngle = this._translator.getCodomainEnd();
-                    options.overlappingBehaviorType = "circular"
-                },
-                _getLabelOptions: function(textValue, textPosition, textIndent, tick, layout) {
-                    var cossin = _getCosAndSin(tick.position),
-                        x = layout.x + cossin.cos * textPosition,
-                        y = layout.y - cossin.sin * textPosition,
-                        dx = cossin.cos * (textValue.length / this._textLength) * this._textWidth / 2,
-                        dy = cossin.sin * this._textHeight / 2;
-                    if (textIndent > 0) {
-                        x += dx;
-                        y -= dy
-                    }
-                    else {
-                        x -= dx;
-                        y += dy
-                    }
-                    return {
-                            x: x,
-                            y: y
-                        }
-                },
-                measure: function(layout) {
-                    var that = this,
-                        result = {
-                            min: layout.radius,
-                            max: layout.radius
-                        };
-                    if (that._majorTicksEnabled) {
-                        result.min = _min(result.min, layout.radius - that._inner * that._options.majorTick.length);
-                        result.max = _max(result.max, layout.radius + that._outer * that._options.majorTick.length)
-                    }
-                    if (that._minorTicksEnabled) {
-                        result.min = _min(result.min, layout.radius - that._inner * that._options.minorTick.length);
-                        result.max = _max(result.max, layout.radius + that._outer * that._options.minorTick.length)
-                    }
-                    if (that._labelsEnabled) {
-                        if (that._options.label.indentFromTick > 0) {
-                            result.horizontalOffset = _Number(that._options.label.indentFromTick) + that._textWidth;
-                            result.verticalOffset = _Number(that._options.label.indentFromTick) + that._textHeight
-                        }
-                        else {
-                            result.horizontalOffset = result.verticalOffset = 0;
-                            result.min -= -_Number(that._options.label.indentFromTick) + _max(that._textWidth, that._textHeight)
-                        }
-                        result.inverseHorizontalOffset = that._textWidth / 2;
-                        result.inverseVerticalOffset = that._textHeight / 2
-                    }
-                    return result
-                }
-            });
-        var LinearScale = internals.BaseScale.inherit({
-                _getGridSpacingFactor: function() {
-                    return {
-                            majorTicks: 25,
-                            minorTicks: 5
-                        }
-                },
-                _getTranslateFunction: function() {
-                    var tr = this._translator;
-                    return function(value) {
-                            return tr.translate(value)
-                        }
-                },
-                _overlappingBehaviorType: "linear",
-                _getScreenDelta: function() {
-                    return _abs(this._translator.getCodomainEnd() - this._translator.getCodomainStart())
-                },
-                _setupOrientation: function() {
-                    var that = this;
-                    that.vertical = that._options.vertical;
-                    that._inner = that._outer = 0;
-                    if (that.vertical)
-                        switch (that._options.horizontalOrientation) {
-                            case'left':
-                                that._inner = 1;
-                                break;
-                            case'center':
-                                that._inner = that._outer = 0.5;
-                                break;
-                            default:
-                                that._outer = 1;
-                                break
-                        }
-                    else
-                        switch (that._options.verticalOrientation) {
-                            case'top':
-                                that._inner = 1;
-                                break;
-                            case'middle':
-                                that._inner = that._outer = 0.5;
-                                break;
-                            default:
-                                that._outer = 1;
-                                break
-                        }
-                },
-                _getTickPoints: function(length, width, layout) {
-                    var that = this,
-                        x1,
-                        x2,
-                        y1,
-                        y2;
-                    if (that.vertical) {
-                        x1 = layout.x - length * that._inner;
-                        x2 = layout.x + length * that._outer;
-                        y1 = -width / 2;
-                        y2 = +width / 2
-                    }
-                    else {
-                        x1 = -width / 2;
-                        x2 = +width / 2;
-                        y1 = layout.y - length * that._inner;
-                        y2 = layout.y + length * that._outer
-                    }
-                    return [x1, y1, x2, y1, x2, y2, x1, y2]
-                },
-                _moveTick: function(element, tick) {
-                    var x = 0,
-                        y = 0;
-                    if (this.vertical)
-                        y = tick.position;
-                    else
-                        x = tick.position;
-                    element.move(x, y)
-                },
-                _getAxisLabelPosition: function(tickLength, textIndent, layout) {
-                    var position = tickLength * (textIndent >= 0 ? this._outer : -this._inner) + textIndent;
-                    if (this.vertical)
-                        position += layout.x;
-                    else
-                        position += layout.y + (textIndent >= 0 ? 1 : -1) * (this._textVerticalOffset || 0);
-                    return position
-                },
-                _getLabelAlign: function(textIndent) {
-                    return this.vertical ? textIndent > 0 ? 'left' : 'right' : 'center'
-                },
-                _applyOverlappingOptions: function(options) {
-                    options.overlappingBehaviorType = "linear"
-                },
-                _getLabelOptions: function(textValue, textPosition, textIndent, tick) {
-                    var x,
-                        y;
-                    if (this.vertical) {
-                        x = textPosition;
-                        y = tick.position
-                    }
-                    else {
-                        x = tick.position;
-                        y = textPosition
-                    }
-                    return {
-                            x: x,
-                            y: y
-                        }
-                },
-                measure: function(layout) {
-                    var that = this,
-                        p = layout[that.vertical ? 'x' : 'y'],
-                        result = {
-                            min: p,
-                            max: p
-                        };
-                    if (that._majorTicksEnabled) {
-                        result.min = _min(result.min, p - that._inner * that._options.majorTick.length);
-                        result.max = _max(result.max, p + that._outer * that._options.majorTick.length)
-                    }
-                    if (that._minorTicksEnabled) {
-                        result.min = _min(result.min, p - that._inner * that._options.minorTick.length);
-                        result.max = _max(result.max, p + that._outer * that._options.minorTick.length)
-                    }
-                    if (that._labelsEnabled) {
-                        if (that._options.label.indentFromTick > 0)
-                            result.max += +_Number(that._options.label.indentFromTick) + that[that.vertical ? '_textWidth' : '_textHeight'];
-                        else
-                            result.min -= -_Number(that._options.label.indentFromTick) + that[that.vertical ? '_textWidth' : '_textHeight'];
-                        result.indent = that[that.vertical ? '_textHeight' : '_textWidth'] / 2
-                    }
-                    return result
-                }
-            });
-        DX.viz.gauges.dxCircularGauge.prototype._factory.Scale = CircularScale;
-        DX.viz.gauges.dxLinearGauge.prototype._factory.Scale = LinearScale
-    })(DevExpress, jQuery);
     /*! Module viz-gauges, file rangeContainer.js */
     (function(DX, $, undefined) {
         var internals = DX.viz.gauges.__internals,
             _Number = Number,
             _max = Math.max,
             _abs = Math.abs,
-            _isString = DX.utils.isString,
-            _isArray = DX.utils.isArray,
+            commonUtils = DX.require("/utils/utils.common"),
+            _isString = commonUtils.isString,
+            _isArray = commonUtils.isArray,
             _isFinite = isFinite,
             _each = $.each,
             _map = $.map,
             _normalizeEnum = DX.viz.utils.normalizeEnum;
         internals.BaseRangeContainer = internals.BaseElement.inherit({
             _init: function() {
-                this._root = this._renderer.g().attr({'class': 'dxg-range-container'}).linkOn(this._container, {
-                    name: "range-container",
-                    after: "elements"
-                })
+                this._root = this._renderer.g().attr({'class': 'dxg-range-container'}).linkOn(this._container, "range-container")
             },
             _dispose: function() {
                 this._root.linkOff()
@@ -3633,95 +3378,13 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
         DX.viz.gauges.dxCircularGauge.prototype._factory.RangeContainer = CircularRangeContainer;
         DX.viz.gauges.dxLinearGauge.prototype._factory.RangeContainer = LinearRangeContainer
     })(DevExpress, jQuery);
-    /*! Module viz-gauges, file title.js */
-    (function(DX, $, undefined) {
-        var viz = DX.viz,
-            patchFontOptions = viz.utils.patchFontOptions,
-            _isString = DX.utils.isString,
-            _max = Math.max,
-            _extend = $.extend;
-        viz.gauges.__internals.Title = DX.Class.inherit({
-            ctor: function(parameters) {
-                this._renderer = parameters.renderer;
-                this._root = parameters.renderer.g().attr({'class': 'dxg-title'}).linkOn(parameters.container, {
-                    name: "title",
-                    after: "peripheral"
-                })
-            },
-            dispose: function() {
-                this._root.linkOff();
-                this._renderer = this._root = null;
-                return this
-            },
-            clean: function() {
-                var that = this;
-                that._root.linkRemove().clear();
-                that._layout = null;
-                return that
-            },
-            render: function(titleOptions, subtitleOptions) {
-                var that = this,
-                    hasTitle = _isString(titleOptions.text) && titleOptions.text.length > 0,
-                    hasSubtitle = _isString(subtitleOptions.text) && subtitleOptions.text.length > 0,
-                    element,
-                    bbox,
-                    totalWidth = 0,
-                    totalHeight = 0,
-                    y = 0;
-                if (!hasTitle && !hasSubtitle)
-                    return that;
-                that._root.linkAppend();
-                if (hasTitle) {
-                    element = that._renderer.text(titleOptions.text, 0, 0).attr({align: 'center'}).css(patchFontOptions(titleOptions.font)).append(that._root);
-                    bbox = element.getBBox();
-                    y += -bbox.y;
-                    element.attr({y: y});
-                    y += bbox.height + bbox.y;
-                    totalWidth = _max(totalWidth, bbox.width);
-                    totalHeight += bbox.height
-                }
-                if (hasSubtitle) {
-                    element = that._renderer.text(subtitleOptions.text, 0, 0).attr({align: 'center'}).css(patchFontOptions(subtitleOptions.font)).append(that._root);
-                    bbox = element.getBBox();
-                    y += -bbox.y;
-                    element.attr({y: y});
-                    totalWidth = _max(totalWidth, bbox.width);
-                    totalHeight += bbox.height
-                }
-                that._layout = _extend({
-                    position: titleOptions.position,
-                    width: totalWidth,
-                    height: totalHeight
-                }, titleOptions.layout);
-                return that
-            },
-            getLayoutOptions: function() {
-                return this._layout
-            },
-            locate: function(left, top) {
-                this._root.attr({
-                    translateX: left + this._layout.width / 2,
-                    translateY: top
-                });
-                return this
-            }
-        })
-    })(DevExpress, jQuery);
     /*! Module viz-gauges, file layoutManager.js */
     (function(DX, $, undefined) {
-        var _Number = Number,
-            _String = String,
-            _max = Math.max,
+        var _String = String,
             _each = $.each,
-            _normalizeEnum = DX.viz.utils.normalizeEnum;
-        function patchLayoutOptions(options) {
-            if (options.position) {
-                var position = _normalizeEnum(options.position).split('-');
-                options.verticalAlignment = position[0];
-                options.horizontalAlignment = position[1]
-            }
-        }
-        DX.viz.gauges.__internals.LayoutManager = DX.Class.inherit({
+            _normalizeEnum = DX.viz.utils.normalizeEnum,
+            Class = DevExpress.require("/class");
+        DX.viz.gauges.__internals.LayoutManager = Class.inherit({
             setRect: function(rect) {
                 this._currentRect = rect.clone();
                 return this
@@ -3737,19 +3400,16 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
             },
             applyLayout: function(target) {
                 var options = target.getLayoutOptions(),
-                    currentRect,
-                    verticalOverlay;
+                    currentRect;
                 if (!options)
                     return this;
                 currentRect = this._currentRect;
-                verticalOverlay = _Number(options.overlay) || 0;
-                patchLayoutOptions(options);
                 switch (_String(options.verticalAlignment).toLowerCase()) {
                     case'bottom':
-                        currentRect.bottom -= _max(options.height - verticalOverlay, 0);
+                        currentRect.bottom -= options.height;
                         break;
                     default:
-                        currentRect.top += _max(options.height - verticalOverlay, 0);
+                        currentRect.top += options.height;
                         break
                 }
                 this._cache.push({
@@ -3765,16 +3425,15 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
                 _each(that._cache, function(_, cacheItem) {
                     var options = cacheItem.options,
                         left,
-                        top,
-                        verticalOverlay = _Number(options.overlay) || 0;
+                        top;
                     switch (_normalizeEnum(options.verticalAlignment)) {
                         case'bottom':
-                            top = currentRect.bottom - verticalOverlay;
-                            currentRect.bottom += _max(options.height - verticalOverlay, 0);
+                            top = currentRect.bottom;
+                            currentRect.bottom += options.height;
                             break;
                         default:
-                            top = currentRect.top - options.height + verticalOverlay;
-                            currentRect.top -= _max(options.height - verticalOverlay, 0);
+                            top = currentRect.top - options.height;
+                            currentRect.top -= options.height;
                             break
                     }
                     switch (_normalizeEnum(options.horizontalAlignment)) {
@@ -3788,7 +3447,7 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
                             left = rootRect.horizontalMiddle() - options.width / 2;
                             break
                     }
-                    cacheItem.target.locate(left, top)
+                    cacheItem.target.shift(left, top)
                 });
                 that._cache = null;
                 return that
@@ -3859,7 +3518,7 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
         var _extend = $.extend;
         var ThemeManager = DX.viz.gauges.__internals.ThemeManager = DX.viz.BaseThemeManager.inherit({
                 _themeSection: 'gauge',
-                _fontFields: ['scale.label.font', 'valueIndicators.rangebar.text.font', 'valueIndicators.textcloud.text.font', 'title.font', 'subtitle.font', 'tooltip.font', 'indicator.text.font', 'loadingIndicator.font'],
+                _fontFields: ['scale.label.font', 'valueIndicators.rangebar.text.font', 'valueIndicators.textcloud.text.font', 'title.font', 'title.subtitle.font', 'tooltip.font', 'indicator.text.font', 'loadingIndicator.font'],
                 _initializeTheme: function() {
                     var that = this,
                         subTheme;
@@ -3880,15 +3539,18 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
     /*! Module viz-gauges, file tracker.js */
     (function(DX, $, undefined) {
         var _abs = Math.abs,
+            Class = DevExpress.require("/class"),
+            wheelEvent = DX.require("/ui/events/ui.events.wheel"),
             TOOLTIP_SHOW_DELAY = 300,
             TOOLTIP_HIDE_DELAY = 300,
             TOOLTIP_TOUCH_SHOW_DELAY = 400,
             TOOLTIP_TOUCH_HIDE_DELAY = 300;
-        DX.viz.gauges.__internals.Tracker = DX.Class.inherit({
+        DX.viz.gauges.__internals.Tracker = Class.inherit({
             ctor: function(parameters) {
-                DX.utils.debug.assertParam(parameters, 'parameters');
-                DX.utils.debug.assertParam(parameters.renderer, 'parameters.renderer');
-                DX.utils.debug.assertParam(parameters.container, 'parameters.container');
+                var debug = DX.require("/utils/utils.console").debug;
+                debug.assertParam(parameters, 'parameters');
+                debug.assertParam(parameters.renderer, 'parameters.renderer');
+                debug.assertParam(parameters.container, 'parameters.container');
                 var that = this;
                 that._element = parameters.renderer.g().attr({
                     'class': 'dxg-tracker',
@@ -3903,9 +3565,10 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
                 that._showTooltipCallback = function() {
                     that._showTooltipTimeout = null;
                     var target = that._tooltipEvent.target,
-                        data = $(target).data();
+                        data_target = target["gauge-data-target"],
+                        data_info = target["gauge-data-info"];
                     that._targetEvent = null;
-                    if (that._tooltipTarget !== target && that._callbacks['tooltip-show'](data.target, data.info))
+                    if (that._tooltipTarget !== target && that._callbacks['tooltip-show'](data_target, data_info))
                         that._tooltipTarget = target
                 };
                 that._hideTooltipCallback = function() {
@@ -3945,8 +3608,8 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
             },
             attach: function(element, target, info) {
                 element.data({
-                    target: target,
-                    info: info
+                    "gauge-data-target": target,
+                    "gauge-data-info": info
                 }).append(this._element);
                 return this
             },
@@ -3999,7 +3662,8 @@ if (!DevExpress.MOD_VIZ_GAUGES) {
                 'mouseout.gauge-tooltip': handleTooltipMouseOut
             };
         var tooltipMouseMoveEvents = {'mousemove.gauge-tooltip': handleTooltipMouseMove};
-        var tooltipMouseWheelEvents = {'dxmousewheel.gauge-tooltip': handleTooltipMouseWheel};
+        var tooltipMouseWheelEvents = {};
+        tooltipMouseWheelEvents[wheelEvent.name + '.gauge-tooltip'] = handleTooltipMouseWheel;
         var tooltipTouchEvents = {'touchstart.gauge-tooltip': handleTooltipTouchStart};
         function handleTooltipMouseOver(event) {
             var tracker = event.data.tracker;
