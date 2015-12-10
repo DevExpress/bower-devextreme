@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme
-* Version: 15.2.3
-* Build date: Dec 2, 2015
+* Version: 15.2.4
+* Build date: Dec 8, 2015
 *
 * Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -3965,6 +3965,8 @@
 {
   height: 100%;
   width: 100%;
+  -ms-touch-action: pinch-zoom;
+  touch-action: pinch-zoom;
 }
 .dx-slideoutview-wrapper
 {
@@ -5797,10 +5799,6 @@
   width: auto;
   text-align: left;
 }
-.dx-field-value:not(.dx-switch):not(.dx-checkbox):not(.dx-button), .dx-field-value-static
-{
-  width: 60%;
-}
 .dx-rtl .dx-fieldset .dx-field-label, .dx-fieldset.dx-rtl .dx-field-label
 {
   float: right;
@@ -6117,9 +6115,16 @@
   padding: 2px;
   margin: 0 10px 0 0;
 }
+.dx-popup-content .dx-button.dx-scheduler-dropdown-appointment-remove-button .dx-button-content, .dx-popup-content .dx-button.dx-scheduler-dropdown-appointment-edit-button .dx-button-content
+{
+  padding: 0;
+}
 .dx-popup-content .dx-button.dx-scheduler-dropdown-appointment-remove-button .dx-icon, .dx-popup-content .dx-button.dx-scheduler-dropdown-appointment-edit-button .dx-icon
 {
   font-size: 14px;
+  width: 18px;
+  height: 18px;
+  line-height: 18px;
 }
 .dx-scheduler-dropdown-appointment-date
 {

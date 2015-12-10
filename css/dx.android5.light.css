@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme
-* Version: 15.2.3
-* Build date: Dec 2, 2015
+* Version: 15.2.4
+* Build date: Dec 8, 2015
 *
 * Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -100,6 +100,10 @@
 .dx-datagrid .dx-datagrid-rowsview .dx-data-row td.dx-pointer-events-none:last-child, .dx-datagrid .dx-datagrid-rowsview .dx-freespace-row td.dx-pointer-events-none:last-child, .dx-datagrid .dx-datagrid-headers .dx-row td.dx-pointer-events-none:last-child
 {
   border-right: none;
+}
+.dx-datagrid .dx-datagrid-rowsview .dx-datagrid-edit-form
+{
+  background-color: #fff;
 }
 .dx-datagrid .dx-datagrid-filter-row .dx-filter-range-content
 {
@@ -602,9 +606,17 @@
   float: left;
   padding-left: 10px;
 }
+.dx-device-mobile .dx-scheduler-navigator
+{
+  padding-left: 0;
+}
 .dx-scheduler-navigator-caption
 {
   width: 180px;
+}
+.dx-device-mobile .dx-scheduler-navigator-caption
+{
+  width: 140px;
 }
 .dx-scheduler-view-switcher.dx-tabs
 {
@@ -725,6 +737,11 @@
 .dx-scheduler-work-space:not(.dx-scheduler-work-space-all-day).dx-scheduler-work-space:not(.dx-scheduler-work-space-month).dx-scheduler-work-space:not(.dx-scheduler-timeline) .dx-scheduler-header-panel
 {
   border-bottom: 1px solid #d3d3d3;
+}
+.dx-scheduler-date-table-scrollable .dx-scrollable-content
+{
+  overflow: hidden;
+  position: relative;
 }
 .dx-scheduler-date-table-cell
 {
@@ -1514,6 +1531,7 @@
 }
 .dx-scheduler-appointment.dx-state-focused:before
 {
+  pointer-events: none;
   content: "";
   position: absolute;
   top: 0;
@@ -1602,6 +1620,7 @@
 }
 .dx-scheduler-timeline .dx-scheduler-appointment.dx-state-focused:before, .dx-scheduler-work-space-month .dx-scheduler-appointment.dx-state-focused:before, .dx-scheduler-all-day-appointment.dx-state-focused:before
 {
+  pointer-events: none;
   content: "";
   position: absolute;
   top: 0;
@@ -1922,6 +1941,10 @@
   padding-left: 0;
   padding-right: 10px;
 }
+.dx-device-mobile .dx-rtl .dx-scheduler-navigator
+{
+  padding-right: 0;
+}
 .dx-rtl .dx-scheduler-view-switcher.dx-tabs
 {
   float: left;
@@ -2059,6 +2082,7 @@
 .dx-rtl .dx-scheduler-work-space-grouped:not(.dx-scheduler-work-space-all-day) .dx-scheduler-header-scrollable
 {
   margin-right: 100px;
+  margin-left: 0;
 }
 .dx-rtl .dx-scheduler-recurrence-rule-item .dx-field-item-label.dx-field-item-label-location-left, .dx-rtl .dx-scheduler-recurrence-rule-item .dx-field-item-label.dx-field-item-label-location-top
 {
@@ -8123,6 +8147,27 @@
   left: 50%;
   margin-left: -12px;
 }
+.dx-rtl .dx-menu .dx-menu-vertical .dx-menu-item-popout, .dx-rtl.dx-menu .dx-menu-vertical .dx-menu-item-popout
+{
+  font: 14px/1 DXIcons;
+  font-size: 24px;
+  text-align: center;
+  line-height: 24px;
+}
+.dx-rtl .dx-menu .dx-menu-vertical .dx-menu-item-popout:before, .dx-rtl.dx-menu .dx-menu-vertical .dx-menu-item-popout:before
+{
+  content: "\f04f ";
+}
+.dx-rtl .dx-menu .dx-menu-vertical .dx-menu-item-popout:before, .dx-rtl.dx-menu .dx-menu-vertical .dx-menu-item-popout:before
+{
+  position: absolute;
+  display: block;
+  width: 24px;
+  top: 50%;
+  margin-top: -12px;
+  left: 50%;
+  margin-left: -12px;
+}
 .dx-menu .dx-menu-item-content
 {
   padding: 5px 7px;
@@ -8130,33 +8175,36 @@
 .dx-menu .dx-menu-item-has-icon.dx-menu-item-has-submenu .dx-icon
 {
   margin-right: 20px;
+  margin-left: auto;
 }
-.dx-menu .dx-menu-item-has-icon.dx-menu-item-has-submenu.dx-menu-item-has-text .dx-icon
-{
-  margin-right: 6px;
-}
-.dx-menu .dx-menu-item-has-text.dx-menu-item-has-submenu .dx-menu-item-text
-{
-  padding-right: 20px;
-}
-.dx-menu.dx-rtl .dx-menu-item-has-icon.dx-menu-item-has-text .dx-icon
-{
-  margin-left: 9px;
-  margin-right: auto;
-}
-.dx-menu.dx-rtl .dx-menu-item-has-icon.dx-menu-item-has-submenu .dx-icon
+.dx-rtl .dx-menu .dx-menu-item-has-icon.dx-menu-item-has-submenu .dx-icon, .dx-rtl.dx-menu .dx-menu-item-has-icon.dx-menu-item-has-submenu .dx-icon
 {
   margin-left: 20px;
   margin-right: auto;
 }
-.dx-menu.dx-rtl .dx-menu-item-has-text.dx-menu-item-has-submenu .dx-menu-item-text
+.dx-menu .dx-menu-item-has-icon.dx-menu-item-has-submenu.dx-menu-item-has-text .dx-icon
+{
+  margin-right: 6px;
+  margin-left: auto;
+}
+.dx-rtl .dx-menu .dx-menu-item-has-icon.dx-menu-item-has-submenu.dx-menu-item-has-text .dx-icon, .dx-rtl.dx-menu .dx-menu-item-has-icon.dx-menu-item-has-submenu.dx-menu-item-has-text .dx-icon
+{
+  margin-left: 6px;
+  margin-right: auto;
+}
+.dx-menu .dx-menu-item-has-text.dx-menu-item-has-submenu .dx-menu-item-text
+{
+  padding-right: 20px;
+  padding-left: 0;
+}
+.dx-rtl .dx-menu .dx-menu-item-has-text.dx-menu-item-has-submenu .dx-menu-item-text, .dx-rtl.dx-menu .dx-menu-item-has-text.dx-menu-item-has-submenu .dx-menu-item-text
 {
   padding-left: 20px;
   padding-right: 0;
 }
-.dx-menu.dx-rtl .dx-menu-item-has-text.dx-menu-item-has-submenu.dx-menu-item-has-icon .dx-icon
+.dx-menu.dx-rtl .dx-menu-item-has-icon.dx-menu-item-has-text .dx-icon
 {
-  margin-left: 6px;
+  margin-left: 9px;
   margin-right: auto;
 }
 .dx-context-menu .dx-submenu>.dx-menu-items-container
@@ -8205,6 +8253,28 @@
   content: "\f04e ";
 }
 .dx-context-menu .dx-menu-item-popout:before
+{
+  position: absolute;
+  display: block;
+  width: 24px;
+  top: 50%;
+  margin-top: -12px;
+  left: 50%;
+  margin-left: -12px;
+}
+.dx-rtl .dx-context-menu .dx-menu-item-popout, .dx-rtl.dx-context-menu .dx-menu-item-popout
+{
+  font: 14px/1 DXIcons;
+  font-size: 24px;
+  text-align: center;
+  line-height: 24px;
+  color: #757575;
+}
+.dx-rtl .dx-context-menu .dx-menu-item-popout:before, .dx-rtl.dx-context-menu .dx-menu-item-popout:before
+{
+  content: "\f04f ";
+}
+.dx-rtl .dx-context-menu .dx-menu-item-popout:before, .dx-rtl.dx-context-menu .dx-menu-item-popout:before
 {
   position: absolute;
   display: block;
@@ -8630,8 +8700,7 @@
 }
 .dx-treeview.dx-treeview-border-visible .dx-scrollable-content>.dx-treeview-node-container
 {
-  padding-left: 7px;
-  padding-top: 7px;
+  padding: 1px 1px 1px 7px;
 }
 .dx-treeview .dx-treeview-select-all-item
 {
@@ -8750,7 +8819,7 @@
 }
 .dx-treeview.dx-rtl.dx-treeview-border-visible .dx-scrollable-content>.dx-treeview-node-container
 {
-  padding-left: 0;
+  padding-left: 1px;
   padding-right: 7px;
 }
 .dx-treeview.dx-rtl .dx-treeview-node
@@ -9052,6 +9121,10 @@
 {
   padding-top: 11px;
   padding-bottom: 8px;
+}
+.dx-field-value:not(.dx-switch):not(.dx-checkbox):not(.dx-button), .dx-field-value-static
+{
+  width: 60%;
 }
 .dx-rtl .dx-field-value:not(.dx-widget)>.dx-texteditor, .dx-rtl.dx-field-value:not(.dx-widget)>.dx-texteditor, .dx-rtl .dx-field-value:not(.dx-widget)>.dx-checkbox, .dx-rtl.dx-field-value:not(.dx-widget)>.dx-checkbox, .dx-rtl .dx-field-value:not(.dx-widget)>.dx-switch, .dx-rtl.dx-field-value:not(.dx-widget)>.dx-switch, .dx-rtl .dx-field-value:not(.dx-widget)>.dx-lookup, .dx-rtl.dx-field-value:not(.dx-widget)>.dx-lookup, .dx-rtl .dx-field-value:not(.dx-widget)>.dx-slider, .dx-rtl.dx-field-value:not(.dx-widget)>.dx-slider
 {
@@ -9394,6 +9467,16 @@
 .dx-scheduler-work-space-both-scrollbar .dx-scheduler-all-day-title:before
 {
   background-color: #fafafa;
+}
+.dx-scheduler-dropdown-appointments.dx-button, .dx-scheduler-dropdown-appointments.dx-button.dx-state-hover, .dx-scheduler-dropdown-appointments.dx-button.dx-state-active
+{
+  min-height: 10px;
+}
+.dx-scheduler-dropdown-appointments.dx-button .dx-button-content, .dx-scheduler-dropdown-appointments.dx-button.dx-state-hover .dx-button-content, .dx-scheduler-dropdown-appointments.dx-button.dx-state-active .dx-button-content
+{
+  padding: 0;
+  min-height: 10px;
+  line-height: 10px;
 }
 .dx-form
 {

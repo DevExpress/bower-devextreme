@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme
-* Version: 15.2.3
-* Build date: Dec 2, 2015
+* Version: 15.2.4
+* Build date: Dec 8, 2015
 *
 * Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -2537,6 +2537,7 @@ declare module DevExpress.ui {
         /** Specifies whether or not the drop-down menu is displayed. */
         opened?: boolean;
         hoverStateEnabled?: boolean;
+        activeStateEnabled?: boolean;
     }
     /** A drop-down menu widget. */
     export class dxDropDownMenu extends Widget {
@@ -5155,10 +5156,6 @@ declare module DevExpress.viz.charts {
         valueField?: string;
     }
     export interface CommonPieSeriesSettings extends CommonPieSeriesConfig {
-        /**
-         * Sets a series type for all series.
-         * @deprecated use the 'type' option instead
-         */
         type?: string;
     }
     export interface PieSeriesConfig extends CommonPieSeriesConfig {
@@ -6392,8 +6389,12 @@ declare module DevExpress.viz.rangeSelector {
             };
             /** Specifies the value to be raised to a power when generating ticks for a logarithmic scale. */
             logarithmBase?: number;
-            /** Specifies an interval between major ticks. */
+            /**
+             * Specifies an interval between major ticks.
+             * @deprecated ..\tickInterval\tickInterval.md
+             */
             majorTickInterval?: any;
+            tickInterval?: any;
             /** Specifies options for the date-time scale's markers. */
             marker?: {
                 /** Defines the options that can be set for the text that is displayed by the scale markers. */
@@ -6428,7 +6429,10 @@ declare module DevExpress.viz.rangeSelector {
             setTicksAtUnitBeginning?: boolean;
             /** Specifies whether or not to show ticks for the boundary scale values, when neither major ticks nor minor ticks are created for these values. */
             showCustomBoundaryTicks?: boolean;
-            /** Indicates whether or not to show minor ticks on the scale. */
+            /**
+             * Indicates whether or not to show minor ticks on the scale.
+             * @deprecated minorTick\visible.md
+             */
             showMinorTicks?: boolean;
             /** Specifies the scale's start value. */
             startValue?: any;
@@ -6440,6 +6444,12 @@ declare module DevExpress.viz.rangeSelector {
                 opacity?: number;
                 /** Specifies the width of the scale's ticks (both major and minor ticks). */
                 width?: number;
+            };
+            minorTick?: {
+                color?: string;
+                opacity?: number;
+                width?: number;
+                visible?: boolean;
             };
             /** Specifies the type of the scale. */
             type?: string;
@@ -6586,7 +6596,7 @@ declare module DevExpress.viz.map {
         selected(): boolean;
         /** Sets the selection state of the layer element. */
         selected(state: boolean): void;
-        /** Applies the layer element settings and updates the element appearance. */
+        /** Applies the layer element settings and updates element appearance. */
         applySettings(settings: any): void;
     }
     /**
@@ -6683,7 +6693,7 @@ declare module DevExpress.viz.map {
         type?: string;
         /** Specifies the type of a marker element. Setting this option makes sense only if the layer type is "marker". */
         elementType?: string;
-        /** Specifies a data source for the layer element. */
+        /** Specifies a data source for the layer. */
         data?: any;
         /** Specifies the width of the layer elements border in pixels. */
         borderWidth?: number;

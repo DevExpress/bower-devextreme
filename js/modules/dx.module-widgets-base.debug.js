@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Common Widgets)
-* Version: 15.2.3
-* Build date: Dec 2, 2015
+* Version: 15.2.4
+* Build date: Dec 8, 2015
 *
 * Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -1148,9 +1148,13 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     return this._$container[this._dimension]()
                 },
                 _contentSize: function() {
-                    var scrollSize = this._$content[0]["scroll" + titleize(this._dimension)],
-                        size = this._$content[this._dimension]();
-                    return math.max(scrollSize, size) - this._pushBackCorrection
+                    var isOverflowHidden = this._$content.css("overflow-" + this._axis) === "hidden",
+                        contentSize = this._$content[this._dimension]();
+                    if (!isOverflowHidden) {
+                        var containerScrollSize = this._$content[0]["scroll" + titleize(this._dimension)];
+                        contentSize = math.max(containerScrollSize - this._pushBackCorrection, contentSize)
+                    }
+                    return contentSize
                 },
                 _validateEvent: function(e) {
                     var $target = $(e.originalEvent.target);
@@ -5785,7 +5789,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                         immediate: true,
                         onStart: $.proxy(this._swipeStartHandler, this),
                         onUpdated: $.proxy(this._swipeUpdateHandler, this),
-                        onEnd: $.proxy(this._swipeEndHandler, this)
+                        onEnd: $.proxy(this._swipeEndHandler, this),
+                        itemSizeFunc: $.proxy(this._getMarginBound, this)
                     });
                     this._renderLabels();
                     this.callBase();
@@ -5822,6 +5827,9 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                 _updateMarginBound: function() {
                     this._marginBound = this._$switchContainer.outerWidth(true) - this._$handle.outerWidth()
                 },
+                _getMarginBound: function() {
+                    return this._marginBound
+                },
                 _marginDirection: function() {
                     return this.option("rtlEnabled") ? "Right" : "Left"
                 },
@@ -5832,7 +5840,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     var stateInt = state ? 1 : 0,
                         marginDirection = this._marginDirection(),
                         resetMarginDirection = marginDirection === "Left" ? "Right" : "Left";
-                    this._$switchInner.css("margin" + marginDirection, this._marginBound * (stateInt + swipeOffset - 1));
+                    this._$switchInner.css("margin" + marginDirection, this._getMarginBound() * (stateInt + swipeOffset - 1));
                     this._$switchInner.css("margin" + resetMarginDirection, 0)
                 },
                 _validateValue: function() {
@@ -5867,8 +5875,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                         fromConfig = {},
                         toConfig = {};
                     this._$switchInner.css("margin" + resetMarginDirection, 0);
-                    fromConfig["margin" + marginDirection] = (Number(startValue) - 1) * this._marginBound;
-                    toConfig["margin" + marginDirection] = (Number(endValue) - 1) * this._marginBound;
+                    fromConfig["margin" + marginDirection] = (Number(startValue) - 1) * this._getMarginBound();
+                    toConfig["margin" + marginDirection] = (Number(endValue) - 1) * this._getMarginBound();
                     fx.animate(this._$switchInner, {
                         from: fromConfig,
                         to: toConfig,
@@ -5898,7 +5906,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     var that = this,
                         offsetDirection = this._offsetDirection(),
                         toConfig = {};
-                    toConfig["margin" + this._marginDirection()] = this._marginBound * (that.option("value") + offsetDirection * e.jQueryEvent.targetOffset - 1);
+                    toConfig["margin" + this._marginDirection()] = this._getMarginBound() * (that.option("value") + offsetDirection * e.jQueryEvent.targetOffset - 1);
                     fx.animate(this._$switchInner, {
                         to: toConfig,
                         duration: SWITCH_ANIMATION_DURATION,
@@ -7076,6 +7084,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                             openOnFieldClick: false,
                             showDropButton: true,
                             popupPosition: this._getDefaultPopupPosition(),
+                            onPopupInitialized: null,
                             applyButtonText: Globalize.localize("OK"),
                             cancelButtonText: Globalize.localize("Cancel"),
                             buttonsLocation: "default",
@@ -7109,11 +7118,15 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                 },
                 _init: function() {
                     this.callBase();
-                    this._initVisibilityActions()
+                    this._initVisibilityActions();
+                    this._initPopupInitializedAction()
                 },
                 _initVisibilityActions: function() {
                     this._openAction = this._createActionByOption("onOpened", {excludeValidators: ["disabled", "readOnly"]});
                     this._closeAction = this._createActionByOption("onClosed", {excludeValidators: ["disabled", "readOnly"]})
+                },
+                _initPopupInitializedAction: function() {
+                    this._popupInitizliedAction = this._createActionByOption("onPopupInitialized", {excludeValidators: ["disabled", "readOnly", "designMode"]})
                 },
                 _render: function() {
                     this.callBase();
@@ -7259,6 +7272,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                 _contentReadyHandler: $.noop,
                 _popupConfig: function() {
                     return {
+                            onInitialized: this._popupInitializedHandler(),
                             position: $.extend(this.option("popupPosition"), {of: this.element()}),
                             showTitle: this.option("showPopupTitle"),
                             width: "auto",
@@ -7287,6 +7301,13 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                             onPositioned: $.proxy(this._popupPositionedHandler, this),
                             fullScreen: false
                         }
+                },
+                _popupInitializedHandler: function() {
+                    if (!this.option("onPopupInitialized"))
+                        return;
+                    return $.proxy(function(e) {
+                            this._popupInitizliedAction({popup: e.component})
+                        }, this)
                 },
                 _popupPositionedHandler: function(e) {
                     this._popup.overlayContent().toggleClass(DROP_DOWN_EDITOR_OVERLAY_FLIPPED, e.position.v.flip)
@@ -7398,6 +7419,9 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                         case"onOpened":
                         case"onClosed":
                             this._initVisibilityActions();
+                            break;
+                        case"onPopupInitialized":
+                            this._initPopupInitializedAction();
                             break;
                         case"fieldTemplate":
                         case"fieldRender":
@@ -15545,6 +15569,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                         usePopover: false,
                         popupWidth: "auto",
                         popupHeight: "auto",
+                        activeStateEnabled: true,
                         hoverStateEnabled: true,
                         opened: false,
                         popupPosition: "bottom",
@@ -15585,6 +15610,12 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                                 }
                             }
                         }])
+            },
+            _initOptions: function(options) {
+                if (devices.current().platform === "android")
+                    if (!options.popupPosition)
+                        options.popupPosition = {at: (options.usePopover ? "bottom " : "top ") + (options.rtlEnabled ? "left" : "right")};
+                this.callBase(options)
             },
             _dataSourceOptions: function() {
                 return {paginate: false}
@@ -16221,7 +16252,6 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     return new Date(min && date < min ? min : date)
                 },
                 _getCellByDate: abstract,
-                canNavigate: abstract,
                 isBoundary: abstract,
                 _optionChanged: function(args) {
                     var name = args.name;
@@ -16317,11 +16347,6 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     _getFirstDayOfWeek: function() {
                         return this.option("firstDayOfWeek") || Globalize.culture().calendar.firstDay
                     },
-                    canNavigate: function(difference) {
-                        var date = new Date(this.option("date"));
-                        var testCurrentDate = difference < 0 ? new Date(date.getFullYear(), date.getMonth() + difference + 1, 0) : new Date(date.getFullYear(), date.getMonth() + difference, 1);
-                        return dateUtils.dateInRange(testCurrentDate, this.option("min"), this.option("max"))
-                    },
                     _getCellByDate: function(date) {
                         return this._$table.find("td[data-value='" + dateUtils.getShortDate(date) + "']")
                     },
@@ -16362,11 +16387,6 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     },
                     getNavigatorCaption: function() {
                         return this.option("date").getFullYear()
-                    },
-                    canNavigate: function(difference) {
-                        var date = new Date(this.option("date"));
-                        var testCurrentDate = difference < 0 ? new Date(date.getFullYear() - 1, 11, 31) : new Date(date.getFullYear() + 1, 1, 1);
-                        return dateUtils.dateInRange(testCurrentDate, this.option("min"), this.option("max"))
                     },
                     isBoundary: function(date) {
                         return dateUtils.sameYear(date, this.option("min")) || dateUtils.sameYear(date, this.option("max"))
@@ -16410,11 +16430,6 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                         foundDate.setMonth(0);
                         return this._$table.find("td[data-value='" + dateUtils.getShortDate(foundDate) + "']")
                     },
-                    canNavigate: function(difference) {
-                        var date = new Date(this.option("date"));
-                        var testCurrentDate = difference < 0 ? new Date(dateUtils.getFirstYearInDecade(date) - 1, 11, 31) : new Date(dateUtils.getFirstYearInDecade(date) + 10, 1, 1);
-                        return dateUtils.dateInRange(testCurrentDate, this.option("min"), this.option("max"))
-                    },
                     isBoundary: function(date) {
                         return dateUtils.sameDecade(date, this.option("min")) || dateUtils.sameDecade(date, this.option("max"))
                     }
@@ -16456,11 +16471,6 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     getNavigatorCaption: function() {
                         var decade = dateUtils.getFirstDecadeInCentury(this.option("date"));
                         return decade + "-" + (decade + 99)
-                    },
-                    canNavigate: function(difference) {
-                        var date = new Date(this.option("date"));
-                        var testCurrentDate = difference < 0 ? new Date(dateUtils.getFirstDecadeInCentury(date) - 1, 11, 31) : new Date(dateUtils.getFirstDecadeInCentury(date) + 100, 1, 1);
-                        return dateUtils.dateInRange(testCurrentDate, this.option("min"), this.option("max"))
                     },
                     isBoundary: function(date) {
                         return dateUtils.sameCentury(date, this.option("min")) || dateUtils.sameCentury(date, this.option("max"))
@@ -16562,7 +16572,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                                 var zoomLevel = this.option("zoomLevel");
                                 var currentDate = this.option("currentDate");
                                 var min = this.option("min");
-                                var date = dateUtils.sameView(zoomLevel, currentDate, min) ? min : dateUtils.getFirstDateView(zoomLevel, currentDate);
+                                var date = dateUtils.sameView(zoomLevel, currentDate, min) ? min : dateUtils.getViewFirstCellDate(zoomLevel, currentDate);
                                 this.option("currentDate", date)
                             },
                             end: function(e) {
@@ -16570,7 +16580,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                                 var zoomLevel = this.option("zoomLevel");
                                 var currentDate = this.option("currentDate");
                                 var max = this.option("max");
-                                var date = dateUtils.sameView(zoomLevel, currentDate, max) ? max : dateUtils.getLastDateView(zoomLevel, currentDate);
+                                var date = dateUtils.sameView(zoomLevel, currentDate, max) ? max : dateUtils.getViewLastCellDate(zoomLevel, currentDate);
                                 this.option("currentDate", date)
                             },
                             pageUp: function(e) {
@@ -16785,8 +16795,9 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                         }
                 },
                 _isViewAvailable: function(date) {
-                    var min = dateUtils.getFirstMonthDate(this._getMinDate()),
-                        max = dateUtils.getLastMonthDate(this._getMaxDate());
+                    var zoomLevel = this.option("zoomLevel");
+                    var min = dateUtils.getViewMinBoundaryDate(zoomLevel, this._getMinDate());
+                    var max = dateUtils.getViewMaxBoundaryDate(zoomLevel, this._getMaxDate());
                     return dateUtils.dateInRange(date, min, max)
                 },
                 _translateViews: function() {
@@ -16881,10 +16892,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     return dateUtils.sameView(zoomLevel, min, max) || this.option("minZoomLevel") === zoomLevel
                 },
                 _updateButtonsVisibility: function() {
-                    var viewType = this.option("zoomLevel"),
-                        difference = this._getRtlCorrection() * dateUtils.getDifferenceInMonth(viewType);
-                    this._navigator.toggleButton("next", !this._view.canNavigate(difference));
-                    this._navigator.toggleButton("prev", !this._view.canNavigate(-difference))
+                    this._navigator.toggleButton("next", !commonUtils.isDefined(this._afterView));
+                    this._navigator.toggleButton("prev", !commonUtils.isDefined(this._beforeView))
                 },
                 _renderSwipeable: function() {
                     if (!this._swipeable)
@@ -16979,9 +16988,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                 _navigate: function(offset, value) {
                     if (fx.isAnimating(this._$viewsWrapper))
                         fx.stop(this._$viewsWrapper, true);
-                    var currentDate = this._view.option("date");
-                    value = value || this._getDateByOffset(offset, currentDate);
-                    if (offset !== 0 && this._view.canNavigate(offset) && Math.abs(offset) !== 1) {
+                    if (offset !== 0 && Math.abs(offset) !== 1 && this._isViewAvailable(value)) {
                         var newView = this._renderSpecificView(value);
                         if (offset > 0) {
                             this._afterView && this._afterView.element().remove();
@@ -17126,6 +17133,10 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     var value = args.value;
                     var previousValue = args.previousValue;
                     switch (args.name) {
+                        case"width":
+                            this.callBase(args);
+                            this._clearViewWidthCache();
+                            break;
                         case"min":
                         case"max":
                             this.option("currentDate", this._getNormalizedDate(this.option("value")) || this._getNormalizedDate(this.option("currentDate")));
@@ -18023,9 +18034,9 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     return userOptions.pickerType ? userOptions.pickerType : commonUtils.isDefined(userOptions.useCalendar) || commonUtils.isDefined(userOptions.useNative) ? this._getPickerType() : this._pickerType || this.option("pickerType")
                 },
                 _getPickerType: function() {
-                    if (this.option("useCalendar"))
+                    if (this.option().useCalendar)
                         return this.option("format") === FORMAT.time ? PICKER_TYPE.list : PICKER_TYPE.calendar;
-                    if (this.option("useNative"))
+                    if (this.option().useNative)
                         return PICKER_TYPE["native"];
                     return PICKER_TYPE.rollers
                 },
@@ -18068,18 +18079,26 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     return STRATEGY_NAME.list
                 },
                 _render: function() {
-                    this.element().addClass(DATEBOX_CLASS).addClass(DATEBOX_CLASS + "-" + this._pickerType);
-                    this._refreshFormatClasses();
+                    this.element().addClass(DATEBOX_CLASS);
+                    this._refreshFormatClass();
+                    this._refreshPickerTypeClass();
                     this.callBase();
                     this._updateSize();
                     this._strategy.renderInputMinMax(this._input())
                 },
-                _refreshFormatClasses: function() {
+                _refreshFormatClass: function() {
                     var $element = this.element();
                     $.each(FORMAT, $.proxy(function(_, item) {
                         $element.removeClass(DATEBOX_CLASS + "-" + item)
-                    }, this));
+                    }, null));
                     $element.addClass(DATEBOX_CLASS + "-" + this.option("format"))
+                },
+                _refreshPickerTypeClass: function() {
+                    var $element = this.element();
+                    $.each(PICKER_TYPE, $.proxy(function(_, item) {
+                        $element.removeClass(DATEBOX_CLASS + "-" + item)
+                    }, null));
+                    $element.addClass(DATEBOX_CLASS + "-" + this._pickerType)
                 },
                 _updateSize: function() {
                     var $element = this.element(),
@@ -18253,12 +18272,13 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                         case"pickerType":
                             this._updatePickerOptions({pickerType: args.value});
                             this._refreshStrategy();
+                            this._refreshPickerTypeClass();
                             this._invalidate();
                             break;
                         case"format":
                             this._updatePickerOptions({format: args.value});
                             this._refreshStrategy();
-                            this._refreshFormatClasses();
+                            this._refreshFormatClass();
                             this._renderPopupWrapper();
                             this._updateSize();
                             break;
@@ -18640,10 +18660,16 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
         var DateViewStrategy = DateBoxStrategy.inherit({
                 NAME: "DateView",
                 getDefaultOptions: function() {
+                    var format = this.dateBox.option("format"),
+                        formatString = "d";
+                    if (format === "datetime")
+                        formatString = this._getDateTimeFormatString();
+                    else if (format === "time")
+                        formatString = "t";
                     return $.extend(this.callBase(), {
                             openOnFieldClick: true,
                             applyButtonText: Globalize.localize("Done"),
-                            formatString: this.dateBox.option("format") === "datetime" ? this._getDateTimeFormatString() : undefined
+                            formatString: formatString
                         })
                 },
                 popupConfig: function() {
@@ -19957,7 +19983,6 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                         };
                     return $.extend({}, parent, {
                             tab: function(e) {
-                                this._focusTarget().focusout();
                                 this.close()
                             },
                             upArrow: function(e) {
@@ -19975,10 +20000,19 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                                 }
                             },
                             enter: function(e) {
-                                if (this.option("fieldEditEnabled"))
-                                    e.preventDefault();
-                                if (parent.enter.apply(this, arguments))
-                                    return this.option("opened")
+                                if (this._input().val() === "") {
+                                    this.option({
+                                        selectedItem: null,
+                                        value: null
+                                    });
+                                    this.close()
+                                }
+                                else {
+                                    if (this.option("fieldEditEnabled"))
+                                        e.preventDefault();
+                                    if (parent.enter.apply(this, arguments))
+                                        return this.option("opened")
+                                }
                             },
                             backspace: clearSelectBox,
                             del: clearSelectBox
@@ -20415,9 +20449,6 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     $.when.apply($, itemLoadDeferreds).done($.proxy(this._renderInputAddons, this));
                     this._renderEmptyState()
                 },
-                _focusTarget: function() {
-                    return this.callBase().add(this._$tagsContainer)
-                },
                 _renderEmptyState: function() {
                     var hasNoValues = !this._values().length;
                     this.element().toggleClass(EMPTY_INPUT_CLASS, hasNoValues);
@@ -20827,7 +20858,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                 if (targetOffset) {
                     this.option("selectedIndex", this._normalizeIndex(this.option("selectedIndex") - targetOffset));
                     var $selectedElement = this.itemElements().filter(".dx-item-selected");
-                    this.option("focusedElement", $selectedElement)
+                    this.option("focusStateEnabled") && this.option("focusedElement", $selectedElement)
                 }
                 else
                     this._animateItemContainer(0, $.noop)
@@ -21950,6 +21981,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                         scrollByContent: this.option("scrollByContent"),
                         showNavButtons: this.option("showNavButtons"),
                         itemTemplateProperty: "tabTemplate",
+                        loopItemFocus: this.option("loop"),
                         selectionRequired: true,
                         onOptionChanged: $.proxy(function(args) {
                             var name = args.name,
@@ -22026,6 +22058,9 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                         break;
                     case"onTitleRendered":
                         this._setTabsOption("onItemRendered", value);
+                        break;
+                    case"loop":
+                        this._setTabsOption("loopItemFocus", value);
                         break;
                     default:
                         this.callBase(args)
@@ -24016,21 +24051,30 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                 }, editorOptions)
             },
             _renderValidator: function($editor, item) {
-                var validationRules = this._prepareValidationRules(item.validationRules, item.isRequired, item.itemType);
+                var fieldName = this._getFieldLabelName(item),
+                    validationRules = this._prepareValidationRules(item.validationRules, item.isRequired, item.itemType, fieldName);
                 if (utils.isArray(validationRules))
                     this._createComponent($editor, Validator, {
                         validationRules: validationRules,
                         validationGroup: this.option("form")
                     })
             },
-            _prepareValidationRules: function(userValidationRules, isItemRequired, itemType) {
+            _getFieldLabelName: function(item) {
+                var isItemHaveCustomLabel = item.label && item.label.text,
+                    itemName = isItemHaveCustomLabel ? null : this._getName(item);
+                return isItemHaveCustomLabel ? item.label.text : itemName && inflector.captionize(itemName)
+            },
+            _prepareValidationRules: function(userValidationRules, isItemRequired, itemType, itemName) {
                 var isSimpleItem = itemType === "simple",
                     validationRules;
                 if (isSimpleItem)
                     if (userValidationRules)
                         validationRules = userValidationRules;
                     else
-                        validationRules = isItemRequired ? [{type: "required"}] : null;
+                        validationRules = isItemRequired ? [{
+                                type: "required",
+                                message: itemName + " is required"
+                            }] : null;
                 return validationRules
             },
             _createEditor: function($container, renderOptions, editorOptions) {

@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Gauges)
-* Version: 15.2.3
-* Build date: Dec 2, 2015
+* Version: 15.2.4
+* Build date: Dec 8, 2015
 *
 * Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -28,16 +28,54 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_GAUGES) {
         }
         DX.viz.gauges.dxBaseGauge = DX.viz.BaseWidget.inherit({
             _rootClassPrefix: "dxg",
-            _invalidatingOptions: ["title", "subtitle", "indicator", "geometry", "startValue", "endValue"],
+            _invalidatingOptions: ["title", "subtitle", "indicator", "geometry", "startValue", "endValue", "animation"],
             _createThemeManager: function() {
                 return new this._factory.ThemeManager
             },
             _setDeprecatedOptions: function() {
                 this.callBase();
-                _extend(this._deprecatedOptions, {subtitle: {
+                _extend(this._deprecatedOptions, {
+                    subtitle: {
                         since: '15.2',
                         message: "Use the 'title.subtitle' option instead"
-                    }})
+                    },
+                    "title.position": {
+                        since: "15.2",
+                        message: "Use the 'verticalAlignment' and 'horizontalAlignment' options instead"
+                    },
+                    "scale.hideFirstTick": {
+                        since: "15.2",
+                        message: "The functionality is not more available"
+                    },
+                    "scale.hideLastTick": {
+                        since: "15.2",
+                        message: "The functionality is not more available"
+                    },
+                    "scale.hideFirstLabel": {
+                        since: "15.2",
+                        message: "The functionality is not more available"
+                    },
+                    "scale.hideLastLabel": {
+                        since: "15.2",
+                        message: "The functionality is not more available"
+                    },
+                    "scale.majorTick": {
+                        since: "15.2",
+                        message: "Use the 'tick' option instead"
+                    },
+                    "scale.minorTick.showCalculatedTicks": {
+                        since: "15.2",
+                        message: "The functionality is not more available"
+                    },
+                    "scale.minorTick.customTickValues": {
+                        since: "15.2",
+                        message: "Use the 'customMinorTicks' option instead"
+                    },
+                    "scale.minorTick.tickInterval": {
+                        since: "15.2",
+                        message: "Use the 'minorTickInterval' option instead"
+                    }
+                })
             },
             _initCore: function() {
                 var that = this,
@@ -475,6 +513,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_GAUGES) {
                 scaleOptions.axisDivisionFactor = that._gridSpacingFactor;
                 scaleOptions.minorAxisDivisionFactor = DEFAULT_MINOR_AXIS_DIVISION_FACTOR;
                 scaleOptions.numberMultipliers = DEFAULT_NUMBER_MULTIPLIERS;
+                scaleOptions.tickOrientation = that._getTicksOrientation(scaleOptions);
                 if (scaleOptions.label.useRangeColors)
                     scaleOptions.label.customizeColor = function() {
                         return that._rangeContainer.getColorForValue(this.value)
@@ -976,8 +1015,13 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_GAUGES) {
             _updateScaleTickIndent: function(scaleOptions) {
                 var indentFromTick = scaleOptions.label.indentFromTick,
                     length = scaleOptions.tick.length,
-                    textParams = this._scale.measureLabels();
-                scaleOptions.label.indentFromAxis = indentFromTick >= 0 ? indentFromTick + length / 2 : indentFromTick - length / 2 - _max(textParams.width, textParams.height);
+                    textParams = this._scale.measureLabels(),
+                    tickCorrection = length;
+                if (scaleOptions.orientation === "inside")
+                    tickCorrection = 0;
+                else if (scaleOptions.orientation === "center")
+                    tickCorrection = 0.5 * length;
+                scaleOptions.label.indentFromAxis = indentFromTick >= 0 ? indentFromTick + tickCorrection : indentFromTick - tickCorrection - _max(textParams.width, textParams.height);
                 this._scale.updateOptions(scaleOptions)
             },
             _updateScaleAngles: function() {
@@ -1018,14 +1062,8 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_GAUGES) {
             _shiftScale: function(layout) {
                 var scaleTranslator = this._scaleTranslator,
                     scale = this._scale,
-                    options = scale.getOptions(),
-                    tickCorrection = 1,
                     centerCoords;
-                if (options.orientation === "inside")
-                    tickCorrection = -1;
-                else if (options.orientation === "center")
-                    tickCorrection = 0;
-                scaleTranslator.setCanvasDimension(layout.radius * 2 + options.tick.length * tickCorrection);
+                scaleTranslator.setCanvasDimension(layout.radius * 2);
                 scale.setTranslator(scaleTranslator.getComponent("arg"), scaleTranslator.getComponent("val"));
                 scale.draw();
                 centerCoords = scaleTranslator.getCenter();
@@ -1033,6 +1071,9 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_GAUGES) {
             },
             _getScaleLayoutValue: function() {
                 return this._area.radius
+            },
+            _getTicksOrientation: function(scaleOptions) {
+                return scaleOptions.orientation
             },
             _getTicksCoefficients: function(options) {
                 var coefs = {
@@ -1172,42 +1213,61 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_GAUGES) {
                 return this._scaleTranslator[name === "arg" !== this._area.vertical ? "arg" : "val"]
             },
             _updateScaleAngles: $.noop,
+            _getTicksOrientation: function(scaleOptions) {
+                return scaleOptions.isHorizontal ? scaleOptions.verticalOrientation : scaleOptions.horizontalOrientation
+            },
             _updateScaleTickIndent: function(scaleOptions) {
                 var indentFromTick = scaleOptions.label.indentFromTick,
                     length = scaleOptions.tick.length,
                     textParams = this._scale.measureLabels(),
-                    verticalTextCorrection = scaleOptions.isHorizontal ? textParams.height + textParams.y : 0;
-                if (indentFromTick > 0)
-                    scaleOptions.label.indentFromAxis = -(indentFromTick + length / 2 + (scaleOptions.isHorizontal ? -textParams.y : textParams.width));
-                else
-                    scaleOptions.label.indentFromAxis = -indentFromTick + length / 2 - verticalTextCorrection;
+                    verticalTextCorrection = scaleOptions.isHorizontal ? textParams.height + textParams.y : 0,
+                    isIndentPositive = indentFromTick > 0,
+                    orientation,
+                    textCorrection,
+                    tickCorrection;
+                if (scaleOptions.isHorizontal) {
+                    orientation = isIndentPositive ? {
+                        middle: 0.5,
+                        top: 0,
+                        bottom: 1
+                    } : {
+                        middle: 0.5,
+                        top: 1,
+                        bottom: 0
+                    };
+                    tickCorrection = length * orientation[scaleOptions.verticalOrientation];
+                    textCorrection = textParams.y
+                }
+                else {
+                    orientation = isIndentPositive ? {
+                        center: 0.5,
+                        left: 0,
+                        right: 1
+                    } : {
+                        center: 0.5,
+                        left: 1,
+                        right: 0
+                    };
+                    tickCorrection = length * orientation[scaleOptions.horizontalOrientation];
+                    textCorrection = -textParams.width
+                }
+                scaleOptions.label.indentFromAxis = -indentFromTick + (isIndentPositive ? -tickCorrection + textCorrection : tickCorrection - verticalTextCorrection);
                 this._scale.updateOptions(scaleOptions)
             },
             _shiftScale: function(layout, scaleOptions) {
                 var that = this,
                     canvas = $.extend({}, that._canvas),
                     isHorizontal = scaleOptions.isHorizontal,
-                    halfLength = scaleOptions.tick.length / 2,
-                    horOrientationDelta = {
-                        center: 0,
-                        left: -1,
-                        right: 1
-                    },
-                    verOrientationDelta = {
-                        middle: 0,
-                        top: -1,
-                        bottom: 1
-                    },
-                    xDelta = isHorizontal ? 0 : halfLength * horOrientationDelta[scaleOptions.horizontalOrientation],
-                    yDelta = isHorizontal ? halfLength * verOrientationDelta[scaleOptions.verticalOrientation] : 0,
                     translator = that._getScaleTranslatorComponent("arg"),
+                    additionalTranslator = that._getScaleTranslatorComponent("val"),
                     scale = that._scale;
                 canvas[isHorizontal ? "left" : "top"] = that._area[isHorizontal ? "startCoord" : "endCoord"];
                 canvas[isHorizontal ? "right" : "bottom"] = canvas[isHorizontal ? "width" : "height"] - that._area[isHorizontal ? "endCoord" : "startCoord"];
                 translator.updateCanvas(canvas);
-                scale.setTranslator(translator, that._getScaleTranslatorComponent("val"));
+                additionalTranslator.updateCanvas(canvas);
+                scale.setTranslator(translator, additionalTranslator);
                 scale.draw();
-                scale.shift(layout.x + xDelta, layout.y + yDelta)
+                scale.shift(layout.x, layout.y)
             },
             _setupCodomain: function() {
                 var that = this,

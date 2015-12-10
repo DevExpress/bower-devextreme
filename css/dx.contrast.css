@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme
-* Version: 15.2.3
-* Build date: Dec 2, 2015
+* Version: 15.2.4
+* Build date: Dec 8, 2015
 *
 * Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -100,6 +100,10 @@
 .dx-datagrid .dx-datagrid-rowsview .dx-data-row td.dx-pointer-events-none:last-child, .dx-datagrid .dx-datagrid-rowsview .dx-freespace-row td.dx-pointer-events-none:last-child, .dx-datagrid .dx-datagrid-headers .dx-row td.dx-pointer-events-none:last-child
 {
   border-right: none;
+}
+.dx-datagrid .dx-datagrid-rowsview .dx-datagrid-edit-form
+{
+  background-color: #000;
 }
 .dx-datagrid .dx-datagrid-filter-row .dx-filter-range-content
 {
@@ -597,9 +601,17 @@
   float: left;
   padding-left: 10px;
 }
+.dx-device-mobile .dx-scheduler-navigator
+{
+  padding-left: 0;
+}
 .dx-scheduler-navigator-caption
 {
   width: 180px;
+}
+.dx-device-mobile .dx-scheduler-navigator-caption
+{
+  width: 140px;
 }
 .dx-scheduler-view-switcher.dx-tabs
 {
@@ -720,6 +732,11 @@
 .dx-scheduler-work-space:not(.dx-scheduler-work-space-all-day).dx-scheduler-work-space:not(.dx-scheduler-work-space-month).dx-scheduler-work-space:not(.dx-scheduler-timeline) .dx-scheduler-header-panel
 {
   border-bottom: 1px solid #fff;
+}
+.dx-scheduler-date-table-scrollable .dx-scrollable-content
+{
+  overflow: hidden;
+  position: relative;
 }
 .dx-scheduler-date-table-cell
 {
@@ -1509,6 +1526,7 @@
 }
 .dx-scheduler-appointment.dx-state-focused:before
 {
+  pointer-events: none;
   content: "";
   position: absolute;
   top: 0;
@@ -1597,6 +1615,7 @@
 }
 .dx-scheduler-timeline .dx-scheduler-appointment.dx-state-focused:before, .dx-scheduler-work-space-month .dx-scheduler-appointment.dx-state-focused:before, .dx-scheduler-all-day-appointment.dx-state-focused:before
 {
+  pointer-events: none;
   content: "";
   position: absolute;
   top: 0;
@@ -1917,6 +1936,10 @@
   padding-left: 0;
   padding-right: 10px;
 }
+.dx-device-mobile .dx-rtl .dx-scheduler-navigator
+{
+  padding-right: 0;
+}
 .dx-rtl .dx-scheduler-view-switcher.dx-tabs
 {
   float: left;
@@ -2054,6 +2077,7 @@
 .dx-rtl .dx-scheduler-work-space-grouped:not(.dx-scheduler-work-space-all-day) .dx-scheduler-header-scrollable
 {
   margin-right: 100px;
+  margin-left: 0;
 }
 .dx-rtl .dx-scheduler-recurrence-rule-item .dx-field-item-label.dx-field-item-label-location-left, .dx-rtl .dx-scheduler-recurrence-rule-item .dx-field-item-label.dx-field-item-label-location-top
 {
@@ -4145,7 +4169,7 @@
 {
   border-color: #fff;
 }
-.dx-texteditor.dx-state-focused
+.dx-texteditor.dx-state-focused, .dx-texteditor.dx-state-active
 {
   border-color: #cf00d7;
   -webkit-box-shadow: none;
@@ -6209,7 +6233,6 @@
 {
   margin: 14px 7px;
   height: 4px;
-  border: 1px solid #fff;
   background: #fff;
   -webkit-border-radius: 2px;
   -moz-border-radius: 2px;
@@ -6220,7 +6243,6 @@
 .dx-slider-range
 {
   border: 1px solid transparent;
-  margin-top: -1px;
   height: 2px;
   -webkit-box-sizing: content-box;
   -moz-box-sizing: content-box;
@@ -6228,8 +6250,8 @@
 }
 .dx-slider-range.dx-slider-range-visible
 {
-  border: 1px solid #fff;
-  background: #fff;
+  border: 1px solid #cf00d7;
+  background: #cf00d7;
   -webkit-border-radius: 2px;
   -moz-border-radius: 2px;
   -ms-border-radius: 2px;
@@ -8820,8 +8842,7 @@
 }
 .dx-treeview.dx-treeview-border-visible .dx-scrollable-content>.dx-treeview-node-container
 {
-  padding-left: 7px;
-  padding-top: 7px;
+  padding: 1px 1px 1px 7px;
 }
 .dx-treeview .dx-treeview-select-all-item
 {
@@ -8943,7 +8964,7 @@
 }
 .dx-treeview.dx-rtl.dx-treeview-border-visible .dx-scrollable-content>.dx-treeview-node-container
 {
-  padding-left: 0;
+  padding-left: 1px;
   padding-right: 7px;
 }
 .dx-treeview.dx-rtl .dx-treeview-node
@@ -9027,6 +9048,10 @@
   line-height: 18px;
   font-size: 13px;
 }
+.dx-field-value:not(.dx-switch):not(.dx-checkbox):not(.dx-button), .dx-field-value-static
+{
+  width: 60%;
+}
 .dx-field-label
 {
   padding: 8px 15px 9px 0;
@@ -9079,6 +9104,10 @@
   margin: 30px 20px;
   padding: 0;
 }
+.dx-rtl.dx-fieldset .dx-field-value, .dx-rtl .dx-fieldset .dx-field-value
+{
+  float: right;
+}
 .dx-fieldset-header
 {
   margin: 0 0 20px 0;
@@ -9097,6 +9126,10 @@
 {
   margin: 20px 15px;
   padding: 0;
+}
+.dx-rtl.dx-device-mobile .dx-fieldset .dx-field-value, .dx-rtl .dx-device-mobile .dx-fieldset .dx-field-value
+{
+  float: right;
 }
 .dx-device-mobile .dx-fieldset-header
 {

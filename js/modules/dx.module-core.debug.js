@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Core Library)
-* Version: 15.2.3
-* Build date: Dec 2, 2015
+* Version: 15.2.4
+* Build date: Dec 8, 2015
 *
 * Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -602,27 +602,56 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                     result = addSubValues(value, interval, isNegative);
                 return result
             };
-        var getFirstDateView = function(typeView, date) {
-                if (!isDefined(date))
-                    return;
-                if (typeView === "month")
-                    return getFirstMonthDate(date);
-                if (typeView === "year")
-                    return new Date(date.getFullYear(), 0, 1);
-                if (typeView === "decade")
-                    return new Date(getFirstYearInDecade(date), 0, 1);
-                if (typeView === "century")
-                    return new Date(getFirstDecadeInCentury(date), 0, 1)
+        var getViewFirstCellDate = function(viewType, date) {
+                if (viewType === "month")
+                    return new Date(date.getFullYear(), date.getMonth(), 1);
+                if (viewType === "year")
+                    return new Date(date.getFullYear(), 0, date.getDate());
+                if (viewType === "decade")
+                    return new Date(getFirstYearInDecade(date), date.getMonth(), date.getDate());
+                if (viewType === "century")
+                    return new Date(getFirstDecadeInCentury(date), date.getMonth(), date.getDate())
             };
-        var getLastDateView = function(typeView, date) {
-                if (typeView === "month")
-                    return new Date(date.getFullYear(), date.getMonth(), getLastDayOfMonth(date));
-                if (typeView === "year")
-                    return new Date(date.getFullYear(), 11, 1);
-                if (typeView === "decade")
-                    return new Date(getFirstYearInDecade(date) + 9, 0, 1);
-                if (typeView === "century")
-                    return new Date(getFirstDecadeInCentury(date) + 90, 0, 1)
+        var getViewLastCellDate = function(viewType, date) {
+                if (viewType === "month")
+                    return new Date(date.getFullYear(), date.getMonth(), getLastMonthDay(date));
+                if (viewType === "year")
+                    return new Date(date.getFullYear(), 11, date.getDate());
+                if (viewType === "decade")
+                    return new Date(getFirstYearInDecade(date) + 9, date.getMonth(), date.getDate());
+                if (viewType === "century")
+                    return new Date(getFirstDecadeInCentury(date) + 90, date.getMonth(), date.getDate())
+            };
+        var getViewMinBoundaryDate = function(viewType, date) {
+                var resultDate = new Date(date.getFullYear(), date.getMonth(), 1);
+                if (viewType === "month")
+                    return resultDate;
+                resultDate.setMonth(0);
+                if (viewType === "year")
+                    return resultDate;
+                if (viewType === "decade")
+                    resultDate.setFullYear(getFirstYearInDecade(date));
+                if (viewType === "century")
+                    resultDate.setFullYear(getFirstDecadeInCentury(date));
+                return resultDate
+            };
+        var getViewMaxBoundaryDate = function(viewType, date) {
+                var resultDate = new Date(date.getFullYear(), date.getMonth(), getLastMonthDay(date));
+                if (viewType === "month")
+                    return resultDate;
+                resultDate.setMonth(11);
+                resultDate.setDate(getLastMonthDay(resultDate));
+                if (viewType === "year")
+                    return resultDate;
+                if (viewType === "decade")
+                    resultDate.setFullYear(getFirstYearInDecade(date) + 9);
+                if (viewType === "century")
+                    resultDate.setFullYear(getFirstDecadeInCentury(date) + 99);
+                return resultDate
+            };
+        var getLastMonthDay = function(date) {
+                var resultDate = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+                return resultDate.getDate()
             };
         var sameView = function(view, date1, date2) {
                 return dateUtils[camelize("same " + view)](date1, date2)
@@ -731,10 +760,6 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
         var getShortDate = function(date) {
                 return Globalize.format(date, "yyyy/M/d")
             };
-        var getLastDayOfMonth = function(date) {
-                date = new Date(date.getFullYear(), date.getMonth() + 1, 0);
-                return date.getDate()
-            };
         var getFirstMonthDate = function(date) {
                 if (!isDefined(date))
                     return;
@@ -827,18 +852,20 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                 getFirstYearInDecade: getFirstYearInDecade,
                 getFirstDecadeInCentury: getFirstDecadeInCentury,
                 getShortDate: getShortDate,
-                getFirstDateView: getFirstDateView,
-                getLastDateView: getLastDateView,
+                getViewFirstCellDate: getViewFirstCellDate,
+                getViewLastCellDate: getViewLastCellDate,
                 getViewDown: getViewDown,
                 getViewUp: getViewUp,
+                getLastMonthDay: getLastMonthDay,
                 getLastMonthDate: getLastMonthDate,
                 getFirstMonthDate: getFirstMonthDate,
                 getFirstWeekDate: getFirstWeekDate,
-                getLastDayOfMonth: getLastDayOfMonth,
                 getQuarter: getQuarter,
                 getFirstQuarterMonth: getFirstQuarterMonth,
                 dateInRange: dateInRange,
                 normalizeDate: normalizeDate,
+                getViewMinBoundaryDate: getViewMinBoundaryDate,
+                getViewMaxBoundaryDate: getViewMaxBoundaryDate,
                 fixTimezoneGap: fixTimezoneGap,
                 makeDate: makeDate,
                 deserializeDate: deserializeDate,
@@ -2535,10 +2562,10 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                 FR: 5,
                 SA: 6
             };
-        var dateInRecurrenceRange = function(recurrenceString, currentDate, viewStartDate, viewEndDate) {
+        var dateInRecurrenceRange = function(recurrenceString, currentDate, viewStartDate, viewEndDate, recurrenceException) {
                 var result = [];
                 if (recurrenceString)
-                    result = getDatesByRecurrence(recurrenceString, currentDate, viewStartDate, viewEndDate);
+                    result = getDatesByRecurrence(recurrenceString, currentDate, viewStartDate, viewEndDate, recurrenceException);
                 return !!result.length
             };
         var normalizeInterval = function(freq, interval) {
@@ -4154,7 +4181,7 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
     });
     /*! Module core, file version.js */
     DevExpress.define("/version", [], function() {
-        return "15.2.3"
+        return "15.2.4"
     });
     /*! Module core, file errors.js */
     DevExpress.define("/errors", ["/utils/utils.error"], function(errorUtils) {
@@ -6366,9 +6393,15 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
             return /^(?:[a-z]+:)?\/\//i.test(url)
         }
         function toAbsoluteUrl(basePath, relativePath) {
-            var part,
-                baseParts = basePath.split("/"),
-                relativeParts = relativePath.split("/");
+            var part;
+            var baseParts = stripParams(basePath).split("/");
+            var relativeParts = relativePath.split("/");
+            function stripParams(url) {
+                var index = url.indexOf("?");
+                if (index > -1)
+                    return url.substr(0, index);
+                return url
+            }
             baseParts.pop();
             while (relativeParts.length) {
                 part = relativeParts.shift();

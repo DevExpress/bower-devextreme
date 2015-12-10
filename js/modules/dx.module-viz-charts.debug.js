@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Charts)
-* Version: 15.2.3
-* Build date: Dec 2, 2015
+* Version: 15.2.4
+* Build date: Dec 8, 2015
 *
 * Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -3652,7 +3652,12 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CHARTS) {
             SERIES_SELECTION_CHANGED = "seriesSelectionChanged",
             POINT_DATA = "chart-data-point",
             SERIES_DATA = "chart-data-series",
+            ARG_DATA = "chart-data-argument",
             DELAY = 100;
+        function getData(event, dataKey) {
+            var target = event.target;
+            return (target.tagName === "tspan" ? target.parentNode : target)[dataKey]
+        }
         function eventCanceled(event, target) {
             return event.cancel || !target.getOptions()
         }
@@ -4030,10 +4035,6 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CHARTS) {
                     setPointsSpecState(series.getPointsByArg(argument), targetPoint, func, eventName, that._eventTrigger)
                 })
             },
-            _getAxisArgument: function(event) {
-                var $target = $(event.target);
-                return (event.target.tagName === "tspan" ? $target.parent() : $target).get(0)["chart-data-argument"]
-            },
             _getCanvas: function(x, y) {
                 var that = this,
                     canvases = that._canvases || [];
@@ -4248,8 +4249,8 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CHARTS) {
                     x = _floor(e.pageX - rootOffset.left),
                     y = _floor(e.pageY - rootOffset.top),
                     canvas = that._getCanvas(x, y),
-                    series = e.target[SERIES_DATA],
-                    point = e.target[POINT_DATA] || series && series.getPointByCoord(x, y);
+                    series = getData(e, SERIES_DATA),
+                    point = getData(e, POINT_DATA) || series && series.getPointByCoord(x, y);
                 that._enableOutHandler();
                 that._x = x;
                 that._y = y;
@@ -4274,7 +4275,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CHARTS) {
                     return
                 }
                 if (that._axisHoverEnabled && that._argumentAxis.coordsIn(x, y)) {
-                    var argument = that._getAxisArgument(e),
+                    var argument = getData(e, ARG_DATA),
                         argumentDefined = isDefined(argument);
                     if (argumentDefined && that.hoveredArgument !== argument) {
                         that._clearHover();
@@ -4351,8 +4352,8 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CHARTS) {
                     rootOffset = that._renderer.getRootOffset(),
                     x = _floor(e.pageX - rootOffset.left),
                     y = _floor(e.pageY - rootOffset.top),
-                    point = e.target[POINT_DATA],
-                    series = that._stickedSeries || e.target[SERIES_DATA] || point && point.series,
+                    point = getData(e, POINT_DATA),
+                    series = that._stickedSeries || getData(e, SERIES_DATA) || point && point.series,
                     axis = that._argumentAxis;
                 if (that._legend.coordsIn(x, y)) {
                     var item = that._legend.getItemByCoord(x, y);
@@ -4366,7 +4367,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CHARTS) {
                     return
                 }
                 if (axis && axis.coordsIn(x, y)) {
-                    var argument = that._getAxisArgument(e);
+                    var argument = getData(e, ARG_DATA);
                     if (isDefined(argument)) {
                         that._eventTrigger("argumentAxisClick", {
                             argument: argument,
@@ -4380,7 +4381,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CHARTS) {
                     if (point)
                         that._pointClick(point, e);
                     else
-                        e.target[SERIES_DATA] && that._eventTrigger(SERIES_CLICK, {
+                        getData(e, SERIES_DATA) && that._eventTrigger(SERIES_CLICK, {
                             target: series,
                             jQueryEvent: e
                         })
@@ -4401,7 +4402,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CHARTS) {
                     rootOffset = that._renderer.getRootOffset(),
                     x = _floor(e.pageX - rootOffset.left),
                     y = _floor(e.pageY - rootOffset.top),
-                    point = e.target[POINT_DATA],
+                    point = getData(e, POINT_DATA),
                     mode,
                     item;
                 that._enableOutHandler();
@@ -4452,8 +4453,8 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CHARTS) {
                     })
                 }
                 else if (_normalizeEnum(point.getOptions().hoverMode) !== NONE_MODE) {
-                    eventTrigger(POINT_HOVER_CHANGED, {target: point});
-                    point.releaseHoverState(that.legendCallback(point))
+                    point.releaseHoverState(that.legendCallback(point));
+                    eventTrigger(POINT_HOVER_CHANGED, {target: point})
                 }
             },
             _clickHandler: function(e) {
@@ -4486,7 +4487,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CHARTS) {
                     }
                 }
                 else {
-                    point = e.target[POINT_DATA];
+                    point = getData(e, POINT_DATA);
                     point && eventTrigger(POINT_CLICK, {
                         target: point,
                         jQueryEvent: e

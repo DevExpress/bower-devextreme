@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Single Page App Framework)
-* Version: 15.2.3
-* Build date: Dec 2, 2015
+* Version: 15.2.4
+* Build date: Dec 8, 2015
 *
 * Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -1864,7 +1864,7 @@ if (!window.DevExpress || !DevExpress.MOD_FRAMEWORK) {
             },
             _processEvent: function(eventName, args, model) {
                 this._callComponentMethod(eventName, args);
-                this.fireEvent(eventName, [args]);
+                this.fireEvent(eventName, args && [args]);
                 var modelMethod = (model || {})[eventName];
                 if (modelMethod)
                     modelMethod.call(model, args)

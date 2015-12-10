@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Visualization Core Library)
-* Version: 15.2.3
-* Build date: Dec 2, 2015
+* Version: 15.2.4
+* Build date: Dec 8, 2015
 *
 * Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -1169,7 +1169,11 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                 barGauge: {},
                 map: {background: {}},
                 rangeSelector: {
-                    scale: {label: {font: {}}},
+                    scale: {
+                        tick: {},
+                        minorTick: {},
+                        label: {font: {}}
+                    },
                     chart: {}
                 },
                 sparkline: {},
@@ -1217,6 +1221,8 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
             mergeScalar(theme.gauge.scale.label.font, colorFieldName, null, theme.axisLabelColor);
             mergeScalar(theme.gauge.scale.tick, colorFieldName, null, theme.backgroundColor);
             mergeScalar(theme.gauge.scale.minorTick, colorFieldName, null, theme.backgroundColor);
+            mergeScalar(theme.rangeSelector.scale.tick, colorFieldName, null, theme.axisColor);
+            mergeScalar(theme.rangeSelector.scale.minorTick, colorFieldName, null, theme.axisColor);
             mergeScalar(theme.rangeSelector.scale.label.font, colorFieldName, null, theme.axisLabelColor)
         }
         function patchMapLayers(theme) {
@@ -3659,23 +3665,21 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                     tickTextWithMaxLength,
                     maxLength = 0;
                 ticks = ticks || that._calculateMajorTicks();
-                if (!ticks.length)
-                    return {
-                            width: 0,
-                            height: 0,
-                            length: 0,
-                            y: 0
-                        };
                 _each(ticks, function(_, item) {
                     var text = getText(item, that._options.labelOptions),
-                        length = text !== null ? text.length : -1;
+                        length = _isDefined(text) ? text.length : -1;
                     if (maxLength < length) {
                         maxLength = length;
                         tickWithMaxLength = item;
                         tickTextWithMaxLength = text
                     }
                 });
-                return that._getTextElementBbox(tickWithMaxLength, tickTextWithMaxLength)
+                return maxLength > 0 ? that._getTextElementBbox(tickWithMaxLength, tickTextWithMaxLength) : {
+                        width: 0,
+                        height: 0,
+                        length: 0,
+                        y: 0
+                    }
             },
             _applyAutoArrangement: function() {
                 var that = this,
@@ -4413,7 +4417,6 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
             _isDefined = commonUtils.isDefined,
             axes = viz.axes,
             constants = axes.constants,
-            _abs = Math.abs,
             _extend = $.extend,
             CANVAS_POSITION_PREFIX = constants.canvasPositionPrefix,
             TOP = constants.top,
@@ -4421,30 +4424,31 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
             LEFT = constants.left,
             RIGHT = constants.right,
             CENTER = constants.center;
-        var dateSetters = {};
-        dateSetters.millisecond = function(date) {
-            date.setMilliseconds(0)
-        };
-        dateSetters.second = function(date) {
-            date.setSeconds(0, 0)
-        };
-        dateSetters.minute = function(date) {
-            date.setMinutes(0, 0, 0)
-        };
-        dateSetters.hour = function(date) {
-            date.setHours(0, 0, 0, 0)
-        };
+        var dateSetters = {
+                millisecond: function(date) {
+                    date.setMilliseconds(0)
+                },
+                second: function(date) {
+                    date.setSeconds(0, 0)
+                },
+                minute: function(date) {
+                    date.setMinutes(0, 0, 0)
+                },
+                hour: function(date) {
+                    date.setHours(0, 0, 0, 0)
+                },
+                month: function(date) {
+                    date.setMonth(0);
+                    dateSetters.day(date)
+                },
+                quarter: function(date) {
+                    date.setMonth(dateUtils.getFirstQuarterMonth(date.getMonth()));
+                    dateSetters.day(date)
+                }
+            };
         dateSetters.week = dateSetters.day = function(date) {
             date.setDate(1);
             dateSetters.hour(date)
-        };
-        dateSetters.month = function(date) {
-            date.setMonth(0);
-            dateSetters.day(date)
-        };
-        dateSetters.quarter = function(date) {
-            date.setMonth(dateUtils.getFirstQuarterMonth(date.getMonth()));
-            dateSetters.day(date)
         };
         function getMarkerDate(date, tickInterval) {
             var markerDate = new Date(date.getTime()),
@@ -4455,6 +4459,9 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
         axes.xyAxes = {linear: {
                 measureLabels: function() {
                     return this._tickManager.getMaxLabelParams()
+                },
+                getMarkerTrackers: function() {
+                    return this._markerTrackers
                 },
                 _prepareDatesDifferences: function(datesDifferences, tickInterval) {
                     var dateUnitInterval,
@@ -4493,7 +4500,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                         }
                 },
                 _getScreenDelta: function() {
-                    return _abs(this._translator.translateSpecialCase(constants.canvasPositionStart) - this._translator.translateSpecialCase(constants.canvasPositionEnd))
+                    return Math.abs(this._translator.translateSpecialCase(constants.canvasPositionStart) - this._translator.translateSpecialCase(constants.canvasPositionEnd))
                 },
                 _initAxisPositions: function() {
                     var that = this,
@@ -4504,13 +4511,22 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                     that._axisPosition = that._additionalTranslator.translateSpecialCase(CANVAS_POSITION_PREFIX + position) + delta
                 },
                 _getTickCoord: function(tick) {
-                    var coords;
+                    var coords,
+                        corrections = {
+                            top: -1,
+                            middle: -0.5,
+                            bottom: 0,
+                            left: -1,
+                            center: -0.5,
+                            right: 0
+                        },
+                        tickCorrection = corrections[this._options.tickOrientation || "center"];
                     if (_isDefined(tick.posX) && _isDefined(tick.posY))
                         coords = {
                             x1: tick.posX,
-                            y1: tick.posY - tick.halfTickLength,
+                            y1: tick.posY + tickCorrection * tick.length,
                             x2: tick.posX,
-                            y2: tick.posY + tick.halfTickLength
+                            y2: tick.posY + tickCorrection * tick.length + tick.length
                         };
                     else
                         coords = null;
@@ -4535,79 +4551,140 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                         labelPosY,
                         textElement,
                         textSize,
+                        textIndent,
                         pathElement;
                     if (options.x === null)
                         return;
-                    pathElement = that._renderer.path([options.x, options.y, options.x, options.y + markerOptions.separatorHeight], "line").attr({
-                        "stroke-width": markerOptions.width,
-                        stroke: markerOptions.color,
-                        "stroke-opacity": markerOptions.opacity,
-                        sharp: "h"
-                    }).append(that._axisElementsGroup);
+                    if (!options.withoutStick)
+                        pathElement = that._renderer.path([options.x, options.y, options.x, options.y + markerOptions.separatorHeight], "line").attr({
+                            "stroke-width": markerOptions.width,
+                            stroke: markerOptions.color,
+                            "stroke-opacity": markerOptions.opacity,
+                            sharp: "h"
+                        }).append(that._axisElementsGroup);
                     textElement = that._renderer.text(String(constants.formatLabel(dateMarker, options.labelFormat)), 0, 0).attr({align: "left"}).css(viz.utils.patchFontOptions(markerOptions.label.font)).append(that._axisElementsGroup);
                     textSize = textElement.getBBox();
-                    labelPosX = options.x + markerOptions.width + markerOptions.textLeftIndent;
+                    textIndent = markerOptions.width + markerOptions.textLeftIndent;
+                    labelPosX = this._translator.getBusinessRange().invert ? options.x - textIndent - textSize.width : options.x + textIndent;
                     labelPosY = options.y + markerOptions.textTopIndent + textSize.height / 2;
                     textElement.move(labelPosX, labelPosY);
                     return {
-                            x1: labelPosX,
-                            x2: labelPosX + textSize.width,
+                            labelStartPosX: labelPosX,
+                            labelEndPosX: labelPosX + textSize.width,
                             path: pathElement,
-                            text: textElement
+                            text: textElement,
+                            date: dateMarker,
+                            dateMarkerStartPosX: options.x
                         }
                 },
-                _deleteDateMarker: function(marker) {
-                    marker.path.dispose();
+                _disposeDateMarker: function(marker) {
+                    marker.path && marker.path.dispose();
                     marker.path = null;
                     marker.text.dispose();
                     marker.text = null
                 },
+                _getDiff: function(currentValue, previousValue) {
+                    var datesDifferences = dateUtils.getDatesDifferences(previousValue, currentValue);
+                    this._prepareDatesDifferences(datesDifferences, this._dateUnitInterval);
+                    return datesDifferences
+                },
                 _drawDateMarkers: function() {
                     var that = this,
-                        markerOptions = that._options.marker,
+                        options = that._options,
                         ticks = that._majorTicks,
+                        boundaryTicks = that._boundaryTicks,
+                        lastIndexOfBoundaryTicks = boundaryTicks.length - 1,
                         length = ticks.length,
-                        dateUnitInterval = dateUtils.getDateUnitInterval(that._tickManager.getTickInterval()),
                         dateMarkers = [],
-                        datesDifferences,
-                        currentDateMarker,
                         prevDateMarker,
+                        markersAreaTop,
+                        dateMarker,
                         markerDate,
-                        posX,
-                        maxLabelHeight,
+                        diff,
                         i = 1;
-                    if (that._options.argumentType !== "datetime" || length <= 1)
+                    boundaryTicks[0] && ticks[0].value > boundaryTicks[0].value && ticks.unshift(boundaryTicks[0]);
+                    boundaryTicks[lastIndexOfBoundaryTicks] && ticks[length - 1].value < boundaryTicks[lastIndexOfBoundaryTicks].value && ticks.push(boundaryTicks[lastIndexOfBoundaryTicks]);
+                    length = ticks.length;
+                    if (options.argumentType !== "datetime" || options.type === "discrete" || length <= 1)
                         return;
-                    maxLabelHeight = this._axisElementsGroup && this._axisElementsGroup.getBBox().height;
+                    markersAreaTop = that._axisPosition + this._axisElementsGroup.getBBox().height + options.label.indentFromAxis + options.marker.topIndent;
+                    that._dateUnitInterval = dateUtils.getDateUnitInterval(this._tickManager.getTickInterval());
                     for (i; i < length; i++) {
-                        datesDifferences = dateUtils.getDatesDifferences(ticks[i - 1].value, ticks[i].value);
-                        that._prepareDatesDifferences(datesDifferences, dateUnitInterval);
-                        if (datesDifferences.count > 0) {
-                            markerDate = getMarkerDate(ticks[i].value, dateUnitInterval);
-                            posX = that._translator.translate(markerDate);
-                            currentDateMarker = that._drawDateMarker(markerDate, {
-                                x: posX,
-                                y: that._axisPosition + maxLabelHeight + that._options.label.indentFromAxis + markerOptions.topIndent,
-                                labelFormat: that._getLabelFormatOptions(formatHelper.getDateFormatByDifferences(datesDifferences))
+                        diff = that._getDiff(ticks[i].value, ticks[i - 1].value);
+                        if (diff.count > 0) {
+                            markerDate = getMarkerDate(ticks[i].value, that._dateUnitInterval);
+                            dateMarker = that._drawDateMarker(markerDate, {
+                                x: that._translator.translate(markerDate),
+                                y: markersAreaTop,
+                                labelFormat: that._getLabelFormatOptions(formatHelper.getDateFormatByDifferences(diff))
                             });
-                            if (prevDateMarker === undefined || currentDateMarker.x1 > prevDateMarker.x2 || currentDateMarker.x2 < prevDateMarker.x1) {
-                                posX !== null && dateMarkers.push({
-                                    dateMarker: markerDate,
-                                    posX: posX
-                                });
-                                prevDateMarker = currentDateMarker
-                            }
-                            else
-                                that._deleteDateMarker(currentDateMarker)
+                            if (dateMarker)
+                                if (that._checkMarkersPosition(dateMarker, prevDateMarker)) {
+                                    dateMarkers.push(dateMarker);
+                                    prevDateMarker = dateMarker
+                                }
+                                else
+                                    that._disposeDateMarker(dateMarker)
                         }
                     }
-                    return dateMarkers
+                    if (dateMarkers.length) {
+                        dateMarker = that._drawDateMarker(ticks[0].value, {
+                            x: that._translator.translate(ticks[0].value),
+                            y: markersAreaTop,
+                            labelFormat: that._getLabelFormatOptions(formatHelper.getDateFormatByDifferences(that._getDiff(ticks[0].value, dateMarkers[0].date))),
+                            withoutStick: true
+                        });
+                        if (dateMarker) {
+                            !that._checkMarkersPosition(dateMarker, dateMarkers[0]) && that._disposeDateMarker(dateMarker);
+                            dateMarkers.unshift(dateMarker)
+                        }
+                    }
+                    that._initializeMarkersTrackers(dateMarkers, that._axisElementsGroup, that._axisGroup.getBBox().width, markersAreaTop)
+                },
+                _initializeMarkersTrackers: function(dateMarkers, group, axisWidth, markersAreaTop) {
+                    var that = this,
+                        separatorHeight = that._options.marker.separatorHeight,
+                        renderer = that._renderer,
+                        markerTracker,
+                        nextMarker,
+                        i,
+                        x,
+                        length = dateMarkers.length,
+                        businessRange = this._translator.getBusinessRange(),
+                        currentMarker;
+                    that._markerTrackers = [];
+                    for (i = 0; i < length; i++) {
+                        currentMarker = dateMarkers[i];
+                        nextMarker = dateMarkers[i + 1] || {
+                            dateMarkerStartPosX: businessRange.invert ? this._translator.translateSpecialCase("canvas_position_end") : axisWidth,
+                            date: businessRange.max
+                        };
+                        x = currentMarker.dateMarkerStartPosX;
+                        markerTracker = renderer.path([x, markersAreaTop, x, markersAreaTop + separatorHeight, nextMarker.dateMarkerStartPosX, markersAreaTop + separatorHeight, nextMarker.dateMarkerStartPosX, markersAreaTop, x, markersAreaTop]).attr({
+                            "stroke-width": 1,
+                            stroke: "grey",
+                            fill: "grey",
+                            "fill-opacity": 0.0001,
+                            "stroke-opacity": 0.0001
+                        }).append(group);
+                        markerTracker.data("range", {
+                            startValue: currentMarker.date,
+                            endValue: nextMarker.date
+                        });
+                        that._markerTrackers.push(markerTracker)
+                    }
+                },
+                _checkMarkersPosition: function(dateMarker, prevDateMarker) {
+                    return prevDateMarker === undefined || dateMarker.labelStartPosX > prevDateMarker.labelEndPosX || dateMarker.labelEndPosX < prevDateMarker.labelStartPosX
                 },
                 _getLabelFormatOptions: function(formatString) {
-                    var markerOptions = this._options.marker;
-                    if (!_isDefined(markerOptions.label.format))
-                        markerOptions.label.format = formatString;
-                    return markerOptions.label
+                    var that = this,
+                        markerLabelOptions = that._markerLabelOptions;
+                    if (!markerLabelOptions)
+                        that._markerLabelOptions = markerLabelOptions = _extend(true, {}, that._options.marker.label);
+                    if (!_isDefined(that._options.marker.label.format))
+                        markerLabelOptions.format = formatString;
+                    return markerLabelOptions
                 },
                 _adjustConstantLineLabels: function() {
                     var that = this,
@@ -4872,7 +4949,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                     return {
                             hasLabelFormat: that._hasLabelFormat,
                             labelOptions: options.label,
-                            isMarkersVisible: options.marker.visible,
+                            isMarkersVisible: options.type === "discrete" ? false : options.marker.visible,
                             overlappingBehavior: overlappingBehavior,
                             isHorizontal: that._isHorizontal,
                             textOptions: that._textOptions,
@@ -5104,11 +5181,18 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
             },
             _getTickCoord: function(tick) {
                 var center = this._additionalTranslator.getCenter(),
-                    r = this._additionalTranslator.getRadius();
+                    r = this._additionalTranslator.getRadius(),
+                    corrections = {
+                        inside: -1,
+                        center: -0.5,
+                        outside: 0
+                    },
+                    tickCorrection = tick.length * corrections[this._options.tickOrientation || "center"],
+                    radiusWithTicks = r + tickCorrection;
                 return {
-                        x1: center.x + r - tick.halfTickLength,
+                        x1: center.x + radiusWithTicks,
                         y1: center.y,
-                        x2: center.x + r + tick.halfTickLength,
+                        x2: center.x + radiusWithTicks + tick.length,
                         y2: center.y,
                         angle: tick.angle
                     }
@@ -5263,9 +5347,9 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
             },
             _getTickCoord: function(tick) {
                 return {
-                        x1: tick.posX - tick.halfTickLength,
+                        x1: tick.posX - tick.length / 2,
                         y1: tick.posY,
-                        x2: tick.posX + tick.halfTickLength,
+                        x2: tick.posX + tick.length / 2,
                         y2: tick.posY,
                         angle: tick.angle + HALF_PI_ANGLE
                     }
@@ -5518,8 +5602,8 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                     min = that._minBound,
                     max = that._maxBound,
                     categories = that._translator.getVisibleCategories() || that._translator.getBusinessRange().categories,
-                    customTicks = options.customTicks || ($.isArray(categories) ? categories : that._majorTicks && constants.convertTicksToValues(that._majorTicks)),
-                    customMinorTicks = options.customMinorTicks || that._minorTicks && constants.convertTicksToValues(that._minorTicks);
+                    customTicks = options.customTicks || ($.isArray(categories) ? categories : that._majorTicks && that._majorTicks.length && constants.convertTicksToValues(that._majorTicks)),
+                    customMinorTicks = options.customMinorTicks || that._minorTicks && that._minorTicks.length && constants.convertTicksToValues(that._minorTicks);
                 if (_isNumber(min) && options.type !== constants.logarithmic)
                     min = that._correctMinForTicks(min, max, screenDelta);
                 return {
@@ -5980,7 +6064,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                 tick.angle = coord.angle
             },
             _initTickStyle: function(tick, style) {
-                tick.halfTickLength = style.halfTickLength;
+                tick.length = style.length;
                 tick.tickStyle = tick.withoutPath ? {
                     stroke: "none",
                     "stroke-width": 0,
@@ -6017,7 +6101,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                             "stroke-width": gridOptions.width,
                             "stroke-opacity": gridOptions.opacity
                         },
-                        halfTickLength: tickOptions.length * 0.5
+                        length: tickOptions.length
                     }
             },
             _initTicks: function(ticks, style, withLabels, skippedCategory, offset, labelPosition) {
@@ -6337,12 +6421,10 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                     }
             },
             shift: function(x, y) {
-                var settings = {};
-                if (x)
-                    settings.translateX = x;
-                if (y)
-                    settings.translateY = y;
-                this._axisGroup.attr(settings)
+                this._axisGroup.attr({
+                    translateX: x,
+                    translateY: y
+                })
             },
             applyClipRects: function(elementsClipID, canvasClipID) {
                 this._axisGroup.attr({clipId: canvasClipID});
@@ -6440,6 +6522,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                 return this._tickManager.getFullTicks()
             },
             _addBoundaryTick: _noop,
+            getMarkerTrackers: _noop,
             measureLabels: _noop,
             _drawDateMarkers: _noop,
             coordsIn: _noop,
@@ -16013,7 +16096,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
             primaryTitleColor: PRIMARY_TITLE_COLOR,
             secondaryTitleColor: SECONDARY_TITLE_COLOR,
             axisColor: LIGHT_GREY,
-            axisLabelColor: "#a8a8a8",
+            axisLabelColor: SECONDARY_TITLE_COLOR,
             title: {
                 font: {
                     size: 28,
@@ -16798,21 +16881,35 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
             },
             rangeSelector: {
                 scale: {
+                    width: 1,
+                    color: "#000000",
+                    opacity: 0.1,
                     showCustomBoundaryTicks: true,
                     showMinorTicks: true,
                     useTicksAutoArrangement: true,
                     setTicksAtUnitBeginning: true,
                     label: {
+                        alignment: "center",
                         visible: true,
                         topIndent: 7,
                         font: {size: 11}
                     },
                     tick: {
                         width: 1,
-                        color: BLACK,
-                        opacity: 0.1
+                        opacity: 1,
+                        visible: true,
+                        length: 12
+                    },
+                    minorTick: {
+                        width: 1,
+                        opacity: 0.3,
+                        visible: true,
+                        length: 12
                     },
                     marker: {
+                        width: 1,
+                        color: "#000000",
+                        opacity: 0.1,
                         visible: true,
                         separatorHeight: 33,
                         topIndent: 10,
@@ -17091,7 +17188,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
             primaryTitleColor: "#dbdbdb",
             secondaryTitleColor: "#a3a3a3",
             axisColor: "#555555",
-            axisLabelColor: "#707070",
+            axisLabelColor: "#a3a3a3",
             tooltip: {
                 color: SOME_GREY,
                 border: {color: "#494949"},
@@ -17130,10 +17227,6 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
             barGauge: {backgroundColor: "#3c3c3c"},
             rangeSelector: {
                 selectedRangeColor: RANGE_COLOR,
-                scale: {tick: {
-                        color: WHITE,
-                        opacity: 0.05
-                    }},
                 sliderMarker: {
                     color: RANGE_COLOR,
                     font: {color: GREY_GREEN}
@@ -17215,11 +17308,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                         border: {color: WHITE}
                     }
                 }},
-            "chart:common:axis": {
-                minorGrid: {opacity: 1},
-                minorTick: {opacity: 1},
-                constantLineStyle: {color: WHITE}
-            },
+            "chart:common:axis": {constantLineStyle: {color: WHITE}},
             chart: {
                 commonSeriesSettings: {},
                 commonPaneSettings: {
@@ -17261,13 +17350,9 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                     }
                 }
             },
-            barGauge: {backgroundColor: BLACK},
+            barGauge: {backgroundColor: "#3c3c3c"},
             rangeSelector: {
-                scale: {tick: {
-                        color: WHITE,
-                        opacity: 1
-                    }},
-                selectedRangeColor: CONTRAST_ACTIVE,
+                electedRangeColor: CONTRAST_ACTIVE,
                 sliderMarker: {color: CONTRAST_ACTIVE},
                 sliderHandle: {
                     color: CONTRAST_ACTIVE,
@@ -17313,10 +17398,10 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                 controlBar: {
                     borderColor: WHITE,
                     color: BLACK,
-                    opacity: 1
+                    opacity: 0.3
                 }
             },
-            sparkline: {},
+            sparkline: {pointColor: BLACK},
             bullet: {},
             polar: {commonSeriesSettings: {}}
         }, "generic.light");
@@ -17334,10 +17419,10 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
             primaryTitleColor: "#232323",
             secondaryTitleColor: "#767676",
             axisColor: "#d3d3d3",
-            axisLabelColor: "#a8a8a8",
+            axisLabelColor: "#767676",
             tooltip: {
                 color: "#e8e8e8",
-                font: {color: "#808080"}
+                font: {color: "#767676"}
             },
             legend: {font: {color: "#000000"}},
             pieIE8: {commonSeriesSettings: {
@@ -17371,11 +17456,11 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
             primaryTitleColor: "#000000",
             secondaryTitleColor: "#767676",
             axisColor: "#ececec",
-            axisLabelColor: "#b8b8b8",
-            legend: {font: {color: '#000000'}},
-            tooltip: {font: {color: '#808080'}},
-            "chart:common": {commonSeriesSettings: {label: {border: {color: '#d3d3d3'}}}},
-            chart: {commonPaneSettings: {border: {color: '#d3d3d3'}}}
+            axisLabelColor: "#767676",
+            legend: {font: {color: "#000000"}},
+            tooltip: {font: {color: "#767676"}},
+            "chart:common": {commonSeriesSettings: {label: {border: {color: "#d3d3d3"}}}},
+            chart: {commonPaneSettings: {border: {color: "#d3d3d3"}}}
         }, "generic.light");
         viz.registerThemeAlias("ios", IOS7_DEFAULT)
     })(DevExpress);
@@ -17396,7 +17481,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
             primaryTitleColor: WHITE,
             secondaryTitleColor: "#d8d8d8",
             axisColor: "#4c4c4c",
-            axisLabelColor: "#a0a0a0",
+            axisLabelColor: WHITE,
             title: {font: {color: WHITE}},
             legend: {font: {color: WHITE}},
             tooltip: {
@@ -17419,8 +17504,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                         selectionStyle: {border: {color: BLACK}}
                     }
                 }},
-            barGauge: {backgroundColor: "#2b3036"},
-            rangeSelector: {scale: {tick: {opacity: 0.15}}}
+            barGauge: {backgroundColor: "#2b3036"}
         }, "generic.dark");
         registerTheme({
             name: WIN10_WHITE,
@@ -17428,7 +17512,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
             primaryTitleColor: BLACK,
             secondaryTitleColor: "#767676",
             axisColor: "#ececec",
-            axisLabelColor: "#b8b8b8",
+            axisLabelColor: BLACK,
             title: {font: {color: BLACK}},
             legend: {font: {color: BLACK}},
             tooltip: {font: {color: BLACK}}
