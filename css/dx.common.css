@@ -1,9 +1,9 @@
 /*! 
 * DevExtreme
-* Version: 15.2.4
-* Build date: Dec 8, 2015
+* Version: 15.2.5
+* Build date: Jan 27, 2016
 *
-* Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
+* Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
 */
 
@@ -527,6 +527,24 @@
   opacity: 0;
 }
 .dx-fade-drop-animation.dx-leave, .dx-fade-drop-animation.dx-enter.dx-enter-active
+{
+  -moz-transform: translate3d(0,0,0) scale3d(1,1,1);
+  -ms-transform: translate3d(0,0,0) scale3d(1,1,1);
+  -o-transform: translate3d(0,0,0) scale3d(1,1,1);
+  -webkit-transform: translate3d(0,0,0) scale3d(1,1,1);
+  transform: translate3d(0,0,0) scale3d(1,1,1);
+  opacity: 1;
+}
+.dx-fade-rise-animation.dx-enter, .dx-fade-rise-animation.dx-leave.dx-leave-active
+{
+  -moz-transform: translate3d(0,10px,0) scale3d(1.1,1.1,1.1);
+  -ms-transform: translate3d(0,10px,0) scale3d(1.1,1.1,1.1);
+  -o-transform: translate3d(0,10px,0) scale3d(1.1,1.1,1.1);
+  -webkit-transform: translate3d(0,10px,0) scale3d(1.1,1.1,1.1);
+  transform: translate3d(0,10px,0) scale3d(1.1,1.1,1.1);
+  opacity: 0;
+}
+.dx-fade-rise-animation.dx-leave, .dx-fade-rise-animation.dx-enter.dx-enter-active
 {
   -moz-transform: translate3d(0,0,0) scale3d(1,1,1);
   -ms-transform: translate3d(0,0,0) scale3d(1,1,1);
@@ -1885,8 +1903,11 @@
   position: relative;
   float: right;
   height: 100%;
-  width: 36.6px;
   cursor: pointer;
+}
+.dx-rtl .dx-dropdowneditor-button, .dx-rtl.dx-dropdowneditor-button
+{
+  float: left;
 }
 .dx-dropdowneditor-button.dx-dropdowneditor-readonly
 {
@@ -1912,10 +1933,6 @@
   -khtml-opacity: .2;
   -moz-opacity: .2;
   opacity: .2;
-}
-.dx-rtl .dx-dropdowneditor-button
-{
-  float: left;
 }
 .dx-list
 {
@@ -2981,32 +2998,6 @@
   line-height: normal;
   white-space: nowrap;
 }
-.dx-invalid-message.dx-tooltip
-{
-  position: relative;
-}
-.dx-invalid-message .dx-tooltip-wrapper
-{
-  visibility: hidden;
-  pointer-events: none;
-}
-.dx-invalid-message .dx-tooltip-wrapper .dx-popover-arrow:after
-{
-  display: none;
-}
-.dx-invalid-message .dx-tooltip-wrapper .dx-overlay-content
-{
-  border-width: 0;
-}
-.dx-invalid-message .dx-tooltip-wrapper .dx-overlay-content .dx-popup-content
-{
-  color: #fff;
-  padding: 10px;
-}
-.dx-state-focused.dx-invalid .dx-invalid-message-auto .dx-tooltip-wrapper, .dx-lookup.dx-dropdowneditor-active .dx-invalid-message-auto .dx-tooltip-wrapper, .dx-invalid-message-always .dx-tooltip-wrapper
-{
-  visibility: visible;
-}
 .dx-slider-label
 {
   position: absolute;
@@ -3167,6 +3158,18 @@
   overflow: hidden;
   width: 100%;
   height: 100%;
+}
+.dx-gallery-wrapper>.dx-empty-message
+{
+  text-align: center;
+  position: absolute;
+  width: 100%;
+  top: 50%;
+  -webkit-transform: translateY(-50%);
+  -moz-transform: translateY(-50%);
+  -ms-transform: translateY(-50%);
+  -o-transform: translateY(-50%);
+  transform: translateY(-50%);
 }
 .dx-gallery-container
 {
@@ -4185,6 +4188,7 @@
 .dx-colorview-container-row
 {
   overflow: hidden;
+  padding-top: 1px;
 }
 .dx-colorview-container-row:first-child
 {
@@ -4305,7 +4309,7 @@
 }
 .dx-colorview-hue-scale-wrapper
 {
-  height: 303px;
+  height: 301px;
 }
 .dx-colorview-controls-container
 {
@@ -4579,6 +4583,15 @@
   -moz-opacity: .5;
   opacity: .5;
 }
+.dx-datagrid .dx-error-row
+{
+  -webkit-user-select: initial;
+  -khtml-user-select: initial;
+  -moz-user-select: initial;
+  -ms-user-select: initial;
+  -o-user-select: initial;
+  user-select: initial;
+}
 .dx-datagrid-column-chooser .dx-overlay-content .dx-popup-title
 {
   border-bottom: none;
@@ -4741,7 +4754,7 @@
 {
   padding: 0;
 }
-.dx-datagrid-content .dx-datagrid-table .dx-row .dx-datagrid-invalid .dx-invalid-message.dx-tooltip
+.dx-datagrid-content .dx-datagrid-table .dx-row .dx-datagrid-invalid .dx-invalid-message.dx-overlay
 {
   position: static;
 }
@@ -5059,6 +5072,14 @@
   border-bottom: 1px solid;
 }
 .dx-datagrid-rowsview .dx-row.dx-group-row:first-child td
+{
+  border-top: none;
+}
+.dx-datagrid-rowsview .dx-row.dx-row-lines:first-child
+{
+  border-top: none;
+}
+.dx-datagrid-rowsview .dx-row.dx-row-lines:first-child>td
 {
   border-top: none;
 }
@@ -5855,6 +5876,23 @@
 {
   margin-left: 12px;
 }
+.dx-fileuploader-button
+{
+  position: relative;
+}
+.dx-fileuploader-button .dx-fileuploader-input
+{
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  left: 0;
+  cursor: pointer;
+}
+.dx-fileuploader-button .dx-fileuploader-input::-webkit-file-upload-button, .dx-fileuploader-button .dx-fileuploader-input::-ms-browse
+{
+  cursor: pointer;
+}
 .dx-fileuploader-content
 {
   display: table-row-group;
@@ -6003,6 +6041,29 @@
 .dx-validationsummary-item
 {
   cursor: pointer;
+}
+.dx-invalid-message.dx-overlay
+{
+  position: absolute;
+}
+.dx-invalid-message.dx-overlay-wrapper
+{
+  width: 100%;
+  visibility: hidden;
+  pointer-events: none;
+}
+.dx-invalid-message>.dx-overlay-content
+{
+  display: inline-block;
+  position: relative;
+  border-width: 0;
+  padding: 10px;
+  font-size: .85em;
+  line-height: normal;
+}
+.dx-state-focused.dx-invalid .dx-invalid-message-auto .dx-overlay-wrapper, .dx-lookup.dx-dropdowneditor-active .dx-invalid-message-auto .dx-overlay-wrapper, .dx-invalid-message-always .dx-overlay-wrapper
+{
+  visibility: visible;
 }
 .dx-timeview
 {

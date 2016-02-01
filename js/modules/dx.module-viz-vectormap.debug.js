@@ -1,9 +1,9 @@
 /*! 
 * DevExtreme (Vector Map)
-* Version: 15.2.4
-* Build date: Dec 8, 2015
+* Version: 15.2.5
+* Build date: Jan 27, 2016
 *
-* Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
+* Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
 */
 
@@ -20,12 +20,9 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
             _extend = $.extend,
             DEFAULT_WIDTH = 800,
             DEFAULT_HEIGHT = 400,
-            TOOLTIP_OFFSET = 12,
             nextDataKey = 1,
-            RE_LAYERS = /^layers/,
-            RE_LAYERS_I = /^layers\[\d+\]$/,
-            RE_LAYERS_I_DATA = /^layers\[\d+\].data$/,
-            RE_LAYERS_DATA = /^layers.data$/;
+            RE_STARTS_LAYERS = /^layers/,
+            RE_ENDS_DATA = /\.data$/;
         function generateDataKey() {
             return "vectormap-data-" + nextDataKey++
         }
@@ -88,21 +85,10 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
                         }
                     })
                 },
-                _setOptionsByReference: function() {
-                    this.callBase.apply(this, arguments);
-                    _extend(this._optionsByReference, {
-                        layers: true,
-                        mapData: true,
-                        markers: true
-                    })
-                },
                 _rootClassPrefix: "dxm",
                 _rootClass: "dxm-vector-map",
                 _createThemeManager: function() {
                     return new map.ThemeManager
-                },
-                _initBackground: function(dataKey) {
-                    this._background = this._renderer.rect(0, 0, 0, 0).attr({"class": "dxm-background"}).data(dataKey, {name: "background"}).append(this._root)
                 },
                 _initLayerCollection: function(dataKey, notifyDirty, notifyReady) {
                     var that = this;
@@ -114,6 +100,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
                         dataKey: dataKey,
                         eventTrigger: that._eventTrigger,
                         dataExchanger: that._dataExchanger,
+                        tooltip: that._tooltip,
                         notifyDirty: notifyDirty,
                         notifyReady: notifyReady
                     });
@@ -141,27 +128,54 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
                         container: that._root,
                         layoutControl: that._layoutControl,
                         projection: that._projection,
+                        tracker: that._tracker,
                         dataKey: dataKey
                     })
+                },
+                _initProjection: function() {
+                    var that = this,
+                        projection = that._projection;
+                    projection.setEngine(that.option("projection"));
+                    projection.setBounds(that.option("bounds"));
+                    projection.setMaxZoom(that.option("maxZoomFactor"));
+                    projection.setZoom(that.option("zoomFactor"));
+                    projection.setCenter(that.option("center"))
                 },
                 _initElements: function() {
                     var that = this,
                         dataKey = generateDataKey(),
                         notifyCounter = 0;
-                    that._dataExchanger = new DataExchanger;
-                    that._initCenterHandler();
-                    that._projection = new map.Projection;
+                    that._dataExchanger = new map.DataExchanger;
+                    that._projection = new map.Projection({
+                        centerChanged: function(value) {
+                            if (that._initialized)
+                                that._eventTrigger("centerChanged", {center: value})
+                        },
+                        zoomChanged: function(value) {
+                            if (that._initialized)
+                                that._eventTrigger("zoomFactorChanged", {zoomFactor: value})
+                        }
+                    });
                     that._tracker = new map.Tracker({
                         root: that._root,
                         projection: that._projection,
                         dataKey: dataKey
                     });
+                    that._gestureHandler = new map.GestureHandler({
+                        projection: that._projection,
+                        renderer: that._renderer,
+                        tracker: that._tracker
+                    });
                     that._layoutControl = new map.LayoutControl;
                     that._layoutControl.suspend();
-                    that._initBackground(dataKey);
                     that._initLayerCollection(dataKey, notifyDirty, notifyReady);
                     that._initControlBar(dataKey);
                     that._initLegendsControl(notifyDirty, notifyReady);
+                    that._tooltipViewer = new map.TooltipViewer({
+                        tracker: that._tracker,
+                        tooltip: that._tooltip,
+                        layerCollection: that._layerCollection
+                    });
                     function notifyDirty() {
                         that._resetIsReady();
                         ++notifyCounter
@@ -182,221 +196,33 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
                     resumeLayersData(this._layerCollection, this._options.layers, this._renderer)
                 },
                 _initCore: function() {
-                    var that = this;
-                    that._root = that._renderer.root.attr({
+                    this._root = this._renderer.root.attr({
                         align: "center",
                         cursor: "default"
                     });
-                    that._initElements();
-                    that._projection.setEngine(that.option("projection")).setBounds(that.option("bounds")).setMaxZoom(that.option("maxZoomFactor")).setZoom(that.option("zoomFactor"), true).setCenter(that.option("center"), true);
-                    that._setTrackerCallbacks();
-                    that._setControlBarCallbacks();
-                    that._setProjectionCallbacks()
+                    this._initElements();
+                    this._initProjection()
                 },
                 _disposeCore: function() {
                     var that = this;
-                    that._resetProjectionCallbacks();
-                    that._resetTrackerCallbacks();
-                    that._resetControlBarCallbacks();
+                    that._controlBar.dispose();
+                    that._gestureHandler.dispose();
                     that._tracker.dispose();
                     that._legendsControl.dispose();
                     that._layerCollection.dispose();
-                    that._controlBar.dispose();
                     that._layoutControl.dispose();
-                    that._disposeCenterHandler();
+                    that._tooltipViewer.dispose();
                     that._dataExchanger.dispose();
                     that._projection.dispose();
-                    that._dataExchanger = that._projection = that._tracker = that._layoutControl = that._root = that._background = that._layerCollection = that._controlBar = that._legendsControl = null
-                },
-                _initCenterHandler: function() {
-                    var that = this,
-                        xdrag,
-                        ydrag,
-                        isCursorChanged = false;
-                    that._centerHandler = {
-                        processStart: function(arg) {
-                            if (that._centeringEnabled) {
-                                xdrag = arg.x;
-                                ydrag = arg.y;
-                                that._noCenterChanged = true
-                            }
-                        },
-                        processMove: function(arg) {
-                            if (that._centeringEnabled) {
-                                if (!isCursorChanged) {
-                                    that._root.attr({cursor: "move"});
-                                    isCursorChanged = true
-                                }
-                                that._projection.moveCenter(xdrag - arg.x, ydrag - arg.y);
-                                xdrag = arg.x;
-                                ydrag = arg.y
-                            }
-                        },
-                        processEnd: function() {
-                            if (that._centeringEnabled) {
-                                that._root.attr({cursor: "default"});
-                                that._noCenterChanged = null;
-                                isCursorChanged && that._raiseCenterChanged();
-                                isCursorChanged = false
-                            }
-                        }
-                    }
-                },
-                _disposeCenterHandler: function() {
-                    this._centerHandler = null
-                },
-                _setProjectionCallbacks: function() {
-                    var that = this;
-                    that._projection.on({
-                        center: function() {
-                            that._raiseCenterChanged()
-                        },
-                        zoom: function() {
-                            that._raiseZoomFactorChanged()
-                        }
-                    });
-                    that._resetProjectionCallbacks = function() {
-                        that._resetProjectionCallbacks = that = null
-                    }
-                },
-                _setTrackerCallbacks: function() {
-                    var that = this,
-                        centerHandler = that._centerHandler,
-                        renderer = that._renderer,
-                        layerCollection = that._layerCollection,
-                        controlBar = that._controlBar,
-                        tooltip = that._tooltip,
-                        isControlDrag = false;
-                    that._tracker.setCallbacks({
-                        click: function(arg) {
-                            var offset = renderer.getRootOffset(),
-                                layer = layerCollection.byName(arg.data.name);
-                            arg.$event.x = arg.x - offset.left;
-                            arg.$event.y = arg.y - offset.top;
-                            if (layer)
-                                layer.raiseClick(arg.data.index, arg.$event);
-                            else if (arg.data.name === "background")
-                                that._eventTrigger("click", {jQueryEvent: arg.$event})
-                        },
-                        start: function(arg) {
-                            isControlDrag = arg.data.name === "control-bar";
-                            if (isControlDrag) {
-                                arg.data = arg.data.index;
-                                controlBar.processStart(arg)
-                            }
-                            else
-                                centerHandler.processStart(arg)
-                        },
-                        move: function(arg) {
-                            if (isControlDrag) {
-                                arg.data = arg.data.index;
-                                controlBar.processMove(arg)
-                            }
-                            else
-                                centerHandler.processMove(arg)
-                        },
-                        end: function(arg) {
-                            if (isControlDrag) {
-                                arg.data = arg.data.index;
-                                controlBar.processEnd(arg);
-                                isControlDrag = false
-                            }
-                            else
-                                centerHandler.processEnd()
-                        },
-                        zoom: function(arg) {
-                            controlBar.processZoom(arg)
-                        },
-                        "hover-on": function(arg) {
-                            var layer = layerCollection.byName(arg.data.name);
-                            if (layer)
-                                layer.hoverItem(arg.data.index, true)
-                        },
-                        "hover-off": function(arg) {
-                            var layer = layerCollection.byName(arg.data.name);
-                            if (layer)
-                                layer.hoverItem(arg.data.index, false)
-                        },
-                        "focus-on": function(arg, done) {
-                            var result = false,
-                                layer,
-                                proxy;
-                            if (tooltip.isEnabled()) {
-                                layer = layerCollection.byName(arg.data.name);
-                                proxy = layer && layer.getProxy(arg.data.index);
-                                if (proxy && tooltip.show(proxy, {
-                                    x: 0,
-                                    y: 0,
-                                    offset: 0
-                                }, {target: proxy})) {
-                                    tooltip.move(arg.x, arg.y, TOOLTIP_OFFSET);
-                                    result = true
-                                }
-                            }
-                            done(result)
-                        },
-                        "focus-move": function(arg) {
-                            tooltip.move(arg.x, arg.y, TOOLTIP_OFFSET)
-                        },
-                        "focus-off": function() {
-                            tooltip.hide()
-                        }
-                    });
-                    that._resetTrackerCallbacks = function() {
-                        that._resetTrackerCallbacks = that = centerHandler = renderer = layerCollection = controlBar = tooltip = null
-                    }
-                },
-                _setControlBarCallbacks: function() {
-                    var that = this,
-                        projection = that._projection,
-                        isZoomChanged;
-                    that._projection.on({zoom: function() {
-                            isZoomChanged = true
-                        }});
-                    that._controlBar.setCallbacks({
-                        reset: function(isCenter, isZoom) {
-                            if (isCenter)
-                                projection.setCenter(null);
-                            if (isZoom)
-                                projection.setZoom(null)
-                        },
-                        beginMove: function() {
-                            that._noCenterChanged = true
-                        },
-                        endMove: function() {
-                            that._noCenterChanged = null;
-                            that._raiseCenterChanged()
-                        },
-                        move: function(dx, dy) {
-                            projection.moveCenter(dx, dy)
-                        },
-                        zoom: function(zoom, center) {
-                            var coords,
-                                screenPosition;
-                            if (center) {
-                                screenPosition = that._renderer.getRootOffset();
-                                screenPosition = [center[0] - screenPosition.left, center[1] - screenPosition.top];
-                                coords = projection.fromScreenPoint(screenPosition[0], screenPosition[1])
-                            }
-                            isZoomChanged = false;
-                            projection.setScaledZoom(zoom);
-                            if (isZoomChanged && center)
-                                projection.setCenterByPoint(coords, screenPosition)
-                        }
-                    });
-                    that._resetControlBarCallbacks = function() {
-                        that._resetControlBarCallbacks = that = projection = null
-                    }
+                    that._dataExchanger = that._gestureHandler = that._projection = that._tracker = that._layoutControl = that._root = that._layerCollection = that._controlBar = that._legendsControl = null
                 },
                 _setupInteraction: function() {
-                    var that = this;
-                    that._centerHandler.processEnd();
-                    that._centeringEnabled = !!_parseScalar(this._getOption("panningEnabled", true), true);
-                    that._zoomingEnabled = !!_parseScalar(this._getOption("zoomingEnabled", true), true);
-                    that._controlBar.setInteraction({
-                        centeringEnabled: that._centeringEnabled,
-                        zoomingEnabled: that._zoomingEnabled
-                    })
+                    var options = {
+                            centeringEnabled: !!_parseScalar(this._getOption("panningEnabled", true), true),
+                            zoomingEnabled: !!_parseScalar(this._getOption("zoomingEnabled", true), true)
+                        };
+                    this._gestureHandler.setInteraction(options);
+                    this._controlBar.setInteraction(options)
                 },
                 _getDefaultSize: function() {
                     return {
@@ -431,28 +257,22 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
                     that._projection.setSize(layout);
                     that._layoutControl.setSize(layout);
                     that._renderer.unlock();
-                    that._background.attr({
-                        x: layout.left,
-                        y: layout.top,
-                        height: layout.height,
-                        width: layout.width
-                    });
                     that._layerCollection.setRect([layout.left, layout.top, layout.width, layout.height])
                 },
-                _resize: _noop,
                 _initDataSource: _noop,
                 _disposeDataSource: _noop,
-                _optionValuesEqual: function(name, oldValue, newValue) {
-                    if (RE_LAYERS.test(name) && newValue && oldValue)
-                        if (RE_LAYERS_I.test(name)) {
-                            if (newValue.data && oldValue.data)
-                                oldValue.data = undefined
-                        }
-                        else if (RE_LAYERS_I_DATA.test(name))
-                            this.option(name.substr(0, 9)).data = undefined;
-                        else if (RE_LAYERS_DATA.test(name))
-                            this.option("layers").data = undefined;
-                    return this.callBase.apply(this, arguments)
+                _optionChanging: function(name, currentValue, nextValue) {
+                    if (currentValue && nextValue) {
+                        if (RE_STARTS_LAYERS.test(name))
+                            if (currentValue.data && nextValue.data && currentValue !== nextValue)
+                                currentValue.data = null;
+                            else if (RE_ENDS_DATA.test(name))
+                                this.option(name, null);
+                        if (name === "mapData")
+                            this._options.mapData = null;
+                        if (name === "markers")
+                            this._options.markers = null
+                    }
                 },
                 _handleChangedOptions: function(options) {
                     var that = this;
@@ -493,13 +313,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
                     that._layoutControl.resume()
                 },
                 _setBackgroundOptions: function() {
-                    var settings = this._getOption("background");
-                    this._background.attr({
-                        "stroke-width": settings.borderWidth,
-                        stroke: settings.borderColor,
-                        fill: settings.color
-                    });
-                    this._layerCollection.setBorderWidth(settings.borderWidth)
+                    this._layerCollection.setBackgroundOptions(this._getOption("background"))
                 },
                 _setLayerCollectionOptions: function() {
                     this._layerCollection.setOptions(this.option("layers"))
@@ -515,12 +329,6 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
                         touchEnabled: this._getOption("touchEnabled", true),
                         wheelEnabled: this._getOption("wheelEnabled", true)
                     })
-                },
-                _raiseCenterChanged: function() {
-                    !this._noCenterChanged && this._eventTrigger("centerChanged", {center: this._projection.getCenter()})
-                },
-                _raiseZoomFactorChanged: function() {
-                    !this._noZoomFactorChanged && this._eventTrigger("zoomFactorChanged", {zoomFactor: this._projection.getZoom()})
                 },
                 getLayers: function() {
                     var layers = this._layerCollection.items(),
@@ -551,41 +359,36 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
                 getMarkers: _noop,
                 clearAreaSelection: _noop,
                 clearMarkerSelection: _noop,
-                center: function(value, _noEvent) {
+                center: function(value) {
                     var that = this;
                     if (value === undefined)
                         return that._projection.getCenter();
                     else {
-                        that._noCenterChanged = _noEvent;
                         that._projection.setCenter(value);
-                        that._noCenterChanged = null;
                         return that
                     }
                 },
-                zoomFactor: function(value, _noEvent) {
+                zoomFactor: function(value) {
                     var that = this;
                     if (value === undefined)
                         return that._projection.getZoom();
                     else {
-                        that._noZoomFactorChanged = _noEvent;
                         that._projection.setZoom(value);
-                        that._noZoomFactorChanged = null;
                         return that
                     }
                 },
-                viewport: function(value, _noEvent) {
+                viewport: function(value) {
                     var that = this;
                     if (value === undefined)
                         return that._projection.getViewport();
                     else {
-                        that._noCenterChanged = that._noZoomFactorChanged = _noEvent;
                         that._projection.setViewport(value);
-                        that._noCenterChanged = that._noZoomFactorChanged = null;
                         return that
                     }
                 },
-                convertCoordinates: function(x, y) {
-                    return this._projection.fromScreenPoint(x, y)
+                convertCoordinates: function(coordinates) {
+                    coordinates = coordinates && coordinates.length ? coordinates : [arguments[0], arguments[1]];
+                    return this._projection.fromScreenPoint(coordinates)
                 }
             });
         function suspendLayersData(layerCollection, options) {
@@ -614,8 +417,8 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
             }
         }
         function applyDeprecatedMode(map) {
-            var log = DX.require("/errors").log;
-            var mapData = map._options.mapData,
+            var log = DX.require("/errors").log,
+                mapData = map._options.mapData,
                 markers = map._options.markers;
             map._options.mapData = map._options.markers = undefined;
             map._afterInit = function() {
@@ -688,48 +491,53 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
                     this._eventTrigger(selectionChangedMap[e.target.layer.name], e)
             })
         }
-        var DataExchanger = function() {
-                this._store = {}
-            };
-        DataExchanger.prototype = {
-            constructor: DataExchanger,
-            dispose: function() {
-                this._store = null;
-                return this
-            },
-            _get: function(category, name) {
-                var store = this._store[category] || (this._store[category] = {});
-                return store[name] || (store[name] = {})
-            },
-            set: function(category, name, data) {
-                var item = this._get(category, name);
-                item.data = data;
-                item.callback && item.callback(data);
-                return this
-            },
-            bind: function(category, name, callback) {
-                var item = this._get(category, name);
-                item.callback = callback;
-                item.data && callback(item.data);
-                return this
-            },
-            unbind: function(category, name) {
-                var item = this._get(category, name);
-                item.data = item.callback = null;
-                return this
-            }
-        };
         registerComponent("dxVectorMap", DX.viz.map, Map);
-        DX.viz.map._internal = {};
         DX.viz.map.sources = {};
         DX.viz.map._tests = {};
         DX.viz.map._tests.resetDataKey = function() {
             nextDataKey = 1
-        };
-        DX.viz.map._tests.DataExchanger = DataExchanger;
-        DX.viz.map._tests.stubDataExchanger = function(stub) {
-            DataExchanger = stub
         }
+    })(DevExpress, jQuery);
+    /*! Module viz-vectormap, file eventEmitter.js */
+    (function(DX, $, undefined) {
+        var eventEmitterMethods = {
+                _initEvents: function() {
+                    var names = this._eventNames,
+                        i,
+                        ii = names.length,
+                        events = this._events = {};
+                    for (i = 0; i < ii; ++i)
+                        events[names[i]] = $.Callbacks()
+                },
+                _disposeEvents: function() {
+                    var events = this._events,
+                        name;
+                    for (name in events)
+                        events[name].empty();
+                    this._events = null
+                },
+                on: function(handlers) {
+                    var events = this._events,
+                        name;
+                    for (name in handlers)
+                        events[name].add(handlers[name]);
+                    return dispose;
+                    function dispose() {
+                        for (name in handlers)
+                            events[name].remove(handlers[name])
+                    }
+                },
+                _fire: function(name, arg) {
+                    this._events[name].fire(arg)
+                }
+            };
+        DX.viz.map.makeEventEmitter = function(target) {
+            var prot = target.prototype,
+                name;
+            for (name in eventEmitterMethods)
+                prot[name] = eventEmitterMethods[name]
+        };
+        DX.viz.map._tests.eventEmitterMethods = eventEmitterMethods
     })(DevExpress, jQuery);
     /*! Module viz-vectormap, file projection.js */
     (function(DX, $, undefined) {
@@ -749,6 +557,9 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
         function floatsEqual(f1, f2) {
             return _abs(f1 - f2) < 1E-8
         }
+        function arraysEqual(a1, a2) {
+            return floatsEqual(a1[0], a2[0]) && floatsEqual(a1[1], a2[1])
+        }
         function parseAndClamp(value, minValue, maxValue, defaultValue) {
             var val = _Number(value);
             return isFinite(val) ? _min(_max(val, minValue), maxValue) : defaultValue
@@ -756,14 +567,16 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
         function parseAndClampArray(value, minValue, maxValue, defaultValue) {
             return [parseAndClamp(value[0], minValue[0], maxValue[0], defaultValue[0]), parseAndClamp(value[1], minValue[1], maxValue[1], defaultValue[1])]
         }
-        function Projection() {
-            this._events = {
-                project: $.Callbacks(),
-                transform: $.Callbacks(),
-                center: $.Callbacks(),
-                zoom: $.Callbacks(),
-                "max-zoom": $.Callbacks()
-            }
+        function getEngine(engine) {
+            return engine instanceof Engine && engine || projection.get(engine) || projection.get(DEFAULT_ENGINE_NAME)
+        }
+        function Projection(parameters) {
+            var that = this;
+            that._initEvents();
+            that._params = parameters;
+            that._engine = getEngine();
+            that._center = that._engine.center();
+            that._adjustCenter()
         }
         Projection.prototype = {
             constructor: Projection,
@@ -772,27 +585,27 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
             _zoom: DEFAULT_MIN_ZOOM,
             _center: DEFAULT_CENTER,
             _canvas: {},
+            _scale: [],
             dispose: function() {
-                var name;
-                for (name in this._events)
-                    this._events[name].empty();
-                this._events = null;
-                return this
+                this._disposeEvents()
             },
-            setEngine: function(engine) {
+            setEngine: function(value) {
                 var that = this,
-                    eng = isEngine(engine) ? engine : projection.get(DEFAULT_ENGINE_NAME);
-                if (that._engine !== eng) {
-                    that._engine = eng;
-                    that._setupScreen();
-                    that._events.project.fire();
-                    that.setCenter(null);
-                    that.setZoom(null)
+                    engine = getEngine(value);
+                if (that._engine !== engine) {
+                    that._engine = engine;
+                    that._fire("engine");
+                    if (that._changeCenter(engine.center()))
+                        that._triggerCenterChanged();
+                    if (that._changeZoom(that._minZoom))
+                        that._triggerZoomChanged();
+                    that._adjustCenter();
+                    that._setupScreen()
                 }
-                return that
             },
             setBounds: function(bounds) {
-                return bounds ? this.setEngine(this._engine.original().bounds(bounds)) : this
+                if (bounds !== undefined)
+                    this.setEngine(this._engine.original().bounds(bounds))
             },
             _setupScreen: function() {
                 var that = this,
@@ -810,13 +623,12 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
                     that._xradius = height / 2 * aspectRatio;
                     that._yradius = height / 2
                 }
+                that._fire("screen")
             },
             setSize: function(canvas) {
                 var that = this;
                 that._canvas = canvas;
-                that._setupScreen();
-                that._events.transform.fire(that.getTransform());
-                return that
+                that._setupScreen()
             },
             _toScreen: function(coordinates) {
                 return [this._x0 + this._xradius * coordinates[0], this._y0 + this._yradius * coordinates[1]]
@@ -854,22 +666,29 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
             getZoom: function() {
                 return this._zoom
             },
-            setZoom: function(zoom, _forceEvent) {
+            _changeZoom: function(value) {
                 var that = this,
                     oldZoom = that._zoom,
-                    newZoom;
-                that._zoom = that._engine.isinv() ? parseAndClamp(zoom, that._minZoom, that._maxZoom, that._minZoom) : that._minZoom;
-                that._adjustCenter();
-                newZoom = that.getZoom();
-                if (!floatsEqual(oldZoom, newZoom) || _forceEvent)
-                    that._events.zoom.fire(newZoom, that.getTransform());
-                return that
+                    newZoom = that._zoom = parseAndClamp(value, that._minZoom, that._maxZoom, that._minZoom),
+                    isChanged = !floatsEqual(oldZoom, newZoom);
+                if (isChanged) {
+                    that._adjustCenter();
+                    that._fire("zoom")
+                }
+                return isChanged
+            },
+            setZoom: function(value) {
+                if (this._engine.isinv() && this._changeZoom(value))
+                    this._triggerZoomChanged()
             },
             getScaledZoom: function() {
                 return _round((this._scale.length - 1) * _ln(this._zoom) / _ln(this._maxZoom))
             },
             setScaledZoom: function(scaledZoom) {
-                return this.setZoom(this._scale[_round(scaledZoom)])
+                this.setZoom(this._scale[_round(scaledZoom)])
+            },
+            changeScaledZoom: function(deltaZoom) {
+                this.setZoom(this._scale[_max(_min(_round(this.getScaledZoom() + deltaZoom), this._scale.length - 1), 0)])
             },
             getZoomScalePartition: function() {
                 return this._scale.length - 1
@@ -894,41 +713,60 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
                 that._setupScaling();
                 if (that._zoom > that._maxZoom)
                     that.setZoom(that._maxZoom);
-                that._events["max-zoom"].fire(that._maxZoom);
-                return that
-            },
-            getMinZoom: function() {
-                return this._minZoom
-            },
-            getMaxZoom: function() {
-                return this._maxZoom
+                that._fire("max-zoom")
             },
             getCenter: function() {
                 return this._center.slice()
             },
-            setCenter: function(center, _forceEvent) {
+            setCenter: function(value) {
+                if (this._engine.isinv() && this._changeCenter(value || []))
+                    this._triggerCenterChanged()
+            },
+            _changeCenter: function(value) {
                 var that = this,
                     engine = that._engine,
                     oldCenter = that._center,
-                    newCenter;
-                that._center = engine.isinv() ? parseAndClampArray(center || [], engine.min(), engine.max(), engine.center()) : DEFAULT_CENTER;
-                that._adjustCenter();
-                newCenter = that.getCenter();
-                if (!floatsEqual(oldCenter[0], newCenter[0]) || !floatsEqual(oldCenter[1], newCenter[1]) || _forceEvent)
-                    that._events.center.fire(newCenter, that.getTransform());
-                return that
+                    newCenter = that._center = parseAndClampArray(value, engine.min(), engine.max(), engine.center()),
+                    isChanged = !arraysEqual(oldCenter, newCenter);
+                if (isChanged) {
+                    that._adjustCenter();
+                    that._fire("center")
+                }
+                return isChanged
+            },
+            _triggerCenterChanged: function() {
+                this._params.centerChanged(this.getCenter())
+            },
+            _triggerZoomChanged: function() {
+                this._params.zoomChanged(this.getZoom())
             },
             setCenterByPoint: function(coordinates, screenPosition) {
                 var that = this,
                     p = that._engine.project(coordinates),
                     q = that._fromScreen(screenPosition);
-                return that.setCenter(that._engine.unproject([-q[0] / that._zoom + p[0], -q[1] / that._zoom + p[1]]))
+                that.setCenter(that._engine.unproject([-q[0] / that._zoom + p[0], -q[1] / that._zoom + p[1]]))
             },
-            moveCenter: function(screenDx, screenDy) {
+            beginMoveCenter: function() {
+                if (this._engine.isinv())
+                    this._moveCenter = this._center
+            },
+            endMoveCenter: function() {
+                var that = this;
+                if (that._moveCenter) {
+                    if (!arraysEqual(that._moveCenter, that._center))
+                        that._triggerCenterChanged();
+                    that._moveCenter = null
+                }
+            },
+            moveCenter: function(shift) {
                 var that = this,
-                    current = that._toScreen(that._toTransformed(that._engine.project(that._center))),
-                    center = that._engine.unproject(that._fromTransformed(that._fromScreen([current[0] + screenDx, current[1] + screenDy])));
-                return that.setCenter(center)
+                    current,
+                    center;
+                if (that._moveCenter) {
+                    current = that._toScreen(that._toTransformed(that._engine.project(that._center)));
+                    center = that._engine.unproject(that._fromTransformed(that._fromScreen([current[0] + shift[0], current[1] + shift[1]])));
+                    that._changeCenter(center)
+                }
             },
             getViewport: function() {
                 var that = this,
@@ -943,7 +781,8 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
             setViewport: function(viewport) {
                 var engine = this._engine,
                     data = viewport ? getZoomAndCenterFromViewport(engine.project, engine.unproject, viewport) : [this._minZoom, engine.center()];
-                return this.setZoom(data[0]).setCenter(data[1])
+                this.setZoom(data[0]);
+                this.setCenter(data[1])
             },
             getTransform: function() {
                 return {
@@ -951,21 +790,12 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
                         translateY: this._dycenter * this._yradius
                     }
             },
-            fromScreenPoint: function(x, y) {
-                return this._engine.unproject(this._fromTransformed(this._fromScreen([x, y])))
+            fromScreenPoint: function(coordinates) {
+                return this._engine.unproject(this._fromTransformed(this._fromScreen(coordinates)))
             },
-            on: function(handlers) {
-                var events = this._events,
-                    name;
-                for (name in handlers)
-                    events[name].add(handlers[name]);
-                return dispose;
-                function dispose() {
-                    for (name in handlers)
-                        events[name].remove(handlers[name])
-                }
-            }
+            _eventNames: ["engine", "screen", "center", "zoom", "max-zoom"]
         };
+        DX.viz.map.makeEventEmitter(Projection);
         function selectFarthestPoint(point1, point2, basePoint1, basePoint2) {
             var basePoint = (basePoint1 + basePoint2) / 2;
             return _abs(point1 - basePoint) > _abs(point2 - basePoint) ? point1 : point2
@@ -1149,13 +979,10 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
             _max = _math.max,
             _round = _math.round,
             _floor = _math.floor,
-            _pow = _math.pow,
-            _ln = _math.log,
-            _LN2 = _math.LN2,
-            utils = DX.viz.utils,
-            _parseScalar = utils.parseScalar,
-            parseHorizontalAlignment = utils.enumParser(["left", "center", "right"]),
-            parseVerticalAlignment = utils.enumParser(["top", "bottom"]),
+            _sqrt = _math.sqrt,
+            _parseScalar = DX.viz.utils.parseScalar,
+            parseHorizontalAlignment = DX.viz.utils.enumParser(["left", "center", "right"]),
+            parseVerticalAlignment = DX.viz.utils.enumParser(["top", "bottom"]),
             COMMAND_RESET = "command-reset",
             COMMAND_MOVE_UP = "command-move-up",
             COMMAND_MOVE_RIGHT = "command-move-right",
@@ -1196,14 +1023,81 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
             that._params = parameters;
             that._createElements(parameters.renderer, parameters.container, parameters.dataKey);
             parameters.layoutControl.addItem(that);
-            that._subscribeToProjection(parameters.projection)
+            that._subscribeToProjection(parameters.projection);
+            that._subscribeToTracker(parameters.tracker);
+            that._createCallbacks(parameters.projection, parameters.renderer)
         }
         ControlBar.prototype = {
             constructor: ControlBar,
             _flags: 0,
-            setCallbacks: function(callbacks) {
-                this._callbacks = callbacks;
-                return this
+            dispose: function() {
+                var that = this;
+                that._params.layoutControl.removeItem(that);
+                that._root.linkRemove().linkOff();
+                that._offProjection();
+                that._offTracker();
+                that._params = that._root = that._offProjection = that._offTracker = that._callbacks = null
+            },
+            _subscribeToProjection: function(projection) {
+                var that = this;
+                that._offProjection = projection.on({
+                    engine: function() {
+                        that._update()
+                    },
+                    zoom: updateZoom,
+                    "max-zoom": function() {
+                        that._zoomPartition = projection.getZoomScalePartition();
+                        that._sliderUnitLength = that._sliderLineLength / that._zoomPartition;
+                        updateZoom()
+                    }
+                });
+                function updateZoom() {
+                    that._adjustZoom(projection.getScaledZoom())
+                }
+            },
+            _subscribeToTracker: function(tracker) {
+                var that = this,
+                    isActive = false;
+                that._offTracker = tracker.on({
+                    start: function(arg) {
+                        isActive = arg.data.name === EVENT_TARGET_TYPE;
+                        if (isActive)
+                            that._processStart(arg.data.index, arg)
+                    },
+                    move: function(arg) {
+                        if (isActive)
+                            that._processMove(arg.data.index, arg)
+                    },
+                    end: function(arg) {
+                        if (isActive) {
+                            that._processEnd();
+                            isActive = false
+                        }
+                    }
+                })
+            },
+            _createCallbacks: function(projection, renderer) {
+                var that = this;
+                that._callbacks = {
+                    reset: function(isCenter, isZoom) {
+                        if (isCenter)
+                            projection.setCenter(null);
+                        if (isZoom)
+                            projection.setZoom(null)
+                    },
+                    beginMove: function() {
+                        projection.beginMoveCenter()
+                    },
+                    endMove: function() {
+                        projection.endMoveCenter()
+                    },
+                    move: function(shift) {
+                        projection.moveCenter(shift)
+                    },
+                    zoom: function(zoom) {
+                        projection.setScaledZoom(zoom)
+                    }
+                }
             },
             _createElements: function(renderer, container, dataKey) {
                 var that = this,
@@ -1242,7 +1136,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
                 renderer.path([[-incdecButtonSize, options.incButtonOffset, incdecButtonSize, options.incButtonOffset], [0, options.incButtonOffset - incdecButtonSize, 0, options.incButtonOffset + incdecButtonSize]], "area").append(group);
                 renderer.circle(0, options.decButtonOffset, options.smallCircleSize / 2).append(group);
                 renderer.path([-incdecButtonSize, options.decButtonOffset, incdecButtonSize, options.decButtonOffset], "area").append(group);
-                that._progressBar = renderer.path([], "area").append(group);
+                that._zoomLine = renderer.path([], "line").append(group);
                 that._zoomDrag = renderer.rect(_floor(-options.sliderLength / 2), _floor(options.sliderLineEndOffset - options.sliderWidth / 2), options.sliderLength, options.sliderWidth).append(group);
                 that._sliderLineLength = options.sliderLineEndOffset - options.sliderLineStartOffset
             },
@@ -1250,7 +1144,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
                 var options = SIZE_OPTIONS,
                     size = _round((options.arrowButtonOffset - options.trackerGap) / 2),
                     offset1 = options.arrowButtonOffset - size,
-                    offset2 = _round(_pow(options.bigCircleSize * options.bigCircleSize / 4 - size * size, 0.5)),
+                    offset2 = _round(_sqrt(options.bigCircleSize * options.bigCircleSize / 4 - size * size)),
                     size2 = offset2 - offset1;
                 renderer.rect(-size, -size, size * 2, size * 2).data(dataKey, {
                     index: COMMAND_RESET,
@@ -1284,33 +1178,10 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
                     index: COMMAND_ZOOM_DRAG_LINE,
                     name: EVENT_TARGET_TYPE
                 }).append(group);
-                this._zoomDragCover = renderer.rect(-options.sliderLength / 2, options.sliderLineEndOffset - options.sliderWidth / 2, options.sliderLength, options.sliderWidth).data(dataKey, {
+                this._zoomDragTracker = renderer.rect(-options.sliderLength / 2, options.sliderLineEndOffset - options.sliderWidth / 2, options.sliderLength, options.sliderWidth).data(dataKey, {
                     index: COMMAND_ZOOM_DRAG,
                     name: EVENT_TARGET_TYPE
                 }).append(group)
-            },
-            _subscribeToProjection: function(projection) {
-                var that = this;
-                projection.on({
-                    project: function() {
-                        that._update()
-                    },
-                    zoom: function() {
-                        that._adjustZoom(projection.getScaledZoom())
-                    },
-                    "max-zoom": function() {
-                        that._zoomPartition = projection.getZoomScalePartition();
-                        that._sliderUnitLength = that._sliderLineLength / that._zoomPartition;
-                        that._adjustZoom(projection.getScaledZoom())
-                    }
-                })
-            },
-            dispose: function() {
-                var that = this;
-                that._params.layoutControl.removeItem(that);
-                that._root.linkRemove().linkOff();
-                that._params = that._root = that._callbacks = that._buttonsGroup = that._zoomDrag = that._zoomDragCover = that._progressBar = null;
-                return that
             },
             resize: function(size) {
                 if (this._isActive)
@@ -1332,7 +1203,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
                     that._root.linkAppend();
                 else
                     that._root.linkRemove();
-                that.processEnd();
+                that._processEnd();
                 that.updateLayout()
             },
             setInteraction: function(interaction) {
@@ -1372,43 +1243,29 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
                     start = SIZE_OPTIONS.sliderLineStartOffset,
                     end = SIZE_OPTIONS.sliderLineEndOffset,
                     h = SIZE_OPTIONS.sliderWidth;
-                that._zoomFactor = _round(zoom);
-                that._zoomFactor >= 0 || (that._zoomFactor = 0);
-                that._zoomFactor <= that._zoomPartition || (that._zoomFactor = that._zoomPartition);
-                transform = {translateY: -that._zoomFactor * that._sliderUnitLength};
+                that._zoomFactor = _max(_min(_round(zoom), that._zoomPartition), 0);
+                transform = {translateY: -_round(that._zoomFactor * that._sliderUnitLength)};
                 y = end - h / 2 + transform.translateY;
-                that._progressBar.attr({points: [[0, start, 0, _max(start, y)], [0, _min(end, y + h), 0, end]]});
+                that._zoomLine.attr({points: [[0, start, 0, _max(start, y)], [0, _min(end, y + h), 0, end]]});
                 that._zoomDrag.attr(transform);
-                that._zoomDragCover.attr(transform)
+                that._zoomDragTracker.attr(transform)
             },
-            _applyZoom: function(center) {
-                this._callbacks.zoom(this._zoomFactor, this._flags & FLAG_CENTERING ? center : undefined)
+            _applyZoom: function() {
+                this._callbacks.zoom(this._zoomFactor)
             },
-            processStart: function(arg) {
+            _processStart: function(command, arg) {
                 var commandType;
                 if (this._isActive) {
-                    commandType = COMMAND_TO_TYPE_MAP[arg.data];
-                    this._command = commandType && commandType.flags & this._flags ? new commandType(this, arg) : null
+                    commandType = COMMAND_TO_TYPE_MAP[command];
+                    this._command = commandType && commandType.flags & this._flags ? new commandType(this, command, arg) : null
                 }
             },
-            processMove: function(arg) {
-                this._command && this._command.update(arg)
+            _processMove: function(command, arg) {
+                this._command && this._command.update(command, arg)
             },
-            processEnd: function() {
+            _processEnd: function() {
                 this._command && this._command.finish();
                 this._command = null
-            },
-            processZoom: function(arg) {
-                var that = this,
-                    zoomFactor;
-                if (that._flags & FLAG_ZOOMING) {
-                    if (arg.delta)
-                        zoomFactor = arg.delta;
-                    else if (arg.ratio)
-                        zoomFactor = _ln(arg.ratio) / _LN2;
-                    that._adjustZoom(that._zoomFactor + zoomFactor);
-                    that._applyZoom([arg.x, arg.y])
-                }
             }
         };
         function disposeCommand(command) {
@@ -1416,23 +1273,21 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
             command.update = function(){};
             command.finish = function(){}
         }
-        function ResetCommand(owner, arg) {
+        function ResetCommand(owner, command) {
             this._owner = owner;
-            this._command = arg.data
+            this._command = command
         }
         ResetCommand.flags = FLAG_CENTERING | FLAG_ZOOMING;
-        ResetCommand.prototype.update = function(arg) {
-            arg.data !== this._command && disposeCommand(this)
+        ResetCommand.prototype.update = function(command) {
+            command !== this._command && disposeCommand(this)
         };
         ResetCommand.prototype.finish = function() {
             var flags = this._owner._flags;
             this._owner._callbacks.reset(!!(flags & FLAG_CENTERING), !!(flags & FLAG_ZOOMING));
-            if (flags & FLAG_ZOOMING)
-                this._owner._adjustZoom(0);
             disposeCommand(this)
         };
-        function MoveCommand(owner, arg) {
-            this._command = arg.data;
+        function MoveCommand(owner, command, arg) {
+            this._command = command;
             var timeout = null,
                 interval = 100,
                 dx = 0,
@@ -1452,7 +1307,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
                     break
             }
             function callback() {
-                owner._callbacks.move(dx, dy);
+                owner._callbacks.move([dx, dy]);
                 timeout = setTimeout(callback, interval)
             }
             this._stop = function() {
@@ -1466,15 +1321,15 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
             callback()
         }
         MoveCommand.flags = FLAG_CENTERING;
-        MoveCommand.prototype.update = function(arg) {
-            this._command !== arg.data && this.finish()
+        MoveCommand.prototype.update = function(command) {
+            this._command !== command && this.finish()
         };
         MoveCommand.prototype.finish = function() {
             disposeCommand(this._stop())
         };
-        function ZoomCommand(owner, arg) {
+        function ZoomCommand(owner, command) {
             this._owner = owner;
-            this._command = arg.data;
+            this._command = command;
             var timeout = null,
                 interval = 150,
                 dzoom = this._command === COMMAND_ZOOM_IN ? 1 : -1;
@@ -1487,24 +1342,23 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
                 this._stop = owner = null;
                 return this
             };
-            arg = null;
             callback()
         }
         ZoomCommand.flags = FLAG_ZOOMING;
-        ZoomCommand.prototype.update = function(arg) {
-            this._command !== arg.data && this.finish()
+        ZoomCommand.prototype.update = function(command) {
+            this._command !== command && this.finish()
         };
         ZoomCommand.prototype.finish = function() {
             this._owner._applyZoom();
             disposeCommand(this._stop())
         };
-        function ZoomDragCommand(owner, arg) {
+        function ZoomDragCommand(owner, command, arg) {
             this._owner = owner;
             this._zoomFactor = owner._zoomFactor;
             this._pos = arg.y
         }
         ZoomDragCommand.flags = FLAG_ZOOMING;
-        ZoomDragCommand.prototype.update = function(arg) {
+        ZoomDragCommand.prototype.update = function(command, arg) {
             var owner = this._owner;
             owner._adjustZoom(this._zoomFactor + owner._zoomPartition * (this._pos - arg.y) / owner._sliderLineLength)
         };
@@ -1520,6 +1374,95 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
         DX.viz.map._tests.restoreCommandToTypeMap = function() {
             COMMAND_TO_TYPE_MAP = COMMAND_TO_TYPE_MAP__ORIGINAL
         }
+    })(DevExpress);
+    /*! Module viz-vectormap, file gestureHandler.js */
+    (function(DX, undefined) {
+        var _ln = Math.log,
+            _LN2 = Math.LN2;
+        function GestureHandler(params) {
+            var that = this;
+            that._projection = params.projection;
+            that._renderer = params.renderer;
+            that._x = that._y = 0;
+            that._subscribeToTracker(params.tracker)
+        }
+        GestureHandler.prototype = {
+            constructor: GestureHandler,
+            dispose: function() {
+                this._offTracker();
+                this._offTracker = null
+            },
+            _subscribeToTracker: function(tracker) {
+                var that = this,
+                    isActive = false;
+                that._offTracker = tracker.on({
+                    start: function(arg) {
+                        isActive = arg.data.name !== "control-bar";
+                        if (isActive)
+                            that._processStart(arg)
+                    },
+                    move: function(arg) {
+                        if (isActive)
+                            that._processMove(arg)
+                    },
+                    end: function(arg) {
+                        if (isActive)
+                            that._processEnd()
+                    },
+                    zoom: function(arg) {
+                        that._processZoom(arg)
+                    }
+                })
+            },
+            setInteraction: function(options) {
+                this._processEnd();
+                this._centeringEnabled = options.centeringEnabled;
+                this._zoomingEnabled = options.zoomingEnabled
+            },
+            _processStart: function(arg) {
+                if (this._centeringEnabled) {
+                    this._x = arg.x;
+                    this._y = arg.y;
+                    this._projection.beginMoveCenter()
+                }
+            },
+            _processMove: function(arg) {
+                var that = this;
+                if (that._centeringEnabled) {
+                    that._renderer.root.attr({cursor: "move"});
+                    that._projection.moveCenter([that._x - arg.x, that._y - arg.y]);
+                    that._x = arg.x;
+                    that._y = arg.y
+                }
+            },
+            _processEnd: function() {
+                if (this._centeringEnabled) {
+                    this._renderer.root.attr({cursor: "default"});
+                    this._projection.endMoveCenter()
+                }
+            },
+            _processZoom: function(arg) {
+                var that = this,
+                    delta,
+                    screenPosition,
+                    coords;
+                if (that._zoomingEnabled) {
+                    if (arg.delta)
+                        delta = arg.delta;
+                    else if (arg.ratio)
+                        delta = _ln(arg.ratio) / _LN2;
+                    if (that._centeringEnabled) {
+                        screenPosition = that._renderer.getRootOffset();
+                        screenPosition = [arg.x - screenPosition.left, arg.y - screenPosition.top];
+                        coords = that._projection.fromScreenPoint(screenPosition)
+                    }
+                    that._projection.changeScaledZoom(delta);
+                    if (that._centeringEnabled)
+                        that._projection.setCenterByPoint(coords, screenPosition)
+                }
+            }
+        };
+        DX.viz.map.GestureHandler = GestureHandler
     })(DevExpress);
     /*! Module viz-vectormap, file tracker.js */
     (function(DX, $, undefined) {
@@ -1559,10 +1502,12 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
         function Tracker(parameters) {
             var that = this;
             that._root = parameters.root;
-            that._callbacks = {};
             that._createEventHandlers(parameters.dataKey);
             that._createProjectionHandlers(parameters.projection);
-            that._focus = new Focus(that._callbacks);
+            that._initEvents();
+            that._focus = new Focus(function(name, arg) {
+                that._fire(name, arg)
+            });
             that._attachHandlers()
         }
         Tracker.prototype = {
@@ -1570,10 +1515,11 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
             dispose: function() {
                 var that = this;
                 that._detachHandlers();
+                that._disposeEvents();
                 that._focus.dispose();
-                that._root = that._callbacks = that._focus = that._docHandlers = that._rootHandlers = null;
-                return that
+                that._root = that._focus = that._docHandlers = that._rootHandlers = null
             },
+            _eventNames: [EVENT_START, EVENT_MOVE, EVENT_END, EVENT_ZOOM, EVENT_CLICK, EVENT_HOVER_ON, EVENT_HOVER_OFF, EVENT_FOCUS_ON, EVENT_FOCUS_OFF, EVENT_FOCUS_MOVE],
             _startClick: function(event, data) {
                 if (!data)
                     return;
@@ -1595,7 +1541,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
                     threshold = state.threshold;
                     coords = getEventCoords(event);
                     if (_abs(coords.x - state.x) <= threshold && _abs(coords.y - state.y) <= threshold)
-                        this._callbacks[EVENT_CLICK]({
+                        this._fire(EVENT_CLICK, {
                             data: data,
                             x: coords.x,
                             y: coords.y,
@@ -1613,7 +1559,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
                         y: coords.y,
                         data: data
                     };
-                this._callbacks[EVENT_START]({
+                this._fire(EVENT_START, {
                     x: state.x,
                     y: state.y,
                     data: state.data
@@ -1632,7 +1578,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
                     state.y = coords.y;
                     state.active = true;
                     state.data = data || {};
-                    this._callbacks[EVENT_MOVE]({
+                    this._fire(EVENT_MOVE, {
                         x: state.x,
                         y: state.y,
                         data: state.data
@@ -1644,7 +1590,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
                 if (!state)
                     return;
                 this._dragState = null;
-                this._callbacks[EVENT_END]({
+                this._fire(EVENT_END, {
                     x: state.x,
                     y: state.y,
                     data: state.data
@@ -1666,7 +1612,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
                 if (delta === 0)
                     return;
                 coords = getEventCoords(event);
-                that._callbacks[EVENT_ZOOM]({
+                that._fire(EVENT_ZOOM, {
                     delta: delta,
                     x: coords.x,
                     y: coords.y
@@ -1730,7 +1676,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
                 if (state.ready) {
                     startDistance = getDistance(state.x1_0, state.y1_0, state.x2_0, state.y2_0);
                     currentDistance = getDistance(state.x1, state.y1, state.x2, state.y2);
-                    this._callbacks[EVENT_ZOOM]({
+                    this._fire(EVENT_ZOOM, {
                         ratio: currentDistance / startDistance,
                         x: (state.x1_0 + state.x2_0) / 2,
                         y: (state.y1_0 + state.y2_0) / 2
@@ -1755,7 +1701,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
                 that._cancelHover();
                 if (data) {
                     that._hoverState = {data: data};
-                    that._callbacks[EVENT_HOVER_ON]({data: data})
+                    that._fire(EVENT_HOVER_ON, {data: data})
                 }
                 that._hoverTarget = event.target
             },
@@ -1763,7 +1709,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
                 var state = this._hoverState;
                 this._hoverState = this._hoverTarget = null;
                 if (state)
-                    this._callbacks[EVENT_HOVER_OFF]({data: state.data})
+                    this._fire(EVENT_HOVER_OFF, {data: state.data})
             },
             _startFocus: function(event, data) {
                 this._doFocus(event, data, true)
@@ -1794,12 +1740,15 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
                 var that = this;
                 that._docHandlers = {};
                 that._rootHandlers = {};
-                that._docHandlers[EVENTS.start] = function(event) {
+                that._rootHandlers[EVENTS.start] = that._docHandlers[EVENTS.start] = function(event) {
                     var isTouch = isTouchEvent(event),
                         data = getData(event);
                     if (isTouch && !that._isTouchEnabled)
                         return;
-                    data && event.preventDefault();
+                    if (data) {
+                        event.preventDefault();
+                        event.stopPropagation()
+                    }
                     that._startClick(event, data);
                     that._startDrag(event, data);
                     that._startZoom(event, data);
@@ -1858,12 +1807,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
                 that._clickState = null;
                 that._endDrag();
                 that._cancelHover();
-                that._cancelFocus();
-                return that
-            },
-            setCallbacks: function(callbacks) {
-                $.extend(this._callbacks, callbacks);
-                return this
+                that._cancelFocus()
             },
             setOptions: function(options) {
                 var that = this;
@@ -1871,8 +1815,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
                 that._detachHandlers();
                 that._isTouchEnabled = !!_parseScalar(options.touchEnabled, true);
                 that._isWheelEnabled = !!_parseScalar(options.wheelEnabled, true);
-                that._attachHandlers();
-                return that
+                that._attachHandlers()
             },
             _detachHandlers: function() {
                 var that = this;
@@ -1901,7 +1844,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
                 that._root.on(that._rootHandlers)
             }
         };
-        var Focus = function(callbacks) {
+        var Focus = function(fire) {
                 var that = this,
                     _activeData = null,
                     _data = null,
@@ -1913,7 +1856,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
                 that.dispose = function() {
                     clearTimeout(_onTimer);
                     clearTimeout(_offTimer);
-                    that.turnOn = that.turnOff = that.cancel = that.cancelOn = that.dispose = that = callbacks = _activeData = _data = _onTimer = _offTimer = null
+                    that.turnOn = that.turnOff = that.cancel = that.cancelOn = that.dispose = that = fire = _activeData = _data = _onTimer = _offTimer = null
                 };
                 that.turnOn = function(data, coords, timeout, forceTimeout) {
                     if (data === _data && _disabled)
@@ -1927,7 +1870,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
                         _onTimer = setTimeout(function() {
                             _onTimer = null;
                             if (_data === _activeData) {
-                                callbacks[EVENT_FOCUS_MOVE]({
+                                fire(EVENT_FOCUS_MOVE, {
                                     data: _data,
                                     x: _x,
                                     y: _y
@@ -1935,11 +1878,12 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
                                 onCheck(true)
                             }
                             else
-                                callbacks[EVENT_FOCUS_ON]({
+                                fire(EVENT_FOCUS_ON, {
                                     data: _data,
                                     x: _x,
-                                    y: _y
-                                }, onCheck)
+                                    y: _y,
+                                    done: onCheck
+                                })
                         }, forceTimeout ? timeout : 0)
                     }
                     else if (!_onTimer || _abs(coords.x - _x) > FOCUS_COORD_THRESHOLD_MOUSE || _abs(coords.y - _y) > FOCUS_COORD_THRESHOLD_MOUSE || forceTimeout) {
@@ -1948,11 +1892,12 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
                         clearTimeout(_onTimer);
                         _onTimer = setTimeout(function() {
                             _onTimer = null;
-                            callbacks[EVENT_FOCUS_ON]({
+                            fire(EVENT_FOCUS_ON, {
                                 data: _data,
                                 x: _x,
-                                y: _y
-                            }, onCheck)
+                                y: _y,
+                                done: onCheck
+                            })
                         }, timeout)
                     }
                     function onCheck(result) {
@@ -1971,7 +1916,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
                     if (_activeData && !_disabled)
                         _offTimer = _offTimer || setTimeout(function() {
                             _offTimer = null;
-                            callbacks[EVENT_FOCUS_OFF]({data: _activeData});
+                            fire(EVENT_FOCUS_OFF, {data: _activeData});
                             _activeData = null
                         }, timeout)
                 };
@@ -1979,7 +1924,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
                     clearTimeout(_onTimer);
                     clearTimeout(_offTimer);
                     if (_activeData)
-                        callbacks[EVENT_FOCUS_OFF]({data: _activeData});
+                        fire(EVENT_FOCUS_OFF, {data: _activeData});
                     _activeData = _data = _onTimer = _offTimer = null
                 };
                 that.cancelOn = function() {
@@ -1987,6 +1932,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
                     _onTimer = null
                 }
             };
+        DX.viz.map.makeEventEmitter(Tracker);
         DX.viz.map.Tracker = Tracker;
         DX.viz.map._tests._DEBUG_forceEventMode = function(mode) {
             setupEvents(mode)
@@ -2076,6 +2022,41 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
             _fontFields: ["layer:area.label.font", "layer:marker:dot.label.font", "layer:marker:bubble.label.font", "layer:marker:pie.label.font", "layer:marker:image.label.font", "tooltip.font", "legend.font", "title.font", "title.subtitle.font", "loadingIndicator.font"]
         })
     })(DevExpress, jQuery);
+    /*! Module viz-vectormap, file dataExchanger.js */
+    (function(DX, undefined) {
+        function DataExchanger() {
+            this._store = {}
+        }
+        DataExchanger.prototype = {
+            constructor: DataExchanger,
+            dispose: function() {
+                this._store = null;
+                return this
+            },
+            _get: function(category, name) {
+                var store = this._store[category] || (this._store[category] = {});
+                return store[name] || (store[name] = {})
+            },
+            set: function(category, name, data) {
+                var item = this._get(category, name);
+                item.data = data;
+                item.callback && item.callback(data);
+                return this
+            },
+            bind: function(category, name, callback) {
+                var item = this._get(category, name);
+                item.callback = callback;
+                item.data && callback(item.data);
+                return this
+            },
+            unbind: function(category, name) {
+                var item = this._get(category, name);
+                item.data = item.callback = null;
+                return this
+            }
+        };
+        DX.viz.map.DataExchanger = DataExchanger
+    })(DevExpress);
     /*! Module viz-vectormap, file legend.js */
     (function(DX, $, undefined) {
         var viz = DX.viz,
@@ -3279,10 +3260,10 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
             _onProjection: function() {
                 var that = this;
                 that._removeHandlers = that._params.projection.on({
-                    project: function() {
+                    engine: function() {
                         that._project()
                     },
-                    transform: function() {
+                    screen: function() {
                         that._transform()
                     },
                     center: function() {
@@ -3431,19 +3412,15 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
                     i,
                     ii = handles.length;
                 for (i = 0; i < ii; ++i)
-                    handles[i].project();
-                this._transformHandles()
+                    handles[i].project()
             },
-            _transformHandles: function() {
+            _transform: function() {
                 var handles = this._handles,
                     i,
                     ii = handles.length;
+                this._transformCore();
                 for (i = 0; i < ii; ++i)
                     handles[i].transform()
-            },
-            _transform: function() {
-                this._transformCore();
-                this._transformHandles()
             },
             getProxies: function() {
                 var handles = this._handles,
@@ -3569,7 +3546,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
                     context = that._ctx,
                     labelSettings = settings.label,
                     label = that._lbl;
-                if (labelSettings.enabled) {
+                if (context.settings.label.enabled) {
                     if (!label) {
                         label = that._lbl = {
                             root: context.labelRoot || that._fig.root,
@@ -3684,22 +3661,33 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
         };
         function calculatePolygonCentroid(coordinates) {
             var i,
-                ii = coordinates.length,
+                length = coordinates.length,
                 v1,
-                v2 = coordinates[ii - 1],
+                v2 = coordinates[length - 1],
                 cross,
                 cx = 0,
                 cy = 0,
-                area = 0;
-            for (i = 0; i < ii; ++i) {
+                area = 0,
+                minX = Infinity,
+                maxX = -Infinity,
+                minY = Infinity,
+                maxY = -Infinity;
+            for (i = 0; i < length; ++i) {
                 v1 = v2;
                 v2 = coordinates[i];
                 cross = v1[0] * v2[1] - v2[0] * v1[1];
                 area += cross;
                 cx += (v1[0] + v2[0]) * cross;
-                cy += (v1[1] + v2[1]) * cross
+                cy += (v1[1] + v2[1]) * cross;
+                minX = _min(minX, v2[0]);
+                maxX = _max(maxX, v2[0]);
+                minY = _min(minY, v2[1]);
+                maxY = _max(maxY, v2[1])
             }
-            return [[cx / 3 / area, cy / 3 / area], _abs(area) / 2]
+            return {
+                    area: _abs(area) / 2,
+                    center: [2 * cx / 3 / area - (minX + maxX) / 2, 2 * cy / 3 / area - (minY + maxY) / 2]
+                }
         }
         function calculateLineStringData(coordinates) {
             var i,
@@ -3737,12 +3725,12 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
                 maxArea = 0;
             for (i = 0; i < ii; ++i) {
                 centroid = calculatePolygonCentroid(coordinates[i]);
-                if (centroid[1] > maxArea) {
-                    maxArea = centroid[1];
+                if (centroid.area > maxArea) {
+                    maxArea = centroid.area;
                     resultCentroid = centroid
                 }
             }
-            return [resultCentroid[0], [_sqrt(resultCentroid[1]), _sqrt(resultCentroid[1])]]
+            return [resultCentroid.center, [_sqrt(resultCentroid.area), _sqrt(resultCentroid.area)]]
         }
         function projectLineLabel(coordinates) {
             var i,
@@ -3760,24 +3748,52 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
             return resultData
         }
         function MapLayerCollection(params) {
-            var that = this;
+            var that = this,
+                renderer = params.renderer;
             that._params = params;
             that._layers = [];
             that._layerByName = {};
             that._rect = [0, 0, 0, 0];
-            that._clip = params.renderer.clipRect();
-            that._container = params.renderer.g().attr({
+            that._clip = renderer.clipRect();
+            that._background = renderer.rect().attr({"class": "dxm-background"}).data(params.dataKey, {name: "background"}).append(renderer.root);
+            that._container = renderer.g().attr({
                 "class": "dxm-layers",
                 clipId: that._clip.id
-            }).linkOn(params.renderer.root, "layers").linkAppend().enableLinks()
+            }).append(renderer.root).enableLinks();
+            that._subscribeToTracker(params.tracker, renderer, params.tooltip, params.eventTrigger)
         }
         MapLayerCollection.prototype = {
             constructor: MapLayerCollection,
             dispose: function() {
                 var that = this;
                 that._clip.dispose();
-                that._container.linkRemove().linkOff();
-                that._params = that._layers = that._layerByName = that._clip = that._container = null
+                that._offTracker();
+                that._params = that._offTracker = that._layers = that._layerByName = that._clip = that._background = that._container = null
+            },
+            _subscribeToTracker: function(tracker, renderer, tooltip, eventTrigger) {
+                var that = this;
+                that._offTracker = tracker.on({
+                    click: function(arg) {
+                        var offset = renderer.getRootOffset(),
+                            layer = that.byName(arg.data.name);
+                        arg.$event.x = arg.x - offset.left;
+                        arg.$event.y = arg.y - offset.top;
+                        if (layer)
+                            layer.raiseClick(arg.data.index, arg.$event);
+                        else if (arg.data.name === "background")
+                            eventTrigger("click", {jQueryEvent: arg.$event})
+                    },
+                    "hover-on": function(arg) {
+                        var layer = that.byName(arg.data.name);
+                        if (layer)
+                            layer.hoverItem(arg.data.index, true)
+                    },
+                    "hover-off": function(arg) {
+                        var layer = that.byName(arg.data.name);
+                        if (layer)
+                            layer.hoverItem(arg.data.index, false)
+                    }
+                })
             },
             _addLayers: function(optionList) {
                 var layers = this._layers,
@@ -3825,12 +3841,23 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
                     height: _max(rect[3] - bw * 2, 0)
                 })
             },
-            setRect: function(rect) {
-                this._rect = rect;
+            setBackgroundOptions: function(options) {
+                this._background.attr({
+                    stroke: options.borderColor,
+                    "stroke-width": options.borderWidth,
+                    fill: options.color
+                });
+                this._bw = _max(options.borderWidth, 0);
                 this._updateClip()
             },
-            setBorderWidth: function(borderWidth) {
-                this._bw = _max(borderWidth, 0);
+            setRect: function(rect) {
+                this._rect = rect;
+                this._background.attr({
+                    x: rect[0],
+                    y: rect[1],
+                    width: rect[2],
+                    height: rect[3]
+                });
                 this._updateClip()
             },
             byIndex: function(index) {
@@ -3873,5 +3900,48 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
             findGroupingIndex: findGroupingIndex
         })
     })(DevExpress, jQuery);
+    /*! Module viz-vectormap, file tooltipViewer.js */
+    (function(DX, undefined) {
+        var TOOLTIP_OFFSET = 12;
+        function TooltipViewer(params) {
+            this._subscribeToTracker(params.tracker, params.tooltip, params.layerCollection)
+        }
+        TooltipViewer.prototype = {
+            constructor: TooltipViewer,
+            dispose: function() {
+                this._offTracker();
+                this._offTracker = null
+            },
+            _subscribeToTracker: function(tracker, tooltip, layerCollection) {
+                this._offTracker = tracker.on({
+                    "focus-on": function(arg) {
+                        var result = false,
+                            layer,
+                            proxy;
+                        if (tooltip.isEnabled()) {
+                            layer = layerCollection.byName(arg.data.name);
+                            proxy = layer && layer.getProxy(arg.data.index);
+                            if (proxy && tooltip.show(proxy, {
+                                x: 0,
+                                y: 0,
+                                offset: 0
+                            }, {target: proxy})) {
+                                tooltip.move(arg.x, arg.y, TOOLTIP_OFFSET);
+                                result = true
+                            }
+                        }
+                        arg.done(result)
+                    },
+                    "focus-move": function(arg) {
+                        tooltip.move(arg.x, arg.y, TOOLTIP_OFFSET)
+                    },
+                    "focus-off": function() {
+                        tooltip.hide()
+                    }
+                })
+            }
+        };
+        DX.viz.map.TooltipViewer = TooltipViewer
+    })(DevExpress);
     DevExpress.MOD_VIZ_VECTORMAP = true
 }

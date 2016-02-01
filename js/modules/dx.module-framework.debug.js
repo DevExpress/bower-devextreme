@@ -1,9 +1,9 @@
 /*! 
 * DevExtreme (Single Page App Framework)
-* Version: 15.2.4
-* Build date: Dec 8, 2015
+* Version: 15.2.5
+* Build date: Jan 27, 2016
 *
-* Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
+* Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
 */
 
@@ -2098,7 +2098,17 @@ if (!window.DevExpress || !DevExpress.MOD_FRAMEWORK) {
                             animation: "none",
                             device: {grade: "C"}
                         }],
-                    "command-rendered": [{animation: "stagger-fade-drop"}, {
+                    "command-rendered-top": [{animation: "stagger-fade-drop"}, {
+                            animation: "fade",
+                            device: {grade: "B"}
+                        }, {
+                            animation: "fade",
+                            device: {deviceType: "desktop"}
+                        }, {
+                            animation: "none",
+                            device: {grade: "C"}
+                        }],
+                    "command-rendered-bottom": [{animation: "stagger-fade-rise"}, {
                             animation: "fade",
                             device: {grade: "B"}
                         }, {
@@ -2164,7 +2174,17 @@ if (!window.DevExpress || !DevExpress.MOD_FRAMEWORK) {
                             animation: "none",
                             device: {grade: "C"}
                         }],
-                    "command-rendered": [{animation: "stagger-fade-drop"}, {
+                    "command-rendered-top": [{animation: "stagger-fade-drop"}, {
+                            animation: "fade",
+                            device: {grade: "B"}
+                        }, {
+                            animation: "fade",
+                            device: {deviceType: "desktop"}
+                        }, {
+                            animation: "none",
+                            device: {grade: "C"}
+                        }],
+                    "command-rendered-bottom": [{animation: "stagger-fade-rise"}, {
                             animation: "fade",
                             device: {grade: "B"}
                         }, {
@@ -2233,7 +2253,17 @@ if (!window.DevExpress || !DevExpress.MOD_FRAMEWORK) {
                             animation: "none",
                             device: {grade: "C"}
                         }],
-                    "command-rendered": [{animation: "stagger-fade-zoom"}, {
+                    "command-rendered-top": [{animation: "stagger-fade-zoom"}, {
+                            animation: "fade",
+                            device: {grade: "B"}
+                        }, {
+                            animation: "fade",
+                            device: {deviceType: "desktop"}
+                        }, {
+                            animation: "none",
+                            device: {grade: "C"}
+                        }],
+                    "command-rendered-bottom": [{animation: "stagger-fade-zoom"}, {
                             animation: "fade",
                             device: {grade: "B"}
                         }, {
@@ -2504,7 +2534,10 @@ if (!window.DevExpress || !DevExpress.MOD_FRAMEWORK) {
                 ctor: function($widgetElement) {
                     this.callBase($widgetElement);
                     this._commandToWidgetItemOptionNames = {title: "text"};
-                    this._commandRenderedAnimation = "command-rendered"
+                    if (this.widget.option("renderAs") === "topToolbar")
+                        this._commandRenderedAnimation = "command-rendered-top";
+                    else
+                        this._commandRenderedAnimation = "command-rendered-bottom"
                 },
                 _getWidgetByElement: function($element) {
                     return $element.dxToolbar("instance")
@@ -3436,12 +3469,15 @@ if (!window.DevExpress || !DevExpress.MOD_FRAMEWORK) {
                 this.markupLoaded = $.Callbacks();
                 this._templateContext = options.templateContext;
                 this._$skippedMarkup = $();
-                if (options.templatesVersion !== undefined && options.templateCacheStorage) {
+                if (options.templatesVersion !== undefined && options.templateCacheStorage && this._isReleaseVersion()) {
                     this._templateCacheEnabled = true;
                     this._templatesVersion = "v_" + options.templatesVersion;
                     this._templateCacheStorage = options.templateCacheStorage;
                     this._templateCacheKey = "dxTemplateCache_" + DevExpress.VERSION + "_" + JSON.stringify(this.device)
                 }
+            },
+            _isReleaseVersion: function() {
+                return !/http:\/\/localhost/.test(location.href)
             },
             _enumerateTemplates: function(processFn) {
                 var that = this;
@@ -3462,8 +3498,10 @@ if (!window.DevExpress || !DevExpress.MOD_FRAMEWORK) {
             },
             _findTemplate: function(name, role) {
                 var component = this._findComponent(name, role);
-                if (!component)
+                if (!component) {
+                    this._clearCache();
                     throw errors.Error("E3013", role, name);
+                }
                 var $template = component.element(),
                     $result;
                 if (!component._isStaticComponentsCreated) {
@@ -3472,6 +3510,9 @@ if (!window.DevExpress || !DevExpress.MOD_FRAMEWORK) {
                 }
                 $result = $template.clone().removeClass("dx-hidden");
                 return $result
+            },
+            _clearCache: function() {
+                this._templateCacheStorage.removeItem(this._templateCacheKey)
             },
             _loadTemplatesFromMarkupCore: function($markup) {
                 var that = this;
@@ -3624,12 +3665,12 @@ if (!window.DevExpress || !DevExpress.MOD_FRAMEWORK) {
                             var data = JSON.parse(value.substr(MARKUP_TEMPLATE_MARKER.length)),
                                 type = data.type,
                                 options = data.options,
-                                $markup = $(data.markup);
+                                $markup = domUtils.createMarkupFromString(data.markup);
                             options.fromCache = true;
                             return $markup[type](options)[type]("instance")
                         }
                         else if (key === "skippedMarkup")
-                            return $("<div>").append($(value)).contents();
+                            return $("<div>").append(domUtils.createMarkupFromString(value)).contents();
                         return value
                     };
                 var toParse = this._templateCacheStorage.getItem(this._templateCacheKey);
@@ -3639,7 +3680,7 @@ if (!window.DevExpress || !DevExpress.MOD_FRAMEWORK) {
                         cache = cacheContainer[this._templatesVersion]
                     }
                     catch(e) {
-                        this._templateCacheStorage.removeItem(this._templateCacheKey)
+                        this._clearCache()
                     }
                 if (!cache)
                     return;

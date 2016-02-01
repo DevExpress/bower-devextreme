@@ -1,9 +1,9 @@
 /*! 
 * DevExtreme (Gauges)
-* Version: 15.2.4
-* Build date: Dec 8, 2015
+* Version: 15.2.5
+* Build date: Jan 27, 2016
 *
-* Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
+* Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
 */
 
@@ -242,22 +242,22 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_GAUGES) {
                 }).append(group)
             },
             _applySize: function() {
-                var canvas = this._canvas;
-                this._rootRect = new DX.viz.Rectangle({
+                var that = this,
+                    canvas = that._canvas;
+                that._rootRect = new DX.viz.Rectangle({
                     left: canvas.left,
                     top: canvas.top,
                     right: canvas.width - canvas.right,
                     bottom: canvas.height - canvas.bottom
                 });
-                this._width = canvas.width;
-                this._height = canvas.height
-            },
-            _resize: function() {
-                var that = this;
-                that._resizing = that._noAnimation = true;
-                that._cleanCore();
-                that._renderCore();
-                that._resizing = null
+                that._width = canvas.width;
+                that._height = canvas.height;
+                if (that._initialized) {
+                    that._resizing = that._noAnimation = true;
+                    that._cleanCore();
+                    that._renderCore();
+                    that._resizing = null
+                }
             },
             _handleChangedOptions: function(options) {
                 this.callBase.apply(this, arguments);
@@ -347,7 +347,6 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_GAUGES) {
             _normalizeEnum = viz.utils.normalizeEnum,
             _isFinite = isFinite,
             _Number = Number,
-            _abs = Math.abs,
             _min = Math.min,
             _max = Math.max,
             _extend = $.extend,
@@ -681,21 +680,6 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_GAUGES) {
                     this._setupDomain();
                 this._valueChangedHandler(options)
             },
-            _optionValuesEqual: function(name, oldValue, newValue) {
-                var result;
-                switch (name) {
-                    case OPTION_VALUE:
-                        result = oldValue === newValue;
-                        break;
-                    case OPTION_SUBVALUES:
-                        result = compareArrays(oldValue, newValue);
-                        break;
-                    default:
-                        result = this.callBase.apply(this, arguments);
-                        break
-                }
-                return result
-            },
             _applyMainLayout: null,
             _getElementLayout: null,
             _createIndicator: function(type, owner, className, trackerType, trackerIndex, _strict) {
@@ -824,19 +808,6 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_GAUGES) {
             }
             else
                 return values[index]
-        }
-        function compareArrays(array1, array2) {
-            var i,
-                ii;
-            if (array1 === array2)
-                return true;
-            if (_isArray(array1) && _isArray(array2) && array1.length === array2.length) {
-                for (i = 0, ii = array1.length; i < ii; ++i)
-                    if (_abs(array1[i] - array2[i]) > 1E-8)
-                        return false;
-                return true
-            }
-            return false
         }
         function ValueIndicatorsSet(parameters) {
             this._parameters = parameters;
@@ -1674,12 +1645,6 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_GAUGES) {
                 if (OPTION_VALUES in options && !this._skipOptionChanged)
                     this._updateValues(options[OPTION_VALUES])
             },
-            _optionValuesEqual: function(name, oldValue, newValue) {
-                if (name === OPTION_VALUES)
-                    return compareArrays(oldValue, newValue);
-                else
-                    return this.callBase.apply(this, arguments)
-            },
             _factory: objectUtils.clone(DX.viz.gauges.dxBaseGauge.prototype._factory)
         }));
         var BarWrapper = function(index, context) {
@@ -1823,17 +1788,6 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_GAUGES) {
         }
         function compareFloats(value1, value2) {
             return _abs(value1 - value2) < 0.0001
-        }
-        function compareArrays(array1, array2) {
-            if (array1 === array2)
-                return true;
-            if (_isArray(array1) && _isArray(array2) && array1.length === array2.length) {
-                for (var i = 0, ii = array1.length; i < ii; ++i)
-                    if (!compareFloats(array1[i], array2[i]))
-                        return false;
-                return true
-            }
-            return false
         }
         var __BarWrapper = BarWrapper;
         DX.viz.gauges.__tests.BarWrapper = __BarWrapper;

@@ -1,9 +1,9 @@
 /*! 
 * DevExtreme
-* Version: 15.2.4
-* Build date: Dec 8, 2015
+* Version: 15.2.5
+* Build date: Jan 27, 2016
 *
-* Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
+* Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
 */
 
@@ -65,8 +65,8 @@ Globalize.addCultureInfo("ja", {messages: {
         "dxFileUploader-uploaded": "アップロード済み",
         "dxFileUploader-readyToUpload": "アップロードの準備中",
         "dxFileUploader-uploadFailedMessage": "アップロードに失敗しました",
-        "dxRangeSlider-ariaFrom": "{0} から",
-        "dxRangeSlider-ariaTill": "{0} まで",
+        "dxRangeSlider-ariaFrom": "から",
+        "dxRangeSlider-ariaTill": "まで",
         "dxSwitch-onText": "オン",
         "dxSwitch-offText": "オフ",
         "dxForm-optionalMark": "任意"

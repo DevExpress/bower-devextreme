@@ -1,9 +1,9 @@
 /*! 
 * DevExtreme (Sparklines)
-* Version: 15.2.4
-* Build date: Dec 8, 2015
+* Version: 15.2.5
+* Build date: Jan 27, 2016
 *
-* Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
+* Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
 */
 
@@ -93,26 +93,26 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_SPARKLINES) {
                 this._updateTranslator()
             },
             _applySize: function() {
-                if (this._allOptions)
-                    this._allOptions.size = {
-                        width: this._canvas.width,
-                        height: this._canvas.height
+                var that = this;
+                if (that._allOptions)
+                    that._allOptions.size = {
+                        width: that._canvas.width,
+                        height: that._canvas.height
+                    };
+                if (that._initialized) {
+                    that._redrawWidgetElements();
+                    if (that._tooltipShown) {
+                        that._tooltipShown = false;
+                        that._tooltip.hide()
                     }
+                    that._drawn()
+                }
             },
             _cleanTranslators: function() {
                 this._translatorX = null;
                 this._translatorY = null
             },
             _setupResizeHandler: _noop,
-            _resize: function() {
-                var that = this;
-                that._redrawWidgetElements();
-                if (that._tooltipShown) {
-                    that._tooltipShown = false;
-                    that._tooltip.hide()
-                }
-                that._drawn()
-            },
             _prepareOptions: function() {
                 return _extend(true, {}, this._themeManager.theme(), this.option())
             },

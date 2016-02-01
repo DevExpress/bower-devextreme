@@ -1,9 +1,9 @@
 /*! 
 * DevExtreme (Web Widgets)
-* Version: 15.2.4
-* Build date: Dec 8, 2015
+* Version: 15.2.5
+* Build date: Jan 27, 2016
 *
-* Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
+* Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
 */
 
@@ -25,9 +25,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
             ACCORDION_ITEM_CLOSED_CLASS = "dx-accordion-item-closed",
             ACCORDION_ITEM_TITLE_CLASS = "dx-accordion-item-title",
             ACCORDION_ITEM_BODY_CLASS = "dx-accordion-item-body",
-            ACCORDION_ITEM_DATA_KEY = "dxAccordionItemData",
-            ACCORDION_ITEM_TITLE_DATA_KEY = "dxAccordionItemTitleData",
-            ACCORDION_ITEM_CONTENT_DATA_KEY = "dxAccordionItemContentData";
+            ACCORDION_ITEM_DATA_KEY = "dxAccordionItemData";
         registerComponent("dxAccordion", ui, ui.CollectionWidget.inherit({
             _activeStateUnit: "." + ACCORDION_ITEM_CLASS,
             _getDefaultOptions: function() {
@@ -104,42 +102,20 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     return;
                 this.callBase.apply(this, arguments)
             },
-            _renderItemContent: function(index, itemData, $container) {
-                $container = $container || this._itemContainer();
-                var $itemTitle = this.callBase.apply(this, [index, $.extend({
-                            type: "title",
-                            titleTemplate: this._getTemplateByOption("itemTitleTemplate")
-                        }, itemData), $container]);
-                var $item = $itemTitle.parent();
-                this._deferredItems.push($.Deferred());
-                this._deferredItems[index].done($.proxy(this._renderItemBody, this, this.callBase, index, itemData, $item));
+            _renderItemContent: function(args) {
+                var $itemTitle = this.callBase($.extend({}, args, {
+                        contentClass: ACCORDION_ITEM_TITLE_CLASS,
+                        templateProperty: "titleTemplate",
+                        defaultTemplateName: this.option("itemTitleTemplate")
+                    }));
+                var deferred = $.Deferred();
+                this._deferredItems.push(deferred);
                 if (!this.option("deferRendering"))
-                    this._deferredItems[index].resolve()
-            },
-            _renderItemBody: function(baseRenderer, index, itemData, $item) {
-                var $itemBody = $("<div>").appendTo($item);
-                baseRenderer.apply(this, [index, $.extend({
-                        type: "content",
-                        template: this._getTemplateByOption("itemTemplate")
-                    }, itemData), $itemBody])
-            },
-            _getItemTemplateName: function(itemData) {
-                var templateProperty = this.option("itemTemplateProperty");
-                if (itemData.type === "title")
-                    templateProperty = "titleTemplate";
-                return itemData && itemData[templateProperty] || this.option("itemTemplate")
-            },
-            _addItemContentClasses: function($container, itemData) {
-                switch (itemData.type) {
-                    case"title":
-                        $container.addClass(ACCORDION_ITEM_TITLE_CLASS).data(ACCORDION_ITEM_TITLE_DATA_KEY, itemData);
-                        break;
-                    case"content":
-                        $container.addClass(ACCORDION_ITEM_BODY_CLASS).data(ACCORDION_ITEM_CONTENT_DATA_KEY, itemData);
-                        break;
-                    default:
-                        this.callBase.apply(this, arguments)
-                }
+                    deferred.resolve();
+                deferred.done($.proxy(this.callBase, this, $.extend({}, args, {
+                    contentClass: ACCORDION_ITEM_BODY_CLASS,
+                    container: $("<div>").appendTo($itemTitle.parent())
+                })))
             },
             _attachItemTitleClickAction: function() {
                 var itemSelector = "." + ACCORDION_ITEM_TITLE_CLASS,
@@ -160,11 +136,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 var $items = this._itemElements(),
                     that = this;
                 $.each(addedSelection, function(_, index) {
-                    var $item = $items.eq(index);
-                    if ($item.find("." + ACCORDION_ITEM_BODY_CLASS).length === 0)
-                        that._deferredItems[index].resolve();
-                    $item.addClass(ACCORDION_ITEM_OPENED_CLASS);
-                    $item.removeClass(ACCORDION_ITEM_CLOSED_CLASS)
+                    that._deferredItems[index].resolve();
+                    $items.eq(index).addClass(ACCORDION_ITEM_OPENED_CLASS).removeClass(ACCORDION_ITEM_CLOSED_CLASS)
                 });
                 $.each(removedSelection, function(_, index) {
                     $items.eq(index).removeClass(ACCORDION_ITEM_OPENED_CLASS)
@@ -184,7 +157,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     fx.stop($item);
                 var startItemHeight = $item.outerHeight(),
                     finalItemHeight = $item.hasClass(ACCORDION_ITEM_OPENED_CLASS) ? itemHeight + $title.outerHeight() || $item.height("auto").outerHeight() : $title.outerHeight();
-                return !skipAnimation ? this._animateItem($item, startItemHeight, finalItemHeight) : $item.css("height", finalItemHeight)
+                return skipAnimation || startItemHeight === finalItemHeight ? $item.css("height", finalItemHeight) : this._animateItem($item, startItemHeight, finalItemHeight)
             },
             _animateItem: function(element, startHeight, endHeight) {
                 return fx.animate(element, {
@@ -702,7 +675,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         return
                     }
                     this._dynamicTemplates["item"] = new FunctionTemplate($.proxy(function(itemData) {
-                        return $("<div>").append(this._getIconContainer(itemData)).append(this._getTextContainer(itemData)).append(this._getPopuotContainer(itemData))
+                        return $("<div>").append(this._getIconContainer(itemData)).append(this._getTextContainer(itemData)).append(this._getPopoutContainer(itemData))
                     }, this))
                 },
                 _useCustomExpressions: function() {
@@ -715,7 +688,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 _getTextContainer: function(itemData) {
                     return $("<span>").text(this._displayGetter(itemData))
                 },
-                _getPopuotContainer: $.noop,
+                _getPopoutContainer: $.noop,
                 _initAccessors: function() {
                     var that = this;
                     $.each(this._getAccessors(), function(_, accessor) {
@@ -735,7 +708,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     return arr
                 },
                 _hasChildren: function(node) {
-                    return node.internalFields.childrenKeys.length
+                    return node && node.internalFields.childrenKeys.length
                 },
                 _compileAccessor: function(optionName) {
                     var getter = "_" + optionName + "Getter",
@@ -809,7 +782,6 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
     /*! Module widgets-web, file ui.dataConverter.js */
     (function($, DX, undefined) {
         var Class = DX.require("/class"),
-            DataSource = DX.data.DataSource,
             commonUtils = DX.require("/utils/utils.common");
         var DataConverter = Class.inherit({
                 ctor: function() {
@@ -855,18 +827,11 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 },
                 setChildrenKeys: function() {
                     var that = this;
-                    new DataSource({
-                        store: this._dataStructure,
-                        map: function(item) {
-                            return item.internalFields.key
-                        },
-                        group: "internalFields.parentKey"
-                    }).load().done(function(parents) {
-                        $.each(parents, function(_, parent) {
-                            if (parent.key === that._rootValue)
-                                return;
-                            that._getByKey(parent.key).internalFields.childrenKeys = parent.items
-                        })
+                    $.each(this._dataStructure, function(_, node) {
+                        if (node.internalFields.parentKey === that._rootValue)
+                            return;
+                        var parent = that._getByKey(node.internalFields.parentKey);
+                        parent.internalFields.childrenKeys.push(node.internalFields.key)
                     })
                 },
                 _makeObjectFromPrimitive: function(item) {
@@ -915,7 +880,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     this._dataAccessors = accessors
                 },
                 _getByKey: function(key) {
-                    return this._dataStructure[this._indexByKey[key]] || null
+                    return this._dataStructure[this.getIndexByKey(key)] || null
                 },
                 getByKey: function(data, key) {
                     var result = null,
@@ -940,6 +905,28 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 },
                 getVisibleItemsCount: function() {
                     return this._visibleItemsCount
+                },
+                updateIndexByKey: function() {
+                    var that = this;
+                    this._indexByKey = {};
+                    $.each(this._dataStructure, function(index, node) {
+                        that._indexByKey[node.internalFields.key] = index
+                    })
+                },
+                updateChildrenKeys: function() {
+                    this._indexByKey = {};
+                    this.removeChildrenKeys();
+                    this.updateIndexByKey();
+                    this.setChildrenKeys()
+                },
+                removeChildrenKeys: function() {
+                    this._indexByKey = {};
+                    $.each(this._dataStructure, function(index, node) {
+                        node.internalFields.childrenKeys = []
+                    })
+                },
+                getIndexByKey: function(key) {
+                    return this._indexByKey[key]
                 },
                 createPlainStructure: function(items, rootValue, dataType) {
                     this._itemsCount = 0;
@@ -1106,8 +1093,45 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     })
                 },
                 _setFieldState: function(node, state, field) {
+                    if (node.internalFields[field] === state)
+                        return;
                     node.internalFields[field] = state;
                     this.options.dataAccessors.setters[field](node.internalFields.item, state)
+                },
+                _markChildren: function(keys) {
+                    var that = this;
+                    $.each(keys, function(_, key) {
+                        var index = that.getIndexByKey(key),
+                            node = that.getNodeByKey(key);
+                        that._dataStructure[index] = 0;
+                        node.internalFields.childrenKeys.length && that._markChildren(node.internalFields.childrenKeys)
+                    })
+                },
+                _removeNode: function(key) {
+                    var node = this.getNodeByKey(key);
+                    this._dataStructure[this.getIndexByKey(key)] = 0;
+                    this._markChildren(node.internalFields.childrenKeys);
+                    var that = this,
+                        counter = 0,
+                        items = $.extend(true, [], this._dataStructure);
+                    $.each(items, function(index, item) {
+                        if (!item) {
+                            that._dataStructure.splice(index - counter, 1);
+                            counter++
+                        }
+                    })
+                },
+                _addNode: function(item) {
+                    var dataConverter = this.options.dataConverter,
+                        node = dataConverter._convertItemToNode(item, this.options.dataAccessors.getters.parentKey(item));
+                    this._dataStructure = this._dataStructure.concat(node);
+                    this._initialDataStructure = this._initialDataStructure.concat(node);
+                    dataConverter._dataStructure = dataConverter._dataStructure.concat(node)
+                },
+                _updateFields: function() {
+                    this.options.dataConverter.updateChildrenKeys();
+                    this._updateSelection();
+                    this._updateExpansion()
                 },
                 getSelectedNodesKeys: function() {
                     return this._selectedNodesKeys
@@ -1145,7 +1169,21 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     return node.internalFields.publicNode
                 },
                 getRootNodes: function() {
-                    return data.query(this._dataStructure).filter(["internalFields.parentKey", this.options.rootValue]).toArray()
+                    return this.getChildrenNodes(this.options.rootValue)
+                },
+                getChildrenNodes: function(parentKey) {
+                    return data.query(this._dataStructure).filter(["internalFields.parentKey", parentKey]).toArray()
+                },
+                getIndexByKey: function(key) {
+                    return this.options.dataConverter.getIndexByKey(key)
+                },
+                addItem: function(item) {
+                    this._addNode(item);
+                    this._updateFields()
+                },
+                removeItem: function(key) {
+                    this._removeNode(key);
+                    this._updateFields()
                 },
                 toggleSelection: function(key, state) {
                     var node = this._getByKey(this._dataStructure, key);
@@ -1180,39 +1218,50 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         this._updateExpansion(key);
                     this._expandedNodesKeys = this._updateNodesKeysArray(EXPANDED)
                 },
+                _filterDataStructure: function(substring) {
+                    var matches = [],
+                        text,
+                        dataStructure = this._initialDataStructure,
+                        reg = new RegExp(substring, 'i');
+                    for (var i = 0, size = dataStructure.length; i < size; i++) {
+                        text = this.options.dataAccessors.getters.display(dataStructure[i]);
+                        reg.test(text) && matches.push(dataStructure[i])
+                    }
+                    return matches
+                },
                 search: function(substring) {
                     var that = this,
-                        matches = [],
-                        dataStructure = this._initialDataStructure,
+                        matches = this._filterDataStructure(substring),
                         dataConverter = this.options.dataConverter;
-                    function lookForParents(matches, startIndex) {
-                        while (startIndex < matches.length) {
-                            var parentKey = matches[startIndex].internalFields.parentKey,
-                                parent = dataConverter._getByKey(parentKey);
-                            if (!parent || $.inArray(parent, matches) > -1) {
-                                startIndex += 1;
+                    function lookForParents(matches, index) {
+                        var length = matches.length;
+                        while (index < length) {
+                            var parentKey = matches[index].internalFields.parentKey,
+                                parent;
+                            if (parentKey === that.options.rootValue) {
+                                index++;
                                 continue
                             }
+                            parent = dataConverter._getByKey(parentKey);
                             if (!parent.internalFields.expanded)
                                 that._setFieldState(parent, true, EXPANDED);
-                            matches.splice(startIndex, 0, parent);
-                            lookForParents(matches, startIndex)
+                            if ($.inArray(parent, matches) > -1) {
+                                index++;
+                                continue
+                            }
+                            matches.splice(index, 0, parent);
+                            lookForParents(matches, index)
                         }
                     }
-                    this.options.dataConverter._newIndexByKey = {};
-                    for (var i = 0, size = dataStructure.length; i < size; i++)
-                        if (this.options.dataAccessors.getters.display(dataStructure[i]).toLowerCase().indexOf(substring.toLowerCase()) > -1)
-                            matches.push(dataStructure[i]);
                     lookForParents(matches, 0);
-                    this.options.dataConverter._indexByKey = {};
+                    dataConverter._indexByKey = {};
                     $.each(matches, function(index, node) {
                         node.internalFields.childrenKeys = [];
-                        that.options.dataConverter._indexByKey[node.internalFields.key] = index
+                        dataConverter._indexByKey[node.internalFields.key] = index
                     });
-                    this.options.dataConverter._dataStructure = matches;
-                    this.options.dataConverter.setChildrenKeys();
-                    matches = this.options.dataConverter._dataStructure;
-                    return matches
+                    dataConverter._dataStructure = matches;
+                    dataConverter.setChildrenKeys();
+                    return dataConverter._dataStructure
                 }
             });
         DX.ui.HierarchicalDataAdapter = DataAdapter
@@ -1301,9 +1350,6 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 _focusTarget: function() {
                     return this._itemContainer()
                 },
-                _eventBindingTarget: function() {
-                    return this._itemContainer()
-                },
                 _supportedKeys: function() {
                     var selectItem = function(e) {
                             var $item = this.option("focusedElement");
@@ -1334,7 +1380,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         itemContent = $.isPlainObject(itemData) ? itemText : String(itemData);
                     return itemText && $itemContainer.html(itemContent)
                 },
-                _getPopuotContainer: function(itemData) {
+                _getPopoutContainer: function(itemData) {
                     var items = this._itemsGetter(itemData),
                         $popOutContainer;
                     if (items && items.length) {
@@ -1396,9 +1442,9 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                             jQueryEvent: e
                         };
                     if (value)
-                        this._inkRipple.renderWave(config);
+                        this._inkRipple.showWave(config);
                     else
-                        this._inkRipple.removeWave(config)
+                        this._inkRipple.hideWave(config)
                 },
                 _getShowSubmenuMode: function() {
                     var defaultValue = "onClick",
@@ -1443,7 +1489,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 },
                 _getSubmenuDelay: function(action) {
                     var delay = this.option("showSubmenuMode").delay;
-                    if (!delay)
+                    if (!commonUtils.isDefined(delay))
                         return DEFAULT_DELAY[action];
                     return commonUtils.isObject(delay) ? delay[action] : delay
                 },
@@ -1560,7 +1606,10 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 },
                 _isItemSelectionAllowed: function(item) {
                     var isSelectionByClickEnabled = this._isSelectionEnabled() && this.option("selectionByClick");
-                    return this._itemContainer() && isSelectionByClickEnabled && this._isItemSelectable(item) && !this._itemsGetter(item)
+                    return !this._isContainerEmpty() && isSelectionByClickEnabled && this._isItemSelectable(item) && !this._itemsGetter(item)
+                },
+                _isContainerEmpty: function() {
+                    return this._itemContainer().is(':empty')
                 },
                 _syncSelectionOptions: $.noop,
                 _optionChanged: function(args) {
@@ -1769,6 +1818,9 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
             _itemContainer: function() {
                 return this._overlay && this._overlay.content()
             },
+            _eventBindingTarget: function() {
+                return this._itemContainer()
+            },
             _supportedKeys: function() {
                 var selectItem = function(e) {
                         var $item = this.option("focusedElement");
@@ -1876,6 +1928,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 this.callBase()
             },
             _renderContextMenuOverlay: function() {
+                if (this._overlay)
+                    return;
                 var overlayOptions = this._getOverlayOptions(),
                     $overlayElement = $("<div>"),
                     $overlayContent;
@@ -1966,12 +2020,12 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         showTitle: false,
                         height: "auto",
                         width: "auto",
+                        visible: this.option("visible"),
                         onShowing: $.proxy(this._overlayShowingActionHandler, this),
                         onShown: $.proxy(this._overlayShownActionHandler, this),
                         onHiding: $.proxy(this._overlayHidingActionHandler, this),
                         onHidden: $.proxy(this._overlayHiddenActionHandler, this),
-                        onPositioned: $.proxy(this._overlayPositionedActionHandler, this),
-                        onPositioning: $.proxy(this._overlayPositioningActionHandler, this)
+                        onPositioned: $.proxy(this._overlayPositionedActionHandler, this)
                     };
                 return overlayOptions
             },
@@ -1989,15 +2043,15 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
             },
             _overlayHidingActionHandler: function(arg) {
                 this._actions.onHiding(arg);
-                if (!arg.cancel)
-                    this._hideAllShownSubmenus()
+                if (!arg.cancel) {
+                    this._hideAllShownSubmenus();
+                    this._setOptionSilent("visible", false)
+                }
             },
             _overlayHiddenActionHandler: function(arg) {
-                this._actions.onHidden(arg);
-                this._setOptionSilent("visible", false)
+                this._actions.onHidden(arg)
             },
             _overlayPositionedActionHandler: $.noop,
-            _overlayPositioningActionHandler: $.noop,
             _closeOnOutsideClickHandler: function(e) {
                 var $clickedItem,
                     $activeItemContainer,
@@ -2136,41 +2190,39 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 var $itemElement,
                     itemData,
                     node,
-                    submenu,
+                    renderSubmenu,
                     $submenuElement,
                     notCloseMenuOnItemClick;
-                if (actionArgs.args.length && actionArgs.args[0]) {
-                    actionArgs.args[0].jQueryEvent.stopPropagation();
-                    $itemElement = actionArgs.args[0].itemElement;
-                    itemData = actionArgs.args[0].itemData;
-                    node = this._dataAdapter.getNodeByItem(itemData);
-                    if (!node)
-                        return;
-                    if ($itemElement.find("." + DX_CONTEXT_MENU_CLASS).length)
-                        submenu = this._getSubmenuInstanceByRootElement($itemElement);
-                    else
-                        submenu = node.internalFields.childrenKeys.length && this._renderSubmenuItems(node, $itemElement, 2);
-                    notCloseMenuOnItemClick = itemData && itemData.closeMenuOnClick === false;
-                    $submenuElement = $itemElement.children("." + DX_SUBMENU_CLASS);
-                    if ($itemElement.context === $submenuElement.context && $submenuElement.css("visibility") === "visible")
-                        return;
-                    if (!itemData || itemData.disabled || notCloseMenuOnItemClick)
-                        return;
-                    this._updateSelectedItemOnClick(actionArgs);
-                    if ($submenuElement.length === 0) {
-                        var $prevSubmenu = $($itemElement.parents("." + DX_SUBMENU_CLASS)[0]);
-                        this._hideSubmenu($prevSubmenu);
-                        if (!actionArgs.canceled && this._overlay && this._overlay.option("visible"))
-                            this.option("visible", false)
-                    }
-                    else {
-                        if (this._shownSubmenus && this._shownSubmenus.length > 0)
-                            if (this._shownSubmenus[0].is($submenuElement) || this._shownSubmenus[0].has($submenuElement).length === 1)
-                                this._hideSubmenu($submenuElement);
-                            else
-                                this._hideAllShownSubmenus();
-                        this._showSubmenu($itemElement)
-                    }
+                if (!actionArgs.args.length)
+                    return;
+                actionArgs.args[0].jQueryEvent.stopPropagation();
+                $itemElement = actionArgs.args[0].itemElement;
+                itemData = actionArgs.args[0].itemData;
+                node = this._dataAdapter.getNodeByItem(itemData);
+                if (!node)
+                    return;
+                renderSubmenu = node.internalFields.childrenKeys.length && !$itemElement.find("." + DX_SUBMENU_CLASS).length;
+                renderSubmenu && this._renderSubmenuItems(node, $itemElement, 2);
+                notCloseMenuOnItemClick = itemData && itemData.closeMenuOnClick === false;
+                $submenuElement = $itemElement.children("." + DX_SUBMENU_CLASS);
+                if ($itemElement.context === $submenuElement.context && $submenuElement.css("visibility") === "visible")
+                    return;
+                if (!itemData || itemData.disabled || notCloseMenuOnItemClick)
+                    return;
+                this._updateSelectedItemOnClick(actionArgs);
+                if ($submenuElement.length === 0) {
+                    var $prevSubmenu = $($itemElement.parents("." + DX_SUBMENU_CLASS)[0]);
+                    this._hideSubmenu($prevSubmenu);
+                    if (!actionArgs.canceled && this._overlay && this._overlay.option("visible"))
+                        this.option("visible", false)
+                }
+                else {
+                    if (this._shownSubmenus && this._shownSubmenus.length > 0)
+                        if (this._shownSubmenus[0].is($submenuElement) || this._shownSubmenus[0].has($submenuElement).length === 1)
+                            this._hideSubmenu($submenuElement);
+                        else
+                            this._hideAllShownSubmenus();
+                    this._showSubmenu($itemElement)
                 }
             },
             _hideSubmenu: function($curSubmenu) {
@@ -2225,11 +2277,6 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     case"alternativeInvocationMode":
                         this._invalidate();
                         break;
-                    case"items":
-                        if (this._overlay.option("visible"))
-                            this._overlay.hide();
-                        this.callBase(args);
-                        break;
                     case"position":
                     case"submenuDirection":
                         this._invalidate();
@@ -2242,9 +2289,6 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         this.callBase(args);
                         break;
                     default:
-                        if (this._overlay)
-                            if (this._overlay.option("visible"))
-                                this._overlay.hide();
                         this.callBase(args)
                 }
             },
@@ -2256,14 +2300,14 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     id = new DevExpress.data.Guid,
                     promise;
                 if (canShowMenu && this._overlay) {
+                    this._setOptionSilent("visible", true);
                     this.option("focusedElement", this._itemElements().first());
                     promise = this._overlay.show();
                     this._overlay.content().attr({
                         id: id,
                         role: "menu"
                     });
-                    this.setAria("owns", id);
-                    this._setOptionSilent("visible", true)
+                    this.setAria("owns", id)
                 }
                 return promise || $.Deferred().reject().promise()
             },
@@ -2285,7 +2329,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 };
                 positioningAction(actionArgs);
                 if (!actionArgs.canceled && this._overlay)
-                    position && this._overlay.option("position", position);
+                    position && !this._overlay.option("visible") && this._overlay.option("position", position);
                 else
                     actionArgs.jQueryEvent.cancel = true;
                 return actionArgs.canceled
@@ -2301,11 +2345,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 return promise || $.Deferred().reject().promise()
             },
             _clean: function() {
-                if (this._overlay) {
-                    this._overlay.element().remove();
-                    this._overlay = null
-                }
-                this._detachShowContextMenuEvents($(this.option("target")))
+                this._detachShowContextMenuEvents($(this.option("target")));
+                this.callBase()
             },
             toggle: function(showing) {
                 var visible = this.option("visible");
@@ -2341,7 +2382,6 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
             DX_SUBMENU_CLASS = "dx-submenu",
             DX_STATE_DISABLED_CLASS = "dx-state-disabled",
             DX_STATE_FOCUSED_CLASS = "dx-state-focused",
-            DX_STATE_HOVER_CLASS = "dx-state-hover",
             FOCUS_UP = "up",
             FOCUS_DOWN = "down",
             FOCUS_LEFT = "left",
@@ -2349,8 +2389,10 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
             SHOW_SUBMENU_OPERATION = "showSubmenu",
             NEXTITEM_OPERATION = "nextItem",
             PREVITEM_OPERATION = "prevItem",
-            DEFAULT_SHOW_DELAY = 50,
-            DEFAULT_HIDE_DELAY = 300,
+            DEFAULT_DELAY = {
+                show: 50,
+                hide: 300
+            },
             ACTIONS = ["onSubmenuShowing", "onSubmenuShown", "onSubmenuHiding", "onSubmenuHidden"],
             dxSubmenu = ui.dxContextMenu.inherit({
                 _getDefaultOptions: function() {
@@ -2382,6 +2424,9 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 _hoverEndHandler: function(e) {
                     this._toggleFocusClass(false, e.currentTarget)
                 },
+                _isMenuHorizontal: function() {
+                    return this.option("orientation") === "horizontal"
+                },
                 _hoverStartHandler: function(e) {
                     this.callBase(e);
                     this._toggleFocusClass(true, e.currentTarget)
@@ -2396,7 +2441,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         containerOffset = arg.position;
                         rootOffset = $rootItem.offset();
                         this.$contentDelimiter.css("display", "block");
-                        if (this.option("orientation") === "horizontal") {
+                        if (this._isMenuHorizontal()) {
                             this.$contentDelimiter.width($rootItem.width() < $submenu.width() ? $rootItem.width() - 2 : $submenu.width() - 2);
                             this.$contentDelimiter.height(2);
                             if (containerOffset.v.location > rootOffset.top)
@@ -2424,7 +2469,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                                 }
                             }
                         }
-                        else if (this.option("orientation") === "vertical") {
+                        else {
                             this.$contentDelimiter.width(2);
                             this.$contentDelimiter.height($rootItem.height() < $submenu.height() ? $rootItem.height() - 2 : $submenu.height() - 2);
                             if (containerOffset.h.location > rootOffset.left)
@@ -2451,6 +2496,12 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         }
                         positionUtils.setup(this.$contentDelimiter, position)
                     }
+                },
+                isOverlayVisible: function() {
+                    return this._overlay.option("visible")
+                },
+                getOverlayContent: function() {
+                    return this._overlay.content()
                 }
             });
         registerComponent("dxMenu", ui, ui.dxMenuBase.inherit({
@@ -2482,14 +2533,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
             _focusTarget: function() {
                 return this.element()
             },
-            _eventBindingTarget: function() {
-                return this.element()
-            },
-            _getOrientation: function() {
-                return this.option("orientation") === "vertical" ? "vertical" : "horizontal"
-            },
             _isMenuHorizontal: function() {
-                return this._getOrientation() === "horizontal"
+                return this.option("orientation") === "horizontal"
             },
             _moveFocus: function(location) {
                 var $items = this._itemElements().filter(":visible"),
@@ -2568,38 +2613,16 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 this.element().addClass(DX_MENU_CLASS);
                 this.setAria("role", "menubar")
             },
-            _getHideDelay: function() {
+            _getDelay: function(delayType) {
                 var delay = this.option("showFirstSubmenuMode").delay;
-                if (delay)
-                    return commonUtils.isObject(delay) ? delay.hide : delay;
-                else
-                    return DEFAULT_HIDE_DELAY
-            },
-            _getShowDelay: function() {
-                var delay = this.option("showFirstSubmenuMode").delay,
-                    resultDelay;
-                if (delay)
-                    resultDelay = commonUtils.isObject(delay) ? delay.show : delay;
-                else
-                    resultDelay = DEFAULT_SHOW_DELAY;
-                return resultDelay
+                if (!commonUtils.isDefined(delay))
+                    return DEFAULT_DELAY[delayType];
+                return commonUtils.isObject(delay) ? delay[delayType] : delay
             },
             _renderContainer: function() {
-                var isVerticalMenu = this.option("orientation") === "vertical",
-                    $wrapper = $("<div>");
-                $wrapper.appendTo(this.element()).addClass(isVerticalMenu ? DX_MENU_VERTICAL_CLASS : DX_MENU_HORIZONTAL_CLASS);
-                return this.callBase($wrapper).css("min-height", this._getValueHeight($wrapper))
-            },
-            _getValueHeight: function($root) {
-                var $div = $("<div>").html("Jj").css({
-                        width: "auto",
-                        position: "fixed",
-                        top: "-3000px",
-                        left: "-3000px"
-                    }).appendTo($root),
-                    height = $div.height();
-                $div.remove();
-                return height
+                var $wrapper = $("<div>");
+                $wrapper.appendTo(this.element()).addClass(this._isMenuHorizontal() ? DX_MENU_HORIZONTAL_CLASS : DX_MENU_VERTICAL_CLASS);
+                return this.callBase($wrapper)
             },
             _renderSubmenuItems: function(node, $itemFrame) {
                 var submenu = this._createSubmenu(node, $itemFrame);
@@ -2644,37 +2667,40 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         onItemRendered: this.option("onItemRendered"),
                         onLeftFirstItem: isMenuHorizontal ? null : $.proxy(this._moveMainMenuFocus, this, PREVITEM_OPERATION),
                         onLeftLastItem: isMenuHorizontal ? null : $.proxy(this._moveMainMenuFocus, this, NEXTITEM_OPERATION),
-                        onCloseRootSubmenu: isMenuHorizontal ? $.proxy(this._moveMainMenuFocus, this, PREVITEM_OPERATION) : null,
+                        onCloseRootSubmenu: $.proxy(this._moveMainMenuFocus, this, isMenuHorizontal ? PREVITEM_OPERATION : null),
                         onExpandLastSubmenu: isMenuHorizontal ? $.proxy(this._moveMainMenuFocus, this, NEXTITEM_OPERATION) : null,
                         _remoteSelectionSync: true,
                         _hideDelimiter: this.option("_hideDelimiter")
                     }
             },
             _getShowFirstSubmenuMode: function() {
-                var modeName;
-                if (commonUtils.isObject(this.option("showFirstSubmenuMode")))
-                    modeName = this._isDesktopDevice() ? this.option("showFirstSubmenuMode").name : "onClick";
-                else
-                    modeName = this._isDesktopDevice() ? this.option("showFirstSubmenuMode") : "onClick";
-                return modeName
+                if (!this._isDesktopDevice())
+                    return "onClick";
+                var optionValue = this.option("showFirstSubmenuMode");
+                return commonUtils.isObject(optionValue) ? optionValue.name : optionValue
             },
             _moveMainMenuFocus: function(direction) {
                 var $expandedItem = this.element().find("." + DX_MENU_ITEM_EXPANDED_CLASS).first(),
+                    $parent = $expandedItem.parent(),
                     $newItem;
                 switch (direction) {
                     case PREVITEM_OPERATION:
-                        $newItem = $expandedItem.parent().prev();
+                        $newItem = $parent.prev();
                         if (!$newItem.length)
-                            $newItem = $expandedItem.parent().siblings().last();
-                        $newItem = $newItem.children();
+                            $newItem = $parent.siblings().last();
                         break;
                     case NEXTITEM_OPERATION:
-                        $newItem = $expandedItem.parent().next();
+                        $newItem = $parent.next();
                         if (!$newItem.length)
-                            $newItem = $expandedItem.parent().siblings().first();
-                        $newItem = $newItem.children();
+                            $newItem = $parent.siblings().first();
+                        break;
+                    default:
+                        $newItem = $parent;
+                        if (!$newItem.length)
+                            $newItem = $parent.siblings().first();
                         break
                 }
+                $newItem = $newItem.children();
                 this._visibleSubmenu && this._hideSubmenu(this._visibleSubmenu);
                 this.focus();
                 this.option("focusedElement", $newItem)
@@ -2720,7 +2746,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
             },
             _attachSubmenuHandlers: function($rootItem, submenu) {
                 var that = this,
-                    $submenuOverlayContent = submenu._overlay.content(),
+                    $submenuOverlayContent = submenu.getOverlayContent(),
                     submenus = $submenuOverlayContent.find("." + DX_SUBMENU_CLASS),
                     submenuMouseLeaveName = eventUtils.addNamespace(hoverEvents.end, this.NAME + "_submenu");
                 submenu.option({
@@ -2761,6 +2787,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 this._actions.onSubmenuHiding(args);
                 eventArgs = args;
                 if (!eventArgs.cancel) {
+                    if (this._visibleSubmenu === submenu)
+                        this._visibleSubmenu = null;
                     $border.hide();
                     $rootItem.removeClass(DX_MENU_ITEM_EXPANDED_CLASS)
                 }
@@ -2774,35 +2802,28 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
             _submenuMouseLeaveHandler: function($rootItem, eventArgs) {
                 var that = this,
                     target = $(eventArgs.relatedTarget).parents("." + DX_CONTEXT_MENU_CLASS)[0],
-                    contextmenu = this._getSubmenuElementByRootElement($rootItem).dxSubmenu("instance")._overlay.content()[0];
+                    contextmenu = this._getSubmenuByRootElement($rootItem).getOverlayContent()[0];
                 if (this.option("hideSubmenuOnMouseLeave") && target !== contextmenu) {
                     clearTimeout(this._showSubmenuTimer);
                     clearTimeout(this._hideSubmenuTimer);
-                    setTimeout($.proxy(this._hideSubmenuAfterTimeout, this), that._getHideDelay(), $rootItem)
+                    setTimeout($.proxy(this._hideSubmenuAfterTimeout, this), that._getDelay("hide"))
                 }
             },
-            _hideSubmenuAfterTimeout: function($rootItem) {
-                var $submenu = this._getSubmenuElementByRootElement($rootItem),
-                    hasVisibleSubmenu = this._visibleSubmenu,
-                    isRootItemHovered = hasVisibleSubmenu && $(this._visibleSubmenu.context).hasClass(DX_STATE_HOVER_CLASS);
-                if (hasVisibleSubmenu && !this._getFocusedSubmenuItem(this._visibleSubmenu).length && !isRootItemHovered)
-                    $submenu.length && this._getSubmenuInstance($submenu).hide()
+            _hideSubmenuAfterTimeout: function() {
+                if (!this._visibleSubmenu)
+                    return;
+                var isSubmenuItemFocused = this._visibleSubmenu.getOverlayContent().find("." + DX_STATE_FOCUSED_CLASS).length;
+                if (!isSubmenuItemFocused)
+                    this._visibleSubmenu.hide()
             },
-            _getFocusedSubmenuItem: function($submenu) {
-                return $submenu._overlay.content().find("." + DX_STATE_FOCUSED_CLASS)
-            },
-            _getSubmenuInstance: function($submenu) {
-                return $submenu.data().dxSubmenu
-            },
-            _getSubmenuElementByRootElement: function($rootItem) {
-                return $rootItem && $rootItem.children("." + DX_CONTEXT_MENU_CLASS)
-            },
-            _getSubmenuInstanceByRootElement: function($rootItem) {
-                var $submenu = this._getSubmenuElementByRootElement($rootItem);
-                return $submenu.length && this._getSubmenuInstance($submenu)
+            _getSubmenuByRootElement: function($rootItem) {
+                if (!$rootItem)
+                    return false;
+                var $submenu = $rootItem.children("." + DX_CONTEXT_MENU_CLASS);
+                return $submenu.length && $submenu.data().dxSubmenu
             },
             getSubmenuPosition: function($rootItem) {
-                var isVerticalMenu = this.option("orientation").toLowerCase() === "vertical",
+                var isHorizontalMenu = this._isMenuHorizontal(),
                     submenuDirection = this.option("submenuDirection").toLowerCase(),
                     rtlEnabled = this.option("rtlEnabled"),
                     submenuPosition = {
@@ -2811,20 +2832,20 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     };
                 switch (submenuDirection) {
                     case"leftortop":
-                        submenuPosition.at = isVerticalMenu ? "left top" : "left top";
-                        submenuPosition.my = isVerticalMenu ? "right top" : "left bottom";
+                        submenuPosition.at = "left top";
+                        submenuPosition.my = isHorizontalMenu ? "left bottom" : "right top";
                         break;
                     case"rightorbottom":
-                        submenuPosition.at = isVerticalMenu ? "right top" : "left bottom";
-                        submenuPosition.my = isVerticalMenu ? "left top" : "left top";
+                        submenuPosition.at = isHorizontalMenu ? "left bottom" : "right top";
+                        submenuPosition.my = "left top";
                         break;
                     default:
-                        if (isVerticalMenu) {
-                            submenuPosition.at = rtlEnabled ? "left top" : "right top";
+                        if (isHorizontalMenu) {
+                            submenuPosition.at = rtlEnabled ? "right bottom" : "left bottom";
                             submenuPosition.my = rtlEnabled ? "right top" : "left top"
                         }
                         else {
-                            submenuPosition.at = rtlEnabled ? "right bottom" : "left bottom";
+                            submenuPosition.at = rtlEnabled ? "left top" : "right top";
                             submenuPosition.my = rtlEnabled ? "right top" : "left top"
                         }
                         break
@@ -2842,20 +2863,18 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 if (this._isItemDisabled($item))
                     return;
                 $item.off(mouseMoveEventName);
-                if (this._getShowFirstSubmenuMode() === "onHover" && node.internalFields.childrenKeys.length && !isSelectionActive) {
-                    var submenu;
-                    if ($item.find("." + DX_CONTEXT_MENU_CLASS).length)
-                        submenu = this._getSubmenuInstanceByRootElement($item);
-                    else
-                        submenu = node.internalFields.childrenKeys.length && this._renderSubmenuItems(node, $item);
+                if (!this._hasChildren(node)) {
+                    setTimeout($.proxy(this._hideSubmenuAfterTimeout, this), this._getDelay("hide"));
+                    return
+                }
+                if (this._getShowFirstSubmenuMode() === "onHover" && !isSelectionActive) {
+                    var submenu = this._getSubmenuByElement($item);
                     clearTimeout(this._hideSubmenuTimer);
                     clearTimeout(this._showSubmenuTimer);
-                    if (!submenu._overlay.option("visible")) {
+                    if (!submenu.isOverlayVisible()) {
                         $item.on(mouseMoveEventName, $.proxy(this._itemMouseMoveHandler, this));
-                        this._showSubmenuTimer = this._getHideDelay()
+                        this._showSubmenuTimer = this._getDelay("hide")
                     }
-                    if (submenu === this._visibleSubmenu)
-                        this._hideSubmenu(this._visibleSubmenu)
                 }
             },
             _hoverEndHandler: function(eventArg) {
@@ -2869,74 +2888,75 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     clearTimeout(this._showSubmenuTimer);
                     clearTimeout(this._hideSubmenuTimer);
                     this._hideSubmenuTimer = setTimeout(function() {
-                        that._hideSubmenuAfterTimeout($item)
-                    }, that._getHideDelay())
+                        that._hideSubmenuAfterTimeout()
+                    }, that._getDelay("hide"))
                 }
             },
+            _hideVisibleSubmenu: function() {
+                if (!this._visibleSubmenu)
+                    return false;
+                this._hideSubmenu(this._visibleSubmenu);
+                return true
+            },
             _showSubmenu: function($itemElement) {
-                var node = this._dataAdapter.getNodeByItem(this._getItemData($itemElement)),
-                    submenu;
-                if ($itemElement.find("." + DX_CONTEXT_MENU_CLASS).length)
-                    submenu = this._getSubmenuInstanceByRootElement($itemElement);
-                else
-                    submenu = node.internalFields.childrenKeys.length && this._renderSubmenuItems(node, $itemElement);
-                if (this._visibleSubmenu && this._visibleSubmenu !== submenu)
-                    this._hideSubmenu(this._visibleSubmenu);
+                var submenu = this._getSubmenuByElement($itemElement);
+                if (this._visibleSubmenu !== submenu)
+                    this._hideVisibleSubmenu();
                 submenu && submenu.show();
                 this._visibleSubmenu = submenu;
                 this._hoveredRootItem = $itemElement
             },
             _hideSubmenu: function(submenu) {
                 submenu && submenu.hide();
-                if (this._visibleSubmenu && this._visibleSubmenu === submenu)
+                if (this._visibleSubmenu === submenu)
                     this._visibleSubmenu = null;
                 this._hoveredRootItem = null
             },
             _itemMouseMoveHandler: function(e) {
-                if (e.pointers && e.pointers.length)
+                if (e.which > 0)
                     return;
                 var that = this,
                     $item = $(e.currentTarget);
-                if (!this._showSubmenuTimer)
+                if (!commonUtils.isDefined(this._showSubmenuTimer))
                     return;
                 clearTimeout(this._hideSubmenuTimer);
                 clearTimeout(this._showSubmenuTimer);
                 this._showSubmenuTimer = setTimeout(function() {
-                    var node = that._dataAdapter.getNodeByItem(that._getItemData($item)),
-                        submenu;
-                    if ($item.find("." + DX_CONTEXT_MENU_CLASS).length)
-                        submenu = that._getSubmenuInstanceByRootElement($item);
-                    else
-                        submenu = node.internalFields.childrenKeys.length && that._renderSubmenuItems(node, $item);
-                    if (submenu && !submenu._overlay.option("visible"))
+                    var submenu = that._getSubmenuByElement($item);
+                    if (submenu && !submenu.isOverlayVisible())
                         that._showSubmenu($item)
-                }, that._getShowDelay())
+                }, that._getDelay("show"))
+            },
+            _getSubmenuByElement: function($itemElement, itemData) {
+                itemData = itemData || this._getItemData($itemElement);
+                var submenu = this._getSubmenuByRootElement($itemElement);
+                if (submenu)
+                    return submenu;
+                else {
+                    var node = this._dataAdapter.getNodeByItem(itemData);
+                    return this._hasChildren(node) && this._renderSubmenuItems(node, $itemElement)
+                }
             },
             _updateSubmenuVisibilityOnClick: function(actionArgs) {
-                var $itemFrame,
-                    node,
-                    submenu,
-                    args = actionArgs.args.length && actionArgs.args[0];
-                if (args) {
-                    args.jQueryEvent.stopPropagation();
-                    node = this._dataAdapter.getNodeByItem(args.itemData);
-                    $itemFrame = args.itemElement;
-                    if (node.disabled)
-                        return;
-                    if ($itemFrame.find("." + DX_CONTEXT_MENU_CLASS).length)
-                        submenu = this._getSubmenuInstanceByRootElement($itemFrame);
+                var args = actionArgs.args.length && actionArgs.args[0],
+                    currentSubmenu;
+                if (!args || this._disabledGetter(args.itemData))
+                    return;
+                args.jQueryEvent.stopPropagation();
+                currentSubmenu = this._getSubmenuByElement(args.itemElement, args.itemData);
+                this._updateSelectedItemOnClick(actionArgs);
+                if (this._visibleSubmenu)
+                    if (this._visibleSubmenu === currentSubmenu) {
+                        this._hideSubmenu(this._visibleSubmenu);
+                        return
+                    }
                     else
-                        submenu = node.internalFields.childrenKeys.length && this._renderSubmenuItems(node, $itemFrame);
-                    this._updateSelectedItemOnClick(actionArgs);
-                    if (submenu)
-                        if (submenu._overlay.option("visible")) {
-                            if (this._getShowFirstSubmenuMode() === "onClick")
-                                this._hideSubmenu(submenu)
-                        }
-                        else
-                            this._showSubmenu($itemFrame);
-                    else if (this._visibleSubmenu)
-                        this._hideSubmenu(this._visibleSubmenu)
+                        this._hideSubmenu(this._visibleSubmenu);
+                if (!currentSubmenu)
+                    return;
+                if (!currentSubmenu.isOverlayVisible()) {
+                    this._showSubmenu(args.itemElement);
+                    return
                 }
             },
             _optionChanged: function(args) {
@@ -3105,11 +3125,6 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     this._createActionByOption("onSelectionChanged", {excludeValidators: ["disabled", "readOnly"]})()
                 }, this))
             },
-            _renderItemFrame: function(index, itemData) {
-                var $itemFrame = this.callBase.apply(this, arguments);
-                $itemFrame.toggleClass(DISABLED_STATE_CLASS, !!this._disabledGetter(itemData));
-                return $itemFrame
-            },
             _checkBoxModeChange: function(value, previousValue) {
                 if (previousValue === "none" || value === "none") {
                     this.repaint();
@@ -3186,7 +3201,69 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
             },
             _init: function() {
                 this.callBase();
+                this._initStoreChangeHandlers();
                 this._initCheckBoxesMode()
+            },
+            _initStoreChangeHandlers: function() {
+                if (this.option("dataStructure") !== "plain")
+                    return;
+                var that = this;
+                this._dataSource && this._dataSource.store().on("inserted", function(newItem) {
+                    that.option().items = that.option("items").concat(newItem);
+                    that._dataAdapter.addItem(newItem);
+                    if (!that._isFiltered(newItem))
+                        return;
+                    that._updateLevel(that._parentIdGetter(newItem))
+                }).on("removed", function(removedKey) {
+                    var node = that._dataAdapter.getNodeByKey(removedKey);
+                    that.option("items")[that._dataAdapter.getIndexByKey(node.internalFields.key)] = 0;
+                    that._markChildrenItemsToRemove(node);
+                    that._removeItems();
+                    that._dataAdapter.removeItem(removedKey);
+                    that._updateLevel(that._parentIdGetter(node))
+                })
+            },
+            _markChildrenItemsToRemove: function(node) {
+                var that = this,
+                    keys = node.internalFields.childrenKeys;
+                $.each(keys, function(_, key) {
+                    that.option("items")[that._dataAdapter.getIndexByKey(key)] = 0;
+                    that._markChildrenItemsToRemove(that._dataAdapter.getNodeByKey(key))
+                })
+            },
+            _removeItems: function() {
+                var that = this,
+                    counter = 0,
+                    items = $.extend(true, [], this.option("items"));
+                $.each(items, function(index, item) {
+                    if (!item) {
+                        that.option("items").splice(index - counter, 1);
+                        counter++
+                    }
+                })
+            },
+            _isFiltered: function(item) {
+                var value = this.option("searchValue"),
+                    reg = new RegExp(value, 'i');
+                return reg.test(this._displayGetter(item))
+            },
+            _updateLevel: function(parentId) {
+                var $container = this._getContainerByParentKey(parentId);
+                this._renderItems($container, this._dataAdapter.getChildrenNodes(parentId))
+            },
+            _getOldContainer: function($itemElement) {
+                return $itemElement.length ? $itemElement.find(" > ." + NODE_CONTAINER_CLASS) : this._scrollableContainer.content().children()
+            },
+            _getContainerByParentKey: function(parentId) {
+                var $container,
+                    $itemElement = this._findItemElementByIndex(parentId).parent();
+                this._getOldContainer($itemElement).remove();
+                $container = this._renderNodeContainer($itemElement);
+                this._isRootLevel(parentId) && this._scrollableContainer.content().append($container);
+                return $container
+            },
+            _isRootLevel: function(parentId) {
+                return parentId === this.option("rootValue")
             },
             _getAccessors: function() {
                 return ["key", "display", "selected", "expanded", "items", "parentId", "disabled", "hasItems"]
@@ -3201,25 +3278,29 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     }
             },
             _render: function() {
-                var that = this;
-                this.element().off(pointerEvents.down).on(pointerEvents.down, function(e) {
-                    var $target = $(e.target).closest(that._activeStateUnit);
-                    if (!$target.length)
-                        e.preventDefault()
-                });
+                this._attachPointerEventHandler();
                 this.callBase();
                 this.setAria("role", "tree")
             },
+            _attachPointerEventHandler: function() {
+                var that = this,
+                    event = pointerEvents.down;
+                this.element().off(event).on(event, function(e) {
+                    var $target = $(e.target).closest(that._activeStateUnit);
+                    if (!$target.length)
+                        e.preventDefault()
+                })
+            },
             _renderContentImpl: function() {
-                if (this.option("items").length) {
-                    this._renderScrollableContainer();
-                    var $nodeContainer = this._renderNodeContainer();
-                    this._scrollableContainer.content().append($nodeContainer);
-                    this._renderItems($nodeContainer, this._dataAdapter.getRootNodes());
-                    if (this._selectAllEnabled())
-                        this._renderSelectAllItem($nodeContainer)
-                }
-                this._renderEmptyMessage()
+                this._renderEmptyMessage();
+                if (!this.option("items").length)
+                    return;
+                var $nodeContainer = this._renderNodeContainer();
+                this._renderScrollableContainer();
+                this._scrollableContainer.content().append($nodeContainer);
+                this._renderItems($nodeContainer, this._dataAdapter.getRootNodes());
+                if (this._selectAllEnabled())
+                    this._renderSelectAllItem($nodeContainer)
             },
             _isVirtualMode: function() {
                 return this.option("virtualModeEnabled") && this._isDataStructurePlain() && this.option("dataSource")
@@ -3243,7 +3324,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
             _renderNodeContainer: function($parent) {
                 var $container = $("<ul>").addClass(NODE_CONTAINER_CLASS);
                 this.setAria("role", "group", $container);
-                if ($parent) {
+                if ($parent && $parent.length) {
                     var itemData = this._getItemData($parent.find("> ." + ITEM_CLASS));
                     if (this._expandedGetter(itemData))
                         $container.addClass(OPENED_NODE_CONTAINER_CLASS);
@@ -3267,27 +3348,33 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 return this.option("showCheckBoxesMode") === "selectAll"
             },
             _initCheckBoxesMode: function() {
-                this._suppressDeprecatedWarnings();
-                if (this.option("showCheckBoxesMode") !== "none")
+                if (this._showCheckboxes())
                     return;
                 this._suppressDeprecatedWarnings();
                 var showCheckboxes = this.option("showCheckBoxes"),
                     selectAllEnabled = this.option("selectAllEnabled");
                 this._resumeDeprecatedWarnings();
-                this.option("showCheckBoxesMode", showCheckboxes ? selectAllEnabled ? "selectAll" : "normal" : "none");
-                this._resumeDeprecatedWarnings()
+                this.option("showCheckBoxesMode", showCheckboxes ? selectAllEnabled ? "selectAll" : "normal" : "none")
             },
             _renderItems: function($nodeContainer, nodes) {
                 var length = nodes.length - 1;
-                for (var i = length; i >= 0; i--) {
-                    var node = nodes[i];
-                    var $node = this._createDOMElement($nodeContainer, node);
-                    this._showCheckboxes() && this._renderCheckBox($node, node);
-                    var $item = this._renderItem.call(this, node.internalFields.key, node.internalFields.item, $node);
-                    this._attachDblclickToItem($item, node);
+                this._firstSelected = false;
+                for (var i = length; i >= 0; i--)
+                    this._renderItem(nodes[i], $nodeContainer);
+                this._renderFocusTarget();
+                delete this._firstSelected
+            },
+            _renderItem: function(node, $nodeContainer) {
+                var $node = this._createDOMElement($nodeContainer, node),
+                    nodeData = node.internalFields;
+                this._showCheckboxes() && this._renderCheckBox($node, node);
+                var $item = this.callBase(nodeData.key, nodeData.item, $node);
+                this._firstSelected && this._isSingleSelection() || this._toggleSelectedClass($node, nodeData.selected);
+                if (nodeData.selected)
+                    this._firstSelected = true;
+                this._attachDblclickToItem($item, node);
+                if (nodeData.item.visible !== false)
                     this._renderChildren($node, node)
-                }
-                this._renderFocusTarget()
             },
             _renderChildren: function($node, node) {
                 if (this._hasChildren(node)) {
@@ -3329,12 +3416,20 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     that._toggleExpandedState(node, undefined, e)
                 })
             },
+            _getNodeByItemElement: function(itemElement) {
+                itemElement = $(itemElement).get(0);
+                if (!itemElement)
+                    return null;
+                if (commonUtils.isPrimitive(itemElement))
+                    return this._dataAdapter.getNodeByKey(itemElement);
+                if (itemElement.nodeType)
+                    return this._dataAdapter.getNodeByItem(this._getItemData(itemElement));
+                return this._dataAdapter.getNodeByItem(itemElement)
+            },
             _convertItemElementToNode: function(itemElement) {
                 if (!itemElement || itemElement.internalFields)
                     return itemElement;
-                var itemData = $(itemElement).get(0).nodeType ? this._getItemData($(itemElement)) : itemElement,
-                    node = this._dataAdapter.getNodeByItem(itemData);
-                return node
+                return this._getNodeByItemElement(itemElement)
             },
             _toggleExpandedState: function(itemElement, state, e) {
                 var node = this._convertItemElementToNode(itemElement);
@@ -3354,10 +3449,10 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
             _createLoadIndicator: function($node) {
                 var $icon = $node.find(">." + TOGGLE_ITEM_VISIBILITY_CLASS),
                     $nodeContainer = $node.find(" > ." + NODE_CONTAINER_CLASS);
-                if (!$icon.hasClass(TOGGLE_ITEM_VISIBILITY_OPENED_CLASS) && $nodeContainer.is(":empty")) {
-                    this._createComponent("<div>", "dxLoadIndicator", {}).element().appendTo($node);
-                    $icon.hide()
-                }
+                if ($icon.hasClass(TOGGLE_ITEM_VISIBILITY_OPENED_CLASS) || $nodeContainer.not(":empty").length)
+                    return;
+                this._createComponent("<div>", "dxLoadIndicator", {}).element().appendTo($node);
+                $icon.hide()
             },
             _renderToggleItemVisibilityIcon: function($node, node) {
                 var $icon = $("<div>").addClass(TOGGLE_ITEM_VISIBILITY_CLASS).appendTo($node);
@@ -3379,21 +3474,23 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
             _updateExpandedItemsUI: function(node, state, e) {
                 var $node = this._getNodeElementById(node.internalFields.key),
                     $icon = $node.find(">." + TOGGLE_ITEM_VISIBILITY_CLASS),
-                    $nodeContainer = $node.find(" > ." + NODE_CONTAINER_CLASS);
+                    $nodeContainer;
                 $icon.toggleClass(TOGGLE_ITEM_VISIBILITY_OPENED_CLASS, state);
-                if (state)
-                    this._renderNestedItems($nodeContainer).done($.proxy(function(itemsLoaded) {
-                        if (itemsLoaded) {
-                            this._animateNodeContainer($nodeContainer, state);
-                            this.setAria("expanded", state, $node);
-                            this._fireExpandedStateUpdatedEvt(state, node, e)
-                        }
-                    }, this));
-                else {
-                    this.setAria("expanded", state, $node);
-                    this._animateNodeContainer($nodeContainer, state);
-                    this._fireExpandedStateUpdatedEvt(state, node, e)
+                if (!state) {
+                    this._updateExpandedItem(node, state, e);
+                    return
                 }
+                $nodeContainer = $node.find(" > ." + NODE_CONTAINER_CLASS);
+                this._renderNestedItems($nodeContainer).done($.proxy(function(itemsLoaded) {
+                    itemsLoaded && this._updateExpandedItem(node, state, e)
+                }, this))
+            },
+            _updateExpandedItem: function(node, state, e) {
+                var $node = this._getNodeElementById(node.internalFields.key),
+                    $nodeContainer = $node.find(" > ." + NODE_CONTAINER_CLASS);
+                this._animateNodeContainer($nodeContainer, state);
+                this.setAria("expanded", state, $node);
+                this._fireExpandedStateUpdatedEvt(state, node, e)
             },
             _animateNodeContainer: function($nodeContainer, state) {
                 var nodeHeight = $nodeContainer.height();
@@ -3416,31 +3513,30 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
             _fireExpandedStateUpdatedEvt: function(isExpanded, node, e) {
                 var optionName = isExpanded ? "onItemExpanded" : "onItemCollapsed",
                     target;
-                var handler = this.option(optionName);
-                if (handler)
-                    if (commonUtils.isDefined(e))
-                        this._itemJQueryEventHandler(e, optionName, {node: this._dataAdapter.getPublicNode(node)});
-                    else {
-                        target = this._getNodeElementById(node.internalFields.key);
-                        this._itemEventHandler(target, optionName, {
-                            jQueryEvent: e,
-                            node: this._dataAdapter.getPublicNode(node)
-                        })
-                    }
+                if (!this.option(optionName))
+                    return;
+                if (commonUtils.isDefined(e))
+                    this._itemJQueryEventHandler(e, optionName, {node: this._dataAdapter.getPublicNode(node)});
+                else {
+                    target = this._getNodeElementById(node.internalFields.key);
+                    this._itemEventHandler(target, optionName, {
+                        jQueryEvent: e,
+                        node: this._dataAdapter.getPublicNode(node)
+                    })
+                }
             },
             _renderNestedItems: function($container) {
                 if (!$container.is(":empty"))
                     return $.Deferred().resolve(true).promise();
-                var itemElement = $container.parent().find(">." + ITEM_CLASS),
-                    item = this._getItemData(itemElement),
-                    node = this._dataAdapter.getNodeByItem(item),
-                    d = $.Deferred();
+                var d = $.Deferred();
                 if (this._isVirtualMode())
                     this._renderVirtualNodes($container).done(function(items) {
                         d.resolve(items && items.length)
                     });
                 else {
-                    var nestedItems = this._getChildNodes(node);
+                    var itemElement = $container.parent().find(">." + ITEM_CLASS),
+                        node = this._getNodeByItemElement(itemElement),
+                        nestedItems = this._getChildNodes(node);
                     this._renderItems($container, nestedItems);
                     d.resolve(true)
                 }
@@ -3448,17 +3544,12 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
             },
             _renderVirtualNodes: function($container) {
                 var itemElement = $container.parent().find(">." + ITEM_CLASS),
-                    itemData = this._getItemData(itemElement),
-                    node = this._dataAdapter.getNodeByItem(itemData),
+                    node = this._getNodeByItemElement(itemElement),
                     that = this;
                 this._dataSource.filter([this.option("parentIdExpr"), node.internalFields.key]);
                 return this._dataSource.load().done(function(data) {
-                        var virtualNodes = [];
-                        $.each(data, function(_, item) {
-                            var virtualNode = that._dataAdapter.getNodeByItem(item);
-                            virtualNode && virtualNodes.push(virtualNode)
-                        });
-                        that._renderItems($container, virtualNodes, false);
+                        var virtualNodes = that._getVirtualNodes(data);
+                        that._renderItems($container, virtualNodes);
                         if (virtualNodes.length && !node.internalFields.selected) {
                             var firstItemKey = virtualNodes[0].internalFields.key,
                                 $firstChild = that._getNodeElementById(firstItemKey);
@@ -3467,27 +3558,37 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         that._normalizeIconState(itemElement, virtualNodes.length)
                     })
             },
+            _getVirtualNodes: function(items) {
+                var that = this,
+                    virtualNodes = [];
+                $.each(items, function(_, item) {
+                    var virtualNode = that._dataAdapter.getNodeByItem(item);
+                    virtualNode && virtualNodes.push(virtualNode)
+                });
+                return virtualNodes
+            },
             _normalizeIconState: function(itemElement, hasNewItems) {
                 var $loadIndicator = itemElement.siblings(".dx-loadindicator"),
-                    $icon = itemElement.siblings("." + TOGGLE_ITEM_VISIBILITY_CLASS);
+                    $icon;
                 $loadIndicator.dxLoadIndicator("instance").option("visible", false);
-                if (!hasNewItems) {
-                    itemElement.siblings("." + TOGGLE_ITEM_VISIBILITY_CLASS).removeClass(TOGGLE_ITEM_VISIBILITY_CLASS);
-                    itemElement.parent().addClass(IS_LEAF)
+                if (hasNewItems) {
+                    $icon = itemElement.siblings("." + TOGGLE_ITEM_VISIBILITY_CLASS);
+                    $icon.show();
+                    return
                 }
-                else
-                    $icon.show()
+                itemElement.siblings("." + TOGGLE_ITEM_VISIBILITY_CLASS).removeClass(TOGGLE_ITEM_VISIBILITY_CLASS);
+                itemElement.parent().addClass(IS_LEAF)
             },
             _dataSourceChangedHandler: function(newItems) {
                 var isInArray = $.inArray(newItems[0], this.option("items")) + 1;
-                if (this._initialized && this._isVirtualMode() && !isInArray) {
-                    this.option().items = this.option("items").concat(newItems);
-                    this._initDataAdapter();
-                    if (!this._contentAlreadyRendered)
-                        this._renderContent()
+                if (!this._initialized || !this._isVirtualMode() || isInArray) {
+                    this.option("items", newItems);
+                    return
                 }
-                else
-                    this.option("items", newItems)
+                this.option().items = this.option("items").concat(newItems);
+                this._initDataAdapter();
+                if (!this._contentAlreadyRendered)
+                    this._renderContent()
             },
             _renderContent: function() {
                 if (this.option("items").length)
@@ -3509,6 +3610,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
             _toggleSelectAll: function(args) {
                 this._dataAdapter.toggleSelectAll(args.value);
                 this._updateCheckBoxes();
+                this._toggleSelectedClass(this.element().find("." + NODE_CLASS), args.value);
                 this._fireSelectionChanged()
             },
             _renderCheckBox: function($node, node) {
@@ -3555,33 +3657,49 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 this._updateCheckBoxes();
                 this._fireSelectionChanged()
             },
+            _isSingleSelection: function() {
+                return !this._showCheckboxes() || this.option("selectionMode") === "single"
+            },
             _updateItemSelection: function(value, itemElement, suppressOnSelectionChanged, $node) {
-                var itemData = itemElement.nodeType ? this._getItemData(itemElement) : itemElement,
-                    node = commonUtils.isPrimitive(itemData) ? this._dataAdapter.getNodeByKey(itemData) : this._dataAdapter.getNodeByItem(itemData);
-                if (node.internalFields.selected === value)
+                var node = this._getNodeByItemElement(itemElement);
+                if (!node || node.internalFields.selected === value)
                     return;
+                if (this._isSingleSelection())
+                    this._toggleSelectAll({value: false});
                 if (!$node) {
                     var $tmpNode = this._getNodeElementById(node.internalFields.key);
                     if ($tmpNode.length)
                         $node = $tmpNode
                 }
-                if ($node)
-                    this._getCheckBoxInstance($node).option("value", value);
-                else
+                if (this._showCheckboxes()) {
+                    if ($node)
+                        this._getCheckBoxInstance($node).option("value", value);
+                    else
+                        this._dataAdapter.toggleSelection(node.internalFields.key, value);
+                    this._updateCheckBoxes()
+                }
+                else {
                     this._dataAdapter.toggleSelection(node.internalFields.key, value);
-                this._updateCheckBoxes();
+                    if ($node)
+                        this._toggleSelectedClass($node, value)
+                }
+                this._fireOnSelectedEvent(node);
+                this._fireSelectionChanged()
+            },
+            _fireOnSelectedEvent: function(node) {
                 var handler = this.option("onItemSelected");
                 if (handler)
                     handler.call(this, {
-                        itemData: itemData,
+                        itemData: node.internalFields.item,
                         node: this._dataAdapter.getPublicNode(node)
-                    });
-                this._fireSelectionChanged()
+                    })
             },
             _getCheckBoxInstance: function($node) {
                 return $node.find("> .dx-checkbox").dxCheckBox("instance")
             },
             _updateCheckBoxes: function() {
+                if (!this._showCheckboxes())
+                    return;
                 var that = this;
                 $.each(this._dataAdapter.getData(), function(_, node) {
                     var $node = that._getNodeElementById(node.internalFields.key);
@@ -3597,9 +3715,10 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
             },
             _updateParentsState: function(node, $node) {
                 var parentNode = this._dataAdapter.getNodeByKey(node.internalFields.parentKey),
-                    parentValue = parentNode.internalFields.selected,
+                    parentValue,
                     $parentNode;
                 if ($node && this._showCheckboxes()) {
+                    parentValue = parentNode.internalFields.selected;
                     $parentNode = $($node.parents("." + NODE_CLASS)[0]);
                     this._getCheckBoxInstance($parentNode).option("value", parentValue);
                     this._toggleSelectedClass($parentNode, parentValue)
@@ -3636,9 +3755,9 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     itemSelector = that._itemSelector(),
                     eventName = eventUtils.addNamespace("dxclick", that.NAME),
                     pointerDownEvent = eventUtils.addNamespace(pointerEvents.down, this.NAME);
-                that._itemContainer().off(eventName, itemSelector).on(eventName, itemSelector, function(e) {
+                that._itemContainer().off(eventName, itemSelector).off(pointerDownEvent, itemSelector).on(eventName, itemSelector, function(e) {
                     that._itemClickHandler(e, $(this))
-                }).off(pointerDownEvent, itemSelector).on(pointerDownEvent, itemSelector, $.proxy(this._itemPointerDownHandler, this))
+                }).on(pointerDownEvent, itemSelector, $.proxy(this._itemPointerDownHandler, this))
             },
             _itemClickHandler: function(e, $item) {
                 var itemData = this._getItemData($item),
@@ -3667,12 +3786,12 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     focusTargets = this._focusTarget();
                 if ($.inArray(currentTarget, focusTargets) !== -1)
                     this._toggleFocusClass(true, currentTarget);
-                if (!this.option("focusedElement")) {
-                    var $activeItem = this._getActiveItem();
-                    this.option("focusedElement", $activeItem.closest("." + NODE_CLASS))
+                if (this.option("focusedElement")) {
+                    this._setFocusedItem(this.option("focusedElement"));
+                    return
                 }
-                else
-                    this._setFocusedItem(this.option("focusedElement"))
+                var $activeItem = this._getActiveItem();
+                this.option("focusedElement", $activeItem.closest("." + NODE_CLASS))
             },
             _setFocusedItem: function($target) {
                 if (!$target || !$target.length)
@@ -3684,12 +3803,12 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
             _itemPointerDownHandler: function(e) {
                 if (!this.option("focusStateEnabled"))
                     return;
-                var $target = $(e.target).closest("." + NODE_CLASS);
-                if ($target.hasClass(NODE_CLASS))
-                    if ($target.hasClass(DISABLED_STATE_CLASS))
-                        this.option("focusedElement", null);
-                    else
-                        this.option("focusedElement", $target)
+                var $target = $(e.target).closest("." + NODE_CLASS),
+                    itemElement;
+                if (!$target.hasClass(NODE_CLASS))
+                    return;
+                itemElement = $target.hasClass(DISABLED_STATE_CLASS) ? null : $target;
+                this.option("focusedElement", itemElement)
             },
             _findNonDisabledNodes: function($nodes) {
                 return $nodes.not(function() {
@@ -3707,42 +3826,43 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     DX.fx.stop(this, true)
                 });
                 var $items = this._findNonDisabledNodes(this._nodeElements());
-                if ($items && $items.length)
-                    switch (location) {
-                        case FOCUS_UP:
-                            var $prevItem = this._prevItem($items);
-                            this.option("focusedElement", $prevItem);
-                            if (e.shiftKey && this._showCheckboxes())
-                                this._updateItemSelection(true, $prevItem.find("." + ITEM_CLASS).get(0), true, $prevItem);
-                            break;
-                        case FOCUS_DOWN:
-                            var $nextItem = this._nextItem($items);
-                            this.option("focusedElement", $nextItem);
-                            if (e.shiftKey && this._showCheckboxes())
-                                this._updateItemSelection(true, $nextItem.find("." + ITEM_CLASS).get(0), true, $nextItem);
-                            break;
-                        case FOCUS_FIRST:
-                            var $firstItem = $items.first();
-                            if (e.shiftKey && this._showCheckboxes())
-                                this._updateSelectionToFirstItem($items, $items.index(this._prevItem($items)));
-                            this.option("focusedElement", $firstItem);
-                            break;
-                        case FOCUS_LAST:
-                            var $lastItem = $items.last();
-                            if (e.shiftKey && this._showCheckboxes())
-                                this._updateSelectionToLastItem($items, $items.index(this._nextItem($items)));
-                            this.option("focusedElement", $lastItem);
-                            break;
-                        case FOCUS_RIGHT:
-                            this._expandFocusedContainer();
-                            break;
-                        case FOCUS_LEFT:
-                            this._collapseFocusedContainer();
-                            break;
-                        default:
-                            this.callBase.apply(this, arguments);
-                            return
-                    }
+                if (!$items || !$items.length)
+                    return;
+                switch (location) {
+                    case FOCUS_UP:
+                        var $prevItem = this._prevItem($items);
+                        this.option("focusedElement", $prevItem);
+                        if (e.shiftKey && this._showCheckboxes())
+                            this._updateItemSelection(true, $prevItem.find("." + ITEM_CLASS).get(0), true, $prevItem);
+                        break;
+                    case FOCUS_DOWN:
+                        var $nextItem = this._nextItem($items);
+                        this.option("focusedElement", $nextItem);
+                        if (e.shiftKey && this._showCheckboxes())
+                            this._updateItemSelection(true, $nextItem.find("." + ITEM_CLASS).get(0), true, $nextItem);
+                        break;
+                    case FOCUS_FIRST:
+                        var $firstItem = $items.first();
+                        if (e.shiftKey && this._showCheckboxes())
+                            this._updateSelectionToFirstItem($items, $items.index(this._prevItem($items)));
+                        this.option("focusedElement", $firstItem);
+                        break;
+                    case FOCUS_LAST:
+                        var $lastItem = $items.last();
+                        if (e.shiftKey && this._showCheckboxes())
+                            this._updateSelectionToLastItem($items, $items.index(this._nextItem($items)));
+                        this.option("focusedElement", $lastItem);
+                        break;
+                    case FOCUS_RIGHT:
+                        this._expandFocusedContainer();
+                        break;
+                    case FOCUS_LEFT:
+                        this._collapseFocusedContainer();
+                        break;
+                    default:
+                        this.callBase.apply(this, arguments);
+                        return
+                }
             },
             _nodeElements: function() {
                 return this.element().find("." + NODE_CLASS).not(":hidden")
@@ -3756,8 +3876,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     this.option("focusedElement", this._nextItem(this._findNonDisabledNodes(this._nodeElements())));
                     return
                 }
-                var itemData = this._getItemData($focusedItem.find(">." + ITEM_CLASS)),
-                    node = this._dataAdapter.getNodeByItem(itemData);
+                var node = this._getNodeByItemElement($focusedItem.find(">." + ITEM_CLASS));
                 this._toggleExpandedState(node, true)
             },
             _getClosestNonDisabledNode: function($node) {
@@ -3772,8 +3891,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     return;
                 var nodeElement = $focusedItem.find("." + NODE_CONTAINER_CLASS).eq(0);
                 if (!$focusedItem.hasClass(IS_LEAF) && nodeElement.hasClass(OPENED_NODE_CONTAINER_CLASS)) {
-                    var itemData = this._getItemData($focusedItem.find(">." + ITEM_CLASS)),
-                        node = this._dataAdapter.getNodeByItem(itemData);
+                    var node = this._getNodeByItemElement($focusedItem.find(">." + ITEM_CLASS));
                     this._toggleExpandedState(node, false)
                 }
                 else {
@@ -4695,23 +4813,22 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                             filter = [selector, selectedFilterOperation || "=", filterValue];
                         return filter
                     },
-                    getGroupDataSourceParameters: function(column) {
+                    getGroupDataSourceParameters: function(column, remoteGrouping) {
                         var result = [],
+                            dataField = column.dataField || column.name,
                             groupInterval = this.getGroupInterval(column);
-                        if (groupInterval)
-                            if (column.dataType === "date") {
-                                $.each(groupInterval, function(_, value) {
-                                    result.push($.proxy(getIntervalSelector, column, value))
-                                });
-                                return result
-                            }
-                            else if (column.dataType === "number") {
-                                $.each(groupInterval, function(index, interval) {
-                                    result.push($.proxy(getIntervalSelector, column, interval))
-                                });
-                                return result
-                            }
-                        return function(data) {
+                        if (column.calculateGroupValue)
+                            return remoteGrouping ? [{selector: column.calculateGroupValue}] : $.proxy(column.calculateGroupValue, column);
+                        if (groupInterval) {
+                            $.each(groupInterval, function(index, interval) {
+                                result.push(remoteGrouping ? {
+                                    selector: dataField,
+                                    groupInterval: interval
+                                } : $.proxy(getIntervalSelector, column, interval))
+                            });
+                            return result
+                        }
+                        return remoteGrouping ? [{selector: dataField}] : function(data) {
                                 var result = column.calculateCellValue(data);
                                 if (result === undefined)
                                     result = null;
@@ -4744,7 +4861,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
     (function($, DX) {
         var ui = DX.ui,
             dataGrid = ui.dxDataGrid,
-            logger = DX.require("/utils/utils.console").logger,
+            errors = DX.require("/ui/ui.errors"),
+            browser = DX.require("/utils/utils.browser"),
             storageUtils = DX.require("/utils/utils.storage"),
             commonUtils = DX.require("/utils/utils.common");
         var DATE_REGEX = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2}(?:\.\d*)?)Z$/;
@@ -4823,7 +4941,10 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
             var getStorage = function(options) {
                     var storage = options.type === "sessionStorage" ? storageUtils.sessionStorage() : localStorage;
                     if (!storage)
-                        throw new Error("E1007");
+                        if (window.location.protocol === "file:" && browser.msie)
+                            throw new Error("E1038");
+                        else
+                            throw new Error("E1007");
                     return storage
                 };
             var getUniqueStorageKey = function(options) {
@@ -4838,7 +4959,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                             return JSON.parse(getStorage(options).getItem(getUniqueStorageKey(options)))
                         }
                         catch(e) {
-                            logger.error(e.message)
+                            errors.log(e.message)
                         }
                     },
                     _saveState: function(state) {
@@ -5066,11 +5187,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 var getSerializationFormat = function(dataType, value) {
                         switch (dataType) {
                             case"date":
-                                if (commonUtils.isNumber(value))
-                                    return "number";
-                                else if (commonUtils.isString(value))
-                                    return "yyyy/MM/dd";
-                                break;
+                                return dateUtils.getDateSerializationFormat(value);
                             case"number":
                                 if (commonUtils.isString(value))
                                     return "string"
@@ -5314,11 +5431,17 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                                 that._updateLockCount--
                             }
                             that._columnChanges = undefined;
-                            if (columnChanges.optionNames && columnChanges.optionNames.dataField)
-                                that.reinit();
-                            that.columnsChanged.firing = true;
-                            that.columnsChanged.fire(columnChanges);
-                            that.columnsChanged.firing = false
+                            if (columnChanges.optionNames && columnChanges.optionNames.lookup) {
+                                assignColumns(that, createColumnsFromOptions(that, that._columns));
+                                that.updateColumns(that._dataSource)
+                            }
+                            else {
+                                if (columnChanges.optionNames && columnChanges.optionNames.dataField)
+                                    that.reinit();
+                                that.columnsChanged.firing = true;
+                                that.columnsChanged.fire(columnChanges);
+                                that.columnsChanged.firing = false
+                            }
                         }
                     };
                 var columnOptionCore = function(that, column, optionName, value, notFireEvent) {
@@ -5927,9 +6050,10 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         updateFilter: function(filter, localFiltering, columnIndex) {
                             var that = this;
                             if (!commonUtils.isArray(filter))
-                                return;
+                                return filter;
                             var column,
                                 i;
+                            filter = $.extend([], filter);
                             columnIndex = filter.columnIndex || columnIndex;
                             if (localFiltering && commonUtils.isString(filter[0])) {
                                 column = that.columnOption(filter[0]);
@@ -5941,7 +6065,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                             else if (commonUtils.isFunction(filter[0]))
                                 filter[0].columnIndex = columnIndex;
                             for (i = 0; i < filter.length; i++)
-                                that.updateFilter(filter[i], localFiltering, columnIndex)
+                                filter[i] = that.updateFilter(filter[i], localFiltering, columnIndex);
+                            return filter
                         },
                         columnCount: function() {
                             return this._columns.length
@@ -6500,7 +6625,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         return this.selectedItemKeys([], true, true, true)
                     },
                     clearSelection: function() {
-                        this.selectedItemKeys([])
+                        return this.selectedItemKeys([])
                     },
                     refresh: function() {
                         return this.selectedItemKeys(this.option("selectedRowKeys") || [])
@@ -6524,9 +6649,12 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                                 if (keys.length || isSelectAll) {
                                     criteria = createSelectedItemsFilterCriteria(dataSource, keys, isSelectAll);
                                     isFunctionCriteria = $.isFunction(criteria);
+                                    if (isSelectAll) {
+                                        dataSourceFilter = dataController.getCombinedFilter();
+                                        if (isDeselect && !dataSourceFilter)
+                                            return that.clearSelection()
+                                    }
                                     if (criteria || isSelectAll) {
-                                        if (isSelectAll)
-                                            dataSourceFilter = dataController.getCombinedFilter();
                                         if (criteria && !isFunctionCriteria && dataSourceFilter) {
                                             filter = [];
                                             filter.push(criteria);
@@ -6545,20 +6673,13 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                                             filter: filter,
                                             select: dataSource.select()
                                         };
-                                        $.each(store._customLoadOptions() || [], function(_, optionName) {
-                                            loadOptions[optionName] = dataSource.loadOptions()[optionName]
-                                        });
                                         new DX.data.ArrayStore(deselectItems.length ? deselectItems : dataSource.items()).load({filter: criteria}).done(function(items) {
                                             if (!isSelectAll && (deselectItems.length || items.length === keys.length))
                                                 deferred.resolve(items);
-                                            else {
-                                                dataController.setSelectionLoading(true);
-                                                store.load(loadOptions).done(function(items) {
+                                            else
+                                                dataSource.load(loadOptions).done(function(items) {
                                                     new DX.data.ArrayStore(items).load({filter: criteria}).done(deferred.resolve)
-                                                }).fail($.proxy(deferred.reject, deferred)).always(function() {
-                                                    dataController.setSelectionLoading(false)
-                                                })
-                                            }
+                                                }).fail($.proxy(deferred.reject, deferred))
                                         })
                                     }
                                 }
@@ -6712,14 +6833,6 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                             if (dataSource)
                                 this.getController("selection").refresh()
                         },
-                        setSelectionLoading: function(isLoading) {
-                            this._isSelectionLoading = isLoading;
-                            this._fireLoadingChanged()
-                        },
-                        isLoading: function() {
-                            var isLoading = this.callBase();
-                            return isLoading || !!this._isSelectionLoading
-                        },
                         pageIndex: function(value) {
                             var that = this,
                                 dataSource = that._dataSource;
@@ -6748,16 +6861,26 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     }},
                 views: {
                     columnHeadersView: {
-                        _renderCore: function(options) {
+                        init: function() {
                             var that = this;
-                            that.getController("selection").selectionChanged.remove(that._selectionChangedHandler);
-                            that.callBase(options)
+                            that.callBase();
+                            that.getController("selection").selectionChanged.add($.proxy(that._updateSelectAllValue, that))
+                        },
+                        _updateSelectAllValue: function() {
+                            var that = this,
+                                $editor = that.element().find("." + DATAGRID_SELECT_CHECKBOX_CLASS);
+                            if (that.option("selection.mode") === "multiple" && $editor.length)
+                                $editor.dxCheckBox("instance").option("value", that.getController("selection").isSelectAll())
+                        },
+                        _handleDataChanged: function(e) {
+                            this.callBase(e);
+                            if (!e || e.changeType === "refresh")
+                                this._updateSelectAllValue()
                         },
                         _getDefaultTemplate: function(column) {
                             var that = this,
                                 groupElement,
-                                selectionController = that.getController("selection"),
-                                dataController = that.getController("data");
+                                selectionController = that.getController("selection");
                             if (column.command === "select")
                                 return function($cell, options) {
                                         var column = options.column;
@@ -6768,20 +6891,23 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                                             that.getController("editorFactory").createEditor(groupElement, $.extend({}, column, {
                                                 parentType: "headerRow",
                                                 value: selectionController.isSelectAll(),
+                                                editorOptions: {visible: that.option("selection.allowSelectAll") || selectionController.isSelectAll() !== false},
                                                 tabIndex: -1,
                                                 setValue: function(value, e) {
+                                                    var allowSelectAll = that.option("selection.allowSelectAll");
                                                     if (e.jQueryEvent && selectionController.isSelectAll() !== value) {
                                                         if (e.previousValue === undefined || e.previousValue) {
                                                             selectionController.deselectAll();
                                                             e.component.option("value", false)
                                                         }
                                                         if (e.previousValue === false)
-                                                            if (that.option("selection.allowSelectAll"))
+                                                            if (allowSelectAll)
                                                                 selectionController.selectAll();
                                                             else
                                                                 e.component.option("value", false);
                                                         e.jQueryEvent.preventDefault()
                                                     }
+                                                    e.component.option("visible", allowSelectAll || e.component.option("value") !== false)
                                                 }
                                             }));
                                             $cell.on("dxclick", that.createAction(function(e) {
@@ -6789,17 +6915,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                                                 if (!$(event.target).closest("." + DATAGRID_SELECT_CHECKBOX_CLASS).length)
                                                     $(event.currentTarget).children().trigger("dxclick");
                                                 event.preventDefault()
-                                            }));
-                                            that._selectionChangedHandler = function() {
-                                                if (that.option("selection.mode") === "multiple")
-                                                    groupElement.dxCheckBox("instance").option("value", selectionController.isSelectAll())
-                                            };
-                                            that._dataChangedHandler = function(e) {
-                                                if (!e || e.changeType === "refresh")
-                                                    that._selectionChangedHandler()
-                                            };
-                                            dataController.changed.add(that._dataChangedHandler);
-                                            selectionController.selectionChanged.add(that._selectionChangedHandler)
+                                            }))
                                         }
                                     };
                             else
@@ -6961,7 +7077,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                             readOnly: options.readOnly,
                             rtlEnabled: options.rtlEnabled,
                             disabled: options.disabled,
-                            placeholder: options.placeholder
+                            placeholder: options.placeholder,
+                            attr: {id: options.id}
                         }, options.editorOptions)
                 };
             var getTextEditorConfig = function(options) {
@@ -7006,7 +7123,6 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     options.editorName = "dxDateBox";
                     options.editorOptions = getResultConfig({
                         value: options.value,
-                        customOverlayCssClass: "dx-datagrid",
                         onValueChanged: function(args) {
                             options.setValue(args.value)
                         },
@@ -7463,10 +7579,6 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                                 eventType: event.type
                             })
                     };
-                if (that.option("onCellClick"))
-                    $table.on("dxclick", ".dx-row > td", function(e) {
-                        that.executeAction("onCellClick", getOptions(e))
-                    });
                 if (that.option("onCellHoverChanged")) {
                     $table.on("mouseover", ".dx-row > td", function(e) {
                         that.executeAction("onCellHoverChanged", getOptions(e))
@@ -7475,7 +7587,11 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         that.executeAction("onCellHoverChanged", getOptions(e))
                     })
                 }
-                $table.on("dxclick", ".dx-row", that.createAction(function(e) {
+                if (that.option("onCellClick"))
+                    $table.on("dxclick", ".dx-row > td", function(e) {
+                        that.executeAction("onCellClick", getOptions(e))
+                    });
+                $table.on("dxclick", ".dx-row", {useNative: that._isNativeClick()}, that.createAction(function(e) {
                     var jQueryEvent = e.jQueryEvent;
                     if (!$(jQueryEvent.target).closest("a").length) {
                         e.rowIndex = that.getRowIndex(jQueryEvent.currentTarget);
@@ -7486,6 +7602,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 }));
                 return $table
             },
+            _isNativeClick: $.noop,
             _rowClick: $.noop,
             _createColGroup: function(columns) {
                 var i,
@@ -7721,15 +7838,20 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     that._skipScrollChanged = true
                 }
             },
-            wrapTableInScrollContainer: function($table) {
+            _wrapTableInScrollContainer: function($table) {
                 var that = this,
                     $scrollContainer;
                 $scrollContainer = $("<div/>").on("scroll", function() {
                     !that._skipScrollChanged && that.scrollChanged.fire({left: $scrollContainer.scrollLeft()}, that.name);
                     that._skipScrollChanged = false
-                }).addClass(DATAGRID_CONTENT_CLASS).addClass(DATAGRID_SCROLL_CONTAINER_CLASS).append($table);
+                }).addClass(DATAGRID_CONTENT_CLASS).addClass(DATAGRID_SCROLL_CONTAINER_CLASS).append($table).appendTo(that.element());
                 return $scrollContainer
             },
+            _updateContent: function($newTableElement) {
+                this._setTableElement($newTableElement);
+                this._wrapTableInScrollContainer($newTableElement)
+            },
+            _findContentElement: $.noop,
             getColumnWidths: function() {
                 var that = this,
                     result = [],
@@ -8101,7 +8223,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         if (!isSharedDataSource)
                             dataSource.dispose()
                     },
-                    refresh: function(storeLoadOptions, isReload, operationTypes) {
+                    refresh: function(options, isReload, operationTypes) {
                         var that = this,
                             dataSource = that._dataSource;
                         if (isReload || operationTypes.reload) {
@@ -8110,6 +8232,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                             that._hasLastPage = that._isLastPage
                         }
                     },
+                    _customizeRemoteOperations: function(){},
                     _handleDataLoading: function(options) {
                         var that = this,
                             dataSource = that._dataSource,
@@ -8121,13 +8244,18 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         options.originalStoreLoadOptions = options.storeLoadOptions;
                         options.remoteOperations = $.extend({}, this.remoteOperations());
                         var isReload = !that.isLoaded() && !that._isRefreshing;
-                        that._lastLoadOptions = loadOptions = $.extend({
+                        loadOptions = $.extend({
                             pageIndex: dataSource.pageIndex(),
                             pageSize: dataSource.pageSize()
                         }, options.storeLoadOptions);
                         operationTypes = calculateOperationTypes(loadOptions, lastLoadOptions);
                         that._isRefreshing = true;
-                        $.when(that.refresh(options.storeLoadOptions, isReload, operationTypes)).always(function() {
+                        that._customizeRemoteOperations(options, isReload, operationTypes);
+                        if (options.isCustomLoading)
+                            return;
+                        else
+                            that._lastLoadOptions = loadOptions;
+                        $.when(that.refresh(options, isReload, operationTypes)).always(function() {
                             if (that._lastOperationId === options.operationId)
                                 that.load();
                             that._isRefreshing = false
@@ -8154,6 +8282,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         var that = this,
                             currentTotalCount,
                             dataSource = that._dataSource,
+                            isLoading = false,
                             itemsCount = that.itemsCount();
                         that._isLastPage = !itemsCount || !that.pageSize() || itemsCount < that.pageSize();
                         if (that._isLastPage)
@@ -8161,7 +8290,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         if (dataSource.totalCount() >= 0) {
                             if (dataSource.pageIndex() >= that.pageCount()) {
                                 dataSource.pageIndex(that.pageCount() - 1);
-                                dataSource.load()
+                                dataSource.load();
+                                isLoading = true
                             }
                         }
                         else {
@@ -8169,10 +8299,11 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                             that._currentTotalCount = Math.max(that._currentTotalCount, currentTotalCount);
                             if (itemsCount === 0 && dataSource.pageIndex() >= that.pageCount()) {
                                 dataSource.pageIndex(that.pageCount() - 1);
-                                dataSource.load()
+                                dataSource.load();
+                                isLoading = true
                             }
                         }
-                        if (!dataSource.isLoading()) {
+                        if (!isLoading) {
                             this.component._optionCache = {};
                             this.changed.fire(args);
                             this.component._optionCache = undefined
@@ -8206,6 +8337,44 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     },
                     hasKnownLastPage: function() {
                         return this._hasLastPage || this._dataSource.totalCount() >= 0
+                    },
+                    load: function(options) {
+                        var that = this,
+                            store,
+                            loadResult,
+                            dataSourceLoadOptions,
+                            dataSource = that._dataSource,
+                            d = $.Deferred();
+                        if (options) {
+                            store = dataSource.store();
+                            dataSourceLoadOptions = dataSource.loadOptions();
+                            loadResult = {
+                                storeLoadOptions: options,
+                                isCustomLoading: true
+                            };
+                            $.each(store._customLoadOptions() || [], function(_, optionName) {
+                                if (!(optionName in loadResult.storeLoadOptions))
+                                    loadResult.storeLoadOptions[optionName] = dataSourceLoadOptions[optionName]
+                            });
+                            dataSource._scheduleLoadCallbacks(d);
+                            that._handleDataLoading(loadResult);
+                            $.when(loadResult.data || store.load(loadResult.storeLoadOptions)).done(function(data, extra) {
+                                loadResult.data = data;
+                                loadResult.extra = extra || {};
+                                that._handleDataLoaded(loadResult);
+                                if (options.requireTotalCount && loadResult.extra.totalCount === undefined)
+                                    loadResult.extra.totalCount = store.totalCount(loadResult.storeLoadOptions);
+                                $.when(loadResult.data, loadResult.extra.totalCount).done(function(data, totalCount) {
+                                    loadResult.extra.totalCount = totalCount;
+                                    d.resolve(data, loadResult.extra)
+                                }).fail(d.reject)
+                            }).fail(d.reject);
+                            return d.fail(function() {
+                                    that.fireEvent("loadError", arguments)
+                                }).promise()
+                        }
+                        else
+                            return dataSource.load()
                     }
                 }
         }());
@@ -8213,23 +8382,30 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
             reload: function(full) {
                 return full ? this._dataSource.reload() : this._dataSource.load()
             },
-            refresh: function(storeLoadOptions, isReload, operationTypes) {
+            _customizeRemoteOperations: function(options, isReload, operationTypes) {
                 var that = this,
-                    remoteOperations = that._remoteOperations;
+                    cachedStoreData = that._cachedStoreData,
+                    cachedPagingData = that._cachedPagingData;
                 that.callBase.apply(that, arguments);
                 if (isReload) {
-                    that._cachedStoreData = undefined;
-                    that._cachedPagingData = undefined
+                    cachedStoreData = undefined;
+                    cachedPagingData = undefined
                 }
                 else {
                     if (operationTypes.reload)
-                        that._cachedPagingData = undefined;
+                        cachedPagingData = undefined;
                     $.each(operationTypes, function(operationType, value) {
-                        if (value && remoteOperations[operationType]) {
-                            that._cachedStoreData = undefined;
-                            that._cachedPagingData = undefined
+                        if (value && options.remoteOperations[operationType]) {
+                            cachedStoreData = undefined;
+                            cachedPagingData = undefined
                         }
                     })
+                }
+                options.cachedStoreData = cachedStoreData;
+                options.cachedPagingData = cachedPagingData;
+                if (!options.isCustomLoading) {
+                    that._cachedStoreData = cachedStoreData;
+                    that._cachedPagingData = cachedPagingData
                 }
             },
             _handleDataLoading: function(options) {
@@ -8238,8 +8414,6 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
             },
             _handleDataLoadingCore: function(options) {
                 var remoteOperations = options.remoteOperations;
-                if (remoteOperations.grouping && options.storeLoadOptions.group)
-                    remoteOperations.paging = false;
                 options.loadOptions = {};
                 var localLoadOptionNames = {
                         filter: !remoteOperations.filtering,
@@ -8256,14 +8430,14 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         delete options.storeLoadOptions[optionName]
                     }
                 });
-                if (!options.storeLoadOptions.isLoadingAll)
-                    options.data = this._cachedStoreData
+                options.data = options.cachedStoreData
             },
             _handleDataLoaded: function(options) {
                 var callBase = this.callBase,
                     loadOptions = options.loadOptions,
                     localPaging = options.remoteOperations && !options.remoteOperations.paging,
-                    isCaching = this.option("cacheEnabled") !== false && localPaging && options.storeLoadOptions && !options.storeLoadOptions.isLoadingAll;
+                    isCaching = this.option("cacheEnabled") !== false && localPaging && options.storeLoadOptions,
+                    needStoreCache = isCaching && !options.isCustomLoading;
                 if (!loadOptions) {
                     this._dataSource.cancel(options.operationId);
                     return
@@ -8277,15 +8451,15 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 if (loadOptions.group)
                     loadOptions.group = options.group || loadOptions.group;
                 var groupCount = dataGrid.normalizeSortingInfo(options.storeLoadOptions.group || loadOptions.group).length;
-                if (isCaching && this._cachedPagingData)
-                    options.data = cloneItems(this._cachedPagingData, groupCount);
+                if (isCaching && options.cachedPagingData)
+                    options.data = cloneItems(options.cachedPagingData, groupCount);
                 else {
-                    if (isCaching && !this._cachedStoreData)
+                    if (needStoreCache && !this._cachedStoreData)
                         this._cachedStoreData = cloneItems(options.data, dataGrid.normalizeSortingInfo(options.storeLoadOptions.group).length);
                     new DX.data.ArrayStore(options.data).load(loadOptions).done(function(data) {
                         options.data = data
                     });
-                    if (isCaching)
+                    if (needStoreCache)
                         this._cachedPagingData = cloneItems(options.data, groupCount)
                 }
                 if (loadOptions.requireTotalCount && localPaging) {
@@ -8309,7 +8483,6 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
     (function($, DX) {
         var ui = DX.ui,
             dataGrid = ui.dxDataGrid,
-            errors = DevExpress.require("/ui/ui.errors"),
             commonUtils = DX.require("/utils/utils.common"),
             Class = DX.require("/class"),
             normalizeSortingInfo = DX.data.utils.normalizeSortingInfo;
@@ -8324,14 +8497,17 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 return {
                         init: function() {
                             this.callBase.apply(this, arguments);
-                            this._grouping = this._createGroupingHelper()
+                            this._initGroupingHelper()
                         },
-                        _createGroupingHelper: function() {
-                            var remoteOperations = this.remoteOperations();
-                            if (remoteOperations.filtering && remoteOperations.sorting && remoteOperations.paging && !remoteOperations.grouping)
-                                return new dataGrid.ExpandedGroupingHelper(this);
-                            else
-                                return new dataGrid.CollapsedGroupingHelper(this)
+                        _initGroupingHelper: function(options) {
+                            var grouping = this._grouping,
+                                remoteOperations = options ? options.remoteOperations : this.remoteOperations();
+                            if (remoteOperations.filtering && remoteOperations.sorting && remoteOperations.paging && !remoteOperations.grouping) {
+                                if (!grouping || grouping instanceof dataGrid.CollapsedGroupingHelper)
+                                    this._grouping = new dataGrid.ExpandedGroupingHelper(this)
+                            }
+                            else if (!grouping || grouping instanceof dataGrid.ExpandedGroupingHelper)
+                                this._grouping = new dataGrid.CollapsedGroupingHelper(this)
                         },
                         totalItemsCount: function() {
                             var that = this,
@@ -8349,10 +8525,6 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                             return groupInfo ? groupInfo.isExpanded : !this._grouping.allowCollapseAll()
                         },
                         collapseAll: function(groupIndex) {
-                            if (!this._grouping.allowCollapseAll()) {
-                                errors.log("E1018");
-                                return false
-                            }
                             return this._collapseExpandAll(groupIndex, false)
                         },
                         expandAll: function(groupIndex) {
@@ -8378,7 +8550,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                             }
                             return true
                         },
-                        refresh: function(storeLoadOptions) {
+                        refresh: function() {
                             this.callBase.apply(this, arguments);
                             return this._grouping.refresh.apply(this._grouping, arguments)
                         },
@@ -8398,8 +8570,24 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         getGroupsInfo: function() {
                             return this._grouping._groupsInfo
                         },
+                        _hasCollapsedGroupLevels: function(group) {
+                            if (group && $.isArray(group))
+                                for (var i = 0; i < group.length; i++)
+                                    if (group[i].isExpanded === false)
+                                        return true
+                        },
+                        _customizeRemoteOperations: function(options) {
+                            var remoteOperations = options.remoteOperations;
+                            if (remoteOperations.grouping && options.storeLoadOptions.group && !options.isCustomLoading)
+                                remoteOperations.paging = false;
+                            if (!remoteOperations.grouping && this._hasCollapsedGroupLevels(options.storeLoadOptions.group))
+                                remoteOperations.paging = false;
+                            this.callBase.apply(this, arguments)
+                        },
                         _handleDataLoading: function(options) {
-                            return this._grouping.handleDataLoading(options, $.proxy(this.callBase, this))
+                            this.callBase(options);
+                            this._initGroupingHelper(options);
+                            return this._grouping.handleDataLoading(options)
                         },
                         _handleDataLoaded: function(options) {
                             return this._grouping.handleDataLoaded(options, $.proxy(this.callBase, this))
@@ -8571,9 +8759,10 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     allowCollapseAll: function() {
                         return true
                     },
-                    refresh: function(storeLoadOptions) {
+                    refresh: function(options) {
                         var that = this,
                             groupIndex,
+                            storeLoadOptions = options.storeLoadOptions,
                             oldGroups = normalizeSortingInfo(that._group || []),
                             groups = normalizeSortingInfo(storeLoadOptions.group || []),
                             groupsCount = Math.min(oldGroups.length, groups.length);
@@ -8588,9 +8777,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         else
                             cleanGroupsInfo(that._groupsInfo, 0, groupsCount)
                     },
-                    handleDataLoading: function(options, callBase) {
-                        callBase(options)
-                    },
+                    handleDataLoading: function(options){},
                     handleDataLoaded: function(options, callBase) {
                         callBase(options)
                     },
@@ -8630,30 +8817,31 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         },
                         _processGroupItems: function(items, groupsCount, options) {
                             var that = this,
+                                groupedColumns = that._columnsController.getGroupColumns(),
+                                column = groupedColumns[groupedColumns.length - groupsCount],
                                 scrollingMode,
                                 i,
                                 item,
-                                resultItems,
-                                path;
+                                resultItems;
                             if (!options) {
                                 scrollingMode = that.option("scrolling.mode");
                                 options = {
                                     collectContinuationItems: scrollingMode !== "virtual" && scrollingMode !== "infinite",
                                     resultItems: [],
-                                    path: []
+                                    path: [],
+                                    values: []
                                 }
                             }
                             resultItems = options.resultItems;
-                            path = options.path;
                             if (options.data)
                                 if (options.collectContinuationItems || !options.data.isContinuation)
                                     resultItems.push({
                                         rowType: "group",
                                         data: options.data,
-                                        groupIndex: path.length - 1,
+                                        groupIndex: options.path.length - 1,
                                         isExpanded: !!options.data.items,
-                                        key: path,
-                                        values: path
+                                        key: options.path.slice(0),
+                                        values: options.values.slice(0)
                                     });
                             if (items)
                                 if (groupsCount === 0)
@@ -8661,13 +8849,17 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                                 else
                                     for (i = 0; i < items.length; i++) {
                                         item = items[i];
-                                        if (item) {
+                                        if (item && "items" in item) {
                                             options.data = item;
-                                            options.path = path.concat(item.key);
+                                            options.path.push(item.key);
+                                            options.values.push(column && column.deserializeValue ? column.deserializeValue(item.key) : item.key);
                                             that._processGroupItems(item.items, groupsCount - 1, options);
                                             options.data = undefined;
-                                            options.path = path
+                                            options.path.pop();
+                                            options.values.pop()
                                         }
+                                        else
+                                            resultItems.push(item)
                                     }
                             return resultItems
                         },
@@ -8878,18 +9070,15 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
             dataGrid = DX.ui.dxDataGrid,
             normalizeSortingInfo = dataGrid.normalizeSortingInfo,
             keysEqual = dataUtils.keysEqual;
-        var loadTotalCount = function(store, options) {
+        var loadTotalCount = function(dataSource, options) {
                 var d = $.Deferred(),
                     loadOptions = $.extend({
                         skip: 0,
                         take: 1,
                         requireTotalCount: true
                     }, options);
-                store.load(loadOptions).done(function(data, extra) {
-                    if (extra && isFinite(extra.totalCount))
-                        d.resolve(extra.totalCount);
-                    else
-                        store.totalCount(options).done($.proxy(d.resolve, d)).fail($.proxy(d.reject, d))
+                dataSource.load(loadOptions).done(function(data, extra) {
+                    d.resolve(extra && extra.totalCount)
                 }).fail($.proxy(d.reject, d));
                 return d
             };
@@ -8991,12 +9180,10 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                             if (additionalGroupInfo && pathEquals(additionalGroupInfo.path, path) && !item.isContinuation)
                                 additionalGroupInfo.offset = offset;
                             var groupInfo = that.findGroupInfo(path);
-                            if (groupInfo && !groupInfo.isExpanded) {
-                                if (!item.isContinuation) {
-                                    groupInfo.offset = offset;
-                                    offset += groupInfo.count
-                                }
-                            }
+                            if (groupInfo)
+                                groupInfo.offset = offset;
+                            if (groupInfo && !groupInfo.isExpanded)
+                                offset += groupInfo.count;
                             else
                                 offset = updateGroupOffsets(that, item.items, path, offset, additionalGroupInfo);
                             path.pop()
@@ -9056,13 +9243,22 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     filter = dataGrid.combineFilters(filter, "or");
                     return dataGrid.combineFilters([filter, storeLoadOptions.filter])
                 };
+            var getGroupCount = function(item, groupCount) {
+                    var count = item.count || item.items.length,
+                        i;
+                    if (!item.count && groupCount > 1) {
+                        count = 0;
+                        for (i = 0; i < item.items.length; i++)
+                            count += getGroupCount(item.items[i], groupCount - 1)
+                    }
+                    return count
+                };
             return {
-                    handleDataLoading: function(options, callBase) {
-                        callBase(options);
+                    handleDataLoading: function(options) {
                         var that = this,
                             storeLoadOptions = options.storeLoadOptions,
                             loadOptions,
-                            collapsedPaths = [],
+                            collapsedGroups = [],
                             collapsedItemsCount = 0,
                             skipFirstItem = false,
                             take,
@@ -9070,7 +9266,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                             skipCorrection = 0;
                         removeGroupLoadOption(storeLoadOptions, options.loadOptions);
                         options.group = options.group || group;
-                        if (storeLoadOptions.isLoadingAll)
+                        if (options.isCustomLoading)
                             return;
                         loadOptions = $.extend({}, storeLoadOptions);
                         loadOptions.skip = correctSkipLoadOption(that, storeLoadOptions.skip);
@@ -9088,15 +9284,15 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                                 return false;
                             else if (groupInfo.offset >= loadOptions.skip + skipCorrection && groupInfo.count) {
                                 skipCorrection += groupInfo.count - 1;
-                                collapsedPaths.push(groupInfo.path);
+                                collapsedGroups.push(groupInfo);
                                 collapsedItemsCount += groupInfo.count
                             }
                         });
-                        $.each(collapsedPaths, function() {
-                            loadOptions.filter = createNotGroupFilter(this, loadOptions, group)
+                        $.each(collapsedGroups, function() {
+                            loadOptions.filter = createNotGroupFilter(this.path, loadOptions, group)
                         });
                         options.storeLoadOptions = loadOptions;
-                        options.collapsedPaths = collapsedPaths;
+                        options.collapsedGroups = collapsedGroups;
                         options.collapsedItemsCount = collapsedItemsCount;
                         options.skip = loadOptions.skip || 0;
                         options.skipFirstItem = skipFirstItem;
@@ -9107,10 +9303,10 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                             data = options.data,
                             pathIndex,
                             query,
-                            collapsedPaths = options.collapsedPaths,
+                            collapsedGroups = options.collapsedGroups,
                             groups = normalizeSortingInfo(options.group),
                             groupCount = groups.length;
-                        function appendCollapsedPath(data, path, groups) {
+                        function appendCollapsedPath(data, path, groups, collapsedGroup, offset) {
                             if (!data || !path.length || !groups.length)
                                 return;
                             var i,
@@ -9118,15 +9314,18 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                                 pathValue = dataUtils.toComparable(path[0], true);
                             for (i = 0; i < data.length; i++) {
                                 keyValue = dataUtils.toComparable(data[i].key, true);
-                                if (groups[0].desc ? pathValue >= keyValue : pathValue <= keyValue)
-                                    break
+                                if (offset >= collapsedGroup.offset || pathValue === keyValue)
+                                    break;
+                                else
+                                    offset += getGroupCount(data[i], groups.length)
                             }
                             if (!data.length || pathValue !== keyValue)
                                 data.splice(i, 0, {
                                     key: path[0],
-                                    items: []
+                                    items: [],
+                                    count: collapsedGroup.count
                                 });
-                            appendCollapsedPath(data[i].items, path.slice(1), groups.slice(1))
+                            appendCollapsedPath(data[i].items, path.slice(1), groups.slice(1), collapsedGroup, offset)
                         }
                         callBase(options);
                         if (groupCount) {
@@ -9134,10 +9333,10 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                             DX.data.utils.multiLevelGroup(query, groups).enumerate().done(function(groupedData) {
                                 data = groupedData
                             });
-                            if (collapsedPaths)
-                                for (pathIndex = 0; pathIndex < collapsedPaths.length; pathIndex++)
-                                    appendCollapsedPath(data, collapsedPaths[pathIndex], groups);
-                            if (!options.storeLoadOptions.isLoadingAll) {
+                            if (collapsedGroups)
+                                for (pathIndex = 0; pathIndex < collapsedGroups.length; pathIndex++)
+                                    appendCollapsedPath(data, collapsedGroups[pathIndex].path, groups, collapsedGroups[pathIndex], options.skip);
+                            if (!options.isCustomLoading) {
                                 processGroupItems(that, data, [], options.skip, options.skipFirstItem, options.take);
                                 that.updateItemsCount(data, groupCount)
                             }
@@ -9165,7 +9364,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         if (groupInfo && !groupInfo.isExpanded)
                             groupCountQuery = $.Deferred().resolve(groupInfo.count);
                         else
-                            groupCountQuery = loadTotalCount(dataSource.store(), {filter: createGroupFilter(path, {
+                            groupCountQuery = loadTotalCount(dataSource, {filter: createGroupFilter(path, {
                                     filter: dataSource.filter(),
                                     group: dataSource.group()
                                 })});
@@ -9195,16 +9394,15 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     allowCollapseAll: function() {
                         return false
                     },
-                    refresh: function(storeLoadOptions, isReload, operationTypes) {
+                    refresh: function(options, isReload, operationTypes) {
                         var that = this,
-                            dataSource = that._dataSource,
-                            store = dataSource.store();
+                            storeLoadOptions = options.storeLoadOptions,
+                            dataSource = that._dataSource;
                         this.callBase.apply(this, arguments);
                         if (isReload || operationTypes.reload)
                             return foreachCollapsedGroups(that, function(groupInfo) {
-                                    var groupCountQuery = loadTotalCount(store, {filter: createGroupFilter(groupInfo.path, storeLoadOptions)}),
-                                        groupOffsetQuery = loadTotalCount(store, {filter: createOffsetFilter(groupInfo.path, storeLoadOptions)});
-                                    dataSource._changeLoadingCount(1);
+                                    var groupCountQuery = loadTotalCount(dataSource, {filter: createGroupFilter(groupInfo.path, storeLoadOptions)}),
+                                        groupOffsetQuery = loadTotalCount(dataSource, {filter: createOffsetFilter(groupInfo.path, storeLoadOptions)});
                                     return $.when(groupOffsetQuery, groupCountQuery).done(function(offset, count) {
                                             offset = parseInt(offset.length ? offset[0] : offset);
                                             count = parseInt(count.length ? count[0] : count);
@@ -9213,10 +9411,6 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                                                 groupInfo.count = count;
                                                 that.updateTotalItemsCount()
                                             }
-                                        }).fail(function() {
-                                            dataSource.fireEvent("loadError", arguments)
-                                        }).always(function() {
-                                            dataSource._changeLoadingCount(-1)
                                         })
                                 }, true)
                     }
@@ -9227,7 +9421,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
     /*! Module widgets-web, file ui.dataGrid.grouping.client.js */
     (function($, DX) {
         var dataGrid = DX.ui.dxDataGrid,
-            normalizeSortingInfo = dataGrid.normalizeSortingInfo;
+            normalizeSortingInfo = dataGrid.normalizeSortingInfo,
+            errors = DX.require("/ui/ui.errors");
         dataGrid.CollapsedGroupingHelper = dataGrid.GroupingHelper.inherit(function() {
             var foreachExpandedGroups = function(that, callback) {
                     return that.foreachGroups(function(groupInfo, parents) {
@@ -9235,9 +9430,11 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                                 return callback(groupInfo, parents)
                         }, true)
                 };
-            var processGroupItems = function(that, items, groupsCount, expandedInfo, path) {
+            var processGroupItems = function(that, items, groupsCount, expandedInfo, path, isCustomLoading, isLastGroupExpanded) {
                     var i,
-                        item;
+                        item,
+                        groupInfo,
+                        isExpanded;
                     expandedInfo.items = expandedInfo.items || [];
                     expandedInfo.paths = expandedInfo.paths || [];
                     expandedInfo.count = expandedInfo.count || 0;
@@ -9248,14 +9445,19 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         item = items[i];
                         if (item.items !== undefined) {
                             path.push(item.key);
-                            var groupInfo = that.findGroupInfo(path);
-                            if (!groupInfo || !groupInfo.isExpanded) {
+                            if (isCustomLoading)
+                                isExpanded = true;
+                            else {
+                                groupInfo = that.findGroupInfo(path);
+                                isExpanded = groupInfo && groupInfo.isExpanded
+                            }
+                            if (!isExpanded) {
                                 item.collapsedItems = item.items;
                                 item.items = null
                             }
                             else if (item.items)
-                                processGroupItems(that, item.items, groupsCount - 1, expandedInfo, path);
-                            else if (groupInfo && groupInfo.isExpanded && groupsCount === 1 && item.count) {
+                                processGroupItems(that, item.items, groupsCount - 1, expandedInfo, path, isCustomLoading, isLastGroupExpanded);
+                            else if (groupsCount === 1 && item.count && (!isCustomLoading || isLastGroupExpanded)) {
                                 expandedInfo.items.push(item);
                                 expandedInfo.paths.push(path.slice(0));
                                 expandedInfo.count += expandedInfo.lastCount;
@@ -9271,6 +9473,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
             var updateGroupInfosCore = function(that, items, groupIndex, groupsCount, path, offset) {
                     var item,
                         totalCount = 0,
+                        count,
                         i,
                         groupInfo;
                     if (groupIndex >= groupsCount)
@@ -9279,6 +9482,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         item = items[i];
                         if (item) {
                             path.push(item.key);
+                            if (!item.count && !item.items)
+                                return -1;
                             groupInfo = that.findGroupInfo(path);
                             if (!groupInfo)
                                 that.addGroupInfo({
@@ -9291,7 +9496,10 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                                 groupInfo.count = item.count > 0 ? item.count : item.items.length;
                                 groupInfo.offset = offset + i
                             }
-                            totalCount += item.items || !item.count ? updateGroupInfosCore(that, item.items, groupIndex + 1, groupsCount, path, 0) : item.count;
+                            count = item.items || !item.count ? updateGroupInfosCore(that, item.items, groupIndex + 1, groupsCount, path, 0) : item.count;
+                            if (count < 0)
+                                return -1;
+                            totalCount += count;
                             path.pop()
                         }
                     }
@@ -9327,6 +9535,31 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     return 0
                 };
             DX.ui.dxDataGrid.getContinuationGroupCount = getContinuationGroupCount;
+            function loadLastLevelGroupItems(that, options, expandedInfo) {
+                var expandedFilters = [],
+                    data = options.data;
+                $.each(expandedInfo.paths, function(_, expandedPath) {
+                    expandedFilters.push(dataGrid.createGroupFilter(expandedPath, {group: options.storeLoadOptions.group}))
+                });
+                var filter = options.storeLoadOptions.filter;
+                if (expandedInfo.take)
+                    filter = dataGrid.combineFilters([filter, dataGrid.combineFilters(expandedFilters, "or")]);
+                options.data = $.Deferred();
+                var loadOptions = $.extend({}, options.storeLoadOptions, {
+                        group: null,
+                        filter: filter,
+                        skip: expandedInfo.skip,
+                        take: expandedInfo.take
+                    });
+                $.when(expandedInfo.take === 0 ? [] : that._dataSource.store().load(loadOptions)).done(function(items, extra) {
+                    $.each(expandedInfo.items, function(index, item) {
+                        DX.data.query(items).filter(expandedFilters[index]).enumerate().done(function(expandedItems) {
+                            item.items = expandedItems
+                        })
+                    });
+                    options.data.resolve(data)
+                }).fail(options.data.reject)
+            }
             return {
                     updateTotalItemsCount: function(options) {
                         var totalItemsCount = 0,
@@ -9429,52 +9662,40 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     handleDataLoadedCore: function(options, callBase) {
                         var that = this,
                             groupCount = normalizeSortingInfo(options.storeLoadOptions.group || options.loadOptions.group).length,
-                            totalCount;
-                        if (options.storeLoadOptions.isLoadingAll) {
+                            totalCount,
+                            expandedInfo = {};
+                        if (options.isCustomLoading) {
                             callBase(options);
-                            return
+                            processGroupItems(that, options.data, groupCount, expandedInfo, [], options.isCustomLoading, options.storeLoadOptions.isLoadingAll)
                         }
-                        totalCount = updateGroupInfos(that, options.data, groupCount, 0);
-                        if (!options.remoteOperations.paging)
-                            if (groupCount && options.extra) {
-                                options.extra.totalCount = totalCount;
-                                options.extra.totalGroupCount = options.data.length
+                        else {
+                            totalCount = updateGroupInfos(that, options.data, groupCount, 0);
+                            if (totalCount < 0) {
+                                options.data = $.Deferred().reject(errors.Error("E1037"));
+                                return
                             }
-                        that.updateTotalItemsCount(options);
-                        that._updatePagingOptions(options);
-                        callBase(options);
-                        that._processPaging(options, groupCount);
-                        var expandedInfo = {};
-                        processGroupItems(that, options.data, groupCount, expandedInfo, []);
-                        expandedInfo.skip = options.skips[groupCount - 1];
-                        if (options.takes[groupCount - 1] !== undefined) {
-                            expandedInfo.take = expandedInfo.count ? expandedInfo.count - (expandedInfo.skip || 0) : 0;
-                            expandedInfo.take += options.takes[groupCount - 1]
+                            if (!options.remoteOperations.paging)
+                                if (groupCount && options.extra && options.loadOptions.requireTotalCount) {
+                                    options.extra.totalCount = totalCount;
+                                    options.extra.totalGroupCount = options.data.length
+                                }
+                            that.updateTotalItemsCount(options);
+                            that._updatePagingOptions(options);
+                            callBase(options);
+                            that._processPaging(options, groupCount);
+                            processGroupItems(that, options.data, groupCount, expandedInfo, []);
+                            expandedInfo.skip = options.skips[groupCount - 1];
+                            if (options.takes[groupCount - 1] !== undefined) {
+                                expandedInfo.take = expandedInfo.count ? expandedInfo.count - (expandedInfo.skip || 0) : 0;
+                                expandedInfo.take += options.takes[groupCount - 1]
+                            }
                         }
-                        var data = options.data;
-                        if (expandedInfo.paths.length && options.storeLoadOptions.group) {
-                            var expandedFilters = [];
-                            $.each(expandedInfo.paths, function(_, expandedPath) {
-                                expandedFilters.push(dataGrid.createGroupFilter(expandedPath, {group: options.storeLoadOptions.group}))
-                            });
-                            var filter = dataGrid.combineFilters(expandedFilters, "or");
-                            filter = dataGrid.combineFilters([options.storeLoadOptions.filter, filter]);
-                            options.data = $.Deferred();
-                            $.when(expandedInfo.take === 0 ? [] : that._dataSource.store().load({
-                                filter: filter,
-                                sort: options.storeLoadOptions.sort,
-                                skip: expandedInfo.skip,
-                                take: expandedInfo.take
-                            })).done(function(items) {
-                                $.each(expandedInfo.items, function(index, item) {
-                                    DX.data.query(items).filter(expandedFilters[index]).enumerate().done(function(expandedItems) {
-                                        item.items = expandedItems
-                                    })
-                                });
-                                options.data.resolve(data)
-                            }).fail(options.data.reject)
-                        }
-                        that.updateItemsCount(data, groupCount)
+                        if (expandedInfo.paths.length && options.storeLoadOptions.group)
+                            loadLastLevelGroupItems(that, options, expandedInfo);
+                        if (!options.isCustomLoading)
+                            $.when(options.data).done(function(data) {
+                                that.updateItemsCount(data, groupCount)
+                            })
                     },
                     _processPaging: function(options, groupCount) {
                         var skips,
@@ -9512,8 +9733,9 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                             }
                         }
                     },
-                    refresh: function(storeLoadOptions) {
+                    refresh: function(options) {
                         var that = this,
+                            storeLoadOptions = options.storeLoadOptions,
                             oldGroups = normalizeSortingInfo(that._group),
                             isExpanded,
                             groupIndex;
@@ -9654,7 +9876,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                                         expandIndex,
                                         result = [];
                                     items = that.callBase.apply(that, arguments);
-                                    if (this._isLoadingAll)
+                                    if (changeType === "loadingAll")
                                         return items;
                                     if (changeType === "refresh")
                                         that._expandedItems = $.grep(that._expandedItems, function(item) {
@@ -9700,11 +9922,6 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                                             initMasterDetail(that)
                                     }
                                     that.callBase(args)
-                                },
-                                refresh: function() {
-                                    var that = this;
-                                    initMasterDetail(that);
-                                    return that.callBase.apply(that, arguments)
                                 }
                             }
                     }()
@@ -9783,6 +10000,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
             dialog = DX.require("/ui/ui.dialog"),
             Button = DX.require("/ui/widgets/ui.button"),
             errors = DevExpress.require("/ui/ui.errors"),
+            devices = DX.require("/devices"),
             getIndexByKey = dataGrid.getIndexByKey;
         var DATAGRID_LINK_CLASS = "dx-link",
             DATAGRID_EDITOR_CELL_CLASS = "dx-editor-cell",
@@ -9833,7 +10051,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                                 row: options.row,
                                 parentType: "dataRow",
                                 width: null,
-                                readOnly: !options.setValue
+                                readOnly: !options.setValue,
+                                id: options.id
                             }))
                         }
                 };
@@ -9996,7 +10215,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                             key,
                             data,
                             editData = that._editData;
-                        that.update();
+                        that.update(changeType);
                         for (i = 0; i < editData.length; i++) {
                             key = editData[i].key;
                             data = {key: key};
@@ -10059,14 +10278,13 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         if (editMode === DATAGRID_EDIT_MODE_CELL && that.hasChanges())
                             that.saveEditData();
                         that.refresh();
-                        if (editMode !== DATAGRID_EDIT_MODE_BATCH) {
-                            if (that._insertIndex > 1)
-                                return;
-                            that._editRowIndex = insertKey.rowIndex
-                        }
+                        if (editMode !== DATAGRID_EDIT_MODE_BATCH && that._insertIndex > 1)
+                            return;
                         if (!key)
                             param.data.__KEY__ = String(new DX.data.Guid);
                         that.executeAction("onInitNewRow", param);
+                        if (editMode !== DATAGRID_EDIT_MODE_BATCH)
+                            that._editRowIndex = insertKey.rowIndex;
                         insertKey[DATAGRID_INSERT_INDEX] = that._insertIndex++;
                         that._addEditData({
                             key: insertKey,
@@ -10136,6 +10354,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     },
                     editCell: function(rowIndex, columnIndex) {
                         var that = this,
+                            $cell,
                             columnsController = that._columnsController,
                             dataController = that._dataController,
                             items = dataController.items(),
@@ -10179,23 +10398,31 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                                     rowIndices: [oldEditRowIndex, that._editRowIndex]
                                 })
                             }
-                            that._focusEditingCell(function() {
-                                that._editCellInProgress = false
-                            });
+                            $cell = that.getView("rowsView").getCellElement(that._editRowIndex, that._editColumnIndex);
+                            if (!$cell.find(":focus").length)
+                                that._focusEditingCell(function() {
+                                    that._editCellInProgress = false
+                                }, $cell);
+                            else
+                                that._editCellInProgress = false;
                             return true
                         }
                         return false
                     },
                     _delayedInputFocus: function($cell, beforeFocusCallback) {
-                        setTimeout(function() {
+                        function inputFocus() {
                             if (beforeFocusCallback)
                                 beforeFocusCallback();
-                            $cell.find("[tabindex], input").first().focus()
-                        })
+                            $cell && $cell.find("[tabindex], input").first().focus()
+                        }
+                        if (devices.real().ios)
+                            inputFocus();
+                        else
+                            setTimeout(inputFocus)
                     },
-                    _focusEditingCell: function(beforeFocusCallback) {
-                        var that = this,
-                            $editCell = that.getView("rowsView").getCellElement(that._editRowIndex, that._editColumnIndex);
+                    _focusEditingCell: function(beforeFocusCallback, $editCell) {
+                        var that = this;
+                        $editCell = $editCell || that.getView("rowsView").getCellElement(that._editRowIndex, that._editColumnIndex);
                         that._delayedInputFocus($editCell, beforeFocusCallback)
                     },
                     removeRow: function(rowIndex) {
@@ -10494,11 +10721,12 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                                 }
                             })
                     },
-                    update: function() {
+                    update: function(changeType) {
                         var that = this,
                             dataController = that._dataController;
                         if (dataController && that._pageIndex !== dataController.pageIndex()) {
-                            that.refresh();
+                            if (changeType === "refresh")
+                                that.refresh();
                             that._pageIndex = dataController.pageIndex()
                         }
                         that._updateEditButtons()
@@ -10561,6 +10789,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                                 var cellOptions = $.extend({}, detailCellOptions, {
                                         value: column.calculateCellValue(detailCellOptions.data),
                                         column: $.extend({}, column, {editorOptions: item.editorOptions}),
+                                        id: options.component.getItemID(item.name || item.dataField),
                                         columnIndex: column.index,
                                         setValue: column.allowEditing && function(value) {
                                             that.updateFieldValue(cellOptions, value)
@@ -10590,6 +10819,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                                 }
                                 that._createComponent($("<div>").appendTo($container), "dxForm", $.extend({}, editFormOptions, {
                                     items: items,
+                                    formID: new DX.data.Guid,
                                     customizeItem: function(item) {
                                         var column = item.column || that._columnsController.columnOption(item.name || item.dataField);
                                         if (column) {
@@ -10629,7 +10859,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         if ((column.showEditorAlways || column.setCellValue && (isRowEditing && column.allowEditing || isCellEditing)) && options.rowType === "data" && !commonUtils.isDefined(column.command)) {
                             allowUpdating = that.option("editing.allowUpdating");
                             if (((allowUpdating || isRowEditing) && column.allowEditing || isCellEditing) && (isRowMode && isRowEditing || !isRowMode)) {
-                                if (column.showEditorAlways) {
+                                if (column.showEditorAlways && !isRowMode) {
                                     editingStartOptions = {
                                         cancel: false,
                                         key: options.row.key,
@@ -10814,11 +11044,13 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                                 template = that.getController("editing").getColumnTemplate(options);
                             return template || that.callBase(options)
                         },
+                        _isNativeClick: function() {
+                            return devices.real().ios && this.option("editing.allowUpdating")
+                        },
                         _createTable: function() {
                             var that = this,
-                                editing = that.option("editing"),
                                 $table = that.callBase.apply(that, arguments);
-                            if (editing && !isRowEditMode(that) && editing.allowUpdating)
+                            if (!isRowEditMode(that) && that.option("editing.allowUpdating"))
                                 $table.on(addNamespace("dxhold", "dxDataGridRowsView"), "td:not(." + DATAGRID_EDITOR_CELL_CLASS + ")", that.createAction(function(e) {
                                     var editingController = that.getController("editing");
                                     if (editingController.isEditing())
@@ -10929,7 +11161,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
             DATAGRID_CELL_HIGHLIGHT_OUTLINE: DATAGRID_CELL_HIGHLIGHT_OUTLINE,
             DATAGRID_FOCUS_OVERLAY_CLASS: DATAGRID_FOCUS_OVERLAY_CLASS,
             DATAGRID_READONLY_CLASS: DATAGRID_READONLY_CLASS,
-            DATAGRID_CELL_FOCUS_DISABLED_CLASS: DATAGRID_CELL_FOCUS_DISABLED_CLASS
+            DATAGRID_CELL_FOCUS_DISABLED_CLASS: DATAGRID_CELL_FOCUS_DISABLED_CLASS,
+            DATAGRID_EDIT_FORM_CLASS: DATAGRID_EDIT_FORM_CLASS
         })
     })(jQuery, DevExpress);
     /*! Module widgets-web, file ui.dataGrid.validationModule.js */
@@ -10947,6 +11180,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
             DATAGRID_CELL_HIGHLIGHT_OUTLINE = "dx-highlight-outline",
             DATAGRID_INSERT_INDEX = "__DX_INSERT_INDEX__",
             DATAGRID_EDIT_MODE_ROW = "row",
+            DATAGRID_EDIT_MODE_FORM = "form",
             DATAGRID_EDIT_MODE_BATCH = "batch",
             DATAGRID_EDIT_MODE_CELL = "cell";
         dataGrid.ValidatingController = dataGrid.Controller.inherit(function() {
@@ -10983,7 +11217,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         if (isFull)
                             $.each(editingController._editData, function(index, editData) {
                                 var validationResult;
-                                if (editData.type) {
+                                if (editData.type && editData.type !== "remove") {
                                     validationResult = that.validateGroup(editData);
                                     if (!validationResult.isValid)
                                         $.each(validationResult.brokenRules, function() {
@@ -11013,9 +11247,13 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         return that._rowValidating(editData, validationResults)
                     },
                     updateEditData: function(editData) {
-                        this.setDisableApplyValidationResults(true);
-                        editData.isValid = DX.validationEngine.getGroupConfig(editData) ? DX.validationEngine.validateGroup(editData).isValid : true;
-                        this.setDisableApplyValidationResults(false)
+                        if (this._editingController.getEditMode() !== DATAGRID_EDIT_MODE_FORM) {
+                            this.setDisableApplyValidationResults(true);
+                            editData.isValid = DX.validationEngine.getGroupConfig(editData) ? DX.validationEngine.validateGroup(editData).isValid : true;
+                            this.setDisableApplyValidationResults(false)
+                        }
+                        else
+                            editData.isValid = true
                     },
                     setValidator: function(validator) {
                         this._currentCellValidator = validator
@@ -11262,6 +11500,9 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                             if (isValid)
                                 this.callBase($cell)
                         },
+                        getEditDataByKey: function(key) {
+                            return this._editData[dataGrid.getIndexByKey(key, this._editData)]
+                        },
                         _formEditorPrepared: function(cellOptions, $container) {
                             this.callBase.apply(this, arguments);
                             this.getController("validating").createValidator(cellOptions, $container.children(".dx-widget"))
@@ -11297,10 +11538,14 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                             })
                         },
                         _showValidationMessage: function($cell, message, alignment) {
-                            var that = this;
-                            $("<div/>").addClass(DATAGRID_INVALID_MESSAGE_CLASS).addClass(DATAGRID_INVALID_MESSAGE_ALWAYS_CLASS).text(message).appendTo($cell).dxTooltip({
-                                target: $cell,
+                            var that = this,
+                                $highlightContainer = $cell.find("." + DATAGRID_CELL_HIGHLIGHT_OUTLINE);
+                            $("<div/>").addClass(DATAGRID_INVALID_MESSAGE_CLASS).addClass(DATAGRID_INVALID_MESSAGE_ALWAYS_CLASS).text(message).appendTo($cell).dxOverlay({
+                                target: $highlightContainer.length ? $highlightContainer : $cell,
                                 container: $cell,
+                                shading: false,
+                                width: 'auto',
+                                height: 'auto',
                                 visible: true,
                                 closeOnOutsideClick: false,
                                 closeOnTargetScroll: false,
@@ -11308,7 +11553,6 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                                     collision: "fit flip",
                                     boundary: that._rowsView.element(),
                                     boundaryOffset: "0 0",
-                                    offset: "1 -10",
                                     my: "top " + alignment,
                                     at: "bottom " + alignment
                                 },
@@ -11331,8 +11575,10 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                             var that = this,
                                 $cell = $element && $element.closest("td"),
                                 validator = $cell && $cell.data("dxValidator"),
+                                rowOptions = $cell && $cell.parent().data("options"),
+                                editData = rowOptions ? that.getController("editing").getEditDataByKey(rowOptions.key) : null,
                                 validationResult,
-                                $tooltips = $cell && $cell.closest(".dx-datagrid-rowsview").find(".dx-editor-cell .dx-tooltip"),
+                                $tooltips = $cell && $cell.closest(".dx-datagrid-rowsview").find(".dx-editor-cell .dx-tooltip, .dx-editor-cell .dx-invalid-message"),
                                 column = $cell && that.getController("columns").getVisibleColumns()[$cell.index()];
                             $tooltips && $tooltips.remove();
                             if (validator && column) {
@@ -11341,12 +11587,13 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                                     validationResult = validator.validate();
                                     if (!validationResult.isValid) {
                                         hideBorder = true;
-                                        that._showValidationMessage($cell, validationResult.brokenRule.message, column.alignment);
-                                        if (that._editingController.getEditMode() === DATAGRID_EDIT_MODE_CELL)
-                                            that._showRevertButton($cell)
+                                        that._showValidationMessage($cell, validationResult.brokenRule.message, column.alignment)
                                     }
                                 }
                             }
+                            if (validationResult && !validationResult.isValid || editData && editData.type === "update")
+                                if (that._editingController.getEditMode() === DATAGRID_EDIT_MODE_CELL)
+                                    that._showRevertButton($cell);
                             !hideBorder && that._rowsView.element() && that._rowsView.updateFreeSpaceRowHeight();
                             return that.callBase($element, hideBorder)
                         }
@@ -11421,11 +11668,11 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         that._columnsController.columnsChanged.add(that._columnsChangedHandler);
                         that._isLoading = false;
                         that._isCustomLoading = false;
-                        that._refreshDataSource();
                         that.createAction("onDataErrorOccurred");
                         that.dataErrorOccurred.add(function(error) {
                             return that.executeAction("onDataErrorOccurred", {error: error})
-                        })
+                        });
+                        that._refreshDataSource()
                     },
                     callbackNames: function() {
                         return ["changed", "loadingChanged", "dataErrorOccurred", "pageChanged", "dataSourceChanged"]
@@ -11488,7 +11735,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                             if (additionalFilter)
                                 if (columnsController.isDataSourceApplied() || columnsController.isAllDataTypesDefined())
                                     filter = dataGrid.combineFilters([additionalFilter, filter]);
-                            columnsController.updateFilter(filter, !dataSource.remoteOperations().filtering)
+                            filter = columnsController.updateFilter(filter, !dataSource.remoteOperations().filtering)
                         }
                         return filter
                     },
@@ -11496,11 +11743,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         var columnsController = this._columnsController,
                             dataSource = this._dataSource,
                             storeLoadOptions = e.storeLoadOptions;
-                        if (this._isLoadingAll) {
-                            storeLoadOptions.isLoadingAll = true;
-                            delete storeLoadOptions.skip;
-                            delete storeLoadOptions.take
-                        }
+                        if (e.isCustomLoading && !storeLoadOptions.isLoadingAll)
+                            return;
                         storeLoadOptions.filter = this.combinedFilter(storeLoadOptions.filter);
                         if (!columnsController.isDataSourceApplied())
                             columnsController.updateColumnDataTypes(dataSource);
@@ -11550,7 +11794,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                             dataSource = that._dataSource,
                             columnsController = that._columnsController,
                             isAllDataTypesDefined = columnsController.isAllDataTypesDefined();
-                        if (dataSource && !that._isDataSourceApplying && !that._isLoadingAll) {
+                        if (dataSource && !that._isDataSourceApplying) {
                             that._isDataSourceApplying = true;
                             $.when(that._columnsController.applyDataSource(dataSource)).done(function() {
                                 if (that._isLoading)
@@ -11599,7 +11843,6 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                                 dataSource.pageSize(pageSize);
                             if (pageIndex !== undefined)
                                 dataSource.pageIndex(pageIndex);
-                            that._dataSource = oldDataSource;
                             that.setDataSource(dataSource)
                         }
                         else if (oldDataSource)
@@ -11691,8 +11934,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                                     change.items = [];
                                     change.rowIndices = [];
                                     change.changeTypes = [];
-                                    var equalItems = function(item1, item2, strictEqual) {
-                                            return dataGrid.equalKeys(item1.key, item2.key) && (!strictEqual || item1.rowType === item2.rowType)
+                                    var equalItems = function(item1, item2) {
+                                            return dataGrid.equalKeys(item1.key, item2.key)
                                         };
                                     $.each(rowIndices, function(index, rowIndex) {
                                         var oldItem,
@@ -11716,12 +11959,12 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                                             if (oldItem.visible !== newItem.visible)
                                                 change.items.splice(-1, 1, {visible: newItem.visible})
                                         }
-                                        else if (newItem && !oldItem || newNextItem && equalItems(oldItem, newNextItem, true)) {
+                                        else if (newItem && !oldItem || newNextItem && equalItems(oldItem, newNextItem)) {
                                             changeType = "insert";
                                             that._items.splice(rowIndex, 0, newItem);
                                             rowIndexCorrection++
                                         }
-                                        else if (oldItem && !newItem || oldNextItem && equalItems(newItem, oldNextItem, true)) {
+                                        else if (oldItem && !newItem || oldNextItem && equalItems(newItem, oldNextItem)) {
                                             changeType = "remove";
                                             that._items.splice(rowIndex, 1);
                                             rowIndexCorrection--;
@@ -11839,7 +12082,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     setDataSource: function(dataSource) {
                         var that = this,
                             oldDataSource = that._dataSource;
-                        if (oldDataSource) {
+                        if (!dataSource && oldDataSource) {
                             oldDataSource.changed.remove(that._dataChangedHandler);
                             oldDataSource.loadingChanged.remove(that._loadingChangedHandler);
                             oldDataSource.loadError.remove(that._loadErrorHandler);
@@ -11883,23 +12126,23 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                             if (data) {
                                 var options = {
                                         data: data,
-                                        storeLoadOptions: {isLoadingAll: true},
+                                        isCustomLoading: true,
+                                        storeLoadOptions: {},
                                         loadOptions: {
                                             group: dataSource.group(),
                                             sort: dataSource.sort()
                                         }
                                     };
                                 dataSource._handleDataLoaded(options);
-                                d.resolve(that._processItems(options.data), options.totalAggregates)
+                                d.resolve(that._processItems(options.data, "loadingAll"), options.extra && options.extra.summary)
                             }
                             else if (!that.isLoading()) {
-                                that._isLoadingAll = true;
-                                dataSource.load(true).done(function(items) {
-                                    items = that._processItems(items.slice(0));
-                                    d.resolve(items)
-                                }).fail(d.reject).always(function() {
-                                    that._isLoadingAll = false
-                                })
+                                var loadOptions = $.extend({isLoadingAll: true}, dataSource.loadOptions());
+                                loadOptions.requireTotalCount = false;
+                                dataSource.load(loadOptions).done(function(items, extra) {
+                                    items = that._processItems(items.slice(0), "loadingAll");
+                                    d.resolve(items, extra && extra.summary)
+                                }).fail(d.reject)
                             }
                             else
                                 d.reject();
@@ -12045,10 +12288,10 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
             CONTENT_HEIHGT_LIMIT = 15000000;
         dataGrid.__MAX_VIRTUAL_CONTENT_SIZE = CONTENT_HEIHGT_LIMIT;
         var isVirtualMode = function(that) {
-                return !that._isLoadingAll && that.option("scrolling.mode") === SCROLLING_MODE_VIRTUAL
+                return that.option("scrolling.mode") === SCROLLING_MODE_VIRTUAL
             };
         var isAppendMode = function(that) {
-                return !that._isLoadingAll && that.option("scrolling.mode") === SCROLLING_MODE_INFINITE
+                return that.option("scrolling.mode") === SCROLLING_MODE_INFINITE
             };
         var VirtualScrollController = Class.inherit(function() {
                 var getViewportPageCount = function(that) {
@@ -12103,7 +12346,6 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         dataSource.updateLoading();
                         that._lastPageIndex = that.pageIndex();
                         that._isDelayChanged = isDelayChanged;
-                        that._isLoadingAll = false;
                         if (!isDelayChanged)
                             fireChanged(that, changed, change)
                     };
@@ -12145,7 +12387,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         },
                         setViewportPosition: function(position) {
                             var that = this,
-                                scrollingTimeout = that.option("scrolling.timeout") || 0;
+                                scrollingTimeout = Math.min(that.option("scrolling.timeout") || 0, that._dataSource.changingDuration());
                             that._position = position;
                             clearTimeout(that._scrollTimeoutID);
                             if (scrollingTimeout > 0)
@@ -12257,7 +12499,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                             var endPageIndex = getEndPageIndex(this);
                             return endPageIndex > 0 ? endPageIndex : this._lastPageIndex
                         },
-                        load: function(isLoadingAll) {
+                        load: function() {
                             var beginPageIndex = getBeginPageIndex(this),
                                 pageIndexForLoad = -1,
                                 dataSource = this._dataSource,
@@ -12269,7 +12511,6 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                                         return dataSource.load()
                                     }
                                 };
-                            this._isLoadingAll = isLoadingAll;
                             if (isVirtualMode(this) || isAppendMode(this)) {
                                 if (beginPageIndex < 0 || !this._cache[this._pageIndex - beginPageIndex])
                                     pageIndexForLoad = this._pageIndex;
@@ -12432,7 +12673,6 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         },
                         _handleLoadError: function() {
                             var that = this;
-                            that._isLoadingAll = false;
                             that._isLoading = false;
                             that.loadingChanged.fire(false);
                             that.callBase.apply(that, arguments)
@@ -12470,8 +12710,10 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         endPageIndex: function() {
                             return this._virtualScrollController.endPageIndex()
                         },
-                        load: function(isLoadingAll) {
-                            return this._virtualScrollController.load(isLoadingAll)
+                        load: function(loadOptions) {
+                            if (loadOptions)
+                                return this.callBase(loadOptions);
+                            return this._virtualScrollController.load()
                         },
                         loadIfNeed: function() {
                             return this._virtualScrollController.loadIfNeed()
@@ -12488,8 +12730,9 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                             updateLoading(this);
                             return result
                         },
-                        refresh: function(storeLoadOptions, isReload, operationTypes) {
+                        refresh: function(options, isReload, operationTypes) {
                             var that = this,
+                                storeLoadOptions = options.storeLoadOptions,
                                 dataSource = that._dataSource;
                             if (isReload || operationTypes.reload) {
                                 that._virtualScrollController.reset();
@@ -12540,9 +12783,10 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                             else
                                 return that.callBase.apply(that, arguments)
                         },
-                        _updateContent: function(contentElement, change, tableElement) {
+                        _updateContent: function(tableElement, change) {
                             var that = this,
                                 contentTable,
+                                contentElement = that._findContentElement(),
                                 changeType = change && change.changeType;
                             if (changeType === "append" || changeType === "prepend") {
                                 contentTable = contentElement.children().first();
@@ -12874,10 +13118,10 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
             _renderCore: function() {
                 var that = this,
                     $container = that.element();
-                if (!that._dataController.isLoaded())
+                if (that._tableElement && !that._dataController.isLoaded())
                     return;
                 $container.addClass(DATAGRID_HEADERS_CLASS).toggleClass(DATAGRID_NOWRAP_CLASS, !that.option("wordWrapEnabled")).empty();
-                that._setTableElement(that._renderTable());
+                that._updateContent(that._renderTable());
                 that.callBase.apply(that, arguments)
             },
             _resizeCore: function() {
@@ -12887,11 +13131,10 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 that._scrollLeft = 0;
                 that.scrollTo({left: scrollLeft})
             },
-            _renderTable: function() {
-                var $table = this.callBase.apply(this, arguments),
-                    $content = this.element();
-                this.wrapTableInScrollContainer($table).appendTo($content);
-                return $table
+            _renderRows: function() {
+                var that = this;
+                if (that._dataController.isLoaded())
+                    that.callBase.apply(that, arguments)
             },
             _getRows: function() {
                 var result = [];
@@ -13210,7 +13453,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                             if (dataGrid.checkChanges(optionNames, ["filterValue", "selectedFilterOperation"]) && e.columnIndex !== undefined) {
                                 visibleIndex = that.getController("columns").getVisibleIndex(e.columnIndex);
                                 column = that.getController("columns").columnOption(e.columnIndex);
-                                $cell = that.element().find("." + DATAGRID_FILTER_ROW_CLASS).children().eq(visibleIndex);
+                                $cell = that.getCellElement(that.element().find("." + DATAGRID_FILTER_ROW_CLASS).index(), visibleIndex) || $();
                                 $rangeContent = $cell.find("." + DATAGRID_FILTER_RANGE_CONTENT_CLASS);
                                 $editorContainer = $cell.find("." + DATAGRID_EDITOR_CONTAINER_CLASS).first();
                                 if (optionNames.filterValue) {
@@ -13431,16 +13674,21 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                                         items: that._getFilterOperationMenuItems(column)
                                     }],
                                 onItemClick: function(properties) {
-                                    var selectedFilterOperation = properties.itemData.name;
+                                    var selectedFilterOperation = properties.itemData.name,
+                                        options = {};
                                     if (properties.itemData.items || selectedFilterOperation === column.selectedFilterOperation)
                                         return;
-                                    if (selectedFilterOperation)
-                                        that._columnsController.columnOption(column.index, "selectedFilterOperation", selectedFilterOperation);
+                                    if (selectedFilterOperation) {
+                                        options.selectedFilterOperation = selectedFilterOperation;
+                                        if (selectedFilterOperation === "between" || column.selectedFilterOperation === "between")
+                                            options.filterValue = undefined
+                                    }
                                     else
-                                        that._columnsController.columnOption(column.index, {
+                                        options = {
                                             selectedFilterOperation: column.defaultSelectedFilterOperation,
                                             filterValue: undefined
-                                        });
+                                        };
+                                    that._columnsController.columnOption(column.index, options);
                                     that._applyFilterViewController.setHighLight($editorContainer, true);
                                     that._focusEditor($editorContainer)
                                 },
@@ -13815,12 +14063,12 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     },
                     getDataSource: function(column) {
                         var that = this,
+                            filter,
                             cutoffLevel,
                             origPostProcess,
-                            group = $.proxy(column.calculateGroupValue, column) || dataGrid.getGroupDataSourceParameters(column),
                             dataSource = that._dataController.dataSource(),
+                            group = dataGrid.getGroupDataSourceParameters(column, dataSource.remoteOperations().grouping),
                             headerFilterDataSource = column.headerFilter && column.headerFilter.dataSource,
-                            store = dataSource.store(),
                             headerFilterOptions = that.option("headerFilter"),
                             options = {component: that.component};
                         if (commonUtils.isDefined(headerFilterDataSource) && !commonUtils.isFunction(headerFilterDataSource)) {
@@ -13851,31 +14099,22 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         else {
                             cutoffLevel = commonUtils.isArray(group) ? group.length - 1 : 0;
                             that._currentColumn = column;
-                            if (column.dataType === "date")
-                                group = group;
-                            else
-                                group = group;
+                            filter = that._dataController.getCombinedFilter();
+                            that._currentColumn = null;
                             options.dataSource = {
-                                filter: that._dataController.getCombinedFilter(),
+                                filter: filter,
                                 group: group,
                                 load: function(options) {
                                     var d = $.Deferred();
-                                    $.when(options.userData.data || store.load({
-                                        filter: options.filter,
-                                        expand: dataSource.loadOptions().expand,
-                                        dataField: column.dataField || column.name
-                                    })).done(function(data) {
-                                        options.userData.data = data;
-                                        new DX.data.ArrayStore(data).load(options).done(function(data) {
-                                            that._processGroupItems(data, null, null, {
-                                                level: cutoffLevel,
-                                                column: column,
-                                                headerFilterOptions: headerFilterOptions
-                                            });
-                                            that._updateSelectedState(data, column);
-                                            that._currentColumn = null;
-                                            d.resolve(data)
-                                        }).fail(d.reject)
+                                    options.dataField = column.dataField || column.name;
+                                    dataSource.load(options).done(function(data) {
+                                        that._processGroupItems(data, null, null, {
+                                            level: cutoffLevel,
+                                            column: column,
+                                            headerFilterOptions: headerFilterOptions
+                                        });
+                                        that._updateSelectedState(data, column);
+                                        d.resolve(data)
                                     }).fail(d.reject);
                                     return d
                                 }
@@ -14185,7 +14424,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 _columnOptionChanged: function(e) {
                     var optionNames = e.optionNames;
                     if (dataGrid.checkChanges(optionNames, ["filterValues", "filterType"])) {
-                        this._updateIndicators("headerFilter");
+                        if (this.option("headerFilter.visible"))
+                            this._updateIndicators("headerFilter");
                         return
                     }
                     this.callBase(e)
@@ -14668,6 +14908,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
             commonUtils = DX.require("/utils/utils.common"),
             support = DX.require("/utils/utils.support"),
             removeEvent = DX.require("/ui/events/ui.events.remove"),
+            stringUtils = DX.require("/utils/utils.string"),
             ko = window.ko;
         var DATAGRID_CELL_CONTENT_CLASS = "dx-datagrid-text-content",
             DATAGRID_GROUP_ROW_CLASS = "dx-group-row",
@@ -14682,8 +14923,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
             DATAGRID_COLUMN_LINES_CLASS = "dx-column-lines",
             DATAGRID_ROW_ALTERNATION_CLASS = "dx-row-alt",
             DATAGRID_LAST_ROW_BORDER = "dx-last-row-border",
-            DATAGRID_LOADPANEL_HIDE_TIMEOUT = 200,
-            DATAGRID_SPACE_REGEXP = /\s/g;
+            DATAGRID_LOADPANEL_HIDE_TIMEOUT = 200;
         var createScrollableOptions = function(that) {
                 var scrollingOptions = that.option("scrolling"),
                     useNativeScrolling = that.option("scrolling.useNative");
@@ -14714,7 +14954,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                             };
                     default:
                         return function($container, options) {
-                                var isDataTextEmpty = (!options.text || !options.text.replace(DATAGRID_SPACE_REGEXP, "")) && options.rowType === "data",
+                                var isDataTextEmpty = stringUtils.isEmpty(options.text) && options.rowType === "data",
                                     text = isDataTextEmpty ? "&nbsp;" : options.text,
                                     container = $container.get(0);
                                 if (column.encodeHtml && !isDataTextEmpty)
@@ -14841,34 +15081,34 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 dxScrollableOptions.onScroll = scrollHandler;
                 dxScrollableOptions.onStop = scrollHandler;
                 that._scrollable = that._createComponent($element, "dxScrollable", dxScrollableOptions);
-                that._scrollableContainer = that._scrollable._$container
+                that._scrollableContainer = that._scrollable && that._scrollable._$container
             },
             _renderLoadPanel: function($element) {
                 var that = this,
-                    loadPanelOptions;
-                if ($element.dxLoadPanel) {
-                    that._loadPanel && that._loadPanel.element().remove();
-                    loadPanelOptions = that.option("loadPanel");
-                    if (loadPanelOptions && loadPanelOptions.enabled) {
-                        loadPanelOptions = $.extend({
-                            shading: false,
-                            message: loadPanelOptions.text,
-                            position: {of: $element},
-                            container: $element
-                        }, loadPanelOptions);
-                        that._loadPanel = that._createComponent($("<div />").appendTo($element.parent()), "dxLoadPanel", loadPanelOptions)
-                    }
-                    else
-                        that._loadPanel = null
+                    loadPanelOptions,
+                    $container = that.element();
+                that._loadPanel && that._loadPanel.element().remove();
+                loadPanelOptions = that.option("loadPanel");
+                if (loadPanelOptions && loadPanelOptions.enabled) {
+                    loadPanelOptions = $.extend({
+                        shading: false,
+                        message: loadPanelOptions.text,
+                        position: {of: $element},
+                        container: $container
+                    }, loadPanelOptions);
+                    that._loadPanel = that._createComponent($("<div>").appendTo($container), "dxLoadPanel", loadPanelOptions)
                 }
+                else
+                    that._loadPanel = null
             },
             _renderContent: function(contentElement, tableElement) {
                 contentElement.replaceWith($("<div>").addClass(DATAGRID_CONTENT_CLASS).append(tableElement));
                 return this._findContentElement()
             },
-            _updateContent: function(contentElement, change, newTableElement) {
+            _updateContent: function(newTableElement, change) {
                 var that = this,
                     tableElement = that._getTableElement(),
+                    contentElement = that._findContentElement(),
                     changeType = change && change.changeType,
                     executors = [];
                 switch (changeType) {
@@ -15077,12 +15317,10 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
             _renderCore: function(change) {
                 var that = this,
                     $table,
-                    $content,
                     $element = that.element();
                 $element.addClass(DATAGRID_ROWS_VIEW_CLASS).toggleClass(DATAGRID_NOWRAP_CLASS, !that.option("wordWrapEnabled"));
                 $table = that._renderTable({change: change});
-                $content = that._findContentElement();
-                that._updateContent($content, change, $table);
+                that._updateContent($table, change);
                 that.callBase(change);
                 that._lastColumnWidths = null
             },
@@ -15266,8 +15504,16 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
             },
             _updateScrollable: function() {
                 var dxScrollable = this.element().data("dxScrollable");
-                if (dxScrollable)
-                    dxScrollable._visibilityChanged(true)
+                if (dxScrollable) {
+                    dxScrollable._visibilityChanged(true);
+                    this._updateHorizontalScrollPosition()
+                }
+            },
+            _updateHorizontalScrollPosition: function() {
+                var scrollable = this.getScrollable(),
+                    scrollLeft = scrollable && scrollable.scrollOffset().left;
+                if (scrollLeft === 0 && scrollLeft !== this._scrollLeft)
+                    scrollable.scrollTo({x: this._scrollLeft})
             },
             _resizeCore: function() {
                 var that = this;
@@ -15768,6 +16014,15 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
             }
         });
         dataGrid.BlockSeparatorView = dataGrid.SeparatorView.inherit({
+            init: function() {
+                var that = this;
+                this.callBase();
+                this.getController("data").loadingChanged.add(function(isLoading, messageText) {
+                    var element = that.element();
+                    if (!isLoading && element && element.css("display") !== "none")
+                        that.hide()
+                })
+            },
             _renderSeparator: function() {
                 this.callBase();
                 this.element().addClass(DATAGRID_BLOCK_SEPARATOR_CLASS).html("&nbsp;")
@@ -15864,9 +16119,15 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 return this.option("showColumnHeaders") && (allowReordering(this) || commonColumnSettings.allowGrouping || commonColumnSettings.allowHiding)
             },
             init: function() {
+                var that = this;
                 this.callBase();
                 this._controller = this.getController("draggingHeader");
-                this._columnsResizerViewController = this.getController("columnsResizer")
+                this._columnsResizerViewController = this.getController("columnsResizer");
+                this.getController("data").loadingChanged.add(function(isLoading, messageText) {
+                    var element = that.element();
+                    if (!isLoading && element && element.css("display") !== "none")
+                        element.hide()
+                })
             },
             dragHeader: function(options) {
                 var that = this,
@@ -16419,6 +16680,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     options,
                     rowIndex,
                     columnIndex,
+                    rowOptions,
                     $targetRowElement,
                     $targetCellElement,
                     menuItems;
@@ -16429,13 +16691,14 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         $targetRowElement = $targetCellElement.closest(".dx-row");
                         rowIndex = view.getRowIndex($targetRowElement);
                         columnIndex = $targetCellElement[0] && $targetCellElement[0].cellIndex;
+                        rowOptions = $targetRowElement.data("options");
                         options = {
                             targetElement: $targetElement,
                             target: viewName[this],
                             rowIndex: rowIndex,
                             row: view._getRows()[rowIndex],
                             columnIndex: columnIndex,
-                            column: view.getColumns()[columnIndex],
+                            column: rowOptions && rowOptions.cells[columnIndex].column,
                             items: view.getContextMenuItems && view.getContextMenuItems($targetElement)
                         };
                         that.executeAction("onContextMenuPreparing", options);
@@ -16635,7 +16898,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     editingOptions = this.option("editing"),
                     rowIndex = this._focusedCellPosition ? this._focusedCellPosition.rowIndex : null,
                     $row = this._focusedView && this._focusedView.getRow(rowIndex);
-                if (this.option("grouping.allowCollapsing") && this._isGroupRow($row) || this.option("masterDetail.enabled") && $cell.hasClass(DATAGRID_COMMAND_EXPAND_CLASS)) {
+                if (this.option("grouping.allowCollapsing") && this._isGroupRow($row) || this.option("masterDetail.enabled") && $cell && $cell.hasClass(DATAGRID_COMMAND_EXPAND_CLASS)) {
                     var key = this._dataController.getKeyByRowIndex(rowIndex),
                         item = this._dataController.items()[rowIndex];
                     if (key !== undefined && item && item.data && !item.data.isContinuation)
@@ -16650,7 +16913,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 }
                 else {
                     var column = this._columnsController.getVisibleColumns()[this._focusedCellPosition.columnIndex];
-                    if (editingOptions.allowUpdating && column.allowEditing)
+                    if (editingOptions.allowUpdating && column && column.allowEditing)
                         if (this._isRowEditMode())
                             this._editingController.editRow(rowIndex);
                         else
@@ -16709,8 +16972,9 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 }
             },
             _spaceKeyHandler: function(eventArgs, isEditing) {
-                var rowIndex = this._focusedCellPosition ? this._focusedCellPosition.rowIndex : null;
-                if (this.option("selection") && this.option("selection").mode !== "none" && !isEditing) {
+                var rowIndex = this._focusedCellPosition ? this._focusedCellPosition.rowIndex : null,
+                    $target = $(eventArgs.originalEvent && eventArgs.originalEvent.target);
+                if (this.option("selection") && this.option("selection").mode !== "none" && !isEditing && ($target.parent().hasClass("dx-data-row") || $target.hasClass(DATAGRID_ROWS_VIEW_CLASS))) {
                     this._selectionController.changeItemSelection(rowIndex, {
                         shift: eventArgs.shift,
                         control: eventArgs.ctrl
@@ -16718,8 +16982,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     eventArgs.originalEvent.preventDefault()
                 }
             },
-            _crtlAKeyHandler: function(eventArgs) {
-                if (eventArgs.ctrl && this.option("selection.mode") === "multiple" && this.option("selection.allowSelectAll")) {
+            _crtlAKeyHandler: function(eventArgs, isEditing) {
+                if (!isEditing && eventArgs.ctrl && this.option("selection.mode") === "multiple" && this.option("selection.allowSelectAll")) {
                     this._selectionController.selectAll();
                     eventArgs.originalEvent.preventDefault()
                 }
@@ -16820,7 +17084,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                             this._spaceKeyHandler(e, isEditing);
                             break;
                         case"A":
-                            this._crtlAKeyHandler(e);
+                            this._crtlAKeyHandler(e, isEditing);
                             break;
                         case"tab":
                             this._tabKeyHandler(e, isEditing);
@@ -16972,10 +17236,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                                 that._isNeedScroll = false
                             }
                     });
-                    that._focusedCellPosition = {
-                        columnIndex: 0,
-                        rowIndex: 0
-                    };
+                    that._focusedCellPosition = {};
                     that._dataController.changed.add(function(change) {
                         if (that._focusedCellPosition && change && change.changeType === "prepend")
                             that._focusedCellPosition.rowIndex += change.items.length
@@ -17071,9 +17332,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
             extenders: {
                 views: {rowsView: {_renderCore: function(change) {
                             this.callBase(change);
-                            this.element().attr("tabindex", this.option("useKeyboard") ? 0 : null);
-                            if (change && change.changeType === "update")
-                                this.getController("keyboardNavigation")._isNeedFocus = true
+                            this.element().attr("tabindex", this.option("useKeyboard") ? 0 : null)
                         }}},
                 controllers: {editing: {
                         editCell: function(rowIndex, columnIndex) {
@@ -17124,7 +17383,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     })
                 }));
                 $("<td/>").attr({
-                    colspan: that._columnHeadersView.getColumnCount(),
+                    colspan: that.getController("columns").getVisibleColumns().length,
                     role: "presentation"
                 }).prepend($closeButton).append($errorMessage).appendTo($errorRow);
                 return $errorRow
@@ -17235,13 +17494,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         var totalItem = this._dataController.footerItems()[0];
                         this.element().empty().addClass(DATAGRID_TOTAL_FOOTER_CLASS);
                         if (totalItem && totalItem.summaryCells && totalItem.summaryCells.length)
-                            this._setTableElement(this._renderTable())
-                    },
-                    _renderTable: function() {
-                        var $table = this.callBase.apply(this, arguments),
-                            $content = this.element();
-                        this.wrapTableInScrollContainer($table).appendTo($content);
-                        return $table
+                            this._updateContent(this._renderTable())
                     },
                     _rowClick: function(e) {
                         var item = this._dataController.footerItems()[e.rowIndex] || {};
@@ -17330,16 +17583,18 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         return data
                     };
                 return {
-                        _handleDataLoadingCore: function(options) {
+                        _customizeRemoteOperations: function(options) {
                             var summary = this.summary();
                             if (summary)
                                 if (options.remoteOperations.summary) {
-                                    options.storeLoadOptions.groupSummary = summary.groupAggregates;
-                                    options.storeLoadOptions.totalSummary = summary.totalAggregates
+                                    if (!options.isCustomLoading || options.storeLoadOptions.isLoadingAll) {
+                                        options.storeLoadOptions.groupSummary = summary.groupAggregates;
+                                        options.storeLoadOptions.totalSummary = summary.totalAggregates
+                                    }
                                 }
                                 else if (summary.totalAggregates.length || summary.groupAggregates.length && options.storeLoadOptions.group)
                                     options.remoteOperations.paging = false;
-                            this.callBase(options)
+                            this.callBase.apply(this, arguments)
                         },
                         _handleDataLoadedCore: function(options) {
                             var that = this,
@@ -17351,7 +17606,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                             else if (!remoteOperations.paging) {
                                 calculateAggregates(that, summary, options.data, groups.length);
                                 options.data = sortGroupsBySummary(options.data, groups, summary);
-                                options.totalAggregates = that._totalAggregates
+                                options.extra = options.extra || {};
+                                options.extra.summary = that._totalAggregates
                             }
                             that.callBase(options)
                         }
@@ -17400,7 +17656,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                                         i;
                                     for (i = 0; i < groupItems.length; i++) {
                                         groupItem = groupItems[i];
-                                        column = this._columnsController.columnOption(groupItem.column);
+                                        column = this._columnsController.columnOption(groupItem.showInColumn || groupItem.column);
                                         if (groupItem.showInGroupFooter && this._isDataColumn(column))
                                             return true
                                     }
@@ -17411,7 +17667,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                                     if (options) {
                                         if (options.isGroupFooterVisible === undefined)
                                             options.isGroupFooterVisible = this._isGroupFooterVisible();
-                                        if (options.data && options.data.items && options.isGroupFooterVisible)
+                                        if (options.data && options.data.items && options.isGroupFooterVisible && (options.collectContinuationItems || !options.data.isContinuationOnNextPage))
                                             result.push({
                                                 rowType: DATAGRID_GROUP_FOOTER_ROW_TYPE,
                                                 data: options.data,
@@ -17783,10 +18039,9 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     $table = that.callBase(options);
                     if (that._isFixedColumns) {
                         that._isFixedTableRendering = true;
-                        that._fixedTableElement = $fixedTable = that._createTable(fixedColumns);
-                        $fixedTable.addClass(DATAGRID_POINTER_EVENTS_NONE_CLASS);
+                        $fixedTable = that._createTable(fixedColumns);
                         that._renderRows($fixedTable, $.extend({}, options, {columns: fixedColumns}));
-                        that.wrapTableInScrollContainer(that._fixedTableElement).appendTo(that.element()).addClass(DATAGRID_CONTENT_FIXED_CLASS + " " + DATAGRID_POINTER_EVENTS_TARGET_CLASS);
+                        that._updateContent($fixedTable, options && options.change);
                         that._isFixedTableRendering = false
                     }
                     else {
@@ -17794,6 +18049,12 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         that._fixedTableElement = null
                     }
                     return $table
+                },
+                _wrapTableInScrollContainer: function() {
+                    var $scrollContainer = this.callBase.apply(this, arguments);
+                    if (this._isFixedTableRendering)
+                        $scrollContainer.addClass(DATAGRID_CONTENT_FIXED_CLASS + " " + DATAGRID_POINTER_EVENTS_TARGET_CLASS);
+                    return $scrollContainer
                 },
                 _renderCellContent: function($cell, options) {
                     var that = this,
@@ -17863,7 +18124,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 },
                 _setTableElement: function(tableElement) {
                     if (this._isFixedTableRendering)
-                        this._fixedTableElement = tableElement;
+                        this._fixedTableElement = tableElement.addClass(DATAGRID_POINTER_EVENTS_NONE_CLASS);
                     else
                         this.callBase(tableElement)
                 },
@@ -18047,30 +18308,6 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         attachHoverEvent(that._tableElement)
                     }
                 },
-                _renderTable: function(options) {
-                    var that = this,
-                        $content,
-                        $table,
-                        $fixedTable,
-                        fixedColumns = that._columnsController.getFixedColumns();
-                    that._isFixedColumns = !!fixedColumns.length;
-                    $table = that.callBase(options);
-                    if (that._isFixedColumns) {
-                        that._isFixedTableRendering = true;
-                        $fixedTable = that._createTable(fixedColumns);
-                        $fixedTable.addClass(DATAGRID_POINTER_EVENTS_NONE_CLASS);
-                        that._fixedTableElement = that._fixedTableElement || $fixedTable;
-                        that._renderRows($fixedTable, $.extend({}, options, {columns: fixedColumns}));
-                        $content = that._findContentElement();
-                        that._updateContent($content, options.change, $fixedTable);
-                        that._isFixedTableRendering = false
-                    }
-                    else {
-                        that._fixedTableElement && that._fixedTableElement.remove();
-                        that._fixedTableElement = null
-                    }
-                    return $table
-                },
                 _findContentElement: function() {
                     var that = this,
                         $content,
@@ -18105,8 +18342,10 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         this.callBase()
                 },
                 _updateScrollable: function() {
+                    var scrollable = this.getScrollable(),
+                        scrollTop = scrollable && scrollable.scrollOffset().top;
                     this.callBase();
-                    this._updateFixedTablePosition(-this._scrollTop)
+                    this._updateFixedTablePosition(-scrollTop)
                 },
                 _renderContent: function(contentElement, tableElement) {
                     if (this._isFixedTableRendering)
@@ -18196,6 +18435,11 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     if (isUpdated)
                         this._updateFixedTablePosition(-this._scrollTop);
                     return isUpdated
+                },
+                _afterRowPrepared: function(e) {
+                    if (this._isFixedTableRendering)
+                        return;
+                    this.callBase(e)
                 }
             });
         var FooterViewFixedColumnsExtender = baseFixedColumns;
@@ -18569,9 +18813,11 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 this._headersView = this.getView("columnHeadersView");
                 this.createAction("onExporting", {excludeValidators: ["disabled", "readOnly"]});
                 this.createAction("onExported", {excludeValidators: ["disabled", "readOnly"]});
+                this.createAction("onFileSaving", {excludeValidators: ["disabled", "readOnly"]});
                 this._clientExporter = new DX.dxClientExporter({
                     exportingAction: this.getAction("onExporting"),
-                    exportedAction: this.getAction("onExported")
+                    exportedAction: this.getAction("onExported"),
+                    fileSavingAction: this.getAction("onFileSaving")
                 })
             },
             optionChanged: function(args) {
@@ -18579,7 +18825,9 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 if (args.name === "onExporting")
                     this._clientExporter.option("exportingAction", this.getAction(args.name));
                 if (args.name === "onExported")
-                    this._clientExporter.option("exportedAction", this.getAction(args.name))
+                    this._clientExporter.option("exportedAction", this.getAction(args.name));
+                if (args.name === "onFileSaving")
+                    this._clientExporter.option("fileSavingAction", this.getAction(args.name))
             },
             callbackNames: function() {
                 return ["selectionOnlyChanged"]
@@ -18805,10 +19053,13 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                             return
                         }
                         var changeType = e && e.changeType;
-                        if (!e || changeType === "refresh" || changeType === "prepend" || changeType === "append" || changeType === "append")
+                        if (!e || changeType === "refresh" || changeType === "prepend" || changeType === "append")
                             that.resize();
                         else if (changeType === "update")
-                            that._rowsView.synchronizeRows && that._rowsView.synchronizeRows();
+                            if (that._dataController.items().length > 1)
+                                that._rowsView.resize();
+                            else
+                                that.resize();
                         if (changeType && changeType !== "updateSelection")
                             that.component._fireContentReadyAction()
                     };
@@ -18926,7 +19177,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                             resultWidths[lastColumnIndex] = "auto";
                             lastWidthReseted = true;
                             if (!hasWidth && !hasPercentWidth) {
-                                that._maxWidth = totalWidth;
+                                that._maxWidth = that.option("showBorders") ? totalWidth + 2 : totalWidth;
                                 $element.css("max-width", that._maxWidth)
                             }
                         }
@@ -19027,8 +19278,10 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 else
                     rowsViewHeight = "auto";
                 that._rowsView.height(rowsViewHeight);
-                if (!dataController.isLoaded())
-                    return;
+                if (!dataController.isLoaded()) {
+                    that._rowsView.setLoading(true);
+                    return
+                }
                 that._columnHeadersView.setScrollerSpacing(that._rowsView.getScrollbarWidth());
                 that._rowsView.setScrollerSpacing();
                 that._synchronizeColumns();
@@ -19160,11 +19413,10 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
     (function($, DX) {
         var ui = DX.ui,
             stringUtils = DX.require("/utils/utils.string"),
-            commonUtils = DX.require("/utils/utils.common"),
-            wheelEvent = DX.require("/ui/events/ui.events.wheel"),
             registerComponent = DX.require("/componentRegistrator"),
             Widget = DX.require("/ui/ui.widget"),
             eventUtils = DX.require("/ui/events/ui.events.utils"),
+            isDefined = DX.require("/utils/utils.common").isDefined,
             DATA_AREA_CELL_CLASS_NAME = "dx-area-data-cell",
             ROW_AREA_CELL_CLASS_NAME = "dx-area-row-cell",
             COLUMN_AREA_CELL_CLASS_NAME = "dx-area-column-cell",
@@ -19189,23 +19441,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
             for (var i = 0; i < sizeArray.length; i++)
                 sizeArray[i] -= delta
         }
-        function getAreaScrollable(area) {
-            return area.groupElement().data('dxScrollable')
-        }
         function subscribeToScrollEvent(area, handler) {
-            var scrollable = getAreaScrollable(area);
-            if (scrollable)
-                scrollable.on('scroll', handler).on("stop", handler)
-        }
-        function setScrollPos(area, pos) {
-            var scrollable;
-            if (area) {
-                scrollable = getAreaScrollable(area);
-                if (scrollable) {
-                    scrollable.scrollTo(pos);
-                    scrollable.update()
-                }
-            }
+            area.on('scroll', handler).on("stop", handler)
         }
         var scrollBarInfoCache = {};
         function getScrollBarInfo(rootElement, useNativeScrolling) {
@@ -19242,7 +19479,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
             _getDefaultOptions: function() {
                 return $.extend(this.callBase(), {
                         scrolling: {
-                            timeout: 30,
+                            timeout: 300,
                             mode: "standard",
                             useNative: "auto",
                             removeInvisiblePages: true
@@ -19310,7 +19547,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         onExpandValueChanging: null,
                         renderCellCountLimit: 20000,
                         onExporting: null,
-                        onExported: null
+                        onExported: null,
+                        onFileSaving: null
                     })
             },
             _setDeprecatedOptions: function() {
@@ -19370,16 +19608,18 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 that._scrollLeft = that._scrollTop = null;
                 that._initActions();
                 that._clientExporter = new DX.dxClientExporter({
-                    exportingAction: that._actions.exportingAction,
-                    exportedAction: that._actions.exportedAction
+                    exportingAction: that._actions.onExporting,
+                    exportedAction: that._actions.onExported,
+                    fileSavingAction: that._actions.onFileSaving
                 })
             },
             _initActions: function() {
                 this._actions = {
                     onContextMenuPreparing: this._createActionByOption("onContextMenuPreparing"),
                     onCellClick: this._createActionByOption("onCellClick"),
-                    exportingAction: this._createActionByOption("onExporting"),
-                    exportedAction: this._createActionByOption("onExported")
+                    onExporting: this._createActionByOption("onExporting"),
+                    onExported: this._createActionByOption("onExported"),
+                    onFileSaving: this._createActionByOption("onFileSaving")
                 }
             },
             _trigger: function(eventName, eventArg) {
@@ -19407,7 +19647,6 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     case"showRowTotals":
                     case"showRowGrandTotals":
                     case"showColumnTotals":
-                    case"showColumnGrandTotals":
                     case"showColumnGrandTotals":
                     case"hideEmptySummaryCells":
                         that._dataController.updateViewOptions(that._getDataControllerOptions());
@@ -19449,10 +19688,16 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         that.updateDimensions();
                         break;
                     case"onExporting":
-                        that._clientExporter.option("exportingAction", that._actions.exportingAction);
+                        that._actions.onExporting = that._createActionByOption(args.name);
+                        that._clientExporter.option("exportingAction", that._actions.onExporting);
                         break;
                     case"onExported":
-                        that._clientExporter.option("exportedAction", that._actions.exportedAction);
+                        that._actions.onExported = that._createActionByOption(args.name);
+                        that._clientExporter.option("exportedAction", that._actions.onExported);
+                        break;
+                    case"onFileSaving":
+                        that._actions.onFileSaving = that._createActionByOption(args.name);
+                        that._clientExporter.option("fileSavingAction", that._actions.onFileSaving);
                         break;
                     default:
                         that.callBase(args)
@@ -19462,7 +19707,6 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 var that = this,
                     scrollTop,
                     scrollLeft,
-                    dataAreaScrollable,
                     scrolled = that._scrollTop || that._scrollLeft;
                 if (rowsArea && !rowsArea.hasScroll())
                     that._scrollTop = null;
@@ -19471,39 +19715,40 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 if (that._scrollTop !== null || that._scrollLeft !== null || scrolled) {
                     scrollTop = that._scrollTop || 0;
                     scrollLeft = that._scrollLeft || 0;
-                    setScrollPos(dataArea, {
+                    dataArea.scrollTo({
                         x: scrollLeft,
                         y: scrollTop
                     });
-                    setScrollPos(columnsArea, scrollLeft);
-                    setScrollPos(rowsArea, scrollTop)
+                    columnsArea.scrollTo(scrollLeft);
+                    rowsArea.scrollTo(scrollTop)
                 }
-                else if (dataArea) {
-                    dataAreaScrollable = getAreaScrollable(dataArea);
-                    dataAreaScrollable && dataAreaScrollable.update()
-                }
+                else
+                    $.each([columnsArea, rowsArea, dataArea], function(_, area) {
+                        if (area)
+                            area.updateScrollable()
+                    })
             },
             _subscribeToEvents: function(columnsArea, rowsArea, dataArea) {
-                var that = this;
-                subscribeToScrollEvent(dataArea, function(e) {
-                    var scrollOffset = e.scrollOffset;
-                    if ((that._scrollLeft || 0) !== (scrollOffset.left || 0) || (that._scrollTop || 0) !== (scrollOffset.top || 0)) {
-                        that._scrollLeft = e.scrollOffset.left;
-                        that._scrollTop = e.scrollOffset.top;
-                        that._updateScrollPosition(columnsArea, rowsArea, null);
-                        if (that.option("scrolling.mode") === "virtual")
-                            that._dataController.setViewportPosition(that._scrollLeft, that._scrollTop)
-                    }
-                });
-                rowsArea.groupElement().off(wheelEvent.name).on(wheelEvent.name, function(e) {
-                    var scrollable = dataArea.groupElement().data("dxScrollable");
-                    scrollable && scrollable.scrollTo({y: that._scrollTop - Math.floor(e.delta)})
-                })
+                var that = this,
+                    scrollHandler = function(e) {
+                        var scrollOffset = e.scrollOffset,
+                            leftOffset = isDefined(scrollOffset.left) ? scrollOffset.left : that._scrollLeft,
+                            topOffset = isDefined(scrollOffset.top) ? scrollOffset.top : that._scrollTop;
+                        if ((that._scrollLeft || 0) !== (leftOffset || 0) || (that._scrollTop || 0) !== (topOffset || 0)) {
+                            that._scrollLeft = leftOffset;
+                            that._scrollTop = topOffset;
+                            that._updateScrollPosition(columnsArea, rowsArea, dataArea);
+                            if (that.option("scrolling.mode") === "virtual")
+                                that._dataController.setViewportPosition(that._scrollLeft, that._scrollTop)
+                        }
+                    };
+                subscribeToScrollEvent(dataArea, scrollHandler);
+                subscribeToScrollEvent(rowsArea, scrollHandler);
+                subscribeToScrollEvent(columnsArea, scrollHandler)
             },
             _clean: $.noop,
-            _needDelayResizing: function() {
-                var cells = this._dataController.getCellsInfo(),
-                    cellsCount = cells.length * (cells.length ? cells[0].length : 0);
+            _needDelayResizing: function(cellsInfo) {
+                var cellsCount = cellsInfo.length * (cellsInfo.length ? cellsInfo[0].length : 0);
                 return cellsCount > this.option("renderCellCountLimit")
             },
             _renderFieldChooser: function() {
@@ -19601,9 +19846,9 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         $.each(oppositeAreaFields, function(index, field) {
                             if (field.allowSortingBySummary)
                                 $.each(e.dataFields, function(dataIndex, dataField) {
-                                    if (commonUtils.isDefined(e.cell.dataIndex) && e.cell.dataIndex !== dataIndex)
+                                    if (isDefined(e.cell.dataIndex) && e.cell.dataIndex !== dataIndex)
                                         return;
-                                    var showDataFieldCaption = !commonUtils.isDefined(e.cell.dataIndex) && e.dataFields.length > 1,
+                                    var showDataFieldCaption = !isDefined(e.cell.dataIndex) && e.dataFields.length > 1,
                                         textFormat = that.option(e.area === "column" ? "texts.sortColumnBySummary" : "texts.sortRowBySummary"),
                                         checked = pivotGrid.findField(e.dataFields, field.sortBySummaryField) === dataIndex && (e.cell.path || []).join("/") === (field.sortBySummaryPath || []).join("/"),
                                         text = stringUtils.format(textFormat, showDataFieldCaption ? field.caption + " - " + dataField.caption : field.caption);
@@ -19624,7 +19869,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                                 })
                         });
                         $.each(oppositeAreaFields, function(index, field) {
-                            if (field.allowSortingBySummary && commonUtils.isDefined(field.sortBySummaryField)) {
+                            if (field.allowSortingBySummary && isDefined(field.sortBySummaryField)) {
                                 items.push({
                                     beginGroup: sortingBySummaryItemCount === 0,
                                     icon: "none",
@@ -19648,7 +19893,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 if (that.option("fieldChooser.enabled"))
                     items.push({
                         beginGroup: true,
-                        icon: "field-chooser",
+                        icon: "column-chooser",
                         text: that.option("texts.showFieldChooser"),
                         onItemClick: function() {
                             that._fieldChooserPopup.show()
@@ -19693,10 +19938,15 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
             },
             _handleCellClick: function(e) {
                 var that = this,
-                    args = that._createCellArgs(e.currentTarget, e);
+                    args = that._createCellArgs(e.currentTarget, e),
+                    cell = args.cell;
                 if (!args.area && (args.rowIndex || args.columnIndex))
                     return;
-                that._trigger("onCellClick", args)
+                that._trigger("onCellClick", args);
+                if (cell && isDefined(cell.expanded))
+                    setTimeout(function() {
+                        that._dataController[cell.expanded ? "collapseHeaderItem" : "expandHeaderItem"](args.area, cell.path)
+                    })
             },
             _getNoDataText: function() {
                 return this.option("texts.noData")
@@ -19714,6 +19964,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 if (that.option("fieldChooser.enabled"))
                     that._createComponent($("<div>").appendTo($descriptionCell).addClass("dx-pivotgrid-field-chooser-button"), "dxButton", {
                         icon: "column-chooser",
+                        hint: that.option("texts.showFieldChooser"),
                         onClick: function() {
                             that.getFieldChooserPopup().show()
                         }
@@ -19721,6 +19972,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 if (that.option("export.enabled"))
                     that._createComponent($("<div>").appendTo($descriptionCell).addClass("dx-pivotgrid-export-button"), "dxButton", {
                         icon: "exportxlsx",
+                        hint: that.option("texts.exportToExcel"),
                         onClick: function() {
                             that.exportToExcel()
                         }
@@ -19733,10 +19985,11 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     dataAreaElement,
                     tableElement,
                     dataArea = that._dataArea || new pivotGrid.DataArea(that),
-                    rowsArea = (that._rowsArea || new pivotGrid.VerticalHeadersArea(that)).setDataController(that._dataController),
-                    columnsArea = (that._columnsArea || new pivotGrid.HorizontalHeadersArea(that)).setDataController(that._dataController),
+                    rowsArea = that._rowsArea || new pivotGrid.VerticalHeadersArea(that),
+                    columnsArea = that._columnsArea || new pivotGrid.HorizontalHeadersArea(that),
                     scrollBarInfo = getScrollBarInfo(that.element(), that.option("scrolling.useNative")),
-                    isFirstDrawing = !that._pivotGridContainer;
+                    isFirstDrawing = !that._pivotGridContainer,
+                    cellsInfo = that._dataController.getCellsInfo();
                 that._scrollBarWidth = scrollBarInfo.scrollBarWidth;
                 that._scrollBarUseNative = scrollBarInfo.scrollBarUseNative;
                 if (isFirstDrawing) {
@@ -19761,7 +20014,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 that._dataArea = dataArea;
                 columnsArea.render(columnsAreaElement, that._dataController.getColumnsInfo());
                 rowsArea.render(rowsAreaElement, that._dataController.getRowsInfo());
-                dataArea.render(dataAreaElement, that._dataController.getCellsInfo());
+                dataArea.render(dataAreaElement, cellsInfo);
                 dataArea.tableElement().prepend(columnsArea.headElement());
                 var updateHandler = function() {
                         that.updateDimensions();
@@ -19776,7 +20029,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     rowsArea.processScroll();
                     columnsArea.processScroll()
                 }
-                that._needDelayResizing() && isFirstDrawing ? setTimeout(updateHandler) : updateHandler()
+                that._needDelayResizing(cellsInfo) && isFirstDrawing ? setTimeout(updateHandler) : updateHandler()
             },
             _fireContentReadyAction: function() {
                 if (!this._dataController.isLoading())
@@ -19843,8 +20096,6 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     rowsAreaWidth = 0,
                     hasRowsScroll,
                     hasColumnsScroll,
-                    loadPanelOptions = that.option("loadPanel") || {},
-                    minHeight,
                     scrollBarWidth = that._scrollBarWidth || 0,
                     dataAreaCell = tableElement.find("." + DATA_AREA_CELL_CLASS_NAME),
                     rowAreaCell = tableElement.find("." + ROW_AREA_CELL_CLASS_NAME),
@@ -19886,14 +20137,6 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 if (!hasRowsScroll)
                     groupHeight = totalHeight + (hasColumnsScroll ? scrollBarWidth : 0);
                 columnsArea.tableElement().append(dataArea.headElement());
-                if (resultHeights.length === 1 && loadPanelOptions.enabled && loadPanelOptions.height) {
-                    minHeight = loadPanelOptions.height + 50;
-                    if (resultHeights[0] < minHeight) {
-                        resultHeights[0] = minHeight;
-                        if (groupHeight < minHeight)
-                            groupHeight = minHeight
-                    }
-                }
                 if (!hasColumnsScroll && hasRowsScroll && scrollBarWidth)
                     adjustSizeArray(resultWidths, scrollBarWidth);
                 if (descriptionCellHeight > columnsAreaHeight) {
@@ -20006,7 +20249,9 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 column: "columns",
                 data: "values",
                 filter: "filters"
-            };
+            },
+            STATE_PROPERTIES = ["area", "areaIndex", "sortOrder", "filterType", "filterValues", "sortBy", "sortBySummaryField", "sortBySummaryPath", "expanded"],
+            CALCULATED_PROPERTIES = ["format", "selector", "customizeText", "caption"];
         function findField(fields, id) {
             var i,
                 field;
@@ -20036,6 +20281,39 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 if (items[i] !== item)
                     i--
             }
+        }
+        function setFieldProperty(field, property, value, isInitialization) {
+            var initProperties = field._initProperties = field._initProperties || {},
+                initValue = isInitialization ? value : field[property];
+            if (!initProperties.hasOwnProperty(property) || isInitialization)
+                initProperties[property] = initValue;
+            field[property] = value
+        }
+        function createCaption(field) {
+            var caption = field.dataField || field.groupName || "",
+                summaryType = (field.summaryType || "").toLowerCase();
+            if (commonUtils.isString(field.groupInterval))
+                caption += "_" + field.groupInterval;
+            if (summaryType && summaryType !== "custom") {
+                summaryType = summaryType.replace(/^./, summaryType[0].toUpperCase());
+                if (caption.length)
+                    summaryType = " (" + summaryType + ")"
+            }
+            else
+                summaryType = "";
+            return inflector.titleize(caption) + summaryType
+        }
+        function resetFieldState(field, properties) {
+            var initialProperties = field._initProperties || {};
+            $.each(properties, function(_, prop) {
+                if (initialProperties.hasOwnProperty(prop))
+                    field[prop] = initialProperties[prop]
+            })
+        }
+        function updateCalculatedFieldProperties(field) {
+            resetFieldState(field, CALCULATED_PROPERTIES);
+            if (!isDefined(field.caption))
+                setFieldProperty(field, "caption", createCaption(field))
         }
         function createPath(items) {
             var result = [],
@@ -20179,7 +20457,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
             }
             function getExpandedPaths(dataSource, loadOptions, dimentionName) {
                 var result = [],
-                    fields = loadOptions[dimentionName];
+                    fields = loadOptions && loadOptions[dimentionName] || [];
                 foreachTree(dataSource[dimentionName], function(items) {
                     var item = items[0],
                         path = createPath(items);
@@ -20188,23 +20466,29 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 }, true);
                 return result
             }
-            function setStateProperties(field, srcField) {
-                $.each(["area", "areaIndex", "sortOrder", "filterType", "filterValues", "sortBy", "sortBySummaryField", "sortBySummaryPath", "expanded"], function(_, name) {
-                    field[name] = srcField[name]
-                });
+            function setStateProperties(field, srcField, skipInitPropertySave) {
+                if (srcField)
+                    each(STATE_PROPERTIES, function(_, name) {
+                        if (skipInitPropertySave)
+                            field[name] = srcField[name];
+                        else
+                            setFieldProperty(field, name, srcField[name])
+                    });
+                else
+                    resetFieldState(field, STATE_PROPERTIES);
                 return field
             }
             function getFieldsState(fields) {
                 var result = [];
-                $.each(fields, function(_, field) {
-                    result.push(setStateProperties({}, field))
+                each(fields, function(_, field) {
+                    result.push(setStateProperties({}, field, true))
                 });
                 return result
             }
             function setFieldsState(stateFields, fields) {
                 stateFields = stateFields || [];
-                $.each(fields, function(index, field) {
-                    setStateProperties(field, stateFields[index] || {})
+                each(fields, function(index, field) {
+                    setStateProperties(field, stateFields[index])
                 });
                 return fields
             }
@@ -20246,7 +20530,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     };
                 each(["row", "column", "data", "filter"], function(_, areaName) {
                     var areaFields = [];
-                    $.each(fields, function(index, field) {
+                    each(fields, function(index, field) {
                         if (isAreaField(field, areaName))
                             areaFields.push(field)
                     });
@@ -20260,7 +20544,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         field.levels = getFieldsByGroup(fields, field);
                     if (!dimension || groupName && commonUtils.isNumber(field.groupIndex) || field.visible === false)
                         return;
-                    if (field.levels && dimension !== descriptions.filters) {
+                    if (field.levels && dimension !== descriptions.filters && dimension !== descriptions.values) {
                         dimension.push.apply(dimension, field.levels);
                         if (field.filterValues && field.filterValues.length)
                             descriptions.filters.push(field)
@@ -20308,20 +20592,6 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     result = fields;
                 result.push.apply(result, mergedGroups);
                 return result
-            }
-            function createCaption(field) {
-                var caption = field.dataField || field.groupName || "",
-                    summaryType = (field.summaryType || "").toLowerCase();
-                if (commonUtils.isString(field.groupInterval))
-                    caption += "_" + field.groupInterval;
-                if (summaryType && summaryType !== "custom") {
-                    summaryType = summaryType.replace(/^./, summaryType[0].toUpperCase());
-                    if (caption.length)
-                        summaryType = " (" + summaryType + ")"
-                }
-                else
-                    summaryType = "";
-                return inflector.titleize(caption) + summaryType
             }
             function getFieldsDataType(fields) {
                 var result = {};
@@ -20485,13 +20755,15 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                             levels;
                         if (field && options) {
                             each(options, function(optionName, optionValue) {
-                                field[optionName] = optionValue;
+                                var isInitialization = $.inArray(optionName, STATE_PROPERTIES) < 0;
+                                setFieldProperty(field, optionName, optionValue, isInitialization);
                                 if (optionName === "sortOrder") {
                                     levels = field.levels || [];
                                     for (var i = 0; i < levels.length; i++)
                                         levels[i][optionName] = optionValue
                                 }
                             });
+                            updateCalculatedFieldProperties(field);
                             that._descriptions = that._createDescriptions(field)
                         }
                         return field
@@ -20592,7 +20864,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         each(fields, function(index, field) {
                             field.index = index;
                             if (!isDefined(field.caption))
-                                field.caption = createCaption(field)
+                                setFieldProperty(field, "caption", createCaption(field))
                         });
                         that.fireEvent("fieldsPrepared", [fields]);
                         that._descriptions = that._createDescriptions()
@@ -20602,8 +20874,11 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     },
                     state: function(state) {
                         var that = this;
-                        if (state) {
-                            state = $.extend({}, state);
+                        if (arguments.length) {
+                            state = $.extend({
+                                rowExpandedPaths: [],
+                                columnExpandedPaths: []
+                            }, state);
                             if (!that._descriptions) {
                                 that._changeLoadingCount(1);
                                 $.when(getFields(that)).done(function(fields) {
@@ -20616,6 +20891,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                             }
                             else {
                                 that._fields = setFieldsState(state.fields, that._fields);
+                                that._descriptions = that._createDescriptions();
                                 that.load(state)
                             }
                         }
@@ -20803,7 +21079,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
         pivotGrid.foreachDataLevel = foreachDataLevel;
         pivotGrid.getCompareFunction = getCompareFunction;
         pivotGrid.findField = findField;
-        pivotGrid.formatValue = formatValue
+        pivotGrid.formatValue = formatValue;
+        pivotGrid.setFieldProperty = setFieldProperty
     })(jQuery, DevExpress);
     /*! Module widgets-web, file ui.pivotGrid.dataController.js */
     (function($, DX) {
@@ -21207,6 +21484,9 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                             onChanged: function(e){},
                             isLoading: function() {
                                 return dataController.isLoading()
+                            },
+                            changingDuration: function() {
+                                return dataController._changingDuration || 0
                             }
                         }, dataAdapter))
             }
@@ -21228,7 +21508,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
             }
             var members = {
                     ctor: function(options) {
-                        var that = this;
+                        var that = this,
+                            virtualScrollControllerChanged = $.proxy(that._fireChanged, that);
                         options = that._options = options || {};
                         that._dataSource = that._createDataSource(options);
                         that._rowsScrollController = createScollController(that, options.component, {
@@ -21244,9 +21525,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                             load: function() {
                                 if (that._rowsScrollController.pageIndex() >= this.pageCount())
                                     that._rowsScrollController.pageIndex(this.pageCount() - 1);
-                                return that._rowsScrollController.handleDataChanged(function() {
-                                        that.changed && that.changed.fire()
-                                    })
+                                return that._rowsScrollController.handleDataChanged(virtualScrollControllerChanged)
                             }
                         });
                         that._columnsScrollController = createScollController(that, options.component, {
@@ -21262,9 +21541,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                             load: function() {
                                 if (that._columnsScrollController.pageIndex() >= this.pageCount())
                                     that._columnsScrollController.pageIndex(this.pageCount() - 1);
-                                return that._columnsScrollController.handleDataChanged(function() {
-                                        that.changed && that.changed.fire()
-                                    })
+                                return that._columnsScrollController.handleDataChanged(virtualScrollControllerChanged)
                             }
                         });
                         that._stateStoringController = new dxDataGrid.StateStoringController(options.component).init();
@@ -21277,6 +21554,12 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         that.load();
                         that._update();
                         that.changed = $.Callbacks()
+                    },
+                    _fireChanged: function() {
+                        var that = this,
+                            startChanging = new Date;
+                        that.changed && !that._lockChanged && that.changed.fire();
+                        that._changingDuration = new Date - startChanging
                     },
                     load: function() {
                         var that = this,
@@ -21335,9 +21618,6 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         $.extend(this._options, options);
                         this._update()
                     },
-                    _handleChanged: function() {
-                        this._update()
-                    },
                     _handleExpandValueChanging: function(e) {
                         this.expandValueChanging.fire(e)
                     },
@@ -21356,7 +21636,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                             dataSource = dataSourceOptions;
                         else
                             dataSource = new pivotGrid.DataSource(dataSourceOptions);
-                        that._changedHandler = $.proxy(that, "_handleChanged");
+                        that._changedHandler = $.proxy(that, "_update");
                         that._expandValueChangingHandler = $.proxy(that, "_handleExpandValueChanging");
                         that._loadingChangedHandler = $.proxy(that, "_handleLoadingChanged");
                         that._fieldsPreparedHandler = $.proxy(that, "_handleFieldsPrepared");
@@ -21420,11 +21700,12 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         if (that._rowsScrollController && that._columnsScrollController && that.changed) {
                             that._rowsScrollController.reset();
                             that._columnsScrollController.reset();
+                            that._lockChanged = true;
                             that._rowsScrollController.load();
-                            that._columnsScrollController.load()
+                            that._columnsScrollController.load();
+                            that._lockChanged = false
                         }
-                        else
-                            that.changed && that.changed.fire();
+                        that._fireChanged();
                         if (that._stateStoringController.isEnabled() && !that._dataSource.isLoading()) {
                             that._stateStoringController.state(that._dataSource.state());
                             that._stateStoringController.save()
@@ -22217,7 +22498,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
             pivotGrid = DX.ui.dxPivotGrid,
             Class = DevExpress.require("/class"),
             formatHelper = DX.require("/utils/utils.formatHelper"),
-            commonUtils = DX.require("/utils/utils.common");
+            commonUtils = DX.require("/utils/utils.common"),
+            setFieldProperty = pivotGrid.setFieldProperty;
         pivotGrid.LocalStore = Class.inherit(function() {
             var DATE_INTERVAL_SELECTORS = {
                     year: function(date) {
@@ -22251,58 +22533,53 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     }
                 };
             function prepareFields(fields) {
-                $.each(fields || [], function() {
+                $.each(fields || [], function(_, field) {
                     var fieldSelector,
                         intervalSelector,
-                        dataField = this.dataField,
+                        dataField = field.dataField,
                         groupInteval,
-                        levels = this.levels;
-                    if (!this.selector) {
+                        levels = field.levels,
+                        dataSelector;
+                    if (!field.selector) {
                         if (!dataField)
-                            fieldSelector = function(data) {
+                            dataSelector = function(data) {
                                 return data
                             };
                         else
-                            fieldSelector = dataField.indexOf(".") !== -1 ? dataUtils.compileGetter(dataField) : function(data) {
+                            dataSelector = dataField.indexOf(".") !== -1 ? dataUtils.compileGetter(dataField) : function(data) {
                                 return data[dataField]
                             };
-                        if (levels) {
+                        if (levels)
                             prepareFields(levels);
-                            this.selector = function(data) {
-                                var value = [];
-                                $.each(levels, function(_, field) {
-                                    value.push(field.selector(data))
-                                });
-                                return value
-                            }
-                        }
-                        else if (this.dataType === 'date') {
-                            intervalSelector = DATE_INTERVAL_SELECTORS[this.groupInterval];
-                            this.selector = function(data) {
-                                var value = fieldSelector(data);
+                        if (field.dataType === 'date') {
+                            intervalSelector = DATE_INTERVAL_SELECTORS[field.groupInterval];
+                            fieldSelector = function(data) {
+                                var value = dataSelector(data);
                                 if (value && !(value instanceof Date))
                                     value = new Date(value);
                                 return intervalSelector ? intervalSelector(value) : value
                             };
-                            this.format = this.format || DATE_INTERVAL_FORMATS[this.groupInterval]
+                            if (!field.format)
+                                setFieldProperty(field, "format", DATE_INTERVAL_FORMATS[field.groupInterval])
                         }
-                        else if (this.dataType === 'number') {
-                            groupInteval = commonUtils.isNumber(this.groupInterval) && this.groupInterval > 0 && this.groupInterval;
-                            if (groupInteval)
-                                this.customizeText = this.customizeText || function(formatObject) {
+                        else if (field.dataType === 'number') {
+                            groupInteval = commonUtils.isNumber(field.groupInterval) && field.groupInterval > 0 && field.groupInterval;
+                            if (groupInteval && !field.customizeText)
+                                setFieldProperty(field, "customizeText", function(formatObject) {
                                     var secondValue = formatObject.value + groupInteval,
-                                        secondValueText = formatHelper.format(secondValue, this.format, this.precision);
+                                        secondValueText = formatHelper.format(secondValue, field.format, field.precision);
                                     return formatObject.valueText && secondValueText ? formatObject.valueText + " - " + secondValueText : ""
-                                };
-                            this.selector = function(data) {
-                                var value = fieldSelector(data);
+                                });
+                            fieldSelector = function(data) {
+                                var value = dataSelector(data);
                                 if (commonUtils.isString(value))
                                     value = Number(value);
                                 return groupInteval ? Math.floor(value / groupInteval) * groupInteval : value
                             }
                         }
                         else
-                            this.selector = fieldSelector
+                            fieldSelector = dataSelector;
+                        setFieldProperty(field, "selector", fieldSelector)
                     }
                 })
             }
@@ -22452,6 +22729,13 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 else
                     return filterValue === fieldValue
             }
+            function getGroupValue(levels, data) {
+                var value = [];
+                $.each(levels, function(_, field) {
+                    value.push(field.selector(data))
+                });
+                return value
+            }
             function createDimensionFilters(dimention) {
                 var filters = [];
                 $.each(dimention, function(_, field) {
@@ -22461,7 +22745,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     if (groupName && commonUtils.isNumber(field.groupIndex))
                         return;
                     filter = function(dataItem) {
-                        var value = field.selector(dataItem),
+                        var value = field.levels ? getGroupValue(field.levels, dataItem) : field.selector(dataItem),
                             result = false;
                         for (var i = 0; i < filterValues.length; i++)
                             if (areValuesEqual(filterValues[i], value)) {
@@ -22665,7 +22949,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
     (function($, DX) {
         var pivotGrid = DX.ui.dxPivotGrid,
             Class = DevExpress.require("/class"),
-            commonUtils = DX.require("/utils/utils.common");
+            commonUtils = DX.require("/utils/utils.common"),
+            cssClassNames = pivotGrid.cssClassNames;
         var getRealElementWidth = function(element) {
                 var width = 0,
                     clientRect;
@@ -22680,6 +22965,24 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 else
                     return element.offsetWidth
             };
+        function getFakeTableOffset(scrollPos, elementOffset, tableSize, viewPortSize) {
+            var offset = 0,
+                halfTableCount = 0,
+                halfTableSize = tableSize / 2;
+            if (scrollPos + viewPortSize - (elementOffset + tableSize) > 1) {
+                if (scrollPos >= elementOffset + tableSize + halfTableSize)
+                    halfTableCount = parseInt((scrollPos - (elementOffset + tableSize)) / halfTableSize);
+                offset = elementOffset + tableSize + halfTableSize * halfTableCount
+            }
+            else if (scrollPos < elementOffset) {
+                if (scrollPos <= elementOffset - halfTableSize)
+                    halfTableCount = parseInt((scrollPos - (elementOffset - halfTableSize)) / halfTableSize);
+                offset = elementOffset - (tableSize - halfTableSize * halfTableCount)
+            }
+            else
+                offset = elementOffset;
+            return offset
+        }
         pivotGrid.getRealElementWidth = getRealElementWidth;
         pivotGrid.AreaItem = Class.inherit({
             _getRowElement: function(index) {
@@ -22694,7 +22997,104 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
             _createTableElement: function() {
                 return $('<table>')
             },
+            _getCellText: function(cell, encodeHtml) {
+                var cellText = cell.text || '';
+                if (encodeHtml && (cellText.indexOf("<") !== -1 || cellText.indexOf(">") !== -1))
+                    cellText = $("<div>").text(cellText).html();
+                return cellText
+            },
+            _getRowClassNames: function(){},
+            _applyCustomStyles: function(options) {
+                if (options.cell.width)
+                    options.cssArray.push("min-width:" + options.cell.width + "px")
+            },
+            _getMainElementMarkup: function() {
+                return "<tbody>"
+            },
+            _getCloseMainElementMarkup: function() {
+                return "</tbody>"
+            },
             _renderTableContent: function(tableElement, data) {
+                var that = this,
+                    rowsCount = data.length,
+                    row,
+                    cell,
+                    i,
+                    j,
+                    rowElement,
+                    cellElement,
+                    cellText,
+                    rtlEnabled = that.option("rtlEnabled"),
+                    markupArray = [],
+                    encodeHtml = that.option("encodeHtml"),
+                    rowClassNames,
+                    colspan = "colspan='",
+                    rowspan = "rowspan='";
+                tableElement.data("area", that._getAreaName());
+                tableElement.data("data", data);
+                tableElement.width('auto');
+                markupArray.push(that._getMainElementMarkup());
+                for (i = 0; i < rowsCount; i++) {
+                    row = data[i];
+                    var columnMarkupArray = [];
+                    rowClassNames = [];
+                    markupArray.push("<tr ");
+                    for (j = 0; j < row.length; j++) {
+                        cell = row[j];
+                        this._getRowClassNames(i, cell, rowClassNames);
+                        columnMarkupArray.push("<td ");
+                        if (cell) {
+                            cell.rowspan && columnMarkupArray.push(rowspan + (cell.rowspan || 1) + "'");
+                            cell.colspan && columnMarkupArray.push(colspan + (cell.colspan || 1) + "'");
+                            var styleOptions = {
+                                    cellElement: cellElement,
+                                    cell: cell,
+                                    cellsCount: row.length,
+                                    cellIndex: j,
+                                    rowElement: rowElement,
+                                    rowIndex: i,
+                                    rowsCount: rowsCount,
+                                    rtlEnabled: rtlEnabled,
+                                    classArray: [],
+                                    cssArray: []
+                                };
+                            that._applyCustomStyles(styleOptions);
+                            if (styleOptions.cssArray.length) {
+                                columnMarkupArray.push("style='");
+                                columnMarkupArray.push(styleOptions.cssArray.join(";"));
+                                columnMarkupArray.push("'")
+                            }
+                            if (styleOptions.classArray.length) {
+                                columnMarkupArray.push("class='");
+                                columnMarkupArray.push(styleOptions.classArray.join(" "));
+                                columnMarkupArray.push("'")
+                            }
+                            columnMarkupArray.push(">");
+                            if (commonUtils.isDefined(cell.expanded))
+                                columnMarkupArray.push("<span class='" + cssClassNames.headersExpandCollapseImage + "'></span>");
+                            cellText = this._getCellText(cell, encodeHtml)
+                        }
+                        else
+                            cellText = "";
+                        columnMarkupArray.push("<span>" + cellText + "</span>");
+                        if (cell && cell.sorted)
+                            columnMarkupArray.push("<span class='dx-icon-sorted'></span>");
+                        columnMarkupArray.push("</td>")
+                    }
+                    if (rowClassNames.length) {
+                        markupArray.push("class='");
+                        markupArray.push(rowClassNames.join(" "));
+                        markupArray.push("'")
+                    }
+                    markupArray.push(">");
+                    markupArray.push(columnMarkupArray.join(""));
+                    markupArray.push("</tr>")
+                }
+                markupArray.push(this._getCloseMainElementMarkup());
+                tableElement.append(markupArray.join(""));
+                this._triggerOnCellPrepared(tableElement, data)
+            },
+            _triggerOnCellPrepared: function(tableElement, data) {
                 var that = this,
                     rowElements = tableElement.find("tr"),
                     areaName = that._getAreaName(),
@@ -22705,8 +23105,6 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     cell,
                     rowIndex,
                     columnIndex;
-                tableElement.data("area", areaName);
-                tableElement.data("data", data);
                 if (onCellPrepared)
                     for (rowIndex = 0; rowIndex < data.length; rowIndex++) {
                         row = data[rowIndex];
@@ -22874,11 +23272,13 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
             _renderVirtualContent: function() {
                 var that = this;
                 if (!that._virtualContent && that.option("scrolling.mode") === "virtual")
-                    that._virtualContent = $("<div>").addClass("dx-virtual-content").insertAfter(that._tableElement)
+                    that._virtualContent = $("<div>").addClass("dx-virtual-content").insertBefore(that._tableElement)
             },
             reset: function() {
                 var that = this,
                     tableElement = that._tableElement[0];
+                that._fakeTable && that._fakeTable.detach();
+                that._fakeTable = null;
                 that.disableVirtualMode();
                 that.groupWidth("100%");
                 that.groupHeight("auto");
@@ -22889,6 +23289,37 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     tableElement.style.height = "";
                     tableElement.style.width = "100%"
                 }
+            },
+            _updateFakeTableVisibility: function() {
+                var that = this,
+                    tableElement = that.tableElement()[0],
+                    fakeTableElement = that._fakeTable[0];
+                if (tableElement.style.top === fakeTableElement.style.top && fakeTableElement.style.left === tableElement.style.left)
+                    that._fakeTable.addClass("dx-hidden");
+                else
+                    that._fakeTable.removeClass("dx-hidden")
+            },
+            _moveFakeTableLeft: function(scrollPos) {
+                var that = this,
+                    tableElementOffsetLeft = parseInt(that.tableElement()[0].style.left, 10),
+                    offsetLeft = getFakeTableOffset(scrollPos, tableElementOffsetLeft, that._tableWidth, that._groupWidth);
+                if (parseInt(that._fakeTable[0].style.left, 10) !== offsetLeft)
+                    that._fakeTable[0].style.left = offsetLeft + "px"
+            },
+            _moveFakeTableTop: function(scrollPos) {
+                var that = this,
+                    tableElementOffsetTop = parseInt(that.tableElement()[0].style.top, 10),
+                    offsetTop = getFakeTableOffset(scrollPos, tableElementOffsetTop, that._tableHeight, that._groupHeight);
+                if (parseInt(that._fakeTable[0].style.top, 10) !== offsetTop)
+                    that._fakeTable[0].style.top = offsetTop + "px"
+            },
+            _moveFakeTable: function(scrollPos) {
+                this._updateFakeTableVisibility()
+            },
+            _createFakeTable: function(scrollPos) {
+                var that = this;
+                if (!that._fakeTable)
+                    that._fakeTable = that.tableElement().clone().addClass("dx-pivot-grid-fake-table").appendTo(that._virtualContent)
             },
             render: function(rootElement, data) {
                 var that = this,
@@ -22914,6 +23345,31 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     that._renderTableContent(that._tableElement, data)
                 }
                 that._renderVirtualContent()
+            },
+            _getScrollable: function() {
+                return this.groupElement().data('dxScrollable')
+            },
+            on: function(eventName, handler) {
+                var scrollable = this._getScrollable();
+                if (scrollable)
+                    scrollable.on(eventName, handler);
+                return this
+            },
+            scrollTo: function(pos) {
+                var scrollable = this._getScrollable();
+                if (scrollable) {
+                    scrollable.scrollTo(pos);
+                    scrollable.update();
+                    if (this._virtualContent) {
+                        this._createFakeTable();
+                        this._moveFakeTable(pos)
+                    }
+                }
+            },
+            updateScrollable: function() {
+                var scrollable = this._getScrollable();
+                if (scrollable)
+                    scrollable.update()
             }
         })
     })(jQuery, DevExpress);
@@ -22922,7 +23378,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
         var ui = DX.ui,
             pivotGrid = ui.dxPivotGrid,
             commonUtils = DX.require("/utils/utils.common"),
-            eventUtils = DX.require("/ui/events/ui.events.utils");
+            cssClassNames = pivotGrid.cssClassNames;
         function getCellPath(tableElement, cell) {
             if (cell) {
                 var data = tableElement.data().data,
@@ -22936,94 +23392,35 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 return "column"
             },
             _getAreaClassName: function() {
-                return pivotGrid.cssClassNames.headersHorizontal
-            },
-            _textCellRender: function(rootElement, value) {
-                var $span = $('<span>');
-                if (!value)
-                    $span.html("&nbsp");
-                else
-                    this.option("encodeHtml") ? $span.text(value) : $span.html(value);
-                $span.appendTo(rootElement)
+                return cssClassNames.headersHorizontal
             },
             _createGroupElement: function() {
-                return $('<div>').addClass(this._getAreaClassName()).addClass(pivotGrid.cssClassNames.area)
-            },
-            _createTableElement: function() {
-                return $('<table>')
-            },
-            _createRow: function() {
-                return $('<tr>')
-            },
-            _createCell: function(cell) {
-                var that = this,
-                    cellElement = $('<td>').attr({
-                        colspan: cell.colspan,
-                        rowspan: cell.rowspan
-                    });
-                if (commonUtils.isDefined(cell.expanded)) {
-                    cellElement.addClass(cell.expanded ? pivotGrid.cssClassNames.headersExpanded : pivotGrid.cssClassNames.headersCollapsed).on(eventUtils.addNamespace("dxclick", this._getEventsNamespace()), function(e) {
-                        setTimeout(function() {
-                            var area = that._getAreaName();
-                            if (cell.expanded)
-                                that._dataSource.collapseHeaderItem(area, cell.path);
-                            else
-                                that._dataSource.expandHeaderItem(area, cell.path)
-                        })
-                    });
-                    $('<span>').addClass(pivotGrid.cssClassNames.headersExpandCollapseImage).appendTo(cellElement)
-                }
-                return cellElement
+                return $('<div>').addClass(this._getAreaClassName()).addClass(cssClassNames.area)
             },
             _applyCustomStyles: function(options) {
+                var cssArray = options.cssArray,
+                    cell = options.cell,
+                    rowsCount = options.rowsCount,
+                    classArray = options.classArray;
                 if (options.cellIndex === options.cellsCount - 1)
-                    options.cellElement.css(options.rtlEnabled ? 'border-left' : 'border-right', '0px');
-                if (options.cell.rowspan === options.rowsCount - options.rowIndex || options.rowIndex + 1 === options.rowsCount)
-                    options.cellElement.css('border-bottom-width', '0px');
-                options.cellElement.toggleClass(pivotGrid.cssClassNames.rowTotal, options.cell.type === 'T' || options.cell.type === 'GT').toggleClass(pivotGrid.cssClassNames.total, options.cell.type === 'T').toggleClass(pivotGrid.cssClassNames.grandTotal, options.cell.type === 'GT');
-                if (options.cell.width)
-                    options.cellElement.css("min-width", options.cell.width);
-                if (options.cell.sorted)
-                    $('<span>').addClass("dx-icon-sorted").appendTo(options.cellElement)
+                    cssArray.push((options.rtlEnabled ? 'border-left:' : 'border-right:') + "0px");
+                if (cell.rowspan === rowsCount - options.rowIndex || options.rowIndex + 1 === rowsCount)
+                    cssArray.push('border-bottom-width:0px');
+                if (cell.type === 'T' || cell.type === 'GT')
+                    classArray.push(cssClassNames.rowTotal);
+                if (options.cell.type === 'T')
+                    classArray.push(cssClassNames.total);
+                if (options.cell.type === 'GT')
+                    classArray.push(cssClassNames.grandTotal);
+                if (commonUtils.isDefined(cell.expanded))
+                    classArray.push(cell.expanded ? cssClassNames.headersExpanded : cssClassNames.headersCollapsed);
+                this.callBase(options)
             },
-            _renderTableContent: function(tableElement, data) {
-                var that = this,
-                    rowsCount = data.length,
-                    row,
-                    cell,
-                    i,
-                    j,
-                    rowElement,
-                    cellElement,
-                    rtlEnabled = that.option("rtlEnabled"),
-                    theadElement = $('<thead>').addClass(this._getAreaClassName());
-                tableElement.width('auto');
-                for (i = 0; i < rowsCount; i++) {
-                    row = data[i];
-                    rowElement = that._createRow();
-                    for (j = 0; j < row.length; j++) {
-                        cell = row[j];
-                        cellElement = that._createCell(cell);
-                        that._textCellRender(cellElement, cell.text);
-                        that._applyCustomStyles({
-                            cellElement: cellElement,
-                            cell: cell,
-                            cellsCount: row.length,
-                            cellIndex: j,
-                            rowElement: rowElement,
-                            rowIndex: i,
-                            rowsCount: rowsCount,
-                            rtlEnabled: rtlEnabled
-                        });
-                        rowElement.append(cellElement)
-                    }
-                    theadElement.append(rowElement)
-                }
-                tableElement.append(theadElement);
-                that.callBase.apply(that, arguments)
+            _getMainElementMarkup: function() {
+                return "<thead class='" + this._getAreaClassName() + "'>"
             },
-            _getEventsNamespace: function() {
-                return 'dxHeadersArea'
+            _getCloseMainElementMarkup: function() {
+                return "</thead>"
             },
             setVirtualContentParams: function(params) {
                 this.callBase(params);
@@ -23040,16 +23437,14 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 return false
             },
             processScroll: function() {
-                if (!this._groupElement.data('dxScrollable')) {
+                if (!this._getScrollable())
                     this._groupElement.dxScrollable({
-                        useNative: true,
+                        useNative: false,
                         useSimulatedScrollbar: false,
                         showScrollbar: false,
                         bounceEnabled: false,
                         direction: "horizontal"
-                    });
-                    this._groupElement.find('.dx-scrollable-container').css('overflow', 'hidden')
-                }
+                    })
             },
             processScrollBarSpacing: function(scrollBarWidth) {
                 var that = this;
@@ -23057,7 +23452,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     that.groupWidth(that._groupWidth - scrollBarWidth);
                 if (that._scrollBarWidth)
                     that._groupElement.next().remove();
-                that._groupElement.toggleClass(pivotGrid.cssClassNames.verticalScroll, scrollBarWidth > 0);
+                that._groupElement.toggleClass(cssClassNames.verticalScroll, scrollBarWidth > 0);
                 that._groupElement.css('float', 'left').width(that._groupHeight);
                 that._scrollBarWidth = scrollBarWidth
             },
@@ -23077,29 +23472,24 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 });
                 return getCellPath(tableElement, cell)
             },
-            setDataController: function(dataController) {
-                this._dataSource = dataController;
-                return this
+            _moveFakeTable: function(scrollPos) {
+                this._moveFakeTableLeft(scrollPos);
+                this.callBase()
             }
         });
         pivotGrid.VerticalHeadersArea = pivotGrid.HorizontalHeadersArea.inherit({
             _getAreaClassName: function() {
-                return pivotGrid.cssClassNames.headersVertical
+                return cssClassNames.headersVertical
             },
             _applyCustomStyles: function(options) {
-                var cellElement = options.cellElement;
                 this.callBase(options);
-                cellElement.addClass(options.cellIndex === options.cellsCount - 1 ? pivotGrid.cssClassNames.headersVerticalLastCell : null);
+                if (options.cellIndex === options.cellsCount - 1)
+                    options.classArray.push(cssClassNames.headersVerticalLastCell);
                 if (options.rowIndex === options.rowsCount - 1)
-                    cellElement.css('border-bottom', '0px');
-                if (options.rowIndex !== 0 && options.cell.expanded)
-                    options.rowElement.addClass(pivotGrid.cssClassNames.headersVerticalExpandBorder)
+                    options.cssArray.push('border-bottom: 0px')
             },
             _getAreaName: function() {
                 return "row"
-            },
-            _getEventsNamespace: function() {
-                return 'dxVerticalHeadersArea'
             },
             setVirtualContentParams: function(params) {
                 this.callBase(params);
@@ -23116,16 +23506,14 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 return false
             },
             processScroll: function() {
-                if (!this._groupElement.data('dxScrollable')) {
+                if (!this._getScrollable())
                     this._groupElement.dxScrollable({
-                        useNative: true,
+                        useNative: false,
                         useSimulatedScrollbar: false,
                         showScrollbar: false,
                         bounceEnabled: false,
                         direction: "vertical"
-                    });
-                    this._groupElement.find('.dx-scrollable-container').css('overflow', 'hidden')
-                }
+                    })
             },
             processScrollBarSpacing: function(scrollBarWidth) {
                 var that = this;
@@ -23149,62 +23537,45 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     }
                 });
                 return getCellPath(tableElement, cell)
+            },
+            _moveFakeTable: function(scrollPos) {
+                this._moveFakeTableTop(scrollPos);
+                this.callBase()
+            },
+            _getRowClassNames: function(rowIndex, cell, rowClassNames) {
+                if (rowIndex !== 0 & cell.expanded && $.inArray(cssClassNames.headersVerticalExpandBorder, rowClassNames) === -1)
+                    rowClassNames.push(cssClassNames.headersVerticalExpandBorder)
             }
         })
     })(jQuery, DevExpress);
     /*! Module widgets-web, file ui.pivotGrid.dataArea.js */
     (function($, DX) {
-        var pivotGrid = DX.ui.dxPivotGrid;
+        var pivotGrid = DX.ui.dxPivotGrid,
+            cssClassNames = pivotGrid.cssClassNames;
         pivotGrid.DataArea = pivotGrid.AreaItem.inherit({
             _getAreaName: function() {
                 return "data"
             },
             _createGroupElement: function() {
-                return $('<div>').addClass(pivotGrid.cssClassNames.area).addClass(pivotGrid.cssClassNames.areaData)
+                return $('<div>').addClass(cssClassNames.area).addClass(cssClassNames.areaData)
             },
-            _renderTableContent: function(tableElement, data) {
-                var i,
-                    j,
-                    row,
-                    cell,
-                    cellText,
-                    tableContentHTML = '',
-                    style,
-                    encodeHtml = this.option("encodeHtml"),
-                    classNames;
-                for (i = 0; i < data.length; i++) {
-                    tableContentHTML += '<tr>';
-                    row = data[i];
-                    for (j = 0; j < row.length; j++) {
-                        cell = row[j];
-                        classNames = [];
-                        style = '';
-                        if (i === data.length - 1)
-                            style = 'border-bottom: 0px';
-                        if (cell) {
-                            if (cell.rowType === 'T' || cell.columnType === 'T')
-                                classNames.push(pivotGrid.cssClassNames.total);
-                            if (cell.rowType === 'GT' || cell.columnType === 'GT')
-                                classNames.push(pivotGrid.cssClassNames.grandTotal);
-                            if (cell.rowType === 'T' || cell.rowType === 'GT')
-                                classNames.push(pivotGrid.cssClassNames.rowTotal);
-                            cellText = cell.text || '';
-                            if (encodeHtml && (cellText.indexOf("<") !== -1 || cellText.indexOf(">") !== -1))
-                                cellText = $("<div>").text(cellText).html();
-                            if (cell.width) {
-                                if (style)
-                                    style += '; ';
-                                style += 'min-width: ' + cell.width + 'px'
-                            }
-                        }
-                        else
-                            cellText = '';
-                        tableContentHTML += '<td class="' + classNames.join(' ') + '" style="' + style + '">' + cellText + '</td>'
-                    }
-                    tableContentHTML += '</tr>'
-                }
-                tableElement.append(tableContentHTML);
-                this.callBase.apply(this, arguments)
+            _applyCustomStyles: function(options) {
+                var cell = options.cell,
+                    classArray = options.classArray;
+                if (cell.rowType === 'T' || cell.columnType === 'T')
+                    classArray.push(cssClassNames.total);
+                if (cell.rowType === 'GT' || cell.columnType === 'GT')
+                    classArray.push(cssClassNames.grandTotal);
+                if (cell.rowType === 'T' || cell.rowType === 'GT')
+                    classArray.push(cssClassNames.rowTotal);
+                if (options.rowIndex === options.rowsCount - 1)
+                    options.cssArray.push('border-bottom: 0px');
+                this.callBase(options)
+            },
+            _moveFakeTable: function(scrollPos) {
+                this._moveFakeTableLeft(scrollPos.x);
+                this._moveFakeTableTop(scrollPos.y);
+                this.callBase()
             },
             _processScrollCore: function(hasRowsScroll, hasColumnsScroll, useNativeScrolling) {
                 var that = this,
@@ -23753,13 +24124,15 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
         var ui = DX.ui,
             Class = DevExpress.require("/class"),
             utils = DevExpress.require("/utils/utils.common"),
+            formatHelper = DX.require("/utils/utils.formatHelper"),
             pivotGrid = DX.ui.dxPivotGrid,
             emptyCell = {
                 text: '',
                 value: undefined,
                 colspan: 1,
                 rowspan: 1
-            };
+            },
+            DEFAULT_DATA_TYPE = "string";
         pivotGrid.include({
             exportToExcel: function() {
                 this._clientExporter && this._clientExporter.exportTo({
@@ -23848,14 +24221,20 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 var columnsInfo = $.extend(true, [], this._dataController.getColumnsInfo(true)),
                     rowsInfoItems = $.extend(true, [], this._dataController.getRowsInfo(true)),
                     cellsInfo = this._dataController.getCellsInfo(true);
-                return new ui.dxPivotGrid.DataProvider({
-                        columns: columnsInfo,
-                        groupColumns: null,
-                        items: this._getAllItems(columnsInfo, rowsInfoItems, cellsInfo),
-                        getVisibleIndex: 0
-                    })
+                return new ui.dxPivotGrid.DataProvider({items: this._getAllItems(columnsInfo, rowsInfoItems, cellsInfo)})
             }
         });
+        function getCellDataType(cell) {
+            if (cell.dataType)
+                return cell.dataType;
+            else if (cell.format) {
+                if (formatHelper.format(1, cell.format))
+                    return "number";
+                if (formatHelper.format(new Date, cell.format))
+                    return "date"
+            }
+            return DEFAULT_DATA_TYPE
+        }
         pivotGrid.DataProvider = Class.inherit({
             _getCellParam: function(rowIndex, cellIndex, param) {
                 var items = this._options.items,
@@ -23871,18 +24250,16 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         var cellItem,
                             headerSize = items[0][0].rowspan,
                             columns = items[headerSize - 1];
-                        for (var columnIndex in columns) {
-                            columns[columnIndex].width = 100;
-                            columns[columnIndex].alignment = columns[columnIndex].alignment || "center";
-                            cellItem = options.items[headerSize + 1] && options.items[headerSize + 1][columnIndex];
+                        $.each(columns, function(columnIndex, column) {
+                            column.width = 100;
+                            column.alignment = column.alignment || "center";
+                            cellItem = options.items[headerSize] && options.items[headerSize][columnIndex];
                             if (cellItem) {
-                                columns[columnIndex].dataType = cellItem.dataType || "string";
-                                columns[columnIndex].format = cellItem.format;
-                                columns[columnIndex].precision = cellItem.precision
+                                column.dataType = getCellDataType(cellItem);
+                                column.format = cellItem.format;
+                                column.precision = cellItem.precision
                             }
-                            else
-                                columns[columnIndex].dataType = "string"
-                        }
+                        });
                         options.columns = columns;
                         options.items = items
                     })
@@ -23905,7 +24282,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
             getGroupLevel: function() {
                 return 0
             },
-            getCellMergin: function(rowIndex, cellIndex) {
+            getCellMerging: function(rowIndex, cellIndex) {
                 var items = this._options.items,
                     item = items[rowIndex] && items[rowIndex][cellIndex];
                 return item ? {
@@ -23926,7 +24303,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
             getCellType: function(rowIndex, cellIndex) {
                 var column = this._options.columns[cellIndex],
                     dataType = column && column.dataType;
-                return dataType || "string"
+                return dataType || DEFAULT_DATA_TYPE
             },
             getCellValue: function(rowIndex, cellIndex) {
                 return this._getCellParam(rowIndex, cellIndex, "value", "")
@@ -24217,8 +24594,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     expression = createPercentVariationExp(crossGroupCalculation);
                 else
                     expression = summaryDictionary[summaryDisplayMode];
-                if (expression && summaryDisplayMode.indexOf("percent") !== -1)
-                    field.format = field.format || "percent"
+                if (expression && !field.format && summaryDisplayMode.indexOf("percent") !== -1)
+                    pivotGrid.setFieldProperty(field, "format", "percent")
             }
             if (field.runningTotal) {
                 expression = expression || defaultExpr;
@@ -24245,7 +24622,9 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         expression,
                         expressionArg,
                         cell,
-                        field;
+                        field,
+                        isEmptyCell = false,
+                        value;
                     columnItem.isEmpty = columnItem.isEmpty || [];
                     for (var i = 0; i < valueFields.length; i++) {
                         field = valueFields[i];
@@ -24254,16 +24633,17 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                             expressionArg = new SummaryCell(columnPath, rowPath, data, descriptions, i);
                             cell = expressionArg.cell();
                             if (cell) {
-                                var value = cell[i] = expression(expressionArg);
-                                if (columnItem.isEmpty[i] === undefined)
-                                    columnItem.isEmpty[i] = true;
-                                if (value === null || value === undefined)
-                                    columnItem.isEmpty[i] = columnItem.isEmpty[i] && true;
-                                else {
-                                    columnItem.isEmpty[i] = false;
-                                    rowItem.isEmpty = false
-                                }
+                                value = cell[i] = expression(expressionArg);
+                                isEmptyCell = value === null || value === undefined
                             }
+                            else
+                                isEmptyCell = true
+                        }
+                        if (columnItem.isEmpty[i] === undefined)
+                            columnItem.isEmpty[i] = true;
+                        if (!isEmptyCell) {
+                            columnItem.isEmpty[i] = false;
+                            rowItem.isEmpty = false
                         }
                     }
                 }, false)
@@ -24277,11 +24657,18 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
     })(jQuery, DevExpress, null);
     /*! Module widgets-web, file ui.scheduler.publisherMixin.js */
     DevExpress.define("/ui/widgets/scheduler/ui.scheduler.publisherMixin", ["jquery"], function($) {
-        var publisherMixin = {notifyObserver: function(subject, args) {
+        var publisherMixin = {
+                notifyObserver: function(subject, args) {
                     var observer = this.option("observer");
                     if (observer)
                         observer.fire(subject, args)
-                }};
+                },
+                invoke: function() {
+                    var observer = this.option("observer");
+                    if (observer)
+                        return observer.fire.apply(observer, arguments)
+                }
+            };
         return publisherMixin
     });
     /*! Module widgets-web, file ui.scheduler.appointmentTooltip.js */
@@ -24335,9 +24722,12 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 },
                 _tooltipContent: function(appointmentData, singleAppointmentData) {
                     var $tooltip = $("<div>").addClass(APPOINTMENT_TOOLTIP_CLASS);
-                    var isAllDay = this.instance.appointmentTakesAllDay(appointmentData);
-                    $("<div>").text(appointmentData.text).addClass(APPOINTMENT_TOOLTIP_TITLE_CLASS).appendTo($tooltip);
-                    $("<div>").addClass(APPOINTMENT_TOOLTIP_DATE_CLASS).text(this._formatTooltipDate(appointmentData.startDate, appointmentData.endDate, isAllDay)).appendTo($tooltip);
+                    var isAllDay = this.instance.appointmentTakesAllDay(appointmentData),
+                        startDate = this.instance.fire("getField", "startDate", appointmentData),
+                        endDate = this.instance.fire("getField", "endDate", appointmentData),
+                        text = this.instance.fire("getField", "text", appointmentData);
+                    $("<div>").text(text).addClass(APPOINTMENT_TOOLTIP_TITLE_CLASS).appendTo($tooltip);
+                    $("<div>").addClass(APPOINTMENT_TOOLTIP_DATE_CLASS).text(this._formatTooltipDate(startDate, endDate, isAllDay)).appendTo($tooltip);
                     var $buttons = $("<div>").addClass(APPOINTMENT_TOOLTIP_BUTTONS_CLASS).appendTo($tooltip);
                     if (this.instance._editing.allowDeleting)
                         this._getDeleteButton(appointmentData, singleAppointmentData).appendTo($buttons);
@@ -24364,7 +24754,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     return new Button($("<div>"), {
                             icon: "trash",
                             onClick: function() {
-                                that.instance._checkRecurringAppointment(appointmentData, singleAppointmentData, singleAppointmentData.startDate, function() {
+                                var startDate = that.instance.fire("getField", "startDate", singleAppointmentData);
+                                that.instance._checkRecurringAppointment(appointmentData, singleAppointmentData, startDate, function() {
                                     that.instance.deleteAppointment(appointmentData)
                                 }, true);
                                 that.hide()
@@ -24378,7 +24769,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                             icon: allowUpdating ? "edit" : "",
                             text: Globalize.localize("dxScheduler-openAppointment"),
                             onClick: function() {
-                                that.instance._checkRecurringAppointment(appointmentData, singleAppointmentData, singleAppointmentData.startDate, function() {
+                                var startDate = that.instance.fire("getField", "startDate", singleAppointmentData);
+                                that.instance._checkRecurringAppointment(appointmentData, singleAppointmentData, startDate, function() {
                                     that.instance.showAppointmentPopup(appointmentData)
                                 }, false, true)
                             }
@@ -24388,110 +24780,186 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
         return appointmentTooltip
     });
     /*! Module widgets-web, file ui.scheduler.appointmentModel.js */
-    DevExpress.define("/ui/widgets/scheduler/ui.scheduler.appointmentModel", ["jquery", "/class", "/utils/utils.recurrence", "/utils/utils.date", "/utils/utils.common"], function($, Class, recurrenceUtils, dateUtils, commonUtils) {
+    DevExpress.define("/ui/widgets/scheduler/ui.scheduler.appointmentModel", ["jquery", "/class", "/utils/utils.recurrence", "/utils/utils.date", "/utils/utils.common", "/utils/utils.array"], function($, Class, recurrenceUtils, dateUtils, commonUtils, arrayUtils) {
+        var FilterMaker = Class.inherit({
+                ctor: function(dataExpressions) {
+                    this._filterRegistry = null;
+                    this._dataExpressions = dataExpressions
+                },
+                make: function(type, args) {
+                    if (!this._filterRegistry)
+                        this._filterRegistry = {};
+                    this._make[type].apply(this, args)
+                },
+                _make: {
+                    date: function(min, max) {
+                        var startDate = this._dataExpressions.startDateExpr,
+                            endDate = this._dataExpressions.endDateExpr,
+                            recurrenceRule = this._dataExpressions.recurrenceRuleExpr;
+                        this._filterRegistry.date = [[[[startDate, ">=", min], [endDate, "<=", max]], "or", [[startDate, "<=", min], [endDate, "<=", max], [endDate, ">", min]], "or", [[startDate, ">=", min], [startDate, "<", max], [endDate, ">=", max]], "or", [[startDate, "<=", min], [endDate, ">=", max]]], "or", [recurrenceRule, "startswith", "freq"]]
+                    },
+                    user: function(userFilter) {
+                        this._filterRegistry.user = userFilter
+                    }
+                },
+                combine: function() {
+                    var filter = [];
+                    this._filterRegistry.date && filter.push(this._filterRegistry.date);
+                    this._filterRegistry.allDay && filter.push(this._filterRegistry.allDay);
+                    this._filterRegistry.user && filter.push(this._filterRegistry.user);
+                    return filter
+                }
+            });
         var AppointmentModel = Class.inherit({
-                _resourceFilter: function(itemData, resources) {
-                    var result = true;
+                _createFilter: function(min, max) {
+                    this._filterMaker.make("date", [min, max]);
+                    this._filterMaker.make("user", [this._dataSource.filter()]);
+                    this._dataSource.filter(this._filterMaker.combine())
+                },
+                _getStoreKey: function(target) {
+                    var store = this._dataSource.store();
+                    return store.keyOf(target)
+                },
+                _filterAppointmentByResources: function(appointment, resources) {
+                    var result = false;
+                    function checkAppointmentResourceValues() {
+                        var appointmentResourceValues = arrayUtils.wrapToArray(appointment[resourceName]),
+                            resourceData = $.map(resources[i].items, function(item) {
+                                return item.id
+                            });
+                        for (var j = 0, itemDataCount = appointmentResourceValues.length; j < itemDataCount; j++)
+                            if ($.inArray(appointmentResourceValues[j], resourceData) > -1)
+                                return true;
+                        return false
+                    }
                     for (var i = 0, len = resources.length; i < len; i++) {
-                        var resourceField = resources[i].field,
-                            resourceData = resources[i].data;
-                        if (itemData.hasOwnProperty(resourceField))
-                            if (!$.isArray(itemData[resourceField])) {
-                                if ($.inArray(itemData[resourceField], resourceData) === -1) {
-                                    result = false;
-                                    break
-                                }
-                            }
-                            else {
-                                result = false;
-                                for (var j = 0, itemDataCount = itemData[resourceField].length; j < itemDataCount; j++)
-                                    if ($.inArray(itemData[resourceField][j], resourceData) > -1) {
-                                        result = true;
-                                        break
-                                    }
-                            }
-                        else {
-                            result = false;
-                            break
-                        }
+                        var resourceName = resources[i].name;
+                        if (!appointment.hasOwnProperty(resourceName))
+                            return false;
+                        result = checkAppointmentResourceValues();
+                        if (!result)
+                            return false
                     }
                     return result
                 },
-                ctor: function(dataSource) {
-                    this.setDataSource(dataSource)
+                _filterAppointmentByRRule: function(appointment, min, max) {
+                    var rrule = appointment.rrule,
+                        recurrenceException = appointment.recurrenceException,
+                        allDay = appointment.allDay,
+                        result = true;
+                    if (allDay) {
+                        min = dateUtils.trimTime(new Date(min));
+                        max = dateUtils.trimTime(new Date(max))
+                    }
+                    if (rrule && !recurrenceUtils.getRecurrenceRule(rrule).isValid)
+                        result = appointment.endDate > min && appointment.startDate <= max;
+                    if (result && recurrenceUtils.getRecurrenceRule(rrule).isValid)
+                        result = recurrenceUtils.dateInRecurrenceRange(rrule, appointment.startDate, min, max, recurrenceException);
+                    return result
+                },
+                _createCombinedFilter: function(filterOptions) {
+                    var dataAccessors = this._dataAccessors,
+                        startDayHour = filterOptions.startDayHour,
+                        endDayHour = filterOptions.endDayHour,
+                        min = dateUtils.makeDate(filterOptions.min),
+                        max = dateUtils.makeDate(filterOptions.max),
+                        resources = filterOptions.resources,
+                        that = this;
+                    return [[function(appointment) {
+                                    var result = true,
+                                        startDate = dateUtils.makeDate(dataAccessors.getter.startDate(appointment)),
+                                        endDate = dateUtils.makeDate(dataAccessors.getter.endDate(appointment)),
+                                        appointmentTakesAllDay = that.appointmentTakesAllDay(appointment, startDayHour, endDayHour);
+                                    if (resources && resources.length)
+                                        result = that._filterAppointmentByResources(appointment, resources);
+                                    if (appointmentTakesAllDay && filterOptions.allDay === false)
+                                        result = false;
+                                    if (result)
+                                        result = that._filterAppointmentByRRule({
+                                            startDate: startDate,
+                                            endDate: endDate,
+                                            rrule: dataAccessors.getter.recurrenceRule(appointment),
+                                            recurrenceException: dataAccessors.getter.recurrenceException(appointment),
+                                            allDay: appointmentTakesAllDay
+                                        }, min, max);
+                                    if (result && startDayHour !== undefined)
+                                        result = startDate.getHours() >= startDayHour || endDate.getHours() >= startDayHour || appointmentTakesAllDay;
+                                    if (result && endDayHour !== undefined)
+                                        result = result = startDate.getHours() <= endDayHour || appointmentTakesAllDay;
+                                    return result
+                                }]]
+                },
+                ctor: function(dataSource, dataExpressions, dataAccessors) {
+                    this.setDataSource(dataSource);
+                    this._filterMaker = new FilterMaker(dataExpressions);
+                    this._dataAccessors = dataAccessors
                 },
                 setDataSource: function(dataSource) {
                     this._dataSource = dataSource
                 },
-                filterByDate: function(min, max, startDayHour, endDayHour, excludeAllDayAppointments) {
+                filterByDate: function(min, max) {
                     if (!this._dataSource)
                         return;
-                    var filter = this._prepareDateFilter(min, max, startDayHour, endDayHour, excludeAllDayAppointments);
-                    this._dataSource.filter(filter)
+                    var minCopy = dateUtils.trimTime(new Date(min)),
+                        maxCopy = dateUtils.trimTime(new Date(max));
+                    maxCopy.setDate(maxCopy.getDate() + 1);
+                    if (!this._filterMaker._filterRegistry)
+                        this._createFilter(minCopy, maxCopy);
+                    else {
+                        this._filterMaker.make("date", [minCopy, maxCopy]);
+                        this._dataSource.filter(this._filterMaker.combine())
+                    }
                 },
-                _prepareDateFilter: function(min, max, startDayHour, endDayHour, excludeAllDayAppointments) {
-                    var ds = this._dataSource,
-                        that = this;
-                    return function(itemData) {
-                            if ($.isFunction(ds._mapFunc))
-                                itemData = ds._mapFunc(itemData);
-                            var startDate = dateUtils.makeDate(itemData.startDate),
-                                endDate = that._getEndDate(startDate, itemData.endDate),
-                                rule = itemData.recurrenceRule,
-                                isAllDay = itemData.allDay,
-                                appointmentTakesAllDay = that.appointmentTakesAllDay(startDate, endDate, startDayHour, endDayHour),
-                                recurrenceException = itemData.recurrenceException;
-                            var stripDateTime = function(date) {
-                                    date = new Date(date);
-                                    dateUtils.correctDateWithUnitBeginning(date, "day");
-                                    return date
-                                };
-                            if (excludeAllDayAppointments && (isAllDay || appointmentTakesAllDay))
-                                return false;
-                            var isRecurrenceRuleValid = recurrenceUtils.getRecurrenceRule(rule).isValid;
-                            var result = endDate > min && startDate <= max && !isRecurrenceRuleValid || dateUtils.dateInRange(startDate, stripDateTime(min), max) && isAllDay || recurrenceUtils.dateInRecurrenceRange(rule, startDate, min, max, recurrenceException);
-                            if (result && startDayHour)
-                                result = startDate.getHours() >= startDayHour || endDate.getHours() >= startDayHour || isAllDay;
-                            if (result && endDayHour)
-                                result = startDate.getHours() <= endDayHour || isAllDay;
-                            return result
+                filterLoadedAppointments: function(filterOptions) {
+                    var combinedFilter = this._createCombinedFilter(filterOptions),
+                        existingFilters = this._dataSource.filter(),
+                        dateFilter = existingFilters ? this.customizeDateFilter(existingFilters[0]) : null;
+                    if (dateFilter)
+                        combinedFilter.push([dateFilter]);
+                    return DevExpress.data.query(this._dataSource.items()).filter(combinedFilter).toArray()
+                },
+                hasAllDayAppointments: function(items, startDayHour, endDayHour) {
+                    if (!items)
+                        return false;
+                    var that = this;
+                    var result = false;
+                    $.each(items, function(index, item) {
+                        if (that.appointmentTakesAllDay(item, startDayHour, endDayHour)) {
+                            result = true;
+                            return false
                         }
+                    });
+                    return result
                 },
-                _getEndDate: function(startDate, endDate) {
-                    if (!commonUtils.isDefined(endDate))
-                        endDate = new Date(startDate.getTime() + 0.5 * 3600000);
-                    return dateUtils.makeDate(endDate)
+                appointmentTakesAllDay: function(appointment, startDayHour, endDayHour) {
+                    var dataAccessors = this._dataAccessors,
+                        startDate = dataAccessors.getter.startDate(appointment),
+                        endDate = dataAccessors.getter.endDate(appointment),
+                        allDay = dataAccessors.getter.allDay(appointment);
+                    return allDay || this._appointmentHasAllDayDuration(startDate, endDate, startDayHour, endDayHour)
                 },
-                appointmentTakesAllDay: function(startDate, endDate, startDayHour, endDayHour) {
+                _appointmentHasAllDayDuration: function(startDate, endDate, startDayHour, endDayHour) {
                     startDate = new Date(startDate);
                     endDate = new Date(endDate);
                     var etalonDayDurationInHours = endDayHour - startDayHour,
                         appointmentDurationInHours = (endDate.getTime() - startDate.getTime()) / 3600000;
                     return appointmentDurationInHours >= etalonDayDurationInHours
                 },
-                filterByResources: function(resources) {
-                    if (!this._dataSource)
-                        return;
-                    var filter = this._prepareResourcesFilter(resources);
-                    this._dataSource.filter(filter)
-                },
-                _prepareResourcesFilter: function(resources) {
-                    return $.proxy(function(itemData) {
-                            return this._resourceFilter(itemData, resources)
+                customizeDateFilter: function(dateFilter) {
+                    var currentFilter = $.extend(true, [], dateFilter);
+                    return $.proxy(function(appointment) {
+                            appointment = $.extend(true, {}, appointment);
+                            if ($.isFunction(this._dataSource._mapFunc))
+                                try {
+                                    appointment = this._dataSource._mapFunc(appointment)
+                                }
+                                catch(e) {}
+                            var startDate = this._dataAccessors.getter.startDate(appointment),
+                                endDate = this._dataAccessors.getter.endDate(appointment);
+                            this._dataAccessors.setter.startDate(appointment, dateUtils.makeDate(startDate));
+                            this._dataAccessors.setter.endDate(appointment, dateUtils.makeDate(endDate));
+                            return DevExpress.data.query([appointment]).filter(currentFilter).toArray().length > 0
                         }, this)
-                },
-                _getStoreKey: function(target) {
-                    var store = this._dataSource.store();
-                    return store.keyOf(target)
-                },
-                filterByDateAndResources: function(options) {
-                    if (!this._dataSource)
-                        return;
-                    this._dataSource.filter($.proxy(function(itemData) {
-                        var dateFilter = this._prepareDateFilter(options.min, options.max, options.startDayHour, options.endDayHour, options.excludeAllDayAppointments),
-                            resourceFilter = this._prepareResourcesFilter(options.resources);
-                        return dateFilter(itemData) && resourceFilter(itemData)
-                    }, this))
                 },
                 add: function(data) {
                     return this._dataSource.store().insert(data).done($.proxy(function() {
@@ -24520,10 +24988,13 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
             DEFAULT_DISPLAY_EXPR = "text";
         var ResourceManager = Class.inherit({
                 _wrapDataSource: function(dataSource) {
+                    var store;
                     if (dataSource instanceof DevExpress.data.DataSource)
-                        return dataSource;
+                        store = dataSource.store();
+                    else
+                        store = new DevExpress.data.ArrayStore(dataSource);
                     return new DevExpress.data.DataSource({
-                            store: new DevExpress.data.ArrayStore(dataSource),
+                            store: store,
                             pageSize: 0
                         })
                 },
@@ -24560,11 +25031,12 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     return this._resources || []
                 },
                 getEditors: function() {
-                    var result = [];
+                    var result = [],
+                        that = this;
                     $.each(this.getResources(), function(i, resource) {
                         result.push({
                             editorOptions: {
-                                dataSource: resource.dataSource,
+                                dataSource: that._wrapDataSource(resource.dataSource),
                                 displayExpr: resource.displayExpr || DEFAULT_DISPLAY_EXPR,
                                 valueExpr: resource.valueExpr || DEFAULT_VALUE_EXPR
                             },
@@ -24725,7 +25197,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         return Globalize.localize("dxScheduler-recurrenceRepeatOnDate")
                     },
                     value: "until"
-                }];
+                }],
+            days = ["SU", "MO", "TU", "WE", "TH", "FR", "SA"];
         var RecurrenceRule = Class.inherit({
                 ctor: function(recurrence) {
                     this._recurrenceRule = recurrenceUtils.getRecurrenceRule(recurrence).rule
@@ -24805,7 +25278,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         this._handleDefaults();
                     else if (!value) {
                         this._recurrenceRule.makeRules("");
-                        this.option("value", undefined)
+                        this.option("value", "")
                     }
                 },
                 _renderContainerVisibility: function(value) {
@@ -24924,15 +25397,16 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 _renderRepeatOnWeekEditor: function() {
                     this._clearRepeatOnEditor();
                     this._$repeatOnWeek = $("<div>").addClass(REPEAT_ON_WEEK_EDITOR).addClass(FIELD_VALUE_CLASS).appendTo(this._$repeatOnEditor);
-                    var days = Globalize.culture().calendar.days.namesShort,
+                    var localDaysNames = Globalize.culture().calendar.days.namesShort,
                         daysFromRules = this._daysOfWeekByRules();
                     this._daysOfWeek = [];
                     for (var i = 0; i < 7; i++) {
-                        var checkBoxText = days[i].toUpperCase();
+                        var checkBoxText = localDaysNames[i].toUpperCase(),
+                            dayName = days[i];
                         var $day = $("<div>").addClass(DAY_OF_WEEK),
                             day = this._createComponent($day, CheckBox, {
                                 text: checkBoxText,
-                                value: $.inArray(checkBoxText, daysFromRules) > -1 ? true : false,
+                                value: $.inArray(dayName, daysFromRules) > -1 ? true : false,
                                 onValueChanged: $.proxy(this._repeatByDayValueChangeHandler, this)
                             });
                         this._daysOfWeek[i] = day;
@@ -24940,17 +25414,16 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     }
                 },
                 _daysOfWeekByRules: function() {
-                    var days = Globalize.culture().calendar.days.namesShort;
                     var daysByRule = this._recurrenceRule.daysFromByDayRule();
                     if (!daysByRule.length)
-                        daysByRule = [days[this.option("startDate").getDay()].toUpperCase()];
+                        daysByRule = [days[this.option("startDate").getDay()]];
                     return daysByRule
                 },
                 _repeatByDayValueChangeHandler: function() {
                     var byDayRule = "";
                     $.each(this._daysOfWeek, function(index, day) {
                         if (day.option("value")) {
-                            var dayName = day.option("text");
+                            var dayName = days[index];
                             if (!byDayRule)
                                 byDayRule = dayName;
                             else
@@ -25157,7 +25630,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         this._clearRepeatOnEditorValues();
                     this._recurrenceRule.makeRule(field, value);
                     this._makeRepeatOnRule(field, value);
-                    this.option("value", this._recurrenceRule.recurrenceString())
+                    this.option("value", this._recurrenceRule.recurrenceString() || "")
                 },
                 _makeRepeatOnRule: function(field, value) {
                     if (field !== "freq" || value === "DAILY")
@@ -25187,7 +25660,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                             this._clearRepeatOnEditor();
                             this._renderRepeatOnEditor();
                             this._makeRepeatOnRule("freq", this._recurrenceRule.rules().freq);
-                            this.option("value", this._recurrenceRule.recurrenceString());
+                            if (commonUtils.isDefined(this._recurrenceRule.recurrenceString()))
+                                this.option("value", this._recurrenceRule.recurrenceString());
                             break;
                         default:
                             this.callBase(args)
@@ -25229,7 +25703,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         return;
                     var daysByRule = this._daysOfWeekByRules();
                     $.each(this._daysOfWeek, function(index, day) {
-                        day.option("value", $.inArray(day.option("text"), daysByRule) > -1)
+                        var dayName = days[index];
+                        day.option("value", $.inArray(dayName, daysByRule) > -1)
                     })
                 },
                 _changeDayOfMonthValue: function() {
@@ -25243,6 +25718,9 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         return;
                     var month = this._monthOfYearByRules() || 1;
                     this._monthEditor.option("value", month)
+                },
+                toggle: function() {
+                    this._switchEditor.element().trigger("dxclick")
                 },
                 setAria: function() {
                     if (this._switchEditor)
@@ -25396,7 +25874,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         date = new Date(this.option("date"));
                     date[stepConfig.setter](date[stepConfig.getter]() + offset);
                     date = dateUtils.normalizeDate(date, this.option("min"), this.option("max"));
-                    this.notifyObserver("updateCurrentDate", date)
+                    this.notifyObserver("currentDateUpdated", date)
                 },
                 _renderFocusTarget: $.noop,
                 _render: function() {
@@ -25425,9 +25903,15 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                             value: this.option("date"),
                             focusStateEnabled: this.option("focusStateEnabled"),
                             onValueChanged: $.proxy(function(e) {
-                                this.notifyObserver("updateCurrentDate", e.value);
+                                if (!this.option("visible"))
+                                    return;
+                                this.notifyObserver("currentDateUpdated", e.value);
                                 this._popover.hide()
                             }, this),
+                            hasFocus: function() {
+                                return true
+                            },
+                            tabIndex: null,
                             _keyboardProcessor: this._calendarKeyboardProcessor
                         }
                 },
@@ -25639,6 +26123,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
             HEADER_ROW_CLASS = "dx-scheduler-header-row",
             GROUP_ROW_CLASS = "dx-scheduler-group-row",
             GROUP_HEADER_CLASS = "dx-scheduler-group-header",
+            GROUP_HEADER_CONTENT_CLASS = "dx-scheduler-group-header-content",
             DATE_TABLE_CLASS = "dx-scheduler-date-table",
             DATE_TABLE_CELL_CLASS = "dx-scheduler-date-table-cell",
             DATE_TABLE_ROW_CLASS = "dx-scheduler-date-table-row",
@@ -25698,6 +26183,10 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 _getFocusedCell: function() {
                     return this._$focusedCell || this._$dateTable.find("." + DATE_TABLE_CELL_CLASS).eq(0)
                 },
+                _moveToCell: function($cell) {
+                    this._setFocusedCell($cell);
+                    this._dateTableScrollable.scrollToElement($cell)
+                },
                 _setFocusedCell: function($cell) {
                     if (!$cell.length)
                         return;
@@ -25708,16 +26197,9 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     this._$focusedCell = $cell;
                     this.setAria("label", "Add appointment", this._$focusedCell)
                 },
-                _moveToCell: function($cell) {
-                    this._setFocusedCell($cell);
-                    this._dateTableScrollable.scrollToElement($cell)
-                },
                 _releaseFocusedCell: function() {
                     if (commonUtils.isDefined(this._$focusedCell))
                         this._toggleFocusClass(false, this._$focusedCell)
-                },
-                _focusTarget: function() {
-                    return this.element()
                 },
                 _focusInHandler: function(e) {
                     if ($(e.target).is(this._focusTarget()) && this._isCellClick !== false) {
@@ -25730,6 +26212,9 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 _focusOutHandler: function(e) {
                     this.callBase.apply(this, arguments);
                     this._releaseFocusedCell()
+                },
+                _focusTarget: function() {
+                    return this.element()
                 },
                 _activeStateUnit: "." + DATE_TABLE_CELL_CLASS + ", ." + ALL_DAY_TABLE_CELL_CLASS,
                 _getDefaultOptions: function() {
@@ -25786,20 +26271,14 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     this.callBase();
                     this._toggleHorizontalScrollClass();
                     this.element().addClass(COMPONENT_CLASS).addClass(this._getElementClass());
-                    this._createWorkSpaceUnits();
-                    this._createDateTableScrollable();
+                    this._initWorkSpaceUnits();
+                    this._initDateTableScrollable();
                     this._createWorkSpaceElements()
-                },
-                _createWorkSpaceElements: function() {
-                    if (this.option("horizontalScrollingEnabled"))
-                        this._createWorkSpaceScrollableElements();
-                    else
-                        this._createWorkSpaceStaticElements()
                 },
                 _toggleHorizontalScrollClass: function() {
                     this.element().toggleClass(WORKSPACE_WITH_BOTH_SCROLLS_CLASS, this.option("horizontalScrollingEnabled"))
                 },
-                _createWorkSpaceUnits: function() {
+                _initWorkSpaceUnits: function() {
                     this._$headerPanel = $("<table>").addClass(HEADER_PANEL_CLASS);
                     this._$thead = $("<thead>").appendTo(this._$headerPanel);
                     this._$fixedContainer = $("<div>").addClass(FIXED_CONTAINER_CLASS);
@@ -25810,25 +26289,11 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     this._$timePanel = $("<table>").addClass(TIME_PANEL_CLASS);
                     this._$dateTable = $("<table>").addClass(DATE_TABLE_CLASS)
                 },
-                _createWorkSpaceStaticElements: function() {
-                    this._dateTableScrollable.content().append(this._$timePanel, this._$dateTable);
-                    this.element().append(this._$fixedContainer, this._$headerPanel, this._$allDayContainer, this._$allDayPanel, this._dateTableScrollable.element())
+                _initDateTableScrollable: function() {
+                    var $dateTableScrollable = $("<div>").addClass(SCHEDULER_DATE_TABLE_SCROLLABLE_CLASS);
+                    this._dateTableScrollable = this._createComponent($dateTableScrollable, "dxScrollable", this._dateTableScrollableConfig())
                 },
-                _createWorkSpaceScrollableElements: function() {
-                    this.element().append(this._$fixedContainer);
-                    this._createHeaderScrollable();
-                    this._createSidebarScrollable();
-                    this.element().append(this._dateTableScrollable.element());
-                    this._headerScrollable.content().append(this._$headerPanel, this._$allDayContainer, this._$allDayPanel);
-                    this._dateTableScrollable.content().append(this._$dateTable);
-                    this._sidebarScrollable.content().append(this._$timePanel)
-                },
-                _createDateTableScrollable: function() {
-                    var $dateTableScrollable = $("<div />").addClass(SCHEDULER_DATE_TABLE_SCROLLABLE_CLASS),
-                        scrollableConfig = this._createDateTableConfig();
-                    this._dateTableScrollable = this._createComponent($dateTableScrollable, "dxScrollable", scrollableConfig)
-                },
-                _createDateTableConfig: function() {
+                _dateTableScrollableConfig: function() {
                     var config = {
                             useKeyboard: false,
                             useNative: false,
@@ -25846,8 +26311,27 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     }
                     return config
                 },
+                _createWorkSpaceElements: function() {
+                    if (this.option("horizontalScrollingEnabled"))
+                        this._createWorkSpaceScrollableElements();
+                    else
+                        this._createWorkSpaceStaticElements()
+                },
+                _createWorkSpaceStaticElements: function() {
+                    this._dateTableScrollable.content().append(this._$timePanel, this._$dateTable);
+                    this.element().append(this._$fixedContainer, this._$headerPanel, this._$allDayContainer, this._$allDayPanel, this._dateTableScrollable.element())
+                },
+                _createWorkSpaceScrollableElements: function() {
+                    this.element().append(this._$fixedContainer);
+                    this._createHeaderScrollable();
+                    this._createSidebarScrollable();
+                    this.element().append(this._dateTableScrollable.element());
+                    this._headerScrollable.content().append(this._$headerPanel, this._$allDayContainer, this._$allDayPanel);
+                    this._dateTableScrollable.content().append(this._$dateTable);
+                    this._sidebarScrollable.content().append(this._$timePanel)
+                },
                 _createHeaderScrollable: function() {
-                    var $headerScrollable = $("<div />").addClass(SCHEDULER_HEADER_SCROLLABLE_CLASS).appendTo(this.element());
+                    var $headerScrollable = $("<div>").addClass(SCHEDULER_HEADER_SCROLLABLE_CLASS).appendTo(this.element());
                     this._headerScrollable = this._createComponent($headerScrollable, "dxScrollable", {
                         useKeyboard: false,
                         showScrollbar: false,
@@ -26022,7 +26506,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         itemCount = items.length;
                     for (var i = 0; i < repeatCount; i++)
                         for (var j = 0; j < itemCount; j++)
-                            cells.push($("<th>").addClass(GROUP_HEADER_CLASS).text(items[j].text));
+                            cells.push($("<th>").addClass(GROUP_HEADER_CLASS).html("<div class='" + GROUP_HEADER_CONTENT_CLASS + "'><div>" + items[j].text + "</div></div>"));
                     return cells
                 },
                 _renderDateHeader: function() {
@@ -26056,7 +26540,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 },
                 _setAllDayCellData: function($cell, rowIndex, cellIndex) {
                     var startDate = this._getDateByCellIndexes(rowIndex, cellIndex);
-                    dateUtils.correctDateWithUnitBeginning(startDate, "day");
+                    startDate = dateUtils.trimTime(startDate);
                     var data = {
                             startDate: startDate,
                             endDate: new Date(startDate.getTime() + 24 * 60 * 60000),
@@ -26101,8 +26585,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 },
                 _getTimeText: function(i) {
                     var startDayHour = this.option("startDayHour"),
-                        cellDuration = 3600000 * this.option("hoursInterval") * 2,
-                        date = new Date(new Date(1970, 0).getTime() + cellDuration * i + startDayHour * 3600000);
+                        timeCellDuration = this.getCellDuration() * 2,
+                        date = new Date(new Date(1970, 0).getTime() + timeCellDuration * i + startDayHour * 3600000);
                     return Globalize.format(date, "t")
                 },
                 _renderDateTable: function() {
@@ -26125,7 +26609,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 },
                 _setCellData: function($cell, rowIndex, cellIndex) {
                     var startDate = this._getDateByCellIndexes(rowIndex, cellIndex),
-                        endDate = this._calculateEndDate(startDate),
+                        endDate = this.calculateEndDate(startDate),
                         data = {
                             startDate: startDate,
                             endDate: endDate,
@@ -26152,7 +26636,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 _isOtherMonth: function(cellDate) {
                     return cellDate.getMonth() !== this.option("currentDate").getMonth()
                 },
-                _calculateEndDate: function(startDate) {
+                calculateEndDate: function(startDate) {
                     return new Date(startDate.getTime() + this._getInterval())
                 },
                 _getGroupCount: function() {
@@ -26419,6 +26903,9 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     var cellClass = allDay ? ALL_DAY_TABLE_CELL_CLASS : DATE_TABLE_CELL_CLASS;
                     return this.element().find("." + cellClass)
                 },
+                _getGroupHeaderCellsContent: function() {
+                    return this.element().find("." + GROUP_HEADER_CONTENT_CLASS)
+                },
                 _getScrollCoordinates: function(hours, minutes) {
                     var currentDate = new Date(this.option("currentDate")),
                         startDayHour = this.option("startDayHour"),
@@ -26437,25 +26924,29 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 getCellData: function($cell) {
                     return $.extend(true, {}, $cell.data(CELL_DATA))
                 },
-                getCoordinatesByDate: function(date, groupIndex, allDay) {
-                    var timeInterval = allDay ? 24 * 60 * 60 * 1000 : this._getInterval(),
-                        dateTimeStamp = this._getIntervalBetween(date, this.getFirstViewDate(), allDay);
+                getCoordinatesByDate: function(date, groupIndex, inAllDayRow) {
+                    var timeInterval = inAllDayRow ? 24 * 60 * 60 * 1000 : this._getInterval(),
+                        dateTimeStamp = this._getIntervalBetween(date, this.getFirstViewDate(), inAllDayRow);
                     groupIndex = groupIndex || 0;
                     var index = Math.floor(dateTimeStamp / timeInterval);
-                    if (allDay)
+                    if (inAllDayRow)
                         index = this._updateIndex(index);
                     if (index < 0)
                         index = 0;
-                    return this._getCellPositionByIndex(index, groupIndex, dateTimeStamp)
+                    var position = this._getCellPositionByIndex(index, groupIndex, dateTimeStamp);
+                    return $.extend(position, {
+                            max: this.getMaxAllowedPosition()[groupIndex],
+                            groupIndex: groupIndex
+                        })
                 },
-                getCoordinatesByDateInGroup: function(date, groups, allDay) {
+                getCoordinatesByDateInGroup: function(date, groups, inAllDayRow) {
                     var indexes = this._getGroupIndexes(groups),
                         result = [];
                     if (indexes.length)
                         for (var i = 0; i < indexes.length; i++)
-                            result.push(this.getCoordinatesByDate(date, indexes[i], allDay));
+                            result.push(this.getCoordinatesByDate(date, indexes[i], inAllDayRow));
                     else
-                        result.push(this.getCoordinatesByDate(date, 0, allDay));
+                        result.push(this.getCoordinatesByDate(date, 0, inAllDayRow));
                     return result
                 },
                 getDroppableCellIndex: function() {
@@ -26517,7 +27008,10 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 },
                 getLastViewDate: function() {
                     var dateOfLastViewCell = this._getDateByCellIndexes(this._getRowCount() - 1, this._getCellCount() - 1);
-                    return new Date(dateOfLastViewCell.getTime() + this._getInterval() - 60000)
+                    return new Date(dateOfLastViewCell.getTime() + this.getCellDuration() - 60000)
+                },
+                getCellDuration: function() {
+                    return 3600000 * this.option("hoursInterval")
                 },
                 getGroupBounds: function(coordinates) {
                     var cellIndex = this.getCellIndexByCoordinates(coordinates),
@@ -26526,15 +27020,15 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         $cells = this._getCells(),
                         cellWidth = this.getCellWidth(),
                         startCellIndex = groupIndex * cellCount,
-                        startOffset = $cells.eq(startCellIndex).offset().left,
-                        endOffset = $cells.eq(startCellIndex + cellCount - 1).offset().left + cellWidth;
+                        startOffset = $cells.eq(startCellIndex).offset().left - cellWidth / 2,
+                        endOffset = $cells.eq(startCellIndex + cellCount - 1).offset().left + cellWidth + cellWidth / 2;
                     var result = {
                             left: startOffset,
                             right: endOffset
                         };
                     if (this.option("rtlEnabled")) {
-                        result.left = endOffset - cellWidth;
-                        result.right = startOffset + cellWidth
+                        result.left = endOffset - cellWidth * 2;
+                        result.right = startOffset + cellWidth * 2
                     }
                     return result
                 },
@@ -26590,10 +27084,22 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                             result = currentPosition - position[groupIndex - 1];
                     return result
                 },
+                restoreScrollTop: function() {
+                    this.element().scrollTop(0)
+                },
                 scrollToTime: function(hours, minutes) {
                     var coordinates = this._getScrollCoordinates(hours, minutes),
                         scrollable = this.getScrollable();
                     scrollable.scrollBy(coordinates.top - scrollable.scrollTop())
+                },
+                getDistanceBetweenCells: function(startIndex, endIndex) {
+                    var result = 0;
+                    this.element().find("." + DATE_TABLE_ROW_CLASS).first().find("." + DATE_TABLE_CELL_CLASS).each(function(index) {
+                        if (index < startIndex || index > endIndex)
+                            return true;
+                        result += $(this).outerWidth()
+                    });
+                    return result
                 }
             }).include(publisherMixin);
         registerComponent("dxSchedulerWorkSpace", {}, SchedulerWorkSpace);
@@ -26721,7 +27227,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 _getInterval: function() {
                     return DAY_IN_MILLISECONDS
                 },
-                _calculateEndDate: function(startDate) {
+                calculateEndDate: function(startDate) {
                     var startDateCopy = new Date(startDate);
                     return new Date(startDateCopy.setHours(this.option("endDayHour")))
                 },
@@ -26763,6 +27269,9 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 _updateIndex: function(index) {
                     return index
                 },
+                getCellDuration: function() {
+                    return this._calculateDayDuration() * 3600000
+                },
                 getTimePanelWidth: function() {
                     return 0
                 },
@@ -26779,7 +27288,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 getCellCountToLastViewDate: function(date) {
                     var firstDateTime = dateUtils.makeDate(date).getTime(),
                         lastDateTime = this.getLastViewDate().getTime(),
-                        dayDurationInMs = this._calculateDayDuration() * 3600000;
+                        dayDurationInMs = this.getCellDuration();
                     return Math.ceil((lastDateTime - firstDateTime) / dayDurationInMs)
                 },
                 supportAllDayRow: function() {
@@ -26825,7 +27334,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 _createWorkSpaceElements: function() {
                     this._createWorkSpaceScrollableElements()
                 },
-                _createDateTableConfig: function() {
+                _dateTableScrollableConfig: function() {
                     var that = this,
                         config = this.callBase(),
                         timelineConfig = {
@@ -26861,11 +27370,16 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 },
                 _renderView: function() {
                     this.callBase();
-                    this._$sidebarTable.appendTo(this._sidebarScrollable.content())
+                    this._$sidebarTable.appendTo(this._sidebarScrollable.content());
+                    this._setGroupHeaderCellsHeight()
                 },
                 _cleanView: function() {
                     this.callBase();
                     this._$sidebarTable.empty()
+                },
+                _visibilityChanged: function(visible) {
+                    this.callBase(visible);
+                    this._setGroupHeaderCellsHeight()
                 },
                 _makeGroupRows: function(groups) {
                     var repeatCount = 1,
@@ -26892,6 +27406,10 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         }
                     }
                     return rows
+                },
+                _setGroupHeaderCellsHeight: function() {
+                    var cellHeight = this.getCellHeight() - 1;
+                    this._getGroupHeaderCellsContent().css("height", cellHeight)
                 },
                 _attachGroupCountAttr: function() {
                     this.element().attr("dx-group-column-count", this.option("groups").length)
@@ -27030,6 +27548,147 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
         return SchedulerTimelineWorkWeek
     });
     DevExpress.require(["/ui/widgets/scheduler/ui.scheduler.timelineWorkWeek"]);
+    /*! Module widgets-web, file ui.scheduler.appointment.js */
+    DevExpress.define("/ui/widgets/scheduler/ui.scheduler.appointment", ["jquery", "/ui/uiNamespace", "/utils/utils.translator", "/utils/utils.array", "/utils/utils.recurrence", "/utils/utils.date", "/utils/utils.common", "/componentRegistrator", "/ui/ui.tooltip", "/ui/widgets/scheduler/ui.scheduler.publisherMixin", "/ui/events/ui.events.utils", "/ui/events/pointer/ui.events.pointer", "/domComponent"], function($, ui, translator, array, recurrenceUtils, dateUtils, commonUtils, registerComponent, tooltip, publisherMixin, eventUtils, pointerEvents, DOMComponent) {
+        var REDUCED_APPOINTMENT_POINTERENTER_EVENT_NAME = eventUtils.addNamespace(pointerEvents.enter, "dxSchedulerAppointment"),
+            REDUCED_APPOINTMENT_POINTERLEAVE_EVENT_NAME = eventUtils.addNamespace(pointerEvents.leave, "dxSchedulerAppointment");
+        var EMPTY_APPOINTMENT_CLASS = "dx-scheduler-appointment-empty",
+            EMPTY_APPOINTMENT_MAX_WIDTH = 40,
+            APPOINTMENT_ALL_DAY_ITEM_CLASS = "dx-scheduler-all-day-appointment",
+            DIRECTION_APPOINTMENT_CLASSES = {
+                horizontal: "dx-scheduler-appointment-horizontal",
+                vertical: "dx-scheduler-appointment-vertical"
+            },
+            RECURRENCE_APPOINTMENT_CLASS = "dx-scheduler-appointment-recurrence",
+            COMPACT_APPOINTMENT_CLASS = "dx-scheduler-appointment-compact",
+            REDUCED_APPOINTMENT_CLASS = "dx-scheduler-appointment-reduced",
+            REDUCED_APPOINTMENT_ICON = "dx-scheduler-appointment-reduced-icon",
+            REDUCED_APPOINTMENT_PARTS_CLASSES = {
+                head: "dx-scheduler-appointment-head",
+                body: "dx-scheduler-appointment-body",
+                tail: "dx-scheduler-appointment-tail"
+            };
+        var Appointment = DOMComponent.inherit({
+                _getDefaultOptions: function() {
+                    return $.extend(this.callBase(), {
+                            data: {},
+                            geometry: {
+                                top: 0,
+                                left: 0,
+                                width: 0,
+                                height: 0
+                            },
+                            allowDrag: true,
+                            allowResize: true,
+                            reduced: null,
+                            isCompact: false,
+                            sortedIndex: undefined,
+                            direction: "vertical",
+                            resizableConfig: {}
+                        })
+                },
+                _optionChanged: function(args) {
+                    switch (args.name) {
+                        case"data":
+                        case"geometry":
+                        case"allowDrag":
+                        case"allowResize":
+                        case"reduced":
+                        case"sortedIndex":
+                        case"isCompact":
+                        case"direction":
+                        case"resizableConfig":
+                            this._invalidate();
+                            break;
+                        default:
+                            this.callBase(args)
+                    }
+                },
+                _render: function() {
+                    this.callBase();
+                    this._renderAppointmentGeometry();
+                    this._renderEmptyClass();
+                    this._renderCompactClass();
+                    this._renderReducedAppointment();
+                    this._renderAllDayClass();
+                    this._renderDirection();
+                    this.element().attr("title", this.invoke("getField", "text", this.option("data")));
+                    this.element().attr("role", "button");
+                    this._renderRecurrenceClass();
+                    this._renderSortedTabIndex();
+                    this._renderResizable()
+                },
+                _renderAppointmentGeometry: function() {
+                    var geometry = this.option("geometry"),
+                        $element = this.element();
+                    translator.move($element, {
+                        top: geometry.top,
+                        left: geometry.left
+                    });
+                    $element.css({
+                        width: geometry.width,
+                        height: geometry.height
+                    })
+                },
+                _renderEmptyClass: function() {
+                    var geometry = this.option("geometry");
+                    if (geometry.width < EMPTY_APPOINTMENT_MAX_WIDTH)
+                        this.element().addClass(EMPTY_APPOINTMENT_CLASS)
+                },
+                _renderReducedAppointment: function() {
+                    var reducedPart = this.option("reduced");
+                    if (!reducedPart)
+                        return;
+                    this.element().toggleClass(REDUCED_APPOINTMENT_CLASS, true).toggleClass(REDUCED_APPOINTMENT_PARTS_CLASSES[reducedPart], true);
+                    this._renderAppointmentReducedIcon()
+                },
+                _renderAppointmentReducedIcon: function() {
+                    var $icon = $("<div>").addClass(REDUCED_APPOINTMENT_ICON).appendTo(this.element()),
+                        endDate = this._getEndDate();
+                    $icon.off(REDUCED_APPOINTMENT_POINTERENTER_EVENT_NAME).on(REDUCED_APPOINTMENT_POINTERENTER_EVENT_NAME, function() {
+                        tooltip.show({
+                            target: $icon,
+                            content: Globalize.localize("dxScheduler-editorLabelEndDate") + ": " + Globalize.format(endDate, "d MMMM yyyy")
+                        })
+                    }).off(REDUCED_APPOINTMENT_POINTERLEAVE_EVENT_NAME).on(REDUCED_APPOINTMENT_POINTERLEAVE_EVENT_NAME, function() {
+                        tooltip.hide()
+                    })
+                },
+                _getEndDate: function() {
+                    var result = this.invoke("getField", "endDate", this.option("data"));
+                    if (result)
+                        return dateUtils.makeDate(result);
+                    return result
+                },
+                _renderAllDayClass: function() {
+                    this.element().toggleClass(APPOINTMENT_ALL_DAY_ITEM_CLASS, !!this.option("allDay"))
+                },
+                _renderRecurrenceClass: function() {
+                    var rule = this.invoke("getField", "recurrenceRule", this.option("data"));
+                    if (recurrenceUtils.getRecurrenceRule(rule).isValid)
+                        this.element().addClass(RECURRENCE_APPOINTMENT_CLASS)
+                },
+                _renderSortedTabIndex: function() {
+                    var sortedIndex = this.option("sortedIndex");
+                    this.element().attr("sortedIndex", sortedIndex);
+                    this.element().attr("tabIndex", sortedIndex === 0 ? 0 : -1)
+                },
+                _renderCompactClass: function() {
+                    this.element().toggleClass(COMPACT_APPOINTMENT_CLASS, !!this.option("isCompact"))
+                },
+                _renderDirection: function() {
+                    this.element().addClass(DIRECTION_APPOINTMENT_CLASSES[this.option("direction")])
+                },
+                _renderResizable: function() {
+                    if (!this.option("allowResize") || this.option("isCompact"))
+                        return;
+                    this._createComponent(this.element(), "dxResizable", this.option("resizableConfig"))
+                }
+            }).include(publisherMixin);
+        registerComponent("dxSchedulerAppointment", {}, Appointment);
+        return Appointment
+    });
+    DevExpress.require(["/ui/widgets/scheduler/ui.scheduler.appointment"]);
     /*! Module widgets-web, file ui.scheduler.appointments.strategy.base.js */
     DevExpress.define("/ui/widgets/scheduler/ui.scheduler.appointments.strategy.base", ["jquery", "/class", "/ui/ui.errors", "/utils/utils.date"], function($, Class, errors, dateUtils) {
         var abstract = Class.abstract;
@@ -27060,15 +27719,9 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     var length = items.length;
                     if (!length)
                         return;
-                    this.instance.notifyObserver("getCellDimensions", {callback: $.proxy(function(width, height, allDayHeight) {
-                            this._defaultWidth = width;
-                            this._defaultHeight = height;
-                            this._allDayHeight = allDayHeight
-                        }, this)});
-                    this.instance.notifyObserver("getMaxAllowedPosition", {callback: $.proxy(function(result) {
-                            if (result)
-                                this._maxAllowedPosition = result
-                        }, this)});
+                    this._defaultWidth = this.instance._cellWidth;
+                    this._defaultHeight = this.instance._cellHeight;
+                    this._allDayHeight = this.instance._allDayCellHeight;
                     var map = [];
                     for (var i = 0; i < length; i++) {
                         var coordinates = this._getItemPosition(items[i]);
@@ -27110,35 +27763,35 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         sourceAppointmentWidth = width,
                         position = this._getAppointmentCoordinates(item),
                         allDay = this.isAllDay(item),
-                        appointmentReduced = false,
-                        multiWeekAppointmentParts = [],
-                        result = [];
+                        result = [],
+                        startDate = this.instance.invoke("getField", "startDate", item);
                     for (var j = 0; j < position.length; j++) {
-                        if (allDay)
-                            position[j].top = 0;
-                        if ((this._needVerifyItemSize() || allDay) && this._maxAllowedPosition) {
-                            var currentMaxAllowedPosition = this._getCurrentMaxAllowedPosition(j, item);
+                        var resultWidth = width,
+                            appointmentReduced = null,
+                            multiWeekAppointmentParts = [];
+                        if (this._needVerifyItemSize() || allDay) {
+                            var currentMaxAllowedPosition = position[j].max;
                             if (this.isAppointmentGreaterThan(currentMaxAllowedPosition, {
                                 left: position[j].left,
                                 width: sourceAppointmentWidth
                             })) {
-                                appointmentReduced = {appointmentPart: "head"};
-                                width = this._reduceMultiWeekAppointment(width, {
+                                appointmentReduced = "head";
+                                resultWidth = this._reduceMultiWeekAppointment(width, {
                                     left: position[j].left,
                                     right: currentMaxAllowedPosition
                                 });
                                 multiWeekAppointmentParts = this._getMultiWeekAppointmentParts({
                                     sourceAppointmentWidth: sourceAppointmentWidth,
-                                    reducedWidth: width,
+                                    reducedWidth: resultWidth,
                                     height: height
-                                }, position[j], allDay, item.startDate, j);
+                                }, position[j], startDate, j);
                                 if (this._isRtl())
-                                    position[j].left = this._maxAllowedPosition[j]
+                                    position[j].left = currentMaxAllowedPosition
                             }
                         }
                         $.extend(position[j], {
                             height: height,
-                            width: width,
+                            width: resultWidth,
                             allDay: allDay,
                             appointmentReduced: appointmentReduced
                         });
@@ -27152,11 +27805,12 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     return result
                 },
                 _getAppointmentCoordinates: function(itemData) {
-                    var startDate = dateUtils.makeDate(itemData.startDate),
+                    var startDate = this.instance.invoke("getField", "startDate", itemData),
                         coordinates = [{
                                 top: 0,
                                 left: 0
                             }];
+                    startDate = dateUtils.makeDate(startDate);
                     this.instance.notifyObserver("needCoordinates", {
                         startDate: startDate,
                         appointmentData: itemData,
@@ -27171,16 +27825,6 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 },
                 _isRtl: function() {
                     return this.instance.option("rtlEnabled")
-                },
-                _getCurrentMaxAllowedPosition: function(index, item) {
-                    this.instance.notifyObserver("getItemGroupIndexes", {
-                        item: item,
-                        callback: function(indexes) {
-                            if (indexes.length)
-                                index = indexes[index]
-                        }
-                    });
-                    return Math.floor(this._maxAllowedPosition[index])
                 },
                 _getMultiWeekAppointmentParts: function() {
                     return []
@@ -27199,9 +27843,10 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     return 0
                 },
                 isAppointmentGreaterThan: function(etalon, comparisonParameters) {
+                    var result = comparisonParameters.left + comparisonParameters.width - etalon;
                     if (this._isRtl())
-                        return comparisonParameters.left - comparisonParameters.width < etalon;
-                    return comparisonParameters.left + comparisonParameters.width > etalon
+                        result = etalon + comparisonParameters.width - comparisonParameters.left;
+                    return result > this._defaultWidth / 2
                 },
                 isAllDay: function() {
                     return false
@@ -27318,14 +27963,15 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                             map[i][j].index = positions[positionCounter].index;
                             map[i][j].sortedIndex = positions[positionCounter].sortedIndex;
                             map[i][j].count = positions[positionCounter++].count;
-                            map[i][j].groupIndex = map[i][j].top + "-" + map[i][j].left
+                            map[i][j].virtualIndex = map[i][j].top + "-" + map[i][j].left
                         }
                     return map
                 },
                 _startDate: function(appointment, skipNormalize) {
-                    var startDate = this.instance._getStartDate(appointment, skipNormalize);
+                    var startDate = this.instance._getStartDate(appointment, skipNormalize),
+                        text = this.instance.invoke("getField", "text", appointment);
                     if (isNaN(startDate.getTime()))
-                        throw errors.Error("E1032", appointment.text);
+                        throw errors.Error("E1032", text);
                     return startDate
                 },
                 _endDate: function(appointment) {
@@ -27334,7 +27980,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         viewStartDate = this._startDate(appointment);
                     if (!endDate || realStartDate >= endDate) {
                         endDate = new Date(realStartDate.getTime() + this.instance.option("appointmentDurationInMinutes") * 60000);
-                        appointment.endDate = endDate
+                        this.instance.invoke("setField", "endDate", appointment, endDate)
                     }
                     if (viewStartDate >= endDate) {
                         var duration = endDate.getTime() - realStartDate.getTime();
@@ -27352,7 +27998,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         coordinates.virtual = {
                             top: coordinates.top,
                             left: coordinates.left,
-                            groupIndex: coordinates.groupIndex,
+                            index: coordinates.virtualIndex,
                             isAllDay: isAllDay
                         }
                 },
@@ -27373,9 +28019,10 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
         return BaseRenderingStrategy
     });
     /*! Module widgets-web, file ui.scheduler.appointments.strategy.horizontal.js */
-    DevExpress.define("/ui/widgets/scheduler/ui.scheduler.appointments.strategy.horizontal", ["jquery", "/ui/widgets/scheduler/ui.scheduler.appointments.strategy.base"], function($, BaseAppointmentsStrategy) {
+    DevExpress.define("/ui/widgets/scheduler/ui.scheduler.appointments.strategy.horizontal", ["jquery", "/ui/widgets/scheduler/ui.scheduler.appointments.strategy.base", "/utils/utils.date"], function($, BaseAppointmentsStrategy, dateUtils) {
         var MAX_APPOINTMENT_HEIGHT = 100,
-            BOTTOM_CELL_GAP = 20;
+            BOTTOM_CELL_GAP = 20,
+            toMs = dateUtils.dateToMilliseconds;
         var HorizontalRenderingStrategy = BaseAppointmentsStrategy.inherit({
                 resizableConfig: function(appointmentData, skippedDirection) {
                     return {
@@ -27390,15 +28037,26 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 },
                 calculateAppointmentWidth: function(appointment) {
                     var cellWidth = this._defaultWidth || this.getAppointmentDefaultSize(),
-                        durationInHours = 0;
-                    if (appointment.allDay)
-                        durationInHours = this.instance.option("dayDuration") * 60 / this.instance.option("appointmentDurationInMinutes");
-                    else {
-                        var startDate = this._startDate(appointment),
-                            endDate = this._endDate(appointment);
-                        durationInHours = (endDate.getTime() - startDate.getTime()) / (this.instance.option("appointmentDurationInMinutes") * 60000)
+                        allDay = this.instance.invoke("getField", "allDay", appointment),
+                        durationInCells = 0;
+                    var dayDuration = toMs("day"),
+                        startDate = this._startDate(appointment),
+                        endDate = this._endDate(appointment),
+                        appointmentDuration = endDate.getTime() - startDate.getTime();
+                    if (allDay) {
+                        var ceilQuantityOfDays = Math.ceil(appointmentDuration / dayDuration);
+                        durationInCells = ceilQuantityOfDays * (this.instance.option("dayDuration") * 60 / this.instance.option("appointmentDurationInMinutes"))
                     }
-                    return durationInHours * cellWidth
+                    else {
+                        var floorQuantityOfDays = Math.floor(appointmentDuration / dayDuration),
+                            tailDuration = appointmentDuration % dayDuration,
+                            visibleDayDuration = this.instance.option("dayDuration") * toMs("hour");
+                        if (tailDuration > visibleDayDuration)
+                            tailDuration = visibleDayDuration;
+                        var cellDuration = this.instance.option("appointmentDurationInMinutes") * toMs("minute");
+                        durationInCells = (floorQuantityOfDays * visibleDayDuration + tailDuration) / cellDuration
+                    }
+                    return durationInCells * cellWidth
                 },
                 getAppointmentGeometry: function(coordinates) {
                     var result = this._customizeAppointmentGeometry(coordinates);
@@ -27437,10 +28095,10 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 },
                 getDeltaTime: function(args, initialSize) {
                     var deltaWidth = this._getDeltaWidth(args, initialSize);
-                    return this.instance.option("appointmentDurationInMinutes") * 60000 * deltaWidth
+                    return this.instance.option("appointmentDurationInMinutes") * toMs("minute") * deltaWidth
                 },
                 isAllDay: function(appointmentData) {
-                    return appointmentData.allDay
+                    return this.instance.invoke("getField", "allDay", appointmentData)
                 }
             });
         return HorizontalRenderingStrategy
@@ -27451,13 +28109,13 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
         var HorizontalMonthRenderingStrategy = HorizontalAppointmentsStrategy.inherit({
                 _skipResizingForReducedAppointments: function(appointmentReduced) {
                     var result = true;
-                    if (appointmentReduced.appointmentPart === "head")
-                        result = {skipDirection: "increase"};
-                    else if (appointmentReduced.appointmentPart === "tail")
-                        result = {skipDirection: "decrease"};
+                    if (appointmentReduced === "head")
+                        result = "increase";
+                    else if (appointmentReduced === "tail")
+                        result = "decrease";
                     return result
                 },
-                _getMultiWeekAppointmentParts: function(appointmentGeometry, appointmentSettings, allDay, startDate, groupIndex) {
+                _getMultiWeekAppointmentParts: function(appointmentGeometry, appointmentSettings, startDate, groupIndex) {
                     var deltaWidth = appointmentGeometry.sourceAppointmentWidth - appointmentGeometry.reducedWidth,
                         height = appointmentGeometry.height,
                         fullWeekAppointmentWidth = this._getFullWeekAppointmentWidth(groupIndex),
@@ -27466,46 +28124,36 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         tailWidth = deltaWidth % fullWeekAppointmentWidth,
                         result = [],
                         totalWidth = appointmentGeometry.reducedWidth + tailWidth,
-                        topOfLastPart = appointmentSettings.top,
-                        left = this._calculateMultiWeekAppointmentLeftOffset(groupIndex);
+                        currentPartTop = appointmentSettings.top + this._defaultHeight,
+                        left = this._calculateMultiWeekAppointmentLeftOffset(appointmentSettings.max, fullWeekAppointmentWidth);
                     for (var i = 0; i < longPartCount; i++) {
                         if (totalWidth > maxAppointmentWidth)
                             break;
-                        topOfLastPart += this._defaultHeight;
                         result.push($.extend(true, {}, appointmentSettings, {
-                            top: topOfLastPart,
+                            top: currentPartTop,
                             left: left,
                             height: height,
                             width: fullWeekAppointmentWidth,
-                            allDay: allDay,
-                            appointmentReduced: {appointmentPart: "body"}
+                            appointmentReduced: "body"
                         }));
+                        currentPartTop += this._defaultHeight;
                         totalWidth += fullWeekAppointmentWidth
                     }
                     if (tailWidth) {
                         if (this._isRtl())
                             left = left + (fullWeekAppointmentWidth - tailWidth);
-                        result.push({
-                            top: topOfLastPart + this._defaultHeight,
+                        result.push($.extend(true, {}, appointmentSettings, {
+                            top: currentPartTop,
                             left: left,
                             height: height,
                             width: tailWidth,
-                            allDay: allDay,
-                            appointmentReduced: {appointmentPart: "tail"}
-                        })
+                            appointmentReduced: "tail"
+                        }))
                     }
                     return result
                 },
-                _calculateMultiWeekAppointmentLeftOffset: function(groupIndex) {
-                    var left = 0;
-                    if (this._isRtl())
-                        left = this._maxAllowedPosition[0];
-                    if (groupIndex > 0) {
-                        left = this._maxAllowedPosition[groupIndex - 1];
-                        if (this._isRtl())
-                            left = this._maxAllowedPosition[groupIndex]
-                    }
-                    return left
+                _calculateMultiWeekAppointmentLeftOffset: function(max, width) {
+                    return this._isRtl() ? max : max - width
                 },
                 _correctRtlCoordinatesParts: $.noop,
                 _getFullWeekAppointmentWidth: function(groupIndex) {
@@ -27533,7 +28181,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         left = coordinates.left + (index - 2) * (compactAppointmentDefaultSize + compactAppointmentDefaultOffset) + compactAppointmentDefaultOffset;
                         height = compactAppointmentDefaultSize,
                         width = compactAppointmentDefaultSize;
-                        coordinates.skipResizing = true;
+                        coordinates.isCompact = true;
                         this._markAppointmentAsVirtual(coordinates)
                     }
                     return {
@@ -27552,10 +28200,9 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     var startDate = new Date(this._startDate(appointment)),
                         endDate = this._endDate(appointment),
                         cellWidth = this._defaultWidth || this.getAppointmentDefaultSize();
-                    dateUtils.correctDateWithUnitBeginning(startDate, "day");
+                    startDate = dateUtils.trimTime(startDate);
                     var durationInHours = (endDate.getTime() - startDate.getTime()) / 3600000;
-                    var width = Math.ceil(durationInHours / 24) * cellWidth;
-                    return width
+                    return Math.ceil(durationInHours / 24) * cellWidth
                 },
                 getDeltaTime: function(args, initialSize) {
                     var deltaWidth = this._getDeltaWidth(args, initialSize);
@@ -27598,8 +28245,9 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     return deltaTime
                 },
                 getAppointmentGeometry: function(coordinates) {
-                    var result;
-                    if (coordinates.allDay)
+                    var result,
+                        allDay = coordinates.allDay;
+                    if (allDay)
                         result = this._getAllDayAppointmentGeometry(coordinates);
                     else
                         result = this._getSimpleAppointmentGeometry(coordinates);
@@ -27630,7 +28278,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                             left = coordinates.left + (index - 2) * compactAppointmentDefaultSize;
                             height = compactAppointmentDefaultSize,
                             width = compactAppointmentDefaultSize;
-                            coordinates.skipResizing = true;
+                            coordinates.isCompact = true;
                             this._markAppointmentAsVirtual(coordinates, true)
                         }
                         else
@@ -27655,15 +28303,18 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         }
                 },
                 isAllDay: function(appointmentData) {
-                    var appointmentTakesAllDay = false;
+                    var appointmentTakesAllDay = false,
+                        startDate = this.instance.invoke("getField", "startDate", appointmentData),
+                        endDate = this.instance.invoke("getField", "endDate", appointmentData),
+                        allDay = this.instance.invoke("getField", "allDay", appointmentData);
                     this.instance.notifyObserver("appointmentTakesAllDay", {
-                        startDate: appointmentData.startDate,
-                        endDate: appointmentData.endDate,
+                        startDate: startDate,
+                        endDate: endDate,
                         callback: function(result) {
                             appointmentTakesAllDay = result
                         }
                     });
-                    return appointmentData.allDay || appointmentTakesAllDay
+                    return allDay || appointmentTakesAllDay
                 },
                 _getAppointmentMaxWidth: function() {
                     return this._defaultWidth - WEEK_APPOINTMENT_DEFAULT_OFFSET || this.getAppointmentDefaultSize()
@@ -27674,7 +28325,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     var startDate = new Date(this._startDate(appointment)),
                         endDate = this._endDate(appointment),
                         cellWidth = this._defaultWidth || this.getAppointmentDefaultSize();
-                    dateUtils.correctDateWithUnitBeginning(startDate, "day");
+                    startDate = dateUtils.trimTime(startDate);
                     var durationInHours = (endDate.getTime() - startDate.getTime()) / 3600000;
                     var width = Math.ceil(durationInHours / 24) * cellWidth;
                     return width
@@ -27699,24 +28350,11 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
         return VerticalRenderingStrategy
     });
     /*! Module widgets-web, file ui.scheduler.appointments.js */
-    DevExpress.define("/ui/widgets/scheduler/ui.scheduler.appointments", ["jquery", "/ui/uiNamespace", "/utils/utils.translator", "/utils/utils.array", "/utils/utils.recurrence", "/utils/utils.date", "/utils/utils.common", "/componentRegistrator", "/ui/ui.tooltip", "/ui/widgets/scheduler/ui.scheduler.publisherMixin", "/ui/widgets/scheduler/ui.scheduler.appointments.strategy.vertical", "/ui/widgets/scheduler/ui.scheduler.appointments.strategy.horizontal", "/ui/widgets/scheduler/ui.scheduler.appointments.strategy.horizontalMonth", "/ui/events/ui.events.utils", "/ui/events/pointer/ui.events.pointer"], function($, ui, translator, array, recurrenceUtils, dateUtils, commonUtils, registerComponent, tooltip, publisherMixin, VerticalAppointmentsStrategy, HorizontalAppointmentsStrategy, HorizontalMonthAppointmentsStrategy, eventUtils, pointerEvents) {
+    DevExpress.define("/ui/widgets/scheduler/ui.scheduler.appointments", ["jquery", "/ui/uiNamespace", "/utils/utils.translator", "/utils/utils.array", "/utils/utils.date", "/utils/utils.common", "/componentRegistrator", "/ui/ui.tooltip", "/ui/widgets/scheduler/ui.scheduler.publisherMixin", "/ui/widgets/scheduler/ui.scheduler.appointment", "/ui/widgets/scheduler/ui.scheduler.appointments.strategy.vertical", "/ui/widgets/scheduler/ui.scheduler.appointments.strategy.horizontal", "/ui/widgets/scheduler/ui.scheduler.appointments.strategy.horizontalMonth", "/ui/events/ui.events.utils", "/ui/events/pointer/ui.events.pointer", "/ui/templates/ui.template.function"], function($, ui, translator, array, dateUtils, commonUtils, registerComponent, tooltip, publisherMixin, Appointment, VerticalAppointmentsStrategy, HorizontalAppointmentsStrategy, HorizontalMonthAppointmentsStrategy, eventUtils, pointerEvents, FunctionTemplate) {
         var CollectionWidget = ui.CollectionWidget;
         var COMPONENT_CLASS = "dx-scheduler-scrollable-appointments",
             APPOINTMENT_ITEM_CLASS = "dx-scheduler-appointment",
-            APPOINTMENT_ALL_DAY_ITEM_CLASS = "dx-scheduler-all-day-appointment",
-            RECURRENCE_APPOINTMENT_CLASS = "dx-scheduler-appointment-recurrence",
-            EMPTY_APPOINTMENT_CLASS = "dx-scheduler-appointment-empty",
-            REDUCED_APPOINTMENT_CLASS = "dx-scheduler-appointment-reduced",
-            REDUCED_APPOINTMENT_ICON = "dx-scheduler-appointment-reduced-icon",
-            REDUCED_APPOINTMENT_PARTS_CLASSES = {
-                head: "dx-scheduler-appointment-head",
-                body: "dx-scheduler-appointment-body",
-                tail: "dx-scheduler-appointment-tail"
-            },
-            REDUCED_APPOINTMENT_POINTERENTER_EVENT_NAME = eventUtils.addNamespace(pointerEvents.enter, "dxSchedulerAppointment"),
-            REDUCED_APPOINTMENT_POINTERLEAVE_EVENT_NAME = eventUtils.addNamespace(pointerEvents.leave, "dxSchedulerAppointment"),
-            DBLCLICK_EVENT_NAME = eventUtils.addNamespace("dxdblclick", "dxSchedulerAppointment"),
-            EMPTY_APPOINTMENT_MAX_WIDTH = 40;
+            DBLCLICK_EVENT_NAME = eventUtils.addNamespace("dxdblclick", "dxSchedulerAppointment");
         var RENDERING_STRATEGIES = {
                 horizontal: HorizontalAppointmentsStrategy,
                 horizontalMonth: HorizontalMonthAppointmentsStrategy,
@@ -27776,7 +28414,11 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 _focusInHandler: function(e) {
                     this.callBase.apply(this, arguments);
                     this._$currentAppointment = $(e.target);
-                    this.option("focusedElement", $(e.target))
+                    this.option("focusedElement", $(e.target));
+                    var that = this;
+                    setTimeout(function() {
+                        that.notifyObserver("appointmentFocused")
+                    })
                 },
                 _focusOutHandler: function(e) {
                     var $appointment = this._getAppointmentByIndex(0);
@@ -27855,11 +28497,28 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     this.callBase();
                     this._initRenderingStrategy();
                     this.element().addClass(COMPONENT_CLASS);
-                    this._preventSingleAppointmentClick = false
+                    this._preventSingleAppointmentClick = false;
+                    this._initDynamicTemplates()
                 },
                 _initRenderingStrategy: function() {
                     var Strategy = RENDERING_STRATEGIES[this.option("renderingStrategy")];
                     this._renderingStrategy = new Strategy(this)
+                },
+                _initDynamicTemplates: function() {
+                    this._dynamicTemplates["item"] = new FunctionTemplate($.proxy(function(itemData) {
+                        var text = this.invoke("getField", "text", itemData),
+                            startDate = dateUtils.makeDate(this.invoke("getField", "startDate", itemData)),
+                            endDate = dateUtils.makeDate(this.invoke("getField", "endDate", itemData)),
+                            rrule = this.invoke("getField", "recurrenceRule", itemData),
+                            $text = $("<div>").text(text),
+                            $contentDetails = $("<div>").addClass("dx-scheduler-appointment-content-details");
+                        $("<div>").addClass("dx-scheduler-appointment-content-date").text(Globalize.format(startDate, "t")).appendTo($contentDetails),
+                        $("<div>").addClass("dx-scheduler-appointment-content-date").text(" - ").appendTo($contentDetails),
+                        $("<div>").addClass("dx-scheduler-appointment-content-date").text(Globalize.format(endDate, "t")).appendTo($contentDetails);
+                        if (rrule)
+                            $("<span>").addClass("dx-scheduler-appointment-recurrence-icon dx-icon-repeat").appendTo($contentDetails);
+                        return [$text, $contentDetails]
+                    }, this))
                 },
                 _executeItemRenderAction: function(index, itemData, itemElement) {
                     var action = this._getItemRenderAction();
@@ -27870,7 +28529,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         })
                 },
                 _getStartDate: function(appointment, skipNormalize) {
-                    var startDate = dateUtils.makeDate(appointment.startDate);
+                    var startDate = this.invoke("getField", "startDate", appointment);
+                    startDate = dateUtils.makeDate(startDate);
                     !skipNormalize && this.notifyObserver("updateAppointmentStartDate", {
                         startDate: startDate,
                         callback: function(result) {
@@ -27880,7 +28540,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     return startDate
                 },
                 _getEndDate: function(appointment) {
-                    var result = appointment.endDate;
+                    var result = this.invoke("getField", "endDate", appointment);
                     if (result)
                         return dateUtils.makeDate(result);
                     return result
@@ -27915,10 +28575,10 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     }, this), 300)
                 },
                 _normalizeAppointmentDates: function(appointmentData) {
-                    var startDate = dateUtils.makeDate(appointmentData.startDate),
-                        endDate = dateUtils.makeDate(appointmentData.endDate);
-                    appointmentData.startDate = startDate;
-                    appointmentData.endDate = endDate
+                    var startDate = dateUtils.makeDate(this.invoke("getField", "startDate", appointmentData)),
+                        endDate = dateUtils.makeDate(this.invoke("getField", "endDate", appointmentData));
+                    this.invoke("setField", "startDate", appointmentData, startDate);
+                    this.invoke("setField", "endDate", appointmentData, endDate)
                 },
                 _extendActionArgs: function() {
                     var args = this.callBase.apply(this, arguments);
@@ -27953,51 +28613,257 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 _renderItems: function(items) {
                     if (this._isContainerInvisible())
                         return;
+                    this.notifyObserver("getCellDimensions", {callback: $.proxy(function(width, height, allDayHeight) {
+                            this._cellWidth = width;
+                            this._cellHeight = height;
+                            this._allDayCellHeight = allDayHeight
+                        }, this)});
                     this._positionMap = this._renderingStrategy.createTaskPositionMap(items);
                     this.callBase(items)
                 },
+                _isContainerInvisible: function() {
+                    var isContainerInvisible = false;
+                    this.notifyObserver("checkContainerVisibility", {callback: function(result) {
+                            isContainerInvisible = result
+                        }});
+                    return isContainerInvisible
+                },
                 _renderItem: function(index, itemData) {
-                    var $allDayContainer = this.option("allDayContainer"),
-                        $container = this.itemsContainer().not($allDayContainer);
-                    if (this._renderingStrategy.isAllDay(itemData) && $allDayContainer)
-                        $container = $allDayContainer;
+                    var allDay = this._renderingStrategy.isAllDay(itemData),
+                        $container = this._getAppointmentContainer(allDay);
                     this.callBase(index, itemData, $container)
                 },
-                _toggleAllDayClass: function($element, value) {
-                    $element.toggleClass(APPOINTMENT_ALL_DAY_ITEM_CLASS, !!value)
+                _getAppointmentContainer: function(allDay) {
+                    var $allDayContainer = this.option("allDayContainer"),
+                        $container = this.itemsContainer().not($allDayContainer);
+                    if (allDay && $allDayContainer)
+                        $container = $allDayContainer;
+                    return $container
                 },
-                _virtualAppointments: {},
                 _postprocessRenderItem: function(args) {
                     var $appointment = args.itemElement,
                         itemData = args.itemData,
                         itemSettings = this._positionMap[args.itemIndex];
-                    $appointment.attr("title", itemData.text);
-                    this.setAria("role", "button", $appointment);
-                    this._toggleAllDayClass($appointment, this._renderingStrategy.isAllDay(itemData));
-                    var deferredColor = this._paintAppointment($appointment, 0);
-                    recurrenceUtils.getRecurrenceRule(itemData.recurrenceRule).isValid && $appointment.addClass(RECURRENCE_APPOINTMENT_CLASS);
                     this._applyResourceDataAttr($appointment);
-                    this._renderAppointmentClones($appointment, itemSettings);
-                    this._renderAppointment($appointment, itemSettings[0]);
-                    if (itemSettings[0].virtual)
-                        deferredColor.done($.proxy(function(color) {
-                            this._processVirtualAppointment(itemSettings[0], $appointment, itemData, color)
-                        }, this))
+                    this._renderAppointmentClones($appointment, itemData, itemSettings);
+                    this._renderAppointment($appointment, itemSettings[0])
+                },
+                _applyResourceDataAttr: function($appointment) {
+                    this.notifyObserver("getResourcesFromItem", {
+                        itemData: this._getItemData($appointment),
+                        callback: function(resources) {
+                            if (resources)
+                                $.each(resources, function(name, values) {
+                                    var attr = "data-" + name.toLowerCase() + "-";
+                                    for (var i = 0; i < values.length; i++)
+                                        $appointment.attr(attr + values[i], true)
+                                })
+                        }
+                    })
+                },
+                _renderAppointmentClones: function($appointment, itemData, coordinates) {
+                    var coordinateCount = coordinates.length;
+                    if (coordinateCount > 1)
+                        for (var i = coordinateCount - 1; i > 0; i--) {
+                            var $clone = $appointment.clone(true);
+                            $appointment.after($clone);
+                            translator.clearCache($clone);
+                            this._renderAppointment($clone, coordinates[i]);
+                            this._executeItemRenderAction(0, itemData, $clone)
+                        }
                 },
                 _renderAppointment: function($appointment, settings) {
-                    this._renderAppointmentGeometry($appointment, settings);
-                    $appointment.attr("sortedIndex", settings.sortedIndex);
-                    if (settings.sortedIndex === 0)
-                        this._resetTabIndex($appointment);
-                    this._renderDraggable($appointment);
-                    if (!commonUtils.isDefined(settings.skipResizing) || commonUtils.isObject(settings.skipResizing))
-                        this._renderResizable($appointment, settings);
-                    if (settings.appointmentReduced)
-                        this._renderReducedAppointment($appointment, settings.appointmentReduced.appointmentPart)
+                    var appointmentData = this._getItemData($appointment),
+                        geometry = this._renderingStrategy.getAppointmentGeometry(settings),
+                        allowResize = !settings.isCompact && this.option("allowResize") && (!commonUtils.isDefined(settings.skipResizing) || commonUtils.isString(settings.skipResizing)),
+                        allowDrag = this.option("allowDrag"),
+                        allDay = this._renderingStrategy.isAllDay(appointmentData),
+                        direction = this.option("renderingStrategy") === "vertical" && !allDay ? "vertical" : "horizontal";
+                    this._createComponent($appointment, "dxSchedulerAppointment", {
+                        observer: this.option("observer"),
+                        data: appointmentData,
+                        geometry: geometry,
+                        direction: direction,
+                        allowResize: allowResize,
+                        allowDrag: allowDrag,
+                        allDay: allDay,
+                        reduced: settings.appointmentReduced,
+                        isCompact: settings.isCompact,
+                        sortedIndex: settings.sortedIndex,
+                        cellWidth: this._cellWidth,
+                        cellHeight: this._cellWidth,
+                        resizableConfig: this._resizableConfig(appointmentData, settings)
+                    });
+                    var deferredColor = this._paintAppointment($appointment, settings.groupIndex);
+                    if (settings.virtual)
+                        deferredColor.done($.proxy(function(color) {
+                            this._processVirtualAppointment(settings, $appointment, appointmentData, color)
+                        }, this));
+                    this._renderDraggable($appointment)
                 },
+                _resizableConfig: function(appointmentData, itemSetting) {
+                    var skippedResizableDirection = itemSetting.skipResizing ? itemSetting.skipResizing : null,
+                        config = this._renderingStrategy.resizableConfig(appointmentData, skippedResizableDirection);
+                    return $.extend(config, {
+                            area: this._calculateResizableArea(itemSetting, appointmentData),
+                            onResizeStart: $.proxy(function(e) {
+                                this._$currentAppointment = $(e.element);
+                                this._initialSize = {
+                                    width: e.width,
+                                    height: e.height
+                                };
+                                this._initialCoordinates = translator.locate(e.element)
+                            }, this),
+                            onResizeEnd: $.proxy(function(e) {
+                                if (this._escPressed) {
+                                    e.jQueryEvent.cancel = true;
+                                    return
+                                }
+                                this._resizeEndHandler(e)
+                            }, this)
+                        })
+                },
+                _calculateResizableArea: function(itemSetting, appointmentData) {
+                    var area = this.element().closest(".dx-scrollable-content"),
+                        allDay = this._renderingStrategy.isAllDay(appointmentData);
+                    this.notifyObserver("getResizableAppointmentArea", {
+                        coordinates: {
+                            left: itemSetting.left,
+                            top: 0
+                        },
+                        allDay: allDay,
+                        callback: function(result) {
+                            if (result)
+                                area = result
+                        }
+                    });
+                    return area
+                },
+                _resizeEndHandler: function(e) {
+                    var itemData = this._getItemData(e.element),
+                        startDate = this._getStartDate(itemData),
+                        endDate = this._getEndDate(itemData);
+                    var dateRange = this._getDateRange(e, startDate, endDate);
+                    var updatedDates = {};
+                    this.invoke("setField", "startDate", updatedDates, new Date(dateRange[0]));
+                    this.invoke("setField", "endDate", updatedDates, new Date(dateRange[1]));
+                    var data = $.extend({}, itemData, updatedDates);
+                    this.notifyObserver("updateAppointmentAfterResize", {
+                        target: itemData,
+                        data: data,
+                        $appointment: e.element
+                    })
+                },
+                _getDateRange: function(e, startDate, endDate) {
+                    var itemData = this._getItemData(e.element),
+                        deltaTime = this._renderingStrategy.getDeltaTime(e, this._initialSize, itemData),
+                        renderingStrategy = this.option("renderingStrategy"),
+                        cond = false;
+                    if (renderingStrategy !== "vertical" || this._renderingStrategy.isAllDay(itemData))
+                        cond = this.option("rtlEnabled") ? e.handles.right : e.handles.left;
+                    else
+                        cond = e.handles.top;
+                    var startTime = cond ? startDate.getTime() - deltaTime : startDate.getTime(),
+                        endTime = cond ? endDate.getTime() : endDate.getTime() + deltaTime;
+                    return [startTime, endTime]
+                },
+                _paintAppointment: function($appointment, groupIndex) {
+                    var res = $.Deferred();
+                    this.notifyObserver("getAppointmentColor", {
+                        itemData: this._getItemData($appointment),
+                        groupIndex: groupIndex,
+                        callback: function(d) {
+                            d.done(function(color) {
+                                if (color)
+                                    $appointment.css("background-color", color);
+                                res.resolve(color)
+                            })
+                        }
+                    });
+                    return res.promise()
+                },
+                _renderDraggable: function($appointment) {
+                    if (!this.option("allowDrag"))
+                        return;
+                    var that = this,
+                        appointmentData = that._getItemData($appointment),
+                        isAllDay = this._renderingStrategy.isAllDay(appointmentData),
+                        $fixedContainer = this.option("fixedContainer"),
+                        draggableArea;
+                    this.notifyObserver("getDraggableAppointmentArea", {callback: function(result) {
+                            if (result)
+                                draggableArea = result
+                        }});
+                    this._createComponent($appointment, "dxDraggable", {
+                        area: draggableArea,
+                        boundOffset: that._calculateBoundOffset(),
+                        onDragStart: function(args) {
+                            var e = args.jQueryEvent;
+                            that._skipDraggableRestriction(e);
+                            that.notifyObserver("hideAppointmentTooltip");
+                            that.notifyObserver("getDragEventTargetElements", {callback: function(result) {
+                                    if (result)
+                                        e.targetElements = result
+                                }});
+                            $fixedContainer.append($appointment);
+                            that._$currentAppointment = $(args.element);
+                            that._initialSize = {
+                                width: args.width,
+                                height: args.height
+                            };
+                            that._initialCoordinates = translator.locate(args.element)
+                        },
+                        onDrag: function(args) {
+                            var coordinates = translator.locate(args.element);
+                            that.notifyObserver("correctAppointmentCoordinates", {
+                                coordinates: coordinates,
+                                allDay: isAllDay,
+                                callback: function(result) {
+                                    if (result)
+                                        coordinates = result
+                                }
+                            });
+                            translator.move($appointment, coordinates)
+                        },
+                        onDragEnd: function(args) {
+                            var $container = that._getAppointmentContainer(isAllDay);
+                            $container.append($appointment);
+                            if (this._escPressed) {
+                                args.jQueryEvent.cancel = true;
+                                return
+                            }
+                            that._dragEndHandler(args)
+                        }
+                    })
+                },
+                _calculateBoundOffset: function() {
+                    var result = {top: 0};
+                    this.notifyObserver("getBoundOffset", {callback: function(offset) {
+                            result = offset
+                        }});
+                    return result
+                },
+                _skipDraggableRestriction: function(e) {
+                    if (this.option("rtlEnabled"))
+                        e.maxLeftOffset = null;
+                    else
+                        e.maxRightOffset = null;
+                    e.maxBottomOffset = null
+                },
+                _dragEndHandler: function(e) {
+                    var itemData = this._getItemData(e.element),
+                        coordinates = this._initialCoordinates;
+                    this._normalizeAppointmentDates(itemData);
+                    this.notifyObserver("updateAppointmentAfterDrag", {
+                        data: itemData,
+                        $appointment: e.element,
+                        coordinates: coordinates
+                    })
+                },
+                _virtualAppointments: {},
                 _processVirtualAppointment: function(appointmentSetting, $appointment, itemData, color) {
                     var virtualAppointment = appointmentSetting.virtual,
-                        virtualGroupIndex = virtualAppointment.groupIndex;
+                        virtualGroupIndex = virtualAppointment.index;
                     if (!commonUtils.isDefined(this._virtualAppointments[virtualGroupIndex]))
                         this._virtualAppointments[virtualGroupIndex] = {
                             coordinates: {
@@ -28019,7 +28885,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     var buttonWidth = this._renderingStrategy.getCompactAppointmentGroupMaxWidth(),
                         rtlOffset = 0;
                     if (this.option("rtlEnabled"))
-                        rtlOffset = this._calculateDropDownButtonRtlOffset(buttonWidth);
+                        rtlOffset = buttonWidth;
                     $.each(this._virtualAppointments, $.proxy(function(groupIndex, appointment) {
                         var virtualGroup = this._virtualAppointments[groupIndex],
                             virtualItems = virtualGroup.items,
@@ -28039,96 +28905,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         })
                     }, this))
                 },
-                _calculateDropDownButtonRtlOffset: function(dropDownWidth) {
-                    return this._renderingStrategy.getDefaultCellWidth() - dropDownWidth
-                },
-                _renderAppointmentGeometry: function($appointment, coordinates) {
-                    var geometry = this._renderingStrategy.getAppointmentGeometry(coordinates);
-                    if (!this.option("allowResize"))
-                        coordinates.skipResizing = true;
-                    translator.move($appointment, {
-                        top: geometry.top,
-                        left: geometry.left
-                    });
-                    $appointment.css({
-                        width: geometry.width,
-                        height: geometry.height
-                    });
-                    if (geometry.width < EMPTY_APPOINTMENT_MAX_WIDTH)
-                        $appointment.addClass(EMPTY_APPOINTMENT_CLASS)
-                },
-                _isContainerInvisible: function() {
-                    var isContainerInvisible = false;
-                    this.notifyObserver("checkContainerVisibility", {callback: function(result) {
-                            isContainerInvisible = result
-                        }});
-                    return isContainerInvisible
-                },
-                _applyResourceDataAttr: function($appointment) {
-                    this.notifyObserver("getResourcesFromItem", {
-                        itemData: this._getItemData($appointment),
-                        callback: function(resources) {
-                            if (resources)
-                                $.each(resources, function(name, values) {
-                                    var attr = "data-" + name.toLowerCase() + "-";
-                                    for (var i = 0; i < values.length; i++)
-                                        $appointment.attr(attr + values[i], true)
-                                })
-                        }
-                    })
-                },
-                _renderDraggable: function($appointment) {
-                    if (!this.option("allowDrag"))
-                        return;
-                    var that = this,
-                        appointmentData = that._getItemData($appointment),
-                        isAllDay = this._renderingStrategy.isAllDay(appointmentData),
-                        $fixedContainer = this.option("fixedContainer"),
-                        draggableArea;
-                    this.notifyObserver("getDraggableAppointmentArea", {callback: function(result) {
-                            if (result)
-                                draggableArea = result
-                        }});
-                    this._createComponent($appointment, "dxDraggable", {
-                        onDragStart: function(e) {
-                            that.notifyObserver("hideAppointmentTooltip");
-                            that.notifyObserver("getDragEventTargetElements", {callback: function(result) {
-                                    if (result)
-                                        e.jQueryEvent.targetElements = result
-                                }});
-                            $fixedContainer.append($appointment);
-                            that._$currentAppointment = $(e.element);
-                            that._initialSize = {
-                                width: e.width,
-                                height: e.height
-                            };
-                            that._initialCoordinates = translator.locate(e.element)
-                        },
-                        onDrag: function(e) {
-                            var coordinates = translator.locate(e.element);
-                            that.notifyObserver("correctAppointmentCoordinates", {
-                                coordinates: coordinates,
-                                allDay: isAllDay,
-                                callback: function(result) {
-                                    if (result)
-                                        coordinates = result
-                                }
-                            });
-                            translator.move($appointment, coordinates)
-                        },
-                        onDragEnd: function(e) {
-                            that.element().append($appointment);
-                            if (this._escPressed) {
-                                e.jQueryEvent.cancel = true;
-                                return
-                            }
-                            that._dragEndHandler(e)
-                        },
-                        area: draggableArea,
-                        boundOffset: that._calculateBoundOffset()
-                    })
-                },
-                _updateDraggablesBoundOffsets: function() {
+                updateDraggablesBoundOffsets: function() {
                     if (this.option("allowDrag"))
                         this.element().find("." + APPOINTMENT_ITEM_CLASS).each($.proxy(function(_, appointmentElement) {
                             var $appointment = $(appointmentElement),
@@ -28136,171 +28913,6 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                             if (!this._renderingStrategy.isAllDay(appointmentData))
                                 $appointment.dxDraggable("instance").option("boundOffset", this._calculateBoundOffset())
                         }, this))
-                },
-                _calculateBoundOffset: function() {
-                    var scheduler = this.option("observer");
-                    return {top: scheduler ? -scheduler.getWorkSpaceAllDayHeight() : 0}
-                },
-                _renderResizable: function($appointment, itemSetting) {
-                    var appointmentData = this._getItemData($appointment),
-                        skippedResizableDirection = itemSetting.skipResizing ? itemSetting.skipResizing.skipDirection : null,
-                        config = this._renderingStrategy.resizableConfig(appointmentData, skippedResizableDirection);
-                    $.extend(config, {
-                        area: this._calculateResizableArea(itemSetting, appointmentData),
-                        onResizeStart: $.proxy(function(e) {
-                            this._$currentAppointment = $(e.element);
-                            this._initialSize = {
-                                width: e.width,
-                                height: e.height
-                            };
-                            this._initialCoordinates = translator.locate(e.element)
-                        }, this),
-                        onResizeEnd: $.proxy(function(e) {
-                            if (this._escPressed) {
-                                e.jQueryEvent.cancel = true;
-                                return
-                            }
-                            this._resizeEndHandler(e)
-                        }, this)
-                    });
-                    this._createComponent($appointment, "dxResizable", config)
-                },
-                _calculateResizableArea: function(itemSetting, appointmentData) {
-                    var area = this.element().closest(".dx-scrollable-content"),
-                        allDay = this._renderingStrategy.isAllDay(appointmentData);
-                    this.notifyObserver("getResizableAppointmentArea", {
-                        coordinates: {
-                            left: itemSetting.left,
-                            top: 0
-                        },
-                        allDay: allDay,
-                        callback: function(result) {
-                            if (result)
-                                area = result
-                        }
-                    });
-                    return area
-                },
-                _paintAppointment: function($appointment, resourceIndex) {
-                    var res = $.Deferred();
-                    this.notifyObserver("getAppointmentColor", {
-                        itemData: this._getItemData($appointment),
-                        resourceIndex: resourceIndex,
-                        callback: function(d) {
-                            d.done(function(color) {
-                                if (color)
-                                    $appointment.css("background-color", color);
-                                res.resolve(color)
-                            })
-                        }
-                    });
-                    return res.promise()
-                },
-                _renderReducedAppointment: function($appointment, reducedAppointmentPart) {
-                    $appointment.toggleClass(REDUCED_APPOINTMENT_CLASS, true).toggleClass(REDUCED_APPOINTMENT_PARTS_CLASSES[reducedAppointmentPart], true);
-                    this._renderAppointmentReducedIcon($appointment)
-                },
-                _renderAppointmentReducedIcon: function($appointment) {
-                    var $icon = $("<div>").addClass(REDUCED_APPOINTMENT_ICON).appendTo($appointment),
-                        endDate = this._getEndDate(this._getItemData($appointment));
-                    $icon.off(REDUCED_APPOINTMENT_POINTERENTER_EVENT_NAME).on(REDUCED_APPOINTMENT_POINTERENTER_EVENT_NAME, function() {
-                        tooltip.show({
-                            target: $icon,
-                            content: Globalize.localize("dxScheduler-editorLabelEndDate") + ": " + Globalize.format(endDate, "d MMMM yyyy")
-                        })
-                    }).off(REDUCED_APPOINTMENT_POINTERLEAVE_EVENT_NAME).on(REDUCED_APPOINTMENT_POINTERLEAVE_EVENT_NAME, function() {
-                        tooltip.hide()
-                    })
-                },
-                _renderAppointmentClones: function($appointment, coordinates) {
-                    var coordinateCount = coordinates.length,
-                        state,
-                        groupCount;
-                    this.notifyObserver("getGroupCount", {callback: function(result) {
-                            groupCount = result
-                        }});
-                    var countChunksInGroup = coordinateCount / groupCount;
-                    if (coordinateCount > 1) {
-                        var itemData = this._getItemData($appointment),
-                            resourceForPainting = this._getResourceForPainting(),
-                            resourceValuesCount = array.wrapToArray(itemData[resourceForPainting]).length;
-                        for (var i = coordinateCount - 1; i > 0; i--) {
-                            var $clone = $appointment.clone(true);
-                            $appointment.after($clone);
-                            translator.clearCache($clone);
-                            this._renderAppointment($clone, coordinates[i]);
-                            if (resourceForPainting)
-                                state = this._paintClone($clone, resourceValuesCount, countChunksInGroup, state, coordinates[i]);
-                            if (coordinates[i].virtual)
-                                if (!resourceForPainting)
-                                    this._processVirtualAppointment(coordinates[i], $clone, itemData)
-                        }
-                    }
-                },
-                _paintClone: function($clone, resourceValuesCount, countChunksInGroup, state, currentClone) {
-                    if (!state)
-                        state = {
-                            processedChunksCount: 0,
-                            currentResourceValueIndex: resourceValuesCount - 1
-                        };
-                    this._paintAppointment($clone, state.currentResourceValueIndex).done($.proxy(function(color) {
-                        if (currentClone.virtual)
-                            this._processVirtualAppointment(currentClone, $clone, this._getItemData($clone), color)
-                    }, this));
-                    state.processedChunksCount++;
-                    if (state.processedChunksCount === countChunksInGroup) {
-                        state.currentResourceValueIndex--;
-                        if (state.currentResourceValueIndex < 0)
-                            state.currentResourceValueIndex = resourceValuesCount - 1;
-                        state.processedChunksCount = 0
-                    }
-                    return state
-                },
-                _getResourceForPainting: function() {
-                    var resourceForPainting;
-                    this.notifyObserver("getResourceForPainting", {callback: function(resource) {
-                            if (resource)
-                                resourceForPainting = resource.field
-                        }});
-                    return resourceForPainting
-                },
-                _getDateRange: function(e, startDate, endDate) {
-                    var itemData = this._getItemData(e.element),
-                        deltaTime = this._renderingStrategy.getDeltaTime(e, this._initialSize, itemData),
-                        renderingStrategy = this.option("renderingStrategy"),
-                        cond = false;
-                    if (renderingStrategy !== "vertical" || this._renderingStrategy.isAllDay(itemData))
-                        cond = this.option("rtlEnabled") ? e.handles.right : e.handles.left;
-                    else
-                        cond = e.handles.top;
-                    var startTime = cond ? startDate.getTime() - deltaTime : startDate.getTime(),
-                        endTime = cond ? endDate.getTime() : endDate.getTime() + deltaTime;
-                    return [startTime, endTime]
-                },
-                _resizeEndHandler: function(e) {
-                    var itemData = this._getItemData(e.element),
-                        startDate = this._getStartDate(itemData),
-                        endDate = this._getEndDate(itemData);
-                    var dateRange = this._getDateRange(e, startDate, endDate);
-                    var updatedDates = {};
-                    updatedDates.startDate = new Date(dateRange[0]);
-                    updatedDates.endDate = new Date(dateRange[1]);
-                    var data = $.extend({}, itemData, updatedDates);
-                    this.notifyObserver("updateAppointmentAfterResize", {
-                        target: itemData,
-                        data: data,
-                        $appointment: e.element
-                    })
-                },
-                _dragEndHandler: function(e) {
-                    var itemData = this._getItemData(e.element),
-                        coordinates = this._initialCoordinates;
-                    this._normalizeAppointmentDates(itemData);
-                    this.notifyObserver("updateAppointmentAfterDrag", {
-                        data: itemData,
-                        $appointment: e.element,
-                        coordinates: coordinates
-                    })
                 },
                 moveAppointmentBack: function() {
                     var $appointment = this._$currentAppointment,
@@ -28344,13 +28956,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         items = options.items;
                     this.instance = instance;
                     var $menu = $("<div>").addClass(DROPDOWN_APPOINTMENTS_CLASS).appendTo(options.$container);
-                    this.instance._createComponent($menu, Button, {
-                        template: this._createButtonTemplate(items.length),
-                        width: options.buttonWidth,
-                        onClick: $.proxy(function() {
-                            this._createDropDownMenu($menu, items, options.itemTemplate, options.color, options.buttonWidth)
-                        }, this)
-                    });
+                    this._createDropDownMenu($menu, items, options.itemTemplate, options.color, options.buttonWidth);
                     if (options.color)
                         $menu.css("background-color", options.color);
                     this._applyInnerShadow($menu, options.buttonWidth);
@@ -28390,7 +28996,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                             activeStateEnabled: false,
                             focusStateEnabled: false,
                             itemTemplate: itemTemplate
-                        }).open()
+                        })
                     }
                 },
                 _createDropDownAppointmentTemplate: function(appointmentData, index, appointmentElement, color) {
@@ -28399,7 +29005,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         borderSide = "left",
                         $title,
                         $date,
-                        $infoBlock;
+                        $infoBlock,
+                        text = this.instance.fire("getField", "text", appointmentData);
                     appointmentElement.addClass(DROPDOWN_APPOINTMENT_CLASS);
                     if (this.instance.option("rtlEnabled"))
                         borderSide = "right";
@@ -28411,16 +29018,18 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                             appointmentData = result
                         }
                     });
+                    var startDate = this.instance.fire("getField", "startDate", appointmentData),
+                        endDate = this.instance.fire("getField", "endDate", appointmentData);
                     this.instance.fire("formatDates", {
-                        startDate: appointmentData.startDate,
-                        endDate: appointmentData.endDate,
+                        startDate: startDate,
+                        endDate: endDate,
                         formatType: "DATETIME",
                         callback: function(result) {
                             dateString = result
                         }
                     });
                     $infoBlock = $("<div />").addClass(DROPDOWN_APPOINTMENT_INFO_BLOCK_CLASS);
-                    $title = $("<div>").addClass(DROPDOWN_APPOINTMENT_TITLE_CLASS).text(appointmentData.text);
+                    $title = $("<div>").addClass(DROPDOWN_APPOINTMENT_TITLE_CLASS).text(text);
                     $date = $("<div>").addClass(DROPDOWN_APPOINTMENT_DATE_CLASS).text(dateString);
                     $infoBlock.append([$title, $date]);
                     appointmentMarkup.push($infoBlock);
@@ -28479,25 +29088,22 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 currentViewUpdated: function(currentView) {
                     this.option("currentView", currentView)
                 },
+                currentDateUpdated: function(date) {
+                    this.option("currentDate", date)
+                },
                 needCoordinates: function(options) {
                     var appointmentData = options.appointmentData,
                         startDate = options.startDate,
+                        recurrenceRule = this.fire("getField", "recurrenceRule", appointmentData),
+                        recurrenceException = this.fire("getField", "recurrenceException", appointmentData),
                         dateRange = this._workSpace.getDateRange(),
-                        dates = recurrenceUtils.getDatesByRecurrence(appointmentData.recurrenceRule, startDate, dateRange[0], dateRange[1], appointmentData.recurrenceException);
+                        startViewDate = this.appointmentTakesAllDay(appointmentData) ? dateUtils.trimTime(new Date(dateRange[0])) : dateRange[0],
+                        dates = recurrenceUtils.getDatesByRecurrence(recurrenceRule, startDate, startViewDate, dateRange[1], recurrenceException);
                     if (!dates.length)
                         dates.push(startDate);
                     var itemResources = this._resourcesManager.getResourcesFromItem(appointmentData),
                         allDay = this.appointmentTakesAllDay(appointmentData) && this._workSpace.supportAllDayRow();
                     options.callback(this._getCoordinates(dates, itemResources, allDay))
-                },
-                showEditAppointmentPopup: function(options) {
-                    var appointmentData = options.data,
-                        $appointment = $(options.target),
-                        singleAppointmentData = this._getSingleAppointmentData(appointmentData, $appointment, options),
-                        that = this;
-                    this._checkRecurringAppointment(appointmentData, singleAppointmentData, singleAppointmentData.startDate, function() {
-                        that.showAppointmentPopup(appointmentData)
-                    }, false, true)
                 },
                 showAppointmentTooltip: function(options) {
                     var appointmentData = options.data,
@@ -28509,21 +29115,30 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     this._hideTooltip()
                 },
                 showAddAppointmentPopup: function(appointmentData) {
-                    this.showAppointmentPopup(appointmentData, true)
+                    var processedData = {};
+                    $.each(["startDate", "endDate", "allDay"], $.proxy(function(_, field) {
+                        if (appointmentData[field] !== undefined) {
+                            this.fire("setField", field, processedData, appointmentData[field]);
+                            delete appointmentData[field]
+                        }
+                    }, this));
+                    this.showAppointmentPopup($.extend(processedData, appointmentData), true)
                 },
-                deleteAppointment: function(options) {
+                showEditAppointmentPopup: function(options) {
                     var appointmentData = options.data,
                         $appointment = $(options.target),
-                        singleAppointmentData = this._getSingleAppointmentData(appointmentData, $appointment, options);
-                    this._checkRecurringAppointment(appointmentData, singleAppointmentData, singleAppointmentData.startDate, $.proxy(function() {
-                        this.deleteAppointment(appointmentData)
-                    }, this), true)
+                        singleAppointmentData = this._getSingleAppointmentData(appointmentData, $appointment, options),
+                        startDate = this.fire("getField", "startDate", singleAppointmentData);
+                    this._checkRecurringAppointment(appointmentData, singleAppointmentData, startDate, $.proxy(function() {
+                        this.showAppointmentPopup(appointmentData)
+                    }, this), false, true)
                 },
                 updateAppointmentAfterResize: function(options) {
                     var targetAppointment = options.target,
                         $appointment = options.$appointment,
-                        singleAppointment = this._getSingleAppointmentData(targetAppointment, $appointment, options);
-                    this._checkRecurringAppointment(targetAppointment, singleAppointment, singleAppointment.startDate, $.proxy(function() {
+                        singleAppointment = this._getSingleAppointmentData(targetAppointment, $appointment, options),
+                        startDate = this.fire("getField", "startDate", singleAppointment);
+                    this._checkRecurringAppointment(targetAppointment, singleAppointment, startDate, $.proxy(function() {
                         this._updateAppointment(targetAppointment, options.data, function() {
                             this._appointments.moveAppointmentBack()
                         })
@@ -28533,14 +29148,14 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     var target = options.data,
                         updatedData = this._getUpdatedData(options),
                         newCellIndex = this._workSpace.getDroppableCellIndex(),
-                        oldCellIndex = this._workSpace.getCellIndexByCoordinates(options.coordinates);
-                    if (this.appointmentTakesAllDay(target) && !updatedData.allDay && this.option("currentView") !== "month")
-                        updatedData.endDate = this._workSpace._calculateEndDate(updatedData.startDate);
+                        oldCellIndex = this._workSpace.getCellIndexByCoordinates(options.coordinates),
+                        becomeAllDay = this.fire("getField", "allDay", updatedData),
+                        wasAllDay = this.fire("getField", "allDay", target);
                     var appointment = $.extend({}, target, updatedData);
-                    var isAllDay = target.allDay || updatedData.allDay,
-                        allowAllDay = this.option("currentView") !== "month" && isAllDay,
-                        cellData = this._workSpace.getCellDataByCoordinates(options.coordinates, allowAllDay);
-                    if (newCellIndex !== oldCellIndex || isAllDay)
+                    var movedToAllDay = this._workSpace.supportAllDayRow() && becomeAllDay,
+                        cellData = this._workSpace.getCellDataByCoordinates(options.coordinates, movedToAllDay),
+                        movedBetweenAllDayAndSimple = this._workSpace.supportAllDayRow() && (wasAllDay && !becomeAllDay || !wasAllDay && becomeAllDay);
+                    if (newCellIndex !== oldCellIndex || movedBetweenAllDayAndSimple)
                         this._checkRecurringAppointment(target, appointment, cellData.startDate, $.proxy(function() {
                             this._updateAppointment(target, appointment, function() {
                                 this._appointments.moveAppointmentBack()
@@ -28549,27 +29164,30 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     else
                         this._appointments.moveAppointmentBack()
                 },
-                updateCurrentDate: function(date) {
-                    this.option("currentDate", this._stripDateTime(dateUtils.makeDate(date)))
+                deleteAppointment: function(options) {
+                    var appointmentData = options.data,
+                        $appointment = $(options.target),
+                        singleAppointmentData = this._getSingleAppointmentData(appointmentData, $appointment, options),
+                        startDate = this.fire("getField", "startDate", singleAppointmentData);
+                    this._checkRecurringAppointment(appointmentData, singleAppointmentData, startDate, $.proxy(function() {
+                        this.deleteAppointment(appointmentData)
+                    }, this), true)
                 },
                 getAppointmentColor: function(options) {
                     var resourceForPainting = this._resourcesManager.getResourceForPainting(this.option("groups")),
                         response = $.Deferred().resolve().promise();
                     if (resourceForPainting) {
-                        var field = resourceForPainting.field;
-                        if (options.itemData[field]) {
-                            var resourceValues = array.wrapToArray(options.itemData[field]),
-                                resourceIndex = options.resourceIndex,
-                                groups = this.option("groups");
-                            if (!groups || !groups.length)
-                                resourceIndex = 0;
-                            response = this._resourcesManager.getResourceColor(field, resourceValues[resourceIndex])
-                        }
+                        var field = resourceForPainting.field,
+                            groupIndex = options.groupIndex,
+                            groups = this._workSpace._getCellGroups(groupIndex),
+                            resourceValues = array.wrapToArray(options.itemData[field]),
+                            groupId = resourceValues.length ? resourceValues[0] : undefined;
+                        for (var i = 0; i < groups.length; i++)
+                            if (groups[i].name === field)
+                                groupId = groups[i].id;
+                        response = this._resourcesManager.getResourceColor(field, groupId)
                     }
                     options.callback(response)
-                },
-                getResourceForPainting: function(options) {
-                    options.callback(this._resourcesManager.getResourceForPainting(this.option("groups")))
                 },
                 getResourcesFromItem: function(options) {
                     options.callback(this._resourcesManager.getResourcesFromItem(options.itemData))
@@ -28578,27 +29196,25 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     if (this._workSpace)
                         options.callback(this._workSpace.getCellWidth(), this._workSpace.getCellHeight(), this._workSpace.getAllDayHeight())
                 },
-                getMaxAllowedPosition: function(options) {
-                    if (this._workSpace)
-                        options.callback(this._workSpace.getMaxAllowedPosition())
-                },
-                getItemGroupIndexes: function(options) {
-                    var groups = this._resourcesManager.getResourcesFromItem(options.item),
-                        indexes = this._workSpace._getGroupIndexes(groups);
-                    options.callback(indexes)
+                getBoundOffset: function(options) {
+                    options.callback({top: -this.getWorkSpaceAllDayHeight()})
                 },
                 appointmentTakesAllDay: function(options) {
-                    options.callback(this.appointmentTakesAllDay({
-                        startDate: options.startDate,
-                        endDate: options.endDate
-                    }))
+                    var appointment = {};
+                    this.fire("setField", "startDate", appointment, options.startDate);
+                    this.fire("setField", "endDate", appointment, options.endDate);
+                    options.callback(this.appointmentTakesAllDay(appointment))
                 },
                 checkContainerVisibility: function(options) {
                     options.callback(this.element().is(":hidden"))
                 },
+                appointmentFocused: function() {
+                    this._workSpace.restoreScrollTop()
+                },
                 getResizableAppointmentArea: function(options) {
-                    var area;
-                    if (this.option("groups") && this.option("groups").length && (options.allDay || this.option("currentView") === "month")) {
+                    var area,
+                        allDay = options.allDay;
+                    if (this.option("groups") && this.option("groups").length && (allDay || this.option("currentView") === "month")) {
                         var groupBounds = this._workSpace.getGroupBounds(options.coordinates);
                         area = {
                             left: groupBounds.left,
@@ -28630,14 +29246,14 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     options.callback(updatedCoordinates)
                 },
                 allDayPanelToggled: function() {
-                    this._appointments._updateDraggablesBoundOffsets()
+                    this._appointments.updateDraggablesBoundOffsets()
                 },
                 normalizeAppointmentDates: function(options) {
-                    var appointmentData = options.appointmentData;
-                    var startDate = dateUtils.makeDate(appointmentData.startDate),
-                        endDate = dateUtils.makeDate(appointmentData.endDate);
-                    appointmentData.startDate = startDate;
-                    appointmentData.endDate = endDate;
+                    var appointmentData = options.appointmentData,
+                        startDate = dateUtils.makeDate(this.fire("getField", "startDate", appointmentData)),
+                        endDate = dateUtils.makeDate(this.fire("getField", "endDate", appointmentData));
+                    this.fire("setField", "startDate", appointmentData, startDate);
+                    this.fire("setField", "endDate", appointmentData, endDate);
                     options.callback(appointmentData)
                 },
                 formatDates: function(options) {
@@ -28703,12 +29319,32 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 },
                 recurrenceEditorVisibylityChanged: function(options) {
                     this.recurrenceEditorVisibylityChanged(options.visible)
+                },
+                getField: function(field, obj) {
+                    return this._dataAccessors.getter[field](obj)
+                },
+                setField: function(field, obj, value) {
+                    return this._dataAccessors.setter[field](obj, value)
+                },
+                prerenderFilter: function() {
+                    var dateRange = this.getWorkSpace().getDateRange(),
+                        allDay;
+                    if (!this.option("showAllDayPanel") && this._workSpace.supportAllDayRow())
+                        allDay = false;
+                    return this._appointmentModel.filterLoadedAppointments({
+                            startDayHour: this.option("startDayHour"),
+                            endDayHour: this.option("endDayHour"),
+                            min: dateRange[0],
+                            max: dateRange[1],
+                            resources: this._loadedResources,
+                            allDay: allDay
+                        })
                 }
             };
         return subscribes
     });
     /*! Module widgets-web, file ui.scheduler.js */
-    DevExpress.define("/ui/widgets/scheduler/ui.scheduler", ["jquery", "/ui/uiNamespace", "/utils/utils.translator", "/ui/ui.errors", "/ui/ui.dialog", "/utils/utils.recurrence", "/utils/utils.dom", "/utils/utils.date", "/utils/utils.common", "/devices", "/componentRegistrator", "/ui/ui.widget", "/ui/widgets/scheduler/ui.scheduler.subscribes", "/ui/templates/ui.template.function", "/ui/templates/ui.template.dynamic", "/ui/templates/ui.template.move", "/ui/widgets/scheduler/ui.scheduler.appointmentTooltip", "/ui/widgets/scheduler/ui.scheduler.reccurenceEditor", "/ui/widgets/scheduler/ui.scheduler.header", "/ui/widgets/scheduler/ui.scheduler.workSpaceDay", "/ui/widgets/scheduler/ui.scheduler.workSpaceWeek", "/ui/widgets/scheduler/ui.scheduler.workSpaceWorkWeek", "/ui/widgets/scheduler/ui.scheduler.workSpaceMonth", "/ui/widgets/scheduler/ui.scheduler.timelineDay", "/ui/widgets/scheduler/ui.scheduler.timelineWeek", "/ui/widgets/scheduler/ui.scheduler.timelineWorkWeek", "/ui/widgets/scheduler/ui.scheduler.resourceManager", "/ui/widgets/scheduler/ui.scheduler.appointmentModel", "/ui/widgets/scheduler/ui.scheduler.appointments", "/ui/widgets/scheduler/ui.scheduler.appointments.dropDown", "/ui/ui.dataHelper"], function($, ui, translator, errors, dialog, recurrenceUtils, domUtils, dateUtils, commonUtils, devices, registerComponent, Widget, subscribes, FunctionTemplate, DynamicTemplate, MoveTemplate, appointmentTooltip, SchedulerRecurrenceEditor, SchedulerHeader, SchedulerWorkSpaceDay, SchedulerWorkSpaceWeek, SchedulerWorkSpaceWorkWeek, SchedulerWorkSpaceMonth, SchedulerTimelineDay, SchedulerTimelineWeek, SchedulerTimelineWorkWeek, SchedulerResourceManager, SchedulerAppointmentModel, SchedulerAppointments, DropDownAppointments, DataHelperMixin) {
+    DevExpress.define("/ui/widgets/scheduler/ui.scheduler", ["jquery", "/ui/uiNamespace", "/utils/utils.translator", "/ui/ui.errors", "/ui/ui.dialog", "/utils/utils.recurrence", "/utils/utils.dom", "/utils/utils.date", "/utils/utils.common", "/devices", "/componentRegistrator", "/ui/ui.widget", "/ui/widgets/scheduler/ui.scheduler.subscribes", "/ui/templates/ui.template.function", "/ui/templates/ui.template.dynamic", "/ui/templates/ui.template.move", "/ui/widgets/scheduler/ui.scheduler.appointmentTooltip", "/ui/widgets/scheduler/ui.scheduler.reccurenceEditor", "/ui/widgets/scheduler/ui.scheduler.header", "/ui/widgets/scheduler/ui.scheduler.workSpaceDay", "/ui/widgets/scheduler/ui.scheduler.workSpaceWeek", "/ui/widgets/scheduler/ui.scheduler.workSpaceWorkWeek", "/ui/widgets/scheduler/ui.scheduler.workSpaceMonth", "/ui/widgets/scheduler/ui.scheduler.timelineDay", "/ui/widgets/scheduler/ui.scheduler.timelineWeek", "/ui/widgets/scheduler/ui.scheduler.timelineWorkWeek", "/ui/widgets/scheduler/ui.scheduler.resourceManager", "/ui/widgets/scheduler/ui.scheduler.appointmentModel", "/ui/widgets/scheduler/ui.scheduler.appointments", "/ui/widgets/scheduler/ui.scheduler.appointments.dropDown", "/ui/ui.dataHelper", "/ui/ui.loading"], function($, ui, translator, errors, dialog, recurrenceUtils, domUtils, dateUtils, commonUtils, devices, registerComponent, Widget, subscribes, FunctionTemplate, DynamicTemplate, MoveTemplate, appointmentTooltip, SchedulerRecurrenceEditor, SchedulerHeader, SchedulerWorkSpaceDay, SchedulerWorkSpaceWeek, SchedulerWorkSpaceWorkWeek, SchedulerWorkSpaceMonth, SchedulerTimelineDay, SchedulerTimelineWeek, SchedulerTimelineWorkWeek, SchedulerResourceManager, SchedulerAppointmentModel, SchedulerAppointments, DropDownAppointments, DataHelperMixin, loading) {
         var WIDGET_CLASS = "dx-scheduler",
             WIDGET_READONLY_CLASS = "dx-scheduler-readonly",
             APPOINTMENT_POPUP_CLASS = "dx-scheduler-appointment-popup",
@@ -28746,15 +29382,11 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 }
             };
         var Scheduler = Widget.inherit({
-                _stripDateTime: function(date) {
-                    dateUtils.correctDateWithUnitBeginning(date, "day");
-                    return date
-                },
                 _getDefaultOptions: function() {
                     return $.extend(this.callBase(), {
                             views: ["day", "week"],
                             currentView: "day",
-                            currentDate: this._stripDateTime(new Date),
+                            currentDate: dateUtils.trimTime(new Date),
                             min: undefined,
                             max: undefined,
                             firstDayOfWeek: undefined,
@@ -28788,7 +29420,15 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                             appointmentTooltipTemplate: "appointmentTooltip",
                             appointmentPopupTemplate: "appointmentPopup",
                             horizontalScrollingEnabled: false,
-                            useDropDownViewSwitcher: false
+                            useDropDownViewSwitcher: false,
+                            startDateExpr: "startDate",
+                            endDateExpr: "endDate",
+                            textExpr: "text",
+                            descriptionExpr: "description",
+                            allDayExpr: "allDay",
+                            recurrenceRuleExpr: "recurrenceRule",
+                            recurrenceExceptionExpr: "recurrenceException",
+                            remoteFiltering: false
                         })
                 },
                 _defaultOptionsRules: function() {
@@ -28819,25 +29459,20 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                             this._header.option(name, value);
                             break;
                         case"currentDate":
-                            value = dateUtils.makeDate(value);
-                            value = this._stripDateTime(value);
+                            value = dateUtils.trimTime(dateUtils.makeDate(value));
                             this._workSpace.option(name, value);
                             this._header.option(name, value);
-                            this._appointments.option("dataSource", []);
+                            this._appointments.option("items", []);
                             this._filterAppointmentsByDate();
-                            this._reloadDataSource().done($.proxy(function() {
-                                this._workSpace.option("allDayExpanded", this._isAllDayExpanded());
-                                this._appointments.option("dataSource", this._dataSource)
-                            }, this));
+                            this._reloadDataSource();
                             break;
                         case"dataSource":
                             this._initDataSource();
                             this._appointmentModel.setDataSource(this._dataSource);
                             this._loadResources().done($.proxy(function(resources) {
-                                this._filterAppointmentsByDateAndResources(resources);
+                                this._filterAppointmentsByDate();
                                 this._workSpace.option("showAllDayPanel", this.option("showAllDayPanel"));
-                                this._workSpace.option("allDayExpanded", this._isAllDayExpanded());
-                                this._appointments.option(name, this._dataSource)
+                                this._reloadDataSource()
                             }, this));
                             break;
                         case"min":
@@ -28850,17 +29485,14 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                             this._header.option(name, value);
                             break;
                         case"currentView":
-                            this._appointments.option("dataSource", []);
+                            this._appointments.option("items", []);
                             this._header.option(name, value);
                             this._loadResources().done($.proxy(function(resources) {
                                 this._refreshWorkSpace(resources);
-                                this._filterAppointmentsByDateAndResources(resources);
-                                this._reloadDataSource().done($.proxy(function() {
-                                    this._workSpace.option("allDayExpanded", this._isAllDayExpanded());
-                                    this._appointments.option("renderingStrategy", this._getAppointmentsRenderingStrategy());
-                                    this._appointments.option("allowAllDayResize", value !== "day");
-                                    this._appointments.option("dataSource", this._dataSource)
-                                }, this))
+                                this._filterAppointmentsByDate();
+                                this._appointments.option("renderingStrategy", this._getAppointmentsRenderingStrategy());
+                                this._appointments.option("allowAllDayResize", value !== "day");
+                                this._reloadDataSource()
                             }, this));
                             break;
                         case"appointmentTemplate":
@@ -28869,7 +29501,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         case"groups":
                             this._loadResources().done($.proxy(function(resources) {
                                 this._workSpace.option(name, resources);
-                                this._filterAppointmentsByDateAndResources(resources);
+                                this._filterAppointmentsByDate();
                                 this._reloadDataSource()
                             }, this));
                             break;
@@ -28877,19 +29509,17 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                             this._resourcesManager.setResources(value);
                             this._loadResources().done($.proxy(function(resources) {
                                 this._workSpace.option("groups", resources);
-                                this._filterAppointmentsByDateAndResources(resources);
+                                this._filterAppointmentsByDate();
                                 this._reloadDataSource()
                             }, this));
                             break;
                         case"startDayHour":
                         case"endDayHour":
-                            this._appointments.option("dataSource", []);
+                            this._appointments.option("items", []);
                             this._workSpace.option(name, value);
                             this._appointments.option("dayDuration", this._getDayDuration());
                             this._filterAppointmentsByDate();
-                            this._reloadDataSource().done($.proxy(function() {
-                                this._appointments.option("dataSource", this._dataSource)
-                            }, this));
+                            this._reloadDataSource();
                             break;
                         case"onAppointmentAdding":
                         case"onAppointmentAdded":
@@ -28909,6 +29539,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         case"onAppointmentDblClick":
                             this._appointments.option(name, this._createActionByOption(name));
                             break;
+                        case"accessKey":
                         case"onCellClick":
                             this._workSpace.option(name, value);
                             break;
@@ -28946,12 +29577,12 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                             var editing = this._editing;
                             this._bringEditingModeToAppointments(editing);
                             if (this._appointmentForm)
-                                this._appointmentForm.option("readOnly", this._isReadOnly());
+                                this._appointmentForm.option("readOnly", !this._editing.allowUpdating);
                             this._hideTooltip();
                             break;
                         case"showAllDayPanel":
                             this._loadResources().done($.proxy(function(resources) {
-                                this._filterAppointmentsByDateAndResources(resources);
+                                this._filterAppointmentsByDate();
                                 this._workSpace.option("allDayExpanded", value);
                                 this._workSpace.option(name, value);
                                 this._reloadDataSource()
@@ -28960,6 +29591,18 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         case"appointmentTooltipTemplate":
                         case"appointmentPopupTemplate":
                         case"recurrenceEditMode":
+                        case"remoteFiltering":
+                            break;
+                        case"startDateExpr":
+                        case"endDateExpr":
+                        case"textExpr":
+                        case"descriptionExpr":
+                        case"allDayExpr":
+                        case"recurrenceRuleExpr":
+                        case"recurrenceExceptionExpr":
+                            this._updateExpression(name, value);
+                            if (this._useDynamicTemplate())
+                                this._appointments.repaint();
                             break;
                         default:
                             this.callBase(args)
@@ -28973,62 +29616,35 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     });
                     this._dropDownAppointments.repaintExisting(this.element())
                 },
-                _isAllDayExpanded: function() {
-                    return this.option("showAllDayPanel") && this._hasAllDayAppointments()
-                },
-                _hasAllDayAppointments: function() {
-                    if (!this._dataSource)
-                        return;
-                    var that = this,
-                        items = this._dataSource.items();
-                    var result = false;
-                    $.each(items, function(index, item) {
-                        if (that.appointmentTakesAllDay(item)) {
-                            result = true;
-                            return false
-                        }
-                    });
-                    return result
+                _isAllDayExpanded: function(items) {
+                    return this.option("showAllDayPanel") && this._appointmentModel.hasAllDayAppointments(items, this.option("startDayHour"), this.option("endDayHour"))
                 },
                 _filterAppointmentsByDate: function() {
                     var dateRange = this._workSpace.getDateRange();
-                    this._appointmentModel.filterByDate(dateRange[0], dateRange[1], this.option("startDayHour"), this.option("endDayHour"), !this.option("showAllDayPanel"))
-                },
-                _filterAppointmentsByDateAndResources: function(resources) {
-                    var dateRange = this._workSpace.getDateRange(),
-                        that = this;
-                    that._appointmentModel.filterByDateAndResources({
-                        min: dateRange[0],
-                        max: dateRange[1],
-                        resources: that._prepareResourcesForFilter(resources),
-                        startDayHour: that.option("startDayHour"),
-                        endDayHour: that.option("endDayHour"),
-                        excludeAllDayAppointments: !that.option("showAllDayPanel") && this._workSpace.supportAllDayRow()
-                    })
-                },
-                _prepareResourcesForFilter: function(resources) {
-                    return $.map(resources, function(resource) {
-                            var resourceItems = resource.items,
-                                data = [];
-                            for (var i = 0, len = resourceItems.length; i < len; i++)
-                                data.push(resourceItems[i].id);
-                            return {
-                                    field: resource.name,
-                                    data: data
-                                }
-                        })
+                    this._appointmentModel.filterByDate(dateRange[0], dateRange[1])
                 },
                 _loadResources: function() {
-                    var groups = this.option("groups");
-                    return this._resourcesManager.getResourcesValueByFields(groups)
+                    var groups = this.option("groups"),
+                        result = $.Deferred();
+                    this._resourcesManager.getResourcesValueByFields(groups).done($.proxy(function(resources) {
+                        result.resolve(resources);
+                        this._loadedResources = resources
+                    }, this));
+                    return result.promise()
                 },
                 _reloadDataSource: function() {
-                    if (this._dataSource)
-                        return this._dataSource.load();
-                    return $.Deferred().resolve().promise()
+                    if (this._dataSource) {
+                        loading.show({position: {of: this.element()}});
+                        this._dataSource.load().done(function() {
+                            loading.hide()
+                        }).fail(function() {
+                            loading.hide()
+                        })
+                    }
                 },
                 _dimensionChanged: function() {
-                    this._appointments && this._appointments.repaint()
+                    this._appointments && this._appointments.repaint();
+                    this._hideTooltip()
                 },
                 _visibilityChanged: function(visible) {
                     visible && this._dimensionChanged()
@@ -29038,17 +29654,56 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 },
                 _init: function() {
                     this.callBase();
+                    this._initExpressions({
+                        startDate: this.option("startDateExpr"),
+                        endDate: this.option("endDateExpr"),
+                        allDay: this.option("allDayExpr"),
+                        text: this.option("textExpr"),
+                        description: this.option("descriptionExpr"),
+                        recurrenceRule: this.option("recurrenceRuleExpr"),
+                        recurrenceException: this.option("recurrenceExceptionExpr")
+                    });
                     this._initDataSource();
+                    this._loadedResources = [];
                     this._proxiedCustomizeStoreLoadOptionsHandler = $.proxy(this._customizeStoreLoadOptionsHandler, this);
                     this._customizeStoreLoadOptions();
                     this.element().addClass(WIDGET_CLASS);
                     this._initEditing();
-                    this._appointmentModel = new SchedulerAppointmentModel(this._dataSource);
+                    this._appointmentModel = new SchedulerAppointmentModel(this._dataSource, {
+                        startDateExpr: this.option("startDateExpr"),
+                        endDateExpr: this.option("endDateExpr"),
+                        allDayExpr: this.option("allDayExpr"),
+                        recurrenceRuleExpr: this.option("recurrenceRuleExpr"),
+                        recurrenceExceptionExpr: this.option("recurrenceExceptionExpr")
+                    }, this._dataAccessors);
                     this._resourcesManager = new SchedulerResourceManager(this.option("resources"));
                     this._initActions();
                     this._dropDownAppointments = new DropDownAppointments;
                     this._subscribes = subscribes;
                     this._checkCellDuration()
+                },
+                _dataSourceChangedHandler: function() {
+                    var filteredItems = this.fire("prerenderFilter");
+                    this._workSpace.option("allDayExpanded", this._isAllDayExpanded(filteredItems));
+                    this._appointments.option("renderingStrategy", this._getAppointmentsRenderingStrategy());
+                    this._setAppointmentsData(filteredItems)
+                },
+                _initExpressions: function(fields) {
+                    var dataUtils = DevExpress.data.utils;
+                    if (!this._dataAccessors)
+                        this._dataAccessors = {
+                            getter: {},
+                            setter: {}
+                        };
+                    $.each(fields, $.proxy(function(name, value) {
+                        this._dataAccessors.getter[name] = dataUtils.compileGetter(value);
+                        this._dataAccessors.setter[name] = dataUtils.compileSetter(value)
+                    }, this))
+                },
+                _updateExpression: function(name, value) {
+                    var exprObj = {};
+                    exprObj[name.replace("Expr", "")] = value;
+                    this._initExpressions(exprObj)
                 },
                 _checkCellDuration: function() {
                     if ($.inArray(this.option("cellDuration"), [5, 10, 15, 20, 30, 60]) < 0)
@@ -29085,6 +29740,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     this.callBase()
                 },
                 _customizeStoreLoadOptionsHandler: function(options) {
+                    if (!this.option("remoteFiltering"))
+                        options.storeLoadOptions.filter[0] = [this._appointmentModel.customizeDateFilter(options.storeLoadOptions.filter[0])];
                     options.storeLoadOptions.dxScheduler = {
                         startDate: this._workSpace.getFirstViewDate(),
                         endDate: this._workSpace.getLastViewDate(),
@@ -29108,17 +29765,17 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 _defaultAppointmentFormEditors: function(allDay) {
                     var that = this;
                     return [{
-                                dataField: "text",
+                                dataField: that.option("textExpr"),
                                 editorType: "dxTextBox",
                                 label: {text: Globalize.localize("dxScheduler-editorLabelTitle")}
                             }, {
-                                dataField: "allDay",
+                                dataField: that.option("allDayExpr"),
                                 editorType: "dxSwitch",
                                 label: {text: Globalize.localize("dxScheduler-allDay")},
                                 editorOptions: {onValueChanged: function(args) {
                                         var value = args.value,
-                                            startDateEditor = that._appointmentForm.getEditor("startDate"),
-                                            endDateEditor = that._appointmentForm.getEditor("endDate"),
+                                            startDateEditor = that._appointmentForm.getEditor(that.option("startDateExpr")),
+                                            endDateEditor = that._appointmentForm.getEditor(that.option("endDateExpr")),
                                             startDate;
                                         if (startDateEditor && endDateEditor) {
                                             startDateEditor.option("format", value ? "date" : "datetime");
@@ -29131,12 +29788,12 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                                             else if (startDateEditor.option("value")) {
                                                 startDate.setHours(that.option("startDayHour"));
                                                 startDateEditor.option("value", startDate);
-                                                endDateEditor.option("value", that._workSpace._calculateEndDate(startDateEditor.option("value")))
+                                                endDateEditor.option("value", that._workSpace.calculateEndDate(startDateEditor.option("value")))
                                             }
                                         }
                                     }}
                             }, {
-                                dataField: "startDate",
+                                dataField: that.option("startDateExpr"),
                                 editorType: "dxDateBox",
                                 label: {text: Globalize.localize("dxScheduler-editorLabelStartDate")},
                                 editorOptions: {
@@ -29144,7 +29801,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                                     onValueChanged: function(args) {
                                         var value = args.value,
                                             previousValue = args.previousValue,
-                                            endDateEditor = that._appointmentForm.getEditor("endDate"),
+                                            endDateEditor = that._appointmentForm.getEditor(that.option("endDateExpr")),
                                             endValue = endDateEditor.option("value");
                                         that._validateAppointmentFormDate(args.component, value, previousValue);
                                         if (endValue <= value) {
@@ -29154,7 +29811,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                                     }
                                 }
                             }, {
-                                dataField: "endDate",
+                                dataField: that.option("endDateExpr"),
                                 editorType: "dxDateBox",
                                 label: {text: Globalize.localize("dxScheduler-editorLabelEndDate")},
                                 editorOptions: {
@@ -29162,7 +29819,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                                     onValueChanged: function(args) {
                                         var value = args.value,
                                             previousValue = args.previousValue,
-                                            startDateEditor = that._appointmentForm.getEditor("startDate"),
+                                            startDateEditor = that._appointmentForm.getEditor(that.option("startDateExpr")),
                                             startValue = startDateEditor.option("value");
                                         that._validateAppointmentFormDate(args.component, value, previousValue);
                                         if (value && startValue >= value) {
@@ -29172,13 +29829,22 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                                     }
                                 }
                             }, {
-                                dataField: "description",
+                                dataField: that.option("descriptionExpr"),
                                 editorType: "dxTextArea",
                                 label: {text: Globalize.localize("dxScheduler-editorLabelDescription")}
                             }, {
-                                dataField: "recurrenceRule",
+                                dataField: that.option("recurrenceRuleExpr"),
                                 editorType: "dxSchedulerRecurrenceEditor",
-                                editorOptions: {observer: that},
+                                editorOptions: {
+                                    observer: that,
+                                    onContentReady: function(args) {
+                                        var $editorField = args.element.closest(".dx-field-item"),
+                                            $editorLabel = $editorField.find(".dx-field-item-label");
+                                        $editorLabel.off("dxclick").on("dxclick", function() {
+                                            args.component.toggle()
+                                        })
+                                    }
+                                },
                                 cssClass: RECURRENCE_EDITOR_ITEM_CLASS,
                                 label: {text: Globalize.localize("dxScheduler-editorLabelRecurrence")}
                             }]
@@ -29211,10 +29877,13 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                             fixedContainer: $fixedContainer,
                             allDayContainer: $allDayContainer
                         });
-                        this._filterAppointmentsByDateAndResources(resources);
-                        this._workSpace.option("allDayExpanded", this.option("showAllDayPanel"));
-                        this._appointments.option("dataSource", this._dataSource)
+                        this._filterAppointmentsByDate();
+                        this._reloadDataSource()
                     }, this))
+                },
+                _setAppointmentsData: function(items) {
+                    if (items)
+                        this._appointments.option("items", items)
                 },
                 _renderHeader: function() {
                     this._header = this._createComponent("<div>", SchedulerHeader, this._headerConfig());
@@ -29228,7 +29897,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                             views: this.option("views"),
                             firstDayOfWeek: this.option("firstDayOfWeek"),
                             currentView: this.option("currentView"),
-                            currentDate: this._stripDateTime(dateUtils.makeDate(this.option("currentDate"))),
+                            currentDate: dateUtils.trimTime(dateUtils.makeDate(this.option("currentDate"))),
                             tabIndex: this.option("tabIndex"),
                             focusStateEnabled: this.option("focusStateEnabled"),
                             width: this.option("width"),
@@ -29236,13 +29905,27 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                             useDropDownViewSwitcher: this.option("useDropDownViewSwitcher")
                         }
                 },
+                _useDynamicTemplate: function() {
+                    var hash = {
+                            startDateExpr: "startDate",
+                            endDateExpr: "endDate",
+                            textExpr: "text"
+                        };
+                    var result = false;
+                    $.each(hash, $.proxy(function(name, value) {
+                        if (this.option(name) !== value) {
+                            result = true;
+                            return false
+                        }
+                    }, this));
+                    return result
+                },
                 _appointmentsConfig: function() {
                     var editing = this._editing,
                         that = this;
-                    return {
+                    var config = {
                             observer: this,
                             renderingStrategy: this._getAppointmentsRenderingStrategy(),
-                            itemTemplate: this._getTemplateByOption("appointmentTemplate"),
                             onItemRendered: this._getAppointmentRenderedAction(),
                             onItemClick: this._createActionByOption("onAppointmentClick"),
                             onAppointmentDblClick: this._createActionByOption("onAppointmentDblClick"),
@@ -29254,10 +29937,13 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                             allowAllDayResize: editing.allowResizing && this.option("currentView") !== "day",
                             rtlEnabled: this.option("rtlEnabled"),
                             onContentReady: function() {
-                                that._workSpace && that._workSpace.option("allDayExpanded", that._isAllDayExpanded())
+                                that._workSpace && that._workSpace.option("allDayExpanded", that._isAllDayExpanded(that._appointments.option("items")))
                             },
                             dayDuration: this._getDayDuration()
-                        }
+                        };
+                    if (!this._useDynamicTemplate() || this.option("appointmentTemplate") !== "item")
+                        config.itemTemplate = this._getTemplateByOption("appointmentTemplate");
+                    return config
                 },
                 _getAppointmentsRenderingStrategy: function() {
                     return VIEWS_CONFIG[this.option("currentView")].renderingStrategy
@@ -29276,16 +29962,17 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                             observer: this,
                             min: dateUtils.makeDate(this.option("min")),
                             max: dateUtils.makeDate(this.option("max")),
-                            currentDate: this._stripDateTime(dateUtils.makeDate(this.option("currentDate"))),
+                            currentDate: dateUtils.trimTime(dateUtils.makeDate(this.option("currentDate"))),
                             firstDayOfWeek: this.option("firstDayOfWeek"),
                             groups: groups,
                             startDayHour: this.option("startDayHour"),
                             endDayHour: this.option("endDayHour"),
                             tabIndex: this.option("tabIndex"),
+                            accessKey: this.option("accessKey"),
                             focusStateEnabled: this.option("focusStateEnabled"),
                             hoursInterval: this.option("cellDuration") / 60,
                             showAllDayPanel: this.option("showAllDayPanel"),
-                            allDayExpanded: this._isAllDayExpanded(),
+                            allDayExpanded: this._isAllDayExpanded(this._appointments.option("items")),
                             onCellClick: this._createActionByOption("onCellClick"),
                             horizontalScrollingEnabled: this.option("horizontalScrollingEnabled")
                         }
@@ -29341,7 +30028,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     return $popupContent
                 },
                 _createAppointmentForm: function(appointmentData, $content) {
-                    var editors = this._defaultAppointmentFormEditors(appointmentData.allDay),
+                    var allDay = this.fire("getField", "allDay", appointmentData),
+                        editors = this._defaultAppointmentFormEditors(allDay),
                         resources = this.option("resources");
                     if (resources && resources.length) {
                         this._resourcesManager.setResources(this.option("resources"));
@@ -29349,7 +30037,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     }
                     this._appointmentForm = this._createComponent($content, "dxForm", {
                         items: editors,
-                        readOnly: this._isReadOnly(),
+                        readOnly: this._editAppointmentData ? !this._editing.allowUpdating : false,
                         showValidationSummary: true,
                         scrollingEnabled: true
                     });
@@ -29357,9 +30045,11 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         appointmentData[resourceName] = resourceValue
                     });
                     this._appointmentForm.option("formData", $.extend(true, {}, appointmentData));
-                    var recurrentEditor = this._appointmentForm.getEditor("recurrenceRule");
-                    if (recurrentEditor)
-                        recurrentEditor.option("startDate", dateUtils.makeDate(appointmentData.startDate));
+                    var recurrentEditor = this._appointmentForm.getEditor(this.option("recurrenceRuleExpr"));
+                    if (recurrentEditor) {
+                        var startDate = this.fire("getField", "startDate", appointmentData);
+                        recurrentEditor.option("startDate", dateUtils.makeDate(startDate))
+                    }
                     this._actions["onAppointmentFormCreated"]({
                         form: this._appointmentForm,
                         appointmentData: appointmentData
@@ -29410,25 +30100,24 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         return
                     }
                     this._saveChanges(args);
-                    this._workSpace.updateScrollPosition(this._appointmentForm.option("formData").startDate)
+                    var startDate = this.fire("getField", "startDate", this._appointmentForm.option("formData"));
+                    this._workSpace.updateScrollPosition(startDate)
                 },
                 _saveChanges: function() {
-                    var appointmentData = this._appointmentForm.option("formData"),
+                    var formData = this._appointmentForm.option("formData"),
                         oldData = this._editAppointmentData,
                         recData = this._updatedRecAppointment;
-                    if (appointmentData.hasOwnProperty("recurrenceRule") && appointmentData.recurrenceRule === undefined)
-                        appointmentData.recurrenceRule = "";
                     if (oldData && !recData)
-                        this.updateAppointment(oldData, appointmentData);
+                        this.updateAppointment(oldData, formData);
                     else {
                         recData && this.updateAppointment(oldData, recData);
                         delete this._updatedRecAppointment;
-                        this.addAppointment(appointmentData)
+                        this.addAppointment(formData)
                     }
                 },
                 _checkRecurringAppointment: function(targetAppointment, singleAppointment, exceptionDate, callback, isDeleted, isPopupEditing) {
                     delete this._updatedRecAppointment;
-                    var recurrenceRule = targetAppointment.recurrenceRule;
+                    var recurrenceRule = this.fire("getField", "recurrenceRule", targetAppointment);
                     if (!recurrenceUtils.getRecurrenceRule(recurrenceRule).isValid || !this._editing.allowUpdating) {
                         callback();
                         return
@@ -29451,8 +30140,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     }
                 },
                 _singleAppointmentChangesHandler: function(targetAppointment, singleAppointment, exceptionDate, isDeleted, isPopupEditing) {
-                    delete singleAppointment.recurrenceRule;
-                    delete singleAppointment.recurrenceException;
+                    this.fire("setField", "recurrenceRule", singleAppointment, "");
+                    this.fire("setField", "recurrenceException", singleAppointment, "");
                     if (!isDeleted && !isPopupEditing)
                         this.addAppointment(singleAppointment);
                     var recurrenceException = this._getRecurrenceException(exceptionDate, targetAppointment),
@@ -29466,14 +30155,16 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         this._updateAppointment(targetAppointment, updatedAppointment)
                 },
                 _getRecurrenceException: function(exceptionDate, targetAppointment) {
-                    var exceptionByDate = this._getRecurrenceExceptionDate(exceptionDate, targetAppointment.startDate);
-                    return targetAppointment.recurrenceException ? targetAppointment.recurrenceException + "," + exceptionByDate : exceptionByDate
+                    var startDate = this.fire("getField", "startDate", targetAppointment),
+                        exceptionByDate = this._getRecurrenceExceptionDate(exceptionDate, startDate),
+                        recurrenceException = this.fire("getField", "recurrenceException", targetAppointment);
+                    return recurrenceException ? recurrenceException + "," + exceptionByDate : exceptionByDate
                 },
                 _getRecurrenceExceptionDate: function(exceptionDate, targetStartDate) {
                     exceptionDate.setHours(targetStartDate.getHours());
                     exceptionDate.setMinutes(targetStartDate.getMinutes());
                     exceptionDate.setSeconds(targetStartDate.getSeconds());
-                    return Globalize.format(exceptionDate, "yyyyMMddThhmmss")
+                    return Globalize.format(exceptionDate, "yyyyMMddTHHmmss")
                 },
                 _showRecurrenceChangeConfirm: function(isDeleted) {
                     var message = Globalize.localize(isDeleted ? "dxScheduler-confirmRecurrenceDeleteMessage" : "dxScheduler-confirmRecurrenceEditMessage"),
@@ -29498,16 +30189,26 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 },
                 _getUpdatedData: function(options) {
                     var target = options.data,
-                        data = this.getTargetCellData(),
-                        targetStartDate = dateUtils.makeDate(target.startDate),
-                        targetEndDate = dateUtils.makeDate(target.endDate),
-                        date = data.date || targetStartDate,
-                        groups = data.groups,
+                        cellData = this.getTargetCellData(),
+                        targetAllDay = this.fire("getField", "allDay", target),
+                        targetStartDate = dateUtils.makeDate(this.fire("getField", "startDate", target)),
+                        targetEndDate = dateUtils.makeDate(this.fire("getField", "endDate", target)),
+                        allDay = cellData.allDay,
+                        date = cellData.date || targetStartDate,
+                        groups = cellData.groups,
                         duration = targetEndDate.getTime() - targetStartDate.getTime();
                     var updatedData = {};
-                    updatedData.allDay = data.allDay;
-                    updatedData.startDate = date;
-                    updatedData.endDate = new Date(date.getTime() + duration);
+                    this.fire("setField", "allDay", updatedData, allDay);
+                    this.fire("setField", "startDate", updatedData, date);
+                    var endDate = new Date(date.getTime() + duration);
+                    if (this.appointmentTakesAllDay(target) && !updatedData.allDay && this._workSpace.supportAllDayRow())
+                        endDate = this._workSpace.calculateEndDate(date);
+                    if (targetAllDay && !this._workSpace.supportAllDayRow()) {
+                        var dateCopy = new Date(date);
+                        dateCopy.setHours(0);
+                        endDate = new Date(dateCopy.getTime() + duration)
+                    }
+                    this.fire("setField", "endDate", updatedData, endDate);
                     for (var name in groups)
                         if (groups.hasOwnProperty(name))
                             updatedData[name] = groups[name];
@@ -29524,21 +30225,25 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         updatedData = this._getUpdatedData(options),
                         appointment = $.extend({}, target, updatedData),
                         coordinates = translator.locate($appointment),
-                        allowAllDay = this._workSpace.supportAllDayRow() && target.allDay,
+                        allDay = this.fire("getField", "allDay", target),
+                        allowAllDay = this._workSpace.supportAllDayRow() && allDay,
                         cellData = this._workSpace.getCellDataByCoordinates(coordinates, allowAllDay),
-                        appointmentDuration = appointment.endDate.getTime() - appointment.startDate.getTime();
-                    appointment.startDate = cellData.startDate;
-                    appointment.endDate = new Date(appointment.startDate.getTime() + appointmentDuration);
+                        startDate = this.fire("getField", "startDate", appointment),
+                        endDate = this.fire("getField", "endDate", appointment),
+                        appointmentDuration = endDate.getTime() - startDate.getTime();
+                    this.fire("setField", "startDate", appointment, cellData.startDate);
+                    this.fire("setField", "endDate", appointment, new Date(cellData.startDate.getTime() + appointmentDuration));
                     return appointment
                 },
-                subsribe: function(subject, action) {
+                subscribe: function(subject, action) {
                     this._subscribes[subject] = subscribes[subject] = action
                 },
-                fire: function(subject, args) {
-                    var callback = this._subscribes[subject];
+                fire: function(subject) {
+                    var callback = this._subscribes[subject],
+                        args = Array.prototype.slice.call(arguments);
                     if (!$.isFunction(callback))
                         throw errors.Error("E1031", subject);
-                    callback.call(this, args)
+                    return callback.apply(this, args.slice(1))
                 },
                 getTargetCellData: function() {
                     return this._workSpace.getDataByDroppableCell()
@@ -29571,7 +30276,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     $.when(actionOptions.cancel).then($.proxy(callback, this))
                 },
                 _expandAllDayPanel: function(appointment) {
-                    if (!this._isAllDayExpanded() && this.appointmentTakesAllDay(appointment))
+                    if (!this._isAllDayExpanded(this._appointments.option("items")) && this.appointmentTakesAllDay(appointment))
                         this._workSpace.option("allDayExpanded", true)
                 },
                 _executeActionWhenOperationIsCompleted: function(action, appointment, e) {
@@ -29611,7 +30316,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     return this._actions
                 },
                 appointmentTakesAllDay: function(appointment) {
-                    return appointment.allDay || this._appointmentModel.appointmentTakesAllDay(appointment.startDate, appointment.endDate, this.option("startDayHour"), this.option("endDayHour"))
+                    return this._appointmentModel.appointmentTakesAllDay(appointment, this.option("startDayHour"), this.option("endDayHour"))
                 },
                 recurrenceEditorVisibylityChanged: function(visible) {
                     if (this._appointmentForm)
@@ -29632,8 +30337,9 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     this._workSpace.scrollToTime(hours, minutes)
                 },
                 addAppointment: function(appointment) {
-                    if (!appointment.text)
-                        appointment.text = "";
+                    var text = this.fire("getField", "text", appointment);
+                    if (!text)
+                        this.fire("setField", "text", appointment, "");
                     var addingOptions = {
                             appointmentData: appointment,
                             cancel: false
@@ -29689,6 +30395,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     eventArgs,
                     exportingAction = this.option("exportingAction"),
                     exportedAction = this.option("exportedAction"),
+                    fileSavingAction = this.option("fileSavingAction"),
                     data,
                     documentCreator,
                     exportableComponent = options.component;
@@ -29704,7 +30411,12 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         documentCreator.ready().done(function() {
                             data = documentCreator.getData(commonUtils.isFunction(window.Blob));
                             commonUtils.isDefined(exportedAction) && exportedAction();
-                            DX.dxClientExporter.fileSaver.saveAs(eventArgs.fileName, options.format, data, options.proxyUrl)
+                            if (commonUtils.isDefined(fileSavingAction)) {
+                                eventArgs.data = data;
+                                fileSavingAction(eventArgs)
+                            }
+                            if (!eventArgs.cancel)
+                                DX.dxClientExporter.fileSaver.saveAs(eventArgs.fileName, options.format, data, options.proxyUrl)
                         })
                     }
                 }
@@ -29756,7 +30468,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 if (precision > 0) {
                     result = format !== "decimal" ? "." : "";
                     for (i = 0; i < precision; i++)
-                        result += "0";
+                        result = result + "0";
                     return result
                 }
                 return ""
@@ -29779,8 +30491,9 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     };
                     result = currency.pattern.slice();
                     for (symbol in encodeSymbols)
-                        for (i = 0; i < result.length; i++)
-                            result[i] = result[i].replace(new RegExp(symbol, "g"), encodeSymbols[symbol]);
+                        if (encodeSymbols.hasOwnProperty(symbol))
+                            for (i = 0; i < result.length; i++)
+                                result[i] = result[i].replace(new RegExp(symbol, "g"), encodeSymbols[symbol]);
                     return result.length === 2 ? result[1] + "_);" + result[0] : result[0]
                 }
             },
@@ -29810,26 +30523,15 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
         };
         exporter.ExcelCreator = Class.inherit({
             _getXMLTag: function(tagName, attributes, content) {
-                var result = ["<"],
-                    key;
-                result.push(tagName);
-                for (key in attributes) {
-                    result.push(" ");
-                    result.push(key);
-                    result.push("=\"");
-                    result.push(attributes[key]);
-                    result.push("\"")
+                var result = "<" + tagName,
+                    i,
+                    length = attributes.length,
+                    attr;
+                for (i = 0; i < length; i++) {
+                    attr = attributes[i];
+                    result = result + " " + attr.name + "=\"" + attr.value + "\""
                 }
-                if (commonUtils.isDefined(content)) {
-                    result.push(">");
-                    result.push(content);
-                    result.push("</");
-                    result.push(tagName);
-                    result.push(">")
-                }
-                else
-                    result.push(" />");
-                return result.join("")
+                return commonUtils.isDefined(content) ? result + ">" + content + "</" + tagName + ">" : result + " />"
             },
             _getDataProviderRowIndex: function(dpRowIndex) {
                 return dpRowIndex - !!this._dataProvider.isHeadersVisible()
@@ -29845,16 +30547,15 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     this._maxIndex[0] = Number(rowIndex);
                 if (this._maxIndex[1] < Number(cellIndex))
                     this._maxIndex[1] = Number(cellIndex);
-                do {
+                while (true) {
                     charCode = 65 + (cellIndex >= max ? cellIndex % max : Math.ceil(cellIndex));
                     sheetIndex = String.fromCharCode(charCode) + sheetIndex;
                     if (cellIndex >= max)
                         cellIndex = Math.floor(cellIndex / max) - 1;
                     else
                         break
-                } while (true);
-                sheetIndex += rowIndex;
-                return sheetIndex
+                }
+                return sheetIndex + rowIndex
             },
             _getDataType: function(dataType) {
                 var validTypes = {
@@ -29878,9 +30579,11 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     value = String(value);
                     if (value.length) {
                         value = stringUtils.encodeHtml(value);
-                        if ($.inArray(value, this._stringArray) === -1)
-                            this._stringArray.push(value);
-                        return $.inArray(value, this._stringArray)
+                        if (this._stringHash[value] === undefined) {
+                            this._stringHash[value] = this._stringArray.length;
+                            this._stringArray.push(value)
+                        }
+                        return this._stringHash[value]
                     }
                 }
             },
@@ -29940,12 +30643,15 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     cellsArray,
                     cellData,
                     result = [],
+                    rowsLength = this._dataProvider.getRowsCount(),
+                    cellsLength,
                     type,
                     styleID,
                     columns = this._dataProvider.getColumns();
-                for (rowIndex = 0; rowIndex < this._dataProvider.getRowsCount(); rowIndex++) {
+                for (rowIndex = 0; rowIndex < rowsLength; rowIndex++) {
                     cellsArray = [];
-                    for (cellIndex = 0; cellIndex !== columns.length; cellIndex++) {
+                    cellsLength = columns.length;
+                    for (cellIndex = 0; cellIndex !== cellsLength; cellIndex++) {
                         cellData = this._prepareValue(rowIndex, cellIndex);
                         type = cellData.type;
                         if (!this._dataProvider.isGroupRow(rowIndex) && commonUtils.isDefined(this._styleArray[cellIndex + BOLD_STYLES_COUNT].formatID) && cellData.type !== "s")
@@ -30011,21 +30717,32 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 this._cellsArray = this._cellsArray.concat(this._getDataArray())
             },
             _createXMLRelationships: function(xmlRelationships) {
-                return this._getXMLTag("Relationships", {xmlns: OPEN_XML_FORMAT_URL + "/package/2006/relationships"}, xmlRelationships)
+                return this._getXMLTag("Relationships", [{
+                            name: "xmlns",
+                            value: OPEN_XML_FORMAT_URL + "/package/2006/relationships"
+                        }], xmlRelationships)
             },
             _createXMLRelationship: function(id, type, target) {
-                return this._getXMLTag("Relationship", {
-                        Id: "rId" + id,
-                        Type: OPEN_XML_FORMAT_URL + "/officeDocument/2006/relationships/" + type,
-                        Target: target
-                    })
+                return this._getXMLTag("Relationship", [{
+                            name: "Id",
+                            value: "rId" + id
+                        }, {
+                            name: "Type",
+                            value: OPEN_XML_FORMAT_URL + "/officeDocument/2006/relationships/" + type
+                        }, {
+                            name: "Target",
+                            value: target
+                        }])
             },
             _getWorkbookContent: function() {
                 var content = "<bookViews><workbookView xWindow=\"0\" yWindow=\"0\" windowWidth=\"0\" windowHeight=\"0\"/></bookViews><sheets><sheet name=\"Sheet\" sheetId=\"1\" r:id=\"rId1\" /></sheets><definedNames><definedName name=\"_xlnm.Print_Titles\" localSheetId=\"0\">Sheet!$1:$1</definedName><definedName name=\"_xlnm._FilterDatabase\" hidden=\"0\" localSheetId=\"0\">Sheet!$A$1:$F$6332</definedName></definedNames>";
-                return XML_TAG + this._getXMLTag("workbook", {
-                        "xmlns:r": OPEN_XML_FORMAT_URL + "/officeDocument/2006/relationships",
-                        xmlns: OPEN_XML_FORMAT_URL + "/spreadsheetml/2006/main"
-                    }, content)
+                return XML_TAG + this._getXMLTag("workbook", [{
+                            name: "xmlns:r",
+                            value: OPEN_XML_FORMAT_URL + "/officeDocument/2006/relationships"
+                        }, {
+                            name: "xmlns",
+                            value: OPEN_XML_FORMAT_URL + "/spreadsheetml/2006/main"
+                        }], content)
             },
             _getContentTypesContent: function() {
                 return XML_TAG + "<Types xmlns=\"" + OPEN_XML_FORMAT_URL + "/package/2006/content-types\"><Default Extension=\"rels\" ContentType=\"application/vnd.openxmlformats-package.relationships+xml\" /><Default Extension=\"xml\" ContentType=\"application/xml\" /><Override PartName=\"/xl/worksheets/sheet1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml\" /><Override PartName=\"/xl/styles.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml\" /><Override PartName=\"/xl/sharedStrings.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.sharedStrings+xml\" /><Override PartName=\"/xl/workbook.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml\" /></Types>"
@@ -30033,60 +30750,103 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
             _generateStylesXML: function() {
                 var xlFolder = this._zip.folder(XL_FOLDER_NAME),
                     styleIndex,
+                    stylesLength = this._styleArray.length,
                     style,
                     xmlStyles = [],
                     formatIndex,
                     XML = "";
-                for (formatIndex in this._styleFormat)
-                    this._styleFormat[formatIndex] = this._getXMLTag("numFmt", {
-                        numFmtId: Number(formatIndex) + CUSTOM_FORMAT_START_INDEX,
-                        formatCode: this._styleFormat[formatIndex]
-                    });
-                XML += this._getXMLTag("numFmts", {count: this._styleFormat.length}, this._styleFormat.join(""));
-                XML += BASE_STYLE_XML;
-                for (styleIndex in this._styleArray) {
+                for (formatIndex = 0; formatIndex < this._styleFormat.length; formatIndex++)
+                    this._styleFormat[formatIndex] = this._getXMLTag("numFmt", [{
+                            name: "numFmtId",
+                            value: Number(formatIndex) + CUSTOM_FORMAT_START_INDEX
+                        }, {
+                            name: "formatCode",
+                            value: this._styleFormat[formatIndex]
+                        }]);
+                XML = XML + this._getXMLTag("numFmts", [{
+                        name: "count",
+                        value: this._styleFormat.length
+                    }], this._styleFormat.join("")) + BASE_STYLE_XML;
+                for (styleIndex = 0; styleIndex < stylesLength; styleIndex++) {
                     style = this._styleArray[styleIndex];
-                    xmlStyles.push(this._getXMLTag("xf", {
-                        xfId: 0,
-                        applyAlignment: 1,
-                        fontId: Number(!!style.bold),
-                        applyNumberFormat: commonUtils.isDefined(style.formatID) ? 1 : 0,
-                        numFmtId: commonUtils.isDefined(style.formatID) ? Number(style.formatID) + CUSTOM_FORMAT_START_INDEX - 1 : 0
-                    }, this._getXMLTag("alignment", {
-                        horizontal: style.alignment,
-                        vertical: "top",
-                        wrapText: style.wrapText
-                    })))
+                    xmlStyles.push(this._getXMLTag("xf", [{
+                            name: "xfId",
+                            value: 0
+                        }, {
+                            name: "applyAlignment",
+                            value: 1
+                        }, {
+                            name: "fontId",
+                            value: Number(!!style.bold)
+                        }, {
+                            name: "applyNumberFormat",
+                            value: commonUtils.isDefined(style.formatID) ? 1 : 0
+                        }, {
+                            name: "numFmtId",
+                            value: commonUtils.isDefined(style.formatID) ? Number(style.formatID) + CUSTOM_FORMAT_START_INDEX - 1 : 0
+                        }], this._getXMLTag("alignment", [{
+                            name: "horizontal",
+                            value: style.alignment
+                        }, {
+                            name: "vertical",
+                            value: "top"
+                        }, {
+                            name: "wrapText",
+                            value: style.wrapText
+                        }])))
                 }
-                XML += this._getXMLTag("cellXfs", {count: xmlStyles.length}, xmlStyles.join(""));
-                XML += this._getXMLTag("cellStyles", {count: 1}, this._getXMLTag("cellStyle", {
-                    name: "Normal",
-                    xfId: 0,
-                    builtinId: 0
-                }));
-                XML = XML_TAG + this._getXMLTag("styleSheet", {xmlns: OPEN_XML_FORMAT_URL + "/spreadsheetml/2006/main"}, XML);
+                XML = XML + this._getXMLTag("cellXfs", [{
+                        name: "count",
+                        value: xmlStyles.length
+                    }], xmlStyles.join(""));
+                XML = XML + this._getXMLTag("cellStyles", [{
+                        name: "count",
+                        value: 1
+                    }], this._getXMLTag("cellStyle", [{
+                        name: "name",
+                        value: "Normal"
+                    }, {
+                        name: "xfId",
+                        value: 0
+                    }, {
+                        name: "builtinId",
+                        value: 0
+                    }]));
+                XML = XML_TAG + this._getXMLTag("styleSheet", [{
+                        name: "xmlns",
+                        value: OPEN_XML_FORMAT_URL + "/spreadsheetml/2006/main"
+                    }], XML);
                 xlFolder.file(STYLE_FILE_NAME, XML);
                 this._styleArray = []
             },
             _generateStringsXML: function() {
                 var xlFolder = this._zip.folder(XL_FOLDER_NAME),
                     stringIndex,
+                    stringsLength = this._stringArray.length,
                     sharedStringXml = XML_TAG;
-                for (stringIndex in this._stringArray)
-                    this._stringArray[stringIndex] = this._getXMLTag("si", {}, this._getXMLTag("t", {}, this._stringArray[stringIndex]));
-                sharedStringXml += this._getXMLTag("sst", {
-                    xmlns: OPEN_XML_FORMAT_URL + "/spreadsheetml/2006/main",
-                    count: this._stringArray.length,
-                    uniqueCount: this._stringArray.length
-                }, this._stringArray.join(""));
+                for (stringIndex = 0; stringIndex < stringsLength; stringIndex++)
+                    this._stringArray[stringIndex] = this._getXMLTag("si", [], this._getXMLTag("t", [], this._stringArray[stringIndex]));
+                sharedStringXml = sharedStringXml + this._getXMLTag("sst", [{
+                        name: "xmlns",
+                        value: OPEN_XML_FORMAT_URL + "/spreadsheetml/2006/main"
+                    }, {
+                        name: "count",
+                        value: this._stringArray.length
+                    }, {
+                        name: "uniqueCount",
+                        value: this._stringArray.length
+                    }], this._stringArray.join(""));
                 xlFolder.file(SHAREDSTRING_FILE_NAME, sharedStringXml);
                 this._stringArray = []
             },
             _getPaneXML: function() {
-                var attributes = {
-                        activePane: "bottomLeft",
-                        state: "frozen"
-                    },
+                var attributes = [{
+                            name: "activePane",
+                            value: "bottomLeft"
+                        }, {
+                            name: "state",
+                            value: "frozen"
+                        }],
                     frozenArea = commonUtils.isDefined(this._dataProvider.getFrozenArea) ? this._dataProvider.getFrozenArea() : {
                         x: 0,
                         y: Number(this._dataProvider.isHeadersVisible())
@@ -30094,10 +30854,19 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 if (!(frozenArea.x || frozenArea.y))
                     return "";
                 if (frozenArea.x)
-                    attributes['xSplit'] = frozenArea.x;
+                    attributes.push({
+                        name: "xSplit",
+                        value: frozenArea.x
+                    });
                 if (frozenArea.y)
-                    attributes['ySplit'] = frozenArea.y;
-                attributes['topLeftCell'] = this._getCellIndex(frozenArea.y + 1, frozenArea.x);
+                    attributes.push({
+                        name: "ySplit",
+                        value: frozenArea.y
+                    });
+                attributes.push({
+                    name: "topLeftCell",
+                    value: this._getCellIndex(frozenArea.y + 1, frozenArea.x)
+                });
                 return this._getXMLTag("pane", attributes)
             },
             _generateWorksheetXML: function() {
@@ -30108,32 +30877,53 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     maxCellIndex,
                     counter = 0,
                     xmlRows = [],
-                    rSpans = "1:" + this._colsArray.length,
+                    rowsLength = this._cellsArray.length,
+                    cellsLength,
+                    colsLength = this._colsArray.length,
+                    rSpans = "1:" + colsLength,
                     xmlResult = [["<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><worksheet xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" mc:Ignorable=\"x14ac\" xmlns:x14ac=\"http://schemas.microsoft.com/office/spreadsheetml/2009/9/ac\">", this._needSheetPr ? GROUP_SHEET_PR_XML : SINGLE_SHEET_PR_XML, "<dimension ref=\"A1:", this._getCellIndex(this._maxIndex[0], this._maxIndex[1]) + "\"/><sheetViews><sheetView " + (this._rtlEnabled ? "rightToLeft=\"1\" " : "") + "tabSelected=\"1\" workbookViewId=\"0\">" + this._getPaneXML() + "</sheetView></sheetViews><sheetFormatPr defaultRowHeight=\"15\" outlineLevelRow=\"", this._dataProvider.getRowsCount() > 0 ? this._dataProvider.getGroupLevel(0) : 0, "\" x14ac:dyDescent=\"0.25\"/>"].join("")];
-                for (colIndex in this._colsArray)
-                    this._colsArray[colIndex] = this._getXMLTag("col", {
-                        width: this._colsArray[colIndex],
-                        min: Number(colIndex) + 1,
-                        max: Number(colIndex) + 1
-                    });
+                for (colIndex = 0; colIndex < colsLength; colIndex++)
+                    this._colsArray[colIndex] = this._getXMLTag("col", [{
+                            name: "width",
+                            value: this._colsArray[colIndex]
+                        }, {
+                            name: "min",
+                            value: Number(colIndex) + 1
+                        }, {
+                            name: "max",
+                            value: Number(colIndex) + 1
+                        }]);
                 xmlResult.push(this._getXMLTag("cols", [], this._colsArray.join("")) + "<sheetData>");
-                for (rowIndex in this._cellsArray) {
+                for (rowIndex = 0; rowIndex < rowsLength; rowIndex++) {
                     xmlCells = [];
-                    for (colIndex in this._cellsArray[rowIndex]) {
+                    cellsLength = this._cellsArray[rowIndex].length;
+                    for (colIndex = 0; colIndex < cellsLength; colIndex++) {
                         rowIndex = Number(rowIndex);
                         cellData = this._cellsArray[rowIndex][colIndex];
-                        xmlCells.push(this._getXMLTag("c", {
-                            r: this._getCellIndex(rowIndex + 1, colIndex),
-                            s: cellData.style,
-                            t: cellData.type
-                        }, commonUtils.isDefined(cellData.value) ? this._getXMLTag("v", {}, cellData.value) : null))
+                        xmlCells.push(this._getXMLTag("c", [{
+                                name: "r",
+                                value: this._getCellIndex(rowIndex + 1, colIndex)
+                            }, {
+                                name: "s",
+                                value: cellData.style
+                            }, {
+                                name: "t",
+                                value: cellData.type
+                            }], commonUtils.isDefined(cellData.value) ? this._getXMLTag("v", [], cellData.value) : null))
                     }
-                    xmlRows.push(this._getXMLTag("row", {
-                        r: Number(rowIndex) + 1,
-                        spans: rSpans,
-                        outlineLevel: !Number(rowIndex) ? 0 : this._dataProvider.getGroupLevel(this._getDataProviderRowIndex(rowIndex)),
-                        "x14ac:dyDescent": "0.25"
-                    }, xmlCells.join("")));
+                    xmlRows.push(this._getXMLTag("row", [{
+                            name: "r",
+                            value: Number(rowIndex) + 1
+                        }, {
+                            name: "spans",
+                            value: rSpans
+                        }, {
+                            name: "outlineLevel",
+                            value: !Number(rowIndex) ? 0 : this._dataProvider.getGroupLevel(this._getDataProviderRowIndex(rowIndex))
+                        }, {
+                            name: "x14ac:dyDescent",
+                            value: "0.25"
+                        }], xmlCells.join("")));
                     this._cellsArray[rowIndex] = null;
                     if (counter++ > 10000) {
                         xmlResult.push(xmlRows.join(""));
@@ -30144,27 +30934,30 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 xmlResult.push(xmlRows.join(""));
                 xmlRows = [];
                 maxCellIndex = this._getCellIndex(this._maxIndex[0], this._maxIndex[1]);
-                xmlResult.push("</sheetData>" + this._generateMerginXML() + (this._options.autoFilterEnabled ? "<autoFilter ref=\"A1:" + maxCellIndex + "\" />" : "") + "<ignoredErrors><ignoredError sqref=\"A1:" + maxCellIndex + "\" numberStoredAsText=\"1\" /></ignoredErrors></worksheet>");
+                xmlResult.push("</sheetData>" + this._generateMergingXML() + (this._options.autoFilterEnabled ? "<autoFilter ref=\"A1:" + maxCellIndex + "\" />" : "") + "<ignoredErrors><ignoredError sqref=\"A1:" + maxCellIndex + "\" numberStoredAsText=\"1\" /></ignoredErrors></worksheet>");
                 this._zip.folder(XL_FOLDER_NAME).folder(WORKSHEETS_FOLDER).file(WORKSHEET_FILE_NAME, xmlResult.join(""));
                 this._colsArray = [];
                 this._cellsArray = [];
                 xmlResult = []
             },
-            _generateMerginXML: function() {
+            _generateMergingXML: function() {
                 var k,
                     l,
-                    mergeCount = 0,
                     cellIndex,
                     rowIndex,
+                    rowsLength = this._dataProvider.getRowsCount(),
+                    columnsLength = this._dataProvider.getColumns().length,
                     usedArea = [],
                     mergeArray = [],
+                    mergeArrayLength,
+                    mergeIndex,
                     mergeXML = '';
-                if (!commonUtils.isDefined(this._dataProvider.getCellMergin))
+                if (!commonUtils.isDefined(this._dataProvider.getCellMerging))
                     return "";
-                for (rowIndex = 0; rowIndex < this._dataProvider.getRowsCount(); rowIndex++)
-                    for (cellIndex = 0; cellIndex !== this._dataProvider.getColumns().length; cellIndex++)
+                for (rowIndex = 0; rowIndex < rowsLength; rowIndex++)
+                    for (cellIndex = 0; cellIndex !== columnsLength; cellIndex++)
                         if (!commonUtils.isDefined(usedArea[rowIndex]) || !commonUtils.isDefined(usedArea[rowIndex][cellIndex])) {
-                            var cellMerge = this._dataProvider.getCellMergin(rowIndex, cellIndex);
+                            var cellMerge = this._dataProvider.getCellMerging(rowIndex, cellIndex);
                             if (cellMerge.colspan || cellMerge.rowspan) {
                                 mergeArray.push({
                                     start: this._getCellIndex(rowIndex + 1, cellIndex),
@@ -30178,11 +30971,16 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                                     }
                             }
                         }
-                for (var mergeIndex in mergeArray) {
-                    mergeCount++;
-                    mergeXML += this._getXMLTag("mergeCell", {ref: mergeArray[mergeIndex].start + ":" + mergeArray[mergeIndex].end})
-                }
-                return mergeXML.length ? this._getXMLTag("mergeCells", {count: mergeCount}, mergeXML) : ""
+                mergeArrayLength = mergeArray.length;
+                for (mergeIndex = 0; mergeIndex < mergeArrayLength; mergeIndex++)
+                    mergeXML = mergeXML + this._getXMLTag("mergeCell", [{
+                            name: "ref",
+                            value: mergeArray[mergeIndex].start + ":" + mergeArray[mergeIndex].end
+                        }]);
+                return mergeXML.length ? this._getXMLTag("mergeCells", [{
+                            name: "count",
+                            value: mergeArrayLength
+                        }], mergeXML) : ""
             },
             _generateCommonXML: function() {
                 var relsFileContent = XML_TAG + this._createXMLRelationships(this._createXMLRelationship(1, "officeDocument", "xl/" + WORKBOOK_FILE_NAME)),
@@ -30191,7 +30989,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     relsXML = XML_TAG;
                 this._zip.folder("_" + RELATIONSHIP_PART_NAME).file("." + RELATIONSHIP_PART_NAME, relsFileContent);
                 xmlRelationships = this._createXMLRelationship(1, "worksheet", "worksheets/" + WORKSHEET_FILE_NAME) + this._createXMLRelationship(2, "styles", STYLE_FILE_NAME) + this._createXMLRelationship(3, "sharedStrings", SHAREDSTRING_FILE_NAME);
-                relsXML += this._createXMLRelationships(xmlRelationships);
+                relsXML = relsXML + this._createXMLRelationships(xmlRelationships);
                 xlFolder.folder("_" + RELATIONSHIP_PART_NAME).file(WORKBOOK_FILE_NAME + ".rels", relsXML);
                 xlFolder.file(WORKBOOK_FILE_NAME, this._getWorkbookContent());
                 this._zip.file(CONTENTTYPES_FILE_NAME, this._getContentTypesContent())
@@ -30212,6 +31010,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 this._options = options;
                 this._maxIndex = [1, 2];
                 this._stringArray = [];
+                this._stringHash = {};
                 this._styleArray = [];
                 this._colsArray = [];
                 this._cellsArray = [];

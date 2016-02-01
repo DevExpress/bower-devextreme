@@ -1,9 +1,9 @@
 /*! 
 * DevExtreme (Core Library)
-* Version: 15.2.4
-* Build date: Dec 8, 2015
+* Version: 15.2.5
+* Build date: Jan 27, 2016
 *
-* Copyright (c) 2012 - 2015 Developer Express Inc. ALL RIGHTS RESERVED
+* Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
 */
 
@@ -11,49 +11,60 @@
 if (!window.DevExpress || !DevExpress.MOD_CORE) {
     /*! Module core, file modules.js */
     (function(global, $) {
-        global.DevExpress = global.DevExpress || {};
-        var ModuleDefinitions = function(DevExpress) {
+        var ModuleDefinitions = function() {
                 var DeferModule = function() {
                         var loadedModules = {};
-                        return function(name) {
-                                var __definition = null;
-                                this.define = function(definition) {
-                                    if (__definition)
-                                        throw"'" + name + "' module definition is already present";
-                                    __definition = definition
-                                };
+                        return function(name, definition, dependencies) {
+                                var loading = false;
                                 this.load = function() {
-                                    loadedModules[name] = loadedModules[name] || __definition();
-                                    return loadedModules[name]
-                                }
+                                    var module = loadedModules[name];
+                                    if (module) {
+                                        if (loading)
+                                            throw"circular dependency to '" + name + "' module with AMD syntax is not allowed";
+                                        return module.exports
+                                    }
+                                    return load().exports
+                                };
+                                var load = function() {
+                                        var module = loadedModules[name] = {exports: {}};
+                                        if (dependencies === null && definition.length)
+                                            definition.call(global, module, module.exports, requireSingle);
+                                        else {
+                                            loading = true;
+                                            module.exports = definition.apply(global, mapDependencies(dependencies));
+                                            loading = false
+                                        }
+                                        return module
+                                    }
                             }
                     }();
                 var deferModules = {};
-                var requireSingle = function(name) {
+                var requireModule = function(name) {
                         var module = deferModules[name];
                         if (!module)
                             throw"'" + name + "' module definition is absent";
                         return module.load()
                     };
+                var requireSingle = function(dependency) {
+                        switch (dependency) {
+                            case"jquery":
+                            case"domReady":
+                                return $;
+                            case"domReady!":
+                                return dependency;
+                            case"require":
+                                return require;
+                            default:
+                                return requireModule(dependency)
+                        }
+                    };
                 var mapDependencies = function(dependencies) {
-                        return $.map(dependencies, function(name) {
-                                switch (name) {
-                                    case"jquery":
-                                    case"domReady":
-                                        return jQuery;
-                                    case"domReady!":
-                                        return name;
-                                    case"require":
-                                        return require;
-                                    default:
-                                        return requireSingle(name)
-                                }
-                            })
+                        return $.map(dependencies || [], requireSingle)
                     };
                 var require = function(dependencies, callback) {
                         if (!$.isArray(dependencies))
                             return requireSingle(dependencies);
-                        if (DevExpress.preserveRequire)
+                        if (global.DevExpress.preserveRequire)
                             return;
                         dependencies = mapDependencies(dependencies);
                         callback = callback || $.noop;
@@ -63,18 +74,22 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                         $.inArray("domReady!", dependencies) ? $(exec) : exec()
                     };
                 var define = function(name, dependencies, definition) {
-                        deferModules[name] = deferModules[name] || new DeferModule(name);
-                        deferModules[name].define(function() {
-                            return definition.apply(global, mapDependencies(dependencies))
-                        })
+                        if ($.isFunction(dependencies)) {
+                            definition = dependencies;
+                            dependencies = null
+                        }
+                        if (deferModules[name])
+                            throw"'" + name + "' module definition is already present";
+                        deferModules[name] = new DeferModule(name, definition, dependencies)
                     };
                 return {
                         require: require,
                         define: define
                     }
-            }(global.DevExpress);
-        global.DevExpress.require = ModuleDefinitions.require;
-        global.DevExpress.define = ModuleDefinitions.define
+            }();
+        var DevExpress = global.DevExpress = global.DevExpress || {};
+        DevExpress.require = ModuleDefinitions.require;
+        DevExpress.define = ModuleDefinitions.define
     })(this, jQuery);
     /*! Module core, file utils.animationFrame.js */
     DevExpress.define("/utils/utils.animationFrame", ["jquery"], function($) {
@@ -274,6 +289,9 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
         var isDate = function(object) {
                 return $.type(object) === 'date'
             };
+        var isBoolean = function(object) {
+                return $.type(object) === "boolean"
+            };
         var isFunction = function(object) {
                 return $.type(object) === 'function'
             };
@@ -319,11 +337,11 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                 $.each(items, function(index, itemSrc) {
                     var matchCount = 0,
                         item = mapFn ? mapFn(itemSrc) : itemSrc;
-                    $.each(targetFilter, function(paramName) {
+                    $.each(targetFilter, function(paramName, targetValue) {
                         var value = item[paramName];
                         if (value === undefined)
                             return;
-                        if (value === targetFilter[paramName]) {
+                        if (match(value, targetValue)) {
                             matchCount++;
                             return
                         }
@@ -339,6 +357,23 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                     bestMatches.push(itemSrc)
                 });
                 return bestMatches
+            };
+        var match = function(value, targetValue) {
+                if ($.isArray(value) && $.isArray(targetValue)) {
+                    var mismatch = false;
+                    $.each(value, function(index, valueItem) {
+                        if (valueItem !== targetValue[index]) {
+                            mismatch = true;
+                            return false
+                        }
+                    });
+                    if (mismatch)
+                        return false;
+                    return true
+                }
+                if (value === targetValue)
+                    return true;
+                return false
             };
         var splitPair = function(raw) {
                 switch (typeof raw) {
@@ -371,6 +406,7 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                 isObject: isObject,
                 isArray: isArray,
                 isDate: isDate,
+                isBoolean: isBoolean,
                 isFunction: isFunction,
                 isPrimitive: isPrimitive,
                 isExponential: isExponential,
@@ -554,6 +590,10 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                 }
                 if (withCorrection && dateUnitInterval !== "hour" && dateUnitInterval !== "minute" && dateUnitInterval !== "second")
                     fixTimezoneGap(oldDate, date)
+            };
+        var trimTime = function(date) {
+                dateUtils.correctDateWithUnitBeginning(date, "day");
+                return date
             };
         var getDatesDifferences = function(date1, date2) {
                 var differences,
@@ -758,7 +798,7 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                 return date && date.getFullYear() - date.getFullYear() % 10
             };
         var getShortDate = function(date) {
-                return Globalize.format(date, "yyyy/M/d")
+                return Globalize.format(date, "yyyy'/'M'/'d")
             };
         var getFirstMonthDate = function(date) {
                 if (!isDefined(date))
@@ -815,17 +855,29 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                     date = new Date(date);
                 return date
             };
+        var NUMBER_SERIALIZATION_FORMAT = "number",
+            DATE_SERIALIZATION_FORMAT = "yyyy'/'MM'/'dd",
+            DATETIME_SERIALIZATION_FORMAT = "yyyy'/'MM'/'dd HH:mm:ss";
+        var getDateSerializationFormat = function(value) {
+                if (commonUtils.isNumber(value))
+                    return NUMBER_SERIALIZATION_FORMAT;
+                else if (commonUtils.isString(value))
+                    if (value.indexOf(":") >= 0)
+                        return DATETIME_SERIALIZATION_FORMAT;
+                    else
+                        return DATE_SERIALIZATION_FORMAT
+            };
         var deserializeDate = function(value, serializationFormat) {
                 var parsedValue;
-                if (!serializationFormat || serializationFormat === "number" || serializationFormat === "yyyy/MM/dd") {
-                    parsedValue = serializationFormat === "number" ? value : !isDate(value) && Date.parse(value);
+                if (!serializationFormat || serializationFormat === NUMBER_SERIALIZATION_FORMAT || serializationFormat === DATE_SERIALIZATION_FORMAT || serializationFormat === DATETIME_SERIALIZATION_FORMAT) {
+                    parsedValue = serializationFormat === NUMBER_SERIALIZATION_FORMAT ? value : !isDate(value) && Date.parse(value);
                     return parsedValue ? new Date(parsedValue) : value
                 }
                 if (value !== undefined)
                     return Globalize.parseDate(value, serializationFormat)
             };
         var serializeDate = function(value, serializationFormat) {
-                if (serializationFormat === "number")
+                if (serializationFormat === NUMBER_SERIALIZATION_FORMAT)
                     return value && value.valueOf && value.valueOf();
                 if (serializationFormat)
                     return Globalize.format(value, serializationFormat);
@@ -839,6 +891,7 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                 getDateUnitInterval: getDateUnitInterval,
                 getDatesDifferences: getDatesDifferences,
                 correctDateWithUnitBeginning: correctDateWithUnitBeginning,
+                trimTime: trimTime,
                 addInterval: addInterval,
                 getDateIntervalByString: getDateIntervalByString,
                 sameMonthAndYear: sameMonthAndYear,
@@ -870,6 +923,7 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                 makeDate: makeDate,
                 deserializeDate: deserializeDate,
                 serializeDate: serializeDate,
+                getDateSerializationFormat: getDateSerializationFormat,
                 getDatesInterval: getDatesInterval
             };
         return dateUtils
@@ -928,7 +982,8 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                     $(".dx-viewport").css(support.styleProp("user-select"), "none");
                 $(metaSelector).attr("content", metaVerbs.join());
                 $("html").css("-ms-touch-action", msTouchVerbs.join(" ") || "none");
-                if (support.touch)
+                realDevice = devices.real();
+                if (support.touch && !(realDevice.platform === "win" && realDevice.version[0] === 10))
                     $(document).off(".dxInitMobileViewport").on("dxpointermove.dxInitMobileViewport", function(e) {
                         var count = e.pointers.length,
                             isTouchEvent = e.pointerType === "touch",
@@ -937,7 +992,6 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                         if (isTouchEvent && (zoomDisabled || panDisabled))
                             e.preventDefault()
                     });
-                realDevice = devices.real();
                 if (realDevice.ios) {
                     var isPhoneGap = document.location.protocol === "file:";
                     if (!isPhoneGap)
@@ -997,11 +1051,10 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                 return result
             };
         var createMarkupFromString = function(str) {
+                if (!window.WinJS)
+                    return $(str);
                 var tempElement = $("<div />");
-                if (window.WinJS)
-                    WinJS.Utilities.setInnerHTMLUnsafe(tempElement.get(0), str);
-                else
-                    tempElement.append(str);
+                window.WinJS.Utilities.setInnerHTMLUnsafe(tempElement.get(0), str);
                 return tempElement.contents()
             };
         var normalizeTemplateElement = function(element) {
@@ -1724,77 +1777,100 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
     });
     /*! Module core, file utils.inkRipple.js */
     DevExpress.define("/utils/utils.inkRipple", ["jquery", "/action"], function($, Action) {
-        var DX = DevExpress,
-            fx = DX.fx;
         var INKRIPPLE_CLASS = "dx-inkripple",
             INKRIPPLE_WAVE_CLASS = "dx-inkripple-wave",
-            INKRIPPLE_REMOVING_CLASS = "dx-inkripple-removing";
-        var DEFAULT_WAVE_SIZE_COEFFICIENT = 2.8,
-            MAX_WAVE_SIZE = 4000;
+            INKRIPPLE_SHOWING_CLASS = "dx-inkripple-showing",
+            INKRIPPLE_HIDING_CLASS = "dx-inkripple-hiding";
+        var DEFAULT_WAVE_SIZE_COEFFICIENT = 2,
+            MAX_WAVE_SIZE = 4000,
+            ANIMATION_DURATION = 300,
+            HOLD_ANIMATION_DURATION = 1000,
+            DEFAULT_WAVE_INDEX = 0;
         var render = function(args) {
                 args = args || {};
+                if (args.useHoldAnimation === undefined)
+                    args.useHoldAnimation = true;
                 var config = {
                         waveSizeCoefficient: args.waveSizeCoefficient || DEFAULT_WAVE_SIZE_COEFFICIENT,
-                        isCentered: args.isCentered || false
+                        isCentered: args.isCentered || false,
+                        wavesNumber: args.wavesNumber || 1,
+                        durations: getDurations(args.useHoldAnimation)
                     };
                 return {
-                        renderWave: $.proxy(renderWave, null, config),
-                        removeWave: $.proxy(removeWave, null, config)
+                        showWave: $.proxy(showWave, null, config),
+                        hideWave: $.proxy(hideWave, null, config)
                     }
             };
-        var renderWave = function(args, config) {
+        var getInkRipple = function(element) {
+                var result = element.children("." + INKRIPPLE_CLASS);
+                if (result.length === 0)
+                    result = $("<div>").addClass(INKRIPPLE_CLASS).appendTo(element);
+                return result
+            };
+        var getWaves = function(element, wavesNumber) {
+                var inkRipple = getInkRipple(element),
+                    result = inkRipple.children("." + INKRIPPLE_WAVE_CLASS);
+                for (var i = result.length; i < wavesNumber; i++) {
+                    var $currentWave = $("<div>").appendTo(inkRipple).addClass(INKRIPPLE_WAVE_CLASS);
+                    result.push($currentWave[0])
+                }
+                return result
+            };
+        var getWaveStyleConfig = function(args, config) {
                 var element = config.element,
-                    inkRipple = element.children("." + INKRIPPLE_CLASS);
-                if (inkRipple.length === 0)
-                    inkRipple = $("<div>").addClass(INKRIPPLE_CLASS).appendTo(element);
-                var elementWidth = element.width(),
+                    elementWidth = element.width(),
                     elementHeight = element.height(),
-                    maxContentSize = Math.max(elementWidth, elementHeight),
-                    rippleSize = Math.min(MAX_WAVE_SIZE, parseInt(maxContentSize * args.waveSizeCoefficient)),
+                    elementDiagonal = parseInt(Math.sqrt(elementWidth * elementWidth + elementHeight * elementHeight)),
+                    waveSize = Math.min(MAX_WAVE_SIZE, parseInt(elementDiagonal * args.waveSizeCoefficient)),
                     left,
                     top;
-                var $wave = $("<div>").appendTo(inkRipple).addClass(INKRIPPLE_WAVE_CLASS);
                 if (args.isCentered) {
-                    left = (elementWidth - rippleSize) / 2;
-                    top = (elementHeight - rippleSize) / 2
+                    left = (elementWidth - waveSize) / 2;
+                    top = (elementHeight - waveSize) / 2
                 }
                 else {
                     var event = config.jQueryEvent,
-                        position = element.offset(),
+                        position = config.element.offset(),
                         x = event.pageX - position.left,
                         y = event.pageY - position.top;
-                    left = x - rippleSize / 2;
-                    top = y - rippleSize / 2
+                    left = x - waveSize / 2;
+                    top = y - waveSize / 2
                 }
-                var duration = parseInt(rippleSize * 3);
-                $wave.css({
-                    left: left,
-                    top: top,
-                    height: rippleSize,
-                    width: rippleSize
-                });
-                fx.animate($wave, {
-                    type: "pop",
-                    from: {scale: 0},
-                    to: {scale: 1},
-                    duration: duration
-                })
+                return {
+                        left: left,
+                        top: top,
+                        height: waveSize,
+                        width: waveSize
+                    }
             };
-        var removeWave = function(args, config) {
-                var $inkRipple = config.element.find("." + INKRIPPLE_CLASS),
-                    $wave = $inkRipple.children(":not(." + INKRIPPLE_REMOVING_CLASS + ")").eq(0);
-                if ($wave.length === 0)
-                    return;
-                if (fx.isAnimating($wave))
-                    fx.stop($wave);
-                $wave.addClass(INKRIPPLE_REMOVING_CLASS);
-                fx.animate($wave, {
-                    complete: function() {
-                        $wave.remove()
-                    },
-                    type: "fadeOut",
-                    duration: 100
-                })
+        var showWave = function(args, config) {
+                var $wave = getWaves(config.element, args.wavesNumber).eq(config.wave || DEFAULT_WAVE_INDEX);
+                args.hidingTimeout && clearTimeout(args.hidingTimeout);
+                hideSelectedWave($wave);
+                $wave.css(getWaveStyleConfig(args, config));
+                setTimeout($.proxy(showingWaveHandler, null, args, $wave), 0)
+            };
+        var showingWaveHandler = function(args, $wave) {
+                var durationCss = args.durations.showingScale + "ms";
+                $wave.addClass(INKRIPPLE_SHOWING_CLASS).css("transition-duration", durationCss)
+            };
+        var getDurations = function(useHoldAnimation) {
+                return {
+                        showingScale: useHoldAnimation ? HOLD_ANIMATION_DURATION : ANIMATION_DURATION,
+                        hidingScale: ANIMATION_DURATION,
+                        hidingOpacity: ANIMATION_DURATION
+                    }
+            };
+        var hideSelectedWave = function($wave) {
+                $wave.removeClass(INKRIPPLE_HIDING_CLASS).css("transition-duration", "")
+            };
+        var hideWave = function(args, config) {
+                var $wave = getWaves(config.element, config.wavesNumber).eq(config.wave || DEFAULT_WAVE_INDEX),
+                    durations = args.durations,
+                    durationCss = durations.hidingScale + "ms, " + durations.hidingOpacity + "ms";
+                $wave.addClass(INKRIPPLE_HIDING_CLASS).removeClass(INKRIPPLE_SHOWING_CLASS).css("transition-duration", durationCss);
+                var animationDuration = Math.max(durations.hidingScale, durations.hidingOpacity);
+                args.hidingTimeout = setTimeout($.proxy(hideSelectedWave, null, $wave), animationDuration)
             };
         return {render: render}
     });
@@ -2084,7 +2160,12 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
             }
     });
     /*! Module core, file utils.position.js */
-    DevExpress.define("/utils/utils.position", ["/utils/utils.translator", "/utils/utils.string", "/utils/utils.support", "/utils/utils.common"], function(translator, stringUtils, support, commonUtils) {
+    DevExpress.define("/utils/utils.position", function(module, exports, require) {
+        var $ = require("jquery");
+        var translator = require("/utils/utils.translator");
+        var stringUtils = require("/utils/utils.string");
+        var support = require("/utils/utils.support");
+        var commonUtils = require("/utils/utils.common");
         var horzRe = /left|right/,
             vertRe = /top|bottom/,
             collisionRe = /fit|flip|none/;
@@ -2375,11 +2456,11 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
             inverseAlign: inverseAlign,
             normalizeAlign: normalizeAlign
         });
-        return {
-                calculateScrollbarWidth: calculateScrollbarWidth,
-                calculate: calculatePosition,
-                setup: position
-            }
+        module.exports = {
+            calculateScrollbarWidth: calculateScrollbarWidth,
+            calculate: calculatePosition,
+            setup: position
+        }
     });
     /*! Module core, file utils.proxyUrlFormatter.js */
     DevExpress.define("/utils/utils.proxyUrlFormatter", ["jquery"], function($) {
@@ -2746,7 +2827,7 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
         var getDateByAsciiString = function(string) {
                 if (typeof string !== "string")
                     return string;
-                var date = Globalize.parseDate(string, "yyyyMMddThhmmss");
+                var date = Globalize.parseDate(string, "yyyyMMddTHHmmss");
                 if (!date)
                     date = Globalize.parseDate(string, "yyyyMMdd");
                 return date
@@ -2923,12 +3004,19 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                         return text.replace(new RegExp("(" + preg_quote(searchToken) + ")", "gi"), replacementToken)
                     }
             }();
+        var isEmpty = function(text) {
+                var SPACE_REGEXP = /\s/g;
+                return function(text) {
+                        return !text || !text.replace(SPACE_REGEXP, "")
+                    }
+            }();
         return {
                 encodeHtml: encodeHtml,
                 pairToObject: pairToObject,
                 quadToObject: quadToObject,
                 format: stringFormat,
-                replaceAll: replaceAll
+                replaceAll: replaceAll,
+                isEmpty: isEmpty
             }
     });
     /*! Module core, file utils.support.js */
@@ -3002,11 +3090,12 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                 }
             };
         var touchEvents = "ontouchstart" in window && !('callPhantom' in window),
-            pointerEvents = !!window.navigator.pointerEnabled || !!window.navigator.msPointerEnabled;
+            pointerEvents = !!window.navigator.pointerEnabled || !!window.navigator.msPointerEnabled,
+            touchPointersPresent = !!window.navigator.maxTouchPoints || !!window.navigator.msMaxTouchPoints;
         return {
                 touchEvents: touchEvents,
-                pointer: pointerEvents,
-                touch: touchEvents || pointerEvents,
+                pointerEvents: pointerEvents,
+                touch: touchEvents || pointerEvents && touchPointersPresent,
                 transform: supportProp("transform"),
                 transition: supportProp("transition"),
                 transitionEndEventName: transitionEndEventNames[styleProp("transition")],
@@ -3448,8 +3537,8 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
             "dxFileUploader-uploaded": "Uploaded",
             "dxFileUploader-readyToUpload": "Ready to upload",
             "dxFileUploader-uploadFailedMessage": "Upload failed",
-            "dxRangeSlider-ariaFrom": "From {0}",
-            "dxRangeSlider-ariaTill": "Till {0}",
+            "dxRangeSlider-ariaFrom": "From",
+            "dxRangeSlider-ariaTill": "Till",
             "dxSwitch-onText": "ON",
             "dxSwitch-offText": "OFF",
             "dxForm-optionalMark": "optional"
@@ -3638,7 +3727,7 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
         return registerComponent
     });
     /*! Module core, file component.js */
-    DevExpress.define("/component", ["/class", "/eventsMixin", "/action", "/errors", "/utils/utils.inflector", "/utils/utils.common", "/utils/utils.publicComponent", "/devices"], function(Class, EventsMixin, Action, errors, inflector, commonUtils, publicComponentUtils, devices) {
+    DevExpress.define("/component", ["jquery", "/class", "/eventsMixin", "/action", "/errors", "/utils/utils.inflector", "/utils/utils.common", "/utils/utils.publicComponent", "/devices"], function($, Class, EventsMixin, Action, errors, inflector, commonUtils, publicComponentUtils, devices) {
         var dataUtils = DevExpress.data.utils;
         var cachedGetters = {};
         var cachedSetters = {};
@@ -3829,6 +3918,7 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                 _resumeDeprecatedWarnings: function() {
                     this._deprecatedOptionsSuppressed = false
                 },
+                _optionChanging: $.noop,
                 _notifyOptionChanged: function(option, value, previousValue) {
                     var that = this;
                     if (this._initialized)
@@ -3957,6 +4047,8 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                             var prevValue = getOptionValue(name, false);
                             if (that._optionValuesEqual(name, prevValue, value))
                                 return;
+                            if (that._initialized)
+                                that._optionChanging(name, prevValue, value);
                             setOptionValue(name, value);
                             that._notifyOptionChanged(name, value, prevValue)
                         })
@@ -4181,7 +4273,7 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
     });
     /*! Module core, file version.js */
     DevExpress.define("/version", [], function() {
-        return "15.2.4"
+        return "15.2.5"
     });
     /*! Module core, file errors.js */
     DevExpress.define("/errors", ["/utils/utils.error"], function(errorUtils) {
@@ -4742,7 +4834,11 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                         document.location = e.action
                 }},
             hash: {execute: function(e) {
-                    if (typeof e.action === "string" && e.action.charAt(0) === "#")
+                    if (typeof e.action !== "string" || e.action.charAt(0) !== "#")
+                        return;
+                    if (e.action === "#_back")
+                        window.history.back();
+                    else
                         document.location.hash = e.action
                 }}
         })
@@ -4932,6 +5028,7 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                 plum: 'dda0dd',
                 powderblue: 'b0e0e6',
                 purple: '800080',
+                rebeccapurple: '663399',
                 red: 'ff0000',
                 rosybrown: 'bc8f8f',
                 royalblue: '4169e1',
@@ -7060,6 +7157,16 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
             Guid = data.Guid,
             errors = DevExpress.require("/data/data.errors"),
             objectUtils = DX.require("/utils/utils.object");
+        var hasKey = function(target, keyOrKeys) {
+                var key,
+                    keys = $.makeArray(keyOrKeys);
+                while (keys.length) {
+                    key = keys.shift();
+                    if (key in target)
+                        return true
+                }
+                return false
+            };
         var trivialPromise = function() {
                 var d = $.Deferred();
                 return d.resolve.apply(d, arguments).promise()
@@ -7113,12 +7220,12 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                 return trivialPromise(values, keyValue)
             },
             _updateImpl: function(key, values) {
-                var target,
-                    index;
-                if (this.key()) {
-                    if (this.keyOf(values))
-                        if (!data.utils.keysEqual(this.key(), key, this.keyOf(values)))
-                            return rejectedPromise(errors.Error("E4017"));
+                var index,
+                    target,
+                    keyExpr = this.key();
+                if (keyExpr) {
+                    if (hasKey(values, keyExpr) && !data.utils.keysEqual(keyExpr, key, this.keyOf(values)))
+                        return rejectedPromise(errors.Error("E4017"));
                     index = this._indexByKey(key);
                     if (index < 0)
                         return rejectedPromise(errors.Error("E4009"));
@@ -7575,7 +7682,11 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
             errors = DX.require("/data/data.errors"),
             array = DX.require("/utils/utils.array"),
             queue = DX.require("/utils/utils.queue"),
-            commonUtils = DX.require("/utils/utils.common");
+            commonUtils = DX.require("/utils/utils.common"),
+            __isString = commonUtils.isString,
+            __isNumber = commonUtils.isNumber,
+            __isBoolean = commonUtils.isBoolean,
+            __isDefined = commonUtils.isDefined;
         var CANCELED_TOKEN = "canceled";
         function OperationManager() {
             this._counter = -1;
@@ -7601,6 +7712,7 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
         var storeTypeRegistry = {
                 jaydata: "JayDataStore",
                 breeze: "BreezeStore",
+                parse: "ParseStore",
                 odata: "ODataStore",
                 local: "LocalStore",
                 array: "ArrayStore"
@@ -7697,23 +7809,26 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                     this._postProcessFunc = options.postProcess;
                     this._pageIndex = options.pageIndex !== undefined ? options.pageIndex : 0;
                     this._pageSize = options.pageSize !== undefined ? options.pageSize : 20;
-                    this._items = [];
-                    this._totalCount = -1;
-                    this._isLoaded = false;
                     this._loadingCount = 0;
                     this._loadQueue = this._createLoadQueue();
                     this._searchValue = "searchValue" in options ? options.searchValue : null;
                     this._searchOperation = options.searchOperation || "contains";
                     this._searchExpr = options.searchExpr;
                     this._paginate = options.paginate;
-                    if (this._paginate === undefined)
-                        this._paginate = !this.group();
-                    this._isLastPage = !this._paginate;
-                    this._userData = {};
                     $.each(["onChanged", "onLoadError", "onLoadingChanged", "onCustomizeLoadResult", "onCustomizeStoreLoadOptions"], function(_, optionName) {
                         if (optionName in options)
                             that.on(optionName.substr(2, 1).toLowerCase() + optionName.substr(3), options[optionName])
-                    })
+                    });
+                    this._init()
+                },
+                _init: function() {
+                    this._items = [];
+                    this._userData = {};
+                    this._totalCount = -1;
+                    this._isLoaded = false;
+                    if (!__isDefined(this._paginate))
+                        this._paginate = !this.group();
+                    this._isLastPage = !this._paginate
                 },
                 dispose: function() {
                     this._disposeEvents();
@@ -7740,22 +7855,21 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                     return this._items
                 },
                 pageIndex: function(newIndex) {
-                    if (newIndex === undefined)
+                    if (!__isNumber(newIndex))
                         return this._pageIndex;
                     this._pageIndex = newIndex;
                     this._isLastPage = !this._paginate
                 },
                 paginate: function(value) {
-                    if (arguments.length < 1)
+                    if (!__isBoolean(value))
                         return this._paginate;
-                    value = !!value;
                     if (this._paginate !== value) {
                         this._paginate = value;
                         this.pageIndex(0)
                     }
                 },
                 pageSize: function(value) {
-                    if (arguments.length < 1)
+                    if (!__isNumber(value))
                         return this._pageSize;
                     this._pageSize = value
                 },
@@ -7772,18 +7886,22 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                 },
                 group: generateStoreLoadOptionAccessor("group"),
                 select: generateStoreLoadOptionAccessor("select"),
-                requireTotalCount: generateStoreLoadOptionAccessor("requireTotalCount"),
+                requireTotalCount: function(value) {
+                    if (!__isBoolean(value))
+                        return this._storeLoadOptions.requireTotalCount;
+                    this._storeLoadOptions.requireTotalCount = value
+                },
                 searchValue: function(value) {
-                    if (value === undefined)
+                    if (arguments.length < 1)
                         return this._searchValue;
-                    this.pageIndex(0);
-                    this._searchValue = value
+                    this._searchValue = value;
+                    this.pageIndex(0)
                 },
                 searchOperation: function(op) {
-                    if (op === undefined)
+                    if (!__isString(op))
                         return this._searchOperation;
-                    this.pageIndex(0);
-                    this._searchOperation = op
+                    this._searchOperation = op;
+                    this.pageIndex(0)
                 },
                 searchExpr: function(expr) {
                     var argc = arguments.length;
@@ -7791,8 +7909,8 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                         return this._searchExpr;
                     if (argc > 1)
                         expr = $.makeArray(arguments);
-                    this.pageIndex(0);
-                    this._searchExpr = expr
+                    this._searchExpr = expr;
+                    this.pageIndex(0)
                 },
                 store: function() {
                     return this._store
@@ -7848,7 +7966,7 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                         store = this._store,
                         options = this._createStoreLoadOptions(),
                         handleDone = function(data) {
-                            if (!commonUtils.isDefined(data) || array.isEmpty(data))
+                            if (!__isDefined(data) || array.isEmpty(data))
                                 d.reject(new errors.Error("E4009"));
                             else
                                 d.resolve(that._applyMapFunction($.makeArray(data))[0])
@@ -7909,13 +8027,7 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                         }
                 },
                 reload: function() {
-                    var prop,
-                        userData = this._userData;
-                    for (prop in userData)
-                        if (userData.hasOwnProperty(prop))
-                            delete userData[prop];
-                    this._totalCount = -1;
-                    this._isLoaded = false;
+                    this._init();
                     return this.load()
                 },
                 cancel: function(loadOperationId) {
@@ -8158,8 +8270,10 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
             current(options)
         }
         function current(options) {
-            if (!arguments.length)
-                return currentThemeName || readThemeMarker();
+            if (!arguments.length) {
+                currentThemeName = currentThemeName || readThemeMarker();
+                return currentThemeName
+            }
             detachCssClasses(viewPort(), currentThemeName);
             options = options || {};
             if (typeof options === "string")
@@ -8304,14 +8418,16 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                     this._handler = options.handler;
                     this._context = options.context;
                     this._childProcessors = [];
-                    if (this._element)
-                        this._element.on(this._keydown, function(e) {
+                    if (this._element) {
+                        this._processFunction = function(e) {
                             _this.process(e)
-                        })
+                        };
+                        this._element.on(this._keydown, this._processFunction)
+                    }
                 },
                 dispose: function() {
                     if (this._element)
-                        this._element.off(this._keydown);
+                        this._element.off(this._keydown, this._processFunction);
                     this._element = undefined;
                     this._handler = undefined;
                     this._context = undefined;
@@ -8925,9 +9041,10 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                             isValid: true,
                             validationError: null,
                             validationMessageMode: "auto",
-                            validationTooltipOffset: {
+                            validationBoundary: undefined,
+                            validationMessageOffset: {
                                 h: 0,
-                                v: -10
+                                v: 0
                             }
                         })
                 },
@@ -8937,13 +9054,7 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                                     var currentTheme = (themes.current() || "").split(".")[0];
                                     return currentTheme === "android5"
                                 },
-                                options: {validationTooltipOffset: {v: -18}}
-                            }, {
-                                device: function() {
-                                    var currentTheme = (themes.current() || "").split(".")[0];
-                                    return currentTheme === "win10"
-                                },
-                                options: {validationTooltipOffset: {v: -4}}
+                                options: {validationMessageOffset: {v: -8}}
                             }])
                 },
                 _attachKeyboardEvents: function() {
@@ -8967,9 +9078,9 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                     this._valueChangeActionSuppressed = false
                 },
                 _render: function() {
+                    this.callBase();
                     this._renderValidationState();
-                    this._toggleReadOnlyState();
-                    this.callBase()
+                    this._toggleReadOnlyState()
                 },
                 _raiseValueChangeAction: function(value, previousValue, extraArguments) {
                     if (!this._valueChangeAction)
@@ -8999,39 +9110,43 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                     }
                     if (!isValid && validationError && validationError.message) {
                         this._$validationMessage = $("<div/>", {"class": INVALID_MESSAGE}).text(validationError.message).appendTo($element);
-                        this._createComponent(this._$validationMessage, "dxTooltip", {
-                            target: this._getValidationTooltipTarget(),
+                        this._createComponent(this._$validationMessage, "dxOverlay", {
+                            target: this._getValidationMessageTarget(),
+                            shading: false,
+                            width: 'auto',
+                            height: 'auto',
                             container: $element,
-                            position: this._getValidationTooltipPosition("below"),
+                            position: this._getValidationMessagePosition("below"),
                             closeOnOutsideClick: false,
                             closeOnTargetScroll: false,
                             animation: null,
                             visible: true
                         });
-                        this._$validationMessage.toggleClass(INVALID_MESSAGE_AUTO, validationMessageMode === "auto").toggleClass(INVALID_MESSAGE_ALWAYS, validationMessageMode === "always")
+                        this._$validationMessage.toggleClass(INVALID_MESSAGE_AUTO, validationMessageMode === "auto").toggleClass(INVALID_MESSAGE_ALWAYS, validationMessageMode === "always").width($element.outerWidth())
                     }
                 },
-                _getValidationTooltipTarget: function() {
+                _getValidationMessageTarget: function() {
                     return this.element()
                 },
-                _getValidationTooltipPosition: function(positionRequest) {
+                _getValidationMessagePosition: function(positionRequest) {
                     var rtlEnabled = this.option("rtlEnabled"),
-                        tooltipPositionSide = commonUtils.getDefaultAlignment(rtlEnabled),
-                        tooltipOriginalOffset = this.option("validationTooltipOffset"),
-                        tooltipOffset = {
-                            h: tooltipOriginalOffset.h,
-                            v: tooltipOriginalOffset.v
+                        messagePositionSide = commonUtils.getDefaultAlignment(rtlEnabled),
+                        messageOriginalOffset = this.option("validationMessageOffset"),
+                        messageOffset = {
+                            h: messageOriginalOffset.h,
+                            v: messageOriginalOffset.v
                         },
                         verticalPositions = positionRequest === "below" ? [" top", " bottom"] : [" bottom", " top"];
                     if (rtlEnabled)
-                        tooltipOffset.h = -tooltipOffset.h;
+                        messageOffset.h = -messageOffset.h;
                     if (positionRequest !== "below")
-                        tooltipOffset.v = -tooltipOffset.v;
+                        messageOffset.v = -messageOffset.v;
                     return {
-                            offset: tooltipOffset,
-                            my: tooltipPositionSide + verticalPositions[0],
-                            at: tooltipPositionSide + verticalPositions[1],
-                            collision: "none"
+                            offset: messageOffset,
+                            boundary: this.option("validationBoundary"),
+                            my: messagePositionSide + verticalPositions[0],
+                            at: messagePositionSide + verticalPositions[1],
+                            collision: "none flip"
                         }
                 },
                 _toggleReadOnlyState: function() {
@@ -9045,6 +9160,7 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                             break;
                         case"isValid":
                         case"validationError":
+                        case"validationBoundary":
                         case"validationMessageMode":
                             this._renderValidationState();
                             break;
@@ -9062,6 +9178,10 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                                     value: args.value,
                                     editor: this
                                 });
+                            break;
+                        case"width":
+                            this.callBase(args);
+                            this._$validationMessage && this._$validationMessage.width(this.element().outerWidth());
                             break;
                         default:
                             this.callBase(args)
@@ -9103,6 +9223,8 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                 E1034: "The current browser does not implement an API required for saving files",
                 E1035: "The editor could not be created because of the internal error: {0}",
                 E1036: "Validation rules are not defined for any form item",
+                E1037: "Invalid structure of grouped data",
+                E1038: "Your browser does not support local storage for local web pages",
                 W1001: "Key option can not be modified after initialization",
                 W1002: "Item '{0}' you are trying to select does not exist",
                 W1003: "Group with key '{0}' in which you are trying to select items does not exist",
@@ -9201,13 +9323,10 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                         toolbar: 'bottom',
                         location: devices.current().android ? 'after' : 'center',
                         widget: 'button',
-                        options: {
-                            text: this.text,
-                            onClick: function() {
+                        options: $.extend({}, this, {onClick: function() {
                                 var result = action.execute(arguments);
                                 hide(result)
-                            }
-                        }
+                            }})
                     })
                 });
                 var popupInstance = $element.dxPopup({
@@ -9754,7 +9873,7 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
         return BaseStrategy
     });
     /*! Module core, file ui.events.pointer.observer.js */
-    DevExpress.define("/ui/events/pointer/ui.events.pointer.observer", [], function() {
+    DevExpress.define("/ui/events/pointer/ui.events.pointer.observer", ["jquery"], function($) {
         var addEventsListener = function(events, handler) {
                 events = events.split(" ");
                 $.each(events, function(_, event) {
@@ -9996,7 +10115,7 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
     /*! Module core, file ui.events.pointer.js */
     DevExpress.define("/ui/events/pointer/ui.events.pointer", ["jquery", "/utils/utils.support", "/devices", "/ui/events/ui.events.eventRegistrator", "/ui/events/pointer/ui.events.pointer.touch", "/ui/events/pointer/ui.events.pointer.mspointer", "/ui/events/pointer/ui.events.pointer.mouse", "/ui/events/pointer/ui.events.pointer.mouseAndTouch"], function($, support, devices, registerEvent, TouchStrategy, MsPointerStrategy, MouseStrategy, MouseAndTouchStrategy) {
         var EventStrategy = function() {
-                if (support.pointer)
+                if (support.pointerEvents)
                     return MsPointerStrategy;
                 var device = devices.real();
                 if (support.touch && !(device.tablet || device.phone))
@@ -10405,6 +10524,9 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                 if (!supportPointerEvents() || !isDesktop)
                     return $.noop;
                 var $cover = $("<div>").addClass(GESTURE_COVER_CLASS).css("pointerEvents", "none");
+                $cover.on("dxmousewheel", function(e) {
+                    e.preventDefault()
+                });
                 $(function() {
                     $cover.appendTo("body")
                 });
@@ -10707,13 +10829,7 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                     });
                     if (!config.duration)
                         config.transitionAnimation.finish();
-                    $element.css("transform");
-                    $element.css({
-                        transitionProperty: "all",
-                        transitionDelay: config.delay + "ms",
-                        transitionDuration: config.duration + "ms",
-                        transitionTimingFunction: config.easing
-                    })
+                    $element.css("transform")
                 },
                 animate: function($element, config) {
                     this._startAnimation($element, config);
@@ -10751,6 +10867,12 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                     return deferred.promise()
                 },
                 _startAnimation: function($element, config) {
+                    $element.css({
+                        transitionProperty: "all",
+                        transitionDelay: config.delay + "ms",
+                        transitionDuration: config.duration + "ms",
+                        transitionTimingFunction: config.easing
+                    });
                     if (typeof config.to === "string")
                         $element[0].className += " " + config.to;
                     else if (config.to)
@@ -11264,7 +11386,8 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                 if (queueData.length === 0)
                     destroyAnimQueueData($element);
                 executeAnimation(animation).done(function() {
-                    shiftFromAnimationQueue($element)
+                    if (!isAnimating($element))
+                        shiftFromAnimationQueue($element)
                 })
             };
         var executeAnimation = function(animation) {
@@ -11306,6 +11429,7 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                 var $element = $(element),
                     queueData = getAnimQueueData($element);
                 $.each(queueData, function(_, animation) {
+                    animation.config.delay = 0;
                     animation.config.duration = 0;
                     animation.isSynchronous = true
                 });
@@ -12010,6 +12134,12 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                             duration: this.option("defaultStaggerAnimationDuration"),
                             delay: this.option("defaultStaggerAnimationStartDelay")
                         }});
+                    this.registerPreset("stagger-fade-rise", {animation: {
+                            extraCssClasses: "dx-fade-rise-animation",
+                            staggerDelay: this.option("defaultStaggerAnimationDelay"),
+                            duration: this.option("defaultStaggerAnimationDuration"),
+                            delay: this.option("defaultStaggerAnimationStartDelay")
+                        }});
                     this.registerPreset("stagger-3d-drop", {animation: {
                             extraCssClasses: "dx-3d-drop-animation",
                             staggerDelay: this.option("defaultStaggerAnimationDelay"),
@@ -12616,7 +12746,7 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
         })
     });
     /*! Module core, file ko.components.js */
-    DevExpress.define("/integration/knockout/ko.components", ["/utils/utils.icon", "/utils/utils.inflector", "/action"], function(iconUtils, inflector, Action) {
+    DevExpress.define("/integration/knockout/ko.components", ["jquery", "/utils/utils.icon", "/utils/utils.inflector", "/action"], function($, iconUtils, inflector, Action) {
         var ko = window.ko;
         ko.bindingHandlers.dxAction = {update: function(element, valueAccessor, allBindingsAccessor, viewModel) {
                 var $element = $(element);
@@ -13132,11 +13262,12 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                     this._parse = options.parse;
                     this._compile = options.compile;
                     this._itemAlias = options.itemAlias;
+                    this._transcludeFn = options.transcludeFn;
                     this._normalizeOptions(options.ngOptions);
                     this._initComponentBindings();
                     this._initComponent(this._scope);
                     if (options.ngOptions)
-                        this._triggerShownEvent();
+                        this._triggerResizeEvent();
                     else
                         this._addOptionsStringWatcher(options.ngOptionsString)
                 },
@@ -13149,7 +13280,7 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                             that._normalizeOptions(newOptions);
                             that._initComponentBindings();
                             that._component.option(that._evalOptions(that._scope));
-                            that._triggerShownEvent()
+                            that._triggerResizeEvent()
                         });
                     that._componentDisposing.add(clearOptionsStringWatcher)
                 },
@@ -13166,10 +13297,10 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                     if (options.data)
                         that._initDataScope(options.data)
                 },
-                _triggerShownEvent: function() {
+                _triggerResizeEvent: function() {
                     var that = this;
                     that._shownEventTimer = setTimeout(function() {
-                        domUtils.triggerShownEvent(that._$element)
+                        domUtils.triggerResizeEvent(that._$element)
                     });
                     that._componentDisposing.add(function() {
                         clearTimeout(that._shownEventTimer)
@@ -13255,7 +13386,7 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                                 templateScope;
                             $resultMarkup.appendTo($container);
                             if (commonUtils.isDefined(data)) {
-                                var dataIsScope = data.$id;
+                                var dataIsScope = data.constructor === that._scope.$root.constructor;
                                 templateScope = dataIsScope ? data : that._createScopeWithData(data);
                                 $resultMarkup.on("$destroy", function() {
                                     var destroyAlreadyCalled = !templateScope.$parent;
@@ -13268,7 +13399,7 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                                 templateScope = that._scope;
                             if (scopeItemsPath)
                                 that._synchronizeScopes(templateScope, scopeItemsPath, index);
-                            safeApply(that._compile($resultMarkup), templateScope);
+                            safeApply(that._compile($resultMarkup, that._transcludeFn), templateScope);
                             return $resultMarkup
                         }
                 },
@@ -13435,7 +13566,7 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                                 compile: function($element) {
                                     var componentClass = registeredComponents[name],
                                         $content = componentClass.subclassOf(Widget) ? $element.contents().detach() : null;
-                                    return function(scope, $element, attrs, ngModelController) {
+                                    return function(scope, $element, attrs, ngModelController, transcludeFn) {
                                             $element.append($content);
                                             new ComponentBuilder({
                                                 componentClass: componentClass,
@@ -13448,6 +13579,7 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                                                 ngOptions: attrs[name] ? scope.$eval(attrs[name]) : {},
                                                 ngModel: attrs.ngModel,
                                                 ngModelController: ngModelController,
+                                                transcludeFn: transcludeFn,
                                                 itemAlias: attrs[ITEM_ALIAS_ATTRIBUTE_NAME]
                                             })
                                         }
@@ -13462,7 +13594,7 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
         })
     });
     /*! Module core, file ng.components.js */
-    DevExpress.define("/integration/angular/ng.components", ["/integration/angular/ng.module", "/utils/utils.icon", "/utils/utils.inflector"], function(ngModule, iconUtils, inflector) {
+    DevExpress.define("/integration/angular/ng.components", ["jquery", "/integration/angular/ng.module", "/utils/utils.icon", "/utils/utils.inflector"], function($, ngModule, iconUtils, inflector) {
         ngModule.filter('dxGlobalize', function() {
             return function(input, param) {
                     return Globalize.format(input, param)
@@ -13812,7 +13944,7 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
     });
     DevExpress.require(["/integration/jquery/jquery"]);
     /*! Module core, file ko.js */
-    DevExpress.define("/integration/knockout/ko", ["/utils/utils.support", "/errors", "/utils/utils.version", "require"], function(support, errors, versionUtils, require) {
+    DevExpress.define("/integration/knockout/ko", ["jquery", "/utils/utils.support", "/errors", "/utils/utils.version", "require"], function($, support, errors, versionUtils, require) {
         if (!support.hasKo)
             return;
         var ko = window.ko;
@@ -13833,7 +13965,7 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
     });
     DevExpress.require(["/integration/angular/ng"]);
     /*! Module core, file ui.events.emitter.click.js */
-    (function($, DX, wnd, undefined) {
+    (function($, DX, undefined) {
         var abs = Math.abs,
             events = DX.ui.events,
             devices = DX.require("/devices"),
@@ -13860,7 +13992,7 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                         $element.attr("onclick", "void(0)")
                 },
                 start: function(e) {
-                    this._blurPrevented = e.dxPreventBlur;
+                    this._blurPrevented = e.isDefaultPrevented();
                     this._startTarget = e.target;
                     this._startEventData = eventUtils.eventData(e)
                 },
@@ -13888,27 +14020,39 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                 }
             });
         (function() {
+            var NATIVE_CLICK_CLASS = "dx-native-click";
             var useNativeClick = devices.real().generic;
-            if (useNativeClick) {
-                var prevented = null;
-                ClickEmitter = ClickEmitter.inherit({
-                    start: function() {
-                        prevented = null
-                    },
-                    end: $.noop,
-                    cancel: function() {
-                        prevented = true
-                    }
-                });
-                var clickHandler = function(e) {
-                        if ((!e.which || e.which === 1) && !prevented)
-                            eventUtils.fireEvent({
-                                type: CLICK_EVENT_NAME,
-                                originalEvent: e
-                            })
-                    };
-                $(document).on(eventUtils.addNamespace("click", "NATIVE_DXCLICK_STRATEGY"), clickHandler)
+            var prevented = null;
+            function isNativeClickEvent(e) {
+                return useNativeClick || $(e.target).closest("." + NATIVE_CLICK_CLASS).length
             }
+            ClickEmitter = ClickEmitter.inherit({
+                configurate: function(data) {
+                    this.callBase(data);
+                    if (data.useNative)
+                        this.getElement().addClass(NATIVE_CLICK_CLASS)
+                },
+                start: function(e) {
+                    prevented = null;
+                    if (!isNativeClickEvent(e))
+                        this.callBase(e)
+                },
+                end: function(e) {
+                    if (!isNativeClickEvent(e))
+                        this.callBase(e)
+                },
+                cancel: function() {
+                    prevented = true
+                }
+            });
+            var clickHandler = function(e) {
+                    if ((!e.which || e.which === 1) && !prevented && isNativeClickEvent(e))
+                        eventUtils.fireEvent({
+                            type: CLICK_EVENT_NAME,
+                            originalEvent: e
+                        })
+                };
+            $(document).on(eventUtils.addNamespace("click", "NATIVE_DXCLICK_STRATEGY"), clickHandler);
             $.extend(events.__internals, {useNativeClick: useNativeClick})
         })();
         (function() {
@@ -13934,7 +14078,7 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                     blurPrevented = false;
                 var pointerDownHandler = function(e) {
                         startTarget = e.target;
-                        blurPrevented = e.dxPreventBlur
+                        blurPrevented = e.isDefaultPrevented()
                     };
                 var clickHandler = function(e) {
                         var $target = $(e.target);
@@ -13956,7 +14100,7 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
             useFastClick: !events.__internals.useNativeClick && !events.__internals.fixBuggyInertia,
             misc: misc
         })
-    })(jQuery, DevExpress, window);
+    })(jQuery, DevExpress);
     /*! Module core, file ui.events.emitter.hold.js */
     (function($, DX, undefined) {
         var eventUtils = DX.require("/ui/events/ui.events.utils"),
@@ -14004,10 +14148,11 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
         })
     })(jQuery, DevExpress);
     /*! Module core, file ui.events.emitter.gesture.scroll.js */
-    (function($, DX, undefined) {
-        var eventUtils = DX.require("/ui/events/ui.events.utils"),
-            GestureEmitter = DX.require("/ui/events/ui.events.emitter.gesture"),
-            registerEmitter = DX.require("/ui/events/ui.events.emitterRegistrator");
+    DevExpress.define("/ui/events/ui.events.emitter.scroll", function(module, exports, require) {
+        var $ = require("jquery"),
+            eventUtils = require("/ui/events/ui.events.utils"),
+            GestureEmitter = require("/ui/events/ui.events.emitter.gesture"),
+            registerEmitter = require("/ui/events/ui.events.emitterRegistrator");
         var SCROLL_INIT_EVENT = "dxscrollinit",
             SCROLL_START_EVENT = "dxscrollstart",
             SCROLL_MOVE_EVENT = "dxscroll",
@@ -14119,8 +14264,16 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
         registerEmitter({
             emitter: ScrollEmitter,
             events: [SCROLL_INIT_EVENT, SCROLL_START_EVENT, SCROLL_MOVE_EVENT, SCROLL_END_EVENT, SCROLL_STOP_EVENT, SCROLL_CANCEL_EVENT]
-        })
-    })(jQuery, DevExpress);
+        });
+        module.exports = {
+            init: SCROLL_INIT_EVENT,
+            start: SCROLL_START_EVENT,
+            move: SCROLL_MOVE_EVENT,
+            end: SCROLL_END_EVENT,
+            stop: SCROLL_STOP_EVENT,
+            cancel: SCROLL_CANCEL_EVENT
+        }
+    });
     /*! Module core, file ui.events.emitter.gesture.swipe.js */
     (function($, DX, undefined) {
         var eventUtils = DX.require("/ui/events/ui.events.utils"),
@@ -15372,7 +15525,13 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                     this._attachItemClickEvent(itemData, $itemFrame);
                     var $itemContent = $itemFrame.find("." + ITEM_CONTENT_PLACEHOLDER_CLASS);
                     $itemContent.removeClass(ITEM_CONTENT_PLACEHOLDER_CLASS);
-                    var renderContentPromise = this._renderItemContent(index, itemData, $itemContent);
+                    var renderContentPromise = this._renderItemContent({
+                            index: index,
+                            itemData: itemData,
+                            container: $itemContent,
+                            contentClass: this._itemContentClass(),
+                            defaultTemplateName: this.option("itemTemplate")
+                        });
                     var that = this;
                     $.when(renderContentPromise).done(function($itemContent) {
                         that._postprocessRenderItem({
@@ -15392,33 +15551,27 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                         this._itemEventHandlerByHandler($itemElement, itemData.onClick, {jQueryEvent: e})
                     }, this))
                 },
-                _renderItemContent: function(index, itemData, $container) {
-                    var $itemNode = itemData && itemData.node;
-                    var itemTemplateName = this._getItemTemplateName(itemData);
-                    var itemTemplate = this._getTemplate(itemTemplateName, itemData, index, $container);
-                    var renderArgs = {
-                            index: index,
-                            item: itemData,
-                            container: $container
-                        };
-                    if ($itemNode) {
-                        $container.replaceWith($itemNode);
-                        $container = $itemNode;
-                        this._addItemContentClasses($container, itemData)
-                    }
-                    else {
-                        this._addItemContentClasses($container, itemData);
-                        var $result = this._createItemByTemplate(itemTemplate, renderArgs);
-                        if ($result.hasClass(TEMPLATE_WRAPPER_CLASS)) {
-                            $container.replaceWith($result);
-                            $container = $result;
-                            this._addItemContentClasses($container, itemData)
-                        }
-                    }
-                    return $container
+                _renderItemContent: function(args) {
+                    var $itemNode = args.itemData && args.itemData.node;
+                    if ($itemNode)
+                        return this._renderItemContentByNode(args, $itemNode);
+                    var itemTemplateName = this._getItemTemplateName(args);
+                    var itemTemplate = this._getTemplate(itemTemplateName);
+                    this._addItemContentClasses(args);
+                    var $templateResult = this._createItemByTemplate(itemTemplate, args);
+                    if (!$templateResult.hasClass(TEMPLATE_WRAPPER_CLASS))
+                        return args.container;
+                    return this._renderItemContentByNode(args, $templateResult)
                 },
-                _addItemContentClasses: function($container) {
-                    $container.addClass([ITEM_CLASS + CONTENT_CLASS_POSTFIX, this._itemContentClass()].join(" "))
+                _renderItemContentByNode: function(args, $node) {
+                    args.container.replaceWith($node);
+                    args.container = $node;
+                    this._addItemContentClasses(args);
+                    return $node
+                },
+                _addItemContentClasses: function(args) {
+                    var classes = [ITEM_CLASS + CONTENT_CLASS_POSTFIX, args.contentClass];
+                    args.container.addClass(classes.join(" "))
                 },
                 _renderItemFrame: function(index, itemData, $container, $itemToReplace) {
                     var itemFrameTemplate = this.option("templateProvider").getTemplates(this)["itemFrame"],
@@ -15450,12 +15603,17 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                 _getItemRenderAction: function() {
                     return this._itemRenderAction || this._createItemRenderAction()
                 },
-                _getItemTemplateName: function(itemData) {
-                    var templateProperty = this.option("itemTemplateProperty");
-                    return itemData && itemData[templateProperty] || this.option("itemTemplate")
+                _getItemTemplateName: function(args) {
+                    var data = args.itemData,
+                        templateProperty = args.templateProperty || this.option("itemTemplateProperty"),
+                        template = data && data[templateProperty];
+                    return template || args.defaultTemplateName
                 },
                 _createItemByTemplate: function(itemTemplate, renderArgs) {
-                    return itemTemplate.render(renderArgs.item, renderArgs.container, renderArgs.index, "ignoreTarget")
+                    return itemTemplate.render(renderArgs.itemData, renderArgs.container, renderArgs.index, "ignoreTarget")
+                },
+                _emptyMessageComtainer: function() {
+                    return this._itemContainer()
                 },
                 _renderEmptyMessage: function() {
                     var noDataText = this.option("noDataText"),
@@ -15468,7 +15626,7 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                     }
                     if (!hideNoData) {
                         this._$nodata = this._$nodata || $("<div>").addClass("dx-empty-message");
-                        this._$nodata.appendTo(this._itemContainer()).html(noDataText);
+                        this._$nodata.appendTo(this._emptyMessageComtainer()).html(noDataText);
                         this.setAria("label", noDataText)
                     }
                     this.element().toggleClass(EMPTY_COLLECTION, !hideNoData)
@@ -15804,11 +15962,11 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                     var optionValue = this.option(optionName);
                     if (optionValue instanceof DX.data.DataSource)
                         return;
-                    this.fireEvent("optionChanged", [{
-                            name: optionName,
-                            fullName: optionName,
-                            value: optionValue
-                        }])
+                    this._optionChangedAction({
+                        name: optionName,
+                        fullName: optionName,
+                        value: optionValue
+                    })
                 },
                 isItemSelected: function(itemElement) {
                     return this._isItemSelected(this._editStrategy.getNormalizedIndex(itemElement))
@@ -15885,17 +16043,10 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                         $destinationItem = strategy.getItemElement(toItemElement),
                         movingIndex = strategy.getNormalizedIndex(itemElement),
                         destinationIndex = strategy.getNormalizedIndex(toItemElement),
-                        changingOption;
+                        changingOption = this._dataSource ? "dataSource" : "items";
                     var canMoveItems = movingIndex > -1 && destinationIndex > -1 && movingIndex !== destinationIndex;
                     if (canMoveItems)
-                        if (this._dataSource) {
-                            changingOption = "dataSource";
-                            deferred.resolveWith(this)
-                        }
-                        else {
-                            changingOption = "items";
-                            deferred.resolveWith(this)
-                        }
+                        deferred.resolveWith(this);
                     else
                         deferred.rejectWith(this);
                     return deferred.promise().done(function() {
@@ -15904,7 +16055,8 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                             strategy.moveItemAtIndexToIndex(movingIndex, destinationIndex);
                             that._selectedItemIndices = strategy.selectedItemIndices(newSelectedItems);
                             that.option("selectedItems", strategy.fetchSelectedItems());
-                            that._simulateOptionChange(changingOption);
+                            if (changingOption === "items")
+                                that._simulateOptionChange(changingOption);
                             that._itemEventHandler($movingItem, "onItemReordered", {
                                 fromIndex: strategy.getIndex(movingIndex),
                                 toIndex: strategy.getIndex(destinationIndex)
@@ -16111,6 +16263,32 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                 }
             };
         return tooltip
+    });
+    /*! Module core, file ui.loading.js */
+    DevExpress.define("/ui/ui.loading", ["jquery", "/utils/utils.viewPort"], function($, viewPortUtils) {
+        var $loading = null;
+        var createLoadPanel = function(options) {
+                return $("<div>").appendTo(viewPortUtils.value()).dxLoadPanel(options)
+            };
+        var removeLoadPanel = function() {
+                if (!$loading)
+                    return;
+                $loading.remove();
+                $loading = null
+            };
+        var loading = {
+                show: function(options) {
+                    removeLoadPanel();
+                    $loading = createLoadPanel(options);
+                    return $loading.dxLoadPanel("show")
+                },
+                hide: function() {
+                    if (!$loading || !$loading.length)
+                        return $.when();
+                    return $loading.dxLoadPanel("hide").done(removeLoadPanel).promise()
+                }
+            };
+        return loading
     });
     DevExpress.MOD_CORE = true
 }
