@@ -33,12 +33,12 @@ Take a look at the DevExtreme demos.
 Sample real-world apps built using the DevExtreme tools.
 
 
-- [Widget Gallery](http://js.devexpress.com/Demos/WidgetsGallery/)  
+- [Widgets Gallery](http://js.devexpress.com/Demos/WidgetsGallery/)  
 A vast collection of code samples illustrating the usage of DevExtreme widgets.
 
 ## License
 
-Familiarize yourself with a [Commercial License](https://www.devexpress.com/Support/EULAs/DevExtreme.xml).
+Familiarize yourself with a [Commercial License](http://js.devexpress.com/EULAs/DevExtremeComplete/).
 
 ## Support
 
