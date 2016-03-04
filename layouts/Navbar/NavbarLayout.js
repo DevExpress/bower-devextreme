@@ -44,7 +44,6 @@
     });
     layoutSets["navbar"].push({
         platform: "win",
-        phone: false,
         controller: new DX.framework.html.NavBarController
     });
     layoutSets["split"] = layoutSets["split"] || [];

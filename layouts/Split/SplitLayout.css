@@ -8,6 +8,7 @@
     display: -ms-grid;
     -ms-grid-columns: 620px 1fr;
     -ms-grid-rows: 104px 1fr;
+    width: 100%;
     height: 100%;    
 }
 
@@ -115,6 +116,7 @@
     display: -ms-grid;
     -ms-grid-columns: 1fr 3fr;
     -ms-grid-rows: 60px 1fr;
+    width: 100%;
     height: 100%;    
 }
 
@@ -124,11 +126,6 @@
     -ms-grid-column-span: 2;
 }
 
-.dx-theme-win10 .dx-rtl .split-layout .layout-header .dx-toolbar,
-.dx-theme-win10 .dx-rtl.split-layout .layout-header .dx-toolbar {
-    margin-left: 0px;
-}
-
 .dx-theme-win10 .split-layout .layout-header .dx-toolbar-center {
     margin: 0 0 0 70px;
     text-align: left;
@@ -136,25 +133,15 @@
 
 .dx-theme-win10 .dx-rtl .split-layout .layout-header .dx-toolbar-center,
 .dx-theme-win10 .dx-rtl.split-layout .layout-header .dx-toolbar-center {
-    margin-right: 7px;
+    margin-right: 70px;
     margin-left: 0;
     text-align: right;
-}
-
-.dx-theme-win10 .split-layout .layout-header .dx-toolbar-after {
-    margin: 10px 120px 0 0;
-}
-
-.dx-theme-win10 .dx-rtl .split-layout .layout-header .dx-toolbar-after,
-.dx-theme-win10 .dx-rtl.split-layout .layout-header .dx-toolbar-after {
-    margin-right: 0;
-    margin-left: 120px;
 }
 
 .dx-theme-win10 .split-layout .left-content {
     -ms-grid-column: 1; 
     -ms-grid-row: 2;
-    background-color: #2b2b2b;
+    background-color: #171717;
 }
 
 .dx-theme-win10 .split-layout .right-content {
@@ -168,12 +155,6 @@
     padding-top: 20px;
 }
 
-.dx-theme-win10 .split-layout .dx-app-bar {
-    -ms-grid-column: 1;
-    -ms-grid-column-span: 2;
-    -ms-grid-row: 3;
-}
-
 .dx-theme-win10 .split-layout.dx-animating:not(.dx-enter):not(.dx-leave) {
     display: none;
 }
@@ -181,11 +162,6 @@
 .dx-theme-win10 .content, .dx-theme-win10 .content>div {
     height: 100%;
     position: relative;
-}
-
-.dx-theme-win10 .have-static-appbar .left-content,
-.dx-theme-win10 .have-static-appbar .right-content {
-    margin-bottom: 82px;
 }
 
 

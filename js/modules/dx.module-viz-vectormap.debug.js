@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Vector Map)
-* Version: 15.2.5
-* Build date: Jan 27, 2016
+* Version: 15.2.7
+* Build date: Mar 3, 2016
 *
 * Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -3693,7 +3693,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
             var i,
                 ii = coordinates.length,
                 v1,
-                v2 = coordinates[0],
+                v2 = coordinates[0] || [],
                 totalLength = 0,
                 items = [0],
                 min0 = v2[0],
@@ -3715,7 +3715,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
             v1 = coordinates[i];
             v2 = coordinates[i + 1];
             t = (totalLength / 2 - items[i]) / (items[i + 1] - items[i]);
-            return [[v1[0] * (1 - t) + v2[0] * t, v1[1] * (1 - t) + v2[1] * t], [max0 - min0, max1 - min1], totalLength]
+            return ii ? [[v1[0] * (1 - t) + v2[0] * t, v1[1] * (1 - t) + v2[1] * t], [max0 - min0, max1 - min1], totalLength] : []
         }
         function projectAreaLabel(coordinates) {
             var i,
@@ -3730,7 +3730,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
                     resultCentroid = centroid
                 }
             }
-            return [resultCentroid.center, [_sqrt(resultCentroid.area), _sqrt(resultCentroid.area)]]
+            return resultCentroid ? [resultCentroid.center, [_sqrt(resultCentroid.area), _sqrt(resultCentroid.area)]] : [[], []]
         }
         function projectLineLabel(coordinates) {
             var i,
@@ -3745,7 +3745,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
                     resultData = data
                 }
             }
-            return resultData
+            return resultData || [[], []]
         }
         function MapLayerCollection(params) {
             var that = this,
@@ -3795,41 +3795,38 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
                     }
                 })
             },
-            _addLayers: function(optionList) {
-                var layers = this._layers,
-                    i = layers.length,
-                    ii = optionList.length,
-                    name,
-                    layer;
-                for (; i < ii; ++i) {
-                    name = (optionList[i] || {}).name || "map-layer-" + i;
-                    layers[i] = layer = new MapLayer(this._params, this._container, name, i);
-                    this._layerByName[name] = layer
-                }
-            },
-            _removeLayers: function(count) {
-                var layers = this._layers,
-                    i = layers.length - 1,
-                    ii = i - count,
-                    layer;
-                for (; i > ii; --i) {
-                    layer = layers[i];
-                    delete this._layerByName[layer.proxy.name];
-                    layer.dispose();
-                    layers.splice(i, 1)
-                }
-            },
             setOptions: function(options) {
                 var optionList = options ? options.length ? options : [options] : [],
                     layers = this._layers,
+                    layerByName = this._layerByName,
+                    params = this._params,
+                    container = this._container,
+                    name,
+                    layer,
                     i,
                     ii;
-                if (layers.length < optionList.length)
-                    this._addLayers(optionList);
-                if (layers.length > optionList.length)
-                    this._removeLayers(layers.length - optionList.length);
-                for (i = 0, ii = layers.length; i < ii; ++i)
-                    layers[i].setOptions(optionList[i])
+                for (i = optionList.length, ii = layers.length; i < ii; ++i) {
+                    layer = layers[i];
+                    delete layerByName[layer.proxy.name];
+                    layer.dispose()
+                }
+                layers.splice(optionList.length, layers.length - optionList.length);
+                for (i = layers.length, ii = optionList.length; i < ii; ++i) {
+                    name = (optionList[i] || {}).name || "map-layer-" + i;
+                    layer = layers[i] = new MapLayer(params, container, name, i);
+                    layerByName[name] = layer
+                }
+                for (i = 0, ii = optionList.length; i < ii; ++i) {
+                    name = optionList[i] && optionList[i].name;
+                    layer = layers[i];
+                    if (name && name !== layer.proxy.name) {
+                        delete layerByName[layer.proxy.name];
+                        layer.dispose();
+                        layer = layers[i] = new MapLayer(params, container, name, i);
+                        layerByName[name] = layer
+                    }
+                    layer.setOptions(optionList[i])
+                }
             },
             _updateClip: function() {
                 var rect = this._rect,

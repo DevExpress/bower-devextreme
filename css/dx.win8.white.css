@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme
-* Version: 15.2.5
-* Build date: Jan 27, 2016
+* Version: 15.2.7
+* Build date: Mar 3, 2016
 *
 * Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -105,9 +105,12 @@
 {
   color: #000;
 }
-.dx-datagrid-form-buttons-container .dx-button
+.dx-datagrid-form-buttons-container
 {
   float: right;
+}
+.dx-datagrid-form-buttons-container .dx-button
+{
   margin-left: 10px;
   margin-top: 10px;
 }
@@ -153,9 +156,12 @@
 {
   border-left: none;
 }
-.dx-rtl .dx-datagrid-form-buttons-container .dx-button
+.dx-rtl .dx-datagrid-form-buttons-container
 {
   float: left;
+}
+.dx-rtl .dx-datagrid-form-buttons-container .dx-button
+{
   margin-left: 0;
   margin-right: 10px;
 }
@@ -566,7 +572,6 @@
 }
 .dx-rtl .dx-pivotgrid-collapsed .dx-expand, .dx-rtl .dx-pivotgrid-expanded .dx-expand
 {
-  float: right;
   margin-right: 0;
   margin-left: 5px;
 }
@@ -665,6 +670,7 @@
 .dx-scheduler-work-space
 {
   border: 1px solid rgba(0,0,0,.1);
+  background-color: #fff;
   position: relative;
   display: inline-block;
   overflow: hidden;
@@ -1055,6 +1061,22 @@
 .dx-scheduler-timeline.dx-scheduler-work-space-grouped[dx-group-column-count='3'] .dx-scheduler-fixed-appointments
 {
   left: 180px;
+}
+.dx-scheduler-work-space.dx-scheduler-timeline-week[dx-group-row-count='1'] .dx-scheduler-header-scrollable, .dx-scheduler-work-space.dx-scheduler-timeline-work-week[dx-group-row-count='1'] .dx-scheduler-header-scrollable
+{
+  height: 121px;
+}
+.dx-scheduler-work-space.dx-scheduler-timeline-week[dx-group-row-count='2'] .dx-scheduler-header-scrollable, .dx-scheduler-work-space.dx-scheduler-timeline-work-week[dx-group-row-count='2'] .dx-scheduler-header-scrollable
+{
+  height: 151px;
+}
+.dx-scheduler-work-space.dx-scheduler-timeline-week[dx-group-row-count='3'] .dx-scheduler-header-scrollable, .dx-scheduler-work-space.dx-scheduler-timeline-work-week[dx-group-row-count='3'] .dx-scheduler-header-scrollable
+{
+  height: 181px;
+}
+.dx-scheduler-work-space.dx-scheduler-timeline-week .dx-scheduler-header-scrollable, .dx-scheduler-work-space.dx-scheduler-timeline-work-week .dx-scheduler-header-scrollable
+{
+  height: 91px;
 }
 .dx-scheduler-work-space.dx-scheduler-timeline-week.dx-scheduler-work-space-grouped .dx-scheduler-sidebar-scrollable, .dx-scheduler-work-space.dx-scheduler-timeline-work-week.dx-scheduler-work-space-grouped .dx-scheduler-sidebar-scrollable
 {
@@ -5756,6 +5778,7 @@
 .dx-lookup-popup-wrapper .dx-list
 {
   margin-top: 10px;
+  margin-left: 8px;
   margin-right: 8px;
 }
 .dx-lookup-popup-wrapper .dx-rtl .dx-list
@@ -5774,9 +5797,9 @@
 .dx-lookup-search-wrapper
 {
   position: absolute;
-  top: 10px;
-  right: 0;
-  left: 0;
+  width: auto;
+  left: 18px;
+  right: 18px;
 }
 .dx-lookup-search-wrapper .dx-texteditor-container
 {
@@ -5796,6 +5819,10 @@
   {
     padding: 0;
   }
+}
+.dx-lookup-popup-wrapper.dx-popover-wrapper .dx-overlay-content
+{
+  padding: 0;
 }
 .dx-invalid.dx-lookup .dx-lookup-field
 {
@@ -6519,17 +6546,17 @@
 {
   border-bottom: 1px solid #ccc;
 }
-.dx-accordion-item.dx-state-active:not(.dx-accordion-item-opened) .dx-accordion-item-title
+.dx-accordion-item.dx-state-active:not(.dx-accordion-item-opened)>.dx-accordion-item-title
 {
   color: #00b8ff;
 }
-.dx-accordion-item-opened .dx-accordion-item-title
+.dx-accordion-item-opened>.dx-accordion-item-title
 {
   color: #fff;
   background-color: #00b8ff;
   font-weight: bold;
 }
-.dx-accordion-item-opened .dx-accordion-item-title:before
+.dx-accordion-item-opened>.dx-accordion-item-title:before
 {
   color: #fff;
   content: "\f014 ";
@@ -6966,30 +6993,36 @@
 {
   content: "\f00a ";
 }
-.dx-datagrid-filter-range-popup .dx-overlay-content
+.dx-datagrid-filter-range-overlay .dx-overlay-content
 {
   border: 1px solid #c7c7c7;
+  overflow: inherit;
 }
-.dx-datagrid-filter-range-popup .dx-overlay-content.dx-state-focused
-{
-  outline: 2px solid #80dbff;
-}
-.dx-datagrid-filter-range-popup .dx-overlay-content:not(.dx-state-focused) .dx-editor-container.dx-highlight-outline::after
+.dx-datagrid-filter-range-overlay .dx-overlay-content .dx-editor-container.dx-highlight-outline::after
 {
   border-color: rgba(24,167,90,.4);
   left: 0;
 }
-.dx-datagrid-filter-range-popup .dx-overlay-content .dx-editor-container .dx-texteditor-container
+.dx-datagrid-filter-range-overlay .dx-overlay-content .dx-editor-container .dx-texteditor-container
 {
   margin: 0;
 }
-.dx-datagrid-filter-range-popup .dx-overlay-content .dx-texteditor-input
+.dx-datagrid-filter-range-overlay .dx-overlay-content .dx-texteditor .dx-texteditor-input
 {
   border: 0;
+  padding: 7px;
 }
-.dx-datagrid-filter-range-popup .dx-overlay-content .dx-texteditor-input:not(:focus)
+.dx-datagrid-filter-range-overlay .dx-overlay-content .dx-texteditor .dx-texteditor-input:not(:focus)
 {
   background-color: #fff;
+}
+.dx-datagrid-filter-range-overlay .dx-overlay-content .dx-texteditor:not(.dx-state-focused) .dx-placeholder, .dx-datagrid-filter-range-overlay .dx-overlay-content .dx-texteditor:not(.dx-state-focused) .dx-texteditor-input
+{
+  color: #000;
+}
+.dx-datagrid-filter-range-overlay .dx-overlay-content .dx-texteditor.dx-state-focused:after
+{
+  border: 2px solid #80dbff;
 }
 .dx-datagrid-headers .dx-texteditor-input, .dx-datagrid-rowsview .dx-texteditor-input
 {

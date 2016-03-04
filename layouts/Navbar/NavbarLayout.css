@@ -199,8 +199,28 @@
     /* end for IE */
 }
 
-.dx-theme-win10 .navbar-layout-tablet.dx-animating:not(.dx-enter):not(.dx-leave) {
+.dx-theme-win10 .navbar-layout-tablet.dx-animating:not(.dx-enter):not(.dx-leave),
+.dx-theme-win10 .navbar-layout.dx-animating:not(.dx-enter):not(.dx-leave) {
     display: none;
+}
+
+.dx-theme-win10 .navbar-layout .layout-header {
+    top: 0;
+    height: 80px;
+}
+
+.dx-theme-win10 .navbar-layout .layout-content {
+    top: 80px;
+    bottom: 0;
+}
+
+.dx-theme-win10 .navbar-layout.has-toolbar .layout-content {
+    bottom: 48px;
+}
+
+.dx-theme-win10 .navbar-layout .layout-footer {
+    bottom: 0;
+    height: 48px;
 }
 
 

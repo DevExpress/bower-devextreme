@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme
-* Version: 15.2.5
-* Build date: Jan 27, 2016
+* Version: 15.2.7
+* Build date: Mar 3, 2016
 *
 * Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -312,6 +312,78 @@
   -o-transform: matrix3d(.71,0,.71,.001,0,1,0,0,-.71,0,.71,0,0,0,0,1);
   -webkit-transform: matrix3d(.71,0,.71,.001,0,1,0,0,-.71,0,.71,0,0,0,0,1);
   transform: matrix3d(.71,0,.71,.001,0,1,0,0,-.71,0,.71,0,0,0,0,1);
+  opacity: 0;
+}
+.dx-win-pop-animation.dx-enter.dx-forward
+{
+  -webkit-transform: scale(.5);
+  -moz-transform: scale(.5);
+  -ms-transform: scale(.5);
+  -o-transform: scale(.5);
+  transform: scale(.5);
+  filter: alpha(opacity=0);
+  -khtml-opacity: 0;
+  -moz-opacity: 0;
+  opacity: 0;
+}
+.dx-win-pop-animation.dx-enter.dx-enter-active.dx-forward
+{
+  -webkit-transform: scale(1);
+  -moz-transform: scale(1);
+  -ms-transform: scale(1);
+  -o-transform: scale(1);
+  transform: scale(1);
+  filter: alpha(opacity=100);
+  -khtml-opacity: 1;
+  -moz-opacity: 1;
+  opacity: 1;
+}
+.dx-win-pop-animation.dx-leave.dx-leave-active.dx-forward
+{
+  -webkit-transform: scale(1.5);
+  -moz-transform: scale(1.5);
+  -ms-transform: scale(1.5);
+  -o-transform: scale(1.5);
+  transform: scale(1.5);
+  filter: alpha(opacity=0);
+  -khtml-opacity: 0;
+  -moz-opacity: 0;
+  opacity: 0;
+}
+.dx-win-pop-animation.dx-enter.dx-backward
+{
+  -webkit-transform: scale(1.5);
+  -moz-transform: scale(1.5);
+  -ms-transform: scale(1.5);
+  -o-transform: scale(1.5);
+  transform: scale(1.5);
+  filter: alpha(opacity=0);
+  -khtml-opacity: 0;
+  -moz-opacity: 0;
+  opacity: 0;
+}
+.dx-win-pop-animation.dx-enter.dx-enter-active.dx-backward
+{
+  -webkit-transform: scale(1);
+  -moz-transform: scale(1);
+  -ms-transform: scale(1);
+  -o-transform: scale(1);
+  transform: scale(1);
+  filter: alpha(opacity=100);
+  -khtml-opacity: 1;
+  -moz-opacity: 1;
+  opacity: 1;
+}
+.dx-win-pop-animation.dx-leave.dx-leave-active.dx-backward
+{
+  -webkit-transform: scale(.5);
+  -moz-transform: scale(.5);
+  -ms-transform: scale(.5);
+  -o-transform: scale(.5);
+  transform: scale(.5);
+  filter: alpha(opacity=0);
+  -khtml-opacity: 0;
+  -moz-opacity: 0;
   opacity: 0;
 }
 .dx-android-pop-animation.dx-enter.dx-forward, .dx-android-pop-animation.dx-leave.dx-leave-active.dx-backward
@@ -966,8 +1038,6 @@
 .dx-scrollable-container
 {
   -webkit-tap-highlight-color: transparent;
-  -ms-touch-action: none;
-  touch-action: none;
   position: relative;
   overflow: hidden;
   width: 100%;
@@ -3371,32 +3441,14 @@
 {
   cursor: pointer;
 }
-.dx-lookup-popup-wrapper .dx-popup-content
-{
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-}
-.dx-lookup-popup-wrapper .dx-popup-bottom
-{
-  position: absolute;
-  bottom: 0;
-}
-.dx-lookup-popup-wrapper .dx-list
-{
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  min-height: 0;
-  height: auto;
-}
 .dx-lookup-popup-search .dx-list
 {
-  top: 45px;
+  padding-top: 45px;
+}
+.dx-lookup-search-wrapper
+{
+  position: absolute;
+  width: 100%;
 }
 .dx-popup-content .dx-lookup-validation-message
 {
@@ -3646,7 +3698,6 @@
 }
 .dx-tagbox .dx-texteditor-input
 {
-  float: left;
   width: auto;
 }
 .dx-tagbox.dx-tagbox-only-select .dx-texteditor-input
@@ -3672,23 +3723,14 @@
 }
 .dx-tag-container
 {
-  padding: 0 4px 0 0;
+  padding: 0;
+  padding-right: 4px;
   outline: none;
-}
-.dx-tag-container:before, .dx-tag-container:after
-{
-  display: table;
-  content: "";
-  line-height: 0;
-}
-.dx-tag-container:after
-{
-  clear: both;
 }
 .dx-tag
 {
   position: relative;
-  float: left;
+  display: inline-block;
   margin: 4px 0 0 4px;
   min-width: 30px;
   text-align: center;
@@ -3725,18 +3767,18 @@
 }
 .dx-rtl .dx-tagbox .dx-tag, .dx-tagbox.dx-rtl .dx-tag
 {
-  float: right;
   margin-left: 0;
   margin-right: 4px;
-}
-.dx-rtl .dx-tagbox .dx-texteditor-input, .dx-tagbox.dx-rtl .dx-texteditor-input
-{
-  float: right;
 }
 .dx-rtl .dx-tagbox .dx-tag-remove-button, .dx-tagbox.dx-rtl .dx-tag-remove-button
 {
   right: auto;
   left: 0;
+}
+.dx-rtl .dx-tagbox .dx-tag-container, .dx-tagbox.dx-rtl .dx-tag-container
+{
+  padding-left: 4px;
+  padding-right: 0;
 }
 .dx-radiobutton
 {
@@ -4449,6 +4491,7 @@
   position: relative;
   line-height: normal;
   cursor: default;
+  white-space: normal;
 }
 .dx-datagrid .dx-datagrid-content-fixed
 {
@@ -4719,6 +4762,11 @@
   border-collapse: collapse;
   border-spacing: 0;
   margin: 0;
+  max-width: 10px;
+}
+.dx-datagrid-content .dx-datagrid-table.dx-datagrid-table-fixed
+{
+  max-width: none;
 }
 .dx-datagrid-content .dx-datagrid-table [class*="column"]+[class*="column"]:last-child
 {
@@ -4744,11 +4792,6 @@
 .dx-datagrid-content .dx-datagrid-table .dx-row .dx-editor-container
 {
   overflow: hidden;
-}
-.dx-datagrid-content .dx-datagrid-table .dx-row .dx-filter-range-content
-{
-  padding: 7px;
-  padding-left: 32px;
 }
 .dx-datagrid-content .dx-datagrid-table .dx-row .dx-cell-modified, .dx-datagrid-content .dx-datagrid-table .dx-row .dx-datagrid-invalid
 {
@@ -4789,6 +4832,14 @@
   padding: 0;
   width: 30px;
   min-width: 30px;
+}
+.dx-datagrid-content .dx-datagrid-table .dx-filter-range-content
+{
+  padding: 7px 7px 7px 32px;
+  overflow: hidden;
+  -o-text-overflow: ellipsis;
+  text-overflow: ellipsis;
+  cursor: pointer;
 }
 .dx-datagrid-content .dx-datagrid-table td
 {
@@ -4879,25 +4930,26 @@
 {
   margin-right: 3px;
 }
-.dx-datagrid-filter-range-popup .dx-overlay-content.dx-state-focused
-{
-  outline-width: 2px;
-  outline-offset: -1px;
-}
-.dx-datagrid-filter-range-popup .dx-popup-content
-{
-  padding: 0;
-}
-.dx-datagrid-filter-range-popup .dx-popup-content .dx-texteditor
+.dx-datagrid-filter-range-overlay .dx-texteditor
 {
   border-width: 0;
-  margin: 0;
 }
-.dx-datagrid-filter-range-popup .dx-popup-content .dx-texteditor .dx-texteditor-input
+.dx-datagrid-filter-range-overlay .dx-texteditor.dx-state-focused:after
 {
-  padding: 7px;
+  content: " ";
+  position: absolute;
+  top: -1px;
+  bottom: -1px;
+  left: -1px;
+  right: -1px;
+  z-index: 1;
+  pointer-events: none;
 }
-.dx-datagrid-filter-range-popup .dx-editor-container.dx-highlight-outline
+.dx-datagrid-filter-range-overlay .dx-datagrid-filter-range-end
+{
+  border-top: 1px solid transparent;
+}
+.dx-datagrid-filter-range-overlay .dx-editor-container.dx-highlight-outline
 {
   padding: 0;
 }
@@ -5047,6 +5099,7 @@
 .dx-datagrid-rowsview
 {
   position: relative;
+  overflow: hidden;
 }
 .dx-datagrid-rowsview.dx-scrollable .dx-scrollable-content
 {
@@ -5259,7 +5312,7 @@
 }
 .dx-rtl .dx-datagrid-content .dx-datagrid-table .dx-row .dx-filter-range-content
 {
-  padding-right: 32px;
+  padding: 7px 32px 7px 7px;
 }
 .dx-rtl .dx-datagrid-content .dx-datagrid-table .dx-group-row.dx-row.dx-column-lines>td
 {
@@ -6044,7 +6097,7 @@
 }
 .dx-invalid-message.dx-overlay
 {
-  position: absolute;
+  position: relative;
 }
 .dx-invalid-message.dx-overlay-wrapper
 {
@@ -6235,6 +6288,36 @@
 {
   padding-top: 0;
 }
+.dx-layout-manager .dx-label-h-align.dx-flex-layout
+{
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -moz-flex;
+  display: -ms-flexbox;
+  display: flex;
+}
+.dx-layout-manager .dx-label-h-align.dx-flex-layout .dx-field-item-label
+{
+  display: block;
+}
+.dx-layout-manager .dx-label-h-align.dx-flex-layout .dx-field-item-content, .dx-layout-manager .dx-label-h-align.dx-flex-layout .dx-field-item-content-wrapper
+{
+  flex-shrink: 1;
+  flex-grow: 1;
+  flex-basis: 0;
+  display: block;
+}
+.dx-layout-manager .dx-label-h-align.dx-flex-layout:not(.dx-field-item-label-align)
+{
+  -ms-flex-align: baseline;
+  -webkit-align-items: baseline;
+  -webkit-box-align: baseline;
+  align-items: baseline;
+}
+.dx-layout-manager .dx-label-h-align.dx-field-item-label-align:not(.dx-flex-layout) .dx-field-item-label
+{
+  vertical-align: baseline;
+}
 .dx-layout-manager .dx-label-h-align .dx-field-item-label, .dx-layout-manager .dx-label-h-align .dx-field-item-content, .dx-layout-manager .dx-label-h-align .dx-field-item-content-wrapper
 {
   display: table-cell;
@@ -6251,10 +6334,6 @@
 .dx-layout-manager .dx-label-h-align .dx-field-item-label .dx-field-item-label-content
 {
   display: block;
-}
-.dx-layout-manager .dx-label-h-align .dx-field-item-label.dx-field-item-label-baseline
-{
-  vertical-align: baseline;
 }
 .dx-layout-manager .dx-label-h-align .dx-field-item-content
 {

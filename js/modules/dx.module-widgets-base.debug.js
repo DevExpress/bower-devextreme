@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Common Widgets)
-* Version: 15.2.5
-* Build date: Jan 27, 2016
+* Version: 15.2.7
+* Build date: Mar 3, 2016
 *
 * Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -1499,7 +1499,11 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     targetScrollable._cursorEnterHandler()
             },
             update: function() {
-                return this._eventHandler("update").done(this._updateAction)
+                var result = this._eventHandler("update").done(this._updateAction);
+                var allowedDirections = this._allowedDirections();
+                var allowedScroll = allowedDirections.vertical || allowedDirections.horizontal;
+                this._$container.css("touchAction", allowedScroll ? "none" : "");
+                return result
             },
             _allowedDirections: function() {
                 var bounceEnabled = this.option("bounceEnabled"),
@@ -1928,6 +1932,10 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     this.pullDownCallbacks.fire()
                 },
                 pullDownEnable: function(enabled) {
+                    if (enabled) {
+                        this._updateDimensions();
+                        this._setTopPocketOffset()
+                    }
                     this._pullDownEnabled = enabled
                 },
                 reachBottomEnable: function(enabled) {
@@ -3513,6 +3521,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                         var zoomBeforeFitting = this._map.getZoom();
                         this._preventZoomChangeEvent = true;
                         this._map.fitBounds(this._bounds);
+                        this._boundsChangeHandler();
                         var zoomAfterFitting = this._map.getZoom();
                         if (zoomBeforeFitting < zoomAfterFitting)
                             this._map.setZoom(zoomBeforeFitting);
@@ -4937,6 +4946,12 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     this._updateTimer = null
                 }, this))
             },
+            _renderItemContent: function(args) {
+                var $itemNode = args.itemData && args.itemData.node;
+                if ($itemNode)
+                    return this._renderItemContentByNode(args, $itemNode);
+                return this.callBase(args)
+            },
             _postprocessRenderItem: function(args) {
                 var boxConfig = args.itemData.box;
                 if (!boxConfig)
@@ -5375,6 +5390,11 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     delete this.node
                 })
             },
+            _toggleVisibility: function(visible) {
+                this.callBase(visible);
+                if (visible)
+                    this._updateRootBox()
+            },
             _optionChanged: function(args) {
                 switch (args.name) {
                     case"rows":
@@ -5411,7 +5431,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
         }))
     })(jQuery, DevExpress);
     /*! Module widgets-base, file ui.button.js */
-    DevExpress.define("/ui/widgets/ui.button", ["jquery", "/ui/uiNamespace", "/utils/utils.icon", "/devices", "/componentRegistrator", "/ui/ui.validationMixin", "/ui/ui.widget", "/utils/utils.inkRipple", "/ui/events/ui.events.utils"], function($, uiNamespace, iconUtils, devices, registerComponent, ValidationMixin, Widget, inkRipple, eventUtils) {
+    DevExpress.define("/ui/widgets/ui.button", ["jquery", "/ui/uiNamespace", "/utils/utils.icon", "/devices", "/componentRegistrator", "/ui/ui.validationMixin", "/validationEngine", "/ui/ui.widget", "/utils/utils.inkRipple", "/ui/events/ui.events.utils", "/ui/ui.themes"], function($, uiNamespace, iconUtils, devices, registerComponent, ValidationMixin, ValidationEngine, Widget, inkRipple, eventUtils, themes) {
         var BUTTON_CLASS = "dx-button",
             BUTTON_CONTENT_CLASS = "dx-button-content",
             BUTTON_HAS_TEXT_CLASS = "dx-button-has-text",
@@ -5458,7 +5478,9 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                                 },
                                 options: {focusStateEnabled: true}
                             }, {
-                                device: {platform: "android"},
+                                device: function() {
+                                    return /android5/.test(themes.current())
+                                },
                                 options: {useInkRipple: true}
                             }])
                 },
@@ -5540,7 +5562,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                 _executeClickAction: function(e) {
                     this._clickAction({
                         jQueryEvent: e,
-                        validationGroup: DevExpress.validationEngine.getGroupConfig(this._findGroup())
+                        validationGroup: ValidationEngine.getGroupConfig(this._findGroup())
                     })
                 },
                 _updateAriaLabel: function() {
@@ -5600,7 +5622,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
     });
     DevExpress.require(["/ui/widgets/ui.button"]);
     /*! Module widgets-base, file ui.checkBox.js */
-    DevExpress.define("/ui/widgets/ui.checkBox", ["jquery", "/ui/uiNamespace", "/devices", "/utils/utils.inkRipple", "/ui/ui.editor", "/componentRegistrator", "/ui/events/ui.events.utils"], function($, uiNamespace, devices, inkRipple, Editor, registerComponent, eventUtils) {
+    DevExpress.define("/ui/widgets/ui.checkBox", ["jquery", "/ui/uiNamespace", "/devices", "/utils/utils.inkRipple", "/ui/ui.editor", "/componentRegistrator", "/ui/events/ui.events.utils", "/ui/ui.themes"], function($, uiNamespace, devices, inkRipple, Editor, registerComponent, eventUtils, themes) {
         var CHECKBOX_CLASS = "dx-checkbox",
             CHECKBOX_ICON_CLASS = "dx-checkbox-icon",
             CHECKBOX_CHECKED_CLASS = "dx-checkbox-checked",
@@ -5634,7 +5656,9 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                                 },
                                 options: {focusStateEnabled: true}
                             }, {
-                                device: {platform: "android"},
+                                device: function() {
+                                    return /android5/.test(themes.current())
+                                },
                                 options: {useInkRipple: true}
                             }])
                 },
@@ -5746,7 +5770,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
     });
     DevExpress.require(["/ui/widgets/ui.checkBox"]);
     /*! Module widgets-base, file ui.switch.js */
-    DevExpress.define("/ui/widgets/ui.switch", ["jquery", "/devices", "/utils/utils.inkRipple", "/componentRegistrator", "/ui/ui.editor", "/ui/uiNamespace", "/ui/events/ui.events.utils", "/ui/events/ui.events.emitter.feedback"], function($, devices, inkRipple, registerComponent, Editor, uiNamespace, eventUtils, feedbackEvents) {
+    DevExpress.define("/ui/widgets/ui.switch", ["jquery", "/devices", "/utils/utils.inkRipple", "/componentRegistrator", "/ui/ui.editor", "/ui/uiNamespace", "/ui/events/ui.events.utils", "/ui/events/ui.events.emitter.feedback", "/ui/ui.themes"], function($, devices, inkRipple, registerComponent, Editor, uiNamespace, eventUtils, feedbackEvents, themes) {
         var fx = DevExpress.fx;
         var SWITCH_CLASS = "dx-switch",
             SWITCH_WRAPPER_CLASS = SWITCH_CLASS + "-wrapper",
@@ -5793,7 +5817,9 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                                 },
                                 options: {focusStateEnabled: true}
                             }, {
-                                device: {platform: "android"},
+                                device: function() {
+                                    return /android5/.test(themes.current())
+                                },
                                 options: {useInkRipple: true}
                             }])
                 },
@@ -6090,6 +6116,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                         text = valueFormat(displayValue);
                     else if (!commonUtils.isDefined(text))
                         text = valueFormat(value);
+                    this.option("text", text);
                     if (this._input().val() !== (commonUtils.isDefined(text) ? text : ""))
                         this._renderDisplayText(text);
                     else
@@ -7530,8 +7557,6 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                                     var $focusedItem = this._list.option("focusedElement");
                                     if ($focusedItem)
                                         this._setSelectedElement($focusedItem);
-                                    else
-                                        this._selectFirstItem();
                                     this.close()
                                 }
                                 else
@@ -7541,9 +7566,6 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                             home: $.noop,
                             end: $.noop
                         })
-                },
-                _selectFirstItem: function() {
-                    this._setSelectedElement(this._listItemElements().first())
                 },
                 _setSelectedElement: function($element) {
                     var $selectedItem = this._listSelectedItemElements();
@@ -8103,16 +8125,13 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
         return SpinButton
     });
     /*! Module widgets-base, file ui.numberBox.js */
-    DevExpress.define("/ui/widgets/ui.numberBox", ["jquery", "/utils/utils.common", "/devices", "/componentRegistrator", "/ui/uiNamespace", "/ui/widgets/ui.textEditor", "/ui/events/ui.events.utils", "/ui/events/pointer/ui.events.pointer", "/ui/events/ui.events.wheel", "/ui/widgets/numberBox/ui.numberBox.spin", "/ui/events/ui.events.emitter.feedback"], function($, commonUtils, devices, registerComponent, uiNamespace, TextEditor, eventUtils, pointerEvents, wheelEvent, SpinButton, feedbackEvents) {
+    DevExpress.define("/ui/widgets/ui.numberBox", ["jquery", "/utils/utils.common", "/devices", "/componentRegistrator", "/ui/uiNamespace", "/ui/widgets/ui.textEditor", "/ui/events/ui.events.utils", "/ui/events/pointer/ui.events.pointer", "/ui/events/ui.events.wheel", "/ui/widgets/numberBox/ui.numberBox.spin", "/ui/events/ui.events.emitter.feedback", "/utils/utils.caret"], function($, commonUtils, devices, registerComponent, uiNamespace, TextEditor, eventUtils, pointerEvents, wheelEvent, SpinButton, feedbackEvents, caret) {
         var math = Math;
         var WIDGET_CLASS = "dx-numberbox",
             SPIN_CLASS = "dx-numberbox-spin",
             SPIN_CONTAINER_CLASS = "dx-numberbox-spin-container",
-            SPIN_UP_CLASS = "dx-numberbox-spin-up",
-            SPIN_DOWN_CLASS = "dx-numberbox-spin-down",
             SPIN_TOUCH_FRIENDLY_CLASS = "dx-numberbox-spin-touch-friendly",
             CONTROL_KEYS = ["Tab", "Del", "Delete", "Backspace", "Left", "ArrowLeft", "Right", "ArrowRight", "Home", "End"];
-        var androidNativeBrowser = devices.real().android && navigator.userAgent.indexOf("Chrome") === -1;
         var NumberBox = TextEditor.inherit({
                 _supportedKeys: function() {
                     return $.extend(this.callBase(), {
@@ -8139,7 +8158,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                             step: 1,
                             showSpinButtons: false,
                             useTouchSpinButtons: true,
-                            mode: "number"
+                            mode: "text"
                         })
                 },
                 _defaultOptionsRules: function() {
@@ -8148,6 +8167,11 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                                     return devices.real().generic && !devices.isSimulator()
                                 },
                                 options: {useTouchSpinButtons: false}
+                            }, {
+                                device: function() {
+                                    return devices.real().platform !== "generic"
+                                },
+                                options: {mode: "number"}
                             }])
                 },
                 _render: function() {
@@ -8167,25 +8191,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                         e.preventDefault();
                         return false
                     }
-                    this._isIncompleteValue = false;
-                    if (this._isValueIncomplete(this._input().val()) || this._isCharSpecial(ch)) {
-                        this._isIncompleteValue = true;
-                        if (!this._isPointsCountCorrect(this.option("value") + ch))
-                            this._isIncompleteValue = false
-                    }
-                },
-                _isCharSpecial: function(char) {
-                    var regExp = /[.,eE\-+]/;
-                    return regExp.test(char)
-                },
-                _isPointsCountCorrect: function(value) {
-                    return (value.match(/\.|,/g) || []).length <= 1
-                },
-                _isValueIncomplete: function(value) {
-                    var expRegex = /\d+[eE]$/,
-                        dotRegex = /^[\.,]$/,
-                        negRegex = /^-$/;
-                    return expRegex.test(value) || dotRegex.test(value) || negRegex.test(value)
+                    this._keyPressed = true
                 },
                 _renderMouseWheelHandler: function(e) {
                     var eventName = eventUtils.addNamespace(wheelEvent.name, this.NAME);
@@ -8222,17 +8228,9 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     this.callBase.apply(this, arguments)
                 },
                 _forceValueRender: function() {
-                    var $input = this._input(),
-                        value = this.option("value"),
+                    var value = this.option("value"),
                         valueFormat = this.option("valueFormat");
-                    if (androidNativeBrowser) {
-                        var inputType = $input.attr("type");
-                        this._setInputType("text");
-                        $input.val(valueFormat(value));
-                        this._setInputType(inputType)
-                    }
-                    else
-                        $input.val(valueFormat(value))
+                    this._renderDisplayText(valueFormat(value))
                 },
                 _renderProps: function() {
                     this.callBase();
@@ -8298,7 +8296,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                         this._spinValueChange(-1)
                 },
                 _spinValueChange: function(sign) {
-                    var value = parseFloat(this._validationRequired() ? this._oldValue : this._normalizeInputValue()) || 0,
+                    var value = parseFloat(this._normalizeInputValue()) || 0,
                         step = parseFloat(this.option("step"));
                     value = this._correctRounding(value, step * sign);
                     this.option("value", value)
@@ -8330,25 +8328,44 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                 _forceRefreshInputValue: function() {
                     var $input = this._input(),
                         valueFormat = this.option("valueFormat");
-                    $input.val(null);
-                    $input.val(valueFormat(this.option("value")))
+                    if (this.option("mode") !== "number") {
+                        $input.val(null);
+                        $input.val(valueFormat(this.option("value")))
+                    }
                 },
                 _valueChangeEventHandler: function(e) {
-                    if (this._validationRequired()) {
-                        this._inputInvalidHandler();
-                        return
-                    }
                     var $input = this._input(),
+                        inputValue = $input.val(),
                         value = this._normalizeInputValue(),
                         valueFormat = this.option("valueFormat");
-                    if (this._isIncompleteValue)
+                    if (this.option("mode") === "number") {
+                        var numberValue = Number(value);
+                        this.callBase(e, isNaN(numberValue) ? null : numberValue);
+                        return
+                    }
+                    if (this._isValueIncomplete(inputValue))
                         return;
-                    if (Number($input.val()) !== value)
-                        $input.val(valueFormat(this.option("value")), valueFormat(value));
+                    if (!this._validateValue(this._normalizeText())) {
+                        this._resetValue();
+                        return
+                    }
+                    if (Number(inputValue) !== value)
+                        $input.val(valueFormat(value));
                     this.callBase(e, value)
                 },
-                _validationRequired: function() {
-                    return !this._isIncompleteValue && !this._validateValue(this._normalizeText())
+                _inputIsInvalid: function() {
+                    var isNumberMode = this.option("mode") === "number";
+                    var validityState = this._input().get(0).validity;
+                    return isNumberMode && validityState && validityState.badInput
+                },
+                _renderDisplayText: function(text) {
+                    if (this._inputIsInvalid())
+                        return;
+                    this.callBase(text)
+                },
+                _isValueIncomplete: function(value) {
+                    var incompleteRegex = /^(([+-])|([+-]?(0|[1-9]\d*)?[.,])|([+-]?(0|[1-9]\d*)?([.,]\d+)[eE][+-]?)|([+-]?(0|[1-9]\d*)[eE][+-]?))$/;
+                    return incompleteRegex.test(value)
                 },
                 _validateValue: function(value) {
                     var isValueValid = this._isValueValid();
@@ -8356,13 +8373,13 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                         this.option("value", null);
                         return true
                     }
-                    var isNumber = /^[-+]?(0|[1-9]\d*)?([.,]\d+)?([eE][-+]?\d+)?/.test(value);
+                    var isNumber = /^[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?$/.test(value);
                     this._oldValue = this.option("value");
                     if (!isNumber && !isValueValid)
                         return false;
                     return true
                 },
-                _inputInvalidHandler: function() {
+                _resetValue: function() {
                     var $input = this._input(),
                         isValueDefined = commonUtils.isDefined(this._oldValue);
                     this.option("value", isValueDefined ? this._oldValue : null);
@@ -8436,18 +8453,11 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                 }
             });
         registerComponent("dxNumberBox", uiNamespace, NumberBox);
-        NumberBox.__internals = {
-            WIDGET_CLASS: WIDGET_CLASS,
-            SPIN_CLASS: SPIN_CLASS,
-            SPIN_CONTAINER_CLASS: SPIN_CONTAINER_CLASS,
-            SPIN_UP_CLASS: SPIN_UP_CLASS,
-            SPIN_DOWN_CLASS: SPIN_DOWN_CLASS
-        };
         return NumberBox
     });
     DevExpress.require(["/ui/widgets/ui.numberBox"]);
     /*! Module widgets-base, file ui.radioButton.js */
-    DevExpress.define("/ui/widgets/ui.radioButton", ["jquery", "/devices", "/utils/utils.inkRipple", "/componentRegistrator", "/ui/ui.editor", "/ui/uiNamespace", "/ui/events/ui.events.utils"], function($, devices, inkRipple, registerComponent, Editor, uiNamespace, eventUtils) {
+    DevExpress.define("/ui/widgets/ui.radioButton", ["jquery", "/devices", "/utils/utils.inkRipple", "/componentRegistrator", "/ui/ui.editor", "/ui/uiNamespace", "/ui/events/ui.events.utils", "/ui/ui.themes"], function($, devices, inkRipple, registerComponent, Editor, uiNamespace, eventUtils, themes) {
         var RADIO_BUTTON_CLASS = "dx-radiobutton",
             RADIO_BUTTON_ICON_CLASS = "dx-radiobutton-icon",
             RADIO_BUTTON_ICON_DOT_CLASS = "dx-radiobutton-icon-dot",
@@ -8475,7 +8485,9 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                                 },
                                 options: {focusStateEnabled: true}
                             }, {
-                                device: {platform: "android"},
+                                device: function() {
+                                    return /android5/.test(themes.current())
+                                },
                                 options: {useInkRipple: true}
                             }])
                 },
@@ -8560,7 +8572,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
         return RadioButton
     });
     /*! Module widgets-base, file ui.radioGroup.js */
-    DevExpress.define("/ui/widgets/ui.radioGroup", ["jquery", "/devices", "/componentRegistrator", "/ui/ui.editor", "/ui/uiNamespace", "/utils/utils.inkRipple", "/ui/ui.dataExpression"], function($, devices, registerComponent, Editor, uiNamespace, inkRipple, DataExpressionMixin) {
+    DevExpress.define("/ui/widgets/ui.radioGroup", ["jquery", "/devices", "/componentRegistrator", "/ui/ui.editor", "/ui/uiNamespace", "/utils/utils.inkRipple", "/ui/ui.dataExpression", "/ui/ui.themes"], function($, devices, registerComponent, Editor, uiNamespace, inkRipple, DataExpressionMixin, themes) {
         var RADIO_GROUP_CLASS = "dx-radiogroup",
             RADIO_GROUP_VERTICAL_CLASS = "dx-radiogroup-vertical",
             RADIO_GROUP_HORIZONTAL_CLASS = "dx-radiogroup-horizontal",
@@ -8616,7 +8628,9 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                                 },
                                 options: {focusStateEnabled: true}
                             }, {
-                                device: {platform: "android"},
+                                device: function() {
+                                    return /android5/.test(themes.current())
+                                },
                                 options: {useInkRipple: true}
                             }])
                 },
@@ -8735,6 +8749,9 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                 _setCollectionWidgetOption: function() {
                     this._setWidgetOption("_radios", arguments)
                 },
+                focus: function() {
+                    this._radios && this._radios.focus()
+                },
                 _optionChanged: function(args) {
                     this._dataExpressionOptionChanged(args);
                     switch (args.name) {
@@ -8785,7 +8802,9 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
             Button = DX.require("/ui/widgets/ui.button"),
             inkRipple = DX.require("/utils/utils.inkRipple"),
             eventUtils = DX.require("/ui/events/ui.events.utils"),
+            domUtils = DX.require("/utils/utils.dom"),
             pointerEvents = DX.require("/ui/events/pointer/ui.events.pointer"),
+            themes = DX.require("/ui/ui.themes"),
             TABS_CLASS = "dx-tabs",
             TABS_WRAPPER_CLASS = "dx-indent-wrapper",
             TABS_EXPANDED_CLASS = "dx-tabs-expanded",
@@ -8832,7 +8851,9 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                             },
                             options: {focusStateEnabled: true}
                         }, {
-                            device: {platform: "android"},
+                            device: function() {
+                                return /android5/.test(themes.current())
+                            },
                             options: {useInkRipple: true}
                         }])
             },
@@ -8851,18 +8872,17 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
             _itemDataKey: function() {
                 return TABS_ITEM_DATA_KEY
             },
+            _renderContent: function() {
+                this.callBase();
+                if (this.option("templatesRenderAsynchronously"))
+                    this._resizeEventTimer = setTimeout(function() {
+                        domUtils.triggerResizeEvent(this._$content)
+                    }, 0)
+            },
             _render: function() {
-                this.element().removeClass(TABS_EXPANDED_CLASS);
                 this.callBase();
                 this._renderWrapper();
-                if (this._allowScrolling()) {
-                    this._renderScrollable();
-                    this._renderNavButtons()
-                }
-                else {
-                    this.element().removeClass(TABS_NAV_BUTTONS_CLASS);
-                    this.element().addClass(TABS_EXPANDED_CLASS)
-                }
+                this._renderScrolling();
                 this.setAria("role", "tablist");
                 var that = this;
                 this.itemElements().each(function(_, item) {
@@ -8870,6 +8890,34 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                 });
                 this.element().addClass(ACTIVE_STATE_CLASS).removeClass(ACTIVE_STATE_CLASS);
                 this.option("useInkRipple") && this._renderInkRipple()
+            },
+            _renderScrolling: function() {
+                this.element().removeClass(TABS_EXPANDED_CLASS);
+                if (this._allowScrolling() && !this._scrollable) {
+                    this._renderScrollable();
+                    this._renderNavButtons();
+                    this._scrollToItem(this.option("selectedItem"))
+                }
+                if (!this._allowScrolling()) {
+                    this._cleanScrolling();
+                    this.element().removeClass(TABS_NAV_BUTTONS_CLASS).addClass(TABS_EXPANDED_CLASS)
+                }
+            },
+            _cleanNavButtons: function() {
+                if (!this._leftButton || !this._rightButton)
+                    return;
+                this._leftButton.element().remove();
+                this._rightButton.element().remove();
+                this._leftButton = null;
+                this._rightButton = null
+            },
+            _cleanScrolling: function() {
+                if (!this._scrollable)
+                    return;
+                this._scrollable.content().children("." + TABS_WRAPPER_CLASS).appendTo(this._itemContainer());
+                this._scrollable.element().remove();
+                this._scrollable = null;
+                this._cleanNavButtons()
             },
             _renderInkRipple: function() {
                 this._inkRipple = inkRipple.render()
@@ -8906,6 +8954,12 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                 });
                 this.element().append(this._scrollable.element())
             },
+            _scrollToItem: function(itemData) {
+                if (!this._scrollable)
+                    return;
+                var $item = this._editStrategy.getItemElement(itemData);
+                this._scrollable.scrollToElement($item)
+            },
             _allowScrolling: function() {
                 if (!this.option("scrollingEnabled"))
                     return false;
@@ -8917,20 +8971,20 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
             },
             _renderNavButtons: function() {
                 this.element().toggleClass(TABS_NAV_BUTTONS_CLASS, this.option("showNavButtons"));
-                if (this.option("showNavButtons")) {
-                    this._leftButton = this._createNavButton(-TAB_OFFSET, "chevronprev");
-                    var $leftButton = this._leftButton.element();
-                    $leftButton.addClass(TABS_LEFT_NAV_BUTTON_CLASS);
-                    this.element().prepend($leftButton);
-                    this._rightButton = this._createNavButton(TAB_OFFSET, "chevronnext");
-                    var $rightButton = this._rightButton.element();
-                    $rightButton.addClass(TABS_RIGHT_NAV_BUTTON_CLASS);
-                    this.element().append($rightButton);
-                    this._updateNavButtonsVisibility();
-                    this._scrollable.update();
-                    if (this.option("rtlEnabled"))
-                        this._scrollable.scrollTo({left: this._scrollable.scrollWidth() - this._scrollable.clientWidth()})
-                }
+                if (!this.option("showNavButtons"))
+                    return;
+                this._leftButton = this._createNavButton(-TAB_OFFSET, "chevronprev");
+                var $leftButton = this._leftButton.element();
+                $leftButton.addClass(TABS_LEFT_NAV_BUTTON_CLASS);
+                this.element().prepend($leftButton);
+                this._rightButton = this._createNavButton(TAB_OFFSET, "chevronnext");
+                var $rightButton = this._rightButton.element();
+                $rightButton.addClass(TABS_RIGHT_NAV_BUTTON_CLASS);
+                this.element().append($rightButton);
+                this._updateNavButtonsVisibility();
+                this._scrollable.update();
+                if (this.option("rtlEnabled"))
+                    this._scrollable.scrollTo({left: this._scrollable.scrollWidth() - this._scrollable.clientWidth()})
             },
             _updateNavButtonsVisibility: function() {
                 this._leftButton && this._leftButton.option("disabled", this._scrollable.scrollLeft() <= 0);
@@ -8984,12 +9038,17 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
             },
             _dimensionChanged: function() {
                 if (this.option("scrollingEnabled"))
-                    this._refresh()
+                    this._renderScrolling()
             },
             _itemSelectHandler: function(e) {
                 if (this.option("selectionMode") === "single" && this.isItemSelected(e.currentTarget))
                     return;
                 this.callBase(e)
+            },
+            _clean: function() {
+                this._scrollable = null;
+                clearTimeout(this._resizeEventTimer);
+                this.callBase()
             },
             _optionChanged: function(args) {
                 switch (args.name) {
@@ -9038,58 +9097,386 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
             }
         }))
     })(jQuery, DevExpress);
+    /*! Module widgets-base, file ui.toolbar.strategy.listBase.js */
+    DevExpress.define("/ui/widgets/toolbar/ui.toolbar.strategy.listBase", ["jquery", "/ui/widgets/toolbar/ui.toolbar.strategy", "/utils/utils.translator", "/utils/utils.topOverlay"], function($, ToolbarStrategy, translator, topOverlay) {
+        var fx = DevExpress.fx,
+            hideTopOverlayCallback = topOverlay.hideCallback;
+        var TOOLBAR_LIST_VISIBLE_CLASS = "dx-toolbar-list-visible",
+            SUBMENU_ANIMATION_EASING = "easeOutCubic",
+            SUBMENU_HIDE_DURATION = 200,
+            SUBMENU_SHOW_DURATION = 400;
+        var ListStrategy = ToolbarStrategy.inherit({
+                render: function() {
+                    this._renderListOverlay();
+                    this.callBase();
+                    this._changeListVisible(this._toolbar.option("visible"))
+                },
+                _renderWidget: function() {
+                    if (!this._hasVisibleMenuItems())
+                        return;
+                    this.callBase()
+                },
+                _menuWidgetClass: function() {
+                    return "dxList"
+                },
+                _menuContainer: function() {
+                    return this._listOverlay.content()
+                },
+                _menuButtonOptions: function() {
+                    return $.extend({}, this.callBase(), {
+                            activeStateEnabled: false,
+                            text: "..."
+                        })
+                },
+                _widgetOptions: function() {
+                    return $.extend({}, this.callBase(), {
+                            width: "100%",
+                            indicateLoading: false
+                        })
+                },
+                _renderListOverlay: function() {
+                    var $listOverlay = $("<div>").appendTo(this._toolbar.element());
+                    this._listOverlay = this._toolbar._createComponent($listOverlay, "dxOverlay", this._listOverlayConfig())
+                },
+                _listOverlayConfig: function() {
+                    return {
+                            container: false,
+                            deferRendering: false,
+                            shading: false,
+                            height: "auto",
+                            width: "100%",
+                            showTitle: false,
+                            closeOnOutsideClick: $.proxy(this._listOutsideClickHandler, this),
+                            position: null,
+                            animation: null,
+                            closeOnBackButton: false
+                        }
+                },
+                _listOutsideClickHandler: function(e) {
+                    if (!$(e.target).closest(this._listOverlay.content()).length)
+                        this._toggleMenu(false, true)
+                },
+                _getListHeight: function() {
+                    var listHeight = this._listOverlay.content().find(".dx-list").height(),
+                        semiHiddenHeight = this._toolbar._$toolbarItemsContainer.height() - this._toolbar.element().height();
+                    return listHeight + semiHiddenHeight
+                },
+                _hideTopOverlayHandler: function() {
+                    this._toggleMenu(false, true)
+                },
+                _toggleHideTopOverlayCallback: function() {
+                    if (this._closeCallback)
+                        hideTopOverlayCallback.remove(this._closeCallback);
+                    if (this._menuShown) {
+                        this._closeCallback = $.proxy(this._hideTopOverlayHandler, this);
+                        hideTopOverlayCallback.add(this._closeCallback)
+                    }
+                },
+                _calculatePixelOffset: function(offset) {
+                    offset = (offset || 0) - 1;
+                    var maxOffset = this._getListHeight();
+                    return offset * maxOffset
+                },
+                _renderMenuPosition: function(offset, animate) {
+                    var pos = this._calculatePixelOffset(offset),
+                        element = this._listOverlay.content();
+                    if (animate)
+                        return this._animateMenuToggling(element, pos, this._menuShown);
+                    translator.move(element, {top: pos});
+                    return $.Deferred().resolve().promise()
+                },
+                _animateMenuToggling: function($element, position, isShowAnimation) {
+                    var duration = isShowAnimation ? SUBMENU_SHOW_DURATION : SUBMENU_HIDE_DURATION;
+                    return fx.animate($element, {
+                            type: "slide",
+                            to: {top: position},
+                            easing: SUBMENU_ANIMATION_EASING,
+                            duration: duration
+                        })
+                },
+                _toggleMenu: function(visible, animate) {
+                    this.callBase.apply(this, arguments);
+                    this._toggleHideTopOverlayCallback();
+                    this._renderMenuPosition(this._menuShown ? 0 : 1, animate).done($.proxy(function() {
+                        this._toolbar.element().toggleClass(TOOLBAR_LIST_VISIBLE_CLASS, visible)
+                    }, this))
+                },
+                _changeListVisible: function(value) {
+                    if (this._listOverlay) {
+                        this._listOverlay.option("visible", value);
+                        this._toggleMenu(false, false)
+                    }
+                },
+                handleToolbarVisibilityChange: function(value) {
+                    this._changeListVisible(value)
+                }
+            });
+        return ListStrategy
+    });
+    /*! Module widgets-base, file ui.toolbar.strategy.listBottom.js */
+    DevExpress.define("/ui/widgets/toolbar/ui.toolbar.strategy.listBottom", ["jquery", "/ui/widgets/toolbar/ui.toolbar.strategy.listBase"], function($, ListStrategy, translator) {
+        var ListBottomStrategy = ListStrategy.inherit({
+                NAME: "listBottom",
+                _renderWidget: function() {
+                    this._renderContainerSwipe();
+                    this.callBase();
+                    this._toolbar._$toolbarItemsContainer.prependTo(this._listOverlay.content())
+                },
+                _renderContainerSwipe: function() {
+                    this._toolbar._createComponent(this._toolbar._$toolbarItemsContainer, "dxSwipeable", {
+                        elastic: false,
+                        onStart: $.proxy(this._swipeStartHandler, this),
+                        onUpdated: $.proxy(this._swipeUpdateHandler, this),
+                        onEnd: $.proxy(this._swipeEndHandler, this),
+                        itemSizeFunc: $.proxy(this._getListHeight, this),
+                        direction: "vertical"
+                    })
+                },
+                _swipeStartHandler: function(e) {
+                    e.jQueryEvent.maxTopOffset = this._menuShown ? 0 : 1;
+                    e.jQueryEvent.maxBottomOffset = this._menuShown ? 1 : 0
+                },
+                _swipeUpdateHandler: function(e) {
+                    var offset = this._menuShown ? e.jQueryEvent.offset : 1 + e.jQueryEvent.offset;
+                    this._renderMenuPosition(offset, false)
+                },
+                _swipeEndHandler: function(e) {
+                    var targetOffset = e.jQueryEvent.targetOffset;
+                    targetOffset -= this._menuShown - 1;
+                    this._toggleMenu(targetOffset === 0, true)
+                }
+            });
+        return ListBottomStrategy
+    });
+    /*! Module widgets-base, file ui.toolbar.strategy.listTop.js */
+    DevExpress.define("/ui/widgets/toolbar/ui.toolbar.strategy.listTop", ["jquery", "/ui/widgets/toolbar/ui.toolbar.strategy.listBase", "/utils/utils.translator"], function($, ListStrategy, translator) {
+        var ListTopStrategy = ListStrategy.inherit({
+                NAME: "listTop",
+                _listOverlayConfig: function() {
+                    var config = this.callBase();
+                    return $.extend({}, config, {onContentReady: $.proxy(this._setItemsContainerZIndex, this)})
+                },
+                _setItemsContainerZIndex: function(e) {
+                    var overlayZIndex = e.component.content().css("z-index");
+                    this._toolbar._$toolbarItemsContainer.css("z-index", overlayZIndex + 1)
+                },
+                _renderMenuPosition: function(offset, animate) {
+                    var $element = this._toolbar._$toolbarItemsContainer;
+                    var pos = this._calculateItemsContainerOffset(offset);
+                    if (animate)
+                        this._animateMenuToggling($element, pos, this._menuShown);
+                    else
+                        translator.move($element, {top: pos});
+                    return this.callBase(offset, animate)
+                },
+                _calculateItemsContainerOffset: function(offset) {
+                    offset = (offset || 0) - 1;
+                    var maxOffset = this._getItemsContainerHeight();
+                    return offset * maxOffset
+                },
+                _getItemsContainerHeight: function() {
+                    var semiHiddenHeight = this._toolbar._$toolbarItemsContainer.height() - this._toolbar.element().height();
+                    return semiHiddenHeight
+                },
+                _listOutsideClickHandler: function(e) {
+                    var $target = $(e.target);
+                    var isOverlayClick = $target.closest(this._listOverlay.content()).length > 0;
+                    var isItemsContainerClick = $target.closest(this._toolbar._$toolbarItemsContainer).length > 0;
+                    if (!isOverlayClick && !isItemsContainerClick)
+                        this._toggleMenu(false, true)
+                }
+            });
+        return ListTopStrategy
+    });
+    /*! Module widgets-base, file ui.toolbar.strategy.dropDownMenu.js */
+    DevExpress.define("/ui/widgets/toolbar/ui.toolbar.strategy.dropDownMenu", ["jquery", "/ui/widgets/toolbar/ui.toolbar.strategy"], function($, ToolbarStrategy) {
+        var DropDownMenuStrategy = ToolbarStrategy.inherit({
+                NAME: "dropDownMenu",
+                render: function() {
+                    if (!this._hasVisibleMenuItems())
+                        return;
+                    this._renderMenuButtonContainer();
+                    this._renderWidget()
+                },
+                _menuWidgetClass: function() {
+                    return "dxDropDownMenu"
+                },
+                _menuContainer: function() {
+                    return this._$menuButtonContainer
+                }
+            });
+        return DropDownMenuStrategy
+    });
+    /*! Module widgets-base, file ui.toolbar.strategy.actionSheet.js */
+    DevExpress.define("/ui/widgets/toolbar/ui.toolbar.strategy.actionSheet", ["jquery", "/ui/widgets/toolbar/ui.toolbar.strategy"], function($, ToolbarStrategy) {
+        var ActionSheetStrategy = ToolbarStrategy.inherit({
+                NAME: "actionSheet",
+                _getMenuItemTemplate: function() {
+                    return this._toolbar._getTemplate("actionSheetItem")
+                },
+                render: function() {
+                    if (!this._hasVisibleMenuItems())
+                        return;
+                    this.callBase()
+                },
+                _menuWidgetClass: function() {
+                    return "dxActionSheet"
+                },
+                _menuContainer: function() {
+                    return this._toolbar.element()
+                },
+                _widgetOptions: function() {
+                    return $.extend({}, this.callBase(), {
+                            target: this._$button,
+                            showTitle: false
+                        })
+                },
+                _menuButtonOptions: function() {
+                    return $.extend({}, this.callBase(), {icon: "overflow"})
+                },
+                _toggleMenu: function(visible, animate) {
+                    this.callBase.apply(this, arguments);
+                    this._menu.toggle(this._menuShown);
+                    this._menuShown = false
+                }
+            });
+        return ActionSheetStrategy
+    });
+    /*! Module widgets-base, file ui.toolbar.strategy.js */
+    DevExpress.define("/ui/widgets/toolbar/ui.toolbar.strategy", ["jquery", "/class", "/ui/widgets/ui.button"], function($, Class, Button) {
+        var abstract = Class.abstract,
+            compileGetter = DevExpress.data.utils.compileGetter;
+        var TOOLBAR_MENU_CONTAINER_CLASS = "dx-toolbar-menu-container",
+            TOOLBAR_MENU_BUTTON_CLASS = "dx-toolbar-menu-button";
+        var ToolbarStrategy = Class.inherit({
+                ctor: function(toolbar) {
+                    this._toolbar = toolbar
+                },
+                render: function() {
+                    this._renderMenuButton();
+                    this._renderWidget()
+                },
+                _widgetOptions: function() {
+                    var itemClickAction = this._toolbar._createActionByOption("onItemClick");
+                    return {
+                            itemTemplate: $.proxy(this._getMenuItemTemplate, this),
+                            onItemClick: $.proxy(function(e) {
+                                this._toggleMenu(false, true);
+                                itemClickAction(e)
+                            }, this)
+                        }
+                },
+                _getMenuItemTemplate: function() {
+                    return this._toolbar._getTemplateByOption("menuItemTemplate")
+                },
+                _renderWidget: function() {
+                    var $menu = $("<div>").appendTo(this._menuContainer());
+                    this._menu = this._toolbar._createComponent($menu, this._menuWidgetClass(), this._widgetOptions());
+                    this.renderMenuItems()
+                },
+                _menuContainer: abstract,
+                _menuWidgetClass: abstract,
+                _hasVisibleMenuItems: function() {
+                    var menuItems = this._getMenuItems(),
+                        result = false;
+                    var optionGetter = compileGetter("visible");
+                    $.each(menuItems, function(index, item) {
+                        var itemVisible = optionGetter(item, {functionsAsIs: true});
+                        if (itemVisible !== false)
+                            result = true
+                    });
+                    return result
+                },
+                _getMenuItems: function() {
+                    return this._toolbar._getMenuItems()
+                },
+                _renderMenuButton: function() {
+                    var buttonOptions = this._menuButtonOptions();
+                    this._renderMenuButtonContainer();
+                    this._$button = $("<div>").appendTo(this._$menuButtonContainer).addClass(TOOLBAR_MENU_BUTTON_CLASS);
+                    this._toolbar._createComponent(this._$button, Button, buttonOptions)
+                },
+                _menuButtonOptions: function() {
+                    return {onClick: $.proxy(this._menuButtonClickHandler, this)}
+                },
+                _menuButtonClickHandler: function() {
+                    this._toggleMenu(!this._menuShown, true)
+                },
+                _renderMenuButtonContainer: function() {
+                    var $afterSection = this._toolbar._$afterSection;
+                    this._$menuButtonContainer = $("<div>").appendTo($afterSection).addClass(this._toolbar._buttonClass()).addClass(TOOLBAR_MENU_CONTAINER_CLASS)
+                },
+                renderMenuItems: function() {
+                    this._menu && this._menu.option("items", this._getMenuItems())
+                },
+                toggleMenuVisibility: function(visible, animate) {
+                    this._menu && this._toggleMenu(visible, animate)
+                },
+                _toggleMenu: function(visible, animate) {
+                    this._menuShown = visible
+                },
+                getMenuWidget: function() {
+                    return this._menu
+                },
+                widgetOption: function(name, value) {
+                    this._menu && this._menu.option(name, value)
+                },
+                handleToolbarVisibilityChange: $.noop
+            });
+        return ToolbarStrategy
+    });
     /*! Module widgets-base, file ui.toolbar.js */
     (function($, DX, undefined) {
         var ui = DX.ui,
-            fx = DX.fx,
-            translator = DX.require("/utils/utils.translator"),
-            hideTopOverlayCallback = DX.require("/utils/utils.topOverlay").hideCallback,
             registerComponent = DX.require("/componentRegistrator"),
-            Button = DX.require("/ui/widgets/ui.button");
+            ActionSheetStrategy = DX.require("/ui/widgets/toolbar/ui.toolbar.strategy.actionSheet"),
+            DropDownMenuStrategy = DX.require("/ui/widgets/toolbar/ui.toolbar.strategy.dropDownMenu"),
+            ListBottomStrategy = DX.require("/ui/widgets/toolbar/ui.toolbar.strategy.listBottom"),
+            ListTopStrategy = DX.require("/ui/widgets/toolbar/ui.toolbar.strategy.listTop");
+        var STRATEGIES = {
+                actionSheet: ActionSheetStrategy,
+                dropDownMenu: DropDownMenuStrategy,
+                listBottom: ListBottomStrategy,
+                listTop: ListTopStrategy
+            };
         var TOOLBAR_CLASS = "dx-toolbar",
             TOOLBAR_BOTTOM_CLASS = "dx-toolbar-bottom",
             TOOLBAR_MINI_CLASS = "dx-toolbar-mini",
             TOOLBAR_ITEM_CLASS = "dx-toolbar-item",
             TOOLBAR_LABEL_CLASS = "dx-toolbar-label",
             TOOLBAR_BUTTON_CLASS = "dx-toolbar-button",
-            TOOLBAR_MENU_CONTAINER_CLASS = "dx-toolbar-menu-container",
-            TOOLBAR_MENU_BUTTON_CLASS = "dx-toolbar-menu-button",
             TOOLBAR_ITEMS_CONTAINER_CLASS = "dx-toolbar-items-container",
             TOOLBAR_LABEL_SELECTOR = "." + TOOLBAR_LABEL_CLASS,
-            TOOLBAR_ITEM_DATA_KEY = "dxToolbarItemDataKey",
-            SUBMENU_SWIPE_EASING = "easeOutCubic",
-            SUBMENU_HIDE_DURATION = 200,
-            SUBMENU_SHOW_DURATION = 400;
-        var slideSubmenu = function($element, position, isShowAnimation) {
-                var duration = isShowAnimation ? SUBMENU_SHOW_DURATION : SUBMENU_HIDE_DURATION;
-                fx.animate($element, {
-                    type: "slide",
-                    to: {top: position},
-                    easing: SUBMENU_SWIPE_EASING,
-                    duration: duration
-                })
-            };
+            TOOLBAR_ITEM_DATA_KEY = "dxToolbarItemDataKey";
         registerComponent("dxToolbar", ui, ui.CollectionWidget.inherit({
             _getDefaultOptions: function() {
                 return $.extend(this.callBase(), {
                         menuItemTemplate: "menuItem",
-                        submenuType: "dxDropDownMenu",
+                        submenuType: "dropDownMenu",
                         renderAs: "topToolbar"
                     })
             },
             _defaultOptionsRules: function() {
                 return this.callBase().concat([{
-                            device: {platform: "ios"},
-                            options: {submenuType: "dxActionSheet"}
-                        }, {
-                            device: {platform: "android"},
-                            options: {submenuType: "dxDropDownMenu"}
+                            device: function() {
+                                return /ios7.*/.test(ui.themes.current())
+                            },
+                            options: {submenuType: "actionSheet"}
                         }, {
                             device: function() {
-                                var currentTheme = (ui.themes.current() || "").split(".")[0];
-                                return currentTheme === "win8"
+                                return /android5.*/.test(ui.themes.current())
                             },
-                            options: {submenuType: "dxList"}
+                            options: {submenuType: "dropDownMenu"}
+                        }, {
+                            device: function() {
+                                return /win8.*/.test(ui.themes.current())
+                            },
+                            options: {submenuType: "listBottom"}
+                        }, {
+                            device: function() {
+                                return /win10.*/.test(ui.themes.current())
+                            },
+                            options: {submenuType: "listTop"}
                         }])
             },
             _itemContainer: function() {
@@ -9101,9 +9488,11 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
             _itemDataKey: function() {
                 return TOOLBAR_ITEM_DATA_KEY
             },
+            _buttonClass: function() {
+                return TOOLBAR_BUTTON_CLASS
+            },
             _dimensionChanged: function() {
-                if (this._menu)
-                    this._toggleMenuVisibility(false, true);
+                this._menuStrategy.toggleMenuVisibility(false, true);
                 this._arrangeTitle()
             },
             _render: function() {
@@ -9160,28 +9549,12 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     container = this._$toolbarItemsContainer.find(".dx-toolbar-" + location),
                     itemHasText = Boolean(item.text),
                     itemElement = this.callBase(index, item, container, $after);
-                itemElement.toggleClass(TOOLBAR_BUTTON_CLASS, !itemHasText).toggleClass(TOOLBAR_LABEL_CLASS, itemHasText);
+                itemElement.toggleClass(this._buttonClass(), !itemHasText).toggleClass(TOOLBAR_LABEL_CLASS, itemHasText);
                 return itemElement
-            },
-            _hasVisibleMenuItems: function() {
-                var menuItems = this._getMenuItems(),
-                    result = false;
-                var optionGetter = DevExpress.data.utils.compileGetter("visible");
-                $.each(menuItems, function(index, item) {
-                    var itemVisible = optionGetter(item, {functionsAsIs: true});
-                    if (itemVisible !== false)
-                        result = true
-                });
-                return result
             },
             _getToolbarItems: function() {
                 return $.grep(this.option("items") || [], function(item) {
                         return item.location !== "menu"
-                    })
-            },
-            _getMenuItems: function() {
-                return $.grep(this.option("items") || [], function(item) {
-                        return item.location === "menu"
                     })
             },
             _renderContentImpl: function() {
@@ -9193,171 +9566,21 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     this._renderItems(items)
             },
             _renderMenu: function() {
-                var that = this,
-                    itemClickAction = this._createActionByOption("onItemClick");
-                var options = {
-                        itemTemplate: function() {
-                            if (that._menuType === "dxActionSheet")
-                                return that._getTemplate("actionSheetItem");
-                            return that._getTemplateByOption("menuItemTemplate")
-                        },
-                        onItemClick: function(e) {
-                            that._toggleMenuVisibility(false, true);
-                            itemClickAction(e)
-                        }
-                    };
-                this._menuType = this.option("submenuType");
-                if (this._menuType === "dxList" && this.option("renderAs") === "topToolbar")
-                    this._menuType = "dxDropDownMenu";
-                switch (this._menuType) {
-                    case"dxActionSheet":
-                        this._renderActionSheet(options);
-                        break;
-                    case"dxDropDownMenu":
-                        this._renderDropDown(options);
-                        break;
-                    case"dxList":
-                        this._renderList(options);
-                        break
-                }
+                this._renderMenuStrategy();
+                this._menuStrategy.render()
             },
-            _renderMenuButton: function(options) {
-                var buttonOptions = $.extend({onClick: $.proxy(this._menuButtonClickHandler, this)}, options);
-                this._renderMenuButtonContainer();
-                this._$button = $("<div>").appendTo(this._$menuButtonContainer).addClass(TOOLBAR_MENU_BUTTON_CLASS);
-                this._createComponent(this._$button, Button, buttonOptions)
+            _renderMenuStrategy: function() {
+                var strategyName = this.option("submenuType");
+                if ((strategyName === "listBottom" || strategyName === "listTop") && this.option("renderAs") === "topToolbar")
+                    strategyName = "dropDownMenu";
+                var strategy = STRATEGIES[strategyName];
+                if (!(this._menuStrategy && this._menuStrategy.NAME === strategyName))
+                    this._menuStrategy = new strategy(this)
             },
-            _renderMenuButtonContainer: function() {
-                var $afterSection = this._$afterSection;
-                this._$menuButtonContainer = $("<div>").appendTo($afterSection).addClass(TOOLBAR_BUTTON_CLASS).addClass(TOOLBAR_MENU_CONTAINER_CLASS)
-            },
-            _renderDropDown: function(options) {
-                if (!this._hasVisibleMenuItems())
-                    return;
-                this._renderMenuButtonContainer();
-                var $menu = $("<div>").appendTo(this._$menuButtonContainer);
-                this._menu = this._createComponent($menu, "dxDropDownMenu", options);
-                this._renderMenuItems()
-            },
-            _renderActionSheet: function(options) {
-                if (!this._hasVisibleMenuItems())
-                    return;
-                this._renderMenuButton({icon: "overflow"});
-                var actionSheetOptions = $.extend({
-                        target: this._$button,
-                        showTitle: false
-                    }, options);
-                var $menu = $("<div>").appendTo(this.element());
-                this._menu = this._createComponent($menu, "dxActionSheet", actionSheetOptions);
-                this._renderMenuItems()
-            },
-            _renderList: function(options) {
-                this._renderMenuButton({
-                    activeStateEnabled: false,
-                    text: "..."
-                });
-                var listOptions = $.extend({
-                        width: "100%",
-                        indicateLoading: false
-                    }, options);
-                this._renderListOverlay();
-                this._renderContainerSwipe();
-                if (this._hasVisibleMenuItems()) {
-                    var $menu = $("<div>").appendTo(this._listOverlay.content());
-                    this._menu = this._createComponent($menu, "dxList", listOptions);
-                    this._renderMenuItems()
-                }
-                this._changeListVisible(this.option("visible"))
-            },
-            _renderMenuItems: function() {
-                this._menu.option("items", this._getMenuItems())
-            },
-            _getListHeight: function() {
-                var listHeight = this._listOverlay.content().find(".dx-list").height(),
-                    semiHiddenHeight = this._$toolbarItemsContainer.height() - this.element().height();
-                return listHeight + semiHiddenHeight
-            },
-            _renderListOverlay: function() {
-                var $listOverlay = $("<div>").appendTo(this.element());
-                this._listOverlay = this._createComponent($listOverlay, "dxOverlay", {
-                    container: false,
-                    deferRendering: false,
-                    shading: false,
-                    height: "auto",
-                    width: "100%",
-                    showTitle: false,
-                    closeOnOutsideClick: $.proxy(this._listOutsideClickHandler, this),
-                    position: null,
-                    animation: null,
-                    closeOnBackButton: false
-                })
-            },
-            _hideTopOverlayHandler: function() {
-                this._toggleMenuVisibility(false, true)
-            },
-            _toggleHideTopOverlayCallback: function() {
-                if (this._closeCallback)
-                    hideTopOverlayCallback.remove(this._closeCallback);
-                if (this._menuShown) {
-                    this._closeCallback = $.proxy(this._hideTopOverlayHandler, this);
-                    hideTopOverlayCallback.add(this._closeCallback)
-                }
-            },
-            _renderContainerSwipe: function() {
-                this._createComponent(this._$toolbarItemsContainer.appendTo(this._listOverlay.content()), "dxSwipeable", {
-                    elastic: false,
-                    onStart: $.proxy(this._swipeStartHandler, this),
-                    onUpdated: $.proxy(this._swipeUpdateHandler, this),
-                    onEnd: $.proxy(this._swipeEndHandler, this),
-                    itemSizeFunc: $.proxy(this._getListHeight, this),
-                    direction: "vertical"
-                })
-            },
-            _listOutsideClickHandler: function(e) {
-                if (!$(e.target).closest(this._listOverlay.content()).length)
-                    this._toggleMenuVisibility(false, true)
-            },
-            _calculatePixelOffset: function(offset) {
-                offset = (offset || 0) - 1;
-                var maxOffset = this._getListHeight();
-                return offset * maxOffset
-            },
-            _swipeStartHandler: function(e) {
-                e.jQueryEvent.maxTopOffset = this._menuShown ? 0 : 1;
-                e.jQueryEvent.maxBottomOffset = this._menuShown ? 1 : 0
-            },
-            _swipeUpdateHandler: function(e) {
-                var offset = this._menuShown ? e.jQueryEvent.offset : 1 + e.jQueryEvent.offset;
-                this._renderMenuPosition(offset, false)
-            },
-            _swipeEndHandler: function(e) {
-                var targetOffset = e.jQueryEvent.targetOffset;
-                targetOffset -= this._menuShown - 1;
-                this._toggleMenuVisibility(targetOffset === 0, true)
-            },
-            _renderMenuPosition: function(offset, animate) {
-                var pos = this._calculatePixelOffset(offset),
-                    element = this._listOverlay.content();
-                if (animate)
-                    slideSubmenu(element, pos, this._menuShown);
-                else
-                    translator.move(element, {top: pos})
-            },
-            _menuButtonClickHandler: function() {
-                this._toggleMenuVisibility(!this._menuShown, true)
-            },
-            _toggleMenuVisibility: function(visible, animate) {
-                this._menuShown = visible;
-                switch (this._menuType) {
-                    case"dxList":
-                        this._toggleHideTopOverlayCallback();
-                        this._renderMenuPosition(this._menuShown ? 0 : 1, animate);
-                        break;
-                    case"dxActionSheet":
-                        this._menu.toggle(this._menuShown);
-                        this._menuShown = false;
-                        break
-                }
+            _getMenuItems: function() {
+                return $.grep(this.option("items") || [], function(item) {
+                        return item.location === "menu"
+                    })
             },
             _renderEmptyMessage: $.noop,
             _clean: function() {
@@ -9365,14 +9588,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                 this.element().empty()
             },
             _changeMenuOption: function(name, value) {
-                if (this._menu)
-                    this._menu.option(name, value)
-            },
-            _changeListVisible: function(value) {
-                if (this._listOverlay) {
-                    this._listOverlay.option("visible", value);
-                    this._toggleMenuVisibility(false, false)
-                }
+                this._menuStrategy.widgetOption(name, value)
             },
             _visibilityChanged: function(visible) {
                 if (visible)
@@ -9388,7 +9604,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
             _itemOptionChanged: function(index, property, value) {
                 var itemData = this.option("items")[index];
                 if (itemData.location === "menu")
-                    this._renderMenuItems();
+                    this._menuStrategy.renderMenuItems();
                 else {
                     var itemIndex = $.inArray(itemData, this._getToolbarItems());
                     this.callBase.apply(this, [itemIndex, property, value]);
@@ -9405,7 +9621,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                         break;
                     case"visible":
                         this.callBase.apply(this, arguments);
-                        this._changeListVisible(value);
+                        this._menuStrategy.handleToolbarVisibilityChange(value);
                         break;
                     case"menuItemTemplate":
                         this._changeMenuOption("itemTemplate", this._getTemplate(value));
@@ -9429,7 +9645,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
             devices = DX.require("/devices"),
             registerComponent = DX.require("/componentRegistrator"),
             Button = DX.require("/ui/widgets/ui.button"),
-            eventUtils = DX.require("/ui/events/ui.events.utils");
+            eventUtils = DX.require("/ui/events/ui.events.utils"),
+            themes = DX.require("/ui/ui.themes");
         var LIST_CLASS = "dx-list",
             LIST_ITEM_CLASS = "dx-list-item",
             LIST_ITEM_SELECTOR = "." + LIST_ITEM_CLASS,
@@ -9552,7 +9769,9 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                             },
                             options: {focusStateEnabled: true}
                         }, {
-                            device: {platform: "android"},
+                            device: function() {
+                                return /android5/.test(themes.current())
+                            },
                             options: {useInkRipple: true}
                         }, {
                             device: function(device) {
@@ -9576,6 +9795,16 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
             },
             _itemContainer: function() {
                 return this._$container
+            },
+            _itemElements: function() {
+                if (!this.option("grouped"))
+                    return this._itemContainer().children(this._itemSelector());
+                return this._itemContainer().children("." + LIST_GROUP_CLASS).children("." + LIST_GROUP_BODY_CLASS).children(this._itemSelector())
+            },
+            _itemSelectHandler: function(e) {
+                if (this.option("selectionMode") === "single" && this.isItemSelected(e.currentTarget))
+                    return;
+                this.callBase(e)
             },
             _allowDinamicItemsAppend: function() {
                 return true
@@ -9906,13 +10135,11 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     case"grouped":
                     case"collapsibleGroups":
                     case"groupTemplate":
+                    case"items":
                         this._invalidate();
                         break;
                     case"onGroupRendered":
                         this._createGroupRenderAction();
-                        break;
-                    case"items":
-                        this._invalidate();
                         break;
                     case"width":
                     case"height":
@@ -9974,6 +10201,10 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
             reload: function() {
                 this.scrollTo(0);
                 this._pullDownHandler()
+            },
+            repaint: function() {
+                this.scrollTo(0);
+                this.callBase()
             },
             scrollTop: function() {
                 return this._scrollView.scrollOffset().top
@@ -10232,6 +10463,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                 var groups = this._collectionWidget.option("items"),
                     index = false;
                 $.each(groups, function(groupIndex, group) {
+                    if (!group.items)
+                        return false;
                     $.each(group.items, function(itemIndex, item) {
                         if (item !== itemData)
                             return true;
@@ -11910,10 +12143,13 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                         case"itemMargin":
                             this._renderGeometry();
                             break;
-                        case"direction":
                         case"width":
                         case"height":
                             this.callBase(args);
+                            this._renderGeometry();
+                            this._updateScrollView();
+                            break;
+                        case"direction":
                             this._renderGeometry();
                             this._updateScrollView();
                             break;
@@ -11928,7 +12164,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     return this._scrollView.scrollOffset()[this._config.mainPosition]
                 }
             });
-        registerComponent("dxTileView", TileView);
+        registerComponent("dxTileView", uiNamespace, TileView);
         return TileView
     });
     DevExpress.require(["/ui/widgets/ui.tileView"]);
@@ -12389,8 +12625,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
         return SliderHandle
     });
     /*! Module widgets-base, file ui.slider.js */
-    DevExpress.define("/ui/widgets/track/ui.slider", ["jquery", "/utils/utils.support", "/utils/utils.dom", "/devices", "/componentRegistrator", "/ui/widgets/track/ui.trackBar", "/ui/uiNamespace", "/ui/events/ui.events.utils", "/ui/events/pointer/ui.events.pointer", "/ui/events/ui.events.emitter.feedback", "/ui/widgets/track/ui.sliderHandle", "/utils/utils.inkRipple"], function($, support, domUtils, devices, registerComponent, TrackBar, uiNamespace, eventUtils, pointerEvents, feedbackEvents, SliderHandle, inkRipple) {
-        var transionEndEventName = support.transitionEndEventName;
+    DevExpress.define("/ui/widgets/track/ui.slider", ["jquery", "/utils/utils.support", "/utils/utils.dom", "/devices", "/componentRegistrator", "/ui/widgets/track/ui.trackBar", "/ui/uiNamespace", "/ui/events/ui.events.utils", "/ui/events/pointer/ui.events.pointer", "/ui/events/ui.events.emitter.feedback", "/ui/widgets/track/ui.sliderHandle", "/utils/utils.inkRipple", "/ui/ui.themes"], function($, support, domUtils, devices, registerComponent, TrackBar, uiNamespace, eventUtils, pointerEvents, feedbackEvents, SliderHandle, inkRipple, themes) {
         var SLIDER_CLASS = "dx-slider",
             SLIDER_WRAPPER_CLASS = "dx-slider-wrapper",
             SLIDER_HANDLE_SELECTOR = ".dx-slider-handle",
@@ -12486,7 +12721,9 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                                 },
                                 options: {focusStateEnabled: true}
                             }, {
-                                device: {platform: "android"},
+                                device: function() {
+                                    return /android5/.test(themes.current())
+                                },
                                 options: {useInkRipple: true}
                             }])
                 },
@@ -12537,8 +12774,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                 },
                 _renderContainer: function() {
                     this.callBase();
-                    this._$bar.addClass(SLIDER_BAR_CLASS);
-                    this._$bar.off(transionEndEventName + "." + this.NAME).on(transionEndEventName, $.proxy(this._fitHandleTooltipPosition, this))
+                    this._$bar.addClass(SLIDER_BAR_CLASS)
                 },
                 _renderRange: function() {
                     this.callBase();
@@ -12585,6 +12821,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                 },
                 _toggleFocusClass: function(isFocused, $element) {
                     this.callBase(isFocused, $element);
+                    if (this._disposed)
+                        return;
                     var $focusTarget = $($element || this._focusTarget());
                     this._renderInkWave($focusTarget, null, isFocused, 0)
                 },
@@ -13044,7 +13282,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
             GALLERY_INDICATOR_ITEM_CLASS = GALLERY_INDICATOR_CLASS + "-item",
             GALLERY_INDICATOR_ITEM_SELECTOR = "." + GALLERY_INDICATOR_ITEM_CLASS,
             GALLERY_INDICATOR_ITEM_SELECTED_CLASS = GALLERY_INDICATOR_ITEM_CLASS + "-selected",
-            GALLERY_ITEM_DATA_KEY = "dxGalleryItemData";
+            GALLERY_ITEM_DATA_KEY = "dxGalleryItemData",
+            MAX_CALC_ERROR = 1;
         var GalleryNavButton = Widget.inherit({
                 _supportedKeys: function() {
                     return $.extend(this.callBase(), {
@@ -13311,10 +13550,14 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                 return animationComplete
             },
             _needMoveContainerForward: function() {
-                return this._$container.position().left * this._offsetDirection() <= -this._maxItemWidth() * this._elementWidth() * this._itemsCount()
+                var expectedPosition = this._$container.position().left * this._offsetDirection(),
+                    actualPosition = -this._maxItemWidth() * this._elementWidth() * this._itemsCount();
+                return expectedPosition <= actualPosition + MAX_CALC_ERROR
             },
             _needMoveContainerBack: function() {
-                return this._$container.position().left * this._offsetDirection() >= this._actualItemWidth() * this._elementWidth()
+                var expectedPosition = this._$container.position().left * this._offsetDirection(),
+                    actualPosition = this._actualItemWidth() * this._elementWidth();
+                return expectedPosition >= actualPosition - MAX_CALC_ERROR
             },
             _maxContainerOffset: function() {
                 return -this._maxItemWidth() * (this._itemsCount() - this._itemsPerPage()) * this._offsetDirection()
@@ -13850,6 +14093,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                         onResizeStart: null,
                         onResize: null,
                         onResizeEnd: null,
+                        onContentReady: null,
                         target: undefined,
                         container: undefined,
                         hideTopOverlayHandler: undefined,
@@ -13911,6 +14155,9 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                 $element.addClass(OVERLAY_CLASS);
                 this._$wrapper.attr("data-bind", "dxControlsDescendantBindings: true");
                 this._$wrapper.on("MSPointerDown", $.noop);
+                this._$wrapper.on("focusin", function(e) {
+                    e.stopPropagation()
+                });
                 this._toggleViewPortSubscriptiion(true)
             },
             _initOptions: function(options) {
@@ -14010,6 +14257,12 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
             _normalizePosition: function() {
                 this._position = this.option("position")
             },
+            _getAnimationConfig: function() {
+                var animation = this.option("animation");
+                if ($.isFunction(animation))
+                    animation = animation.call(this);
+                return animation
+            },
             _show: function() {
                 var that = this,
                     deferred = $.Deferred();
@@ -14023,7 +14276,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     return $.when().promise();
                 this._currentVisible = true;
                 this._normalizePosition();
-                var animation = that.option("animation") || {},
+                var animation = that._getAnimationConfig() || {},
                     showAnimation = this._normalizeAnimation(animation.show, "to"),
                     startShowAnimation = showAnimation && showAnimation.start || $.noop,
                     completeShowAnimation = showAnimation && showAnimation.complete || $.noop;
@@ -14060,7 +14313,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                 this._currentVisible = false;
                 var that = this,
                     deferred = $.Deferred(),
-                    animation = this.option("animation") || {},
+                    animation = that._getAnimationConfig() || {},
                     hideAnimation = this._normalizeAnimation(animation.hide, "from"),
                     completeHideAnimation = hideAnimation && hideAnimation.complete || $.noop,
                     hidingArgs = {cancel: false};
@@ -14071,6 +14324,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     deferred.resolve()
                 }
                 else {
+                    this._forceFocusLost();
                     this._toggleShading(false);
                     this._toggleSubscriptions(false);
                     this._animate(hideAnimation, function() {
@@ -14081,6 +14335,9 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     })
                 }
                 return deferred.promise()
+            },
+            _forceFocusLost: function() {
+                document.activeElement && this._$content.find(document.activeElement).length && document.activeElement.blur()
             },
             _animate: function(animation, completeCallback, startCallback) {
                 if (animation) {
@@ -14956,6 +15213,9 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                             device: {platform: "ios"},
                             options: {animation: this._iosAnimation}
                         }, {
+                            device: {platform: "android"},
+                            options: {animation: this._androidAnimation}
+                        }, {
                             device: {platform: "generic"},
                             options: {showCloseButton: true}
                         }, {
@@ -15001,6 +15261,49 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                         }
                     }
                 }
+            },
+            _androidAnimation: function() {
+                var fullScreenConfig = {
+                        show: {
+                            type: "slide",
+                            duration: 300,
+                            from: {
+                                top: "30%",
+                                opacity: 0
+                            },
+                            to: {
+                                top: 0,
+                                opacity: 1
+                            }
+                        },
+                        hide: {
+                            type: "slide",
+                            duration: 300,
+                            from: {
+                                top: 0,
+                                opacity: 1
+                            },
+                            to: {
+                                top: "30%",
+                                opacity: 0
+                            }
+                        }
+                    },
+                    defaultConfig = {
+                        show: {
+                            type: "fade",
+                            duration: 400,
+                            from: 0,
+                            to: 1
+                        },
+                        hide: {
+                            type: "fade",
+                            duration: 400,
+                            from: 1,
+                            to: 0
+                        }
+                    };
+                return this.option("fullScreen") ? fullScreenConfig : defaultConfig
             },
             _init: function() {
                 this.callBase();
@@ -15278,6 +15581,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
             stringUtils = DX.require("/utils/utils.string"),
             positionUtils = DX.require("/utils/utils.position"),
             commonUtils = DX.require("/utils/utils.common"),
+            mathUtils = DX.require("/utils/utils.math"),
             registerComponent = DX.require("/componentRegistrator");
         var POPOVER_CLASS = "dx-popover",
             POPOVER_WRAPPER_CLASS = "dx-popover-wrapper",
@@ -15488,7 +15792,9 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     arrowLocation = max - contentLocation - arrowSize;
                 else
                     arrowLocation = (min + max) / 2 - contentLocation - arrowSize / 2;
-                this._$arrow.css(axis, arrowLocation - this._getContentBorderWidth(side) + this.option("arrowOffset"))
+                var borderWidth = this._getContentBorderWidth(side);
+                var finalArrowLocation = mathUtils.fitIntoRange(arrowLocation - borderWidth + this.option("arrowOffset"), borderWidth, contentSize - arrowSize - borderWidth * 2);
+                this._$arrow.css(axis, finalArrowLocation)
             },
             _isPopoverInside: function() {
                 var position = this._getPosition();
@@ -18106,7 +18412,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                             useNative: true,
                             pickerType: PICKER_TYPE["native"],
                             invalidDateMessage: Globalize.localize("dxDateBox-validation-datetime"),
-                            dateOutOfRangeMessage: Globalize.localize("validation-range")
+                            dateOutOfRangeMessage: Globalize.localize("validation-range"),
+                            applyButtonText: Globalize.localize("Done")
                         })
                 },
                 _defaultOptionsRules: function() {
@@ -19379,7 +19686,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
         }
     })(jQuery, DevExpress);
     /*! Module widgets-base, file ui.lookup.js */
-    DevExpress.define("/ui/widgets/ui.lookup", ["jquery", "/utils/utils.string", "/utils/utils.version", "/utils/utils.support", "/utils/utils.browser", "/utils/utils.common", "/utils/utils.inkRipple", "/devices", "/componentRegistrator", "/ui/events/ui.events.utils", "/ui/widgets/ui.dropDownList", "/ui/uiNamespace"], function($, stringUtils, versionUtils, support, browser, commonUtils, inkRipple, devices, registerComponent, eventUtils, DropDownList, uiNamespace) {
+    DevExpress.define("/ui/widgets/ui.lookup", ["jquery", "/utils/utils.string", "/utils/utils.version", "/utils/utils.support", "/utils/utils.browser", "/utils/utils.common", "/utils/utils.inkRipple", "/devices", "/componentRegistrator", "/ui/events/ui.events.utils", "/ui/widgets/ui.dropDownList", "/ui/uiNamespace", "/ui/ui.themes"], function($, stringUtils, versionUtils, support, browser, commonUtils, inkRipple, devices, registerComponent, eventUtils, DropDownList, uiNamespace, themes) {
         var compareVersions = versionUtils.compare;
         var LOOKUP_CLASS = "dx-lookup",
             LOOKUP_SELECTED_CLASS = "dx-lookup-selected",
@@ -19437,7 +19744,6 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                             cleanSearchOnOpening: true,
                             fullScreen: false,
                             showCancelButton: true,
-                            cancelButtonText: Globalize.localize("Cancel"),
                             showClearButton: false,
                             clearButtonText: Globalize.localize("Clear"),
                             applyButtonText: Globalize.localize("Done"),
@@ -19481,7 +19787,10 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                                 device: function(device) {
                                     return !support.nativeScrolling && !devices.isSimulator() && devices.real().platform === "generic" && device.platform === "generic"
                                 },
-                                options: {usePopover: true}
+                                options: {
+                                    usePopover: true,
+                                    popupHeight: "auto"
+                                }
                             }, {
                                 device: function(device) {
                                     return browser.msie && compareVersions(browser.version, 9) < 0
@@ -19517,9 +19826,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                                     popupWidth: function() {
                                         return Math.min($(window).width(), $(window).height()) * 0.4
                                     },
-                                    popupHeight: function() {
-                                        return Math.min($(window).width(), $(window).height()) * 0.4
-                                    },
+                                    popupHeight: "auto",
                                     usePopover: true,
                                     useInkRipple: false
                                 }
@@ -19532,7 +19839,9 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                                 },
                                 options: {focusStateEnabled: true}
                             }, {
-                                device: {platform: "android"},
+                                device: function() {
+                                    return /android5/.test(themes.current())
+                                },
                                 options: {useInkRipple: true}
                             }])
                 },
@@ -19589,6 +19898,9 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     var data = this._fieldRenderData();
                     fieldTemplate.render(data, this._$field)
                 },
+                _fieldRenderData: function() {
+                    return this.option("selectedItem")
+                },
                 _popupShowingHandler: function() {
                     var validationError;
                     if (this._$popupValidationMessage) {
@@ -19610,27 +19922,6 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                         this._list && this._list.option("focusedElement", null)
                     }
                     this._attachSearchChildProcessor()
-                },
-                _popupPositionedHandler: function() {
-                    if (this.option("usePopover"))
-                        this._updatePopoverHeight()
-                },
-                _updatePopoverHeight: function() {
-                    if (!this._isInitialOptionValue("popupHeight"))
-                        return;
-                    var listHeight = 0,
-                        topSpace = this._popup.content().position().top,
-                        bottomSpace = this._popup.bottomToolbar() ? this._popup.bottomToolbar().outerHeight(true) : 0,
-                        contentPaddings = topSpace + bottomSpace;
-                    if (this._list) {
-                        listHeight += this._list.element().position().top;
-                        listHeight += this._list.element().outerHeight() - this._list.clientHeight();
-                        listHeight += this._list.scrollHeight()
-                    }
-                    this._popup.overlayContent().css("maxHeight", "none");
-                    var popupHeight = Math.min(listHeight + contentPaddings, this._popup.overlayContent().outerHeight());
-                    this._popup.overlayContent().css("maxHeight", popupHeight);
-                    this._list && this._list.updateDimensions()
                 },
                 _renderPopup: function() {
                     if (this.option("usePopover") && !this.option("fullScreen"))
@@ -19658,8 +19949,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                         showing: $.proxy(this._popupShowingHandler, this),
                         shown: $.proxy(this._popupShownHandler, this),
                         hiding: $.proxy(this._popupHidingHandler, this),
-                        hidden: $.proxy(this._popupHiddenHandler, this),
-                        positioning: $.proxy(this._popupPositionedHandler, this)
+                        hidden: $.proxy(this._popupHiddenHandler, this)
                     });
                     this._popup.option("onContentReady", $.proxy(this._contentReadyHandler, this));
                     this._contentReadyHandler()
@@ -19679,7 +19969,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                             fullScreen: this.option("fullScreen"),
                             shading: this.option("shading"),
                             closeOnTargetScroll: false,
-                            closeOnOutsideClick: this.option("closeOnOutsideClick")
+                            closeOnOutsideClick: this.option("closeOnOutsideClick"),
+                            onPositioned: null
                         });
                     delete result.animation;
                     delete result.position;
@@ -19754,18 +20045,25 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                         this._setListOption("_keyboardProcessor", undefined)
                 },
                 _renderSearch: function() {
-                    var $searchWrapper = this._$searchWrapper = $("<div>").addClass(LOOKUP_SEARCH_WRAPPER_CLASS);
-                    var $searchBox = this._$searchBox = $("<div>").addClass(LOOKUP_SEARCH_CLASS).appendTo($searchWrapper);
-                    var currentDevice = devices.current(),
-                        searchMode = currentDevice.android && currentDevice.version[0] >= 5 ? "text" : "search";
-                    this._searchBox = this._createComponent($searchBox, "dxTextBox", {
-                        mode: searchMode,
-                        showClearButton: true,
-                        valueChangeEvent: this.option("valueChangeEvent"),
-                        onValueChanged: $.proxy(this._search, this)
-                    });
-                    this._registerSearchKeyHandlers();
-                    $searchWrapper.appendTo(this._popup.content());
+                    this._$searchWrapper && this._$searchWrapper.remove();
+                    delete this._$searchWrapper;
+                    this._$searchBox && this._$searchBox.remove();
+                    delete this._$searchBox;
+                    delete this._searchBox;
+                    if (this.option("searchEnabled")) {
+                        var $searchWrapper = this._$searchWrapper = $("<div>").addClass(LOOKUP_SEARCH_WRAPPER_CLASS);
+                        var $searchBox = this._$searchBox = $("<div>").addClass(LOOKUP_SEARCH_CLASS).appendTo($searchWrapper);
+                        var currentDevice = devices.current(),
+                            searchMode = currentDevice.android && currentDevice.version[0] >= 5 ? "text" : "search";
+                        this._searchBox = this._createComponent($searchBox, "dxTextBox", {
+                            mode: searchMode,
+                            showClearButton: true,
+                            valueChangeEvent: this.option("valueChangeEvent"),
+                            onValueChanged: $.proxy(this._search, this)
+                        });
+                        this._registerSearchKeyHandlers();
+                        $searchWrapper.appendTo(this._popup.content())
+                    }
                     this._renderSearchVisibility();
                     this._setSearchPlaceholder()
                 },
@@ -19782,11 +20080,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     this._searchBox.registerKeyHandler("space", $.proxy(this._selectListItemHandler, this))
                 },
                 _renderSearchVisibility: function() {
-                    if (this._popup) {
-                        var searchEnabled = this.option("searchEnabled");
-                        this._popup._wrapper().toggleClass(LOOKUP_POPUP_SEARCH_CLASS, searchEnabled);
-                        this._$searchWrapper.toggle(searchEnabled)
-                    }
+                    if (this._popup)
+                        this._popup._wrapper().toggleClass(LOOKUP_POPUP_SEARCH_CLASS, this.option("searchEnabled"))
                 },
                 _setSearchPlaceholder: function() {
                     if (!this._$searchBox)
@@ -19821,7 +20116,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                             pageLoadMode: this._getPageLoadMode(),
                             nextButtonText: this.option("nextButtonText"),
                             _keyboardProcessor: this._listKeyboardProcessor,
-                            onFocusIn: $.proxy(this._onFocusInHandler, this)
+                            onFocusIn: $.proxy(this._onFocusInHandler, this),
+                            selectionMode: "single"
                         })
                 },
                 _onFocusInHandler: function() {
@@ -19885,10 +20181,17 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                         }, this))
                 },
                 _refreshField: function() {
-                    this._$field.text(this.option("displayValue") || this.option("placeholder"));
+                    this._$field.text(this.option("displayValue"));
                     this.element().toggleClass(LOOKUP_EMPTY_CLASS, !this.option("selectedItem"))
                 },
-                _renderPlaceholder: function(){},
+                _renderPlaceholder: function() {
+                    if (this.element().find("input").length === 0) {
+                        if ($.trim(this._$field.text()) === "")
+                            this._$field.text(this.option("placeholder"));
+                        return
+                    }
+                    this.callBase()
+                },
                 _clean: function() {
                     this._$fieldWrapper.remove();
                     this._$searchBox = null;
@@ -19899,7 +20202,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     var value = args.value;
                     switch (name) {
                         case"searchEnabled":
-                            this._renderSearchVisibility();
+                            this._popup && this._renderSearch();
                             this._attachSearchChildProcessor();
                             break;
                         case"searchPlaceholder":
@@ -20122,7 +20425,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
     });
     DevExpress.require(["/ui/widgets/ui.autocomplete"]);
     /*! Module widgets-base, file ui.selectBox.js */
-    DevExpress.define("/ui/widgets/ui.selectBox", ["jquery", "/utils/utils.common", "/utils/utils.inkRipple", "/componentRegistrator", "/ui/events/ui.events.utils", "/ui/widgets/ui.dropDownList", "/ui/uiNamespace"], function($, commonUtils, inkRipple, registerComponent, eventUtils, DropDownList, uiNamespace) {
+    DevExpress.define("/ui/widgets/ui.selectBox", ["jquery", "/utils/utils.common", "/utils/utils.inkRipple", "/componentRegistrator", "/ui/events/ui.events.utils", "/ui/widgets/ui.dropDownList", "/ui/uiNamespace", "/ui/ui.themes"], function($, commonUtils, inkRipple, registerComponent, eventUtils, DropDownList, uiNamespace, themes) {
         var SELECTBOX_CLASS = "dx-selectbox",
             SELECTBOX_POPUP_CLASS = "dx-selectbox-popup",
             SELECTBOX_SELECTED_CLASS = "dx-selectbox-selected",
@@ -20155,7 +20458,14 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                         };
                     return $.extend({}, parent, {
                             tab: function(e) {
-                                this.close()
+                                var fieldEditEnabled = this.option("fieldEditEnabled");
+                                var searchEnabled = this.option("searchEnabled");
+                                if (this.option("opened")) {
+                                    if (searchEnabled && !fieldEditEnabled)
+                                        this._input().val("");
+                                    parent.tab.apply(this, arguments);
+                                    this.close()
+                                }
                             },
                             upArrow: function(e) {
                                 if (parent.upArrow.apply(this, arguments)) {
@@ -20189,10 +20499,6 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                             backspace: clearSelectBox,
                             del: clearSelectBox
                         })
-                },
-                _selectFirstItem: function() {
-                    if (this._isEditable())
-                        this.callBase()
                 },
                 _getDefaultOptions: function() {
                     return $.extend(this.callBase(), {
@@ -20236,7 +20542,9 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                                         }}
                                 }
                             }, {
-                                device: {platform: "android"},
+                                device: function() {
+                                    return /android5/.test(themes.current())
+                                },
                                 options: {useInkRipple: true}
                             }])
                 },
@@ -20749,6 +21057,11 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                         return this._valuesData || [];
                     this._valuesData = values.slice()
                 },
+                _previousValues: function(previousValues) {
+                    if (!arguments.length)
+                        return this._previousValuesData || [];
+                    this._previousValuesData = previousValues.slice()
+                },
                 _optionValuesEqual: function(name, value, prevValue) {
                     if (name === "value")
                         return false;
@@ -20785,7 +21098,10 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                 _valueChangeArgs: function() {
                     var result = this.callBase.apply(this, arguments);
                     delete result.previousValue;
-                    return $.extend(result, {values: this._values()})
+                    return $.extend(result, {
+                            values: this._values(),
+                            previousValues: this._previousValues()
+                        })
                 },
                 _refreshSelected: function() {
                     this._list && this._suppressingSelectionChanged(function() {
@@ -20810,6 +21126,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                             break;
                         case"values":
                             this._values(args.value);
+                            this._previousValues(args.previousValue);
                             this._updateValues();
                             break;
                         case"onValuesChanged":
@@ -21145,7 +21462,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
         return DefaultAdapter
     });
     /*! Module widgets-base, file ui.validator.js */
-    DevExpress.define("/ui/widgets/ui.validator", ["jquery", "/ui/ui.errors", "/componentRegistrator", "/domComponent", "/ui/ui.validationMixin", "/ui/widgets/validation/ui.defaultAdapter", "/ui/uiNamespace"], function($, errors, registerComponent, DOMComponent, ValidationMixin, DefaultAdapter, uiNamespace) {
+    DevExpress.define("/ui/widgets/ui.validator", ["jquery", "/ui/ui.errors", "/componentRegistrator", "/domComponent", "/ui/ui.validationMixin", "/validationEngine", "/ui/widgets/validation/ui.defaultAdapter", "/ui/uiNamespace"], function($, errors, registerComponent, DOMComponent, ValidationMixin, ValidationEngine, DefaultAdapter, uiNamespace) {
         var VALIDATOR_CLASS = "dx-validator";
         var Validator = DOMComponent.inherit({
                 _getDefaultOptions: function() {
@@ -21161,13 +21478,13 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     var group = this._findGroup();
                     if (!this._groupWasInit)
                         this.on("disposing", function(args) {
-                            DevExpress.validationEngine.removeRegistredValidator(args.component._validationGroup, args.component)
+                            ValidationEngine.removeRegistredValidator(args.component._validationGroup, args.component)
                         });
                     if (!this._groupWasInit || this._validationGroup !== group) {
-                        DevExpress.validationEngine.removeRegistredValidator(this._validationGroup, this);
+                        ValidationEngine.removeRegistredValidator(this._validationGroup, this);
                         this._groupWasInit = true;
                         this._validationGroup = group;
-                        DevExpress.validationEngine.registerValidatorInGroup(group, this)
+                        ValidationEngine.registerValidatorInGroup(group, this)
                     }
                 },
                 _setOptionsByReference: function() {
@@ -21238,7 +21555,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                         }
                     }
                     else
-                        result = DevExpress.validationEngine.validate(value, rules, name);
+                        result = ValidationEngine.validate(value, rules, name);
                     this._applyValidationResult(result, adapter);
                     return result
                 },
@@ -21269,7 +21586,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
     });
     DevExpress.require(["/ui/widgets/ui.validator"]);
     /*! Module widgets-base, file ui.validationSummary.js */
-    DevExpress.define("/ui/widgets/ui.validationSummary", ["jquery", "/componentRegistrator", "/ui/ui.validationMixin", "/ui/uiNamespace"], function($, registerComponent, ValidationMixin, uiNamespace) {
+    DevExpress.define("/ui/widgets/ui.validationSummary", ["jquery", "/componentRegistrator", "/ui/ui.validationMixin", "/validationEngine", "/ui/uiNamespace"], function($, registerComponent, ValidationMixin, ValidationEngine, uiNamespace) {
         var VALIDATION_SUMMARY_CLASS = "dx-validationsummary",
             ITEM_CLASS = VALIDATION_SUMMARY_CLASS + "-item",
             ITEM_DATA_KEY = VALIDATION_SUMMARY_CLASS + "-item-data";
@@ -21290,7 +21607,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                 },
                 _initGroupRegistration: function() {
                     var group = this._findGroup(),
-                        groupConfig = DevExpress.validationEngine.addGroup(group);
+                        groupConfig = ValidationEngine.addGroup(group);
                     this._unsubscribeGroup();
                     this._groupWasInit = true;
                     this._validationGroup = group;
@@ -21298,7 +21615,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     groupConfig.on("validated", this.groupSubscription)
                 },
                 _unsubscribeGroup: function() {
-                    var groupConfig = DevExpress.validationEngine.getGroupConfig(this._validationGroup);
+                    var groupConfig = ValidationEngine.getGroupConfig(this._validationGroup);
                     groupConfig && groupConfig.off("validated", this.groupSubscription)
                 },
                 _getOrderedItems: function(validators, items) {
@@ -21406,7 +21723,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
     });
     DevExpress.require(["/ui/widgets/ui.validationSummary"]);
     /*! Module widgets-base, file ui.validationGroup.js */
-    DevExpress.define("/ui/widgets/ui.validationGroup", ["jquery", "/componentRegistrator", "/domComponent", "/ui/widgets/ui.validationSummary", "/ui/widgets/ui.validator", "/ui/uiNamespace"], function($, registerComponent, DOMComponent, ValidationSummary, Validator, uiNamespace) {
+    DevExpress.define("/ui/widgets/ui.validationGroup", ["jquery", "/componentRegistrator", "/domComponent", "/ui/widgets/ui.validationSummary", "/validationEngine", "/ui/widgets/ui.validator", "/ui/uiNamespace"], function($, registerComponent, DOMComponent, ValidationSummary, ValidationEngine, Validator, uiNamespace) {
         var VALIDATION_ENGINE_CLASS = "dx-validationgroup";
         var ValidationGroup = DOMComponent.inherit({
                 _getDefaultOptions: function() {
@@ -21427,10 +21744,10 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     this.callBase()
                 },
                 validate: function() {
-                    return DevExpress.validationEngine.validateGroup(this)
+                    return ValidationEngine.validateGroup(this)
                 },
                 reset: function() {
-                    return DevExpress.validationEngine.resetGroup(this)
+                    return ValidationEngine.resetGroup(this)
                 },
                 _optionChanged: function(args) {
                     switch (args.name) {
@@ -21439,7 +21756,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     }
                 },
                 _dispose: function() {
-                    DevExpress.validationEngine.removeGroup(this);
+                    ValidationEngine.removeGroup(this);
                     this.element().removeClass(VALIDATION_ENGINE_CLASS);
                     this.callBase()
                 }
@@ -21847,7 +22164,9 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                         e.preventDefault();
                         var fileList = e.originalEvent.dataTransfer.files,
                             files = this._getFiles(fileList);
-                        this._changeValues(files)
+                        this._changeValues(files);
+                        if (this.option("uploadMode") === "instantly")
+                            this._uploadFiles()
                     }
                     this._dragEventsCount = 0;
                     this.element().removeClass(FILEUPLOADER_DRAGOVER_CLASS)
@@ -21896,7 +22215,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                         }
                     }, FILEUPLOADER_AFTER_LOAD_DELAY);
                     this._uploadErrorAction({
-                        file: file,
+                        file: file.value,
                         jQueryEvent: e
                     })
                 },
@@ -21910,7 +22229,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                         }
                     }, FILEUPLOADER_AFTER_LOAD_DELAY);
                     this._uploadedAction({
-                        file: file,
+                        file: file.value,
                         jQueryEvent: e
                     })
                 },
@@ -21928,7 +22247,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                             showStatus: true
                         });
                         this._progressAction({
-                            file: file,
+                            file: file.value,
                             segmentSize: segmentSize,
                             bytesLoaded: e.loaded,
                             jQueryEvent: e
@@ -23087,8 +23406,6 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                 _getDefaultOptions: function() {
                     return $.extend(this.callBase(), {
                             editAlphaChannel: false,
-                            applyButtonText: Globalize.localize("OK"),
-                            cancelButtonText: Globalize.localize("Cancel"),
                             applyValueMode: "useButtons",
                             keyStep: 1,
                             onApplyButtonClick: null,
@@ -23285,10 +23602,12 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
         var ui = DX.ui,
             errors = DX.require("/ui/ui.errors"),
             utils = DX.require("/utils/utils.common"),
+            domUtils = DX.require("/utils/utils.dom"),
             registerComponent = DX.require("/componentRegistrator"),
             Widget = DX.require("/ui/ui.widget"),
             ValidationSummary = DX.require("/ui/widgets/ui.validationSummary"),
             ValidationGroup = DX.require("/ui/widgets/ui.validationGroup"),
+            ValidationEngine = DX.require("/validationEngine"),
             FORM_CLASS = "dx-form",
             FIELD_ITEM_CLASS = "dx-field-item",
             FIELD_ITEM_LABEL_TEXT_CLASS = "dx-field-item-label-text",
@@ -23328,6 +23647,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                         showOptionalMark: false,
                         requiredMark: "*",
                         optionalMark: Globalize.localize("dxForm-optionalMark"),
+                        requiredMessage: Globalize.localize("dxForm-requiredMessage"),
                         showValidationSummary: false,
                         items: undefined,
                         scrollingEnabled: false
@@ -23554,6 +23874,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
             },
             _itemTabbedTemplate: function(item, e, $container) {
                 var that = this,
+                    $tabPanel = $("<div/>").appendTo($container),
                     tabPanelOptions = $.extend({}, item.tabPanelOptions, {
                         dataSource: item.tabs,
                         itemTemplate: function(itemData) {
@@ -23583,7 +23904,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                             return $layoutManager
                         }
                     });
-                $("<div/>").appendTo($container).dxTabPanel(tabPanelOptions)
+                that._createComponent($tabPanel, "dxTabPanel", tabPanelOptions)
             },
             _itemGroupTemplate: function(item, e, $container) {
                 var $group = $("<div/>").appendTo($container).toggleClass(FORM_GROUP_WITH_CAPTION_CLASS, utils.isDefined(item.caption) && item.caption.length).addClass(FORM_GROUP_CLASS),
@@ -23621,6 +23942,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                         showOptionalMark: this.option("showOptionalMark"),
                         requiredMark: this.option("requiredMark"),
                         optionalMark: this.option("optionalMark"),
+                        requiredMessage: this.option("requiredMessage"),
                         form: that,
                         layoutData: this.option("formData"),
                         labelLocation: this.option("labelLocation"),
@@ -23694,6 +24016,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     case"showOptionalMark":
                     case"requiredMark":
                     case"optionalMark":
+                    case"requiredMessage":
                     case"scrollingEnabled":
                     case"formID":
                         this._invalidate();
@@ -23711,6 +24034,11 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                         this.callBase(args);
                         this._rootLayoutManager.option(args.name, args.value);
                         this._alignLabels(this._rootLayoutManager, this._rootLayoutManager.isLayoutChanged());
+                        break;
+                    case"visible":
+                        this.callBase(args);
+                        if (args.value)
+                            domUtils.triggerShownEvent(this.element());
                         break;
                     default:
                         this.callBase(args)
@@ -23924,7 +24252,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
             },
             validate: function() {
                 try {
-                    return DX.validationEngine.validateGroup(this)
+                    return ValidationEngine.validateGroup(this)
                 }
                 catch(e) {
                     errors.log("E1036", e.message)
@@ -23942,7 +24270,9 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
     (function($, DX) {
         var ui = DX.ui,
             normalizeIndexes = DX.require("/utils/utils.array").normalizeIndexes,
+            stringUtils = DX.require("/utils/utils.string"),
             errors = DX.require("/ui/ui.errors"),
+            support = DX.require("/utils/utils.support"),
             inflector = DX.require("/utils/utils.inflector"),
             utils = DX.require("/utils/utils.common"),
             knockoutUtils = DX.require("/utils/utils.knockout"),
@@ -23957,7 +24287,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
             FIELD_ITEM_REQUIRED_MARK_CLASS = "dx-field-item-required-mark",
             FIELD_ITEM_OPTIONAL_MARK_CLASS = "dx-field-item-optional-mark",
             FIELD_ITEM_LABEL_CLASS = "dx-field-item-label",
-            FIELD_ITEM_LABEL_BASELINE_CLASS = "dx-field-item-label-baseline",
+            FIELD_ITEM_LABEL_ALIGN_CLASS = "dx-field-item-label-align",
             FIELD_ITEM_LABEL_CONTENT_CLASS = "dx-field-item-label-content",
             FIELD_ITEM_LABEL_TEXT_CLASS = "dx-field-item-label-text",
             FIELD_ITEM_LABEL_LOCATION_CLASS = "dx-field-item-label-location-",
@@ -23971,6 +24301,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
             LAYOUT_MANAGER_FIRST_ROW_CLASS = "dx-first-row",
             LAYOUT_MANAGER_FIRST_COL_CLASS = "dx-first-col",
             LAYOUT_MANAGER_LAST_COL_CLASS = "dx-last-col",
+            FLEX_LAYOUT_CLASS = "dx-flex-layout",
             LAYOUT_MANAGER_ONE_COLUMN = "dx-layout-manager-one-col";
         registerComponent("dxLayoutManager", ui.dxForm, Widget.inherit({
             _getDefaultOptions: function() {
@@ -23987,7 +24318,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                         showRequiredMark: true,
                         showOptionalMark: false,
                         requiredMark: "*",
-                        optionalMark: Globalize.localize("dxForm-optionalMark")
+                        optionalMark: Globalize.localize("dxForm-optionalMark"),
+                        requiredMessage: Globalize.localize("dxForm-requiredMessage")
                     })
             },
             _init: function() {
@@ -24012,13 +24344,16 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                 return dataField ? this.option("layoutData." + dataField) : null
             },
             _updateFieldValue: function(dataField, value) {
-                if (utils.isDefined(dataField)) {
+                var layoutData = this.option("layoutData");
+                if (!knockoutUtils.isObservable(layoutData[dataField]) && utils.isDefined(dataField)) {
                     this.option("layoutData." + dataField, value);
                     this._triggerOnFieldDataChanged({
                         dataField: dataField,
                         value: value
                     })
                 }
+                else
+                    layoutData[dataField](value)
             },
             _triggerOnFieldDataChanged: function(args) {
                 this._createActionByOption("onFieldDataChanged")(args)
@@ -24107,6 +24442,9 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
             _clearEditorInstances: function() {
                 this._editorInstancesByField = {}
             },
+            _hasBrowserFlex: function() {
+                return support.styleProp("flex") === "flex"
+            },
             _renderContentImpl: function() {
                 this.callBase();
                 this._renderResponsiveBox()
@@ -24119,6 +24457,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     that._prepareItemsWithMerging(colCount);
                     layoutItems = that._generateLayoutItems();
                     that._responsiveBox = $("<div />").appendTo(that.element()).dxResponsiveBox({
+                        _layoutStrategy: that._hasBrowserFlex() ? "flex" : "fallback",
                         onLayoutChanged: function() {
                             var onLayoutChanged = that.option("onLayoutChanged"),
                                 isLayoutChanged = that.isLayoutChanged();
@@ -24225,8 +24564,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                         location: this.option("labelLocation"),
                         id: id,
                         visible: true,
-                        isRequired: isRequired,
-                        hasBaselineAlign: this._isLabelNeedBaselineAlign(item)
+                        isRequired: isRequired
                     }, item ? item.label : {}),
                     $editor = $("<div/>"),
                     $label,
@@ -24239,6 +24577,11 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                 }
                 if (item.helpText)
                     helpID = new DX.data.Guid;
+                if (item.itemType === "simple") {
+                    if (this._isLabelNeedBaselineAlign(item) && labelOptions.location !== "top")
+                        $container.addClass(FIELD_ITEM_LABEL_ALIGN_CLASS);
+                    this._hasBrowserFlex() && $container.addClass(FLEX_LAYOUT_CLASS)
+                }
                 this._appendEditorToField({
                     $fieldItem: $container,
                     $label: $label,
@@ -24256,7 +24599,9 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     id: id,
                     validationBoundary: this.option("validationBoundary")
                 });
-                this._renderValidator($editor.children().first(), item);
+                var $validationTarget = $editor.children().first();
+                if ($validationTarget && $validationTarget.data("dx-validation-target"))
+                    this._renderValidator($validationTarget, item);
                 this._renderHelpText(item, $editor, helpID);
                 this._attachClickHandler($label, $editor, item.editorType)
             },
@@ -24276,7 +24621,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
             },
             _isLabelNeedBaselineAlign: function(item) {
                 var largeEditors = ["dxTextArea", "dxRadioGroup", "dxCalendar"];
-                return !!item.helpText || $.inArray(item.editorType, largeEditors) !== -1
+                return !!item.helpText && !this._hasBrowserFlex() || $.inArray(item.editorType, largeEditors) !== -1
             },
             _prepareLabelOptions: function(dataField, options) {
                 if (!options.text && dataField)
@@ -24292,15 +24637,9 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     $("<span />").addClass(FIELD_ITEM_LABEL_TEXT_CLASS).text(options.text).appendTo($labelContent);
                     if (options.alignment)
                         $label.css("text-align", options.alignment);
-                    if (options.location !== "top")
-                        this._toggleBaselineLabelAlignment(options.hasBaselineAlign, $label);
                     $labelContent.append(this._renderLabelMark(options.isRequired));
                     return $label
                 }
-            },
-            _toggleBaselineLabelAlignment: function(hasBaselineAlign, $label) {
-                if (hasBaselineAlign)
-                    $label.addClass(FIELD_ITEM_LABEL_BASELINE_CLASS)
             },
             _renderLabelMark: function(isRequired) {
                 var $mark,
@@ -24362,11 +24701,13 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                 if (isSimpleItem)
                     if (userValidationRules)
                         validationRules = userValidationRules;
-                    else
+                    else {
+                        var requiredMessage = stringUtils.format(this.option("requiredMessage"), itemName);
                         validationRules = isItemRequired ? [{
                                 type: "required",
-                                message: itemName + " is required"
-                            }] : null;
+                                message: requiredMessage
+                            }] : null
+                    }
                 return validationRules
             },
             _createEditor: function($container, renderOptions, editorOptions) {
@@ -24500,6 +24841,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                         break;
                     case"alignItemLabels":
                     case"labelLocation":
+                    case"requiredMessage":
                         this._invalidate();
                         break;
                     case"customizeItem":
@@ -24601,7 +24943,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
             FIELD_ITEM_CONTENT_CLASS: FIELD_ITEM_CONTENT_CLASS,
             FIELD_ITEM_CONTENT_LOCATION_CLASS: FIELD_ITEM_CONTENT_LOCATION_CLASS,
             FIELD_ITEM_LABEL_CLASS: FIELD_ITEM_LABEL_CLASS,
-            FIELD_ITEM_LABEL_BASELINE_CLASS: FIELD_ITEM_LABEL_BASELINE_CLASS,
+            FIELD_ITEM_LABEL_ALIGN_CLASS: FIELD_ITEM_LABEL_ALIGN_CLASS,
             FIELD_ITEM_LABEL_LOCATION_CLASS: FIELD_ITEM_LABEL_LOCATION_CLASS,
             LABEL_HORIZONTAL_ALIGNMENT_CLASS: LABEL_HORIZONTAL_ALIGNMENT_CLASS,
             LABEL_VERTICAL_ALIGNMENT_CLASS: LABEL_VERTICAL_ALIGNMENT_CLASS,
@@ -24614,7 +24956,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
             FIELD_ITEM_OPTIONAL_CLASS: FIELD_ITEM_OPTIONAL_CLASS,
             FIELD_ITEM_REQUIRED_MARK_CLASS: FIELD_ITEM_REQUIRED_MARK_CLASS,
             FIELD_ITEM_OPTIONAL_MARK_CLASS: FIELD_ITEM_OPTIONAL_MARK_CLASS,
-            LAYOUT_MANAGER_ONE_COLUMN: LAYOUT_MANAGER_ONE_COLUMN
+            LAYOUT_MANAGER_ONE_COLUMN: LAYOUT_MANAGER_ONE_COLUMN,
+            FLEX_LAYOUT_CLASS: FLEX_LAYOUT_CLASS
         })
     })(jQuery, DevExpress);
     DevExpress.MOD_WIDGETS_BASE = true

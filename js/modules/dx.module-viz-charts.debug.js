@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Charts)
-* Version: 15.2.5
-* Build date: Jan 27, 2016
+* Version: 15.2.7
+* Build date: Mar 3, 2016
 *
 * Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -422,6 +422,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CHARTS) {
             _init: function() {
                 var that = this;
                 that.callBase.apply(that, arguments);
+                that._savedBusinessRange = {};
                 that._reinit(true)
             },
             _createThemeManager: function() {
@@ -604,7 +605,6 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CHARTS) {
             _render: function(_options) {
                 var that = this,
                     drawOptions,
-                    originalCanvas,
                     recreateCanvas;
                 if (!that._initialized)
                     return;
@@ -614,7 +614,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CHARTS) {
                 drawOptions = that._prepareDrawOptions(_options);
                 recreateCanvas = drawOptions.recreateCanvas;
                 clearTimeout(that._delayedRedraw);
-                originalCanvas = that._canvas;
+                that.__originalCanvas = that._canvas;
                 that._canvas = $.extend({}, that._canvas);
                 if (recreateCanvas)
                     that.__currentCanvas = that._canvas;
@@ -625,9 +625,9 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CHARTS) {
                 that._renderer.stopAllAnimations(true);
                 _setCanvasValues(that._canvas);
                 that._cleanGroups(drawOptions);
-                that._renderElements(drawOptions);
-                that._canvas = originalCanvas
+                that._renderElements(drawOptions)
             },
+            _saveBusinessRange: _noop,
             _renderElements: function(drawOptions) {
                 var that = this,
                     preparedOptions = that._prepareToRender(drawOptions),
@@ -646,6 +646,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CHARTS) {
                 if (layoutCanvas)
                     drawElements = that._getDrawElements(drawOptions, isLegendInside);
                 that._renderer.lock();
+                that._saveBusinessRange();
                 that.layoutManager.setOptions(that._layoutManagerOptions());
                 that.layoutManager.layoutElements(drawElements, that._canvas, that._getAxisDrawingMethods(drawOptions, preparedOptions, isRotated), layoutTargets, isRotated, that._getAxesForTransform(isRotated));
                 layoutCanvas && that._updateCanvasClipRect(dirtyCanvas);
@@ -694,6 +695,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CHARTS) {
                 that._tracker.repairTooltip();
                 if (that._dataIsReady())
                     that._fulfillLoadingIndicatorHiding();
+                that._canvas = that.__originalCanvas;
                 that._drawn();
                 that._renderCompleteHandler()
             },
@@ -1270,9 +1272,11 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CHARTS) {
                             axis.drawGrids(panesBorderOptions[axis.pane])
                         })
                     };
+                that._restoreOriginalBusinessRange();
                 that._reinitTranslators();
                 that._prepareAxesAndDraw(drawAxes, drawStaticAxisElements, drawOptions)
             },
+            _restoreOriginalBusinessRange: _noop,
             _appendAdditionalSeriesGroups: function() {
                 this._crosshairCursorGroup.linkAppend();
                 this._scrollBar && this._scrollBarGroup.linkAppend()
@@ -2027,6 +2031,26 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CHARTS) {
                         translator.val.reinit();
                         axis.setTranslator(translator.val, translator.arg)
                     }
+                })
+            },
+            _saveBusinessRange: function() {
+                var savedBusinessRange = this._savedBusinessRange;
+                $.each(this.translators, function(name, pane) {
+                    savedBusinessRange[name] = {};
+                    $.each(pane, function(axisName, translator) {
+                        savedBusinessRange[name][axisName] = {};
+                        savedBusinessRange[name][axisName]["arg"] = $.extend(true, {}, translator.arg.getBusinessRange());
+                        savedBusinessRange[name][axisName]["val"] = $.extend(true, {}, translator.val.getBusinessRange())
+                    })
+                })
+            },
+            _restoreOriginalBusinessRange: function() {
+                var savedBusinessRange = this._savedBusinessRange;
+                $.each(this.translators, function(name, pane) {
+                    $.each(pane, function(axisName, translator) {
+                        translator.arg.updateBusinessRange($.extend(true, {}, savedBusinessRange[name][axisName]["arg"]));
+                        translator.val.updateBusinessRange($.extend(true, {}, savedBusinessRange[name][axisName]["val"]))
+                    })
                 })
             },
             _prepareAxesAndDraw: function(drawAxes, drawStaticAxisElements, drawOptions) {
@@ -3731,6 +3755,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CHARTS) {
             commonUtils = DX.require("/utils/utils.common"),
             pointerEvents = DX.require("/ui/events/pointer/ui.events.pointer"),
             wheelEvent = DX.require("/ui/events/ui.events.wheel"),
+            devices = DX.require("/devices"),
             isDefined = commonUtils.isDefined,
             _normalizeEnum = DX.viz.utils.normalizeEnum,
             _floor = math.floor,
@@ -3820,7 +3845,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CHARTS) {
                         that._releaseSelectedSeries = that._releaseSelectedSeriesSingleMode;
                         that._setSelectedSeries = that._setSelectedSeriesSingleMode
                     }
-                    that._prepare(that._renderer.root)
+                    that._prepare()
                 },
                 updateSeries: function(series) {
                     var that = this;
@@ -3845,10 +3870,22 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CHARTS) {
                     else
                         this._showTooltip(point)
                 },
-                _prepare: function(root) {
-                    root.off(wheelEvent.name).on(wheelEvent.name, {tracker: this}, function(e) {
-                        e.data.tracker._pointerOut()
-                    })
+                _prepare: function() {
+                    this._toggleParentsScrollSubscription(true)
+                },
+                _toggleParentsScrollSubscription: function(subscribe) {
+                    var that = this,
+                        $parents = $(that._renderer.root.element).parents(),
+                        scrollEvents = "scroll.dxChartTracker";
+                    if (devices.real().platform === "generic")
+                        $parents = $parents.add(window);
+                    $().add(that._$prevRootParents).off(scrollEvents);
+                    if (subscribe) {
+                        $parents.on(scrollEvents, function(e) {
+                            that._pointerOut()
+                        });
+                        that._$prevRootParents = $parents
+                    }
                 },
                 _selectPointMultipleMode: function(point) {
                     var that = this;
@@ -3887,29 +3924,6 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CHARTS) {
                         that._selectedPoint = null
                     }
                 },
-                _setPointState: function(point, action, mode, eventName, legendCallback) {
-                    var that = this,
-                        series,
-                        eventTrigger = that._eventTrigger;
-                    switch (mode) {
-                        case ALL_ARGUMENTS_POINTS_MODE:
-                            that._toAllArgumentPoints(point.argument, action, eventName, point);
-                            break;
-                        case ALL_SERIES_POINTS_MODE:
-                            setPointsSpecState(point.series.getPoints(), point, action, eventName, eventTrigger);
-                            break;
-                        case NONE_MODE:
-                            break;
-                        default:
-                            series = that._getPointSeries(point);
-                            series[action]({
-                                point: point,
-                                legendCallback: legendCallback,
-                                setState: true
-                            });
-                            eventTrigger(eventName, {target: point})
-                    }
-                },
                 _setHoveredPoint: function(point, mode) {
                     var that = this;
                     var debug = DX.require("/utils/utils.console").debug;
@@ -3932,22 +3946,6 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CHARTS) {
                     if (that._tooltip.isEnabled())
                         that._hideTooltip(point);
                     that.hoveredPoint = null
-                },
-                _releasePoint: function(point, eventTrigger) {
-                    var that = this,
-                        mode = _normalizeEnum(point.getOptions().hoverMode);
-                    if (mode === ALL_SERIES_POINTS_MODE)
-                        setPointsSpecState(point.series.getPoints(), point, RELEASE_POINT_HOVER_STATE, POINT_HOVER_CHANGED, eventTrigger);
-                    else if (mode === ALL_ARGUMENTS_POINTS_MODE)
-                        that._toAllArgumentPoints(point.argument, RELEASE_POINT_HOVER_STATE, POINT_HOVER_CHANGED, point);
-                    else if (mode !== "none") {
-                        that._getPointSeries(point).releasePointHoverState({
-                            point: point,
-                            setState: true,
-                            legendCallback: that._legend.getActionCallback(point)
-                        });
-                        eventTrigger(POINT_HOVER_CHANGED, {target: point})
-                    }
                 },
                 _setSelectedSeriesMultipleMode: function(series, mode) {
                     var that = this;
@@ -4214,6 +4212,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CHARTS) {
                 dispose: function() {
                     var that = this;
                     that._disableOutHandler();
+                    that._toggleParentsScrollSubscription();
                     _each(that, function(k) {
                         that[k] = null
                     })
@@ -4285,10 +4284,54 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CHARTS) {
             },
             _moveCrosshair: function(point, x, y) {
                 if (point && this._crosshair && point.isVisible())
-                    this._crosshair.show(point.getCrosshairData(x, y), point.getPointRadius())
+                    this._crosshair.show({
+                        point: point,
+                        x: x,
+                        y: y
+                    })
             },
-            _prepare: function(root) {
+            _releasePoint: function(point, eventTrigger) {
                 var that = this,
+                    mode = _normalizeEnum(point.getOptions().hoverMode);
+                if (mode === ALL_SERIES_POINTS_MODE)
+                    setPointsSpecState(point.series.getPoints(), point, RELEASE_POINT_HOVER_STATE, POINT_HOVER_CHANGED, eventTrigger);
+                else if (mode === ALL_ARGUMENTS_POINTS_MODE)
+                    that._toAllArgumentPoints(point.argument, RELEASE_POINT_HOVER_STATE, POINT_HOVER_CHANGED, point);
+                else if (mode !== "none") {
+                    that._getPointSeries(point).releasePointHoverState({
+                        point: point,
+                        setState: true,
+                        legendCallback: that._legend.getActionCallback(point)
+                    });
+                    eventTrigger(POINT_HOVER_CHANGED, {target: point})
+                }
+            },
+            _setPointState: function(point, action, mode, eventName, legendCallback) {
+                var that = this,
+                    series,
+                    eventTrigger = that._eventTrigger;
+                switch (mode) {
+                    case ALL_ARGUMENTS_POINTS_MODE:
+                        that._toAllArgumentPoints(point.argument, action, eventName, point);
+                        break;
+                    case ALL_SERIES_POINTS_MODE:
+                        setPointsSpecState(point.series.getPoints(), point, action, eventName, eventTrigger);
+                        break;
+                    case NONE_MODE:
+                        break;
+                    default:
+                        series = that._getPointSeries(point);
+                        series[action]({
+                            point: point,
+                            legendCallback: legendCallback,
+                            setState: true
+                        });
+                        eventTrigger(eventName, {target: point})
+                }
+            },
+            _prepare: function() {
+                var that = this,
+                    root = that._renderer.root,
                     touchScrollingEnabled = that._scrollingMode === "all" || that._scrollingMode === "touch",
                     touchZoomingEnabled = that._zoomingMode === "all" || that._zoomingMode === "touch",
                     cssValue = (!touchScrollingEnabled ? "pan-x pan-y " : "") + (!touchZoomingEnabled ? "pinch-zoom" : "") || "none",
@@ -4298,7 +4341,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CHARTS) {
                     },
                     wheelzoomingEnabled = that._zoomingMode === "all" || that._zoomingMode === "mouse";
                 root.off(wheelEvent.name + " dxc-scroll-start dxc-scroll-move");
-                baseTrackerPrototype._prepare.call(that, root);
+                baseTrackerPrototype._prepare.call(that);
                 if (!that._gestureEndHandler) {
                     that._gestureEndHandler = function() {
                         that._gestureEnd && that._gestureEnd()
@@ -4564,6 +4607,32 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CHARTS) {
                     jQueryEvent: e
                 })
             },
+            _releasePoint: function(point, eventTrigger) {
+                var that = this,
+                    mode = _normalizeEnum(point.getOptions().hoverMode);
+                if (mode !== "none") {
+                    that._getPointSeries(point).releasePointHoverState({
+                        point: point,
+                        setState: true,
+                        legendCallback: that._legend.getActionCallback(point)
+                    });
+                    eventTrigger(POINT_HOVER_CHANGED, {target: point})
+                }
+            },
+            _setPointState: function(point, action, mode, eventName, legendCallback) {
+                var that = this,
+                    series,
+                    eventTrigger = that._eventTrigger;
+                if (mode !== "none") {
+                    series = that._getPointSeries(point);
+                    series[action]({
+                        point: point,
+                        legendCallback: legendCallback,
+                        setState: true
+                    });
+                    eventTrigger(eventName, {target: point})
+                }
+            },
             _hoverArgumentAxis: _noop,
             _setStickedSeries: _noop,
             _setSeriesWithHoverView: _noop,
@@ -4615,17 +4684,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CHARTS) {
             },
             dispose: function() {
                 var that = this;
-                that._renderer = null;
-                that._crosshairGroup = null;
-                that._options = null;
-                that._axes = null;
-                that._canvas = null;
-                that._horizontalGroup = null;
-                that._verticalGroup = null;
-                that._horizontal = null;
-                that._vertical = null;
-                that._circle = null;
-                that._panes = null
+                that._renderer = that._crosshairGroup = that._options = that._axes = that._canvas = that._horizontalGroup = that._verticalGroup = that._horizontal = that._vertical = that._circle = that._panes = null
             },
             _prepareOptions: function(options, direction) {
                 var lineOptions = options[direction + "Line"];
@@ -4665,6 +4724,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CHARTS) {
                     canvas = that._canvas;
                 that._horizontal = {};
                 that._vertical = {};
+                that._circle = renderer.circle(canvas.left, canvas.top, 0).attr(circleOptions).append(that._crosshairGroup);
                 that._horizontalGroup = renderer.g().append(that._crosshairGroup);
                 that._verticalGroup = renderer.g().append(that._crosshairGroup);
                 if (verticalOptions.visible) {
@@ -4675,7 +4735,6 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CHARTS) {
                     that._horizontal.lines = that._createLines(horizontalOptions.line, "v", that._horizontalGroup);
                     that._horizontal.labels = that._createLabels(that._axes[1], horizontalOptions, true, that._horizontalGroup)
                 }
-                that._circle = renderer.circle(canvas.left, canvas.top, 0).attr(circleOptions).append(that._crosshairGroup);
                 that.hide()
             },
             _createLabels: function(axes, options, isHorizontal, group) {
@@ -4688,14 +4747,16 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CHARTS) {
                     labels = [],
                     background,
                     curentLabelPos,
+                    labelOptions = options.label,
                     bbox;
-                if (!options.label || !options.label.visible)
+                if (!labelOptions || !labelOptions.visible)
                     return;
                 $.each(axes, function(_, axis) {
-                    var position = axis.getOptions().position;
+                    var position = axis.getOptions().position,
+                        align;
                     if (axis.getTranslator().getBusinessRange().stubData)
                         return;
-                    curentLabelPos = axis.getCurrentLabelPos();
+                    curentLabelPos = axis.getLabelsParams().pos;
                     if (isHorizontal) {
                         y = canvas.top;
                         x = curentLabelPos
@@ -4704,42 +4765,63 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CHARTS) {
                         x = canvas.left;
                         y = curentLabelPos
                     }
-                    text = renderer.text("0", x, y).css(DX.viz.utils.patchFontOptions(options.label.font)).attr({align: position === TOP || position === BOTTOM ? CENTER : position === RIGHT ? LEFT : RIGHT}).append(group);
+                    align = position === TOP || position === BOTTOM ? CENTER : position === RIGHT ? LEFT : RIGHT;
+                    background = renderer.rect(0, 0, 0, 0).attr({fill: labelOptions.backgroundColor || options.line.stroke}).append(group);
+                    text = renderer.text("0", x, y).css(DX.viz.utils.patchFontOptions(options.label.font)).attr({align: align}).append(group);
                     bbox = text.getBBox();
                     text.attr({y: isHorizontal ? 2 * y - bbox.y - bbox.height / 2 : position === BOTTOM ? 2 * y - bbox.y : 2 * y - (bbox.y + bbox.height)});
-                    background = renderer.rect(0, 0, 0, 0).attr({fill: options.label.backgroundColor || options.line.stroke}).append(group).toBackground();
                     labels.push({
                         text: text,
                         background: background,
                         axis: axis,
+                        options: labelOptions,
                         pos: {
                             coord: curentLabelPos,
-                            side: position
+                            side: position,
+                            align: align
                         }
                     })
                 });
                 return labels
             },
-            _updateText: function(value, labels, axis) {
+            _updateText: function(value, labels, axisName, point, isHorizintalLine) {
                 var that = this,
                     bbox,
                     text,
                     textElement,
-                    backgroundElement;
+                    backgroundElement,
+                    axisLabelsParams,
+                    labelSide;
                 if (!labels)
                     return;
                 $.each(labels, function(i, label) {
+                    var axis = label.axis;
                     text = "";
                     textElement = label.text;
                     backgroundElement = label.background;
                     if (!textElement)
                         return;
-                    if (!label.axis.name || label.axis.name === axis)
-                        text = label.axis.getFormattedValue(value);
+                    if (!axis.name || axis.name === axisName)
+                        text = axis.getFormattedValue(value, label.options, point);
                     if (text) {
                         textElement.attr({text: text});
                         bbox = textElement.getBBox();
-                        that._updateLinesCanvas(label.pos.side, label.pos.coord);
+                        axisLabelsParams = axis.getLabelsParams();
+                        labelSide = label.pos.side;
+                        if (isHorizintalLine) {
+                            if (axisLabelsParams.width < bbox.width)
+                                textElement.attr({
+                                    align: labelSide,
+                                    x: axisLabelsParams.pos + (labelSide === LEFT ? -1 : 1) * axisLabelsParams.width
+                                });
+                            else
+                                textElement.attr({
+                                    align: label.pos.align,
+                                    x: axisLabelsParams.pos
+                                });
+                            bbox = textElement.getBBox()
+                        }
+                        that._updateLinesCanvas(labelSide, label.pos.coord);
                         backgroundElement.attr({
                             x: bbox.x - LABEL_BACKGROUND_PADDING_X,
                             y: bbox.y - LABEL_BACKGROUND_PADDING_Y,
@@ -4793,15 +4875,18 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CHARTS) {
                 }
                 return {id: null}
             },
-            show: function(data, r) {
+            show: function(data) {
                 var that = this,
+                    point = data.point,
+                    pointData = point.getCrosshairData(data.x, data.y),
+                    r = point.getPointRadius(),
                     horizontal = that._horizontal,
                     vertical = that._vertical,
                     clipRect,
                     rad = !r ? 0 : r + 3,
                     canvas = that._canvas,
-                    x = mathFloor(data.x),
-                    y = mathFloor(data.y);
+                    x = mathFloor(pointData.x),
+                    y = mathFloor(pointData.y);
                 if (x >= canvas.left && x <= canvas.right && y >= canvas.top && y <= canvas.bottom) {
                     that._crosshairGroup.attr({visibility: "visible"});
                     that._resetLinesCanvas();
@@ -4813,12 +4898,12 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CHARTS) {
                         clipId: clipRect.id
                     });
                     if (horizontal.lines) {
-                        that._updateText(data.yValue, horizontal.labels, data.axis);
+                        that._updateText(pointData.yValue, horizontal.labels, pointData.axis, point, true);
                         that._updateLines(horizontal.lines, x, y, rad, true);
                         that._horizontalGroup.attr({translateY: y - canvas.top})
                     }
                     if (vertical.lines) {
-                        that._updateText(data.xValue, vertical.labels, data.axis);
+                        that._updateText(pointData.xValue, vertical.labels, pointData.axis, point, false);
                         that._updateLines(vertical.lines, x, y, rad, false);
                         that._verticalGroup.attr({translateX: x - canvas.left})
                     }

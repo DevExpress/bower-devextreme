@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Single Page App Framework)
-* Version: 15.2.5
-* Build date: Jan 27, 2016
+* Version: 15.2.7
+* Build date: Mar 3, 2016
 *
 * Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -653,6 +653,23 @@ if (!window.DevExpress || !DevExpress.MOD_FRAMEWORK) {
                     location: "before"
                 },
                 commands: ["back"]
+            },
+            "win10-appbar": {
+                defaults: {
+                    showText: false,
+                    location: "after"
+                },
+                commands: [{
+                        id: "back",
+                        location: "before"
+                    }, "edit", "cancel", "save", "delete", "create", "refresh"]
+            },
+            "win10-phone-appbar": {
+                defaults: {location: "after"},
+                commands: ["create", "edit", "cancel", "save", "refresh", {
+                        id: "delete",
+                        location: "menu"
+                    }]
             },
             "desktop-toolbar": {
                 defaults: {
@@ -1470,7 +1487,7 @@ if (!window.DevExpress || !DevExpress.MOD_FRAMEWORK) {
                 return this.currentStack.items[index]
             },
             clearHistory: function() {
-                this.currentStack.clear()
+                this._createNavigationStacks({keepPositionInStack: this._keepPositionInStack})
             },
             itemByKey: function(itemKey) {
                 var result;
@@ -2071,6 +2088,13 @@ if (!window.DevExpress || !DevExpress.MOD_FRAMEWORK) {
                             animation: "openDoor",
                             device: {
                                 deviceType: "phone",
+                                platform: "win",
+                                version: [8]
+                            }
+                        }, {
+                            animation: "win-pop",
+                            device: {
+                                deviceType: "phone",
                                 platform: "win"
                             }
                         }],
@@ -2107,6 +2131,12 @@ if (!window.DevExpress || !DevExpress.MOD_FRAMEWORK) {
                         }, {
                             animation: "none",
                             device: {grade: "C"}
+                        }, {
+                            animation: "none",
+                            device: {
+                                platform: "win",
+                                version: [10]
+                            }
                         }],
                     "command-rendered-bottom": [{animation: "stagger-fade-rise"}, {
                             animation: "fade",
@@ -2117,6 +2147,12 @@ if (!window.DevExpress || !DevExpress.MOD_FRAMEWORK) {
                         }, {
                             animation: "none",
                             device: {grade: "C"}
+                        }, {
+                            animation: "none",
+                            device: {
+                                platform: "win",
+                                version: [10]
+                            }
                         }],
                     "list-item-rendered": [{
                             animation: "stagger-3d-drop",
@@ -3010,15 +3046,21 @@ if (!window.DevExpress || !DevExpress.MOD_FRAMEWORK) {
                 direction = direction || "forward";
                 var that = this,
                     previousViewInfo = that._getPreviousViewInfo(viewInfo),
-                    previousViewTemplateId = previousViewInfo === viewInfo ? previousViewInfo.currentViewTemplateId : undefined;
+                    previousViewTemplateId = previousViewInfo === viewInfo ? previousViewInfo.currentViewTemplateId : undefined,
+                    result;
                 this._defineCurrentViewTemplateId(viewInfo);
-                if (previousViewTemplateId && previousViewTemplateId === viewInfo.currentViewTemplateId && viewInfo === previousViewInfo)
-                    return $.Deferred().resolve().promise();
-                that._ensureViewRendered(viewInfo);
-                that.fireEvent("viewShowing", [viewInfo, direction]);
-                return this._showViewImpl(viewInfo, direction, previousViewTemplateId).done(function() {
+                if (previousViewTemplateId && previousViewTemplateId === viewInfo.currentViewTemplateId && viewInfo === previousViewInfo) {
+                    that.fireEvent("viewShowing", [viewInfo, direction]);
+                    result = $.Deferred().resolve().promise()
+                }
+                else {
+                    that._ensureViewRendered(viewInfo);
+                    that.fireEvent("viewShowing", [viewInfo, direction]);
+                    result = this._showViewImpl(viewInfo, direction, previousViewTemplateId).done(function() {
                         that._onViewShown(viewInfo)
                     })
+                }
+                return result
             },
             disposeView: function(viewInfo) {
                 this._clearRenderResult(viewInfo)
@@ -3172,8 +3214,10 @@ if (!window.DevExpress || !DevExpress.MOD_FRAMEWORK) {
                     animationModifier = {direction: direction};
                 if (previousViewInfo === viewInfo)
                     previousViewInfo = undefined;
-                if (!previousViewInfo)
+                if (!previousViewInfo) {
                     animationModifier.duration = 0;
+                    animationModifier.delay = 0
+                }
                 result = that._doTransition(previousViewInfo, viewInfo, animationModifier).then(function() {
                     return that._changeView(viewInfo, previousViewTemplateId)
                 });

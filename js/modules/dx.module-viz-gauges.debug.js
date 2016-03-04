@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Gauges)
-* Version: 15.2.5
-* Build date: Jan 27, 2016
+* Version: 15.2.7
+* Build date: Mar 3, 2016
 *
 * Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -1976,14 +1976,15 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_GAUGES) {
                 var that = this,
                     bbox,
                     info,
-                    textCloudOptions = that._getTextCloudOptions();
-                that._text.attr({text: _formatValue(that._actualValue, that._options.text)});
+                    textCloudOptions = that._getTextCloudOptions(),
+                    text = _formatValue(that._actualValue, that._options.text);
+                that._text.attr({text: text});
                 bbox = that._text.getBBox();
                 info = getTextCloudInfo({
                     x: textCloudOptions.x,
                     y: textCloudOptions.y,
-                    textWidth: bbox.width,
-                    textHeight: bbox.height,
+                    textWidth: bbox.width || text.length * that._textUnitWidth,
+                    textHeight: bbox.height || that._textHeight,
                     horMargin: that._options.horizontalOffset,
                     verMargin: that._options.verticalOffset,
                     tailLength: that._options.arrowLength,
@@ -2000,15 +2001,18 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_GAUGES) {
                 var that = this,
                     root,
                     text,
-                    bbox;
+                    bbox,
+                    sampleText;
                 if (!that._textVerticalOffset) {
                     root = that._createRoot().append(that._owner);
-                    text = that._renderer.text(_getSampleText(that._translator, that._options.text), 0, 0).attr({align: "center"}).css(_patchFontOptions(that._options.text.font)).append(root);
+                    sampleText = _getSampleText(that._translator, that._options.text);
+                    text = that._renderer.text(sampleText, 0, 0).attr({align: "center"}).css(_patchFontOptions(that._options.text.font)).append(root);
                     bbox = text.getBBox();
                     root.remove();
                     that._textVerticalOffset = -bbox.y - bbox.height / 2;
                     that._textWidth = bbox.width;
                     that._textHeight = bbox.height;
+                    that._textUnitWidth = that._textWidth / sampleText.length;
                     that._textFullWidth = that._textWidth + 2 * that._options.horizontalOffset;
                     that._textFullHeight = that._textHeight + 2 * that._options.verticalOffset
                 }

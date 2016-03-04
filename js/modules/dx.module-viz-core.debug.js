@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Visualization Core Library)
-* Version: 15.2.5
-* Build date: Jan 27, 2016
+* Version: 15.2.7
+* Build date: Mar 3, 2016
 *
 * Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -321,7 +321,24 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                 val1 = isDefined(val1) ? val1 : canvasOptions.rangeMin;
                 val2 = isDefined(val2) ? val2 : canvasOptions.rangeMax;
                 return (canvasOptions.rangeMax - canvasOptions.rangeMin) / Math.abs(val1 - val2)
-            }
+            },
+            isValid: function(value) {
+                var co = this._canvasOptions;
+                return !isNaN(value) && value.valueOf() + co.rangeDoubleError >= co.rangeMin && value.valueOf() - co.rangeDoubleError <= co.rangeMax
+            },
+            parse: function(value) {
+                return Number(value)
+            },
+            to: function(value) {
+                return this._conversionValue(this._calculateProjection((value - this._canvasOptions.rangeMinVisible) * this._canvasOptions.ratioOfCanvasRange))
+            },
+            from: function(position) {
+                return this._calculateUnProjection((position - this._canvasOptions.startPoint) / this._canvasOptions.ratioOfCanvasRange)
+            },
+            _add: function(value, diff, coeff) {
+                return value + diff * coeff
+            },
+            isValueProlonged: false
         }
     })(jQuery, DevExpress);
     /*! Module viz-core, file datetimeTranslator.js */
@@ -338,7 +355,19 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
             getInterval: numericTranslator.getInterval,
             zoom: numericTranslator.zoom,
             getMinScale: numericTranslator.getMinScale,
-            getScale: numericTranslator.getScale
+            getScale: numericTranslator.getScale,
+            isValid: function(value) {
+                return numericTranslator.isValid.call(this, new Date(value))
+            },
+            parse: function(value) {
+                return new Date(value)
+            },
+            to: numericTranslator.to,
+            from: function(position) {
+                return new Date(numericTranslator.from.call(this, position))
+            },
+            _add: DX.require("/utils/utils.date").addDateInterval,
+            isValueProlonged: numericTranslator.isValueProlonged
         }
     })(jQuery, DevExpress);
     /*! Module viz-core, file categoryTranslator.js */
@@ -440,7 +469,42 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                 if (!isDefined(maxPoint))
                     maxPoint = canvasOptions.invert ? visibleArea.min : visibleArea.max;
                 return that.canvasLength / Math.abs(maxPoint - minPoint)
-            }
+            },
+            isValid: function(value) {
+                return this._categoriesToPoints[value] >= 0
+            },
+            parse: function(value) {
+                return value
+            },
+            to: function(value, direction) {
+                var canvasOptions = this._canvasOptions,
+                    businessRange = this._businessRange,
+                    categoryIndex = this._categoriesToPoints[value],
+                    startPointIndex = canvasOptions.startPointIndex || 0,
+                    stickInterval = businessRange.stick ? 0 : 0.5,
+                    stickDelta = categoryIndex + stickInterval - startPointIndex + (businessRange.invert ? -1 : +1) * direction * 0.5;
+                return round(this._calculateProjection(canvasOptions.interval * stickDelta))
+            },
+            from: function(position, direction) {
+                var canvasOptions = this._canvasOptions,
+                    businessRange = this._businessRange,
+                    startPoint = canvasOptions.startPoint,
+                    categories = this._categories,
+                    categoriesLength = categories.length,
+                    stickInterval = businessRange.stick ? 0.5 : 0,
+                    result = round((position - startPoint) / canvasOptions.interval + stickInterval - 0.5 - direction * 0.5);
+                if (categoriesLength === result)
+                    result--;
+                if (result === -1)
+                    result = 0;
+                if (canvasOptions.invert)
+                    result = categoriesLength - result - 1;
+                return categories[result]
+            },
+            _add: function(value, diff, coeff) {
+                return NaN
+            },
+            isValueProlonged: true
         }
     })(jQuery, DevExpress);
     /*! Module viz-core, file logarithmicTranslator.js */
@@ -474,7 +538,22 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                 val1 = commonUtils.isDefined(val1) ? getLog(val1, base) : undefined;
                 val2 = commonUtils.isDefined(val2) ? getLog(val2, base) : undefined;
                 return numericTranslator.getScale.call(this, val1, val2)
-            }
+            },
+            isValid: function(value) {
+                return numericTranslator.isValid.call(this, getLog(value, this._businessRange.base))
+            },
+            parse: numericTranslator.parse,
+            to: function(value) {
+                return numericTranslator.to.call(this, getLog(value, this._businessRange.base))
+            },
+            from: function(position) {
+                return raiseTo(numericTranslator.from.call(this, position), this._businessRange.base)
+            },
+            _add: function(value, diff, dir) {
+                var b = this._businessRange.base;
+                return raiseTo(numericTranslator._add(getLog(value, b), diff, dir), b)
+            },
+            isValueProlonged: numericTranslator.isValueProlonged
         }
     })(jQuery, DevExpress);
     /*! Module viz-core, file translator1D.js */
@@ -611,13 +690,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                         else
                             script = viz.numericTranslatorFunctions
                 }
-                that.translate = script.translate;
-                that.untranslate = script.untranslate;
-                that.getInterval = script.getInterval;
-                that.zoom = script.zoom;
-                that.getMinScale = script.getMinScale;
-                that._getValue = script._getValue;
-                that.getScale = script.getScale;
+                $.extend(that, script);
                 that._conversionValue = that._options.conversionValue ? function(value) {
                     return value
                 } : function(value) {
@@ -782,7 +855,19 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
             untranslate: _noop,
             getInterval: _noop,
             zoom: _noop,
-            getMinScale: _noop
+            getMinScale: _noop,
+            getRange: function() {
+                return [this.untranslate(this._canvasOptions.startPoint), this.untranslate(this._canvasOptions.endPoint)]
+            },
+            isEmptyValueRange: function() {
+                return this._businessRange.stubData
+            },
+            getScreenRange: function() {
+                return [this._canvasOptions.startPoint, this._canvasOptions.endPoint]
+            },
+            add: function(value, diff, dir) {
+                return this._add(value, diff, (this._businessRange.invert ? -1 : +1) * dir)
+            }
         }
     })(jQuery, DevExpress);
     /*! Module viz-core, file polarTranslator.js */
@@ -2935,7 +3020,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                 return this
             },
             isDefined: function() {
-                return _isDefined(this[minSelector]) && _isDefined(this[maxSelector]) || _isDefined(this[categoriesSelector])
+                return _isDefined(this[minSelector]) && _isDefined(this[maxSelector]) || this[categoriesSelector] && this[categoriesSelector].length
             },
             setStubData: function(dataType) {
                 var that = this,
@@ -3616,7 +3701,18 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
             SCREEN_DELTA_KOEF = 4,
             AXIS_STAGGER_OVERLAPPING_KOEF = 2,
             STAGGER = "stagger",
+            ROTATE = "rotate",
             MIN_ARRANGEMENT_TICKS_COUNT = 2;
+        function nextState(state) {
+            switch (state) {
+                case"overlap":
+                    return STAGGER;
+                case STAGGER:
+                    return ROTATE;
+                default:
+                    return "end"
+            }
+        }
         function defaultGetTextFunc(value) {
             return value.toString()
         }
@@ -3629,9 +3725,15 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                 if (overlappingBehavior.mode !== "ignore") {
                     that._useAutoArrangement = true;
                     that._correctTicks();
-                    if (overlappingBehavior.mode === STAGGER)
-                        that._screenDelta *= AXIS_STAGGER_OVERLAPPING_KOEF;
-                    that._applyAutoArrangement()
+                    if (overlappingBehavior.mode === "_auto") {
+                        that._applyAutoOverlappingBehavior();
+                        that._useAutoArrangement = options.overlappingBehavior.isOverlapped
+                    }
+                    if (that._useAutoArrangement) {
+                        if (overlappingBehavior.mode === STAGGER)
+                            that._screenDelta *= AXIS_STAGGER_OVERLAPPING_KOEF;
+                        that._applyAutoArrangement()
+                    }
                 }
             },
             checkBoundedTicksOverlapping: function() {
@@ -3725,6 +3827,9 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
         };
         overlappingMethods.circular = _extend({}, overlappingMethods.base, {
             _correctTicks: _noop,
+            _applyAutoOverlappingBehavior: function() {
+                this._options.overlappingBehavior.isOverlapped = true
+            },
             _getTextElementBbox: function(value, text) {
                 var textOptions = _extend({}, this._options.textOptions, {rotate: 0}),
                     delta = _isFunction(this._options.translate) ? this._options.translate(value) : {
@@ -3807,6 +3912,51 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                     return _ceil((options.ticksCount || that._ticks.length) / requiredValuesCount)
                 }
                 return 1
+            },
+            _getOptimalRotationAngle: function() {
+                var that = this,
+                    options = that._options,
+                    tick1 = that._ticks[0],
+                    tick2 = that._ticks[1],
+                    outOfScreen = viz.outOfScreen,
+                    textOptions = that._textOptions,
+                    getText = options.getText || defaultGetTextFunc,
+                    textFontStyles = options.textFontStyles,
+                    svgElement1 = options.renderText(getText(tick1, options.labelOptions), outOfScreen.x + options.translate(tick1, !options.isHorizontal), outOfScreen.y).css(textFontStyles).attr(textOptions),
+                    svgElement2 = options.renderText(getText(tick2, options.labelOptions), outOfScreen.x + options.translate(tick2, !options.isHorizontal), outOfScreen.y).css(textFontStyles).attr(textOptions),
+                    bBox1 = svgElement1.getBBox(),
+                    bBox2 = svgElement2.getBBox(),
+                    angle = _math.asin((bBox1.height + options.textSpacing) / (bBox2.x - bBox1.x)) * 180 / Math.PI;
+                svgElement1.remove();
+                svgElement2.remove();
+                return isNaN(angle) ? 90 : _ceil(angle)
+            },
+            _applyAutoOverlappingBehavior: function() {
+                var that = this,
+                    overlappingBehavior = that._options.overlappingBehavior,
+                    screenDelta = that._screenDelta,
+                    isOverlapped = false,
+                    rotationAngle = null,
+                    mode = null,
+                    state = "overlap";
+                while (state !== "end") {
+                    isOverlapped = rotationAngle && rotationAngle !== 90 ? false : that._isOverlappedTicks(screenDelta);
+                    state = nextState(isOverlapped ? state : null);
+                    switch (state) {
+                        case STAGGER:
+                            screenDelta *= AXIS_STAGGER_OVERLAPPING_KOEF;
+                            mode = state;
+                            break;
+                        case ROTATE:
+                            rotationAngle = that._getOptimalRotationAngle();
+                            screenDelta = that._screenDelta;
+                            mode = state;
+                            break
+                    }
+                }
+                overlappingBehavior.isOverlapped = isOverlapped;
+                overlappingBehavior.mode = mode;
+                overlappingBehavior.rotationAngle = rotationAngle
             },
             _getDistanceByAngle: function(elementHeight, rotationAngle) {
                 return elementHeight / _abs(_math.sin(rotationAngle * (_math.PI / 180)))
@@ -4338,7 +4488,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
     (function($, DX, undefined) {
         var _map = DX.viz.utils.map,
             formatHelper = DX.require("/utils/utils.formatHelper");
-        function getFormatObject(value, options, axisMinMax) {
+        function getFormatObject(value, options, axisMinMax, point) {
             var formatObject = {
                     value: value,
                     valueText: formatHelper.format(value, options.format, options.precision) || ""
@@ -4347,6 +4497,8 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                 formatObject.min = axisMinMax.min;
                 formatObject.max = axisMinMax.max
             }
+            if (point)
+                formatObject.point = point;
             return formatObject
         }
         DX.viz.axes = {constants: {
@@ -4380,8 +4532,8 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                 validateOverlappingMode: function(mode) {
                     return mode !== "ignore" ? "enlargeTickInterval" : "ignore"
                 },
-                formatLabel: function(value, options, axisMinMax) {
-                    var formatObject = getFormatObject(value, options, axisMinMax);
+                formatLabel: function(value, options, axisMinMax, point) {
+                    var formatObject = getFormatObject(value, options, axisMinMax, point);
                     return $.isFunction(options.customizeText) ? options.customizeText.call(formatObject, formatObject) : formatObject.valueText
                 },
                 formatHint: function(value, options, axisMinMax) {
@@ -5477,9 +5629,11 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
             commonUtils = DX.require("/utils/utils.common"),
             constants = viz.axes.constants,
             parseUtils = viz.parseUtils,
+            formatLabel = constants.formatLabel,
+            convertTicksToValues = constants.convertTicksToValues,
+            convertValuesToTicks = constants.convertValuesToTicks,
             _isDefined = commonUtils.isDefined,
             _isNumber = commonUtils.isNumber,
-            _isString = commonUtils.isString,
             _getSignificantDigitPosition = mathUtils.getSignificantDigitPosition,
             _roundValue = mathUtils.roundValue,
             patchFontOptions = viz.utils.patchFontOptions,
@@ -5593,8 +5747,8 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                     min = that._minBound,
                     max = that._maxBound,
                     categories = that._translator.getVisibleCategories() || that._translator.getBusinessRange().categories,
-                    customTicks = options.customTicks || (hasCategories({categories: categories}) ? categories : that._majorTicks && that._majorTicks.length && constants.convertTicksToValues(that._majorTicks)),
-                    customMinorTicks = options.customMinorTicks || that._minorTicks && that._minorTicks.length && constants.convertTicksToValues(that._minorTicks);
+                    customTicks = options.customTicks || (hasCategories({categories: categories}) ? categories : that._majorTicks && that._majorTicks.length && convertTicksToValues(that._majorTicks)),
+                    customMinorTicks = options.customMinorTicks || that._minorTicks && that._minorTicks.length && convertTicksToValues(that._minorTicks);
                 if (_isNumber(min) && options.type !== constants.logarithmic)
                     min = that._correctMinForTicks(min, max, screenDelta);
                 return {
@@ -5632,7 +5786,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
             _getBoundaryTicks: function() {
                 var categories = this._translator.getVisibleCategories() || this._translator.getBusinessRange().categories,
                     boundaryValues = hasCategories({categories: categories}) && this._tickOffset ? [categories[0], categories[categories.length - 1]] : this._tickManager.getBoundaryTicks();
-                return constants.convertValuesToTicks(boundaryValues)
+                return convertValuesToTicks(boundaryValues)
             },
             _createTickManager: function() {
                 return viz.CoreFactory.createTickManager({}, {}, {overlappingBehaviorType: this._overlappingBehaviorType})
@@ -5814,7 +5968,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                     labelOptions = options.label,
                     coords;
                 that._checkAlignmentConstantLineLabels(lineLabelOptions);
-                text = _isDefined(text) ? text : constants.formatLabel(parsedValue, labelOptions);
+                text = _isDefined(text) ? text : formatLabel(parsedValue, labelOptions);
                 coords = that._getConstantLineLabelsCoords(value, lineLabelOptions);
                 return that._renderer.text(text, coords.x, coords.y).css(patchFontOptions(_extend({}, labelOptions.font, lineLabelOptions.font))).attr({align: coords.align}).append(that._axisConstantLineGroup)
             },
@@ -6066,7 +6220,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
             _initTickLabel: function(tick, position) {
                 var that = this,
                     customizeColor = that._options.label.customizeColor;
-                tick.labelText = constants.formatLabel(tick.value, that._options.label, {
+                tick.labelText = formatLabel(tick.value, that._options.label, {
                     min: that._minBound,
                     max: that._maxBound
                 });
@@ -6116,7 +6270,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                     skippedCategory = that._getSkippedCategory(),
                     boundaryTicks = this._boundaryTicks,
                     withLabels = options.label.visible && that._axisElementsGroup && !that._translator.getBusinessRange().stubData,
-                    labelPosition = that.getCurrentLabelPos(),
+                    labelPosition = that.getLabelsParams().pos,
                     offset = that._tickOffset;
                 that._initTicks(that._majorTicks, majorTickStyle, withLabels, skippedCategory, offset, labelPosition);
                 that._initTicks(that._minorTicks, minorTickStyle, false, undefined, offset);
@@ -6295,23 +6449,26 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                 this._deleteLabels();
                 this._majorTicks = this._minorTicks = null
             },
-            getCurrentLabelPos: function() {
+            getLabelsParams: function() {
                 var that = this,
                     options = that._options,
                     position = options.position,
                     labelOffset = options.label.indentFromAxis,
-                    axisPosition = that._axisPosition;
-                return position === constants.top || position === constants.left ? axisPosition - labelOffset : axisPosition + labelOffset
+                    axisPosition = that._axisPosition,
+                    axisElementsGroup = that._axisElementsGroup;
+                return {
+                        pos: position === constants.top || position === constants.left ? axisPosition - labelOffset : axisPosition + labelOffset,
+                        width: axisElementsGroup && axisElementsGroup.getBBox().width || 0
+                    }
             },
-            getFormattedValue: function(value) {
-                if (_isDefined(value))
-                    return constants.formatLabel(_isNumber(value) && !_isString(value) ? _roundValue(value, _getSignificantDigitPosition(this._translator.getBusinessRange().interval)) : value, this._options.label);
-                return null
+            getFormattedValue: function(value, options, point) {
+                var labelOptions = this._options.label;
+                return _isDefined(value) ? formatLabel(value, _extend(true, {}, labelOptions, options), undefined, point) : null
             },
             getTicksValues: function() {
                 return {
-                        majorTicksValues: constants.convertTicksToValues(this._majorTicks || this.getMajorTicks()),
-                        minorTicksValues: constants.convertTicksToValues(this._minorTicks || this.getMinorTicks())
+                        majorTicksValues: convertTicksToValues(this._majorTicks || this.getMajorTicks()),
+                        minorTicksValues: convertTicksToValues(this._minorTicks || this.getMinorTicks())
                     }
             },
             getMajorTicks: function(withoutOverlappingBehavior) {
@@ -6321,7 +6478,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                     boundedOverlappedTicks;
                 that._updateTickManager();
                 that._textOptions.rotate = 0;
-                majorTicks = constants.convertValuesToTicks(that._tickManager.getTicks(withoutOverlappingBehavior));
+                majorTicks = convertValuesToTicks(that._tickManager.getTicks(withoutOverlappingBehavior));
                 if (majorTicks.length)
                     if (overlappingBehavior.hideFirstTick || overlappingBehavior.hideLastTick || overlappingBehavior.hideFirstLabel || overlappingBehavior.hideLastLabel) {
                         overlappingBehavior.hideFirstLabel && (majorTicks[0].withoutLabel = true);
@@ -6339,15 +6496,15 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                 return majorTicks
             },
             getMinorTicks: function() {
-                return constants.convertValuesToTicks(this._tickManager.getMinorTicks())
+                return convertValuesToTicks(this._tickManager.getMinorTicks())
             },
             getDecimatedTicks: function() {
-                return constants.convertValuesToTicks(this._tickManager.getDecimatedTicks())
+                return convertValuesToTicks(this._tickManager.getDecimatedTicks())
             },
             setTicks: function(ticks) {
                 this.resetTicks();
-                this._majorTicks = constants.convertValuesToTicks(ticks.majorTicks);
-                this._minorTicks = constants.convertValuesToTicks(ticks.minorTicks)
+                this._majorTicks = convertValuesToTicks(ticks.majorTicks);
+                this._minorTicks = convertValuesToTicks(ticks.minorTicks)
             },
             setPercentLabelFormat: function() {
                 if (!this._hasLabelFormat)
@@ -7341,7 +7498,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                             from: {},
                             to: {}
                         };
-                        animationParams.transform.from[key] = key in settings ? settings[key] : defaults[key];
+                        animationParams.transform.from[key] = key in settings ? Number(settings[key].toFixed(3)) : defaults[key];
                         animationParams.transform.to[key] = value
                     }
                     else if (key === "arc" || key === "segments")
@@ -10028,15 +10185,11 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                     that._changeStyle(legendCallback, APPLY_HOVER)
             },
             _setLabelGroupSettings: function(animationEnabled) {
-                var that = this,
-                    settings = {
-                        "class": "dxc-labels",
-                        visibility: that.getLabelVisibility() ? "visible" : "hidden"
-                    };
-                that._applyElementsClipRect(settings);
-                that._applyClearingSettings(settings);
+                var settings = {"class": "dxc-labels"};
+                this._applyElementsClipRect(settings);
+                this._applyClearingSettings(settings);
                 animationEnabled && (settings.opacity = 0.001);
-                that._labelsGroup.attr(settings).append(that._extGroups.labelsGroup)
+                this._labelsGroup.attr(settings).append(this._extGroups.labelsGroup)
             },
             _checkType: function(widgetType) {
                 return !!seriesNS.mixins[widgetType][this.type]
@@ -12171,7 +12324,8 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
             _noop = $.noop,
             _map = viz.utils.map,
             _isFinite = isFinite,
-            _max = Math.max;
+            _max = Math.max,
+            INSIDE = "inside";
         pieSeries.pie = _extend({}, barSeries, {
             _setGroupsSettings: scatterSeries._setGroupsSettings,
             _createErrorBarGroup: _noop,
@@ -12188,17 +12342,19 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                     maxLabelLength,
                     labelsBBoxes = [];
                 _each(points, function(_, point) {
-                    if (point._label.isVisible() && point._label.getLayoutOptions().position !== "inside") {
-                        point.setLabelEllipsis();
+                    if (point._label.isVisible()) {
                         point.setLabelTrackerData();
-                        labelsBBoxes.push(point._label.getBoundingRect().width)
+                        if (point._label.getLayoutOptions().position !== INSIDE) {
+                            point.setLabelEllipsis();
+                            labelsBBoxes.push(point._label.getBoundingRect().width)
+                        }
                     }
                 });
                 if (labelsBBoxes.length)
                     maxLabelLength = _max.apply(null, labelsBBoxes);
                 _each(points, function(_, point) {
-                    if (point._label.isVisible() && point._label.getLayoutOptions().position !== "inside") {
-                        point._maxLabelLength = maxLabelLength;
+                    if (point._label.isVisible() && point._label.getLayoutOptions().position !== INSIDE) {
+                        point.setMaxLabelLength(maxLabelLength);
                         point.updateLabelCoord()
                     }
                 })
@@ -12216,7 +12372,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                 var that = this,
                     options = that._options,
                     points = that._points || [];
-                if (options.label.position === "inside")
+                if (options.label.position === INSIDE)
                     return false;
                 that._labelsGroup.append(that._extGroups.labelsGroup);
                 _each(points, function(_, point) {
@@ -13076,6 +13232,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
             updateLabelCoord: _noop,
             drawLabel: _noop,
             correctLabelPosition: _noop,
+            setMaxLabelLength: _noop,
             dispose: function() {
                 var that = this;
                 that.deleteMarker();
@@ -14358,6 +14515,9 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                 that.minValue = correction;
                 that.percent = percent;
                 that._label.setDataField("percent", percent)
+            },
+            setMaxLabelLength: function(maxLabelLength) {
+                this._maxLabelLength = maxLabelLength
             },
             _updateLabelData: function() {
                 this._label.setData(this._getLabelFormatObject())
@@ -16951,7 +17111,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                         enabled: false,
                         stroke: WHITE,
                         "stroke-width": 1,
-                        "stroke-opacity": 0.5,
+                        "stroke-opacity": 0.7,
                         font: {
                             color: SOME_GREY,
                             size: 12
@@ -16966,10 +17126,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                     selectedBorderColor: GREY_GREEN,
                     label: {
                         "stroke-width": 2,
-                        font: {
-                            size: 16,
-                            opacity: 0.5
-                        }
+                        font: {size: 16}
                     }
                 },
                 "layer:line": {
@@ -16980,10 +17137,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                     selectedColor: "#e55100",
                     label: {
                         "stroke-width": 2,
-                        font: {
-                            size: 16,
-                            opacity: 0.5
-                        }
+                        font: {size: 16}
                     }
                 },
                 "layer:marker": {label: {

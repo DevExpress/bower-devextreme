@@ -44,6 +44,10 @@
     border-bottom-style: solid;
 }
 
+.desktop-layout .toolbar .dx-content {
+    width: 100%;
+}
+
 .desktop-layout #navBar .dx-icon {
     display: none;
 }
@@ -111,4 +115,11 @@
 
 .desktop-layout .dx-popup-title.dx-toolbar .dx-toolbar-label {
     padding: 0 5px 0 0;
+}
+
+.desktop-layout .dx-content.dx-animating.dx-leave,
+.desktop-layout .dx-content.dx-animating.dx-enter {
+  position: absolute;
+  top: 0;
+  left: 0;
 }

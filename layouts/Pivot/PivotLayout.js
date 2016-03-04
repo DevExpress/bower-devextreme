@@ -81,6 +81,7 @@
     layoutSets["navbar"] = layoutSets["navbar"] || [];
     layoutSets["navbar"].push({
         platform: "win",
+        version: [8],
         phone: true,
         root: true,
         controller: new DX.framework.html.PivotLayoutController

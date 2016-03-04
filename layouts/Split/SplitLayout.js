@@ -114,13 +114,13 @@
             this._onNavigatingHandler = $.proxy(this._onNavigating, this);
             this._onNavigatedHandler = $.proxy(this._onNavigated, this);
             this._navigationManager = options.navigationManager;
-            this._navigationManager.on("navigating", this._onNavigatingHandler);
             this._ensurePanesConfig();
             this._initChildControllers(options)
         },
         activate: function() {
             var tasks = [];
             this.callBase();
+            this._navigationManager.on("navigating", this._onNavigatingHandler);
             this._navigationManager.on("navigated", this._onNavigatedHandler);
             this._navigationManager.on("navigatingBack", this._onNavigatingBackHandler);
             $.each(this._panesConfig, function(_, paneConfig) {
@@ -134,6 +134,7 @@
             $.each(this._panesConfig, function(_, paneConfig) {
                 tasks.push(paneConfig.controller.deactivate())
             });
+            this._navigationManager.off("navigating", this._onNavigatingHandler);
             this._navigationManager.off("navigated", this._onNavigatedHandler);
             this.callBase();
             return $.when.apply($, tasks).done(function() {
@@ -329,7 +330,7 @@
                 }
         }
     });
-    DX.framework.html.Win8SplitLayoutController = DX.framework.html.MultipaneLayoutController.inherit({
+    DX.framework.html.WinSplitLayoutController = DX.framework.html.MultipaneLayoutController.inherit({
         ctor: function(options) {
             options = options || {};
             this._eventHelper = new SplitLayoutEventHelper(this);
@@ -339,15 +340,13 @@
         init: function(options) {
             this.callBase(options);
             this._eventHelper.init();
-            this.headerToolbarController = new DX.framework.html.ToolbarController(this._$mainLayout.find(".header-toolbar"), this._commandManager);
-            this.footerToolbarController = new DX.framework.html.ToolbarController(this._$mainLayout.find(".footer-toolbar"), this._commandManager)
+            this.headerToolbarController = new DX.framework.html.ToolbarController(this._$mainLayout.find(".header-toolbar"), this._commandManager)
         },
         showView: function(viewInfo, direction) {
             var that = this;
             that._updateLayoutTitle(viewInfo);
             return that.callBase(viewInfo, direction).done(function() {
-                    that.headerToolbarController.showViews(that._activeViews);
-                    that.footerToolbarController.showViews(that._activeViews)
+                    that.headerToolbarController.showViews(that._activeViews)
                 })
         },
         _createLayoutModel: function() {
@@ -371,6 +370,18 @@
             return footerToolbar ? footerToolbar.option("items").length : false
         }
     });
+    DX.framework.html.Win8SplitLayoutController = DX.framework.html.WinSplitLayoutController.inherit({
+        init: function(options) {
+            this.callBase(options);
+            this.footerToolbarController = new DX.framework.html.ToolbarController(this._$mainLayout.find(".footer-toolbar"), this._commandManager)
+        },
+        showView: function(viewInfo, direction) {
+            var that = this;
+            return that.callBase(viewInfo, direction).done(function() {
+                    that.footerToolbarController.showViews(that._activeViews)
+                })
+        }
+    });
     var layoutSets = DX.framework.html.layoutSets;
     layoutSets["split"] = layoutSets["split"] || [];
     layoutSets["split"].push({
@@ -390,6 +401,12 @@
     });
     layoutSets["split"].push({
         platform: "win",
+        phone: false,
+        controller: new DX.framework.html.WinSplitLayoutController
+    });
+    layoutSets["split"].push({
+        platform: "win",
+        version: [8],
         phone: false,
         controller: new DX.framework.html.Win8SplitLayoutController
     })

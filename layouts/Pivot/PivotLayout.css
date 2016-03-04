@@ -84,7 +84,7 @@
 }
 
 .dx-theme-win10 .pivot-layout.has-toolbar-bottom .layout-footer {
-    height: 60px;
+    height: 48px;
 }
 
 .dx-theme-win10 .pivot-layout.dx-animating:not(.dx-enter):not(.dx-leave) {
@@ -102,7 +102,7 @@
     width: 100%;
     height: auto;
     top: 0;
-    bottom: 60px;
+    bottom: 48px;
     position: absolute;
 }
 

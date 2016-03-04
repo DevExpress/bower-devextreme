@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme
-* Version: 15.2.5
-* Build date: Jan 27, 2016
+* Version: 15.2.7
+* Build date: Mar 3, 2016
 *
 * Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -69,7 +69,8 @@ Globalize.addCultureInfo("de", {messages: {
         "dxRangeSlider-ariaTill": "Bis",
         "dxSwitch-onText": "EIN",
         "dxSwitch-offText": "AUS",
-        "dxForm-optionalMark": "optional"
+        "dxForm-optionalMark": "optional",
+        "dxForm-requiredMessage": "{0} ist ein Pflichtfeld"
     }});
 
 Globalize.addCultureInfo("de", {messages: {

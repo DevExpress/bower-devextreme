@@ -69,3 +69,20 @@
         </div>
     </div>
 </div>
+
+<div class="navbar-layout" data-options="dxLayout : { name: 'navbar', platform: 'win', phone: true } ">
+
+    <div class="layout-header">
+        <div class="navbar-container dx-navbar-layout-header" data-bind="dxNavBar: {}" data-options="dxCommandContainer: { id: 'global-navigation' }">
+        </div>
+    </div>
+
+    <div class="layout-content" data-options="dxContentPlaceholder : { name: 'content', animation: 'view-content-change' }">
+    </div>
+
+    <div class="layout-footer" data-options="dxContentPlaceholder : { name: 'footer' }">
+        <div class="layout-toolbar-bottom" data-bind="dxToolbar: { items: [], renderAs: 'bottomToolbar' }" data-options="dxCommandContainer : { id: 'win10-phone-appbar' } "></div>
+    </div>
+
+</div>
+

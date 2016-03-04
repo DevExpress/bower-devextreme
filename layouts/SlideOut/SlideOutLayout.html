@@ -73,6 +73,25 @@
         <div class="layout-content" data-options="dxContentPlaceholder : { name: 'content' } ">
         </div>
 
+        <div class="layout-toolbar-bottom" data-bind="dxToolbar: { visible: false, renderAs: 'bottomToolbar' }" data-options="dxCommandContainer : { id: 'win10-phone-appbar' } ">
+        </div>
+    </div>
+
+</div>
+
+<div class="slideout-layout" data-options="dxLayout : { name: 'slideout', platform: 'win', version: [8] } ">
+    <div class="layout-frame" data-options="dxTransition: { name: 'main', animation: 'view-content-change' }">
+        <div class="layout-header">
+            <div class="layout-toolbar" data-bind="dxToolbar: { items: [{ location: 'before', template: 'nav-button', visible: false }, { location: 'center', text: title }] }">
+                <div class="nav-button-item" data-options="dxTemplate : { name: 'nav-button' } ">
+                    <div class="nav-button" data-bind="dxButton: { icon: 'menu' }"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="layout-content" data-options="dxContentPlaceholder : { name: 'content' } ">
+        </div>
+
         <div class="layout-toolbar-bottom" data-bind="dxToolbar: { visible: false, renderAs: 'bottomToolbar' }" data-options="dxCommandContainer : { id: 'win8-phone-appbar' } ">
         </div>
     </div>
