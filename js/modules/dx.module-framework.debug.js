@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Single Page App Framework)
-* Version: 15.2.7
-* Build date: Mar 3, 2016
+* Version: 15.2.8
+* Build date: Apr 4, 2016
 *
 * Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -2938,17 +2938,20 @@ if (!window.DevExpress || !DevExpress.MOD_FRAMEWORK) {
             activeViewInfo: function() {
                 return this._visibleViews[this._defaultPaneName]
             },
-            _notifyShowing: function() {
+            _fireViewEvents: function(eventName) {
                 var that = this;
                 $.each(this._visibleViews, function(index, viewInfo) {
-                    that.fireEvent("viewShowing", [viewInfo])
+                    that.fireEvent(eventName, [viewInfo])
                 })
             },
+            _notifyShowing: function() {
+                this._fireViewEvents("viewShowing")
+            },
+            _notifyShown: function() {
+                this._fireViewEvents("viewShown")
+            },
             _notifyHidden: function() {
-                var that = this;
-                $.each(this._visibleViews, function(index, viewInfo) {
-                    that.fireEvent("viewHidden", [viewInfo])
-                })
+                this._fireViewEvents("viewHidden")
             },
             _applyTemplate: function($elements, model) {
                 $elements.each(function(i, element) {
@@ -2964,9 +2967,12 @@ if (!window.DevExpress || !DevExpress.MOD_FRAMEWORK) {
                 this._visibleViews = {}
             },
             _templateContextChangedHandler: function() {
-                $.each(this._visibleViews, $.proxy(function(index, viewInfo) {
-                    this.showView(viewInfo)
-                }, this))
+                var that = this;
+                $.when.apply($, $.map(that._visibleViews, function(viewInfo) {
+                    return that.showView(viewInfo)
+                })).then(function() {
+                    that._notifyShown()
+                })
             },
             _attachRefreshViewRequiredHandler: function() {
                 if (this._templateContext)
@@ -4082,6 +4088,13 @@ if (!window.DevExpress || !DevExpress.MOD_FRAMEWORK) {
                             });
                             controller.on("viewShowing", function(viewInfo, direction) {
                                 that._processEvent("viewShowing", {
+                                    viewInfo: viewInfo,
+                                    direction: direction,
+                                    params: viewInfo.routeData
+                                }, viewInfo.model)
+                            });
+                            controller.on("viewShown", function(viewInfo, direction) {
+                                that._processEvent("viewShown", {
                                     viewInfo: viewInfo,
                                     direction: direction,
                                     params: viewInfo.routeData

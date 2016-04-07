@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Common Widgets)
-* Version: 15.2.7
-* Build date: Mar 3, 2016
+* Version: 15.2.8
+* Build date: Apr 4, 2016
 *
 * Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -3566,7 +3566,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
             };
         var MAP_CLASS = "dx-map",
             MAP_CONTAINER_CLASS = "dx-map-container",
-            MAP_SHIELD_CLASS = "dx-map-shield";
+            MAP_SHIELD_CLASS = "dx-map-shield",
+            NATIVE_CLICK_CLASS = "dx-native-click";
         var Map = Widget.inherit({
                 _getDefaultOptions: function() {
                     return $.extend(this.callBase(), {
@@ -3612,6 +3613,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                 },
                 _init: function() {
                     this.callBase();
+                    this.element().addClass(MAP_CLASS).addClass(NATIVE_CLICK_CLASS);
                     this._asyncQueue = [];
                     this._checkOption("provider");
                     this._checkOption("markers");
@@ -3648,7 +3650,6 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                 },
                 _render: function() {
                     this.callBase();
-                    this.element().addClass(MAP_CLASS);
                     this._renderShield();
                     this._saveRendered("markers");
                     this._saveRendered("routes");
@@ -5492,13 +5493,13 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     this._feedbackHideTimeout = BUTTON_FEEDBACK_HIDE_TIMEOUT
                 },
                 _render: function() {
-                    this.callBase();
                     this.element().addClass(BUTTON_CLASS);
                     this._renderType();
                     this.option("useInkRipple") && this._renderInkRipple();
                     this._renderClick();
                     this.setAria("role", "button");
-                    this._updateAriaLabel()
+                    this._updateAriaLabel();
+                    this.callBase()
                 },
                 _renderInkRipple: function() {
                     var isOnlyIconButton = !this.option("text") && this.option("icon") || this.option("type") === "back",
@@ -7226,13 +7227,18 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                 _readOnlyPropValue: function() {
                     return !this.option("fieldEditEnabled") || this.callBase()
                 },
+                _cleanFocusState: function() {
+                    this.callBase();
+                    if (this.option("fieldTemplate"))
+                        this._input().off("focusin focusout beforeactivate")
+                },
                 _renderField: function() {
                     var fieldTemplate = this._getTemplateByOption("fieldTemplate");
                     if (!(fieldTemplate && this.option("fieldTemplate")))
                         return;
                     var isFocused = this._input().is(":focus");
-                    isFocused && this._input().focusout();
                     this._cleanFocusState();
+                    isFocused && this._input().focusout();
                     var $container = this._$container;
                     var data = this._fieldRenderData();
                     $container.empty();
@@ -7242,8 +7248,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     if (!this._input().length)
                         throw errors.Error("E1010");
                     this._refreshValueChangeEvent();
-                    this._renderFocusState();
-                    isFocused && this._input().focus()
+                    isFocused && this._input().focus();
+                    this._renderFocusState()
                 },
                 _fieldRenderData: function() {
                     return this.option("value")
@@ -7542,7 +7548,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
         return DropDownEditor
     });
     /*! Module widgets-base, file ui.dropDownList.js */
-    DevExpress.define("/ui/widgets/ui.dropDownList", ["jquery", "/ui/ui.errors", "/utils/utils.common", "/componentRegistrator", "/ui/widgets/ui.dropDownEditor", "/ui/uiNamespace", "/ui/ui.dataExpression"], function($, errors, commonUtils, registerComponent, DropDownEditor, uiNamespace, DataExpressionMixin) {
+    DevExpress.define("/ui/widgets/ui.dropDownList", ["jquery", "/ui/ui.errors", "/utils/utils.common", "/componentRegistrator", "/ui/widgets/ui.dropDownEditor", "/ui/uiNamespace", "/ui/ui.dataExpression", "/ui/ui.themes"], function($, errors, commonUtils, registerComponent, DropDownEditor, uiNamespace, DataExpressionMixin, themes) {
         var LIST_ITEM_SELECTOR = ".dx-list-item",
             LIST_ITEM_DATA_KEY = "dxListItemData",
             DROPDOWNLIST_SELECTED_CLASS = "dx-dropdownlist-selected",
@@ -7613,7 +7619,9 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                                 },
                                 options: {popupPosition: {offset: {v: -6}}}
                             }, {
-                                device: {platform: "android"},
+                                device: function() {
+                                    return /android5/.test(themes.current())
+                                },
                                 options: {popupWidthExtension: 32}
                             }, {
                                 device: {platform: "ios"},
@@ -7726,7 +7734,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     this._renderInputValue().fail($.proxy(function() {
                         if (this._isCustomValueAllowed())
                             return;
-                        this.reset()
+                        this._clearSelectedItem()
                     }, this))
                 },
                 _isCustomValueAllowed: function() {
@@ -7755,7 +7763,9 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                             },
                             onHidden: function() {
                                 that.element().removeClass(SKIP_GESTURE_EVENT_CLASS)
-                            }
+                            },
+                            height: "auto",
+                            maxHeight: $.proxy(this._getMaxHeight, this)
                         })
                 },
                 _renderPopupContent: function() {
@@ -7915,11 +7925,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     this._setPopupOption("width", this.element().outerWidth() + this.option("popupWidthExtension"))
                 },
                 _updatePopupHeight: function() {
-                    var popupPadding = this._popup.overlayContent().outerHeight() - this._popup.content().height();
-                    var listMargin = this._list ? this._list.element().outerHeight() - this._list.clientHeight() : 0;
-                    var listHeight = this._list ? this._list.scrollHeight() + listMargin : 0;
-                    var popupHeight = Math.min(listHeight + popupPadding, this._getMaxHeight());
-                    this._setPopupOption("height", popupHeight);
+                    this._popup.repaint();
                     this._list && this._list.updateDimensions()
                 },
                 _getMaxHeight: function() {
@@ -8210,12 +8216,15 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     e.stopPropagation()
                 },
                 _renderValue: function() {
-                    if (!this._input().val().length || Number(this._input().val()) !== this.option("value")) {
+                    var inputValue = this._input().val();
+                    if (!inputValue.length || Number(inputValue) !== this.option("value")) {
                         this._forceValueRender();
                         this._toggleEmptinessEventHandler()
                     }
+                    var value = this.option("value");
+                    this._validateValue(value);
                     this._renderInputAddons();
-                    this.setAria("valuenow", this.option("value"))
+                    this.setAria("valuenow", value)
                 },
                 _renderValueEventName: function() {
                     return this.callBase() + " keypress"
@@ -8229,8 +8238,10 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                 },
                 _forceValueRender: function() {
                     var value = this.option("value"),
-                        valueFormat = this.option("valueFormat");
-                    this._renderDisplayText(valueFormat(value))
+                        number = Number(value),
+                        valueFormat = this.option("valueFormat"),
+                        formattedValue = isNaN(number) ? "" : valueFormat(value);
+                    this._renderDisplayText(formattedValue)
                 },
                 _renderProps: function() {
                     this.callBase();
@@ -8299,6 +8310,12 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     var value = parseFloat(this._normalizeInputValue()) || 0,
                         step = parseFloat(this.option("step"));
                     value = this._correctRounding(value, step * sign);
+                    var min = this.option("min"),
+                        max = this.option("max");
+                    if (min !== undefined)
+                        value = Math.max(min, value);
+                    if (max !== undefined)
+                        value = Math.min(max, value);
                     this.option("value", value)
                 },
                 _correctRounding: function(value, step) {
@@ -8326,29 +8343,28 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     this._input().focusout($.proxy(this._forceRefreshInputValue, this))
                 },
                 _forceRefreshInputValue: function() {
+                    if (this.option("mode") === "number")
+                        return;
                     var $input = this._input(),
                         valueFormat = this.option("valueFormat");
-                    if (this.option("mode") !== "number") {
-                        $input.val(null);
-                        $input.val(valueFormat(this.option("value")))
-                    }
+                    $input.val(null);
+                    $input.val(valueFormat(this.option("value")))
                 },
                 _valueChangeEventHandler: function(e) {
                     var $input = this._input(),
                         inputValue = $input.val(),
                         value = this._normalizeInputValue(),
                         valueFormat = this.option("valueFormat");
+                    if (this._shouldBeValidated() && !this._validateValue(value)) {
+                        $input.val(valueFormat(this.option("value")));
+                        return
+                    }
                     if (this.option("mode") === "number") {
-                        var numberValue = Number(value);
-                        this.callBase(e, isNaN(numberValue) ? null : numberValue);
+                        this.callBase(e, isNaN(value) ? null : value);
                         return
                     }
                     if (this._isValueIncomplete(inputValue))
                         return;
-                    if (!this._validateValue(this._normalizeText())) {
-                        this._resetValue();
-                        return
-                    }
                     if (Number(inputValue) !== value)
                         $input.val(valueFormat(value));
                     this.callBase(e, value)
@@ -8367,28 +8383,26 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     var incompleteRegex = /^(([+-])|([+-]?(0|[1-9]\d*)?[.,])|([+-]?(0|[1-9]\d*)?([.,]\d+)[eE][+-]?)|([+-]?(0|[1-9]\d*)[eE][+-]?))$/;
                     return incompleteRegex.test(value)
                 },
-                _validateValue: function(value) {
-                    var isValueValid = this._isValueValid();
-                    if (!value && isValueValid) {
-                        this.option("value", null);
-                        return true
-                    }
-                    var isNumber = /^[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?$/.test(value);
-                    this._oldValue = this.option("value");
-                    if (!isNumber && !isValueValid)
-                        return false;
-                    return true
+                _shouldBeValidated: function() {
+                    var inputValue = this._normalizeText();
+                    return !!inputValue && !isNaN(Number(inputValue)) && this._isValueValid()
                 },
-                _resetValue: function() {
-                    var $input = this._input(),
-                        isValueDefined = commonUtils.isDefined(this._oldValue);
-                    this.option("value", isValueDefined ? this._oldValue : null);
-                    isValueDefined && $input.val(this._oldValue);
-                    this._oldValue = null
+                _validateValue: function(value) {
+                    var inputValue = this._normalizeText(),
+                        isValueValid = this._isValueValid(),
+                        isValid = true,
+                        isNumber = /^[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?$/.test(inputValue);
+                    if (isNaN(Number(value)))
+                        isValid = false;
+                    if (!value && isValueValid)
+                        isValid = true;
+                    else if (!isNumber && !isValueValid)
+                        isValid = false;
+                    this.option("isValid", isValid);
+                    return isValid
                 },
                 _normalizeInputValue: function() {
-                    var value = this._normalizeValue();
-                    return commonUtils.isDefined(value) ? value : this.option("value")
+                    return this._normalizeValue()
                 },
                 _normalizeValue: function(value) {
                     return this._parseValue(this._normalizeText(value))
@@ -8398,30 +8412,14 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     return value.replace(",", ".")
                 },
                 _parseValue: function(value) {
+                    if (value === "")
+                        return null;
                     var number = parseFloat(value);
                     if (this.option("min") !== undefined)
                         number = math.max(number, this.option("min"));
                     if (this.option("max") !== undefined)
                         number = math.min(number, this.option("max"));
                     return number
-                },
-                _setValue: function(value, prevValue) {
-                    if (value == null || value === "") {
-                        this.option("value", null);
-                        if (value !== null)
-                            this._suppressValueChangeAction();
-                        return
-                    }
-                    var newValue = this._normalizeValue(value);
-                    if (!newValue && newValue !== 0) {
-                        this.option("value", prevValue);
-                        this._suppressValueChangeAction();
-                        return
-                    }
-                    if (value !== newValue) {
-                        this.option("value", newValue);
-                        this._suppressValueChangeAction()
-                    }
                 },
                 _clean: function() {
                     delete this._$spinContainer;
@@ -8432,8 +8430,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                 _optionChanged: function(args) {
                     switch (args.name) {
                         case"value":
-                            this._setValue(args.value, args.previousValue);
                             this.callBase(args);
+                            this._validateValue(args.value);
                             this._resumeValueChangeAction();
                             break;
                         case"step":
@@ -8874,9 +8872,10 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
             },
             _renderContent: function() {
                 this.callBase();
+                var that = this;
                 if (this.option("templatesRenderAsynchronously"))
                     this._resizeEventTimer = setTimeout(function() {
-                        domUtils.triggerResizeEvent(this._$content)
+                        domUtils.triggerResizeEvent(that._$content)
                     }, 0)
             },
             _render: function() {
@@ -8936,7 +8935,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     this._inkRipple.hideWave(config)
             },
             _renderMultiple: function() {
-                if (this.option("selectionMode") === "multi")
+                if (this.option("selectionMode") === "multiple")
                     this.option("selectOnFocus", false)
             },
             _renderWrapper: function() {
@@ -10120,6 +10119,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     case"pullRefreshEnabled":
                     case"autoPagingEnabled":
                         this._initScrollView();
+                        this._updateLoadingState();
                         break;
                     case"nextButtonText":
                     case"onItemSwipe":
@@ -10791,7 +10791,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
             },
             _toggleContentShield: function($itemElement, enabled) {
                 if (enabled)
-                    $itemElement.find("." + LIST_ITEM_CONTENT_CLASS).append(this._$itemContentShield);
+                    $itemElement.find("." + LIST_ITEM_CONTENT_CLASS).first().append(this._$itemContentShield);
                 else
                     this._$itemContentShield.detach()
             },
@@ -13417,7 +13417,11 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                 this.setAria({
                     role: "listbox",
                     label: "gallery"
-                })
+                });
+                this._fireContentReadyAction()
+            },
+            _renderContent: function() {
+                this._renderContentImpl()
             },
             _dimensionChanged: function() {
                 var selectedIndex = this.option("selectedIndex") || 0;
@@ -14477,7 +14481,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     closeOnScroll = this.option("closeOnTargetScroll");
                 if ($.isFunction(closeOnScroll))
                     closeHandled = closeOnScroll(e);
-                if (!closeHandled)
+                if (!closeHandled && !this._showAnimationProcessing)
                     this.hide()
             },
             _render: function() {
@@ -14488,7 +14492,11 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
             _renderContent: function() {
                 var shouldDeferRendering = !this.option("visible") && this.option("deferRendering");
                 var isParentHidden = this.option("visible") && this._isParentHidden();
-                if (this._contentAlreadyRendered || shouldDeferRendering || isParentHidden)
+                if (isParentHidden) {
+                    this._isHidden = true;
+                    return
+                }
+                if (this._contentAlreadyRendered || shouldDeferRendering)
                     return;
                 this._contentAlreadyRendered = true;
                 this.callBase()
@@ -15480,7 +15488,10 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
             },
             _renderResize: function() {
                 this.callBase();
-                this._$content.dxResizable("option", "onResize", $.proxy(this._setContentHeight, this))
+                this._$content.dxResizable("option", "onResize", $.proxy(function() {
+                    this._setContentHeight();
+                    this._actions.onResize(arguments)
+                }, this))
             },
             _setContentHeight: function() {
                 if (this._disallowUpdateContentHeight())
@@ -16575,11 +16586,11 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                 },
                 _renderImpl: function() {
                     this._$table = $("<table>");
+                    this.element().append(this._$table);
                     this._renderBody();
                     this._renderContouredDate();
                     this._renderValue();
-                    this._renderEvents();
-                    this.element().append(this._$table)
+                    this._renderEvents()
                 },
                 _renderBody: function() {
                     this.$body = $("<tbody>").appendTo(this._$table);
@@ -19380,7 +19391,12 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                 },
                 _listItemClickHandler: function(e) {
                     this.dateBox.option("opened", false);
-                    this.dateBoxValue(e.itemData)
+                    var date = this.dateBox.option("value");
+                    date = date ? new Date(date) : new Date;
+                    date.setHours(e.itemData.getHours());
+                    date.setMinutes(e.itemData.getMinutes());
+                    date.setSeconds(e.itemData.getSeconds());
+                    this.dateBoxValue(date)
                 },
                 attachKeyboardEvents: function(keyboardProcessor) {
                     var child = keyboardProcessor.attachChildProcessor();
@@ -19476,7 +19492,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
             },
             _render: function() {
                 this._renderWrapper();
-                this._renderContent();
+                this._renderIndicatorContent();
                 this._renderMarkup();
                 this.callBase()
             },
@@ -19484,7 +19500,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                 this._$wrapper = $("<div>").addClass(LOADINDICATOR_WRAPPER_CLASS);
                 this.element().append(this._$wrapper)
             },
-            _renderContent: function() {
+            _renderIndicatorContent: function() {
                 this._$content = $("<div>").addClass(LOADINDICATOR_CONTENT_CLASS);
                 this._$wrapper.append(this._$content)
             },
@@ -19974,6 +19990,9 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                         });
                     delete result.animation;
                     delete result.position;
+                    result.maxHeight = function() {
+                        return $(window).height()
+                    };
                     $.each(["position", "animation", "popupWidth", "popupHeight"], $.proxy(function(_, optionName) {
                         if (this.option(optionName) !== undefined)
                             result[this._popupOptionMap(optionName)] = this.option(optionName)
@@ -20181,15 +20200,12 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                         }, this))
                 },
                 _refreshField: function() {
-                    this._$field.text(this.option("displayValue"));
+                    this._$field.text(this.option("displayValue") || this.option("placeholder"));
                     this.element().toggleClass(LOOKUP_EMPTY_CLASS, !this.option("selectedItem"))
                 },
                 _renderPlaceholder: function() {
-                    if (this.element().find("input").length === 0) {
-                        if ($.trim(this._$field.text()) === "")
-                            this._$field.text(this.option("placeholder"));
-                        return
-                    }
+                    if (this.element().find("input").length === 0)
+                        return;
                     this.callBase()
                 },
                 _clean: function() {
@@ -20324,9 +20340,12 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                             }
                         })
                 },
-                _setOptionAliases: function() {
+                _setDeprecatedOptions: function() {
                     this.callBase();
-                    $.extend(this._optionAliases, {displayExpr: "valueExpr"})
+                    $.extend(this._deprecatedOptions, {displayExpr: {
+                            since: "15.2",
+                            alias: "valueExpr"
+                        }})
                 },
                 _getDefaultOptions: function() {
                     return $.extend(this.callBase(), {
@@ -20517,8 +20536,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                 },
                 _defaultOptionsRules: function() {
                     return this.callBase().concat([{
-                                device: function(device) {
-                                    return device.platform === "win" && device.version && device.version[0] === 8
+                                device: function() {
+                                    return /win8/.test(themes.current())
                                 },
                                 options: {
                                     _isAdaptablePopupPosition: true,
@@ -20531,8 +20550,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                                     }
                                 }
                             }, {
-                                device: function(device) {
-                                    return device.platform === "android"
+                                device: function() {
+                                    return /android5/.test(themes.current())
                                 },
                                 options: {
                                     _isAdaptablePopupPosition: true,
@@ -20676,14 +20695,20 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                         this._setValue(this._valueGetter(addedItem))
                     }, this))
                 },
-                _toggleOpenState: function() {
-                    if (this.option("disabled") || !this._wasSearch() || this.option("opened") || !this._isEditable()) {
-                        this.callBase.apply(this, arguments);
-                        return
+                _toggleOpenState: function(isVisible) {
+                    if (this.option("disabled"))
+                        return;
+                    isVisible = arguments.length ? isVisible : !this.option("opened");
+                    if (this._wasSearch() && isVisible) {
+                        this._wasSearch(false);
+                        if (this.option("showDataBeforeSearch") || this.option("minSearchLength") === 0)
+                            this._filterDataSource(null);
+                        else {
+                            this._setListOption("items", []);
+                            this._list && this._setListOption("noDataText", this._list.initialOption("noDataText"))
+                        }
                     }
-                    this._wasSearch(false);
-                    this._filterDataSource(null);
-                    this._input().focus()
+                    this.callBase(isVisible)
                 },
                 _renderTooltip: function() {
                     if (this.option("tooltipEnabled"))
@@ -23233,6 +23258,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                         transparence = rtlEnabled ? 1 : 0;
                     else if (transparence < 1)
                         transparence = transparence.toFixed(2);
+                    transparence = Math.max(transparence, 0);
+                    transparence = Math.min(transparence, 1);
                     this._alphaChannelInput.option("value", transparence)
                 },
                 _placeAlphaChannelHandle: function() {
@@ -23602,6 +23629,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
         var ui = DX.ui,
             errors = DX.require("/ui/ui.errors"),
             utils = DX.require("/utils/utils.common"),
+            stringUtils = DX.require("/utils/utils.string"),
             domUtils = DX.require("/utils/utils.dom"),
             registerComponent = DX.require("/componentRegistrator"),
             Widget = DX.require("/ui/ui.widget"),
@@ -23672,31 +23700,45 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                         text: " ",
                         location: this.option("labelLocation")
                     }).appendTo(this._$hiddenElement);
-                this._hiddenLabelText = $hiddenLabel.find("." + FIELD_ITEM_LABEL_TEXT_CLASS).first()
+                this._hiddenLabelText = $hiddenLabel.find("." + FIELD_ITEM_LABEL_TEXT_CLASS)[0]
             },
             _removeHiddenElement: function() {
                 this._$hiddenElement.remove();
                 this._hiddenLabelText = null
             },
             _getLabelWidthByText: function(text) {
-                return this._hiddenLabelText.text(text).width()
+                this._hiddenLabelText.innerHTML = text;
+                return this._hiddenLabelText.offsetWidth
             },
             _getLabelsSelectorByCol: function(index, options) {
                 options = options || {};
                 var cssExcludeTabbedSelector = options.excludeTabbed ? ":not(." + FIELD_ITEM_TAB_CLASS + ")" : "";
                 return "." + (options.inOneColumn ? FIELD_ITEM_CLASS : FORM_FIELD_ITEM_COL_CLASS + index) + cssExcludeTabbedSelector + "> ." + FIELD_ITEM_LABEL_CLASS + " > ." + FIELD_ITEM_LABEL_CONTENT_CLASS
             },
+            _getLabelText: function(labelText) {
+                var length = labelText.children.length,
+                    child,
+                    result = "",
+                    i;
+                for (i = 0; i < length; i++) {
+                    child = labelText.children[i];
+                    result = result + (!stringUtils.isEmpty(child.innerText) ? child.innerText : child.innerHTML)
+                }
+                return result
+            },
             _applyLabelsWidthByCol: function($container, index, options) {
                 var $labelTexts = $container.find(this._getLabelsSelectorByCol(index, options)),
+                    $labelTextsLength = $labelTexts.length,
                     labelWidth,
                     i,
                     maxWidth = 0;
-                for (i = 0; i < $labelTexts.length; i++) {
-                    labelWidth = this._getLabelWidthByText($labelTexts.eq(i).text());
+                for (i = 0; i < $labelTextsLength; i++) {
+                    labelWidth = this._getLabelWidthByText(this._getLabelText($labelTexts[i]));
                     if (labelWidth > maxWidth)
                         maxWidth = labelWidth
                 }
-                $labelTexts.width(maxWidth)
+                for (i = 0; i < $labelTextsLength; i++)
+                    $labelTexts[i].style.width = maxWidth + "px"
             },
             _applyLabelsWidth: function($container, excludeTabbed, inOneColumn) {
                 var colCount = inOneColumn ? 1 : this._getColCount($container),
@@ -23877,17 +23919,19 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     $tabPanel = $("<div/>").appendTo($container),
                     tabPanelOptions = $.extend({}, item.tabPanelOptions, {
                         dataSource: item.tabs,
-                        itemTemplate: function(itemData) {
-                            var $layoutManager = $("<div/>"),
-                                layoutManager,
+                        onItemRendered: function(args) {
+                            domUtils.triggerShownEvent(args.itemElement)
+                        },
+                        itemTemplate: function(itemData, e, $container) {
+                            var layoutManager,
                                 alignItemLabels = utils.ensureDefined(itemData.alignItemLabels, true);
-                            layoutManager = that._renderLayoutManager(itemData.items, $layoutManager, {
+                            layoutManager = that._renderLayoutManager(itemData.items, $container, {
                                 colCount: itemData.colCount,
                                 alignItemLabels: alignItemLabels,
                                 cssItemClass: itemData.cssItemClass,
                                 onLayoutChanged: function(inOneColumn) {
                                     $.proxy(that._alignLabelsInColumn, that)({
-                                        $container: $layoutManager,
+                                        $container: $container,
                                         layoutManager: layoutManager,
                                         items: itemData.items,
                                         inOneColumn: inOneColumn
@@ -23896,12 +23940,11 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                             });
                             if (alignItemLabels)
                                 $.proxy(that._alignLabelsInColumn, that)({
-                                    $container: $layoutManager,
+                                    $container: $container,
                                     layoutManager: layoutManager,
                                     items: itemData.items,
                                     inOneColumn: layoutManager.isLayoutChanged()
-                                });
-                            return $layoutManager
+                                })
                         }
                     });
                 that._createComponent($tabPanel, "dxTabPanel", tabPanelOptions)
@@ -23936,6 +23979,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
             _renderLayoutManager: function(items, $rootElement, options) {
                 var $element = $("<div />"),
                     that = this,
+                    instance,
                     config = $.extend({
                         items: items,
                         showRequiredMark: this.option("showRequiredMark"),
@@ -23966,27 +24010,29 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                         validationBoundary: that.option("scrollingEnabled") ? that.element() : undefined
                     });
                 $element.appendTo($rootElement);
-                return that._createComponent($element, "dxLayoutManager", config)
+                instance = that._createComponent($element, "dxLayoutManager", config);
+                that._attachSyncSubscriptions(instance);
+                return instance
             },
             _updateEditorInstancesFromLayoutManager: function(instancesByDataFields) {
                 $.extend(this._editorInstancesByField, instancesByDataFields)
             },
             _createComponent: function($element, type, config) {
-                var that = this,
-                    instance;
+                var that = this;
                 config = config || {};
                 that._extendConfig(config, {readOnly: that.option("readOnly")});
-                instance = that.callBase($element, type, config);
-                that._attachSyncSubscriptions(instance);
-                return instance
+                return that.callBase($element, type, config)
             },
             _attachSyncSubscriptions: function(instance) {
-                this.on("optionChanged", function(args) {
+                var that = this;
+                that.on("optionChanged", function(args) {
                     var formDataFieldStart = "formData.";
                     if (args.fullName.search(formDataFieldStart) === 0) {
                         var layoutDataField = args.fullName.replace(formDataFieldStart, "layoutData.");
                         instance.option(layoutDataField, args.value)
                     }
+                    if (utils.isDefined(that.option("items")) && args.fullName === "formData")
+                        instance.updateData(args.value);
                     if (args.name === "readOnly")
                         instance.option(args.fullName, args.value)
                 })
@@ -23999,9 +24045,11 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                 }
                 switch (args.name) {
                     case"formData":
-                        this._options[args.name] = args.value;
-                        this._triggerOnFieldDataChangedByDataSet(args.value);
-                        this._invalidate();
+                        if (!utils.isDefined(this._options.items)) {
+                            this._options[args.name] = args.value;
+                            this._invalidate();
+                            this._triggerOnFieldDataChangedByDataSet(args.value)
+                        }
                         break;
                     case"items":
                     case"colCount":
@@ -24044,15 +24092,15 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                         this.callBase(args)
                 }
             },
-            _getRootLevelOfExpectedComplexOption: function(fullOptionName, expextedRootNames) {
-                var splittedFullName = fullOptionName.split("."),
+            _getRootLevelOfExpectedComplexOption: function(fullOptionName, expectedRootNames) {
+                var splitedFullName = fullOptionName.split("."),
                     result;
-                if (splittedFullName.length > 1) {
+                if (splitedFullName.length > 1) {
                     var i,
-                        rootOptionName = splittedFullName[0];
-                    for (i = 0; i < expextedRootNames.length; i++)
-                        if (rootOptionName.search(expextedRootNames[i]) !== -1)
-                            result = expextedRootNames[i]
+                        rootOptionName = splitedFullName[0];
+                    for (i = 0; i < expectedRootNames.length; i++)
+                        if (rootOptionName.search(expectedRootNames[i]) !== -1)
+                            result = expectedRootNames[i]
                 }
                 return result
             },
@@ -24060,11 +24108,20 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                 var nameParts = args.fullName.split(".");
                 switch (rootOptionName) {
                     case"items":
+                        var itemPath = this._getItemPath(nameParts),
+                            instance,
+                            items,
+                            name,
+                            item = this.option(itemPath);
                         if (args.fullName.search("editorOptions") !== -1) {
-                            var itemPath = this._getItemPath(nameParts),
-                                item = this.option(itemPath),
-                                instance = this.getEditor(item.dataField);
+                            instance = this.getEditor(item.dataField);
                             instance && instance.option(item.editorOptions)
+                        }
+                        else if (item) {
+                            name = args.fullName.replace(itemPath + ".", "");
+                            this._changeItemOption(item, name, args.value);
+                            items = this._generateItemsFromData(this.option("items"));
+                            this.option("items", items)
                         }
                         break;
                     case"formData":
@@ -24183,7 +24240,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     }
                     else
                         break;
-                while (path.length);
+                while (path.length && result !== false);
                 return result
             },
             _getSubItemField: function(itemType) {
@@ -24197,6 +24254,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     if (result)
                         return false
                 });
+                if (!result)
+                    result = false;
                 return result
             },
             _getTextWithoutSpaces: function(text) {

@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Range Selector)
-* Version: 15.2.7
-* Build date: Mar 3, 2016
+* Version: 15.2.8
+* Build date: Apr 4, 2016
 *
 * Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -418,7 +418,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_RANGESELECTOR) {
             },
             _rootClassPrefix: "dxrs",
             _rootClass: "dxrs-range-selector",
-            _invalidatingOptions: ["scale", "selectedRangeColor", "containerBackgroundColor", "sliderMarker", "sliderHandle", "shutter", OPTION_BACKGROUND, "behavior", "chart", "indent"],
+            _invalidatingOptions: ["scale", "selectedRangeColor", "containerBackgroundColor", "sliderMarker", "sliderHandle", "shutter", "title", OPTION_BACKGROUND, "behavior", "chart", "indent"],
             _dataIsReady: function() {
                 return this._dataSource.isLoaded()
             },
@@ -1707,7 +1707,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_RANGESELECTOR) {
                             }
                     })
             };
-        var processSeriesFamilies = function(series, equalBarWidth, minBubbleSize, maxBubbleSize, barWidth) {
+        var processSeriesFamilies = function(series, equalBarWidth, minBubbleSize, maxBubbleSize, barWidth, negativesAsZeroes) {
                 var families = [],
                     types = [];
                 $.each(series, function(i, item) {
@@ -1720,7 +1720,8 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_RANGESELECTOR) {
                             equalBarWidth: equalBarWidth,
                             minBubbleSize: minBubbleSize,
                             maxBubbleSize: maxBubbleSize,
-                            barWidth: barWidth
+                            barWidth: barWidth,
+                            negativesAsZeroes: negativesAsZeroes
                         });
                     family.add(series);
                     family.adjustSeriesValues();
@@ -1755,7 +1756,9 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_RANGESELECTOR) {
                 seriesTemplate,
                 themeManager = that._themeManager = createThemeManager(options.chart),
                 topIndent,
-                bottomIndent;
+                bottomIndent,
+                negativesAsZeroes,
+                negativesAsZeros;
             themeManager._fontFields = ["commonSeriesSettings.label.font"];
             themeManager.setTheme(options.chart.theme);
             topIndent = themeManager.getOptions('topIndent');
@@ -1771,7 +1774,9 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_RANGESELECTOR) {
                 templatedSeries = viz.utils.processSeriesTemplate(seriesTemplate, options.dataSource);
             that._useAggregation = options.chart.useAggregation;
             that._series = that._calculateSeries(options, templatedSeries);
-            that._seriesFamilies = processSeriesFamilies(that._series, themeManager.getOptions('equalBarWidth'), themeManager.getOptions('minBubbleSize'), themeManager.getOptions('maxBubbleSize'), themeManager.getOptions('barWidth'))
+            negativesAsZeroes = themeManager.getOptions("negativesAsZeroes");
+            negativesAsZeros = themeManager.getOptions("negativesAsZeros");
+            that._seriesFamilies = processSeriesFamilies(that._series, themeManager.getOptions('equalBarWidth'), themeManager.getOptions('minBubbleSize'), themeManager.getOptions('maxBubbleSize'), themeManager.getOptions('barWidth'), commonUtils.isDefined(negativesAsZeroes) ? negativesAsZeroes : negativesAsZeros)
         };
         _SeriesDatasource.prototype = {
             constructor: _SeriesDatasource,

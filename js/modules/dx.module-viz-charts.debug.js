@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Charts)
-* Version: 15.2.7
-* Build date: Mar 3, 2016
+* Version: 15.2.8
+* Build date: Apr 4, 2016
 *
 * Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -213,7 +213,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CHARTS) {
             _isDefined = commonUtils.isDefined,
             _setCanvasValues = DX.viz.utils.setCanvasValues,
             DEFAULT_OPACITY = 0.3,
-            REINIT_REFRESH_ACTION_OPTIONS = ["adaptiveLayout", "crosshair", "equalBarWidth", "minBubbleSize", "maxBubbleSize", "resolveLabelOverlapping", "seriesSelectionMode", "pointSelectionMode", "adjustOnZoom", "synchronizeMultiAxes", "zoomingMode", "scrollingMode", "useAggregation"];
+            REINIT_REFRESH_ACTION_OPTIONS = ["adaptiveLayout", "crosshair", "equalBarWidth", "minBubbleSize", "maxBubbleSize", "barWidth", "negativesAsZeroes", "negativesAsZeros", "resolveLabelOverlapping", "seriesSelectionMode", "pointSelectionMode", "adjustOnZoom", "synchronizeMultiAxes", "zoomingMode", "scrollingMode", "useAggregation"];
         function checkHeightLabelsInCanvas(points, canvas, isRotated) {
             var commonLabelSize = 0,
                 canvasSize = canvas.end - canvas.start,
@@ -457,12 +457,12 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CHARTS) {
                 _setCanvasValues(that._canvas);
                 that._reinitAxes();
                 if (!_skipRender)
-                    that._initialized = false;
+                    that._skipRender = true;
                 that._updateDataSource();
                 if (!that.series)
                     that._dataSpecificInit(false);
                 if (!_skipRender)
-                    that._initialized = true;
+                    that._skipRender = false;
                 that._correctAxes();
                 _skipRender || that._forceRender()
             },
@@ -606,7 +606,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CHARTS) {
                 var that = this,
                     drawOptions,
                     recreateCanvas;
-                if (!that._initialized)
+                if (!that._initialized || that._skipRender)
                     return;
                 if (that._canvas.width === 0 && that._canvas.height === 0)
                     return;
@@ -1309,11 +1309,14 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CHARTS) {
                     families = [],
                     paneSeries,
                     themeManager = that._themeManager,
+                    negativesAsZeroes = themeManager.getOptions("negativesAsZeroes"),
+                    negativesAsZeros = themeManager.getOptions("negativesAsZeros"),
                     familyOptions = {
                         equalBarWidth: themeManager.getOptions("equalBarWidth"),
                         minBubbleSize: themeManager.getOptions("minBubbleSize"),
                         maxBubbleSize: themeManager.getOptions("maxBubbleSize"),
-                        barWidth: themeManager.getOptions("barWidth")
+                        barWidth: themeManager.getOptions("barWidth"),
+                        negativesAsZeroes: _isDefined(negativesAsZeroes) ? negativesAsZeroes : negativesAsZeros
                     };
                 if (that.seriesFamilies && that.seriesFamilies.length) {
                     _each(that.seriesFamilies, function(_, family) {
@@ -1336,6 +1339,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CHARTS) {
                                 minBubbleSize: familyOptions.minBubbleSize,
                                 maxBubbleSize: familyOptions.maxBubbleSize,
                                 barWidth: familyOptions.barWidth,
+                                negativesAsZeroes: familyOptions.negativesAsZeroes,
                                 rotated: that._isRotated()
                             });
                         family.add(paneSeries);
@@ -1676,6 +1680,16 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CHARTS) {
         function compareAxes(a, b) {
             return a.priority - b.priority
         }
+        function doesPaneExist(panes, paneName) {
+            var found = false;
+            _each(panes, function(_, pane) {
+                if (pane.name === paneName) {
+                    found = true;
+                    return false
+                }
+            });
+            return found
+        }
         charts._test_prepareSegmentRectPoints = function() {
             var original = prepareSegmentRectPoints.original || prepareSegmentRectPoints;
             if (arguments[0])
@@ -1688,9 +1702,6 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CHARTS) {
         };
         registerComponent("dxChart", viz.charts, charts.AdvancedChart.inherit({
             _chartType: "chart",
-            _getDefaultOptions: function() {
-                return $.extend(this.callBase(), {defaultPane: DEFAULT_PANE_NAME})
-            },
             _initCore: function() {
                 this.paneAxis = {};
                 this._panesClipRects = {};
@@ -1764,34 +1775,30 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CHARTS) {
                 var that = this,
                     panes = that.option("panes"),
                     panesNameCounter = 0,
-                    bottomPaneName;
-                if (panes && _isArray(panes) && !panes.length || $.isEmptyObject(panes))
+                    defaultPane;
+                if (!panes || _isArray(panes) && !panes.length)
                     panes = DEFAULT_PANES;
                 that._cleanPanesClipRects("fixed");
                 that._cleanPanesClipRects("base");
                 that._cleanPanesClipRects("wide");
-                that.defaultPane = that.option("defaultPane");
-                panes = _extend(true, [], _isArray(panes) ? panes : panes ? [panes] : []);
+                defaultPane = that.option("defaultPane");
+                panes = _extend(true, [], _isArray(panes) ? panes : [panes]);
                 _each(panes, function(_, pane) {
                     pane.name = !_isDefined(pane.name) ? DEFAULT_PANE_NAME + panesNameCounter++ : pane.name
                 });
-                if (!that._doesPaneExists(panes, that.defaultPane) && panes.length > 0) {
-                    bottomPaneName = panes[panes.length - 1].name;
-                    that._incidentOccured("W2101", [that.defaultPane, bottomPaneName]);
-                    that.defaultPane = bottomPaneName
+                if (_isDefined(defaultPane)) {
+                    if (!doesPaneExist(panes, defaultPane)) {
+                        that._incidentOccured("W2101", [defaultPane]);
+                        defaultPane = panes[panes.length - 1].name
+                    }
                 }
+                else if (doesPaneExist(panes, DEFAULT_PANE_NAME))
+                    defaultPane = DEFAULT_PANE_NAME;
+                else
+                    defaultPane = panes[panes.length - 1].name;
+                that.defaultPane = defaultPane;
                 panes = that._isRotated() ? panes.reverse() : panes;
                 return panes
-            },
-            _doesPaneExists: function(panes, paneName) {
-                var found = false;
-                _each(panes, function(_, pane) {
-                    if (pane.name === paneName) {
-                        found = true;
-                        return false
-                    }
-                });
-                return found
             },
             _getAxisRenderingOptions: function() {
                 return {
@@ -1952,7 +1959,10 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CHARTS) {
                         width: 0,
                         height: 0
                     });
-                    layoutManager.layoutElements([that._legend], newCanvas, $.noop, [{canvas: newCanvas}])
+                    layoutManager.layoutElements([that._legend], newCanvas, $.noop, [{canvas: newCanvas}], undefined, {
+                        horizontalAxes: [],
+                        verticalAxes: []
+                    })
                 }
             },
             _prepareTranslators: function(series, _, rotated) {
@@ -2790,7 +2800,8 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CHARTS) {
             mathUtils = DX.require("/utils/utils.math"),
             viz = DX.viz,
             _noop = $.noop,
-            DEFAULT_PANE_NAME = 'default';
+            DEFAULT_PANE_NAME = 'default',
+            REINIT_REFRESH_ACTION = "_reinit";
         var PolarChart = charts.AdvancedChart.inherit({
                 _chartType: 'polar',
                 _createPanes: function() {
@@ -2817,6 +2828,11 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CHARTS) {
                             isHorizontal: true,
                             showCustomBoundaryTicks: isArgumentAxis
                         }
+                },
+                _handleChangedOptions: function(options) {
+                    this.callBase.apply(this, arguments);
+                    if ("useSpiderWeb" in options)
+                        this._processRefreshData(REINIT_REFRESH_ACTION)
                 },
                 _getExtraOptions: function() {
                     return {spiderWidget: this.option("useSpiderWeb")}

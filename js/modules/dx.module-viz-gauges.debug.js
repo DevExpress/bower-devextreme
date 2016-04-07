@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Gauges)
-* Version: 15.2.7
-* Build date: Mar 3, 2016
+* Version: 15.2.8
+* Build date: Apr 4, 2016
 *
 * Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -1198,10 +1198,12 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_GAUGES) {
                     tickCorrection;
                 if (scaleOptions.isHorizontal) {
                     orientation = isIndentPositive ? {
+                        center: 0.5,
                         middle: 0.5,
                         top: 0,
                         bottom: 1
                     } : {
+                        center: 0.5,
                         middle: 0.5,
                         top: 1,
                         bottom: 0
@@ -1386,7 +1388,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_GAUGES) {
             OPTION_VALUES = "values";
         registerComponent("dxBarGauge", DX.viz.gauges, DX.viz.gauges.dxBaseGauge.inherit({
             _rootClass: "dxbg-bar-gauge",
-            _invalidatingOptions: DX.viz.gauges.dxBaseGauge.prototype._invalidatingOptions.concat(["backgroundColor", "relativeInnerRadius", "barSpacing", "label"]),
+            _invalidatingOptions: DX.viz.gauges.dxBaseGauge.prototype._invalidatingOptions.concat(["backgroundColor", "relativeInnerRadius", "barSpacing", "label", "palette"]),
             _initCore: function() {
                 var that = this;
                 that.callBase.apply(that, arguments);
@@ -3354,6 +3356,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_GAUGES) {
                             case'top':
                                 that._inner = 1;
                                 break;
+                            case'center':
                             case'middle':
                                 that._inner = that._outer = 0.5;
                                 break;

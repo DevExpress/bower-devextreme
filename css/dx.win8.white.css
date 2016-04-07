@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme
-* Version: 15.2.7
-* Build date: Mar 3, 2016
+* Version: 15.2.8
+* Build date: Apr 4, 2016
 *
 * Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -75,10 +75,6 @@
   font-size: 14px;
   text-align: center;
   line-height: 14px;
-}
-.dx-datagrid.dx-filter-menu .dx-icon-filter-operation-default+.dx-menu-item-text
-{
-  padding-left: 2px;
 }
 .dx-datagrid .dx-datagrid-content-fixed .dx-datagrid-table .dx-col-fixed
 {
@@ -1011,6 +1007,19 @@
 {
   border-top: none;
 }
+.dx-scheduler-timeline.dx-scheduler-work-space-grouped .dx-scheduler-work-space-both-scrollbar .dx-scheduler-date-table-scrollable
+{
+  margin-left: 0;
+}
+.dx-scheduler-timeline.dx-scheduler-work-space-grouped .dx-scheduler-work-space-both-scrollbar .dx-scheduler-header-scrollable.dx-scrollable
+{
+  margin: 0;
+  padding: 0;
+}
+.dx-rtl .dx-scheduler-timeline.dx-scheduler-work-space-grouped .dx-scheduler-work-space-both-scrollbar .dx-scheduler-header-scrollable.dx-scrollable
+{
+  margin: 0;
+}
 .dx-scheduler-timeline.dx-scheduler-work-space-grouped[dx-group-column-count='1'] .dx-scheduler-group-table, .dx-scheduler-timeline.dx-scheduler-work-space-grouped[dx-group-column-count='1'] .dx-scheduler-sidebar-scrollable, .dx-scheduler-timeline.dx-scheduler-work-space-grouped[dx-group-column-count='1'] .dx-scheduler-sidebar-scrollable:before
 {
   width: 100px;
@@ -1374,6 +1383,15 @@
 {
   height: 26px;
 }
+.dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space-month .dx-scheduler-header-scrollable.dx-scrollable, .dx-scheduler-work-space-both-scrollbar.dx-scheduler-timeline .dx-scheduler-header-scrollable.dx-scrollable
+{
+  margin: 0;
+  padding: 0;
+}
+.dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space-month .dx-scheduler-date-table-scrollable, .dx-scheduler-work-space-both-scrollbar.dx-scheduler-timeline .dx-scheduler-date-table-scrollable
+{
+  margin-left: 0;
+}
 .dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space-month[dx-group-row-count='1'] .dx-scheduler-header-scrollable
 {
   height: 81px;
@@ -1389,15 +1407,6 @@
 .dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space-month .dx-scheduler-header-scrollable
 {
   height: 51px;
-}
-.dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space-month .dx-scheduler-header-scrollable.dx-scrollable
-{
-  margin: 0;
-  padding: 0;
-}
-.dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space-month .dx-scheduler-date-table-scrollable
-{
-  margin-left: 0;
 }
 .dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space-month .dx-scheduler-sidebar-scrollable
 {
@@ -1667,6 +1676,14 @@
 .dx-scheduler-appointment.dx-scheduler-appointment-empty .dx-scheduler-appointment-reduced-icon, .dx-scheduler-appointment.dx-scheduler-appointment-tail .dx-scheduler-appointment-reduced-icon
 {
   display: none;
+}
+.dx-scheduler-appointment.dx-state-disabled
+{
+  cursor: default;
+  filter: alpha(opacity=60);
+  -khtml-opacity: .6;
+  -moz-opacity: .6;
+  opacity: .6;
 }
 .dx-scheduler-timeline .dx-scheduler-appointment, .dx-scheduler-work-space-month .dx-scheduler-appointment, .dx-scheduler-all-day-appointment
 {

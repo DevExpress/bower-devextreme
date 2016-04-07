@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Visualization Core Library)
-* Version: 15.2.7
-* Build date: Mar 3, 2016
+* Version: 15.2.8
+* Build date: Apr 4, 2016
 *
 * Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -243,7 +243,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                 E2203: "The \"{0}\" field of the \"selectedRange\" configuration object is not valid",
                 W2002: "The {0} data field is absent",
                 W2003: "Tick interval is too small",
-                W2101: "\"{0}\" pane does not exist; \"{1}\" pane is used instead",
+                W2101: "The \"{0}\" pane does not exist; the last pane is used by default",
                 W2102: "Value axis with the \"{0}\" name was created automatically",
                 W2103: "Chart title was hidden due to container size",
                 W2104: "Legend was hidden due to container size",
@@ -6199,8 +6199,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                 that._axisStripGroup && that._axisStripGroup.clear();
                 that._axisGridGroup && that._axisGridGroup.clear();
                 that._axisConstantLineGroup && that._axisConstantLineGroup.clear();
-                that._axisLabelGroup && that._axisLabelGroup.clear();
-                that._labelAxesGroup && that._labelAxesGroup.clear()
+                that._axisLabelGroup && that._axisLabelGroup.clear()
             },
             _initTickCoord: function(tick, offset) {
                 var coord = this._getTranslatedValue(tick.value, this._axisPosition, offset);
@@ -7343,6 +7342,8 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                         lines = prepareLines(element, this._texts);
                         for (i = 0, ii = lines.length; i < ii; ++i)
                             maxLength = mathMax(maxLength, lines[i].commonLength);
+                        if (maxLength === 1)
+                            return false;
                         requiredLength = mathFloor(maxLength * maxWidth / width);
                         for (i = 0; i < ii; ++i) {
                             lineParts = lines[i].parts;
@@ -9462,6 +9463,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
         }
         function adjustStackedSeriesValues() {
             var that = this,
+                negativesAsZeroes = that._options.negativesAsZeroes,
                 series = getVisibleSeries(that),
                 stackKeepers = {
                     positive: {},
@@ -9482,6 +9484,11 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                         stackName = singleSeries.getStackName(),
                         stacks = value >= 0 ? stackKeepers.positive : stackKeepers.negative,
                         currentStack;
+                    if (negativesAsZeroes && value < 0) {
+                        stacks = stackKeepers.positive;
+                        value = 0;
+                        point.resetValue()
+                    }
                     stacks[stackName] = stacks[stackName] || {};
                     currentStack = stacks[stackName];
                     if (currentStack[argument]) {
@@ -12912,10 +12919,8 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
             }});
         function getPointsByArgFromPrevSeries(prevSeries, argument) {
             var result;
-            while (prevSeries) {
-                result = prevSeries._segmentByArg[argument];
-                if (result)
-                    break;
+            while (!result && prevSeries) {
+                result = prevSeries._segmentByArg && prevSeries._segmentByArg[argument];
                 prevSeries = prevSeries._prevSeries
             }
             return result
@@ -13223,6 +13228,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
             isVisible: _noop,
             resetCorrection: _noop,
             correctValue: _noop,
+            resetValue: _noop,
             setPercentValue: _noop,
             correctCoordinates: _noop,
             coordsIn: _noop,
@@ -13686,6 +13692,15 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
             resetCorrection: function() {
                 this.value = this.initialValue;
                 this.minValue = CANVAS_POSITION_DEFAULT
+            },
+            resetValue: function() {
+                var that = this;
+                if (that.hasValue()) {
+                    that.value = that.initialValue = 0;
+                    that.minValue = 0;
+                    that.translate();
+                    that._label.setDataField("value", that.value)
+                }
             },
             _getTranslates: function(animationEnabled) {
                 var translateX = this.x,
@@ -18169,6 +18184,8 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                 that.callBase.apply(that, arguments);
                 return that
             },
+            _clean: $.noop,
+            _render: $.noop,
             _optionChanged: function(args) {
                 ++this._changedOptions._num;
                 this._changedOptions[args.name] = args.value;

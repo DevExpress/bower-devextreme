@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Vector Map)
-* Version: 15.2.7
-* Build date: Mar 3, 2016
+* Version: 15.2.8
+* Build date: Apr 4, 2016
 *
 * Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -3061,9 +3061,15 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
         function transformList(projection, coordinates) {
             var output = [],
                 i,
-                ii = output.length = coordinates.length;
-            for (i = 0; i < ii; ++i)
-                output[i] = projection.transform(coordinates[i]);
+                ii = coordinates.length,
+                item,
+                k = 0;
+            output.length = 2 * ii;
+            for (i = 0; i < ii; ++i) {
+                item = projection.transform(coordinates[i]);
+                output[k++] = item[0];
+                output[k++] = item[1]
+            }
             return output
         }
         function transformPointList(content, projection, coordinates) {
@@ -3760,7 +3766,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
                 "class": "dxm-layers",
                 clipId: that._clip.id
             }).append(renderer.root).enableLinks();
-            that._subscribeToTracker(params.tracker, renderer, params.tooltip, params.eventTrigger)
+            that._subscribeToTracker(params.tracker, renderer, params.eventTrigger)
         }
         MapLayerCollection.prototype = {
             constructor: MapLayerCollection,
@@ -3770,7 +3776,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
                 that._offTracker();
                 that._params = that._offTracker = that._layers = that._layerByName = that._clip = that._background = that._container = null
             },
-            _subscribeToTracker: function(tracker, renderer, tooltip, eventTrigger) {
+            _subscribeToTracker: function(tracker, renderer, eventTrigger) {
                 var that = this;
                 that._offTracker = tracker.on({
                     click: function(arg) {

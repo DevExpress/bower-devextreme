@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme
-* Version: 15.2.7
-* Build date: Mar 3, 2016
+* Version: 15.2.8
+* Build date: Apr 4, 2016
 *
 * Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -3727,6 +3727,10 @@
   padding-right: 4px;
   outline: none;
 }
+.dx-texteditor-container.dx-tag-container
+{
+  white-space: pre-line;
+}
 .dx-tag
 {
   position: relative;
@@ -5260,6 +5264,13 @@
   width: 0;
   height: 0;
 }
+.dx-datagrid-notouch-action
+{
+  -ms-touch-action: none;
+  touch-action: none;
+  -ms-content-zooming: none;
+  -ms-overflow-style: none;
+}
 .dx-rtl .dx-datagrid .dx-menu-subitem .dx-menu-item, .dx-datagrid.dx-rtl .dx-menu-subitem .dx-menu-item
 {
   padding: 7px 5px 7px 30px;
@@ -5854,6 +5865,10 @@
 .dx-field-value, .dx-field-value-static
 {
   float: right;
+}
+.dx-field-value-static
+{
+  white-space: normal;
 }
 .dx-field-value.dx-datebox
 {
