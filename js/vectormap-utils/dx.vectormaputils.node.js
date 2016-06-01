@@ -1,7 +1,7 @@
 ﻿/*! 
 * DevExtreme (Vector Map)
-* Version: 15.2.9
-* Build date: Apr 7, 2016
+* Version: 15.2.10
+* Build date: May 27, 2016
 *
 * Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -745,15 +745,15 @@ function getContentWrapper(namespace, isDebug) {
     };
 }
 
-function prepareSettings(options) {
+function prepareSettings(source, options) {
     options = options || {};
     var settings = {
-        input: options.input ? String(options.input) : null,
+        input: source ? String(source) : null,
         output: options.output ? String(options.output) : null,
         precision: options.precision >= 0 ? Number(options.precision) : 4,
-        ext: options.isJson ? ".json" : ".js",
+        ext: options.isJSON ? ".json" : ".js",
         indent: options.isDebug ? 4 : undefined,
-        wrapContent: options.isJson ? eigen : getContentWrapper(options.namespace, options.isDebug),
+        wrapContent: options.isJSON ? eigen : getContentWrapper(options.namespace, options.isDebug),
         processData: getDataProcessor(options.processData)
     };
     settings.info = options.isQuiet ? noop : console.info.bind(console);
@@ -761,8 +761,8 @@ function prepareSettings(options) {
     return settings;
 }
 
-function processFiles(options, callback) {
-    var settings = prepareSettings(options);
+function processFiles(source, options, callback) {
+    var settings = prepareSettings(source, options);
     settings.info("Started");
     collectFiles(settings.input, function (e, files) {
         e && settings.error(e.message);
@@ -783,12 +783,11 @@ function processFiles(options, callback) {
 module.exports.processFiles = processFiles;
 
 var COMMAND_LINE_ARG_KEYS = [
-    { key: "--input", name: "input", arg: true, desc: "Directory containing source shapefiles" },
     { key: "--output", name: "output", arg: true, desc: "Destination directory" },
     { key: "--process-data", name: "processData", arg: true, desc: "Process parsed data" },
     { key: "--precision", name: "precision", arg: true, desc: "Precision of shape coordinates" },
     { key: "--namespace", name: "namespace", arg: true, desc: "Global variable where to put data" },
-    { key: "--json", name: "isJson", desc: "Generate as a .json file" },
+    { key: "--json", name: "isJSON", desc: "Generate as a .json file" },
     { key: "--debug", name: "isDebug", desc: "Generate non minified file" },
     { key: "--quiet", name: "isQuiet", desc: "Suppress console output" },
     { key: "--help", name: "isHelp", desc: "Print help" }
@@ -811,7 +810,7 @@ function parseCommandLineArgs(commandLineArgKeys) {
 }
 
 function printCommandLineHelp(desctiption, commandLineArgKeys) {
-    var parts = ["node ", path.basename(process.argv[1]), " "],
+    var parts = ["node ", path.basename(process.argv[1]), " Source "],
         lines = [],
         maxLength = Math.max.apply(null, commandLineArgKeys.map(function (info) {
             return info.key.length;
@@ -834,7 +833,7 @@ function runFromConsole() {
     if (args.isHelp || args.isEmpty) {
         return printCommandLineHelp("Generates dxVectorMap-compatible files from shapefiles.", COMMAND_LINE_ARG_KEYS);
     }
-    processFiles(args);
+    processFiles(process.argv[2] || "", args);
 }
 
 if (require.main === module) {

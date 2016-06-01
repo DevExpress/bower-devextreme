@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Vector Map)
-* Version: 15.2.9
-* Build date: Apr 7, 2016
+* Version: 15.2.10
+* Build date: May 27, 2016
 *
 * Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -22,7 +22,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
             DEFAULT_HEIGHT = 400,
             nextDataKey = 1,
             RE_STARTS_LAYERS = /^layers/,
-            RE_ENDS_DATA = /\.data$/;
+            RE_ENDS_DATA_SOURCE = /\.(dataSource|data)$/;
         function generateDataKey() {
             return "vectormap-data-" + nextDataKey++
         }
@@ -82,6 +82,10 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
                         onMarkerSelectionChanged: {
                             since: "15.2",
                             message: "Use the 'onSelectionChanged' option instead"
+                        },
+                        "layers.data": {
+                            since: "15.2",
+                            message: "Use the 'layers.dataSource' option instead"
                         }
                     })
                 },
@@ -264,9 +268,11 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
                 _optionChanging: function(name, currentValue, nextValue) {
                     if (currentValue && nextValue) {
                         if (RE_STARTS_LAYERS.test(name))
-                            if (currentValue.data && nextValue.data && currentValue !== nextValue)
+                            if (currentValue.dataSource && nextValue.dataSource && currentValue !== nextValue)
+                                currentValue.dataSource = null;
+                            else if (currentValue.data && nextValue.data && currentValue !== nextValue)
                                 currentValue.data = null;
-                            else if (RE_ENDS_DATA.test(name))
+                            else if (RE_ENDS_DATA_SOURCE.test(name))
                                 this.option(name, null);
                         if (name === "mapData")
                             this._options.mapData = null;
@@ -395,10 +401,9 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
             if (options)
                 layerCollection.__data = options.length ? $.map(options, patch) : patch(options);
             function patch(ops) {
-                ops = ops || {};
-                var data = ops.data;
-                ops.data = undefined;
-                return {data: data}
+                var ret = {};
+                swapData(ops || {}, ret);
+                return ret
             }
         }
         function resumeLayersData(layerCollection, options, renderer) {
@@ -407,14 +412,19 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
                 layerCollection.__data = undefined;
                 if (data.length)
                     $.each(data, function(i, item) {
-                        options[i].data = item.data
+                        swapData(item, options[i])
                     });
                 else
-                    options.data = data.data;
+                    swapData(data, options);
                 renderer.lock();
                 layerCollection.setOptions(options);
                 renderer.unlock()
             }
+        }
+        function swapData(source, target) {
+            var name = !("dataSource" in source) && "data" in source ? "data" : "dataSource";
+            target[name] = source[name];
+            source[name] = undefined
         }
         function applyDeprecatedMode(map) {
             var log = DX.require("/errors").log,
@@ -438,12 +448,12 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
                 this._layerCollection.setOptions([_extend({}, options.areaSettings, {
                         name: "areas",
                         _deprecated: true,
-                        data: mapData,
+                        dataSource: mapData,
                         type: "area"
                     }), _extend({}, options.markerSettings, {
                         name: "markers",
                         _deprecated: true,
-                        data: markers,
+                        dataSource: markers,
                         type: "marker",
                         elementType: options.markerSettings && options.markerSettings.type
                     })])
@@ -3300,12 +3310,14 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
                 return this._context
             },
             setOptions: function(options) {
-                var that = this;
+                var that = this,
+                    name;
                 options = that._options = options || {};
-                if ("data" in options && options.data !== that._options_data) {
-                    that._options_data = options.data;
+                name = !("dataSource" in options) && "data" in options ? "data" : "dataSource";
+                if (name in options && options[name] !== that._options_dataSource) {
+                    that._options_dataSource = options[name];
                     that._params.notifyDirty();
-                    that._dataSource.update(wrapToDataSource(options.data))
+                    that._dataSource.update(wrapToDataSource(options[name]))
                 }
                 else if (that._data.count() > 0) {
                     that._params.notifyDirty();

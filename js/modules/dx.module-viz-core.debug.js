@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Visualization Core Library)
-* Version: 15.2.9
-* Build date: Apr 7, 2016
+* Version: 15.2.10
+* Build date: May 27, 2016
 *
 * Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -324,7 +324,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
             },
             isValid: function(value) {
                 var co = this._canvasOptions;
-                return !isNaN(value) && value.valueOf() + co.rangeDoubleError >= co.rangeMin && value.valueOf() - co.rangeDoubleError <= co.rangeMax
+                return value !== null && !isNaN(value) && value.valueOf() + co.rangeDoubleError >= co.rangeMin && value.valueOf() - co.rangeDoubleError <= co.rangeMax
             },
             parse: function(value) {
                 return Number(value)
@@ -657,6 +657,59 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                 validate("maxVisible", "max");
                 return businessRange
             };
+        function valuesIsDefinedAndEqual(val1, val2) {
+            return isDefined(val1) && isDefined(val2) && val1.valueOf() === val2.valueOf()
+        }
+        function getCanvasBounds(range) {
+            var min = range.min,
+                max = range.max,
+                minVisible = range.minVisible,
+                maxVisible = range.maxVisible,
+                newMin,
+                newMax,
+                base = range.base,
+                isDateTime = commonUtils.isDate(max) || commonUtils.isDate(min),
+                correction = isDateTime ? DATETIME_EQUALITY_CORRECTION : NUMBER_EQUALITY_CORRECTION,
+                isLogarithmic = range.axisType === 'logarithmic';
+            if (isLogarithmic) {
+                maxVisible = getLog(maxVisible, base);
+                minVisible = getLog(minVisible, base);
+                min = getLog(min, base);
+                max = getLog(max, base)
+            }
+            if (valuesIsDefinedAndEqual(min, max)) {
+                newMin = min.valueOf() - correction;
+                newMax = max.valueOf() + correction;
+                if (isDateTime) {
+                    min = new Date(newMin);
+                    max = new Date(newMax)
+                }
+                else {
+                    min = min !== 0 || isLogarithmic ? newMin : 0;
+                    max = newMax
+                }
+            }
+            if (valuesIsDefinedAndEqual(minVisible, maxVisible)) {
+                newMin = minVisible.valueOf() - correction;
+                newMax = maxVisible.valueOf() + correction;
+                if (isDateTime) {
+                    minVisible = newMin < min.valueOf() ? min : new Date(newMin);
+                    maxVisible = newMax > max.valueOf() ? max : new Date(newMax)
+                }
+                else {
+                    if (minVisible !== 0 || isLogarithmic)
+                        minVisible = newMin < min ? min : newMin;
+                    maxVisible = newMax > max ? max : newMax
+                }
+            }
+            return {
+                    base: base,
+                    rangeMin: min,
+                    rangeMax: max,
+                    rangeMinVisible: minVisible,
+                    rangeMaxVisible: maxVisible
+                }
+        }
         _Translator2d = viz.Translator2D = function(businessRange, canvas, options) {
             this.update(businessRange, canvas, options)
         };
@@ -702,59 +755,10 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                 var correctedCategoriesCount = categoriesLength - (this._businessRange.stick ? 1 : 0);
                 return correctedCategoriesCount > 0 ? canvasOptions.canvasLength / correctedCategoriesCount : canvasOptions.canvasLength
             },
-            _getCanvasBounds: function(range) {
-                var min = range.min,
-                    max = range.max,
-                    minVisible = range.minVisible,
-                    maxVisible = range.maxVisible,
-                    newMin,
-                    newMax,
-                    base = range.base,
-                    isDateTime = commonUtils.isDate(max) || commonUtils.isDate(min),
-                    correction = isDateTime ? DATETIME_EQUALITY_CORRECTION : NUMBER_EQUALITY_CORRECTION;
-                if (range.axisType === 'logarithmic') {
-                    maxVisible = getLog(maxVisible, base);
-                    minVisible = getLog(minVisible, base);
-                    min = getLog(min, base);
-                    max = getLog(max, base)
-                }
-                if (isDefined(min) && isDefined(max) && min.valueOf() === max.valueOf()) {
-                    newMin = min.valueOf() - correction;
-                    newMax = max.valueOf() + correction;
-                    if (isDateTime) {
-                        min = new Date(newMin);
-                        max = new Date(newMax)
-                    }
-                    else {
-                        min = min !== 0 ? newMin : 0;
-                        max = newMax
-                    }
-                }
-                if (isDefined(minVisible) && isDefined(maxVisible) && minVisible.valueOf() === maxVisible.valueOf()) {
-                    newMin = minVisible.valueOf() - correction;
-                    newMax = maxVisible.valueOf() + correction;
-                    if (isDateTime) {
-                        minVisible = newMin < min.valueOf() ? min : new Date(newMin);
-                        maxVisible = newMax > max.valueOf() ? max : new Date(newMax)
-                    }
-                    else {
-                        if (minVisible !== 0)
-                            minVisible = newMin < min ? min : newMin;
-                        maxVisible = newMax > max ? max : newMax
-                    }
-                }
-                return {
-                        base: base,
-                        rangeMin: min,
-                        rangeMax: max,
-                        rangeMinVisible: minVisible,
-                        rangeMaxVisible: maxVisible
-                    }
-            },
             _prepareCanvasOptions: function() {
                 var that = this,
                     businessRange = that._businessRange,
-                    canvasOptions = that._canvasOptions = that._getCanvasBounds(businessRange),
+                    canvasOptions = that._canvasOptions = getCanvasBounds(businessRange),
                     length,
                     canvas = that._canvas;
                 if (that._options.isHorizontal) {
@@ -2910,8 +2914,6 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
             commonUtils = DX.require("/utils/utils.common"),
             _isDefined = commonUtils.isDefined,
             _isDate = commonUtils.isDate,
-            NUMBER_EQUALITY_CORRECTION = 1,
-            DATETIME_EQUALITY_CORRECTION = 60000,
             minSelector = "min",
             maxSelector = "max",
             minVisibleSelector = "minVisible",
@@ -2958,8 +2960,6 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                 }
             return categories
         }
-        DX.viz.__NUMBER_EQUALITY_CORRECTION = NUMBER_EQUALITY_CORRECTION;
-        DX.viz.__DATETIME_EQUALITY_CORRECTION = DATETIME_EQUALITY_CORRECTION;
         _Range = viz.Range = function(range) {
             range && $.extend(this, range)
         };
@@ -4901,7 +4901,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                             else if (labelIsInside) {
                                 switch (labelHorizontalAlignment) {
                                     case CENTER:
-                                        x += lineBox.x + labelWidth / 2 - box.x - labelWidth / 2;
+                                        x += lineBox.x + lineBox.width / 2 - box.x - labelWidth / 2;
                                         break;
                                     case RIGHT:
                                         x -= paddingLeftRight;
@@ -5688,18 +5688,31 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
         };
         Axis.prototype = {
             constructor: Axis,
-            _updateBusinessRangeInterval: function() {
-                var i,
-                    ticks = this._majorTicks,
-                    length = ticks.length,
-                    businessRange = this._translator.getBusinessRange(),
-                    minInterval;
-                if (length < 2 || hasCategories(businessRange))
-                    return;
-                minInterval = _abs(ticks[0].value - ticks[1].value);
-                for (i = 1; i < length - 1; i++)
-                    minInterval = Math.min(_abs(ticks[i].value - ticks[i + 1].value), minInterval);
-                businessRange.addRange({interval: minInterval})
+            _updateIntervalAndBounds: function() {
+                var that = this,
+                    i,
+                    ticks,
+                    length,
+                    minInterval,
+                    translator = that._translator,
+                    businessRange = translator.getBusinessRange(),
+                    bounds;
+                if (!hasCategories(businessRange)) {
+                    ticks = that.getMajorTicks(true);
+                    length = ticks.length;
+                    if (!businessRange.isSynchronized)
+                        bounds = this._tickManager.getTickBounds();
+                    if (length > 1) {
+                        minInterval = _abs(ticks[0].value - ticks[1].value);
+                        for (i = 1; i < length - 1; i++)
+                            minInterval = Math.min(_abs(ticks[i].value - ticks[i + 1].value), minInterval);
+                        bounds = _extend({interval: minInterval}, bounds)
+                    }
+                    if (bounds) {
+                        businessRange.addRange(bounds);
+                        translator.reinit()
+                    }
+                }
             },
             _createAllTicks: function(businessRange) {
                 var that = this;
@@ -5707,16 +5720,6 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                 that._majorTicks = that.getMajorTicks(that._options.withoutOverlappingBehavior);
                 that._decimatedTicks = hasCategories(businessRange) ? that.getDecimatedTicks() : [];
                 that._minorTicks = that.getMinorTicks()
-            },
-            _updateTranslatorInterval: function() {
-                var that = this,
-                    translator = that._translator,
-                    businessRange = translator.getBusinessRange();
-                if (!hasCategories(businessRange) && !businessRange.isSynchronized) {
-                    that.getMajorTicks(true);
-                    businessRange.addRange(that._tickManager.getTickBounds());
-                    translator.reinit()
-                }
             },
             _drawAxis: function() {
                 var that = this,
@@ -6440,9 +6443,8 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                 that._translator = translator;
                 that._additionalTranslator = additionalTranslator;
                 that.resetTicks();
-                that._updateTranslatorInterval();
-                that._buildTicks();
-                that._updateBusinessRangeInterval()
+                that._updateIntervalAndBounds();
+                that._buildTicks()
             },
             resetTicks: function() {
                 this._deleteLabels();
@@ -6531,9 +6533,8 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                     areLabelsVisible;
                 that._axisGroup && that._clearAxisGroups(adjustAxis);
                 areLabelsVisible = options.label.visible && that._axisElementsGroup && !that._translator.getBusinessRange().stubData;
-                that._updateTranslatorInterval();
+                that._updateIntervalAndBounds();
                 that._buildTicks();
-                that._updateBusinessRangeInterval();
                 that._initAxisPositions();
                 that._initAllTicks();
                 options.visible && that._drawAxis();
@@ -9913,6 +9914,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                 return this._options.tagField || "tag"
             },
             getValueFields: _noop,
+            getSizeField: _noop,
             getArgumentField: _noop,
             getPoints: function() {
                 return this._points
@@ -12274,16 +12276,17 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                     }
             },
             getValueFields: function() {
-                var options = this._options;
-                return [options.valueField || "val", options.sizeField || "size"]
+                return [this._options.valueField || "val"]
+            },
+            getSizeField: function() {
+                return this._options.sizeField || "size"
             },
             updateTeamplateFieldNames: function() {
                 var that = this,
                     options = that._options,
-                    valueFields = that.getValueFields(),
                     name = that.name;
-                options.valueField = valueFields[0] + name;
-                options.sizeField = valueFields[1] + name;
+                options.valueField = that.getValueFields()[0] + name;
+                options.sizeField = that.getSizeField() + name;
                 options.tagField = that.getTagField() + name
             },
             _clearingAnimation: function(translators, drawComplete) {
@@ -15921,14 +15924,14 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
         }
         function parseAxisCategories(groups, parsers) {
             var argumentCategories = groups.argumentOptions && groups.argumentOptions.categories,
-                valueParser = parsers[1][1];
+                valueParser = parsers[1];
             _each(groups, function(_, valueGroup) {
                 var categories = valueGroup.valueOptions && valueGroup.valueOptions.categories;
                 if (categories)
                     valueGroup.valueOptions.categories = parseCategories(categories, valueParser)
             });
             if (argumentCategories)
-                groups.argumentOptions.categories = parseCategories(argumentCategories, parsers[0][1])
+                groups.argumentOptions.categories = parseCategories(argumentCategories, parsers[0])
         }
         function processSeries(_, series) {
             series.updateDataType({})
@@ -15978,17 +15981,26 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                     return parseUnit
                 }
         }
-        function createParsers(groups, skipFields, incidentOccurred) {
+        function prepareParsers(groups, skipFields, incidentOccurred) {
             var argumentParser = createParserUnit(groups.argumentType, groups.argumentAxisType, false, skipFields, incidentOccurred),
+                sizeParser,
+                valueParser,
+                iep,
+                categoryParsers = [argumentParser],
                 cache = {},
                 list = [];
             _each(groups, function(_, group) {
                 _each(group, function(_, series) {
-                    var valueParser = createParserUnit(group.valueType, group.valueAxisType, series.getOptions().ignoreEmptyPoints, skipFields, incidentOccurred);
+                    iep = series.getOptions().ignoreEmptyPoints;
+                    valueParser = createParserUnit(group.valueType, group.valueAxisType, iep, skipFields, incidentOccurred);
+                    sizeParser = createParserUnit(NUMERIC, CONTINUOUS, iep, skipFields, incidentOccurred);
                     cache[series.getArgumentField()] = argumentParser;
                     _each(series.getValueFields(), function(_, field) {
+                        !categoryParsers[1] && (categoryParsers[1] = valueParser);
                         cache[field] = valueParser
                     });
+                    if (series.getSizeField())
+                        cache[series.getSizeField()] = sizeParser;
                     if (series.getTagField())
                         cache[series.getTagField()] = eigen
                 })
@@ -15996,6 +16008,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
             _each(cache, function(field, parser) {
                 list.push([field, parser])
             });
+            list.length && parseAxisCategories(groups, categoryParsers);
             return list
         }
         function getParsedCell(cell, parsers) {
@@ -16182,9 +16195,8 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
             checkType(data, groups, options.checkTypeForAllData);
             checkAxisType(groups, userArgumentCategories, incidentOccurred);
             if (options.convertToAxisDataType) {
-                parsers = createParsers(groups, skipFields, incidentOccurred);
-                data = parse(data, parsers);
-                parsers.length && parseAxisCategories(groups, parsers)
+                parsers = prepareParsers(groups, skipFields, incidentOccurred);
+                data = parse(data, parsers)
             }
             groupData(data, groups);
             sort(data, groups, options.sortingMethod, userArgumentCategories);
@@ -18165,21 +18177,23 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                 var that = this;
                 that.callBase.apply(that, arguments);
                 if (that._initialized && that._updateLockCount === 1)
-                    that._changedOptions = {
-                        _has: hasAnyOfFields,
-                        _num: 0
-                    };
+                    that._changedOptions = createChangedOptions();
                 return that
             },
             endUpdate: function() {
-                var that = this;
+                var that = this,
+                    changedOptions;
                 if (that._initialized && that._updateLockCount === 1) {
-                    if (that._changedOptions._num) {
+                    changedOptions = that._changedOptions;
+                    that._changedOptions = null;
+                    if (changedOptions._num) {
                         that._renderer.lock();
-                        that._handleChangedOptions(that._changedOptions);
+                        that._changedOptions = createChangedOptions();
+                        that._handleChangedOptions(changedOptions);
+                        if (!that._changedOptions._num && that._updateLockCount === 1)
+                            that._changedOptions = null;
                         that._renderer.unlock()
                     }
-                    that._changedOptions = null
                 }
                 that.callBase.apply(that, arguments);
                 return that
@@ -18317,6 +18331,12 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                 this._loadingIndicator.hide()
             }
         });
+        function createChangedOptions() {
+            return {
+                    _has: hasAnyOfFields,
+                    _num: 0
+                }
+        }
         function hasAnyOfFields(fields) {
             var i,
                 ii = fields.length;

@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme
-* Version: 15.2.9
-* Build date: Apr 7, 2016
+* Version: 15.2.10
+* Build date: May 27, 2016
 *
 * Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -1482,6 +1482,7 @@
 .dx-scheduler-group-header
 {
   height: 30px;
+  text-align: center;
 }
 .dx-scheduler-time-panel
 {
@@ -5794,7 +5795,8 @@
 }
 .dx-lookup-popup-wrapper .dx-list
 {
-  margin-top: 10px;
+  margin-top: 40px;
+  padding-bottom: 40px;
   margin-left: 8px;
   margin-right: 8px;
 }
@@ -5821,10 +5823,6 @@
 .dx-lookup-search-wrapper .dx-texteditor-container
 {
   margin: 0;
-}
-.dx-lookup-popup-search .dx-list
-{
-  top: 52px;
 }
 @media screen and (orientation: portrait)
 {
@@ -5902,7 +5900,7 @@
 }
 .dx-popup-content.dx-lookup-invalid .dx-lookup-search-wrapper
 {
-  top: 58px;
+  top: 118px;
 }
 .dx-popup-content.dx-lookup-invalid .dx-list
 {
@@ -5910,15 +5908,15 @@
 }
 .dx-popup-title+.dx-popup-content.dx-lookup-invalid
 {
-  padding-top: 10px;
+  padding-top: 40px;
 }
 .dx-popup-title+.dx-popup-content.dx-lookup-invalid .dx-list
 {
-  top: 48px;
+  top: 78px;
 }
 .dx-lookup-popup-search .dx-popup-content.dx-lookup-invalid
 {
-  padding-top: 10px;
+  margin-top: 40px;
 }
 .dx-lookup-popup-search .dx-popup-content.dx-lookup-invalid .dx-list
 {
@@ -7777,8 +7775,6 @@
 {
   width: 320px;
   height: 348px;
-  min-width: 320px;
-  min-height: 348px;
   background: #fff;
 }
 .dx-calendar.dx-calendar-with-footer
@@ -7986,7 +7982,6 @@
 .dx-calendar-body td
 {
   width: 39px;
-  height: 40px;
   border: 1px solid #000;
 }
 .dx-calendar-body th

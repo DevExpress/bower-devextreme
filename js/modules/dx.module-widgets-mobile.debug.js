@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Mobile Widgets)
-* Version: 15.2.9
-* Build date: Apr 7, 2016
+* Version: 15.2.10
+* Build date: May 27, 2016
 *
 * Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -1935,8 +1935,9 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_MOBILE) {
             _renderContentTemplate: function() {
                 if (commonUtils.isDefined(this._singleContent))
                     return;
-                var $result = this._getTemplateByOption("contentTemplate").render(this._itemContainer());
-                this._singleContent = !!$result.length || $result.is(":empty")
+                var itemsLength = this._itemContainer().html().length;
+                this._getTemplateByOption("contentTemplate").render(this._itemContainer());
+                this._singleContent = this._itemContainer().html().length !== itemsLength
             },
             _itemClickHandler: $.noop,
             _renderContentImpl: function(template) {

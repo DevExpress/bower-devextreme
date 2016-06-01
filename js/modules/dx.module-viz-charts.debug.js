@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Charts)
-* Version: 15.2.9
-* Build date: Apr 7, 2016
+* Version: 15.2.10
+* Build date: May 27, 2016
 *
 * Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -664,7 +664,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CHARTS) {
                 });
                 if (that._scrollBar) {
                     argBusinessRange = that.businessRanges[0].arg;
-                    if (argBusinessRange.categories && argBusinessRange.categories.length <= 1)
+                    if (argBusinessRange.axisType === "discrete" && argBusinessRange.categories && argBusinessRange.categories.length <= 1)
                         zoomMinArg = zoomMaxArg = undefined;
                     else {
                         zoomMinArg = argBusinessRange.minVisible;
@@ -2395,7 +2395,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CHARTS) {
                         zoomingMode: themeManager.getOptions("zoomingMode"),
                         scrollingMode: themeManager.getOptions("scrollingMode"),
                         rotated: that._isRotated(),
-                        crosshair: that._crosshair
+                        crosshair: that._getCrosshairOptions().enabled ? that._crosshair : null
                     })
             },
             _resolveLabelOverlappingStack: function() {

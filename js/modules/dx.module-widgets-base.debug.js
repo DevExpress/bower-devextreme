@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Common Widgets)
-* Version: 15.2.9
-* Build date: Apr 7, 2016
+* Version: 15.2.10
+* Build date: May 27, 2016
 *
 * Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -1091,6 +1091,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     this._crossThumbScrolling = false
                 },
                 _stopHandler: function() {
+                    if (this._thumbScrolling)
+                        this._scrollComplete();
                     this._resetThumbScrolling();
                     this._scrollToBounds()
                 },
@@ -5396,6 +5398,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                 if (visible)
                     this._updateRootBox()
             },
+            _attachClickEvent: $.noop,
             _optionChanged: function(args) {
                 switch (args.name) {
                     case"rows":
@@ -5403,6 +5406,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     case"screenByWidth":
                     case"_layoutStrategy":
                     case"singleColumnScreen":
+                        this._clearItemNodeTemplates();
                         this._invalidate();
                         break;
                     case"width":
@@ -6128,9 +6132,11 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     this._toggleEmptinessEventHandler()
                 },
                 _isValueValid: function() {
-                    var validity = this._input().get(0).validity;
-                    if (validity)
-                        return validity.valid;
+                    if (this._input().length) {
+                        var validity = this._input().get(0).validity;
+                        if (validity)
+                            return validity.valid
+                    }
                     return true
                 },
                 _toggleEmptiness: function(isEmpty) {
@@ -6179,7 +6185,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                         $input.focus()
                     });
                     $placeholder.insertAfter($input);
-                    $placeholder.addClass(TEXTEDITOR_PLACEHOLDER_CLASS)
+                    $placeholder.addClass(TEXTEDITOR_PLACEHOLDER_CLASS);
+                    this._toggleEmptinessEventHandler()
                 },
                 _placeholder: function() {
                     return this._$placeholder || $()
@@ -6267,8 +6274,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                 },
                 _renderEmptinessEvent: function() {
                     var $input = this._input();
-                    $input.on("input blur", $.proxy(this._toggleEmptinessEventHandler, this));
-                    this._toggleEmptinessEventHandler()
+                    $input.on("input blur", $.proxy(this._toggleEmptinessEventHandler, this))
                 },
                 _toggleEmptinessEventHandler: function(value) {
                     var text = this._input().val(),
@@ -6725,8 +6731,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                 _isMaskedValueMode: function() {
                     return this.option("useMaskedValue")
                 },
-                _displayMask: function() {
-                    var caret = this._caret();
+                _displayMask: function(caret) {
+                    caret = caret || this._caret();
                     this._renderValue();
                     this._caret(caret)
                 },
@@ -6787,14 +6793,38 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     return CONTROL_KEYS[e.keyCode] && !e.which || e.metaKey
                 },
                 _maskBackspaceHandler: function(e) {
-                    this._keyPressHandled = true;
-                    this._maskKeyHandler(e, function() {
-                        if (this._hasSelection())
-                            return true;
-                        if (this._tryMoveCaretBackward())
-                            return false;
-                        this._handleKey(EMPTY_CHAR_CODE, BACKWARD_DIRECTION);
-                        return true
+                    var that = this;
+                    that._keyPressHandled = true;
+                    var afterBackspaceHandler = function(needAdjustCaret, callBack) {
+                            if (needAdjustCaret) {
+                                that._direction(FORWARD_DIRECTION);
+                                that._adjustCaret()
+                            }
+                            var currentCaret = that._caret();
+                            clearTimeout(that._backspaceHandlerTimeout);
+                            that._backspaceHandlerTimeout = setTimeout(function() {
+                                callBack(currentCaret)
+                            })
+                        };
+                    that._maskKeyHandler(e, function() {
+                        if (that._hasSelection()) {
+                            afterBackspaceHandler(true, function(currentCaret) {
+                                that._displayMask(currentCaret);
+                                that._maskRulesChain.reset()
+                            });
+                            return
+                        }
+                        if (that._tryMoveCaretBackward()) {
+                            afterBackspaceHandler(false, function(currentCaret) {
+                                that._caret(currentCaret)
+                            });
+                            return
+                        }
+                        that._handleKey(EMPTY_CHAR_CODE, BACKWARD_DIRECTION);
+                        afterBackspaceHandler(true, function(currentCaret) {
+                            that._displayMask(currentCaret);
+                            that._maskRulesChain.reset()
+                        })
                     })
                 },
                 _maskDelHandler: function(e) {
@@ -6949,6 +6979,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                 },
                 _dispose: function() {
                     clearTimeout(this._inputHandlerTimer);
+                    clearTimeout(this._backspaceHandlerTimeout);
                     this.callBase()
                 },
                 _optionChanged: function(args) {
@@ -7678,7 +7709,6 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     var callBase = $.proxy(this.callBase, this);
                     return this._loadItem(this.option("value")).always($.proxy(function(item) {
                             this._setSelectedItem(item);
-                            this._refreshSelected();
                             callBase()
                         }, this))
                 },
@@ -7877,6 +7907,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     this._refreshList()
                 },
                 _searchDataSource: function() {
+                    this._clearSearchTimer();
                     this._filterDataSource(this._searchValue())
                 },
                 _filterDataSource: function(searchValue) {
@@ -7890,7 +7921,6 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     this._dataSource.searchValue() && this._dataSource.searchValue(null)
                 },
                 _dataSourceFiltered: function() {
-                    this._clearSearchTimer();
                     this._refreshList();
                     this._refreshPopupVisibility()
                 },
@@ -9911,6 +9941,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
             _pullDownHandler: function(e) {
                 this._pullRefreshAction(e);
                 if (this._dataSource && !this._isDataSourceLoading()) {
+                    this._clearSelectedItems();
                     this._dataSource.pageIndex(0);
                     this._dataSource.load()
                 }
@@ -9951,7 +9982,10 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                 if (collapsibleGroups)
                     $element.on(eventName, selector, $.proxy(function(e) {
                         this._createAction($.proxy(function(e) {
-                            this._collapseGroupHandler($(e.jQueryEvent.currentTarget).parent())
+                            var $group = $(e.jQueryEvent.currentTarget).parent();
+                            this._collapseGroupHandler($group);
+                            if (this.option("focusStateEnabled"))
+                                this.option("focusedElement", $group.find("." + LIST_ITEM_CLASS).eq(0))
                         }, this), {validatingTargetName: "element"})({jQueryEvent: e})
                     }, this))
             },
@@ -9959,7 +9993,6 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                 var deferred = $.Deferred(),
                     $groupBody = $group.children("." + LIST_GROUP_BODY_CLASS);
                 $group.toggleClass(LIST_GROUP_COLLAPSED_CLASS, toggle);
-                this.option("focusedElement", $group.find("." + LIST_ITEM_CLASS).eq(0));
                 var slideMethod = "slideToggle";
                 if (toggle === true)
                     slideMethod = "slideUp";
@@ -9969,6 +10002,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     duration: 200,
                     complete: $.proxy(function() {
                         this.updateDimensions();
+                        this._updateLoadingState(true);
                         deferred.resolve()
                     }, this)
                 });
@@ -10135,7 +10169,6 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     case"grouped":
                     case"collapsibleGroups":
                     case"groupTemplate":
-                    case"items":
                         this._invalidate();
                         break;
                     case"onGroupRendered":
@@ -10524,12 +10557,14 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
             selectedItemIndices: function() {
                 var selectedIndices = [],
                     items = this._collectionWidget.option("items"),
-                    selected = this._collectionWidget.option("selectedItems");
+                    selected = this._collectionWidget.option("selectedItems"),
+                    dataSource = this._collectionWidget._dataSource;
                 $.each(selected, function(_, selectionInGroup) {
                     var group = groupByKey(items, selectionInGroup.key),
                         groupIndex = $.inArray(group, items);
                     if (!group) {
-                        errors.log("W1003", selectionInGroup.key);
+                        if (!dataSource)
+                            errors.log("W1003", selectionInGroup.key);
                         return
                     }
                     $.each(selectionInGroup.items, function(_, selectedGroupItem) {
@@ -10539,7 +10574,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                                 group: groupIndex,
                                 item: itemIndex
                             }));
-                        else
+                        else if (!dataSource)
                             errors.log("W1004", selectedGroupItem, selectionInGroup.key)
                     })
                 });
@@ -13425,12 +13460,13 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
             },
             _dimensionChanged: function() {
                 var selectedIndex = this.option("selectedIndex") || 0;
+                this._stopItemAnimations();
                 this._clearCacheWidth();
                 this._renderDuplicateItems();
                 this._renderItemSizes();
                 this._renderItemPositions();
                 this._renderIndicator();
-                this._renderContainerPosition(this._calculateIndexOffset(selectedIndex))
+                this._renderContainerPosition(this._calculateIndexOffset(selectedIndex), false)
             },
             _renderDragHandler: function() {
                 var eventName = eventUtils.addNamespace("dragstart", this.NAME);
@@ -13996,7 +14032,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
             RTL_DIRECTION_CLASS = "dx-rtl",
             ACTIONS = ["onShowing", "onShown", "onHiding", "onHidden", "onPositioning", "onPositioned", "onResizeStart", "onResize", "onResizeEnd"],
             FIRST_Z_INDEX = 1000,
-            Z_INDEX_STACK = [],
+            OVERLAY_STACK = [],
             DISABLED_STATE_CLASS = "dx-state-disabled",
             TAB_KEY = 9;
         var realDevice = devices.real(),
@@ -14020,6 +14056,11 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
         var getElement = function(value) {
                 return value && $(value instanceof $.Event ? value.target : value)
             };
+        $(document).on(pointerEvents.down, function(e) {
+            for (var i = OVERLAY_STACK.length - 1; i >= 0; i--)
+                if (!OVERLAY_STACK[i]._proxiedDocumentDownHandler(e))
+                    return
+        });
         registerComponent("dxOverlay", ui, Widget.inherit({
             _supportedKeys: function() {
                 var offsetSize = 5,
@@ -14106,7 +14147,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                         boundaryOffset: {
                             h: 0,
                             v: 0
-                        }
+                        },
+                        propagateOutsideClick: false
                     })
             },
             _defaultOptionsRules: function() {
@@ -14210,12 +14252,10 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
             _initCloseOnOutsideClickHandler: function() {
                 var that = this;
                 this._proxiedDocumentDownHandler = function() {
-                    that._documentDownHandler.apply(that, arguments)
+                    return that._documentDownHandler.apply(that, arguments)
                 }
             },
             _documentDownHandler: function(e) {
-                if (!this._isTopOverlay())
-                    return;
                 if (this._showAnimationProcessing) {
                     this._stopAnimation();
                     return
@@ -14232,13 +14272,14 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                         this.hide()
                     }
                 }
+                return this.option("propagateOutsideClick")
             },
             _isTopOverlay: function() {
-                var zIndexStack = this._zIndexStack();
-                return zIndexStack[zIndexStack.length - 1] === this._zIndex
+                var overlayStack = this._overlayStack();
+                return overlayStack[overlayStack.length - 1] === this
             },
-            _zIndexStack: function() {
-                return Z_INDEX_STACK
+            _overlayStack: function() {
+                return OVERLAY_STACK
             },
             _zIndexInitValue: function() {
                 return FIRST_Z_INDEX
@@ -14388,21 +14429,19 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                 this._toggleSubscriptions(visible)
             },
             _updateZIndexStackPosition: function(pushToStack) {
-                var zIndexStack = this._zIndexStack();
+                var overlayStack = this._overlayStack(),
+                    index = $.inArray(this, overlayStack);
                 if (pushToStack) {
-                    if (!this._zIndex) {
-                        var length = zIndexStack.length;
-                        this._zIndex = (length ? zIndexStack[length - 1] : this._zIndexInitValue()) + 1;
-                        zIndexStack.push(this._zIndex)
+                    if (index === -1) {
+                        var length = overlayStack.length;
+                        this._zIndex = (length ? overlayStack[length - 1]._zIndex : this._zIndexInitValue()) + 1;
+                        overlayStack.push(this)
                     }
                     this._$wrapper.css("z-index", this._zIndex);
                     this._$content.css("z-index", this._zIndex)
                 }
-                else if (this._zIndex) {
-                    var index = $.inArray(this._zIndex, zIndexStack);
-                    zIndexStack.splice(index, 1);
-                    delete this._zIndex
-                }
+                else if (index !== -1)
+                    overlayStack.splice(index, 1)
             },
             _toggleShading: function(visible) {
                 this._$wrapper.toggleClass(OVERLAY_MODAL_CLASS, this.option("shading") && !this.option("container"));
@@ -14440,7 +14479,6 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
             },
             _toggleSubscriptions: function(enabled) {
                 this._toggleHideTopOverlayCallback(enabled);
-                this._toggleDocumentDownHandler(enabled);
                 this._toggleParentsScrollSubscription(enabled)
             },
             _toggleHideTopOverlayCallback: function(subscribe) {
@@ -14450,13 +14488,6 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     hideTopOverlayCallback.add(this._hideTopOverlayHandler);
                 else
                     hideTopOverlayCallback.remove(this._hideTopOverlayHandler)
-            },
-            _toggleDocumentDownHandler: function(enabled) {
-                var eventName = eventUtils.addNamespace(pointerEvents.down, this.NAME);
-                if (enabled)
-                    $(document).on(eventName, this._proxiedDocumentDownHandler);
-                else
-                    $(document).off(eventName, this._proxiedDocumentDownHandler)
             },
             _toggleParentsScrollSubscription: function(subscribe) {
                 if (!this._position)
@@ -14769,7 +14800,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
             _clean: function() {
                 if (!this._contentAlreadyRendered)
                     this.content().empty();
-                this._currentVisible = null;
+                this._renderVisibility(false);
                 this._cleanFocusState()
             },
             _dispose: function() {
@@ -14777,6 +14808,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                 this._toggleViewPortSubscriptiion(false);
                 this._toggleSubscriptions(false);
                 this._updateZIndexStackPosition(false);
+                this._toggleTabTerminator(false);
                 this._actions = null;
                 this.callBase();
                 this._$wrapper.remove();
@@ -14841,13 +14873,12 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     case"closeOnBackButton":
                         this._toggleHideTopOverlayCallback(this.option("visible"));
                         break;
-                    case"closeOnOutsideClick":
-                        this._toggleDocumentDownHandler(this.option("visible"));
-                        break;
                     case"closeOnTargetScroll":
                         this._toggleParentsScrollSubscription(this.option("visible"));
                         break;
+                    case"closeOnOutsideClick":
                     case"animation":
+                    case"propagateOutsideClick":
                         break;
                     default:
                         this.callBase(args)
@@ -14892,6 +14923,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
     (function($, DX, undefined) {
         var ui = DX.ui,
             commonUtils = DX.require("/utils/utils.common"),
+            pointerEvents = DX.require("/ui/events/pointer/ui.events.pointer"),
             registerComponent = DX.require("/componentRegistrator");
         var TOAST_CLASS = "dx-toast",
             TOAST_CLASS_PREFIX = TOAST_CLASS + "-",
@@ -14901,7 +14933,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
             TOAST_ICON_CLASS = TOAST_CLASS_PREFIX + "icon",
             WIDGET_NAME = "dxToast",
             toastTypes = ["info", "warning", "error", "success"],
-            Z_INDEX_STACK = [],
+            TOAST_STACK = [],
             FIRST_Z_INDEX_OFFSET = 8000,
             visibleToastInstance = null,
             POSITION_ALIASES = {
@@ -14936,6 +14968,11 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     offset: "0 0"
                 }
             };
+        $(document).on(pointerEvents.down, function(e) {
+            for (var i = TOAST_STACK.length - 1; i >= 0; i--)
+                if (!TOAST_STACK[i]._proxiedDocumentDownHandler(e))
+                    return
+        });
         registerComponent(WIDGET_NAME, ui, ui.dxOverlay.inherit({
             _getDefaultOptions: function() {
                 return $.extend(this.callBase(), {
@@ -15081,8 +15118,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                 visibleToastInstance = null;
                 return this.callBase.apply(this, arguments)
             },
-            _zIndexStack: function() {
-                return Z_INDEX_STACK
+            _overlayStack: function() {
+                return TOAST_STACK
             },
             _zIndexInitValue: function() {
                 return this.callBase() + FIRST_Z_INDEX_OFFSET
@@ -15838,7 +15875,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     })
             },
             _normalizePosition: function() {
-                var position = this._getPosition();
+                var position = $.extend({}, this._getPosition());
                 if (!position.of)
                     position.of = this.option("target");
                 if (!position.collision)
@@ -15903,10 +15940,16 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
     (function($, DX, undefined) {
         var ui = DX.ui,
             registerComponent = DX.require("/componentRegistrator"),
+            pointerEvents = DX.require("/ui/events/pointer/ui.events.pointer"),
             TOOLTIP_CLASS = "dx-tooltip",
             TOOLTIP_WRAPPER_CLASS = "dx-tooltip-wrapper",
-            Z_INDEX_STACK = [],
+            TOOLTIP_STACK = [],
             FIRST_Z_INDEX_OFFSET = -500;
+        $(document).on(pointerEvents.down, function(e) {
+            for (var i = TOOLTIP_STACK.length - 1; i >= 0; i--)
+                if (!TOOLTIP_STACK[i]._proxiedDocumentDownHandler(e))
+                    return
+        });
         registerComponent("dxTooltip", ui, ui.dxPopover.inherit({
             _getDefaultOptions: function() {
                 return $.extend(this.callBase(), {
@@ -15938,8 +15981,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     label = showing ? this._contentId : undefined;
                 this.setAria("describedby", label, $target)
             },
-            _zIndexStack: function() {
-                return Z_INDEX_STACK
+            _overlayStack: function() {
+                return TOOLTIP_STACK
             },
             _zIndexInitValue: function() {
                 return this.callBase() + FIRST_Z_INDEX_OFFSET
@@ -16279,7 +16322,10 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                 ONE_DAY: ONE_DAY,
                 ONE_YEAR: ONE_YEAR,
                 MIN_DATEVIEW_DEFAULT_DATE: new Date(1900, 1, 1),
-                MAX_DATEVIEW_DEFAULT_DATE: new Date((new Date).setHours(23, 59, 59) + 50 * ONE_YEAR),
+                MAX_DATEVIEW_DEFAULT_DATE: function() {
+                    var newDate = new Date;
+                    return new Date(newDate.getFullYear() + 50, newDate.getMonth(), newDate.getDate(), 23, 59, 59)
+                }(),
                 FORMATS_INFO: {
                     date: {
                         standardPattern: "yyyy-MM-dd",
@@ -16949,6 +16995,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                             hoverStateEnabled: true,
                             activeStateEnabled: true,
                             currentDate: new Date,
+                            value: null,
                             min: new Date(1000, 0),
                             max: new Date(3000, 0),
                             firstDayOfWeek: undefined,
@@ -17012,7 +17059,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                                 e.preventDefault();
                                 var zoomLevel = this.option("zoomLevel");
                                 var currentDate = this.option("currentDate");
-                                var min = this.option("min");
+                                var min = this._dateOption("min");
                                 var date = dateUtils.sameView(zoomLevel, currentDate, min) ? min : dateUtils.getViewFirstCellDate(zoomLevel, currentDate);
                                 this.option("currentDate", date)
                             },
@@ -17020,7 +17067,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                                 e.preventDefault();
                                 var zoomLevel = this.option("zoomLevel");
                                 var currentDate = this.option("currentDate");
-                                var max = this.option("max");
+                                var max = this._dateOption("max");
                                 var date = dateUtils.sameView(zoomLevel, currentDate, max) ? max : dateUtils.getViewLastCellDate(zoomLevel, currentDate);
                                 this.option("currentDate", date)
                             },
@@ -17038,10 +17085,28 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                                     this._navigateDown();
                                 else {
                                     var value = this._updateTimeComponent(this.option("currentDate"));
-                                    this.option("value", value)
+                                    this._dateOption("value", value)
                                 }
                             }
                         })
+                },
+                _getSerializationFormat: function() {
+                    var value = this.option("value");
+                    if (commonUtils.isNumber(value))
+                        return "number";
+                    if (!commonUtils.isString(value))
+                        return;
+                    return dateUtils.getDateSerializationFormat(value)
+                },
+                _convertToDate: function(value) {
+                    var serializationFormat = this._getSerializationFormat();
+                    return dateUtils.deserializeDate(value, serializationFormat)
+                },
+                _dateOption: function(optionName, optionValue) {
+                    if (arguments.length === 1)
+                        return this._convertToDate(this.option(optionName));
+                    var serializationFormat = this._getSerializationFormat();
+                    this.option(optionName, dateUtils.serializeDate(optionValue, serializationFormat))
                 },
                 _moveCurrentDate: function(offset) {
                     var currentDate = new Date(this.option("currentDate"));
@@ -17088,7 +17153,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                         this.option("zoomLevel", minZoomLevel)
                 },
                 _initCurrentDate: function() {
-                    this.option("currentDate", this._getNormalizedDate(this.option("value")) || this._getNormalizedDate(this.option("currentDate")))
+                    var currentDate = this._getNormalizedDate(this._dateOption("value")) || this._getNormalizedDate(this.option("currentDate"));
+                    this.option("currentDate", currentDate)
                 },
                 _getNormalizedDate: function(date) {
                     date = dateUtils.normalizeDate(date, this._getMinDate(), this._getMaxDate());
@@ -17126,10 +17192,10 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                         this._view.option("contouredDate", date)
                 },
                 _getMinDate: function() {
-                    return this.option("min") || new Date(1000, 0)
+                    return this._dateOption("min") || new Date(1000, 0)
                 },
                 _getMaxDate: function() {
-                    return this.option("max") || new Date(3000, 0)
+                    return this._dateOption("max") || new Date(3000, 0)
                 },
                 _getViewsOffset: function(startDate, endDate) {
                     var zoomLevel = this.option("zoomLevel");
@@ -17227,7 +17293,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                             min: this._getMinDate(),
                             max: this._getMaxDate(),
                             firstDayOfWeek: this.option("firstDayOfWeek"),
-                            value: this.option("value"),
+                            value: this._dateOption("value"),
                             rtl: this.option("rtlEnabled"),
                             disabled: this.option("disabled") || DevExpress.designMode,
                             tabIndex: undefined,
@@ -17263,13 +17329,13 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     }
                     else {
                         var newValue = this._updateTimeComponent(e.value);
-                        this.option("value", newValue);
+                        this._dateOption("value", newValue);
                         this._cellClickAction(e)
                     }
                 },
                 _updateTimeComponent: function(date) {
                     var result = new Date(date);
-                    var currentValue = this.option("value");
+                    var currentValue = this._dateOption("value");
                     if (currentValue) {
                         result.setHours(currentValue.getHours());
                         result.setMinutes(currentValue.getMinutes());
@@ -17334,7 +17400,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                 _isMinZoomLevel: function(zoomLevel) {
                     var min = this._getMinDate(),
                         max = this._getMaxDate();
-                    return dateUtils.sameView(zoomLevel, min, max) || this.option("minZoomLevel") === zoomLevel
+                    return dateUtils.sameView(zoomLevel, min, max) || this._dateOption("minZoomLevel") === zoomLevel
                 },
                 _updateButtonsVisibility: function() {
                     this._navigator.toggleButton("next", !commonUtils.isDefined(this._getRequiredView("next")));
@@ -17473,12 +17539,12 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                 _toTodayView: function() {
                     var today = new Date;
                     if (this._isMaxZoomLevel()) {
-                        this.option("value", today);
+                        this._dateOption("value", today);
                         return
                     }
                     this._preventViewChangeAnimation = true;
                     this.option("zoomLevel", this.option("maxZoomLevel"));
-                    this.option("value", today);
+                    this._dateOption("value", today);
                     this._animateShowView();
                     this._preventViewChangeAnimation = false
                 },
@@ -17564,7 +17630,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     this._afterView && this._afterView.option("value", newValue)
                 },
                 _updateAriaSelected: function(value, previousValue) {
-                    value = value || this.option("value");
+                    value = value || this._dateOption("value");
                     var $prevSelectedCell = this._view._getCellByDate(previousValue);
                     var $selectedCell = this._view._getCellByDate(value);
                     this.setAria("selected", undefined, $prevSelectedCell);
@@ -17620,6 +17686,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                             this._updateButtonsVisibility();
                             break;
                         case"value":
+                            value = this._convertToDate(value);
+                            previousValue = this._convertToDate(previousValue);
                             this._updateAriaSelected(value, previousValue);
                             this.option("currentDate", commonUtils.isDefined(value) ? new Date(value) : new Date);
                             this._updateViewsValue(value);
@@ -19772,7 +19840,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                             shading: true,
                             closeOnOutsideClick: false,
                             position: undefined,
-                            animation: undefined,
+                            animation: {},
                             pullRefreshEnabled: false,
                             useNativeScrolling: true,
                             pullingDownText: Globalize.localize("dxList-pullingDownText"),
@@ -19908,11 +19976,17 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                 },
                 _renderField: function() {
                     var fieldTemplate = this._getTemplateByOption("fieldTemplate");
-                    if (!(fieldTemplate && this.option("fieldTemplate")))
-                        return;
+                    if (fieldTemplate && this.option("fieldTemplate")) {
+                        this._renderFieldTemplate(fieldTemplate);
+                        return
+                    }
+                    this._$field.text(this.option("displayValue") || this.option("placeholder"));
+                    this.element().toggleClass(LOOKUP_EMPTY_CLASS, !this.option("selectedItem"))
+                },
+                _renderFieldTemplate: function(template) {
                     this._$field.empty();
                     var data = this._fieldRenderData();
-                    fieldTemplate.render(data, this._$field)
+                    template.render(data, this._$field)
                 },
                 _fieldRenderData: function() {
                     return this.option("selectedItem")
@@ -20143,8 +20217,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     this._setListOption("_keyboardProcessor", undefined)
                 },
                 _listContentReadyHandler: function() {
-                    if (this.option("usePopover"))
-                        this._popup.repaint();
+                    this._popup.repaint();
                     this.callBase.apply(this, arguments)
                 },
                 _getPageLoadMode: function() {
@@ -20196,12 +20269,9 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                 },
                 _renderInputValue: function() {
                     return this.callBase().always($.proxy(function() {
-                            this._refreshField()
+                            this._renderField();
+                            this._refreshSelected()
                         }, this))
-                },
-                _refreshField: function() {
-                    this._$field.text(this.option("displayValue") || this.option("placeholder"));
-                    this.element().toggleClass(LOOKUP_EMPTY_CLASS, !this.option("selectedItem"))
                 },
                 _renderPlaceholder: function() {
                     if (this.element().find("input").length === 0)
@@ -20501,7 +20571,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                                 }
                             },
                             enter: function(e) {
-                                if (this._list.option("focusedElement") === null && this._input().val() === "") {
+                                if (this._list && this._list.option("focusedElement") === null && this._input().val() === "") {
                                     this.option({
                                         selectedItem: null,
                                         value: null
@@ -20629,8 +20699,12 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                 _renderInputValue: function() {
                     return this.callBase().always($.proxy(function() {
                             this._renderTooltip();
-                            this._renderInputAddons()
+                            this._renderInputValueImpl();
+                            this._refreshSelected()
                         }, this))
+                },
+                _renderInputValueImpl: function() {
+                    this._renderInputAddons()
                 },
                 _fitIntoRange: function(value, start, end) {
                     if (value > end)
@@ -20877,7 +20951,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                             onValuesChanged: null,
                             showDropButton: false,
                             tagTemplate: "tag",
-                            selectAllText: Globalize.localize("dxList-selectAll")
+                            selectAllText: Globalize.localize("dxList-selectAll"),
+                            onSelectAllChanged: null
                         })
                 },
                 _init: function() {
@@ -20885,7 +20960,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     this._initValuesChangedAction();
                     this._initDynamicTagTemplate();
                     this._values(this.option("values"));
-                    this._updateValues()
+                    this._updateValues();
+                    this._initSelectAllValueChangedAction()
                 },
                 _initValuesChangedAction: function() {
                     this._valuesChangedAction = this._createActionByOption("onValuesChanged", {excludeValidators: ["disabled", "readonly"]});
@@ -20918,15 +20994,12 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                             e.preventDefault()
                         })
                 },
-                _renderInputValue: function() {
-                    return this.callBase().always($.proxy(function() {
-                            this._renderMultiSelect()
-                        }, this))
+                _renderInputValueImpl: function() {
+                    this._renderMultiSelect()
                 },
                 _listContentReadyHandler: function() {
                     this._suppressingSelectionChanged(function() {
-                        this._valuesChangedAction = $.noop;
-                        this._setListOption("selectedItems", this._selectedItems)
+                        this._valuesChangedAction = $.noop
                     });
                     this.callBase();
                     this._initValuesChangedAction()
@@ -20936,12 +21009,20 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     callback.call(this);
                     this._setListOption("onSelectionChanged", this._getSelectionChangeHandler())
                 },
+                _initSelectAllValueChangedAction: function() {
+                    this._selectAllValueChangeAction = this._createActionByOption("onSelectAllChanged")
+                },
                 _listConfig: function() {
-                    var config = this.callBase();
+                    var that = this,
+                        config = this.callBase();
                     if (this.option("showSelectionControls"))
                         $.extend(config, {
                             selectionMode: "all",
-                            selectAllText: this.option("selectAllText")
+                            selectAllText: this.option("selectAllText"),
+                            onSelectAllChanged: function(e) {
+                                that._selectAllValueChangeAction({value: e.value})
+                            },
+                            selectedItems: this._selectedItems
                         });
                     return config
                 },
@@ -21080,7 +21161,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                 _values: function(values) {
                     if (!arguments.length)
                         return this._valuesData || [];
-                    this._valuesData = values.slice()
+                    this._valuesData = values ? values.slice() : []
                 },
                 _previousValues: function(previousValues) {
                     if (!arguments.length)
@@ -21140,6 +21221,9 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                 },
                 _optionChanged: function(args) {
                     switch (args.name) {
+                        case"onSelectAllChanged":
+                            this._initSelectAllValueChangedAction();
+                            break;
                         case"displayExpr":
                             this.callBase(args);
                             this._initDynamicTagTemplate();
@@ -21550,6 +21634,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                             this._initGroupRegistration();
                             return;
                         case"validationRules":
+                            this.option("isValid") !== undefined && this.validate();
                             return;
                         case"adapter":
                             this._initAdapter();
@@ -21686,31 +21771,25 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                         replacementFound = false,
                         newMessage = itemValidationResult.brokenRule && itemValidationResult.brokenRule.message,
                         validator = itemValidationResult.validator;
-                    if (isValid) {
-                        $.each(items, function(index, item) {
-                            if (item.validator === validator) {
+                    $.each(items, function(index, item) {
+                        if (item.validator === validator) {
+                            if (isValid)
                                 elementIndex = index;
-                                replacementFound = true;
-                                return false
-                            }
-                        });
-                        if (replacementFound)
-                            items.splice(elementIndex, 1)
-                    }
-                    else {
-                        $.each(items, function(index, item) {
-                            if (item.validator === validator) {
+                            else
                                 item.text = newMessage;
-                                replacementFound = true;
-                                return false
-                            }
+                            replacementFound = true;
+                            return false
+                        }
+                    });
+                    if (isValid ^ replacementFound)
+                        return;
+                    if (isValid)
+                        items.splice(elementIndex, 1);
+                    else
+                        items.push({
+                            text: newMessage,
+                            validator: validator
                         });
-                        if (!replacementFound)
-                            items.push({
-                                text: newMessage,
-                                validator: validator
-                            })
-                    }
                     items = this._getOrderedItems(this.validators, items);
                     this.option("items", items)
                 },
@@ -21885,9 +21964,6 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                                     return devices.real().generic && !devices.isSimulator()
                                 },
                                 options: {focusStateEnabled: true}
-                            }, {
-                                device: {platform: "generic"},
-                                options: {validationMessageOffset: {h: 3}}
                             }, {
                                 device: [{platform: "android"}, {platform: "win"}],
                                 options: {validationMessageOffset: {v: 0}}
@@ -22185,16 +22261,18 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                         this.element().removeClass(FILEUPLOADER_DRAGOVER_CLASS)
                 },
                 _dropHandler: function(e) {
-                    if (!this._useInputForDrop()) {
-                        e.preventDefault();
-                        var fileList = e.originalEvent.dataTransfer.files,
-                            files = this._getFiles(fileList);
-                        this._changeValues(files);
-                        if (this.option("uploadMode") === "instantly")
-                            this._uploadFiles()
-                    }
                     this._dragEventsCount = 0;
-                    this.element().removeClass(FILEUPLOADER_DRAGOVER_CLASS)
+                    this.element().removeClass(FILEUPLOADER_DRAGOVER_CLASS);
+                    if (this._useInputForDrop())
+                        return;
+                    e.preventDefault();
+                    var fileList = e.originalEvent.dataTransfer.files,
+                        files = this._getFiles(fileList);
+                    if (!this.option("multiple") && files.length > 1)
+                        return;
+                    this._changeValues(files);
+                    if (this.option("uploadMode") === "instantly")
+                        this._uploadFiles()
                 },
                 _renderWrapper: function() {
                     var $wrapper = $("<div>").addClass(FILEUPLOADER_WRAPPER_CLASS).appendTo(this.element());
@@ -22550,6 +22628,14 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                 this.setAria("role", "tabpanel");
                 this._renderLayout()
             },
+            _renderContent: function() {
+                var that = this;
+                this.callBase();
+                if (this.option("templatesRenderAsynchronously"))
+                    this._resizeEventTimer = setTimeout(function() {
+                        that._updateLayout()
+                    }, 0)
+            },
             _renderLayout: function() {
                 var $element = this.element();
                 this._$tabContainer = $("<div>").addClass(TABPANEL_TABS_CLASS).appendTo($element);
@@ -22679,6 +22765,10 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     default:
                         this.callBase(args)
                 }
+            },
+            _clean: function() {
+                clearTimeout(this._resizeEventTimer);
+                this.callBase()
             }
         }))
     })(jQuery, DevExpress);
@@ -24050,6 +24140,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                             this._invalidate();
                             this._triggerOnFieldDataChangedByDataSet(args.value)
                         }
+                        else if ($.isEmptyObject(args.value))
+                            this._resetValues();
                         break;
                     case"items":
                     case"colCount":
@@ -24156,20 +24248,22 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     })
             },
             _updateFieldValue: function(dataField, value) {
-                this.option("formData." + dataField, value)
+                if (utils.isDefined(this.option("formData")))
+                    this.option("formData." + dataField, value)
             },
             _generateItemsFromData: function(items) {
                 var formData = this.option("formData"),
                     result = [];
-                if (utils.isDefined(formData))
+                if (!items && utils.isDefined(formData))
                     $.each(formData, function(dataField, value) {
-                        if (!items || items && $.inArray(dataField, items) > -1)
-                            result.push({dataField: dataField})
+                        result.push({dataField: dataField})
                     });
                 if (items)
                     $.each(items, function(index, item) {
                         if (utils.isObject(item))
-                            result.push(item)
+                            result.push(item);
+                        else
+                            result.push({dataField: item})
                     });
                 return result
             },
@@ -24268,6 +24362,15 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
             _dimensionChanged: function() {
                 if (this.option("colCount") === "auto")
                     this._refresh()
+            },
+            _resetValues: function() {
+                $.each(this._editorInstancesByField, function(dataField, editor) {
+                    editor.reset();
+                    editor.option("isValid", true)
+                })
+            },
+            resetValues: function() {
+                this._resetValues()
             },
             updateData: function(data, value) {
                 var that = this;
@@ -24411,8 +24514,10 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                         value: value
                     })
                 }
-                else
-                    layoutData[dataField](value)
+                else if (knockoutUtils.isWritableObservable(layoutData[dataField])) {
+                    var newValue = utils.isFunction(value) ? value() : value;
+                    layoutData[dataField](newValue)
+                }
             },
             _triggerOnFieldDataChanged: function(args) {
                 this._createActionByOption("onFieldDataChanged")(args)

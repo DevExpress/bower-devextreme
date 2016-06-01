@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme
-* Version: 15.2.9
-* Build date: Apr 7, 2016
+* Version: 15.2.10
+* Build date: May 27, 2016
 *
 * Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -1482,6 +1482,7 @@
 .dx-scheduler-group-header
 {
   height: 30px;
+  text-align: center;
 }
 .dx-scheduler-time-panel
 {
@@ -3458,10 +3459,6 @@
   -moz-box-shadow: 0 1px 3px 0 rgba(0,0,0,.3);
   box-shadow: 0 1px 3px 0 rgba(0,0,0,.3);
 }
-.dx-button-default .dx-icon
-{
-  color: #fff;
-}
 .dx-button-default.dx-state-hover, .dx-button-default.dx-state-focused
 {
   background-color: #1e88e5;
@@ -3478,10 +3475,6 @@
   -moz-box-shadow: 0 1px 3px 0 rgba(0,0,0,.3);
   box-shadow: 0 1px 3px 0 rgba(0,0,0,.3);
 }
-.dx-button-danger .dx-icon
-{
-  color: #fff;
-}
 .dx-button-danger.dx-state-hover, .dx-button-danger.dx-state-focused
 {
   background-color: #dd191d;
@@ -3497,10 +3490,6 @@
   -webkit-box-shadow: 0 1px 3px 0 rgba(0,0,0,.3);
   -moz-box-shadow: 0 1px 3px 0 rgba(0,0,0,.3);
   box-shadow: 0 1px 3px 0 rgba(0,0,0,.3);
-}
-.dx-button-success .dx-icon
-{
-  color: #fff;
 }
 .dx-button-success.dx-state-hover, .dx-button-success.dx-state-focused
 {
@@ -6184,7 +6173,7 @@
 }
 .dx-lookup-popup-search .dx-list
 {
-  top: 48px;
+  padding-bottom: 52px;
 }
 .dx-lookup-popup-search .dx-list .dx-scrollable-container
 {
@@ -8477,9 +8466,9 @@
   padding: 14px;
   font-size: 14px;
   height: 356px;
-  min-height: 356px;
+  min-height: 260px;
   width: 348px;
-  min-width: 348px;
+  min-width: 290px;
   background: #fafafa;
 }
 .dx-calendar.dx-calendar-with-footer
@@ -8653,32 +8642,32 @@
 .dx-calendar-view-month .dx-calendar-cell.dx-state-active:not(.dx-calendar-empty-cell)
 {
   background: #ececec;
-  background: -webkit-radial-gradient(circle closest-side,#ececec 18px,rgba(255,255,255,0) 19px);
-  background: -moz-radial-gradient(circle closest-side,#ececec 18px,rgba(255,255,255,0) 19px);
-  background: -ms-radial-gradient(circle closest-side,#ececec 18px,rgba(255,255,255,0) 19px);
-  background: -o-radial-gradient(circle closest-side,#ececec 18px,rgba(255,255,255,0) 19px);
-  background: radial-gradient(circle closest-side at center,#ececec 18px,rgba(255,255,255,0) 19px);
+  background: -webkit-radial-gradient(circle closest-side,#ececec 90%,rgba(255,255,255,0) 95%);
+  background: -moz-radial-gradient(circle closest-side,#ececec 90%,rgba(255,255,255,0) 95%);
+  background: -ms-radial-gradient(circle closest-side,#ececec 90%,rgba(255,255,255,0) 95%);
+  background: -o-radial-gradient(circle closest-side,#ececec 90%,rgba(255,255,255,0) 95%);
+  background: radial-gradient(circle closest-side at center,#ececec 90%,rgba(255,255,255,0) 95%);
 }
 .dx-calendar-view-month .dx-calendar-cell.dx-calendar-selected-date, .dx-calendar-view-month .dx-calendar-cell.dx-calendar-selected-date.dx-calendar-contoured-date, .dx-calendar-view-month .dx-calendar-cell.dx-calendar-selected-date.dx-state-active
 {
   color: #fff;
   background: #00bcd4;
-  background: -webkit-radial-gradient(circle closest-side,#00bcd4 18px,rgba(255,255,255,0) 19px);
-  background: -moz-radial-gradient(circle closest-side,#00bcd4 18px,rgba(255,255,255,0) 19px);
-  background: -ms-radial-gradient(circle closest-side,#00bcd4 18px,rgba(255,255,255,0) 19px);
-  background: -o-radial-gradient(circle closest-side,#00bcd4 18px,rgba(255,255,255,0) 19px);
-  background: radial-gradient(circle closest-side at center,#00bcd4 18px,rgba(255,255,255,0) 19px);
+  background: -webkit-radial-gradient(circle closest-side,#00bcd4 90%,rgba(255,255,255,0) 95%);
+  background: -moz-radial-gradient(circle closest-side,#00bcd4 90%,rgba(255,255,255,0) 95%);
+  background: -ms-radial-gradient(circle closest-side,#00bcd4 90%,rgba(255,255,255,0) 95%);
+  background: -o-radial-gradient(circle closest-side,#00bcd4 90%,rgba(255,255,255,0) 95%);
+  background: radial-gradient(circle closest-side at center,#00bcd4 90%,rgba(255,255,255,0) 95%);
   background-repeat: no-repeat;
   background-position: center center;
 }
 .dx-calendar-view-month td.dx-calendar-contoured-date
 {
   background: transparent;
-  background: -webkit-radial-gradient(circle closest-side,transparent 17px,#d7d7d7 18px,transparent 20px);
-  background: -moz-radial-gradient(circle closest-side,transparent 17px,#d7d7d7 18px,transparent 20px);
-  background: -ms-radial-gradient(circle closest-side,transparent 17px,#d7d7d7 18px,transparent 20px);
-  background: -o-radial-gradient(circle closest-side,transparent 17px,#d7d7d7 18px,transparent 20px);
-  background: radial-gradient(circle closest-side at center,transparent 17px,#d7d7d7 18px,transparent 20px);
+  background: -webkit-radial-gradient(circle closest-side,transparent 90%,#d7d7d7 95%,transparent 100%);
+  background: -moz-radial-gradient(circle closest-side,transparent 90%,#d7d7d7 95%,transparent 100%);
+  background: -ms-radial-gradient(circle closest-side,transparent 90%,#d7d7d7 95%,transparent 100%);
+  background: -o-radial-gradient(circle closest-side,transparent 90%,#d7d7d7 95%,transparent 100%);
+  background: radial-gradient(circle closest-side at center,transparent 90%,#d7d7d7 95%,transparent 100%);
 }
 .dx-calendar-body
 {
@@ -8703,6 +8692,8 @@
 }
 .dx-calendar-body th
 {
+  height: 26px;
+  line-height: normal;
   font-size: 0;
   color: #8f8f8f;
 }
@@ -8714,6 +8705,10 @@
 {
   color: #00bcd4;
 }
+.dx-calendar-view-year .dx-calendar-cell, .dx-calendar-view-decade .dx-calendar-cell, .dx-calendar-view-century .dx-calendar-cell
+{
+  padding: 0;
+}
 .dx-calendar-view-year .dx-calendar-cell span, .dx-calendar-view-decade .dx-calendar-cell span, .dx-calendar-view-century .dx-calendar-cell span
 {
   border: 1px solid transparent;
@@ -8723,6 +8718,10 @@
   -o-border-radius: 10px;
   border-radius: 10px;
   display: inline-block;
+}
+.dx-calendar-view-year .dx-calendar-cell, .dx-calendar-view-decade .dx-calendar-cell
+{
+  padding: 0;
 }
 .dx-calendar-view-year .dx-calendar-cell span, .dx-calendar-view-decade .dx-calendar-cell span
 {

@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Core Library)
-* Version: 15.2.9
-* Build date: Apr 7, 2016
+* Version: 15.2.10
+* Build date: May 27, 2016
 *
 * Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -1907,9 +1907,13 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
         var isObservable = function(value) {
                 return support.hasKo && ko.isObservable(value)
             };
+        var isWritableObservable = function(value) {
+                return support.hasKo && ko.isWritableObservable(value)
+            };
         return {
                 unwrapObservable: unwrapObservable,
-                isObservable: isObservable
+                isObservable: isObservable,
+                isWritableObservable: isWritableObservable
             }
     });
     /*! Module core, file utils.locker.js */
@@ -3805,8 +3809,13 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                     return this._optionAliases
                 },
                 _getOptionAliasesByName: function(optionName) {
-                    return $.map(this._getOptionAliases(), function(aliasedOption, aliasName) {
-                            return optionName === aliasedOption ? aliasName : undefined
+                    return $.map(this._getOptionAliases(), function(aliasName, deprecatedName) {
+                            return optionName === deprecatedName ? aliasName : undefined
+                        })
+                },
+                _getOptionDeprecatesByName: function(optionName) {
+                    return $.map(this._getOptionAliases(), function(aliasName, deprecatedName) {
+                            return optionName === aliasName ? deprecatedName : undefined
                         })
                 },
                 _getDefaultOptions: function() {
@@ -3974,8 +3983,9 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                 _optionChanging: $.noop,
                 _notifyOptionChanged: function(option, value, previousValue) {
                     var that = this;
-                    if (this._initialized)
-                        $.each(that._getOptionAliasesByName(option).concat([option]), function(index, name) {
+                    if (this._initialized) {
+                        var options = that._getOptionAliasesByName(option).concat(that._getOptionDeprecatesByName(option)).concat([option]);
+                        $.each(options, function(index, name) {
                             var args = {
                                     name: name.split(/[.\[]/)[0],
                                     fullName: name,
@@ -3987,6 +3997,7 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                             if (!that._disposed)
                                 that._optionChanged(args)
                         })
+                    }
                 },
                 initialOption: function(optionName) {
                     var options = this._initialOptions;
@@ -4064,10 +4075,8 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                     var normailzeOptionValue = function(name, value) {
                             if (name) {
                                 var alias = normalizeOptionName(name);
-                                if (alias && alias !== name) {
-                                    setOptionsField(alias, value);
-                                    clearOptionsField(name)
-                                }
+                                if (alias && alias !== name)
+                                    setOptionsField(alias, value)
                             }
                         };
                     var getPreviousName = function(fullName) {
@@ -4077,22 +4086,19 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                         };
                     var getFieldName = function(fullName) {
                             var splittedNames = fullName.split('.');
-                            return splittedNames[splittedNames.length - 1]
+                            return splittedNames.pop()
                         };
-                    var setOptionsField = function(name, value) {
-                            var previousFieldName = getPreviousName(name),
-                                fieldName = getFieldName(name),
-                                fieldObject = previousFieldName ? getOptionValue(options, previousFieldName, false) || getOptionValue(that._options, previousFieldName, false) : options;
-                            if (fieldObject)
-                                fieldObject[fieldName] = value
-                        };
-                    var clearOptionsField = function(name) {
-                            delete options[name];
-                            var previousFieldName = getPreviousName(name),
-                                fieldName = getFieldName(name),
-                                fieldObject = previousFieldName ? getOptionValue(options, previousFieldName, false) : options;
-                            if (fieldObject)
-                                delete fieldObject[fieldName]
+                    var setOptionsField = function(fullName, value) {
+                            var fieldName = "",
+                                fieldObject;
+                            do {
+                                if (fieldName)
+                                    fieldName = "." + fieldName;
+                                fieldName = getFieldName(fullName) + fieldName;
+                                fullName = getPreviousName(fullName);
+                                fieldObject = fullName ? getOptionValue(options, fullName, false) : options
+                            } while (!fieldObject);
+                            fieldObject[fieldName] = value
                         };
                     var getOptionValue = function(options, name, unwrapObservables) {
                             if (!cachedGetters[name])
@@ -4360,7 +4366,7 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
     });
     /*! Module core, file version.js */
     DevExpress.define("/version", [], function() {
-        return "15.2.9"
+        return "15.2.10"
     });
     /*! Module core, file errors.js */
     DevExpress.define("/errors", ["/utils/utils.error"], function(errorUtils) {
@@ -4397,8 +4403,7 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                 W0003: "{0} - '{1}' property is deprecated in {2}. {3}",
                 W0004: "Timeout for theme loading is over: {0}",
                 W0005: "'{0}' event is deprecated in {1}. {2}",
-                W0006: "Invalid recurrence rule: '{0}'",
-                W0007: "A 3rd party template should be specified inside a <script> element:\n{0}"
+                W0006: "Invalid recurrence rule: '{0}'"
             })
     });
     /*! Module core, file eventsMixin.js */
@@ -5649,8 +5654,11 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
         var toComparable = function(value, caseSensitive) {
                 if (value instanceof Date)
                     return value.getTime();
-                if (value instanceof Guid)
-                    return value.valueOf();
+                if (value instanceof Class && value.valueOf) {
+                    var result = value.valueOf();
+                    if (result !== undefined)
+                        return result
+                }
                 if (!caseSensitive && typeof value === "string")
                     return value.toLowerCase();
                 return value
@@ -6594,8 +6602,8 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
             return ret.join("")
         }
         function parseISO8601(isoString) {
-            var result = new Date(0);
-            var chunks = isoString.replace("Z", "").split("T"),
+            var result = new Date(new Date(0).getTimezoneOffset() * 60 * 1000),
+                chunks = isoString.replace("Z", "").split("T"),
                 date = /(\d{4})-(\d{2})-(\d{2})/.exec(chunks[0]),
                 time = /(\d{2}):(\d{2}):(\d{2})\.?(\d{0,7})?/.exec(chunks[1]);
             result.setFullYear(Number(date[1]));
@@ -6982,10 +6990,12 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
         var createODataQueryAdapter = function(queryOptions) {
                 var _sorting = [],
                     _criteria = [],
+                    _expand = queryOptions.expand,
                     _select,
                     _skip,
                     _take,
-                    _countQuery;
+                    _countQuery,
+                    _oDataVersion = queryOptions.version || DEFAULT_PROTOCOL_VERSION;
                 var hasSlice = function() {
                         return _skip || _take !== undefined
                     };
@@ -6998,23 +7008,108 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                         }
                         return false
                     };
-                var generateExpand = function() {
-                        var hash = {};
-                        if (queryOptions.expand)
-                            $.each($.makeArray(queryOptions.expand), function() {
-                                hash[serializePropName(this)] = 1
-                            });
-                        if (_select)
-                            $.each(_select, function() {
-                                var path = this.split(".");
-                                if (path.length < 2)
+                var generateSelectExpand = function() {
+                        var hasDot = function(x) {
+                                return /\./.test(x)
+                            };
+                        var generateSelect = function() {
+                                if (!_select)
                                     return;
-                                path.pop();
-                                hash[serializePropName(path.join("."))] = 1
-                            });
-                        return $.map(hash, function(k, v) {
-                                return v
-                            }).join() || undefined
+                                if (_oDataVersion < 4)
+                                    return serializePropName(_select.join());
+                                return $.grep(_select, hasDot, true).join()
+                            };
+                        var generateExpand = function() {
+                                var generatorV2 = function() {
+                                        var hash = {};
+                                        if (_expand)
+                                            $.each($.makeArray(_expand), function() {
+                                                hash[serializePropName(this)] = 1
+                                            });
+                                        if (_select)
+                                            $.each($.makeArray(_select), function() {
+                                                var path = this.split(".");
+                                                if (path.length < 2)
+                                                    return;
+                                                path.pop();
+                                                hash[serializePropName(path.join("."))] = 1
+                                            });
+                                        return $.map(hash, function(k, v) {
+                                                return v
+                                            }).join()
+                                    };
+                                var generatorV4 = function() {
+                                        var format = function(hash) {
+                                                var formatCore = function(hash) {
+                                                        var ret = "",
+                                                            select = [],
+                                                            expand = [];
+                                                        $.each(hash, function(key, value) {
+                                                            if ($.isArray(value))
+                                                                [].push.apply(select, value);
+                                                            if ($.isPlainObject(value))
+                                                                expand.push(key + formatCore(value))
+                                                        });
+                                                        if (select.length || expand.length) {
+                                                            ret += "(";
+                                                            if (select.length)
+                                                                ret += "$select=" + $.map(select, serializePropName).join();
+                                                            if (expand.length) {
+                                                                if (select.length)
+                                                                    ret += ";";
+                                                                ret += "$expand=" + $.map(expand, serializePropName).join()
+                                                            }
+                                                            ret += ")"
+                                                        }
+                                                        return ret
+                                                    };
+                                                var ret = [];
+                                                $.each(hash, function(key, value) {
+                                                    ret.push(key + formatCore(value))
+                                                });
+                                                return ret.join()
+                                            };
+                                        var parseTree = function(exprs, root, stepper) {
+                                                var parseCore = function(exprParts, root, stepper) {
+                                                        var result = stepper(root, exprParts.shift(), exprParts);
+                                                        if (result === false)
+                                                            return;
+                                                        parseCore(exprParts, result, stepper)
+                                                    };
+                                                $.each(exprs, function(_, x) {
+                                                    parseCore(x.split("."), root, stepper)
+                                                })
+                                            };
+                                        var hash = {};
+                                        if (_expand || _select) {
+                                            if (_expand)
+                                                parseTree($.makeArray(_expand), hash, function(node, key, path) {
+                                                    node[key] = node[key] || {};
+                                                    if (!path.length)
+                                                        return false;
+                                                    return node[key]
+                                                });
+                                            if (_select)
+                                                parseTree($.grep($.makeArray(_select), hasDot), hash, function(node, key, path) {
+                                                    if (!path.length) {
+                                                        node[key] = node[key] || [];
+                                                        node[key].push(key);
+                                                        return false
+                                                    }
+                                                    return node[key] = node[key] || {}
+                                                });
+                                            return format(hash)
+                                        }
+                                    };
+                                if (_oDataVersion < 4)
+                                    return generatorV2();
+                                return generatorV4()
+                            };
+                        var turple = {
+                                $select: generateSelect() || undefined,
+                                $expand: generateExpand() || undefined
+                            };
+                        return turple
                     };
                 var requestData = function() {
                         var result = {};
@@ -7025,25 +7120,24 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                                 result["$skip"] = _skip;
                             if (_take !== undefined)
                                 result["$top"] = _take;
-                            if (_select)
-                                result["$select"] = serializePropName(_select.join());
-                            result["$expand"] = generateExpand()
+                            var turple = generateSelectExpand();
+                            result["$select"] = turple["$select"];
+                            result["$expand"] = turple["$expand"]
                         }
                         if (_criteria.length)
-                            result["$filter"] = compileCriteria(_criteria.length < 2 ? _criteria[0] : _criteria, queryOptions.version);
+                            result["$filter"] = compileCriteria(_criteria.length < 2 ? _criteria[0] : _criteria, _oDataVersion);
                         if (_countQuery)
                             result["$top"] = 0;
                         if (queryOptions.requireTotalCount || _countQuery)
-                            if (queryOptions.version !== 4)
+                            if (_oDataVersion !== 4)
                                 result["$inlinecount"] = "allpages";
                             else
                                 result["$count"] = "true";
                         return result
                     };
-                queryOptions.version = queryOptions.version || DEFAULT_PROTOCOL_VERSION;
                 return {
                         exec: function(url) {
-                            return sendRequest(queryOptions.version, {
+                            return sendRequest(_oDataVersion, {
                                     url: url,
                                     params: $.extend(requestData(), queryOptions && queryOptions.params)
                                 }, {
@@ -7051,7 +7145,7 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                                     jsonp: queryOptions.jsonp,
                                     withCredentials: queryOptions.withCredentials,
                                     countOnly: _countQuery
-                                })
+                                }, queryOptions.deserializeDates)
                         },
                         multiSort: function(args) {
                             var rules;
@@ -7372,7 +7466,9 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                 return -1
             },
             clear: function() {
-                this._array = []
+                this.fireEvent("modifying");
+                this._array = [];
+                this.fireEvent("modified")
             }
         })
     })(jQuery, DevExpress);
@@ -7697,7 +7793,7 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
             ctor: function(options) {
                 options = options || {};
                 this.callBase(options);
-                this._useDefaultSearch = false;
+                this._useDefaultSearch = !!options.useDefaultSearch;
                 this._loadFunc = options[LOAD];
                 this._totalCountFunc = options[TOTAL_COUNT];
                 this._byKeyFunc = options[BY_KEY];
@@ -7847,7 +7943,7 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
             var store;
             function createCustomStoreFromLoadFunc() {
                 var storeConfig = {};
-                $.each(["key", "load", "byKey", "lookup", "totalCount", "insert", "update", "remove"], function() {
+                $.each(["useDefaultSearch", "key", "load", "byKey", "lookup", "totalCount", "insert", "update", "remove"], function() {
                     storeConfig[this] = options[this];
                     delete options[this]
                 });
@@ -8919,7 +9015,7 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                                 that._hoverStartHandler(args.event);
                                 var $target = args.element;
                                 that._refreshHoveredElement($target)
-                            });
+                            }, {excludeValidators: ["readOnly"]});
                         that._eventBindingTarget().on(nameStart, hoverableSelector, function(e) {
                             startAction.execute({
                                 element: $(e.target),
@@ -9142,7 +9238,8 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
             INVALID_CLASS = "dx-invalid",
             INVALID_MESSAGE = "dx-invalid-message",
             INVALID_MESSAGE_AUTO = "dx-invalid-message-auto",
-            INVALID_MESSAGE_ALWAYS = "dx-invalid-message-always";
+            INVALID_MESSAGE_ALWAYS = "dx-invalid-message-always",
+            VALIDATION_MESSAGE_MIN_WIDTH = 100;
         var Editor = Widget.inherit({
                 _init: function() {
                     this.callBase();
@@ -9242,11 +9339,18 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                             closeOnOutsideClick: false,
                             closeOnTargetScroll: false,
                             animation: null,
-                            visible: true
+                            visible: true,
+                            propagateOutsideClick: true
                         });
                         this._$validationMessage.toggleClass(INVALID_MESSAGE_AUTO, validationMessageMode === "auto").toggleClass(INVALID_MESSAGE_ALWAYS, validationMessageMode === "always");
-                        this._$validationMessage.dxOverlay("option", "width", $element.outerWidth())
+                        this._setValidationMessageMaxWidth()
                     }
+                },
+                _setValidationMessageMaxWidth: function() {
+                    if (!this._$validationMessage)
+                        return;
+                    var validationMessageMaxWidth = Math.max(VALIDATION_MESSAGE_MIN_WIDTH, this._getValidationMessageTarget().outerWidth());
+                    this._$validationMessage.dxOverlay("option", "maxWidth", validationMessageMaxWidth)
                 },
                 _getValidationMessageTarget: function() {
                     return this.element()
@@ -9304,7 +9408,7 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                             break;
                         case"width":
                             this.callBase(args);
-                            this._$validationMessage && this._$validationMessage.dxOverlay("option", "width", this.element().outerWidth());
+                            this._setValidationMessageMaxWidth();
                             break;
                         default:
                             this.callBase(args)
@@ -12553,11 +12657,12 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
         TEMPLATE_GENERATORS.dxToolbar = {
             item: function(itemData) {
                 var $itemContent = TEMPLATE_GENERATORS.CollectionWidget.item(itemData);
-                var widget = itemData.widget;
-                if (widget) {
+                var widgetName = itemData.widget;
+                if (widgetName) {
                     var widgetElement = $("<div>").appendTo($itemContent),
-                        widgetName = camelize("dx-" + widget),
                         options = itemData.options || {};
+                    if (widgetName === "button" || widgetName === "tabs" || widgetName === "dropDownMenu")
+                        widgetName = camelize("dx-" + widgetName);
                     widgetElement[widgetName](options)
                 }
                 else if (itemData.text)
@@ -12612,10 +12717,7 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                     return element.html();
                 else {
                     element = $("<div>").append(element);
-                    var result = element.html();
-                    if (result.length)
-                        errors.log("W0007", result);
-                    return result
+                    return element.html()
                 }
             };
         registerTemplateEngine("default", {
@@ -12925,7 +13027,9 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                 if (!widgetName)
                     return;
                 ko.virtualElements.emptyNode(element);
-                var markup = $("<div data-bind=\"" + inflector.camelize("dx-" + widgetName) + ": options\">").get(0);
+                if (widgetName === "button" || widgetName === "tabs" || widgetName === "dropDownMenu")
+                    widgetName = inflector.camelize("dx-" + widgetName);
+                var markup = $("<div data-bind=\"" + widgetName + ": options\">").get(0);
                 ko.virtualElements.prepend(element, markup);
                 var innerBindingContext = bindingContext.extend(valueAccessor);
                 ko.applyBindingsToDescendants(innerBindingContext, element);
@@ -13493,11 +13597,14 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                         if (!optionDependencies[optionForSubscribe])
                             optionDependencies[optionForSubscribe] = {};
                         optionDependencies[optionForSubscribe][optionPath] = valuePath;
-                        var watchCallback = function(newValue) {
+                        var watchCallback = function(newValue, oldValue) {
                                 if (that._ngLocker.locked(optionPath))
                                     return;
+                                that._ngLocker.obtain(optionPath);
                                 that._component.option(optionPath, newValue);
-                                updateWatcher()
+                                updateWatcher();
+                                if (newValue === oldValue && that._ngLocker.locked(optionPath))
+                                    that._ngLocker.release(optionPath)
                             };
                         var updateWatcher = function() {
                                 var watchMethod = $.isArray(that._scope.$eval(valuePath)) && !forcePlainWatchMethod ? "$watchCollection" : "$watch";
@@ -13515,6 +13622,10 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                         var optionName = args.name,
                             fullName = args.fullName,
                             component = args.component;
+                        if (that._ngLocker.locked(optionName)) {
+                            that._ngLocker.release(optionName);
+                            return
+                        }
                         if (that._scope.$root.$$phase === "$digest" || !optionDependencies || !optionDependencies[optionName])
                             return;
                         try {
@@ -13790,7 +13901,9 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                             var widgetName = $scope.name;
                             if (!widgetName)
                                 return;
-                            var markup = $("<div " + inflector.dasherize("dx-" + widgetName) + "=\"options\">").get(0);
+                            if (widgetName === "button" || widgetName === "tabs" || widgetName === "dropDownMenu")
+                                widgetName = inflector.camelize("dx-" + widgetName);
+                            var markup = $("<div " + inflector.dasherize(widgetName) + "=\"options\">").get(0);
                             $element.after(markup);
                             $compile(markup)($scope)
                         }
@@ -15417,7 +15530,7 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                 _prepareItemTemplate: function($item) {
                     var templateId = ITEM_TEMPLATE_ID_PREFIX + new DX.data.Guid;
                     var templateOptions = "dxTemplate: { name: \"" + templateId + "\" }";
-                    $item.attr("data-options", templateOptions).data("options", templateOptions);
+                    $item.detach().clone().attr("data-options", templateOptions).data("options", templateOptions).appendTo(this.element());
                     return templateId
                 },
                 _dataSourceOptions: function() {
@@ -16125,10 +16238,6 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                     if (this._cancelOptionChange)
                         return;
                     switch (args.name) {
-                        case"items":
-                            this.callBase(args);
-                            this._clearSelectedItems();
-                            break;
                         case"selectionMode":
                             if (args.value === "multi")
                                 this.option("selectionMode", "multiple");
@@ -16533,6 +16642,10 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                     this._initAccessors();
                     this._initDataAdapter();
                     this._initDynamicTemplates()
+                },
+                _initDataSource: function() {
+                    this.callBase();
+                    this._dataSource && this._dataSource.paginate(false)
                 },
                 _initDataAdapter: function() {
                     var accessors = this._createDataAdapterAccessors();

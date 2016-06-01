@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme
-* Version: 15.2.9
-* Build date: Apr 7, 2016
+* Version: 15.2.10
+* Build date: May 27, 2016
 *
 * Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -1481,6 +1481,7 @@
 .dx-scheduler-group-header
 {
   height: 30px;
+  text-align: center;
 }
 .dx-scheduler-time-panel
 {
@@ -5562,10 +5563,6 @@
 {
   background-color: #f2f2f2;
 }
-.dx-lookup-popup-wrapper .dx-list
-{
-  top: 12px;
-}
 .dx-lookup-validation-message
 {
   height: 20px;
@@ -5573,7 +5570,7 @@
 }
 .dx-lookup-popup-search .dx-list
 {
-  top: 56px;
+  padding-bottom: 45px;
 }
 .dx-lookup-popup-search .dx-lookup-invalid .dx-list
 {
@@ -5948,6 +5945,7 @@
   background-color: #0078d7;
   color: #fff;
   margin: 2px 0 0 2px;
+  vertical-align: top;
   padding: 4px 6px 4px;
   line-height: 16px;
 }

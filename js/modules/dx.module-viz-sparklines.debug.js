@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Sparklines)
-* Version: 15.2.9
-* Build date: Apr 7, 2016
+* Version: 15.2.10
+* Build date: May 27, 2016
 *
 * Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -25,12 +25,6 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_SPARKLINES) {
         function generateDefaultCustomizeTooltipCallback(fontOptions, rtlEnabled) {
             var lineSpacing = fontOptions.lineSpacing,
                 lineHeight = (lineSpacing !== undefined && lineSpacing !== null ? lineSpacing : DEFAULT_LINE_SPACING) + fontOptions.size;
-            DX.viz.sparklines.generated_customize_tooltip = function() {
-                return {
-                        lineHeight: lineHeight,
-                        rtlEnabled: rtlEnabled
-                    }
-            };
             return function(customizeObject) {
                     var html = "",
                         vt = customizeObject.valueText;
@@ -38,6 +32,18 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_SPARKLINES) {
                         html += "<tr><td>" + vt[i] + "</td><td style='width: 15px'></td><td style='text-align: " + (rtlEnabled ? "left" : "right") + "'>" + vt[i + 1] + "</td></tr>";
                     return {html: "<table style='border-spacing:0px; line-height: " + lineHeight + "px'>" + html + "</table>"}
                 }
+        }
+        function generateCustomizeTooltipCallback(customizeTooltip, fontOptions, rtlEnabled) {
+            var defaultCustomizeTooltip = generateDefaultCustomizeTooltipCallback(fontOptions, rtlEnabled);
+            if ($.isFunction(customizeTooltip))
+                return function(customizeObject) {
+                        var res = customizeTooltip.call(customizeObject, customizeObject);
+                        if (!("html" in res) && !("text" in res))
+                            $.extend(res, defaultCustomizeTooltip.call(customizeObject, customizeObject));
+                        return res
+                    };
+            else
+                return defaultCustomizeTooltip
         }
         DX.viz.sparklines = {};
         DX.viz.sparklines.BaseSparkline = viz.BaseWidget.inherit({
@@ -192,7 +198,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_SPARKLINES) {
                 var tooltip = this._tooltip,
                     options = tooltip && this._getOption("tooltip");
                 tooltip && tooltip.update($.extend({}, options, {
-                    customizeTooltip: !$.isFunction(options.customizeTooltip) ? generateDefaultCustomizeTooltipCallback(options.font, this.option("rtlEnabled")) : options.customizeTooltip,
+                    customizeTooltip: generateCustomizeTooltipCallback(options.customizeTooltip, options.font, this.option("rtlEnabled")),
                     enabled: options.enabled && this._isTooltipEnabled()
                 }))
             },
@@ -970,13 +976,15 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_SPARKLINES) {
                     tooltip = that._tooltip,
                     options = that._allOptions,
                     value = options.value,
-                    target = options.target;
+                    target = options.target,
+                    valueText = tooltip.formatValue(value),
+                    targetText = tooltip.formatValue(target);
                 return {
                         originalValue: value,
                         originalTarget: target,
-                        value: tooltip.formatValue(value),
-                        target: tooltip.formatValue(target),
-                        valueText: ["Actual Value:", value, "Target Value:", target]
+                        value: valueText,
+                        target: targetText,
+                        valueText: ["Actual Value:", valueText, "Target Value:", targetText]
                     }
             },
             _isTooltipEnabled: function() {
