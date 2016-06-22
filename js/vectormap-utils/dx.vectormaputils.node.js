@@ -1,12 +1,12 @@
 ﻿/*! 
-* DevExtreme (Vector Map)
-* Version: 15.2.10
-* Build date: May 27, 2016
+* DevExtreme (dx.vectormaputils.node.js)
+* Version: 16.1.4
+* Build date: Wed Jun 22 2016
 *
 * Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
 */
-"use strict";
+﻿"use strict";
 
 function noop() { }
 
@@ -146,6 +146,8 @@ function parse(source, parameters, callback) {
     });
     return result;
 }
+
+exports.parse = parse;
 
 function when(actions, callback) {
     var errorArray = [],
@@ -667,7 +669,6 @@ function sendRequest(path, callback) {
     fs.readFile(path, callback);
 }
 
-module.exports.parse = parse;
 var path = require("path");
 
 function normalizeJsName(value) {
@@ -675,18 +676,22 @@ function normalizeJsName(value) {
 }
 
 function processFile(file, options, callback) {
-    var fileName = path.basename(file, path.extname(file));
-    options.info("%s: started", fileName);
+    var name = path.basename(file, path.extname(file));
+    options.info("%s: started", name);
     parse(file, { precision: options.precision }, function (shapeData, errors) {
-        options.info("%s: finished", fileName);
+        var content;
+        options.info("%s: finished", name);
         errors && errors.forEach(function (e) {
             options.error("  " + e);
         });
         if (shapeData) {
+            content = JSON.stringify(options.processData(shapeData), null, options.isDebug && 4);
+            if (!options.isJSON) {
+                content = options.processFileContent(content, normalizeJsName(name));
+            }
             fs.writeFile(
-                path.resolve(options.output || path.dirname(file), fileName + options.ext),
-                options.wrapContent(JSON.stringify(options.processData(shapeData), null, options.indent), fileName),
-                function (e) {
+                path.resolve(options.output || path.dirname(file), options.processFileName(name + (options.isJSON ? ".json" : ".js"))),
+                content, function (e) {
                     e && options.error("  " + e.message);
                     callback();
                 });
@@ -696,8 +701,8 @@ function processFile(file, options, callback) {
     });
 }
 
-function collectFiles(input, done) {
-    input = path.resolve(input || "");
+function collectFiles(dir, done) {
+    var input = path.resolve(dir || "");
     fs.stat(input, function (e, stat) {
         if (e) {
             done(e, []);
@@ -727,42 +732,41 @@ function collectFiles(input, done) {
     }
 }
 
-function getDataProcessor(val) {
-    var func = isFunction(val) && val;
-    if (!func && val) {
-        try {
-            func = require(path.resolve(String(val)));
-        } catch (_) { }
-    }
-    return isFunction(func) ? func : eigen;
+function importFile(file) {
+    var content;
+    try {
+        content = require(path.resolve(String(file)));
+    } catch (_) { }
+    return content;
 }
 
-function getContentWrapper(namespace, isDebug) {
-    var p1 = namespace ? normalizeJsName(String(namespace)) + "." : "",
-        p2 = isDebug ? " = " : "=";
-    return function (content, name) {
-        return p1 + normalizeJsName(name) + p2 + content;
-    };
+function pickFunctionOption(value) {
+    return (isFunction(value) && value) || (value && importFile(String(value))) || null;
+}
+
+function processFileContentByDefault(content, name) {
+    return name + " = " + content + ";";
 }
 
 function prepareSettings(source, options) {
-    options = options || {};
-    var settings = {
+    options = Object.assign({}, options);
+    if (options.settings) {
+        options = Object.assign(importFile(options.settings) || {}, options);
+    }
+    return Object.assign(options, {
         input: source ? String(source) : null,
         output: options.output ? String(options.output) : null,
-        precision: options.precision >= 0 ? Number(options.precision) : 4,
-        ext: options.isJSON ? ".json" : ".js",
-        indent: options.isDebug ? 4 : undefined,
-        wrapContent: options.isJSON ? eigen : getContentWrapper(options.namespace, options.isDebug),
-        processData: getDataProcessor(options.processData)
-    };
-    settings.info = options.isQuiet ? noop : console.info.bind(console);
-    settings.error = options.isQuiet ? noop : console.error.bind(console);
-    return settings;
+        precision: options.precision >= 0 ? Math.round(options.precision) : 4,
+        processData: pickFunctionOption(options.processData) || eigen,
+        processFileName: pickFunctionOption(options.processFileName) || eigen,
+        processFileContent: pickFunctionOption(options.processFileContent) || processFileContentByDefault,
+        info: options.isQuiet ? noop : console.info.bind(console),
+        error: options.isQuiet ? noop : console.error.bind(console)
+    });
 }
 
 function processFiles(source, options, callback) {
-    var settings = prepareSettings(source, options);
+    var settings = prepareSettings(source, options && options.trim ? importFile(options) : options);
     settings.info("Started");
     collectFiles(settings.input, function (e, files) {
         e && settings.error(e.message);
@@ -780,43 +784,49 @@ function processFiles(source, options, callback) {
     });
 }
 
-module.exports.processFiles = processFiles;
+exports.processFiles = processFiles;
 
 var COMMAND_LINE_ARG_KEYS = [
     { key: "--output", name: "output", arg: true, desc: "Destination directory" },
     { key: "--process-data", name: "processData", arg: true, desc: "Process parsed data" },
+    { key: "--process-file-name", name: "processFileName", arg: true, desc: "Process output file name" },
+    { key: "--process-file-content", name: "processFileContent", arg: true, desc: "Process output file content" },
     { key: "--precision", name: "precision", arg: true, desc: "Precision of shape coordinates" },
-    { key: "--namespace", name: "namespace", arg: true, desc: "Global variable where to put data" },
     { key: "--json", name: "isJSON", desc: "Generate as a .json file" },
     { key: "--debug", name: "isDebug", desc: "Generate non minified file" },
     { key: "--quiet", name: "isQuiet", desc: "Suppress console output" },
+    { key: "--settings", name: "settings", arg: true, desc: "Path to settings file" },
     { key: "--help", name: "isHelp", desc: "Print help" }
 ];
 
-function parseCommandLineArgs(commandLineArgKeys) {
+function parseCommandLineArgs() {
     var args = process.argv.slice(2),
         options = { isEmpty: !args.length },
         map = {};
     args.forEach(function (arg, i) {
         map[arg] = args[i + 1] || true;
     });
-    commandLineArgKeys.forEach(function (info) {
+    COMMAND_LINE_ARG_KEYS.forEach(function (info) {
         var val = map[info.key];
         if (val) {
             options[info.name] = info.arg ? val : true;
         }
     });
+    if (options.isHelp || options.isEmpty) {
+        options = null;
+        printCommandLineHelp();
+    }
     return options;
 }
 
-function printCommandLineHelp(desctiption, commandLineArgKeys) {
+function printCommandLineHelp() {
     var parts = ["node ", path.basename(process.argv[1]), " Source "],
         lines = [],
-        maxLength = Math.max.apply(null, commandLineArgKeys.map(function (info) {
+        maxLength = Math.max.apply(null, COMMAND_LINE_ARG_KEYS.map(function (info) {
             return info.key.length;
         })) + 2,
         message;
-    commandLineArgKeys.forEach(function (info) {
+    COMMAND_LINE_ARG_KEYS.forEach(function (info) {
         var key = info.key;
         parts.push(key, " ");
         if (info.arg) {
@@ -824,16 +834,15 @@ function printCommandLineHelp(desctiption, commandLineArgKeys) {
         }
         lines.push(["  ", key, Array(maxLength - key.length).join(" "), info.desc].join(""));
     });
-    message = [desctiption, "\n", parts.join("")].concat(lines).join("\n");
+    message = ["Generates dxVectorMap-compatible files from shapefiles.", "\n", parts.join("")].concat(lines).join("\n");
     console.log(message);
 }
 
 function runFromConsole() {
-    var args = parseCommandLineArgs(COMMAND_LINE_ARG_KEYS);
-    if (args.isHelp || args.isEmpty) {
-        return printCommandLineHelp("Generates dxVectorMap-compatible files from shapefiles.", COMMAND_LINE_ARG_KEYS);
+    var args = parseCommandLineArgs();
+    if (args) {
+        processFiles(process.argv[2] || "", args);
     }
-    processFiles(process.argv[2] || "", args);
 }
 
 if (require.main === module) {

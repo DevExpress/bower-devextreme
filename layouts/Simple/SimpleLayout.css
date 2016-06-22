@@ -79,6 +79,11 @@
 
 .dx-theme-generic.dx-device-mobile .simple-layout .layout-header .dx-toolbar {
     background: none;
+    padding: 10px;
+}
+
+.dx-theme-generic .simple-layout .layout-header .dx-toolbar {
+    padding: 10px 0;
 }
 
 .dx-theme-generic .simple-layout .view-footer .dx-button {

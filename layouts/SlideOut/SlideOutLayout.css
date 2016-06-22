@@ -217,6 +217,11 @@
 
 .dx-theme-generic.dx-device-mobile .slideout-layout .layout-header .dx-toolbar {
     background: none;
+    padding: 10px;
+}
+
+.dx-theme-generic .slideout-layout .layout-header .dx-toolbar {
+    padding: 10px 0;
 }
 
 .dx-theme-generic .slideout-layout .view-footer .dx-button {

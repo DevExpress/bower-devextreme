@@ -99,7 +99,7 @@
 }
 
 .desktop-layout .dx-toolbar {
-    padding: 0;
+    padding: 10px 0;
     box-sizing: border-box;
     box-shadow: none;
     background-color: transparent;

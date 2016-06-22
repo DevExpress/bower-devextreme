@@ -1,13 +1,18 @@
 ﻿/*! 
-* DevExtreme (Vector Map)
-* Version: 15.2.10
-* Build date: May 27, 2016
+* DevExtreme (dx.vectormaputils.debug.js)
+* Version: 16.1.4
+* Build date: Wed Jun 22 2016
 *
 * Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
 */
-(function (window, undefined) {
-"use strict";
+﻿"use strict";
+
+(function (wnd) {
+
+var exports = wnd.DevExpress = wnd.DevExpress || {};
+exports = exports.viz = exports.viz || {};
+exports = exports.vectormaputils = {};
 
 function noop() { }
 
@@ -147,6 +152,8 @@ function parse(source, parameters, callback) {
     });
     return result;
 }
+
+exports.parse = parse;
 
 function when(actions, callback) {
     var errorArray = [],
@@ -679,11 +686,5 @@ function sendRequest(url, callback) {
     request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
     request.send(null);
 }
-
-(function (tmp) {
-    tmp = (tmp.DevExpress = tmp.DevExpress || {});
-    tmp = (tmp.viz = tmp.viz || {});
-    tmp.vectormaputils = { parse: parse };
-}(window));
 
 }(window));
