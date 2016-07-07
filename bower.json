@@ -5,7 +5,7 @@
   "moduleType": [
     "globals"
   ],
-  "main": ["js/dx.all.js", "css/dx.spa.css", "css/dx.common.css", "css/dx.light.css"],
+  "main": ["js/dx.all.js", "css/dx.spa.css", "css/dx.common.css", "css/dx.light.css", "css/icons/dxicons.eot", "css/icons/dxicons.ttf", "css/icons/dxicons.woff"],
   "authors": [
     { "name": "Developer Express Inc.", "email": "support@devexpress.com", "homepage": "https://www.devexpress.com" }
   ],
@@ -13,8 +13,7 @@
   "homepage": "https://js.devexpress.com",
   "keywords": [ "grid", "datagrid", "widgets", "charts", "gauge", "sparkline", "vector map", "viz", "visualization", "SPA" ],
   "dependencies": {
-    "jquery": "2.2.3",
-    "jquery-1.12.3": "http://code.jquery.com/jquery-1.12.3.js",
+    "jquery": "^2.2.3",
     "globalize": "^1.1",
     "jszip": "^2.4.0"
   },
