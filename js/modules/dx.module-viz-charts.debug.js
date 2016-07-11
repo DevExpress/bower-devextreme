@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Charts)
-* Version: 15.2.10
-* Build date: May 27, 2016
+* Version: 15.2.11
+* Build date: Jun 22, 2016
 *
 * Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -390,14 +390,14 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CHARTS) {
                     textField: formatObjectFields.nameField
                 }
         }
-        function setTemplateFields(data, teamplateData, series) {
+        function setTemplateFields(data, templateData, series) {
             _each(data, function(_, data) {
-                _each(series.getTeamplatedFields(), function(_, field) {
-                    data[field.teamplateField] = data[field.originalField]
+                _each(series.getTemplateFields(), function(_, field) {
+                    data[field.templateField] = data[field.originalField]
                 });
-                teamplateData.push(data)
+                templateData.push(data)
             });
-            series.updateTeamplateFieldNames()
+            series.updateTemplateFieldNames()
         }
         function checkOverlapping(firstRect, secondRect) {
             return (firstRect.x <= secondRect.x && secondRect.x <= firstRect.x + firstRect.width || firstRect.x >= secondRect.x && firstRect.x <= secondRect.x + secondRect.width) && (firstRect.y <= secondRect.y && secondRect.y <= firstRect.y + firstRect.height || firstRect.y >= secondRect.y && firstRect.y <= secondRect.y + secondRect.height)
@@ -976,7 +976,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CHARTS) {
                     that._templatedSeries = vizUtils.processSeriesTemplate(seriesTemplate, data);
                     that._populateSeries();
                     delete that._templatedSeries;
-                    data = that.teamplateData || data
+                    data = that.templateData || data
                 }
                 that._groupSeries();
                 parsedData = viz.validateData(data, that._groupedSeries, that._incidentOccured, dataValidatorOptions);
@@ -1045,7 +1045,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CHARTS) {
                     };
                 that._disposeSeries();
                 that.series = [];
-                that.teamplateData = [];
+                that.templateData = [];
                 themeManager.resetPalette();
                 for (i = 0; i < allSeriesOptions.length; i++) {
                     particularSeriesOptions = _extend(true, {}, allSeriesOptions[i], extraOptions);
@@ -1073,7 +1073,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CHARTS) {
                         that._processSingleSeries(particularSeries);
                         that.series.push(particularSeries);
                         if (hasSeriesTemplate)
-                            setTemplateFields(data, that.teamplateData, particularSeries)
+                            setTemplateFields(data, that.templateData, particularSeries)
                     }
                 }
                 return that.series

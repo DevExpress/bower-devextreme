@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Visualization Core Library)
-* Version: 15.2.10
-* Build date: May 27, 2016
+* Version: 15.2.11
+* Build date: Jun 22, 2016
 *
 * Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -10071,18 +10071,14 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                 that._correctPointsLength(lastPointIndex, points);
                 that._endUpdateData()
             },
-            getTeamplatedFields: function() {
-                var that = this,
-                    fields = that.getValueFields(),
-                    teampleteFields = [];
-                fields.push(that.getTagField());
-                _each(fields, function(_, field) {
-                    var fieldsObject = {};
-                    fieldsObject.teamplateField = field + that.name;
-                    fieldsObject.originalField = field;
-                    teampleteFields.push(fieldsObject)
-                });
-                return teampleteFields
+            getTemplateFields: function() {
+                var that = this;
+                return _map(that.getValueFields().concat(that.getTagField(), that.getSizeField()), function(field) {
+                        return {
+                                templateField: field + that.name,
+                                originalField: field
+                            }
+                    })
             },
             resamplePoints: function(argTranslator, min, max) {
                 var that = this,
@@ -10968,7 +10964,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                             hatching: styleOptions.hatching
                         }
                 },
-                updateTeamplateFieldNames: function() {
+                updateTemplateFieldNames: function() {
                     var that = this,
                         options = that._options;
                     options.valueField = that.getValueFields()[0] + that.name;
@@ -12124,7 +12120,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                 _checkData: function(data) {
                     return _isDefined(data.argument) && data.value !== undefined && data.minValue !== undefined
                 },
-                updateTeamplateFieldNames: function() {
+                updateTemplateFieldNames: function() {
                     var that = this,
                         options = that._options,
                         valueFields = that.getValueFields(),
@@ -12281,7 +12277,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
             getSizeField: function() {
                 return this._options.sizeField || "size"
             },
-            updateTeamplateFieldNames: function() {
+            updateTemplateFieldNames: function() {
                 var that = this,
                     options = that._options,
                     name = that.name;
@@ -12694,7 +12690,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                         fill: style.color || innerColor
                     }
             },
-            updateTeamplateFieldNames: function() {
+            updateTemplateFieldNames: function() {
                 var that = this,
                     options = that._options,
                     valueFields = that.getValueFields(),

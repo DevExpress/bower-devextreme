@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Core Library)
-* Version: 15.2.10
-* Build date: May 27, 2016
+* Version: 15.2.11
+* Build date: Jun 22, 2016
 *
 * Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -404,6 +404,14 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                         return raw
                 }
             };
+        var normalizeKey = function(id) {
+                var key = isString(id) ? id : id.toString(),
+                    arr = key.match(/[^a-zA-Z0-9]/g);
+                arr && $.each(arr, function(_, sign) {
+                    key = key.replace(sign, "_" + sign.charCodeAt() + "_")
+                });
+                return key
+            };
         return {
                 isDefined: isDefined,
                 isString: isString,
@@ -420,7 +428,8 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                 splitPair: splitPair,
                 splitQuad: splitQuad,
                 findBestMatches: findBestMatches,
-                getDefaultAlignment: getDefaultAlignment
+                getDefaultAlignment: getDefaultAlignment,
+                normalizeKey: normalizeKey
             }
     });
     /*! Module core, file utils.console.js */
@@ -1682,6 +1691,9 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                     dateDifferences[dateDifferencesConverter[dateUnitInterval] || dateUnitInterval] = true;
                     resultFormat = formatHelper.getDateFormatByDifferences(dateDifferences);
                     return resultFormat
+                },
+                getDateTimeFormatByName: function(patternName) {
+                    return DateTimeFormat[patternName.toLowerCase()]
                 }
             };
         return formatHelper
@@ -1840,8 +1852,8 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
             };
         var getWaveStyleConfig = function(args, config) {
                 var element = config.element,
-                    elementWidth = element.width(),
-                    elementHeight = element.height(),
+                    elementWidth = element.outerWidth(),
+                    elementHeight = element.outerHeight(),
                     elementDiagonal = parseInt(Math.sqrt(elementWidth * elementWidth + elementHeight * elementHeight)),
                     waveSize = Math.min(MAX_WAVE_SIZE, parseInt(elementDiagonal * args.waveSizeCoefficient)),
                     left,
@@ -2137,6 +2149,9 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                         fn.apply(fn, item)
                     });
                     callbacks.add(fn)
+                };
+                this.remove = function(fn) {
+                    callbacks.remove(fn)
                 };
                 this.fire = function() {
                     memory.push(arguments);
@@ -4366,7 +4381,7 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
     });
     /*! Module core, file version.js */
     DevExpress.define("/version", [], function() {
-        return "15.2.10"
+        return "15.2.11"
     });
     /*! Module core, file errors.js */
     DevExpress.define("/errors", ["/utils/utils.error"], function(errorUtils) {
@@ -12058,10 +12073,10 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                     for (var i = 0; i < animations.length; i++)
                         animations[i].start()
                 },
-                _stopAnimations: function() {
+                _stopAnimations: function(jumpToEnd) {
                     var animations = this._animations;
                     for (var i = 0; i < animations.length; i++)
-                        animations[i].stop()
+                        animations[i].stop(jumpToEnd)
                 },
                 _clearAnimations: function() {
                     var animations = this._animations;
@@ -12109,8 +12124,8 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                     }
                     return result
                 },
-                stop: function() {
-                    this._stopAnimations()
+                stop: function(jumpToEnd) {
+                    this._stopAnimations(jumpToEnd)
                 }
             });
         var optionPrefix = "preset_";
@@ -13561,7 +13576,8 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                 },
                 _initComponent: function(scope) {
                     this._component = new this._componentClass(this._$element, this._evalOptions(scope));
-                    this._component._isHidden = true
+                    this._component._isHidden = true;
+                    this._handleDigestPhase()
                 },
                 _handleDigestPhase: function() {
                     var that = this,
@@ -13583,7 +13599,6 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                         optionDependencies = {};
                     if (!that._ngOptions.bindingOptions)
                         return;
-                    that._handleDigestPhase();
                     $.each(that._ngOptions.bindingOptions, function(optionPath, value) {
                         var separatorIndex = optionPath.search(/\[|\./),
                             optionForSubscribe = separatorIndex > -1 ? optionPath.substring(0, separatorIndex) : optionPath,
@@ -13622,8 +13637,8 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                         var optionName = args.name,
                             fullName = args.fullName,
                             component = args.component;
-                        if (that._ngLocker.locked(optionName)) {
-                            that._ngLocker.release(optionName);
+                        if (that._ngLocker.locked(fullName)) {
+                            that._ngLocker.release(fullName);
                             return
                         }
                         if (that._scope.$root.$$phase === "$digest" || !optionDependencies || !optionDependencies[optionName])
@@ -13872,7 +13887,7 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
         })
     });
     /*! Module core, file ng.components.js */
-    DevExpress.define("/integration/angular/ng.components", ["jquery", "/integration/angular/ng.module", "/utils/utils.icon", "/utils/utils.inflector"], function($, ngModule, iconUtils, inflector) {
+    DevExpress.define("/integration/angular/ng.components", ["jquery", "/utils/utils.memorizedCallbacks", "/integration/angular/ng.module", "/utils/utils.icon", "/utils/utils.inflector"], function($, MemorizedCallbacks, ngModule, iconUtils, inflector) {
         ngModule.filter('dxGlobalize', function() {
             return function(input, param) {
                     return Globalize.format(input, param)
@@ -13910,8 +13925,8 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                     }
             }]);
         ngModule.service("dxDigestCallbacks", ["$rootScope", function($rootScope) {
-                var begin = $.Callbacks(),
-                    end = $.Callbacks();
+                var begin = new MemorizedCallbacks,
+                    end = new MemorizedCallbacks;
                 var digestPhase = false;
                 $rootScope.$watch(function() {
                     if (digestPhase)
@@ -16501,8 +16516,13 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                 return $.isNumeric(index)
             },
             _isDOMNode: function(value) {
-                var $value = $(value);
-                return $value.length && $value.get(0).nodeType
+                try {
+                    var $value = $(value);
+                    return $value && $value.length && $value.get(0).nodeType
+                }
+                catch(error) {
+                    return false
+                }
             },
             _isItemIndex: abstract,
             _getNormalizedItemIndex: abstract,
@@ -16973,6 +16993,9 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                 getData: function() {
                     return this._dataStructure
                 },
+                getFullData: function() {
+                    return this._initialDataStructure
+                },
                 getNodeByItem: function(item) {
                     var result = null;
                     $.each(this._dataStructure, function(_, node) {
@@ -17016,7 +17039,7 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                     this._updateFields()
                 },
                 toggleSelection: function(key, state, selectRecursive) {
-                    var node = this._getByKey(this._dataStructure, key);
+                    var node = !selectRecursive ? this._getByKey(this._dataStructure, key) : this._getByKey(this._initialDataStructure, key);
                     this._setFieldState(node, state, SELECTED);
                     if (this.options.recursiveSelection && !selectRecursive) {
                         state ? this._setChildrenSelection() : this._toggleChildrenSelection(node, state);

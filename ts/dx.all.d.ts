@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme
-* Version: 15.2.10
-* Build date: May 27, 2016
+* Version: 15.2.11
+* Build date: Jun 22, 2016
 *
 * Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -1961,8 +1961,6 @@ declare module DevExpress.ui {
         itemTemplate?: any;
         /** A handler for the itemTitleClick event. */
         onItemTitleClick?: any;
-        /** A handler for the itemTitleHold event. */
-        onItemTitleHold?: Function;
         /** The template to be used for rendering an item title. */
         itemTitleTemplate?: any;
         /** The index number of the currently selected item. */
@@ -3265,6 +3263,14 @@ declare module DevExpress.ui {
         rowIndex: number;
         /** The type of the row. */
         rowType: string;
+        /** The group index of the row. Available when the rowType is "group". */
+        groupIndex: number;
+        /** Indicates whether the row is expanded or collapsed. Available if rowType is "data", "detail" or "group". */
+        isExpanded: boolean;
+        /** Indicates whether the row is selected. Available if rowType is "data". */
+        isSelected: boolean;
+        /** Values of the row as they exist in the data source. */
+        values: Array<any>;
     }
     export interface dxDataGridColumn {
         /** Specifies the content alignment within column cells. */
@@ -3479,6 +3485,8 @@ declare module DevExpress.ui {
         onContentReady?: Function;
         /** Specifies a function that customizes grid columns after they are created. */
         customizeColumns?: (columns: Array<dxDataGridColumn>) => void;
+        /** Customizes grid columns and data before exporting. */
+        customizeExportData?: (columns: Array<dxDataGridColumn>, rows: Array<dxDataGridRow>) => void;
         /** Specifies a data source for the grid. */
         dataSource?: any;
         /** Specifies whether or not to enable data caching. */
@@ -3512,17 +3520,17 @@ declare module DevExpress.ui {
             form?: DevExpress.ui.dxFormOptions;
             /** Contains options that specify texts for editing-related grid controls. */
             texts?: {
-                /** Specifies text for a hint that appears when a user hovers the mouse pointer over the "Save" button. Setting this option makes sense only when the editMode option is set to batch. */
+                /** Specifies text for a hint that appears when a user hovers the mouse pointer over the "Save" button. Setting this option makes sense only when the mode option is set to batch. */
                 saveAllChanges?: string;
                 /** Specifies text for a cancel button displayed when a row is in the editing state. Setting this option makes sense only when the allowUpdating option is set to true. */
                 cancelRowChanges?: string;
-                /** Specifies text for a hint that appears when a user hovers the mouse pointer over the "Revert" button. Setting this option makes sense only when the editMode option is set to batch. */
+                /** Specifies text for a hint that appears when a user hovers the mouse pointer over the "Revert" button. Setting this option makes sense only when the mode option is set to batch. */
                 cancelAllChanges?: string;
                 /** Specifies a message to be displayed by a confirmation window. Setting this option makes sense only when the edit mode is "row". */
                 confirmDeleteMessage?: string;
                 /** Specifies text to be displayed in the title of a confirmation window. Setting this option makes sense only when the edit mode is "row". */
                 confirmDeleteTitle?: string;
-                /** Specifies text for a hint that appears when a user hovers the mouse pointer over the "Cancel changes" button. Setting this option makes sense only when the editMode option is set to cell and the validation capabilities are enabled. */
+                /** Specifies text for a hint that appears when a user hovers the mouse pointer over the "Cancel changes" button. Setting this option makes sense only when the mode option is set to cell and the validation capabilities are enabled. */
                 validationCancelChanges?: string;
                 /** Specifies text for a button that deletes a row from a grid. Setting this option makes sense only when the allowDeleting option is set to true. */
                 deleteRow?: string;
@@ -3986,7 +3994,7 @@ declare module DevExpress.ui {
         /** Gets the current page size. */
         pageSize(): number;
         /** Refreshes grid data. */
-        refresh(): void;
+        refresh(): JQueryPromise<any>;
         /** Removes a specific row from a grid. */
         deleteRow(rowIndex: number): void;
         /**
@@ -3995,7 +4003,7 @@ declare module DevExpress.ui {
          */
         removeRow(rowIndex: number): void;
         /** Saves changes made in a grid. */
-        saveEditData(): void;
+        saveEditData(): JQueryPromise<any>;
         /** Searches grid records by a search string. */
         searchByText(text: string): void;
         /** Selects all grid records. */
@@ -5915,7 +5923,7 @@ declare module DevExpress.viz.charts {
             position?: string;
         };
     }
-    /** A widget used to embed charts into HTML JS applications. */
+    /** A widget used to embed charts into web applications. */
     export class dxChart extends BaseChart {
         constructor(element: JQuery, options?: dxChartOptions);
         constructor(element: Element, options?: dxChartOptions);
@@ -6010,7 +6018,7 @@ declare module DevExpress.viz.charts {
         /** Specifies the type of the pie chart series. */
         type?: string;
     }
-    /** A circular chart widget for HTML JS applications. */
+    /** A circular chart widget for web applications. */
     export class dxPieChart extends BaseChart {
         constructor(element: JQuery, options?: dxPieChartOptions);
         constructor(element: Element, options?: dxPieChartOptions);

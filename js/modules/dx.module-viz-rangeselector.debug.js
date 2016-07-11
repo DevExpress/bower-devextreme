@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Range Selector)
-* Version: 15.2.10
-* Build date: May 27, 2016
+* Version: 15.2.11
+* Build date: Jun 22, 2016
 *
 * Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -438,13 +438,6 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_RANGESELECTOR) {
                     "touch-action": "pan-y",
                     "-ms-touch-action": "pan-y"
                 });
-                that._updateSelectedRangeCallback = function(range) {
-                    that.option(SELECTED_RANGE, range);
-                    that._eventTrigger(SELECTED_RANGE_CHANGED, {
-                        startValue: range.startValue,
-                        endValue: range.endValue
-                    })
-                };
                 that._clipRect = renderer.clipRect();
                 rangeViewGroup = renderer.g().attr({"class": "dxrs-view"}).append(root);
                 slidersGroup = renderer.g().attr({
@@ -466,13 +459,21 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_RANGESELECTOR) {
                     renderer: renderer,
                     root: slidersGroup,
                     trackersGroup: trackersGroup,
-                    updateSelectedRange: that._updateSelectedRangeCallback,
+                    updateSelectedRange: function(range) {
+                        that.option(SELECTED_RANGE, range);
+                        that._eventTrigger(SELECTED_RANGE_CHANGED, {
+                            startValue: range.startValue,
+                            endValue: range.endValue
+                        })
+                    },
                     translator: that._translator
                 });
                 that._axis = new AxisWrapper({
                     renderer: renderer,
                     root: scaleGroup,
-                    updateSelectedRange: that._updateSelectedRangeCallback,
+                    updateSelectedRange: function(range) {
+                        that.setSelectedRange(range)
+                    },
                     translator: that._translator
                 });
                 that._tracker = new rangeSelector.Tracker({
@@ -528,7 +529,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_RANGESELECTOR) {
                     that._options[SELECTED_RANGE] = null;
                     that._updateDataSource()
                 }
-                if (SELECTED_RANGE in options)
+                if (SELECTED_RANGE in options && !("scale" in options))
                     that.setSelectedRange($.extend({}, oldSelectedRange, options[SELECTED_RANGE], newSelectedRange))
             },
             _applySize: function() {
@@ -1743,12 +1744,12 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_RANGESELECTOR) {
             };
         function setTemplateFields(data, templateData, series) {
             $.each(data, function(_, data) {
-                $.each(series.getTeamplatedFields(), function(_, field) {
-                    data[field.teamplateField] = data[field.originalField]
+                $.each(series.getTemplateFields(), function(_, field) {
+                    data[field.templateField] = data[field.originalField]
                 });
                 templateData.push(data)
             });
-            series.updateTeamplateFieldNames()
+            series.updateTemplateFieldNames()
         }
         _SeriesDatasource = rangeSelector.SeriesDataSource = function(options) {
             var that = this,
@@ -1795,7 +1796,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_RANGESELECTOR) {
                     dataSourceField,
                     i,
                     newSeries;
-                that.teamplateData = [];
+                that.templateData = [];
                 if (options.dataSource && !allSeriesOptions) {
                     if (isArrayOfSimpleTypes(options.dataSource))
                         options.dataSource = convertToArrayOfObjects(options.dataSource);
@@ -1818,9 +1819,9 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_RANGESELECTOR) {
                         series.push(newSeries)
                     }
                     if (hasSeriesTemplate)
-                        setTemplateFields(data, that.teamplateData, newSeries)
+                        setTemplateFields(data, that.templateData, newSeries)
                 }
-                data = hasSeriesTemplate ? that.teamplateData : data;
+                data = hasSeriesTemplate ? that.templateData : data;
                 groupSeries = [series];
                 groupSeries.argumentOptions = {
                     categories: options.categories,

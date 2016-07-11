@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Common Widgets)
-* Version: 15.2.10
-* Build date: May 27, 2016
+* Version: 15.2.11
+* Build date: Jun 22, 2016
 *
 * Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -4283,7 +4283,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                 return this._renderOrAnimate()
             },
             _dispose: function() {
-                this.transitionExecutor.stop();
+                this.transitionExecutor.stop(true);
                 if (this._renderTask)
                     this._renderTask.abort();
                 this._actions = null;
@@ -5521,7 +5521,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     if (!this._inkRipple)
                         return;
                     var config = {
-                            element: $element,
+                            element: this._$content,
                             jQueryEvent: e
                         };
                     if (value)
@@ -8428,7 +8428,10 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                         isValid = true;
                     else if (!isNumber && !isValueValid)
                         isValid = false;
-                    this.option("isValid", isValid);
+                    this.option({
+                        isValid: isValid,
+                        validationError: isValid ? null : {editorSpecific: true}
+                    });
                     return isValid
                 },
                 _normalizeInputValue: function() {
@@ -8460,8 +8463,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                 _optionChanged: function(args) {
                     switch (args.name) {
                         case"value":
-                            this.callBase(args);
                             this._validateValue(args.value);
+                            this.callBase(args);
                             this._resumeValueChangeAction();
                             break;
                         case"step":
@@ -9709,7 +9712,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                         var $item = that.option("focusedElement"),
                             isItemVisible = true;
                         if (!$item)
-                            return;
+                            return $();
                         while (isItemVisible) {
                             var $nextItem = $item[direction]();
                             if (!$nextItem.length)
@@ -20170,7 +20173,9 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                 _registerSearchKeyHandlers: function() {
                     this._searchBox.registerKeyHandler("escape", $.proxy(this.close, this));
                     this._searchBox.registerKeyHandler("enter", $.proxy(this._selectListItemHandler, this));
-                    this._searchBox.registerKeyHandler("space", $.proxy(this._selectListItemHandler, this))
+                    this._searchBox.registerKeyHandler("space", $.proxy(this._selectListItemHandler, this));
+                    this._searchBox.registerKeyHandler("end", $.noop);
+                    this._searchBox.registerKeyHandler("home", $.noop)
                 },
                 _renderSearchVisibility: function() {
                     if (this._popup)
@@ -20696,6 +20701,12 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     else
                         this._list.scrollToItem(this._$list.find("." + this._selectedItemClass()))
                 },
+                _listContentReadyHandler: function() {
+                    this.callBase();
+                    if (this._dataSource.paginate() && this._isEditable())
+                        return;
+                    this._list.scrollToItem(this._list.option("selectedItem"))
+                },
                 _renderInputValue: function() {
                     return this.callBase().always($.proxy(function() {
                             this._renderTooltip();
@@ -21166,7 +21177,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                 _previousValues: function(previousValues) {
                     if (!arguments.length)
                         return this._previousValuesData || [];
-                    this._previousValuesData = previousValues.slice()
+                    this._previousValuesData = $.isArray(previousValues) ? previousValues.slice() : previousValues
                 },
                 _optionValuesEqual: function(name, value, prevValue) {
                     if (name === "value")
@@ -22270,9 +22281,47 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                         files = this._getFiles(fileList);
                     if (!this.option("multiple") && files.length > 1)
                         return;
-                    this._changeValues(files);
+                    this._changeValues(this._filterFiles(files));
                     if (this.option("uploadMode") === "instantly")
                         this._uploadFiles()
+                },
+                _filterFiles: function(files) {
+                    if (!files.length)
+                        return files;
+                    var accept = this.option("accept");
+                    if (!accept.length)
+                        return files;
+                    var result = [],
+                        allowedTypes = this._getAllowedFileTypes(accept);
+                    for (var i = 0, n = files.length; i < n; i++)
+                        if (this._isFileTypeAllowed(files[i], allowedTypes))
+                            result.push(files[i]);
+                    return result
+                },
+                _getAllowedFileTypes: function(acceptString) {
+                    if (!acceptString.length)
+                        return [];
+                    var acceptArray = acceptString.split(',');
+                    $.map(acceptArray, function(value) {
+                        return $.trim(value)
+                    });
+                    return acceptArray
+                },
+                _isFileTypeAllowed: function(file, allowedTypes) {
+                    for (var i = 0, n = allowedTypes.length; i < n; i++) {
+                        var allowedType = allowedTypes[i];
+                        if (allowedType[0] === ".") {
+                            allowedType = allowedType.replace(".", "\\.");
+                            if (file.name.match(allowedType))
+                                return true
+                        }
+                        else {
+                            allowedType = allowedType.replace("*", "");
+                            if (file.type.match(allowedType))
+                                return true
+                        }
+                    }
+                    return false
                 },
                 _renderWrapper: function() {
                     var $wrapper = $("<div>").addClass(FILEUPLOADER_WRAPPER_CLASS).appendTo(this.element());

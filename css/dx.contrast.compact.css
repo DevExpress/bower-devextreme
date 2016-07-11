@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme
-* Version: 15.2.10
-* Build date: May 27, 2016
+* Version: 15.2.11
+* Build date: Jun 22, 2016
 *
 * Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -207,7 +207,12 @@
 }
 .dx-pivotgrid .dx-virtual-mode .dx-virtual-content table td
 {
-  opacity: 0;
+  color: transparent;
+  background-color: transparent !important;
+}
+.dx-pivotgrid .dx-virtual-mode .dx-virtual-content table td>span
+{
+  visibility: hidden;
 }
 .dx-pivotgrid .dx-virtual-mode table
 {
@@ -624,6 +629,11 @@
 .dx-device-mobile .dx-scheduler-navigator-caption
 {
   width: 140px;
+}
+.dx-calendar.dx-scheduler-navigator-calendar
+{
+  width: 100%;
+  height: 100%;
 }
 .dx-scheduler-view-switcher.dx-tabs
 {
@@ -1378,12 +1388,12 @@
 {
   height: 26px;
 }
-.dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space-month .dx-scheduler-header-scrollable.dx-scrollable, .dx-scheduler-work-space-both-scrollbar.dx-scheduler-timeline .dx-scheduler-header-scrollable.dx-scrollable
+.dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space-month .dx-scheduler-header-scrollable.dx-scrollable, .dx-scheduler-work-space-both-scrollbar.dx-scheduler-timeline:not(.dx-scheduler-work-space-grouped) .dx-scheduler-header-scrollable.dx-scrollable
 {
   margin: 0;
   padding: 0;
 }
-.dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space-month .dx-scheduler-date-table-scrollable, .dx-scheduler-work-space-both-scrollbar.dx-scheduler-timeline .dx-scheduler-date-table-scrollable
+.dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space-month .dx-scheduler-date-table-scrollable, .dx-scheduler-work-space-both-scrollbar.dx-scheduler-timeline:not(.dx-scheduler-work-space-grouped) .dx-scheduler-date-table-scrollable
 {
   margin-left: 0;
 }
@@ -6707,8 +6717,7 @@
 }
 .dx-lookup-popup-search .dx-list
 {
-  margin-top: 45px;
-  padding-bottom: 45px;
+  padding-top: 45px;
 }
 .dx-lookup-search-wrapper
 {

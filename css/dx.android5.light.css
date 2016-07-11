@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme
-* Version: 15.2.10
-* Build date: May 27, 2016
+* Version: 15.2.11
+* Build date: Jun 22, 2016
 *
 * Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -212,7 +212,12 @@
 }
 .dx-pivotgrid .dx-virtual-mode .dx-virtual-content table td
 {
-  opacity: 0;
+  color: transparent;
+  background-color: transparent !important;
+}
+.dx-pivotgrid .dx-virtual-mode .dx-virtual-content table td>span
+{
+  visibility: hidden;
 }
 .dx-pivotgrid .dx-virtual-mode table
 {
@@ -629,6 +634,11 @@
 .dx-device-mobile .dx-scheduler-navigator-caption
 {
   width: 140px;
+}
+.dx-calendar.dx-scheduler-navigator-calendar
+{
+  width: 100%;
+  height: 100%;
 }
 .dx-scheduler-view-switcher.dx-tabs
 {
@@ -1383,12 +1393,12 @@
 {
   height: 26px;
 }
-.dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space-month .dx-scheduler-header-scrollable.dx-scrollable, .dx-scheduler-work-space-both-scrollbar.dx-scheduler-timeline .dx-scheduler-header-scrollable.dx-scrollable
+.dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space-month .dx-scheduler-header-scrollable.dx-scrollable, .dx-scheduler-work-space-both-scrollbar.dx-scheduler-timeline:not(.dx-scheduler-work-space-grouped) .dx-scheduler-header-scrollable.dx-scrollable
 {
   margin: 0;
   padding: 0;
 }
-.dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space-month .dx-scheduler-date-table-scrollable, .dx-scheduler-work-space-both-scrollbar.dx-scheduler-timeline .dx-scheduler-date-table-scrollable
+.dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space-month .dx-scheduler-date-table-scrollable, .dx-scheduler-work-space-both-scrollbar.dx-scheduler-timeline:not(.dx-scheduler-work-space-grouped) .dx-scheduler-date-table-scrollable
 {
   margin-left: 0;
 }
@@ -3374,13 +3384,9 @@
   -webkit-transition: box-shadow 280ms cubic-bezier(.4,0,.2,1);
   -moz-transition: box-shadow 280ms cubic-bezier(.4,0,.2,1);
   -ms-transition: box-shadow 280ms cubic-bezier(.4,0,.2,1);
-  position: relative;
   -webkit-box-shadow: 0 1px 4px 0 rgba(0,0,0,.37);
   -moz-box-shadow: 0 1px 4px 0 rgba(0,0,0,.37);
   box-shadow: 0 1px 4px 0 rgba(0,0,0,.37);
-  -webkit-box-shadow: 0 1px 4px 0 rgba(0,0,0,.37),none;
-  -moz-box-shadow: 0 1px 4px 0 rgba(0,0,0,.37),none;
-  box-shadow: 0 1px 4px 0 rgba(0,0,0,.37),none;
 }
 .dx-button:before
 {
@@ -3395,7 +3401,6 @@
 }
 .dx-button.dx-state-active
 {
-  position: relative;
   -webkit-box-shadow: 0 4px 13px 0 rgba(0,0,0,.3),0 2px 2px 0 rgba(0,0,0,.2);
   -moz-box-shadow: 0 4px 13px 0 rgba(0,0,0,.3),0 2px 2px 0 rgba(0,0,0,.2);
   box-shadow: 0 4px 13px 0 rgba(0,0,0,.3),0 2px 2px 0 rgba(0,0,0,.2);
@@ -3509,13 +3514,9 @@
   color: #646464;
   min-width: 0;
   background-color: transparent;
-  position: relative;
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
   box-shadow: none;
-  -webkit-box-shadow: none,none;
-  -moz-box-shadow: none,none;
-  box-shadow: none,none;
 }
 .dx-button-has-icon:not(.dx-button-has-text) .dx-button-content, .dx-button.dx-button-back .dx-button-content
 {
@@ -3593,13 +3594,9 @@
 .dx-scrollable-native.dx-scrollable-native-android .dx-scrollview-pull-down
 {
   background-color: #fff;
-  position: relative;
   -webkit-box-shadow: 0 1px 4px 0 rgba(0,0,0,.37);
   -moz-box-shadow: 0 1px 4px 0 rgba(0,0,0,.37);
   box-shadow: 0 1px 4px 0 rgba(0,0,0,.37);
-  -webkit-box-shadow: 0 1px 4px 0 rgba(0,0,0,.37),none;
-  -moz-box-shadow: 0 1px 4px 0 rgba(0,0,0,.37),none;
-  box-shadow: 0 1px 4px 0 rgba(0,0,0,.37),none;
   position: static;
 }
 .dx-scrollable-native.dx-scrollable-native-android .dx-scrollview-pull-down-refreshing .dx-icon-pulldown
@@ -3915,9 +3912,6 @@
   -webkit-box-shadow: 0 1px 4px 0 rgba(0,0,0,.37);
   -moz-box-shadow: 0 1px 4px 0 rgba(0,0,0,.37);
   box-shadow: 0 1px 4px 0 rgba(0,0,0,.37);
-  -webkit-box-shadow: 0 1px 4px 0 rgba(0,0,0,.37),none;
-  -moz-box-shadow: 0 1px 4px 0 rgba(0,0,0,.37),none;
-  box-shadow: 0 1px 4px 0 rgba(0,0,0,.37),none;
 }
 .dx-switch-handle:after
 {
@@ -5184,13 +5178,9 @@
 .dx-overlay-content .dx-button
 {
   background-color: transparent;
-  position: relative;
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
   box-shadow: none;
-  -webkit-box-shadow: none,none;
-  -moz-box-shadow: none,none;
-  box-shadow: none,none;
 }
 .dx-overlay-content .dx-button .dx-button-content
 {
@@ -5248,13 +5238,9 @@
   padding: 16px 24px 12px 24px;
   background-color: rgba(0,0,0,.9);
   color: #fff;
-  position: relative;
   -webkit-box-shadow: 0 1px 4px 0 rgba(0,0,0,.37);
   -moz-box-shadow: 0 1px 4px 0 rgba(0,0,0,.37);
   box-shadow: 0 1px 4px 0 rgba(0,0,0,.37);
-  -webkit-box-shadow: 0 1px 4px 0 rgba(0,0,0,.37),none;
-  -moz-box-shadow: 0 1px 4px 0 rgba(0,0,0,.37),none;
-  box-shadow: 0 1px 4px 0 rgba(0,0,0,.37),none;
 }
 .dx-device-tablet .dx-toast-wrapper .dx-overlay-content, .dx-device-desktop .dx-toast-wrapper .dx-overlay-content
 {
@@ -5292,7 +5278,6 @@
 {
   background: #fafafa;
   color: rgba(0,0,0,.87);
-  position: relative;
   -webkit-box-shadow: 0 7px 40px 0 rgba(0,0,0,.3),0 14px 12px 0 rgba(0,0,0,.17);
   -moz-box-shadow: 0 7px 40px 0 rgba(0,0,0,.3),0 14px 12px 0 rgba(0,0,0,.17);
   box-shadow: 0 7px 40px 0 rgba(0,0,0,.3),0 14px 12px 0 rgba(0,0,0,.17);
@@ -5421,7 +5406,6 @@
 }
 .dx-popover-wrapper .dx-overlay-content
 {
-  position: relative;
   -webkit-box-shadow: 0 3px 25px 0 rgba(0,0,0,.3),0 11px 7px 0 rgba(0,0,0,.19);
   -moz-box-shadow: 0 3px 25px 0 rgba(0,0,0,.3),0 11px 7px 0 rgba(0,0,0,.19);
   box-shadow: 0 3px 25px 0 rgba(0,0,0,.3),0 11px 7px 0 rgba(0,0,0,.19);
@@ -5808,13 +5792,9 @@
   background-color: rgba(97,97,97,.9);
   border: 1px solid transparent;
   color: #fff;
-  position: relative;
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
   box-shadow: none;
-  -webkit-box-shadow: none,none;
-  -moz-box-shadow: none,none;
-  box-shadow: none,none;
 }
 .dx-tooltip-wrapper .dx-overlay-content .dx-popup-content
 {
@@ -6173,7 +6153,7 @@
 }
 .dx-lookup-popup-search .dx-list
 {
-  padding-bottom: 52px;
+  padding-top: 48px;
 }
 .dx-lookup-popup-search .dx-list .dx-scrollable-container
 {
@@ -6743,13 +6723,9 @@
 }
 .dx-autocomplete-popup-wrapper .dx-overlay-content
 {
-  position: relative;
   -webkit-box-shadow: 0 1px 4px 0 rgba(0,0,0,.37);
   -moz-box-shadow: 0 1px 4px 0 rgba(0,0,0,.37);
   box-shadow: 0 1px 4px 0 rgba(0,0,0,.37);
-  -webkit-box-shadow: 0 1px 4px 0 rgba(0,0,0,.37),none;
-  -moz-box-shadow: 0 1px 4px 0 rgba(0,0,0,.37),none;
-  box-shadow: 0 1px 4px 0 rgba(0,0,0,.37),none;
 }
 .dx-autocomplete-popup-wrapper .dx-scrollable-content
 {
@@ -6852,13 +6828,9 @@
 }
 .dx-selectbox-popup-wrapper .dx-overlay-content
 {
-  position: relative;
   -webkit-box-shadow: 0 1px 4px 0 rgba(0,0,0,.37);
   -moz-box-shadow: 0 1px 4px 0 rgba(0,0,0,.37);
   box-shadow: 0 1px 4px 0 rgba(0,0,0,.37);
-  -webkit-box-shadow: 0 1px 4px 0 rgba(0,0,0,.37),none;
-  -moz-box-shadow: 0 1px 4px 0 rgba(0,0,0,.37),none;
-  box-shadow: 0 1px 4px 0 rgba(0,0,0,.37),none;
 }
 .dx-rtl .dx-selectbox .dx-dropdowneditor-button, .dx-rtl.dx-selectbox .dx-dropdowneditor-button
 {
@@ -8350,13 +8322,9 @@
   padding: 8px 0;
   min-width: 112px;
   background-color: #fafafa;
-  position: relative;
   -webkit-box-shadow: 0 1px 4px 0 rgba(0,0,0,.37);
   -moz-box-shadow: 0 1px 4px 0 rgba(0,0,0,.37);
   box-shadow: 0 1px 4px 0 rgba(0,0,0,.37);
-  -webkit-box-shadow: 0 1px 4px 0 rgba(0,0,0,.37),none;
-  -moz-box-shadow: 0 1px 4px 0 rgba(0,0,0,.37),none;
-  box-shadow: 0 1px 4px 0 rgba(0,0,0,.37),none;
 }
 .dx-context-menu .dx-menu-item-wrapper
 {
@@ -8497,9 +8465,6 @@
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
   box-shadow: none;
-  -webkit-box-shadow: none,none;
-  -moz-box-shadow: none,none;
-  box-shadow: none,none;
   text-decoration: none;
 }
 .dx-calendar.dx-calendar-with-footer .dx-calendar-footer .dx-calendar-today-button .dx-button-content
@@ -8574,14 +8539,11 @@
 {
   margin: 0 auto;
   width: auto;
-  background-color: transparent;
   position: relative;
+  background-color: transparent;
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
   box-shadow: none;
-  -webkit-box-shadow: none,none;
-  -moz-box-shadow: none,none;
-  box-shadow: none,none;
 }
 .dx-calendar-navigator .dx-calendar-caption-button .dx-button-content
 {
@@ -9058,13 +9020,9 @@
 .dx-field-value .dx-button, .dx-field-value.dx-button
 {
   background-color: transparent;
-  position: relative;
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
   box-shadow: none;
-  -webkit-box-shadow: none,none;
-  -moz-box-shadow: none,none;
-  box-shadow: none,none;
 }
 .dx-field-value .dx-button .dx-button-content, .dx-field-value.dx-button .dx-button-content
 {
@@ -9114,13 +9072,9 @@
 .dx-field-value .dx-button.dx-button-has-icon:not(.dx-button-has-text), .dx-field-value.dx-button.dx-button-has-icon:not(.dx-button-has-text), .dx-field-value .dx-button.dx-button-back, .dx-field-value.dx-button.dx-button-back
 {
   background-color: transparent;
-  position: relative;
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
   box-shadow: none;
-  -webkit-box-shadow: none,none;
-  -moz-box-shadow: none,none;
-  box-shadow: none,none;
 }
 .dx-field-value .dx-button.dx-button-has-icon:not(.dx-button-has-text) .dx-button-content, .dx-field-value.dx-button.dx-button-has-icon:not(.dx-button-has-text) .dx-button-content, .dx-field-value .dx-button.dx-button-back .dx-button-content, .dx-field-value.dx-button.dx-button-back .dx-button-content
 {
@@ -9320,13 +9274,9 @@
 .dx-fileuploader-files-container .dx-fileuploader-button
 {
   background-color: transparent;
-  position: relative;
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
   box-shadow: none;
-  -webkit-box-shadow: none,none;
-  -moz-box-shadow: none,none;
-  box-shadow: none,none;
 }
 .dx-fileuploader-files-container .dx-fileuploader-button .dx-button-content
 {
@@ -9437,13 +9387,9 @@
 .dx-scheduler-navigator .dx-button
 {
   background-color: transparent;
-  position: relative;
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
   box-shadow: none;
-  -webkit-box-shadow: none,none;
-  -moz-box-shadow: none,none;
-  box-shadow: none,none;
   background-color: #00bcd4;
 }
 .dx-scheduler-navigator .dx-button .dx-button-content
