@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme
-* Version: 16.1.4
-* Build date: Jun 22, 2016
+* Version: 16.1.5
+* Build date: Jul 25, 2016
 *
 * Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -415,7 +415,7 @@
   color: transparent;
   background-color: transparent !important;
 }
-.dx-pivotgrid .dx-virtual-mode .dx-virtual-content table td>span
+.dx-pivotgrid .dx-virtual-mode .dx-virtual-content table td span
 {
   visibility: hidden;
 }
@@ -803,7 +803,7 @@
 }
 .dx-device-mobile .dx-scheduler-navigator
 {
-  padding-left: 0;
+  padding-left: 5px;
 }
 .dx-scheduler-navigator-caption
 {
@@ -1216,6 +1216,7 @@
   -o-transform: translate(0,-50%);
   transform: translate(0,-50%);
   white-space: normal;
+  line-height: normal;
 }
 .dx-scheduler-timeline .dx-scheduler-date-table, .dx-scheduler-timeline .dx-scheduler-date-table-scrollable .dx-scrollable-content, .dx-scheduler-timeline .dx-scheduler-sidebar-scrollable .dx-scrollable-content, .dx-scheduler-timeline .dx-scheduler-group-table
 {
@@ -1261,10 +1262,10 @@
 .dx-scheduler-timeline.dx-scheduler-work-space-grouped .dx-scheduler-sidebar-scrollable:before
 {
   content: "";
-  height: 51px;
+  height: 50px;
   position: absolute;
   display: block;
-  top: 56px;
+  margin-top: -50px;
   left: 0;
   border-right: 1px solid rgba(255,255,255,.3);
 }
@@ -1504,6 +1505,10 @@
 .dx-scheduler-work-space-grouped:not(.dx-scheduler-work-space-all-day):not(.dx-scheduler-timeline):not(.dx-scheduler-agenda):not(.dx-scheduler-work-space-month) .dx-scheduler-header-scrollable
 {
   margin-left: 100px;
+}
+.dx-rtl .dx-scheduler-work-space-grouped:not(.dx-scheduler-work-space-all-day):not(.dx-scheduler-timeline):not(.dx-scheduler-agenda):not(.dx-scheduler-work-space-month) .dx-scheduler-header-scrollable
+{
+  margin-left: 0;
 }
 .dx-scheduler-small .dx-scheduler-work-space-grouped:not(.dx-scheduler-work-space-all-day):not(.dx-scheduler-timeline):not(.dx-scheduler-agenda):not(.dx-scheduler-work-space-month) .dx-scheduler-header-scrollable
 {
@@ -1900,6 +1905,8 @@
 }
 .dx-scheduler-appointment
 {
+  border-top: 1px solid transparent;
+  border-left: 1px solid transparent;
   background-clip: padding-box;
   position: absolute;
   cursor: pointer;
@@ -1977,6 +1984,10 @@
 .dx-scheduler-appointment .dx-resizable-handle-left
 {
   left: -1px;
+}
+.dx-scheduler-appointment .dx-resizable-handle-top
+{
+  top: -1px;
 }
 .dx-scheduler-appointment .dx-scheduler-appointment-reduced-icon
 {
@@ -2690,7 +2701,7 @@
 }
 .dx-device-mobile .dx-rtl .dx-scheduler-navigator
 {
-  padding-right: 0;
+  padding-right: 5px;
 }
 .dx-rtl .dx-scheduler-view-switcher.dx-tabs
 {
@@ -2729,7 +2740,6 @@
 }
 .dx-rtl .dx-scheduler-work-space-month .dx-scheduler-header-panel-cell, .dx-rtl .dx-scheduler-work-space-month .dx-scheduler-date-table-cell
 {
-  border-left: none;
   border-right: 1px solid rgba(255,255,255,.3);
 }
 .dx-rtl .dx-scheduler-work-space-month .dx-scheduler-header-panel-cell:first-child, .dx-rtl .dx-scheduler-work-space-month .dx-scheduler-date-table-cell:first-child
@@ -2809,7 +2819,6 @@
 .dx-rtl .dx-scheduler-work-space-both-scrollbar .dx-scheduler-date-table-row .dx-scheduler-date-table-cell:first-child, .dx-rtl .dx-scheduler-work-space-both-scrollbar .dx-scheduler-header-row .dx-scheduler-header-panel-cell:first-child, .dx-rtl .dx-scheduler-work-space-both-scrollbar .dx-scheduler-all-day-table-row .dx-scheduler-all-day-table-cell:first-child
 {
   border-right: none;
-  border-left: 1px solid rgba(255,255,255,.3);
 }
 .dx-rtl .dx-scheduler-timeline.dx-scheduler-work-space-grouped .dx-scheduler-sidebar-scrollable
 {
@@ -2844,7 +2853,6 @@
 }
 .dx-rtl .dx-scheduler-work-space-grouped:not(.dx-scheduler-work-space-all-day) .dx-scheduler-header-scrollable
 {
-  margin-right: 100px;
   margin-left: 0;
 }
 .dx-scheduler-small .dx-rtl .dx-scheduler-work-space-grouped:not(.dx-scheduler-work-space-all-day) .dx-scheduler-header-scrollable
@@ -3483,6 +3491,14 @@
 .dx-icon-upload:before
 {
   content: "\f006 ";
+}
+.dx-icon-floppy
+{
+  font: 14px/1 DXIcons;
+}
+.dx-icon-floppy:before
+{
+  content: "\f073 ";
 }
 .dx-icon-arrowleft
 {
@@ -5714,6 +5730,23 @@
 {
   position: absolute;
 }
+.dx-overlay-wrapper
+{
+  color: #fff;
+  font-size: 11pt;
+  font-weight: 300;
+  font-family: Segoe UI,Helvetica,Arial,sans-serif;
+  line-height: 1.3636;
+}
+.dx-overlay-wrapper a
+{
+  text-decoration: underline;
+  color: #bb1000;
+}
+.dx-overlay-wrapper img
+{
+  border-style: none;
+}
 .dx-toast-content
 {
   padding-bottom: 15px;
@@ -6494,7 +6527,7 @@
 }
 .dx-lookup-popup-wrapper .dx-list
 {
-  padding-top: 40px;
+  padding-top: 30px;
   margin-left: 8px;
   margin-right: 8px;
 }
@@ -6513,10 +6546,11 @@
 }
 .dx-lookup-search-wrapper
 {
-  position: absolute;
   width: auto;
-  left: 18px;
-  right: 18px;
+}
+.dx-lookup-search-wrapper .dx-list
+{
+  height: calc(100%);
 }
 .dx-lookup-search-wrapper .dx-texteditor-container
 {
@@ -6588,6 +6622,10 @@
   margin-right: -10px;
   margin-left: 0;
 }
+.dx-popup-content
+{
+  padding: 0;
+}
 .dx-popup-content.dx-lookup-invalid
 {
   padding-top: 0;
@@ -6596,25 +6634,9 @@
 {
   display: inline-block;
 }
-.dx-popup-content.dx-lookup-invalid .dx-lookup-search-wrapper
-{
-  top: 118px;
-}
-.dx-popup-content.dx-lookup-invalid .dx-list
-{
-  top: 38px;
-}
 .dx-popup-title+.dx-popup-content.dx-lookup-invalid
 {
-  padding-top: 40px;
-}
-.dx-popup-title+.dx-popup-content.dx-lookup-invalid .dx-list
-{
-  top: 78px;
-}
-.dx-lookup-popup-search .dx-popup-content.dx-lookup-invalid .dx-list
-{
-  top: 90px;
+  padding-top: 30px;
 }
 .dx-actionsheet-popup-wrapper .dx-popup-content .dx-button, .dx-actionsheet-popover-wrapper .dx-popup-content .dx-button
 {
@@ -7470,7 +7492,7 @@
 {
   border-bottom: 1px solid #c7c7c7;
 }
-.dx-datagrid.dx-datagrid-borders>.dx-datagrid-pager, .dx-datagrid.dx-datagrid-borders>.dx-datagrid-headers, .dx-datagrid.dx-datagrid-borders>.dx-datagrid-rowsview
+.dx-datagrid.dx-datagrid-borders>.dx-datagrid-pager, .dx-datagrid.dx-datagrid-borders>.dx-datagrid-headers
 {
   border-top: 1px solid #c7c7c7;
 }
@@ -7771,14 +7793,10 @@
   -moz-box-shadow: 0 1px 3px rgba(0,0,0,.2);
   box-shadow: 0 1px 3px rgba(0,0,0,.2);
 }
-.dx-datagrid-column-chooser .dx-overlay-content .dx-popup-title
-{
-  margin-top: 0;
-  margin-bottom: 21px;
-}
 .dx-datagrid-column-chooser .dx-overlay-content .dx-popup-content
 {
   margin: 0;
+  padding-top: 20px;
 }
 .dx-datagrid-column-chooser .dx-overlay-content .dx-popup-content .dx-column-chooser-item
 {

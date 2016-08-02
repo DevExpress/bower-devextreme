@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme
-* Version: 16.1.4
-* Build date: Jun 22, 2016
+* Version: 16.1.5
+* Build date: Jul 25, 2016
 *
 * Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -1819,19 +1819,22 @@
   text-align: left;
   cursor: text;
   pointer-events: none;
-  display: table;
 }
 .dx-placeholder:before
 {
-  position: relative;
-  display: table-cell;
+  display: inline-block;
   vertical-align: middle;
   overflow: hidden;
-  width: auto;
-  height: auto;
   content: attr(DATA-DX_PLACEHOLDER);
   pointer-events: none;
   white-space: nowrap;
+}
+.dx-placeholder:after
+{
+  content: ' ';
+  display: inline-block;
+  height: 100%;
+  vertical-align: middle;
 }
 .dx-texteditor-container
 {
@@ -2628,6 +2631,10 @@
 .dx-toolbar-before, .dx-toolbar-after
 {
   position: absolute;
+}
+.dx-toolbar-center:empty
+{
+  display: none;
 }
 .dx-toolbar-before
 {
@@ -3477,7 +3484,6 @@
 }
 .dx-lookup-search-wrapper
 {
-  position: absolute;
   width: 100%;
 }
 .dx-popup-content .dx-lookup-validation-message
@@ -3759,11 +3765,11 @@
 }
 .dx-texteditor-container.dx-tag-container
 {
-  white-space: pre-line;
+  white-space: normal;
 }
 .dx-tagbox-single-line .dx-tag-container
 {
-  overflow: hidden;
+  overflow-x: hidden;
   white-space: nowrap;
   position: static;
 }
@@ -4589,10 +4595,6 @@
 {
   margin-top: 1px;
 }
-.dx-datagrid.dx-datagrid-borders>.dx-datagrid-headers .dx-row:last-child td
-{
-  border-bottom-width: 0;
-}
 .dx-datagrid.dx-datagrid-borders>.dx-datagrid-header-panel
 {
   border-bottom: 0;
@@ -4701,8 +4703,6 @@
 {
   border-bottom: none;
   font-size: 16px;
-  margin-top: 1px;
-  margin-bottom: 3px;
 }
 .dx-datagrid-column-chooser .dx-overlay-content .dx-popup-title .dx-toolbar-label
 {
@@ -5291,6 +5291,11 @@
   -ms-word-break: normal;
   word-break: normal;
 }
+.dx-command-adaptive
+{
+  width: 21px;
+  min-width: 21px;
+}
 .dx-datagrid-revert-tooltip.dx-popover-wrapper .dx-overlay-content
 {
   border: none;
@@ -5302,14 +5307,14 @@
 {
   padding: 0;
 }
-.dx-datagrid-revert-tooltip.dx-popover-wrapper .dx-overlay-content .dx-popup-content .dx-revert-button
-{
-  margin: 0;
-}
 .dx-datagrid-revert-tooltip.dx-popover-wrapper .dx-popover-arrow
 {
   width: 0;
   height: 0;
+}
+.dx-datagrid-revert-tooltip .dx-revert-button
+{
+  margin: 0;
 }
 .dx-datagrid-notouch-action
 {
@@ -5385,6 +5390,14 @@
   border-left: none;
   border-right: none;
 }
+.dx-rtl .dx-datagrid-headers, .dx-rtl .dx-datagrid-total-footer
+{
+  direction: ltr;
+}
+.dx-rtl .dx-datagrid-headers .dx-datagrid-table, .dx-rtl .dx-datagrid-total-footer .dx-datagrid-table
+{
+  direction: rtl;
+}
 .dx-rtl .dx-datagrid-filter-row .dx-editor-cell .dx-editor-with-menu .dx-texteditor .dx-texteditor-input, .dx-rtl .dx-datagrid-filter-row .dx-editor-cell .dx-editor-with-menu .dx-texteditor .dx-placeholder:before
 {
   padding-right: 32px;
@@ -5459,12 +5472,15 @@
 {
   cursor: default;
   width: 100%;
-  overflow: hidden;
   position: relative;
 }
 .dx-pivotgrid .dx-area-data-cell, .dx-pivotgrid .dx-area-column-cell
 {
   width: 100%;
+}
+.dx-pivotgrid.dx-overflow-hidden
+{
+  overflow: hidden;
 }
 .dx-pivotgrid table, .dx-pivotgrid tbody, .dx-pivotgrid tfoot, .dx-pivotgrid thead, .dx-pivotgrid tr, .dx-pivotgrid th, .dx-pivotgrid td
 {
@@ -5826,6 +5842,10 @@
   -moz-box-sizing: content-box;
   box-sizing: content-box;
 }
+.dx-calendar-cell
+{
+  white-space: normal;
+}
 .dx-calendar-contoured-date
 {
   outline-offset: -1px;
@@ -5860,6 +5880,10 @@
   overflow: visible;
   width: 100%;
   height: 100%;
+}
+.dx-multiview-item-container .dx-empty-message
+{
+  text-align: center;
 }
 .dx-multiview-item
 {
@@ -6388,6 +6412,10 @@
 {
   padding: 0;
   max-width: none;
+}
+.dx-scheduler-work-space-mouse-selection .dx-scheduler-fixed-appointments, .dx-scheduler-work-space-mouse-selection .dx-scheduler-scrollable-appointments
+{
+  pointer-events: none;
 }
 .dx-dropdownmenu-popup-wrapper .dx-scheduler-dropdown-appointment
 {

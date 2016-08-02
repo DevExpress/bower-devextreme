@@ -28,6 +28,11 @@
                 }, deactivate: function() {
                     this._navigationManager.off("navigationCanceled", this._navigationCanceledHandler);
                     return this.callBase.apply(this, arguments)
+                }, disable: function() {
+                    if (this.slideOut.option("menuVisible")) {
+                        this._toggleNavigation()
+                    }
+                    return this.callBase.apply(this, arguments)
                 }, _onNavigatingCanceled: function(args) {
                     if (this.slideOut.option("menuVisible") && args.cancelReason !== "redirect") {
                         this._toggleNavigation()

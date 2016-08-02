@@ -237,11 +237,14 @@
 
 .dx-theme-generic.dx-device-mobile .navbar-layout .layout-header .dx-toolbar {
     background: none;
-    padding: 10px;
 }
 
 .dx-theme-generic .navbar-layout .layout-header .dx-toolbar {
-    padding: 10px 0;
+    padding: 0 10px;
+}
+
+.dx-theme-generic .navbar-layout .layout-header .dx-toolbar-items-container {
+    height: 56px;
 }
 
 .dx-theme-generic .navbar-layout.has-navbar .layout-content {
