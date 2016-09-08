@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme
-* Version: 16.1.5
-* Build date: Jul 25, 2016
+* Version: 16.1.6
+* Build date: Sep 2, 2016
 *
 * Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -4811,6 +4811,11 @@
   display: table-cell !important;
   font-size: 0 !important;
 }
+input.dx-hidden
+{
+  display: inline-block !important;
+  width: 0 !important;
+}
 .dx-row>td
 {
   border: none;
@@ -5616,7 +5621,6 @@
   padding: 0;
   border: 0;
   outline: 0;
-  height: 100%;
 }
 .dx-menu-base .dx-menu-items-container
 {
@@ -5687,6 +5691,17 @@
 {
   position: relative;
 }
+.dx-menu-horizontal
+{
+  height: 100%;
+}
+.dx-menu-horizontal:before
+{
+  height: 100%;
+  display: inline-block;
+  content: '';
+  vertical-align: middle;
+}
 .dx-menu-horizontal .dx-menu-item-wrapper
 {
   display: inline-block;
@@ -5695,6 +5710,17 @@
 {
   display: inline-block;
   margin: 0 15px 0 0;
+}
+.dx-menu-vertical
+{
+  height: 100%;
+}
+.dx-menu-vertical:before
+{
+  height: 100%;
+  display: inline-block;
+  content: '';
+  vertical-align: middle;
 }
 .dx-menu-vertical .dx-menu-item-wrapper
 {
@@ -5979,10 +6005,8 @@
   -moz-background-size: 24px 24px;
   background-size: 24px 24px;
 }
-.dx-treeview .dx-treeview-item .dx-treeview-item-content::before
+.dx-treeview .dx-treeview-item .dx-treeview-item-content span
 {
-  display: inline-block;
-  height: 100%;
   vertical-align: middle;
 }
 .dx-treeview .dx-treeview-item.dx-state-disabled
@@ -6506,13 +6530,13 @@
   padding-left: 0;
   padding-right: 0;
 }
-.dx-layout-manager.dx-layout-manager-one-col .dx-field-item.dx-first-row
-{
-  padding-top: 10px;
-}
-.dx-layout-manager.dx-layout-manager-one-col .dx-field-item.dx-first-row.dx-first-col:first-child
+.dx-layout-manager.dx-layout-manager-one-col .dx-form-group .dx-first-row.dx-col-0.dx-field-item
 {
   padding-top: 0;
+}
+.dx-layout-manager.dx-layout-manager-one-col .dx-box-item:not(:first-child) .dx-field-item
+{
+  padding-top: 10px;
 }
 .dx-layout-manager .dx-label-h-align.dx-flex-layout
 {

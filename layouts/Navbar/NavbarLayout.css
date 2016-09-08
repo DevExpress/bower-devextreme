@@ -94,13 +94,16 @@
 }
 
 .dx-theme-android5 .navbar-layout .layout-footer {
-    bottom: 0;
     height: 56px;
-    display: none;
+    bottom: -9999px;
+    left: -9999px;
+    visibility: hidden;
 }
 
 .dx-theme-android5 .navbar-layout.has-toolbar .layout-footer {
-    display: block;
+    bottom: 0;
+    left: 0;
+    visibility: visible;
 }
 
 /* win8 */
