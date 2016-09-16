@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Visualization Core Library)
-* Version: 15.2.11
-* Build date: Jun 22, 2016
+* Version: 15.2.12
+* Build date: Aug 29, 2016
 *
 * Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -1158,15 +1158,13 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
         DX.viz.WrapperLayoutElement = WrapperLayoutElement
     })(jQuery, DevExpress);
     /*! Module viz-core, file themes.js */
-    (function(DX, $, undefined) {
+    (function(DX, undefined) {
         var viz = DX.viz,
             vizUtils = viz.utils,
             wrapDeprecate = vizUtils.wrapDeprecate,
             themes = {},
             themesMapping = {},
             themesSchemeMapping = {},
-            _extend = $.extend,
-            _each = $.each,
             _normalizeEnum = vizUtils.normalizeEnum,
             currentThemeName = null,
             nextCacheUid = 0,
@@ -1210,7 +1208,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
             var themeName = _normalizeEnum(theme && theme.name);
             if (themeName) {
                 registerThemeName(themeName, themeName);
-                themes[themeName] = _extend(true, {}, findTheme(baseThemeName), patchTheme(theme))
+                themes[themeName] = extend(extend({}, findTheme(baseThemeName)), patchTheme(theme))
             }
         }
         function registerThemeAlias(alias, theme) {
@@ -1227,10 +1225,10 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
         function mergeObject(target, field, source, sourceValue) {
             var _value = source ? source[field] : sourceValue;
             if (_value !== undefined)
-                target[field] = _extend(true, {}, _value, target[field])
+                target[field] = extend(extend({}, _value), target[field])
         }
         function patchTheme(theme) {
-            theme = _extend(true, {
+            theme = extend({
                 loadingIndicator: {font: {}},
                 legend: {
                     font: {},
@@ -1276,20 +1274,20 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
             mergeScalar(theme.legend.font, "color", null, theme.secondaryTitleColor);
             mergeScalar(theme.legend.border, "color", null, theme.axisColor);
             patchAxes(theme);
-            _each(["chart", "pie", "polar", "gauge", "barGauge", "map", "rangeSelector", "sparkline", "bullet"], function(_, section) {
+            forEach(["chart", "pie", "polar", "gauge", "barGauge", "map", "rangeSelector", "sparkline", "bullet"], function(section) {
                 mergeScalar(theme[section], "redrawOnResize", theme);
                 mergeScalar(theme[section], "containerBackgroundColor", null, theme.backgroundColor);
                 mergeObject(theme[section], "tooltip", theme)
             });
-            _each(["chart", "pie", "polar", "gauge", "barGauge", "map", "rangeSelector"], function(_, section) {
+            forEach(["chart", "pie", "polar", "gauge", "barGauge", "map", "rangeSelector"], function(section) {
                 mergeObject(theme[section], "loadingIndicator", theme);
                 mergeObject(theme[section], "legend", theme);
                 mergeObject(theme[section], "title", theme)
             });
-            _each(["chart", "pie", "polar"], function(_, section) {
+            forEach(["chart", "pie", "polar"], function(section) {
                 mergeObject(theme, section, null, theme["chart:common"])
             });
-            _each(["chart", "polar"], function(_, section) {
+            forEach(["chart", "polar"], function(section) {
                 theme[section] = theme[section] || {};
                 mergeObject(theme[section], "commonAxisSettings", null, theme["chart:common:axis"])
             });
@@ -1302,7 +1300,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
         function patchAxes(theme) {
             var commonAxisSettings = theme["chart:common:axis"],
                 colorFieldName = "color";
-            _each([commonAxisSettings, commonAxisSettings.grid, commonAxisSettings.minorGrid, commonAxisSettings.tick, commonAxisSettings.minorTick], function(_, obj) {
+            forEach([commonAxisSettings, commonAxisSettings.grid, commonAxisSettings.minorGrid, commonAxisSettings.tick, commonAxisSettings.minorTick], function(obj) {
                 mergeScalar(obj, colorFieldName, null, theme.axisColor)
             });
             mergeScalar(commonAxisSettings.title.font, colorFieldName, null, theme.secondaryTitleColor);
@@ -1316,10 +1314,10 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
         }
         function patchMapLayers(theme) {
             var map = theme.map;
-            _each(["area", "line", "marker"], function(_, section) {
+            forEach(["area", "line", "marker"], function(section) {
                 mergeObject(map, "layer:" + section, null, map.layer)
             });
-            _each(["dot", "bubble", "pie", "image"], function(_, section) {
+            forEach(["dot", "bubble", "pie", "image"], function(section) {
                 mergeObject(map, "layer:marker:" + section, null, map["layer:marker"])
             })
         }
@@ -1332,33 +1330,54 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
             delete widgetsCache[target._cache]
         }
         function refreshAll() {
-            _each(widgetsCache, function() {
-                this.refresh()
-            });
+            for (var key in widgetsCache)
+                if (widgetsCache.hasOwnProperty(key))
+                    widgetsCache[key].refresh();
             return this
         }
+        function extend(dst, src) {
+            for (var property in src)
+                if (typeof src[property] === "object" && src[property] !== null)
+                    if (src[property] instanceof Array)
+                        dst[property] = src[property].slice();
+                    else if (!dst[property] || typeof dst[property] !== "object" || dst[property] instanceof Array)
+                        dst[property] = extend({}, src[property]);
+                    else
+                        dst[property] = extend(dst[property], src[property]);
+                else
+                    dst[property] = src[property];
+            return dst
+        }
+        var forEach = function() {
+                if (!Array.prototype.forEach)
+                    return function(array, callback) {
+                            var i = 0;
+                            for (; i < array.length; i++)
+                                callback(array[i], i, array)
+                        };
+                else
+                    return function(array, callback) {
+                            array.forEach(callback)
+                        }
+            }();
         wrapDeprecate("currentTheme", currentTheme);
         wrapDeprecate("registerTheme", registerTheme);
-        _extend(viz, {
-            currentTheme: currentTheme,
-            registerTheme: registerTheme,
-            findTheme: findTheme,
-            registerThemeAlias: registerThemeAlias,
-            registerThemeSchemeAlias: registerThemeSchemeAlias,
-            refreshAll: refreshAll,
-            addCacheItem: addCacheItem,
-            removeCacheItem: removeCacheItem
-        });
-        _extend(viz, {
-            themes: themes,
-            themesMapping: themesMapping,
-            themesSchemeMapping: themesSchemeMapping,
-            widgetsCache: widgetsCache,
-            resetCurrentTheme: function() {
-                currentThemeName = null
-            }
-        })
-    })(DevExpress, jQuery);
+        viz.currentTheme = currentTheme;
+        viz.registerTheme = registerTheme;
+        viz.findTheme = findTheme;
+        viz.registerThemeAlias = registerThemeAlias;
+        viz.registerThemeSchemeAlias = registerThemeSchemeAlias;
+        viz.refreshAll = refreshAll;
+        viz.addCacheItem = addCacheItem;
+        viz.removeCacheItem = removeCacheItem;
+        viz.themes = themes;
+        viz.themesMapping = themesMapping;
+        viz.themesSchemeMapping = themesSchemeMapping;
+        viz.widgetsCache = widgetsCache;
+        viz.resetCurrentTheme = function() {
+            currentThemeName = null
+        }
+    })(DevExpress);
     /*! Module viz-core, file palette.js */
     (function(DX, $, undefined) {
         var viz = DX.viz,
@@ -2739,11 +2758,10 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                         itemsAlignment: options.itemsAlignment,
                         orientation: options.orientation
                     },
-                    width = that._size.width - 2 * options.paddingLeftRight,
-                    height = that._size.height - 2 * options.paddingTopBottom;
+                    width = that._size.width - (that._background ? 2 * options.paddingLeftRight : 0),
+                    height = that._size.height - (that._background ? 2 * options.paddingTopBottom : 0);
                 if (orientation === HORIZONTAL) {
                     layoutOptions.length = width;
-                    layoutOptions.ortLength = height;
                     layoutOptions.spacing = options.columnItemSpacing;
                     layoutOptions.direction = "x";
                     layoutOptions.measure = WIDTH;
@@ -2761,7 +2779,6 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                 }
                 else {
                     layoutOptions.length = height;
-                    layoutOptions.ortLength = width;
                     layoutOptions.spacing = options.rowItemSpacing;
                     layoutOptions.direction = "y";
                     layoutOptions.measure = HEIGHT;
@@ -2914,11 +2931,11 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
             commonUtils = DX.require("/utils/utils.common"),
             _isDefined = commonUtils.isDefined,
             _isDate = commonUtils.isDate,
+            unique = viz.utils.unique,
             minSelector = "min",
             maxSelector = "max",
             minVisibleSelector = "minVisible",
             maxVisibleSelector = "maxVisible",
-            categoriesSelector = "categories",
             baseSelector = "base",
             axisTypeSelector = "axisType",
             _Range;
@@ -2937,41 +2954,15 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
             else if (otherValueDefined)
                 setValue(otherValue)
         }
-        function returnValue(value) {
-            return value
-        }
-        function returnValueOf(value) {
-            return value.valueOf()
-        }
-        function getUniqueCategories(categories, otherCategories, dataType) {
-            var length = categories.length,
-                found,
-                i,
-                j,
-                valueOf = dataType === "datetime" ? returnValueOf : returnValue;
-            if (otherCategories && otherCategories.length)
-                for (i = 0; i < otherCategories.length; i++) {
-                    for (j = 0, found = false; j < length; j++)
-                        if (valueOf(categories[j]) === valueOf(otherCategories[i])) {
-                            found = true;
-                            break
-                        }
-                    !found && categories.push(otherCategories[i])
-                }
-            return categories
-        }
         _Range = viz.Range = function(range) {
             range && $.extend(this, range)
         };
         _Range.prototype = {
             constructor: _Range,
-            dispose: function() {
-                this[categoriesSelector] = null
-            },
             addRange: function(otherRange) {
                 var that = this,
-                    categories = that[categoriesSelector],
-                    otherCategories = otherRange[categoriesSelector];
+                    categories = that.categories,
+                    otherCategories = otherRange.categories;
                 var compareAndReplaceByField = function(field, compare) {
                         compareAndReplace(that[field], otherRange[field], function(value) {
                             that[field] = value
@@ -3014,13 +3005,13 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                 controlValuesByVisibleBounds(maxSelector, maxVisibleSelector, otherGreaterThan);
                 controlValuesByVisibleBounds(maxSelector, minVisibleSelector, otherGreaterThan);
                 if (categories === undefined)
-                    that[categoriesSelector] = otherCategories;
+                    that.categories = otherCategories;
                 else
-                    that[categoriesSelector] = getUniqueCategories(categories, otherCategories, that.dataType);
-                return this
+                    that.categories = otherCategories ? unique(categories.concat(otherCategories)) : categories;
+                return that
             },
             isDefined: function() {
-                return _isDefined(this[minSelector]) && _isDefined(this[maxSelector]) || this[categoriesSelector] && this[categoriesSelector].length
+                return _isDefined(this[minSelector]) && _isDefined(this[maxSelector]) || this.categories && this.categories.length
             },
             setStubData: function(dataType) {
                 var that = this,
@@ -3297,11 +3288,10 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                 var that = this;
                 that._items = null;
                 if (that._ds) {
-                    if (that._isShared)
-                        that._ds.off({
-                            changed: that._callback,
-                            loadError: that._callback
-                        });
+                    if (that._isShared) {
+                        that._ds.off("changed", that._callback);
+                        that._ds.off("loadError", that._callback)
+                    }
                     else
                         that._ds.dispose();
                     that._ds = null;
@@ -3816,7 +3806,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                     hasVerticalOverlapping,
                     result;
                 if (rotationAngle !== 0)
-                    result = that._getDistanceByAngle(bBox1.height, rotationAngle) <= _abs(bBox2.x - bBox1.x);
+                    result = that._getDistanceByAngle(bBox1, rotationAngle) <= _abs(bBox2.x - bBox1.x);
                 else {
                     hasHorizontalOverlapping = !horizontalInverted ? bBox1.x + bBox1.width > bBox2.x : bBox2.x + bBox2.width > bBox1.x;
                     hasVerticalOverlapping = !verticalInverted ? bBox1.y + bBox1.height > bBox2.y : bBox2.y + bBox2.height > bBox1.y;
@@ -3958,15 +3948,19 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                 overlappingBehavior.mode = mode;
                 overlappingBehavior.rotationAngle = rotationAngle
             },
-            _getDistanceByAngle: function(elementHeight, rotationAngle) {
-                return elementHeight / _abs(_math.sin(rotationAngle * (_math.PI / 180)))
+            _getDistanceByAngle: function(bBox, rotationAngle) {
+                var a = rotationAngle * (_math.PI / 180);
+                if (a >= _atan(bBox.height / bBox.width))
+                    return bBox.height / _abs(_math.sin(a));
+                else
+                    return bBox.width
             },
             _getTicksSize: function() {
                 var bBox = this.getMaxLabelParams(this._ticks),
                     options = this._options,
                     rotationAngle = options.overlappingBehavior ? options.overlappingBehavior.rotationAngle : 0,
                     isRotate = _isNumber(rotationAngle) && rotationAngle !== 0;
-                return _ceil(isRotate ? this._getDistanceByAngle(bBox.height, rotationAngle) : options.isHorizontal ? bBox.width : bBox.height)
+                return _ceil(isRotate ? this._getDistanceByAngle(bBox, rotationAngle) : options.isHorizontal ? bBox.width : bBox.height)
             }
         })
     })(jQuery, DevExpress);
@@ -4678,12 +4672,13 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                         return;
                     that._title = that._renderer.text(titleOptions.text, 0, 0).css(viz.utils.patchFontOptions(titleOptions.font)).attr(attr).append(that._axisTitleGroup)
                 },
-                _drawDateMarker: function(dateMarker, options) {
+                _drawDateMarker: function(date, options) {
                     var that = this,
                         markerOptions = that._options.marker,
                         labelPosX,
                         labelPosY,
                         textElement,
+                        text,
                         textSize,
                         textIndent,
                         pathElement;
@@ -4696,7 +4691,8 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                             "stroke-opacity": markerOptions.opacity,
                             sharp: "h"
                         }).append(that._axisElementsGroup);
-                    textElement = that._renderer.text(String(constants.formatLabel(dateMarker, options.labelFormat)), 0, 0).attr({align: "left"}).css(viz.utils.patchFontOptions(markerOptions.label.font)).append(that._axisElementsGroup);
+                    text = String(constants.formatLabel(date, options.labelFormat));
+                    textElement = that._renderer.text(text, 0, 0).attr({align: "left"}).css(viz.utils.patchFontOptions(markerOptions.label.font)).append(that._axisElementsGroup);
                     textSize = textElement.getBBox();
                     textIndent = markerOptions.width + markerOptions.textLeftIndent;
                     labelPosX = this._translator.getBusinessRange().invert ? options.x - textIndent - textSize.width : options.x + textIndent;
@@ -4705,17 +4701,20 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                     return {
                             labelStartPosX: labelPosX,
                             labelEndPosX: labelPosX + textSize.width,
-                            path: pathElement,
-                            text: textElement,
-                            date: dateMarker,
-                            dateMarkerStartPosX: options.x
+                            date: date,
+                            dateMarkerStartPosX: options.x,
+                            setTitle: function() {
+                                this.title = text
+                            },
+                            dispose: function(onlyLabel) {
+                                if (!onlyLabel && pathElement) {
+                                    pathElement.dispose();
+                                    pathElement = null
+                                }
+                                textElement.dispose();
+                                textElement = null
+                            }
                         }
-                },
-                _disposeDateMarker: function(marker) {
-                    marker.path && marker.path.dispose();
-                    marker.path = null;
-                    marker.text.dispose();
-                    marker.text = null
                 },
                 _getDiff: function(currentValue, previousValue) {
                     var datesDifferences = dateUtils.getDatesDifferences(previousValue, currentValue);
@@ -4732,6 +4731,9 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                         dateMarkers = [],
                         prevDateMarker,
                         markersAreaTop,
+                        tr = that._translator,
+                        invert = tr.getBusinessRange().invert,
+                        xBound = tr.translateSpecialCase("canvas_position_end"),
                         dateMarker,
                         markerDate,
                         diff,
@@ -4748,28 +4750,36 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                         if (diff.count > 0) {
                             markerDate = getMarkerDate(ticks[i].value, that._dateUnitInterval);
                             dateMarker = that._drawDateMarker(markerDate, {
-                                x: that._translator.translate(markerDate),
+                                x: tr.translate(markerDate),
                                 y: markersAreaTop,
                                 labelFormat: that._getLabelFormatOptions(formatHelper.getDateFormatByDifferences(diff))
                             });
                             if (dateMarker)
-                                if (that._checkMarkersPosition(dateMarker, prevDateMarker)) {
+                                if (invert ? dateMarker.labelStartPosX < xBound : dateMarker.labelEndPosX > xBound) {
+                                    dateMarkers.push(dateMarker);
+                                    dateMarker.dispose(true);
+                                    dateMarker.setTitle()
+                                }
+                                else if (that._checkMarkersPosition(dateMarker, prevDateMarker)) {
                                     dateMarkers.push(dateMarker);
                                     prevDateMarker = dateMarker
                                 }
                                 else
-                                    that._disposeDateMarker(dateMarker)
+                                    dateMarker.dispose()
                         }
                     }
                     if (dateMarkers.length) {
                         dateMarker = that._drawDateMarker(ticks[0].value, {
-                            x: that._translator.translate(ticks[0].value),
+                            x: tr.translate(ticks[0].value),
                             y: markersAreaTop,
                             labelFormat: that._getLabelFormatOptions(formatHelper.getDateFormatByDifferences(that._getDiff(ticks[0].value, dateMarkers[0].date))),
                             withoutStick: true
                         });
                         if (dateMarker) {
-                            !that._checkMarkersPosition(dateMarker, dateMarkers[0]) && that._disposeDateMarker(dateMarker);
+                            if (!that._checkMarkersPosition(dateMarker, dateMarkers[0])) {
+                                dateMarker.dispose();
+                                dateMarker.setTitle()
+                            }
                             dateMarkers.unshift(dateMarker)
                         }
                     }
@@ -4805,6 +4815,8 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                             startValue: currentMarker.date,
                             endValue: nextMarker.date
                         });
+                        if (currentMarker.title)
+                            markerTracker.setTitle(currentMarker.title);
                         that._markerTrackers.push(markerTracker)
                     }
                 },
@@ -6766,6 +6778,15 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                         return "DevExpress_" + numDefsSvgElements++
                     }
             }();
+        var removeExtraAttrs = rendererNS.removeExtraAttrs = function(html) {
+                var findTagAttrs = /(?:<[a-z0-9])+(?:[\s\S]*?>)/gi,
+                    findStyleAttrWithValue = /(\S*\s*)=\s*(["'])(?:(?!\2).)*\2\s?/gi;
+                return html.replace(findTagAttrs, function(allTagAttrs) {
+                        return allTagAttrs.replace(findStyleAttrWithValue, function(currentAttr, attrName) {
+                                return attrName.toLowerCase() === "style" ? currentAttr : ""
+                            })
+                    })
+            };
         function isObjectArgument(value) {
             return value && typeof value !== "string"
         }
@@ -6816,6 +6837,12 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
             result.isEmpty = !result.x && !result.y && !result.width && !result.height;
             return result
         }
+        function roundValue(value, exp) {
+            value = value.toString().split('e');
+            value = mathRound(+(value[0] + 'e' + (value[1] ? +value[1] + exp : exp)));
+            value = value.toString().split('e');
+            return +(value[0] + 'e' + (value[1] ? +value[1] - exp : -exp))
+        }
         var preserveAspectRatioMap = {
                 full: NONE,
                 lefttop: "xMinYMin",
@@ -6830,9 +6857,10 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
             };
         rendererNS._normalizeArcParams = function(x, y, innerR, outerR, startAngle, endAngle) {
             var isCircle,
-                noArc = true;
-            if (mathRound(startAngle) !== mathRound(endAngle)) {
-                if (mathAbs(endAngle - startAngle) % 360 === 0) {
+                noArc = true,
+                angleDiff = roundValue(endAngle, 3) - roundValue(startAngle, 3);
+            if (angleDiff) {
+                if (mathAbs(angleDiff) % 360 === 0) {
                     startAngle = 0;
                     endAngle = 360;
                     isCircle = true;
@@ -7407,14 +7435,18 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
             text.stroke && text.stroke.parentNode.removeChild(text.stroke)
         }
         function createTextNodes(wrapper, text, isStroked) {
-            var items;
+            var items,
+                parsedHtml;
             wrapper._texts = null;
             wrapper.clear();
             if (text === null)
                 return;
             text = "" + text;
-            if (!wrapper.renderer.encodeHtml && (text.indexOf("<") !== -1 || text.indexOf("&") !== -1))
-                items = parseHTML(text);
+            if (!wrapper.renderer.encodeHtml && (text.indexOf("<") !== -1 || text.indexOf("&") !== -1)) {
+                parsedHtml = removeExtraAttrs(text);
+                items = parseHTML(parsedHtml);
+                wrapper.DEBUG_parsedHtml = parsedHtml
+            }
             else if (text.indexOf("\n") !== -1)
                 items = parseMultiline(text);
             else if (isStroked)
@@ -8594,6 +8626,8 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                             value = isDefined(value) ? value.toString().replace(/\r/g, "") : "";
                             if (this.renderer.encodeHtml)
                                 value = value.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                            value = rendererNS.removeExtraAttrs(value);
+                            this.DEBUG_parsedHtml = value;
                             element.innerHTML = value.replace(/\n/g, "<br/>");
                             this.css({filter: ""});
                             this._bbox = null
@@ -9546,7 +9580,8 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                 };
             _each(series, function(_, singleSeries) {
                 var minBarSize = singleSeries.getOptions().minBarSize,
-                    minShownBusinessValue = minBarSize && translators.val.getMinBarSize(minBarSize),
+                    tr = singleSeries.axis ? translators.axesTrans[singleSeries.axis] : translators,
+                    minShownBusinessValue = minBarSize && tr.val.getMinBarSize(minBarSize),
                     stackName = singleSeries.getStackName();
                 _each(singleSeries.getPoints(), function(index, point) {
                     if (!point.hasValue())
@@ -9587,7 +9622,8 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
         function updateBarSeriesValues(translators) {
             _each(this.series, function(_, singleSeries) {
                 var minBarSize = singleSeries.getOptions().minBarSize,
-                    minShownBusinessValue = minBarSize && translators.val.getMinBarSize(minBarSize);
+                    tr = singleSeries.axis ? translators.axesTrans[singleSeries.axis] : translators,
+                    minShownBusinessValue = minBarSize && tr.val.getMinBarSize(minBarSize);
                 if (minShownBusinessValue)
                     _each(singleSeries.getPoints(), function(index, point) {
                         if (point.hasValue())
@@ -9737,7 +9773,6 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
     (function($, DX, undefined) {
         var viz = DX.viz,
             seriesNS = viz.series,
-            dateUtils = DevExpress.require("/utils/utils.date"),
             commonUtils = DX.require("/utils/utils.common"),
             _isDefined = commonUtils.isDefined,
             _map = viz.utils.map,
@@ -9853,18 +9888,6 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                     connector: connectorAttr,
                     rotationAngle: opt.rotationAngle
                 }
-        }
-        function isInInterval(argument, ticks, nowIndexTicks, ticksInterval) {
-            var minTick = ticks[nowIndexTicks],
-                maxTick = ticks[nowIndexTicks + 1],
-                sumMinTickTicksInterval;
-            ticksInterval = $.isNumeric(ticksInterval) ? ticksInterval : dateUtils.dateToMilliseconds(ticksInterval);
-            sumMinTickTicksInterval = commonUtils.isDate(minTick) ? new Date(minTick.getTime() + ticksInterval) : minTick + ticksInterval;
-            if (argument >= minTick && argument < sumMinTickTicksInterval)
-                return true;
-            if (argument < minTick || maxTick === undefined)
-                return false;
-            return "nextInterval"
         }
         function applyPointStyle(point, styleName) {
             !point.isSelected() && !point.hasSelectedView && point.applyStyle(styleName)
@@ -10004,27 +10027,6 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                 this._disposePoints(this._oldPoints);
                 this._oldPoints = points.splice(length, points.length)
             },
-            _getTicksForAggregation: function(min, max, screenDelta, pointSize) {
-                var types = {
-                        axisType: "continuous",
-                        dataType: commonUtils.isDate(min) ? "datetime" : "numeric"
-                    },
-                    data = {
-                        min: min,
-                        max: max,
-                        screenDelta: screenDelta
-                    },
-                    options = {
-                        gridSpacingFactor: pointSize,
-                        labelOptions: {},
-                        stick: true
-                    },
-                    tickManager = new viz.tickManager.TickManager(types, data, options);
-                return {
-                        ticks: tickManager.getTicks(true),
-                        tickInterval: tickManager.getTickInterval()
-                    }
-            },
             getErrorBarRangeCorrector: _noop,
             updateDataType: function(settings) {
                 var that = this;
@@ -10083,36 +10085,55 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
             resamplePoints: function(argTranslator, min, max) {
                 var that = this,
                     originalPoints = that.getAllPoints(),
-                    minI,
-                    maxI,
-                    sizePoint,
-                    tickObject,
-                    ticks,
+                    canvasLength = argTranslator.canvasLength,
+                    categories,
+                    sizePoint = that._getPointSize(),
+                    pointsLength = originalPoints.length,
+                    count,
+                    isDefinedMinMax = _isDefined(min) && _isDefined(max),
+                    discreteMin,
+                    discreteMax,
                     tickInterval;
-                if (originalPoints.length) {
-                    _each(originalPoints, function(i, point) {
-                        minI = point.argument - min <= 0 ? i : minI;
-                        if (!maxI)
-                            maxI = point.argument - max > 0 ? i : null
-                    });
-                    minI = minI ? minI : 1;
-                    maxI = _isDefined(maxI) ? maxI : originalPoints.length - 1;
-                    min = originalPoints[minI - 1].argument;
-                    max = originalPoints[maxI].argument;
-                    sizePoint = that._getPointSize();
-                    if (that.argumentAxisType !== DISCRETE && that.valueAxisType !== DISCRETE) {
-                        tickObject = that._getTicksForAggregation(min, max, argTranslator.canvasLength, sizePoint);
-                        ticks = tickObject.ticks;
-                        tickInterval = tickObject.tickInterval;
-                        if (ticks.length === 1) {
-                            that._points = originalPoints;
-                            return
+                if (pointsLength && pointsLength > 1) {
+                    count = canvasLength / sizePoint;
+                    count = count <= 1 ? 1 : count;
+                    if (that.argumentAxisType !== DISCRETE && that.valueAxisType !== DISCRETE)
+                        tickInterval = Math.abs(!isDefinedMinMax ? that._getDifMinMax(originalPoints) : min - max) / count;
+                    else {
+                        if (isDefinedMinMax) {
+                            if (that.argumentAxisType !== DISCRETE)
+                                originalPoints = _map(originalPoints, function(p) {
+                                    if (p.argument >= min && p.argument <= max)
+                                        return p;
+                                    return null
+                                });
+                            else {
+                                categories = argTranslator.getBusinessRange().categories;
+                                discreteMin = _inArray(min, categories);
+                                discreteMax = _inArray(max, categories);
+                                categories = categories.slice(discreteMin, discreteMax + 1);
+                                if (discreteMin !== -1 && discreteMax !== -1)
+                                    originalPoints = _map(originalPoints, function(p) {
+                                        if (_inArray(p.argument, categories) !== -1)
+                                            return p;
+                                        return null
+                                    })
+                            }
+                            pointsLength = originalPoints.length
                         }
+                        tickInterval = Math.ceil(pointsLength / count)
                     }
-                    else
-                        ticks = argTranslator.canvasLength / sizePoint;
-                    that._points = that._resample(ticks, tickInterval, argTranslator.getBusinessRange().categories, min, max)
+                    that._points = that._resample(tickInterval, min - tickInterval, max + tickInterval, isDefinedMinMax)
                 }
+            },
+            _getDifMinMax: function(originalPoints) {
+                var minArgumentPoint = originalPoints[0].argument,
+                    maxArgumentPoint = originalPoints[originalPoints.length - 1].argument;
+                _each(originalPoints, function(i, point) {
+                    minArgumentPoint = point.argument < minArgumentPoint ? point.argument : minArgumentPoint;
+                    maxArgumentPoint = point.argument > maxArgumentPoint ? point.argument : maxArgumentPoint
+                });
+                return maxArgumentPoint - minArgumentPoint
             },
             _removeOldSegments: function(startIndex) {
                 var that = this;
@@ -10422,64 +10443,51 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                         selectionStyle: {}
                     })
             },
-            _resample: function(ticks, ticksInterval, categories, min, max) {
+            _resample: function(ticksInterval, min, max, isDefinedMinMax) {
                 var that = this,
                     fusPoints = [],
-                    arrayFusPoints,
                     nowIndexTicks = 0,
                     lastPointIndex = 0,
-                    originalPoints = that.getAllPoints(),
-                    discreteMin = min !== undefined ? min : -Infinity,
-                    discreteMax = max !== undefined ? max : Infinity,
-                    isArgumentDiscrete = that.argumentAxisType === DISCRETE;
-                if (isArgumentDiscrete || that.valueAxisType === DISCRETE) {
-                    if (isArgumentDiscrete) {
-                        discreteMin = _inArray(min, categories);
-                        discreteMax = _inArray(max, categories);
-                        if (discreteMin === -1)
-                            discreteMin = 0;
-                        if (discreteMax === -1)
-                            discreteMax = categories.length - 1
-                    }
-                    originalPoints = _map(originalPoints, function(p) {
-                        var result = null,
-                            argument = isArgumentDiscrete ? _inArray(p.argument, categories) : p.argument;
-                        if (argument >= discreteMin && argument <= discreteMax)
-                            result = p;
+                    pointData,
+                    minTick,
+                    state = 0,
+                    originalPoints = that.getAllPoints();
+                function addFirstFusPoint(point) {
+                    fusPoints.push(point);
+                    minTick = point.argument;
+                    if (isDefinedMinMax)
+                        if (point.argument < min)
+                            state = 1;
+                        else if (point.argument > max)
+                            state = 2;
                         else
-                            p.setInvisibility();
-                        return result
-                    });
-                    ticksInterval = originalPoints.length / ticks;
-                    arrayFusPoints = _map(originalPoints, function(point, index) {
-                        if (Math.floor(nowIndexTicks) <= index) {
-                            nowIndexTicks += ticksInterval;
-                            return point
-                        }
-                        point.setInvisibility();
-                        return null
-                    });
-                    return arrayFusPoints
+                            state = 0
                 }
+                if (that.argumentAxisType === DISCRETE || that.valueAxisType === DISCRETE)
+                    return _map(originalPoints, function(point, index) {
+                            if (index % ticksInterval === 0)
+                                return point;
+                            point.setInvisibility();
+                            return null
+                        });
                 that._aggregatedPoints = that._aggregatedPoints || [];
                 _each(originalPoints, function(_, point) {
                     point.setInvisibility();
-                    switch (isInInterval(point.argument, ticks, nowIndexTicks, ticksInterval)) {
-                        case true:
-                            fusPoints.push(point);
-                            break;
-                        case"nextInterval":
-                            var pointData = that._fusionPoints(fusPoints, ticks[nowIndexTicks], nowIndexTicks);
-                            while (isInInterval(point.argument, ticks, nowIndexTicks, ticksInterval) === "nextInterval")
-                                nowIndexTicks++;
-                            fusPoints = [];
-                            isInInterval(point.argument, ticks, nowIndexTicks, ticksInterval) === true && fusPoints.push(point);
-                            if (that._createPoint(pointData, that._aggregatedPoints, lastPointIndex))
-                                lastPointIndex++
+                    if (!fusPoints.length)
+                        addFirstFusPoint(point);
+                    else if (!state && Math.abs(minTick - point.argument) < ticksInterval)
+                        fusPoints.push(point);
+                    else if (!(state === 1 && point.argument < min) && !(state === 2 && point.argument > max)) {
+                        pointData = that._fusionPoints(fusPoints, minTick, nowIndexTicks);
+                        nowIndexTicks++;
+                        if (that._createPoint(pointData, that._aggregatedPoints, lastPointIndex))
+                            lastPointIndex++;
+                        fusPoints = [];
+                        addFirstFusPoint(point)
                     }
                 });
                 if (fusPoints.length) {
-                    var pointData = that._fusionPoints(fusPoints, ticks[nowIndexTicks], nowIndexTicks);
+                    pointData = that._fusionPoints(fusPoints, minTick, nowIndexTicks);
                     if (that._createPoint(pointData, that._aggregatedPoints, lastPointIndex))
                         lastPointIndex++
                 }
@@ -10652,11 +10660,11 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                 data = series._rangeData[type],
                 minInterval = data.interval,
                 interval;
-            if (isDiscrete) {
+            if (isDiscrete && type === "val") {
                 data.categories = data.categories || [];
                 data.categories.push(value)
             }
-            else {
+            else if (!isDiscrete) {
                 _truncateValue(data, value);
                 if (type === "arg") {
                     interval = (_isDefined(prevValue) ? _abs(calcInterval ? calcInterval(value, prevValue) : value - prevValue) : interval) || minInterval;
@@ -10793,8 +10801,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
             data.arg.axisType = series.argumentAxisType;
             data.arg.dataType = series.argumentType;
             data.val.axisType = series.valueAxisType;
-            data.val.dataType = series.valueType;
-            data.val.isValueRange = true
+            data.val.dataType = series.valueType
         }
         function processTwoValues(series, point, prevPoint, highValueName, lowValueName) {
             var val = point[highValueName],
@@ -15865,49 +15872,9 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                     }
                 })
         }
-        function mergeSort(data, field) {
-            function merge_sort(array, low, high, field) {
-                if (low < high) {
-                    var mid = Math.floor((low + high) / 2);
-                    merge_sort(array, low, mid, field);
-                    merge_sort(array, mid + 1, high, field);
-                    merge(array, low, mid, high, field)
-                }
-            }
-            var n = data.length;
-            merge_sort(data, 0, n - 1, field);
-            return data
-        }
-        function merge(array, low, mid, high, field) {
-            var newArray = new Array(high - low + 1),
-                countL = low,
-                countR = mid + 1,
-                k,
-                i = 0;
-            while (countL <= mid && countR <= high) {
-                if (array[countL][field] <= array[countR][field] || !_isDefined(array[countR][field])) {
-                    newArray[i] = array[countL];
-                    countL++
-                }
-                else {
-                    newArray[i] = array[countR];
-                    countR++
-                }
-                i++
-            }
-            if (countL > mid)
-                for (k = countR; k <= high; k++, i++)
-                    newArray[i] = array[k];
-            else
-                for (k = countL; k <= mid; k++, i++)
-                    newArray[i] = array[k];
-            for (k = 0; k <= high - low; k++)
-                array[k + low] = newArray[k];
-            return array
-        }
         function processGroup(_, group) {
             group.valueType = group.valueAxisType = null;
-            _each(group, processSeries);
+            _each(group.series, processSeries);
             group.valueAxis && group.valueAxis.resetTypes(VALUE_TYPE)
         }
         function parseCategories(categories, parser) {
@@ -15918,16 +15885,16 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
             });
             return newArray
         }
-        function parseAxisCategories(groups, parsers) {
-            var argumentCategories = groups.argumentOptions && groups.argumentOptions.categories,
+        function parseAxisCategories(groupsData, parsers) {
+            var argumentCategories = groupsData.argumentOptions && groupsData.argumentOptions.categories,
                 valueParser = parsers[1];
-            _each(groups, function(_, valueGroup) {
+            _each(groupsData.groups, function(_, valueGroup) {
                 var categories = valueGroup.valueOptions && valueGroup.valueOptions.categories;
                 if (categories)
                     valueGroup.valueOptions.categories = parseCategories(categories, valueParser)
             });
             if (argumentCategories)
-                groups.argumentOptions.categories = parseCategories(argumentCategories, parsers[0])
+                groupsData.argumentOptions.categories = parseCategories(argumentCategories, parsers[0])
         }
         function processSeries(_, series) {
             series.updateDataType({})
@@ -15977,16 +15944,16 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                     return parseUnit
                 }
         }
-        function prepareParsers(groups, skipFields, incidentOccurred) {
-            var argumentParser = createParserUnit(groups.argumentType, groups.argumentAxisType, false, skipFields, incidentOccurred),
+        function prepareParsers(groupsData, skipFields, incidentOccurred) {
+            var argumentParser = createParserUnit(groupsData.argumentType, groupsData.argumentAxisType, false, skipFields, incidentOccurred),
                 sizeParser,
                 valueParser,
                 iep,
                 categoryParsers = [argumentParser],
                 cache = {},
                 list = [];
-            _each(groups, function(_, group) {
-                _each(group, function(_, series) {
+            _each(groupsData.groups, function(_, group) {
+                _each(group.series, function(_, series) {
                     iep = series.getOptions().ignoreEmptyPoints;
                     valueParser = createParserUnit(group.valueType, group.valueAxisType, iep, skipFields, incidentOccurred);
                     sizeParser = createParserUnit(NUMERIC, CONTINUOUS, iep, skipFields, incidentOccurred);
@@ -16004,7 +15971,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
             _each(cache, function(field, parser) {
                 list.push([field, parser])
             });
-            list.length && parseAxisCategories(groups, categoryParsers);
+            list.length && parseAxisCategories(groupsData, categoryParsers);
             return list
         }
         function getParsedCell(cell, parsers) {
@@ -16059,58 +16026,116 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
             groupingValues(data, others, valueField, mode === "smallValueThreshold" ? findIndexByThreshold(data, valueField, smallValuesGrouping.threshold) : smallValuesGrouping.topCount);
             others[valueField] && originalData.push(others)
         }
-        function groupData(data, groups) {
-            var isPie = groups[0] && groups[0][0] && (groups[0][0].type === "pie" || groups[0][0].type === "doughnut" || groups[0][0].type === "donut");
+        function groupPieData(data, groupsData) {
+            var firstSeries = groupsData.groups[0] && groupsData.groups[0].series[0],
+                isPie = firstSeries && (firstSeries.type === "pie" || firstSeries.type === "doughnut" || firstSeries.type === "donut");
             if (!isPie)
                 return;
-            _each(groups, function(_, group) {
-                _each(group, function(_, series) {
+            _each(groupsData.groups, function(_, group) {
+                _each(group.series, function(_, series) {
                     groupMinSlices(data, series.getArgumentField(), series.getValueFields()[0], series.getOptions().smallValuesGrouping)
                 })
             })
         }
-        function sort(data, groups, sortingMethod, userArgumentCategories) {
-            var hash = {},
-                argumentField = groups.length && groups[0].length && groups[0][0].getArgumentField();
-            if (_isFunction(sortingMethod))
-                data.sort(sortingMethod);
-            else if (userArgumentCategories.length) {
-                _each(userArgumentCategories, function(index, value) {
-                    hash[value] = index
-                });
-                data.sort(function sortCat(a, b) {
-                    a = a[argumentField];
-                    b = b[argumentField];
-                    return hash[a] - hash[b]
-                })
+        function addUniqueItemToCollection(item, collection, itemsHash) {
+            if (!itemsHash[item]) {
+                collection.push(item);
+                itemsHash[item] = true
             }
-            else if (sortingMethod === true && groups.argumentType !== STRING)
-                mergeSort(data, argumentField)
+        }
+        function getUniqueArgumentFields(groupsData) {
+            var uniqueArgumentFields = [],
+                hash = {};
+            _each(groupsData.groups, function(_, group) {
+                _each(group.series, function(__, series) {
+                    addUniqueItemToCollection(series.getArgumentField(), uniqueArgumentFields, hash)
+                })
+            });
+            return uniqueArgumentFields
+        }
+        function discreteDataProcessing(data, groupsData, userArgumentCategories, uniqueArgumentFields) {
+            var categories = groupsData.categories = $.extend([], userArgumentCategories),
+                hash = {};
+            categories.length && _each(categories, function(_, currentCategory) {
+                hash[currentCategory] = true
+            });
+            _each(uniqueArgumentFields, function(_, field) {
+                _each(data, function(_, item) {
+                    _isDefined(item[field]) && addUniqueItemToCollection(item[field], categories, hash)
+                })
+            })
+        }
+        function compareWithoutHash(argumentField) {
+            return function(a, b) {
+                    var cmpResult = a[argumentField] - b[argumentField];
+                    if (isNaN(cmpResult)) {
+                        if (!a[argumentField])
+                            return 1;
+                        if (!b[argumentField])
+                            return -1;
+                        return 0
+                    }
+                    return cmpResult
+                }
+        }
+        function sort(data, groupsData, sortingMethodOption, uniqueArgumentFields) {
+            var itemsHash = {},
+                dataByArguments = {},
+                getSortMethodByType = function(sortingByHash, hash) {
+                    return sortingByHash ? function(argumentField) {
+                            return function(a, b) {
+                                    return hash[a[argumentField]] - hash[b[argumentField]]
+                                }
+                        } : compareWithoutHash
+                },
+                getSortingMethod;
+            if (_isFunction(sortingMethodOption))
+                data.sort(sortingMethodOption);
+            else if (groupsData.categories) {
+                _each(groupsData.categories, function(index, value) {
+                    itemsHash[value] = index
+                });
+                getSortingMethod = getSortMethodByType(true, itemsHash)
+            }
+            else if (sortingMethodOption === true && groupsData.argumentType !== STRING)
+                getSortingMethod = getSortMethodByType(false, itemsHash);
+            _each(uniqueArgumentFields, function(_, argumentField) {
+                var sortMethod,
+                    currentDataItem;
+                if (getSortingMethod) {
+                    sortMethod = getSortingMethod(argumentField);
+                    currentDataItem = data.slice().sort(sortMethod)
+                }
+                else
+                    currentDataItem = data;
+                dataByArguments[argumentField] = currentDataItem
+            });
+            return dataByArguments
         }
         function checkValueTypeOfGroup(group, cell) {
-            _each(group, function(_, series) {
+            _each(group.series, function(_, series) {
                 _each(series.getValueFields(), function(_, field) {
                     group.valueType = getType(cell[field], group.valueType)
                 })
             });
             return group.valueType
         }
-        function checkArgumentTypeOfGroup(group, cell, groups) {
-            _each(group, function(_, series) {
-                groups.argumentType = getType(cell[series.getArgumentField()], groups.argumentType)
+        function checkArgumentTypeOfGroup(series, cell, groupsData) {
+            _each(series, function(_, currentCeries) {
+                groupsData.argumentType = getType(cell[currentCeries.getArgumentField()], groupsData.argumentType)
             });
-            return groups.argumentType
+            return groupsData.argumentType
         }
-        function checkType(data, groups, checkTypeForAllData) {
+        function checkType(data, groupsData, checkTypeForAllData) {
             var groupsWithUndefinedValueType = [],
                 groupsWithUndefinedArgumentType = [],
-                argumentTypeGroup = groups.argumentOptions && axisTypeParser(groups.argumentOptions.argumentType);
-            _each(groups, function(_, group) {
-                if (!group.length)
+                argumentTypeGroup = groupsData.argumentOptions && axisTypeParser(groupsData.argumentOptions.argumentType);
+            _each(groupsData.groups, function(_, group) {
+                if (!group.series.length)
                     return null;
                 var valueTypeGroup = group.valueOptions && axisTypeParser(group.valueOptions.valueType);
                 group.valueType = valueTypeGroup;
-                groups.argumentType = argumentTypeGroup;
+                groupsData.argumentType = argumentTypeGroup;
                 !valueTypeGroup && groupsWithUndefinedValueType.push(group);
                 !argumentTypeGroup && groupsWithUndefinedArgumentType.push(group)
             });
@@ -16122,26 +16147,26 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                         defineVal = checkValueTypeOfGroup(group, cell)
                     });
                     _each(groupsWithUndefinedArgumentType, function(_, group) {
-                        defineArg = checkArgumentTypeOfGroup(group, cell, groups)
+                        defineArg = checkArgumentTypeOfGroup(group.series, cell, groupsData)
                     });
                     if (!checkTypeForAllData && defineVal && defineArg)
                         return false
                 })
         }
-        function checkAxisType(groups, userArgumentCategories, incidentOccurred) {
-            var argumentOptions = groups.argumentOptions || {},
-                argumentAxisType = correctAxisType(groups.argumentType, argumentOptions.type, !!userArgumentCategories.length, incidentOccurred);
-            _each(groups, function(_, group) {
+        function checkAxisType(groupsData, userArgumentCategories, incidentOccurred) {
+            var argumentOptions = groupsData.argumentOptions || {},
+                argumentAxisType = correctAxisType(groupsData.argumentType, argumentOptions.type, !!userArgumentCategories.length, incidentOccurred);
+            _each(groupsData.groups, function(_, group) {
                 var valueOptions = group.valueOptions || {},
                     valueCategories = valueOptions.categories || [],
                     valueAxisType = correctAxisType(group.valueType, valueOptions.type, !!valueCategories.length, incidentOccurred);
-                _each(group, function(_, series) {
+                _each(group.series, function(_, series) {
                     var optionsSeries = {};
                     optionsSeries.argumentAxisType = argumentAxisType;
                     optionsSeries.valueAxisType = valueAxisType;
-                    groups.argumentAxisType = groups.argumentAxisType || optionsSeries.argumentAxisType;
+                    groupsData.argumentAxisType = groupsData.argumentAxisType || optionsSeries.argumentAxisType;
                     group.valueAxisType = group.valueAxisType || optionsSeries.valueAxisType;
-                    optionsSeries.argumentType = groups.argumentType;
+                    optionsSeries.argumentType = groupsData.argumentType;
                     optionsSeries.valueType = group.valueType;
                     optionsSeries.showZero = valueOptions.showZero;
                     series.updateDataType(optionsSeries)
@@ -16152,10 +16177,10 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                     group.valueAxis.validate(false)
                 }
             });
-            groups.argumentAxisType = groups.argumentAxisType || argumentAxisType;
-            if (groups.argumentAxes)
-                _each(groups.argumentAxes, function(_, axis) {
-                    axis.setTypes(groups.argumentAxisType, groups.argumentType, ARGUMENT_TYPE);
+            groupsData.argumentAxisType = groupsData.argumentAxisType || argumentAxisType;
+            if (groupsData.argumentAxes)
+                _each(groupsData.argumentAxes, function(_, axis) {
+                    axis.setTypes(groupsData.argumentAxisType, groupsData.argumentType, ARGUMENT_TYPE);
                     axis.validate(true)
                 })
         }
@@ -16178,30 +16203,36 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                 incidentOccurred("E2001");
             return data
         }
-        function validateData(data, groups, incidentOccurred, options) {
+        function validateData(data, groupsData, incidentOccurred, options) {
             var parsers,
                 skipFields = {},
-                userArgumentCategories = groups.argumentOptions && groups.argumentOptions.categories || [],
-                dataLength;
+                argumentOptions = groupsData.argumentOptions,
+                userArgumentCategories = argumentOptions && argumentOptions.categories || [],
+                dataLength,
+                categoriesInAxisType,
+                uniqueArgumentFields = getUniqueArgumentFields(groupsData),
+                dataByArgumentFields;
             data = verifyData(data, incidentOccurred);
-            groups.argumentType = groups.argumentAxisType = null;
-            _each(groups, processGroup);
-            if (groups.argumentAxes)
-                _each(groups.argumentAxes, resetAxisTypes);
-            checkType(data, groups, options.checkTypeForAllData);
-            checkAxisType(groups, userArgumentCategories, incidentOccurred);
+            groupsData.argumentType = groupsData.argumentAxisType = null;
+            _each(groupsData.groups, processGroup);
+            if (groupsData.argumentAxes)
+                _each(groupsData.argumentAxes, resetAxisTypes);
+            checkType(data, groupsData, options.checkTypeForAllData);
+            checkAxisType(groupsData, userArgumentCategories, incidentOccurred);
             if (options.convertToAxisDataType) {
-                parsers = prepareParsers(groups, skipFields, incidentOccurred);
+                parsers = prepareParsers(groupsData, skipFields, incidentOccurred);
                 data = parse(data, parsers)
             }
-            groupData(data, groups);
-            sort(data, groups, options.sortingMethod, userArgumentCategories);
+            groupPieData(data, groupsData);
+            categoriesInAxisType = argumentOptions && argumentOptions.categories || [];
+            groupsData.argumentAxisType === DISCRETE && discreteDataProcessing(data, groupsData, categoriesInAxisType, uniqueArgumentFields);
+            dataByArgumentFields = sort(data, groupsData, options.sortingMethod, uniqueArgumentFields);
             dataLength = data.length;
             _each(skipFields, function(field, fieldValue) {
                 if (fieldValue === dataLength)
                     incidentOccurred("W2002", [field])
             });
-            return data
+            return dataByArgumentFields
         }
         viz.validateData = validateData;
         viz.DEBUG_validateData_sort = sort

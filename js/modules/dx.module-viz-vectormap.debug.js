@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Vector Map)
-* Version: 15.2.11
-* Build date: Jun 22, 2016
+* Version: 15.2.12
+* Build date: Aug 29, 2016
 *
 * Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -2033,7 +2033,8 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
         })
     })(DevExpress, jQuery);
     /*! Module viz-vectormap, file dataExchanger.js */
-    (function(DX, undefined) {
+    (function(DX, $, undefined) {
+        var _Callbacks = $.Callbacks;
         function DataExchanger() {
             this._store = {}
         }
@@ -2045,28 +2046,28 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
             },
             _get: function(category, name) {
                 var store = this._store[category] || (this._store[category] = {});
-                return store[name] || (store[name] = {})
+                return store[name] || (store[name] = {callbacks: _Callbacks()})
             },
             set: function(category, name, data) {
                 var item = this._get(category, name);
                 item.data = data;
-                item.callback && item.callback(data);
+                item.callbacks.fire(data);
                 return this
             },
             bind: function(category, name, callback) {
                 var item = this._get(category, name);
-                item.callback = callback;
+                item.callbacks.add(callback);
                 item.data && callback(item.data);
                 return this
             },
-            unbind: function(category, name) {
+            unbind: function(category, name, callback) {
                 var item = this._get(category, name);
-                item.data = item.callback = null;
+                item.callbacks.remove(callback);
                 return this
             }
         };
         DX.viz.map.DataExchanger = DataExchanger
-    })(DevExpress);
+    })(DevExpress, jQuery);
     /*! Module viz-vectormap, file legend.js */
     (function(DX, $, undefined) {
         var viz = DX.viz,
@@ -2165,7 +2166,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_VECTORMAP) {
             },
             _unbindData: function() {
                 if (this._dataCategory)
-                    this._params.dataExchanger.unbind(this._dataCategory, this._dataName)
+                    this._params.dataExchanger.unbind(this._dataCategory, this._dataName, this._onDataChanged)
             },
             _bindData: function(arg) {
                 this._params.dataExchanger.bind(this._dataCategory = arg.category, this._dataName = arg.name, this._onDataChanged)

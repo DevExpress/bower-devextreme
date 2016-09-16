@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme
-* Version: 15.2.11
-* Build date: Jun 22, 2016
+* Version: 15.2.12
+* Build date: Aug 29, 2016
 *
 * Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -7920,6 +7920,11 @@
 {
   background-color: #303030;
 }
+.dx-editor-cell.dx-editor-inline-block .dx-highlight-outline::before
+{
+  padding-top: 7px;
+  padding-bottom: 7px;
+}
 .dx-datagrid-checkbox-size
 {
   line-height: normal;
@@ -8471,14 +8476,18 @@
 }
 .dx-datagrid-revert-tooltip .dx-overlay-content
 {
-  background-color: #303030;
+  background-color: transparent;
+  min-width: inherit;
 }
 .dx-datagrid-revert-tooltip .dx-revert-button
 {
-  width: 33px;
-  height: 33px;
+  margin: 0 1px;
   background-color: #ea4444;
   border-color: #ea4444;
+}
+.dx-datagrid-revert-tooltip .dx-revert-button>.dx-button-content
+{
+  padding: 6px;
 }
 .dx-datagrid-revert-tooltip .dx-revert-button.dx-state-hover, .dx-datagrid-revert-tooltip .dx-revert-button.dx-state-focused
 {

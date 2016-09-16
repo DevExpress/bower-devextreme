@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Range Selector)
-* Version: 15.2.11
-* Build date: Jun 22, 2016
+* Version: 15.2.12
+* Build date: Aug 29, 2016
 *
 * Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -17,6 +17,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_RANGESELECTOR) {
             commonUtils = DX.require("/utils/utils.common"),
             mathUtils = DX.require("/utils/utils.math"),
             dateUtils = DX.require("/utils/utils.date"),
+            dateToMilliseconds = dateUtils.dateToMilliseconds,
             viz = DX.viz,
             vizUtils = viz.utils,
             patchFontOptions = vizUtils.patchFontOptions,
@@ -44,6 +45,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_RANGESELECTOR) {
             OPTION_BACKGROUND = "background",
             LOGARITHMIC = "logarithmic",
             INVISIBLE_POS = -1000,
+            GRID_SPACING_FACTOR = 50,
             logarithmBase = 10;
         rangeSelector.utils = {
             trackerSettings: {
@@ -166,7 +168,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_RANGESELECTOR) {
         function updateTranslatorRangeInterval(translatorRange, scaleOptions) {
             var intervalX = scaleOptions.minorTickInterval || scaleOptions.tickInterval;
             if (scaleOptions.valueType === "datetime")
-                intervalX = dateUtils.dateToMilliseconds(intervalX);
+                intervalX = dateToMilliseconds(intervalX);
             translatorRange.addRange({interval: intervalX})
         }
         function checkLogarithmicOptions(options, defaultLogarithmBase, incidentOccured) {
@@ -243,13 +245,13 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_RANGESELECTOR) {
                 rangeForCategories;
             if (scaleOptions.type === DISCRETE) {
                 rangeForCategories = new viz.Range({
-                    categories: scaleOptions.categories || (!seriesDataSource && startValue && endValue ? [startValue, endValue] : undefined),
                     minVisible: startValue,
                     maxVisible: endValue
                 });
                 rangeForCategories.addRange(translatorRange);
                 translatorRange = rangeForCategories;
-                categories = rangeForCategories.categories || [];
+                categories = seriesDataSource ? seriesDataSource.argCategories : scaleOptions.categories || !seriesDataSource && startValue && endValue && [startValue, endValue];
+                categories = categories || [];
                 scaleOptions._categoriesInfo = categoriesInfo = vizUtils.getCategoriesInfo(categories, startValue || categories[0], endValue || categories[categories.length - 1])
             }
             if (_isDefined(startValue) && _isDefined(endValue)) {
@@ -276,6 +278,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_RANGESELECTOR) {
                     dataType: scaleOptions.valueType
                 });
             translatorRange.addRange({
+                categories: categories,
                 base: scaleOptions.logarithmBase,
                 axisType: scaleOptions.type
             });
@@ -295,21 +298,32 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_RANGESELECTOR) {
             textElement.remove();
             return textBBox
         }
-        function updateScaleOptions(scaleOptions, seriesDataSource, translatorRange, tickIntervalsInfo) {
+        function getDateMarkerVisibilityChecker(screenDelta) {
+            return function(isDateScale, isMarkerVisible, min, max, tickInterval) {
+                    if (isMarkerVisible && isDateScale)
+                        if (tickInterval.years || tickInterval.months >= 6 || screenDelta / GRID_SPACING_FACTOR < _ceil((max - min) / dateToMilliseconds("year")) + 1)
+                            isMarkerVisible = false;
+                    return isMarkerVisible
+                }
+        }
+        function updateScaleOptions(scaleOptions, seriesDataSource, translatorRange, tickIntervalsInfo, checkDateMarkerVisibility) {
             var bounds,
                 isEmptyInterval,
-                categoriesInfo = scaleOptions._categoriesInfo;
+                categoriesInfo = scaleOptions._categoriesInfo,
+                isDateTime = scaleOptions.valueType === DATETIME,
+                isDiscrete = scaleOptions.type === DISCRETE;
             if (seriesDataSource && !seriesDataSource.isEmpty() && !translatorRange.stubData) {
                 bounds = tickIntervalsInfo.bounds;
                 translatorRange.addRange(bounds);
                 scaleOptions.startValue = translatorRange.invert ? bounds.maxVisible : bounds.minVisible;
                 scaleOptions.endValue = translatorRange.invert ? bounds.minVisible : bounds.maxVisible
             }
+            scaleOptions.marker.visible = checkDateMarkerVisibility(isDateTime && !isDiscrete, scaleOptions.marker.visible, scaleOptions.startValue, scaleOptions.endValue, tickIntervalsInfo.tickInterval);
             if (categoriesInfo) {
                 scaleOptions.startValue = categoriesInfo.start;
                 scaleOptions.endValue = categoriesInfo.end
             }
-            if (scaleOptions.type !== DISCRETE)
+            if (!isDiscrete)
                 isEmptyInterval = _isDate(scaleOptions.startValue) && _isDate(scaleOptions.endValue) && scaleOptions.startValue.getTime() === scaleOptions.endValue.getTime() || scaleOptions.startValue === scaleOptions.endValue;
             scaleOptions.isEmpty = startEndNotDefined(scaleOptions.startValue, scaleOptions.endValue) || isEmptyInterval;
             if (scaleOptions.isEmpty)
@@ -317,8 +331,8 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_RANGESELECTOR) {
             else {
                 scaleOptions.minorTickInterval = tickIntervalsInfo.minorTickInterval;
                 scaleOptions.tickInterval = tickIntervalsInfo.tickInterval;
-                if (scaleOptions.valueType === DATETIME && !_isDefined(scaleOptions.label.format))
-                    if (scaleOptions.type === DISCRETE)
+                if (isDateTime && !_isDefined(scaleOptions.label.format))
+                    if (isDiscrete)
                         scaleOptions.label.format = formatHelper.getDateFormatByTicks(tickIntervalsInfo.ticks);
                     else if (!scaleOptions.marker.visible)
                         scaleOptions.label.format = formatHelper.getDateFormatByTickInterval(scaleOptions.startValue, scaleOptions.endValue, scaleOptions.tickInterval);
@@ -560,7 +574,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_RANGESELECTOR) {
                     chartThemeManager = seriesDataSource && seriesDataSource.isShowChart() && seriesDataSource.getThemeManager();
                 if (chartThemeManager)
                     checkLogarithmicOptions(chartOptions && chartOptions.valueAxis, chartThemeManager.getOptions("valueAxis").logarithmBase, that._incidentOccured);
-                updateScaleOptions(scaleOptions, seriesDataSource, argTranslatorRange, tickIntervalsInfo);
+                updateScaleOptions(scaleOptions, seriesDataSource, argTranslatorRange, tickIntervalsInfo, getDateMarkerVisibilityChecker(canvas.width));
                 updateTranslatorRangeInterval(argTranslatorRange, scaleOptions);
                 sliderMarkerOptions = that._prepareSliderMarkersOptions(scaleOptions, canvas.width, tickIntervalsInfo);
                 indents = calculateIndents(that._renderer, scaleOptions, sliderMarkerOptions, that.option("indent"));
@@ -583,9 +597,9 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_RANGESELECTOR) {
                     selectedRange = that.option(SELECTED_RANGE),
                     shutterOptions = that._getOption("shutter");
                 if (selectedRange) {
-                    if (!that._translator.isValid(selectedRange[START_VALUE]))
+                    if (_isDefined(selectedRange[START_VALUE]) && !that._translator.isValid(selectedRange[START_VALUE]))
                         that._incidentOccured("E2203", [START_VALUE]);
-                    if (!that._translator.isValid(selectedRange[END_VALUE]))
+                    if (_isDefined(selectedRange[END_VALUE]) && !that._translator.isValid(selectedRange[END_VALUE]))
                         that._incidentOccured("E2203", [END_VALUE])
                 }
                 shutterOptions.color = shutterOptions.color || that._getOption(CONTAINER_BACKGROUND_COLOR, true);
@@ -1787,7 +1801,6 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_RANGESELECTOR) {
                     particularSeriesOptions,
                     seriesTheme,
                     data,
-                    groupSeries,
                     parsedData,
                     chartThemeManager = that._themeManager,
                     hasSeriesTemplate = !!chartThemeManager.getOptions('seriesTemplate'),
@@ -1795,7 +1808,8 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_RANGESELECTOR) {
                     seriesValueType = options.chart.valueAxis && options.chart.valueAxis.valueType,
                     dataSourceField,
                     i,
-                    newSeries;
+                    newSeries,
+                    groupsData;
                 that.templateData = [];
                 if (options.dataSource && !allSeriesOptions) {
                     if (isArrayOfSimpleTypes(options.dataSource))
@@ -1822,17 +1836,22 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_RANGESELECTOR) {
                         setTemplateFields(data, that.templateData, newSeries)
                 }
                 data = hasSeriesTemplate ? that.templateData : data;
-                groupSeries = [series];
-                groupSeries.argumentOptions = {
-                    categories: options.categories,
-                    argumentType: options.valueType,
-                    type: options.axisType
-                };
-                groupSeries[0].valueOptions = {valueType: dataSourceField ? options.valueType : seriesValueType};
                 if (series.length) {
-                    parsedData = viz.validateData(data, groupSeries, options.incidentOccured, chartThemeManager.getOptions("dataPrepareSettings"));
+                    groupsData = {
+                        groups: [{
+                                series: series,
+                                valueOptions: {valueType: dataSourceField ? options.valueType : seriesValueType}
+                            }],
+                        argumentOptions: {
+                            categories: options.categories,
+                            argumentType: options.valueType,
+                            type: options.axisType
+                        }
+                    };
+                    parsedData = viz.validateData(data, groupsData, options.incidentOccured, chartThemeManager.getOptions("dataPrepareSettings"));
+                    that.argCategories = groupsData.categories;
                     for (i = 0; i < series.length; i++)
-                        series[i].updateData(parsedData)
+                        series[i].updateData(parsedData[series[i].getArgumentField()])
                 }
                 return series
             },
@@ -1854,7 +1873,6 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_RANGESELECTOR) {
                     valueAxisMin = that._valueAxis.min,
                     valueAxisMax = that._valueAxis.max,
                     valRange = new viz.Range({
-                        isValueRange: true,
                         min: valueAxisMin,
                         minVisible: valueAxisMin,
                         max: valueAxisMax,

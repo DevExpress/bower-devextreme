@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Core Library)
-* Version: 15.2.11
-* Build date: Jun 22, 2016
+* Version: 15.2.12
+* Build date: Aug 29, 2016
 *
 * Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -1032,7 +1032,9 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                 }
                 if (realDevice.android)
                     windowUtils.resizeCallbacks.add(function() {
-                        document.activeElement.scrollIntoViewIfNeeded()
+                        setTimeout(function() {
+                            document.activeElement.scrollIntoViewIfNeeded()
+                        })
                     })
             };
         var triggerVisibilityChangeEvent = function(eventName) {
@@ -4381,7 +4383,7 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
     });
     /*! Module core, file version.js */
     DevExpress.define("/version", [], function() {
-        return "15.2.11"
+        return "15.2.12"
     });
     /*! Module core, file errors.js */
     DevExpress.define("/errors", ["/utils/utils.error"], function(errorUtils) {
@@ -4426,6 +4428,12 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
         return {
                 ctor: function() {
                     this._events = {}
+                },
+                hasEvent: function(eventName) {
+                    var callbacks = this._events[eventName];
+                    if (callbacks)
+                        return callbacks.has();
+                    return false
                 },
                 fireEvent: function(eventName, eventArgs) {
                     var callbacks = this._events[eventName];
@@ -8315,6 +8323,10 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                     function handleSuccess(data, extra) {
                         function processResult() {
                             var loadResult;
+                            if (data && !$.isArray(data) && data.data) {
+                                extra = data;
+                                data = data.data
+                            }
                             loadResult = $.extend({
                                 data: data,
                                 extra: extra
@@ -13488,11 +13500,11 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
             SKIP_APPLY_ACTION_CATEGORIES = ["rendering"];
         var safeApply = function(func, scope) {
                 if (scope.$root.$$phase)
-                    func(scope);
+                    return func(scope);
                 else
-                    scope.$apply(function() {
-                        func(scope)
-                    })
+                    return scope.$apply(function() {
+                            return func(scope)
+                        })
             };
         var ComponentBuilder = Class.inherit({
                 ctor: function(options) {
@@ -13618,7 +13630,7 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                                 that._ngLocker.obtain(optionPath);
                                 that._component.option(optionPath, newValue);
                                 updateWatcher();
-                                if (newValue === oldValue && that._ngLocker.locked(optionPath))
+                                if (that._component._optionValuesEqual(optionPath, oldValue, newValue) && that._ngLocker.locked(optionPath))
                                     that._ngLocker.release(optionPath)
                             };
                         var updateWatcher = function() {
@@ -13641,20 +13653,24 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                             that._ngLocker.release(fullName);
                             return
                         }
-                        if (that._scope.$root.$$phase === "$digest" || !optionDependencies || !optionDependencies[optionName])
+                        if (!optionDependencies || !optionDependencies[optionName])
                             return;
-                        try {
-                            that._ngLocker.obtain(fullName);
-                            safeApply(function(scope) {
-                                $.each(optionDependencies[optionName], function(optionPath, valuePath) {
-                                    var value = component.option(optionPath);
-                                    that._parse(valuePath).assign(that._scope, value)
-                                })
-                            }, that._scope)
-                        }
-                        finally {
-                            that._ngLocker.release(fullName)
-                        }
+                        that._ngLocker.obtain(fullName);
+                        safeApply(function(scope) {
+                            $.each(optionDependencies[optionName], function(optionPath, valuePath) {
+                                var value = component.option(optionPath);
+                                that._parse(valuePath).assign(that._scope, value);
+                                var scopeValue = that._parse(valuePath)(that._scope);
+                                if (scopeValue !== value)
+                                    that._component.option(optionPath, scopeValue)
+                            })
+                        }, that._scope);
+                        var releaseOption = function() {
+                                if (that._ngLocker.locked(fullName))
+                                    that._ngLocker.release(fullName);
+                                that._digestCallbacks.end.remove(releaseOption)
+                            };
+                        that._digestCallbacks.end.add(releaseOption)
                     })
                 },
                 _compilerByTemplate: function(template) {
@@ -13680,9 +13696,22 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                                 templateScope = that._scope;
                             if (scopeItemsPath)
                                 that._synchronizeScopes(templateScope, scopeItemsPath, index);
-                            safeApply(that._compile($resultMarkup, that._transcludeFn), templateScope);
+                            that._applyAsync(that._compile($resultMarkup, that._transcludeFn), templateScope);
                             return $resultMarkup
                         }
+                },
+                _applyAsync: function(func, scope) {
+                    var that = this;
+                    func(scope);
+                    if (!scope.$root.$$phase) {
+                        clearTimeout(that._renderingTimer);
+                        that._renderingTimer = setTimeout(function() {
+                            scope.$apply()
+                        });
+                        that._componentDisposing.add(function() {
+                            clearTimeout(that._renderingTimer)
+                        })
+                    }
                 },
                 _getScopeItemsPath: function() {
                     if (this._componentClass.subclassOf(DevExpress.ui.CollectionWidget) && this._ngOptions.bindingOptions && this._ngOptions.bindingOptions.items)
@@ -13764,14 +13793,15 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                                     args = arguments;
                                 if (!scope || !scope.$root || scope.$root.$$phase)
                                     return action.apply(that, args);
-                                return scope.$apply(function() {
+                                return safeApply(function() {
                                         return action.apply(that, args)
-                                    })
+                                    }, scope)
                             };
                         return wrappedAction
                     };
                     result.nestedComponentOptions = function(component) {
                         return {
+                                templatesRenderAsynchronously: true,
                                 templateCompiler: component.option("templateCompiler"),
                                 modelByElement: component.option("modelByElement"),
                                 onActionCreated: component.option("onActionCreated"),
@@ -15711,9 +15741,8 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                             this._invalidate();
                             break;
                         case"dataSource":
+                            this.option("items", []);
                             this._refreshDataSource();
-                            if (!this._dataSource)
-                                this.option("items", []);
                             this._renderEmptyMessage();
                             break;
                         case"noDataText":
@@ -16874,7 +16903,7 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                     for (var i = length - 1; i >= 0; i--) {
                         var node = this._dataStructure[i],
                             parent = this.options.dataConverter._getByKey(node.internalFields.parentKey);
-                        if (node.internalFields.parentKey !== this.options.rootValue) {
+                        if (parent && node.internalFields.parentKey !== this.options.rootValue) {
                             var newParentState = this._calculateSelectedState(parent);
                             this._setFieldState(parent, newParentState, SELECTED)
                         }
@@ -16908,9 +16937,11 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                     if (node.internalFields.parentKey === this.options.rootValue)
                         return;
                     var parent = this.options.dataConverter._getByKey(node.internalFields.parentKey);
-                    $.isFunction(callback) && callback(parent);
-                    if (parent.internalFields.parentKey !== this.options.rootValue)
-                        this._iterateParents(parent, callback)
+                    if (parent) {
+                        $.isFunction(callback) && callback(parent);
+                        if (parent.internalFields.parentKey !== this.options.rootValue)
+                            this._iterateParents(parent, callback)
+                    }
                 },
                 _calculateSelectedState: function(node) {
                     var itemsCount = node.internalFields.childrenKeys.length,
@@ -17171,7 +17202,7 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                         if (node.internalFields.parentKey === that._rootValue)
                             return;
                         var parent = that._getByKey(node.internalFields.parentKey);
-                        parent.internalFields.childrenKeys.push(node.internalFields.key)
+                        parent && parent.internalFields.childrenKeys.push(node.internalFields.key)
                     })
                 },
                 _makeObjectFromPrimitive: function(item) {

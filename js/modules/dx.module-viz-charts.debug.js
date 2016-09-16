@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Charts)
-* Version: 15.2.11
-* Build date: Jun 22, 2016
+* Version: 15.2.12
+* Build date: Aug 29, 2016
 *
 * Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -516,8 +516,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CHARTS) {
                     disposeObjectsInArray = this._disposeObjectsInArray;
                 clearTimeout(that._delayedRedraw);
                 that._renderer.stopAllAnimations();
-                disposeObjectsInArray.call(that, "businessRanges", ["arg", "val"]);
-                that.translators = null;
+                that.businessRanges = that.translators = null;
                 disposeObjectsInArray.call(that, "series");
                 disposeObject("_tracker");
                 disposeObject("_crosshair");
@@ -979,10 +978,10 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CHARTS) {
                     data = that.templateData || data
                 }
                 that._groupSeries();
-                parsedData = viz.validateData(data, that._groupedSeries, that._incidentOccured, dataValidatorOptions);
+                parsedData = viz.validateData(data, that._groupsData, that._incidentOccured, dataValidatorOptions);
                 themeManager.resetPalette();
                 _each(that.series, function(_, singleSeries) {
-                    singleSeries.updateData(parsedData);
+                    singleSeries.updateData(parsedData[singleSeries.getArgumentField()]);
                     that._processSingleSeries(singleSeries)
                 });
                 that._organizeStackPoints()
@@ -1135,13 +1134,11 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CHARTS) {
         function prepareAxis(axisOptions) {
             return _isArray(axisOptions) ? axisOptions.length === 0 ? [{}] : axisOptions : [axisOptions]
         }
-        function prepareVisibleArea(visibleArea, axisRange, useAggregation, aggregationRange) {
+        function prepareVisibleArea(visibleArea, aggregationRange, axisRange, argRange) {
             visibleArea.minVal = axisRange.min;
             visibleArea.maxVal = axisRange.max;
-            if (useAggregation) {
-                visibleArea.minArg = visibleArea.minArg === undefined ? aggregationRange.arg.min : visibleArea.minArg;
-                visibleArea.maxArg = visibleArea.maxArg === undefined ? aggregationRange.arg.max : visibleArea.maxArg
-            }
+            visibleArea.minArg = !_isDefined(visibleArea.minArg) ? _isDefined(argRange.minVisible) ? argRange.minVisible : aggregationRange.arg.min : visibleArea.minArg;
+            visibleArea.maxArg = !_isDefined(visibleArea.maxArg) ? _isDefined(argRange.maxVisible) ? argRange.maxVisible : aggregationRange.arg.max : visibleArea.maxArg
         }
         charts.AdvancedChart = charts.BaseChart.inherit({
             _dispose: function() {
@@ -1374,35 +1371,33 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CHARTS) {
             _populateBusinessRange: function(visibleArea) {
                 var that = this,
                     businessRanges = [],
-                    themeManager = that._themeManager,
                     rotated = that._isRotated(),
-                    useAggregation = themeManager.getOptions("useAggregation"),
                     argAxes = that._argumentAxes,
                     lastArgAxis = argAxes[argAxes.length - 1],
                     calcInterval = lastArgAxis.calcInterval,
                     argRange = new viz.Range({rotated: !!rotated}),
-                    argBusinessRange;
-                that._disposeObjectsInArray("businessRanges", ["arg", "val"]);
+                    argBusinessRange,
+                    groupsData = that._groupsData;
+                that.businessRanges = null;
                 _each(argAxes, function(_, axis) {
                     argRange.addRange(axis.getRangeData())
                 });
-                _each(that._groupedSeries, function(_, group) {
+                _each(groupsData.groups, function(_, group) {
                     var groupRange = new viz.Range({
                             rotated: !!rotated,
-                            isValueRange: true,
                             pane: group.valueAxis.pane,
                             axis: group.valueAxis.name
                         }),
                         groupAxisRange = group.valueAxis.getRangeData();
                     groupRange.addRange(groupAxisRange);
-                    _each(group, function(_, series) {
-                        visibleArea && prepareVisibleArea(visibleArea, groupAxisRange, useAggregation, series.getRangeData());
+                    _each(group.series, function(_, series) {
+                        visibleArea && prepareVisibleArea(visibleArea, series.getRangeData(), groupAxisRange, argRange);
                         var seriesRange = series.getRangeData(visibleArea, calcInterval);
                         groupRange.addRange(seriesRange.val);
                         argRange.addRange(seriesRange.arg)
                     });
                     if (!groupRange.isDefined())
-                        groupRange.setStubData(group.valueAxis.getOptions().valueType === "datetime" ? "datetime" : undefined);
+                        groupRange.setStubData(group.valueAxis.getOptions().valueType);
                     if (group.valueAxis.getOptions().showZero)
                         groupRange.correctValueZeroLevel();
                     groupRange.checkZeroStick();
@@ -1411,6 +1406,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CHARTS) {
                         arg: argRange
                     })
                 });
+                argRange.addRange({categories: groupsData.categories});
                 if (!argRange.isDefined())
                     argRange.setStubData(argAxes[0].getOptions().argumentType);
                 if (visibleArea && visibleArea.notApplyMargins && argRange.axisType !== "discrete") {
@@ -1732,7 +1728,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CHARTS) {
                     series = that.series,
                     paneAxis = that.paneAxis,
                     synchronizeMultiAxes = that._themeManager.getOptions("synchronizeMultiAxes"),
-                    groupedSeries = that._groupedSeries = [];
+                    groupedSeries = that._groupsData = {groups: []};
                 _each(series, function(i, particularSeries) {
                     particularSeries.axis = particularSeries.axis || getFirstAxisNameForPane(valAxes, particularSeries.pane);
                     if (particularSeries.axis) {
@@ -1750,12 +1746,12 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CHARTS) {
                 _each(paneAxis, function(paneName, pane) {
                     hideGridsOnNonFirstValueAxisForPane(valAxes, paneName, synchronizeMultiAxes);
                     _each(pane, function(axisName) {
-                        var group = [];
+                        var group = {series: []};
                         _each(series, function(_, particularSeries) {
                             if (particularSeries.pane === paneName && particularSeries.axis === axisName)
-                                group.push(particularSeries)
+                                group.series.push(particularSeries)
                         });
-                        groupedSeries.push(group);
+                        groupedSeries.groups.push(group);
                         group.valueAxis = findAxis(paneName, axisName, valAxes);
                         group.valueOptions = group.valueAxis.getOptions()
                     })
@@ -2298,11 +2294,13 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CHARTS) {
                 if (!paneTrans)
                     return foundTranslator;
                 foundTranslator = paneTrans[axisName];
-                if (!foundTranslator)
+                if (!foundTranslator) {
                     _each(paneTrans, function(axis, trans) {
                         foundTranslator = trans;
                         return false
                     });
+                    foundTranslator = _extend({axesTrans: paneTrans}, foundTranslator)
+                }
                 return foundTranslator
             },
             _getCanvasForPane: function(paneName) {
@@ -2595,15 +2593,20 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CHARTS) {
                     this._refreshSeries(DATA_INIT_REFRESH_ACTION)
             },
             _groupSeries: function() {
-                this.series.valueOptions = {valueType: "numeric"};
-                this._groupedSeries = [this.series];
-                this._groupedSeries.argumentOptions = this.series[0] && this.series[0].getOptions()
+                var series = this.series;
+                this._groupsData = {
+                    groups: [{
+                            series: series,
+                            valueOptions: {valueType: "numeric"}
+                        }],
+                    argumentOptions: series[0] && series[0].getOptions()
+                }
             },
             _populateBusinessRange: function() {
                 var businessRanges = [],
                     series = this.series,
                     singleSeriesRange;
-                this._disposeObjectsInArray("businessRanges");
+                this.businessRanges = null;
                 _each(series, function(_, singleSeries) {
                     var range = new viz.Range;
                     singleSeriesRange = singleSeries.getRangeData();
@@ -2838,11 +2841,16 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CHARTS) {
                     return {spiderWidget: this.option("useSpiderWeb")}
                 },
                 _groupSeries: function() {
-                    this._groupedSeries = [this.series];
-                    this._groupedSeries[0].valueAxis = this._valueAxes[0];
-                    this._groupedSeries[0].valueOptions = this._valueAxes[0].getOptions();
-                    this._groupedSeries.argumentAxes = this._argumentAxes;
-                    this._groupedSeries.argumentOptions = this._argumentAxes[0].getOptions()
+                    var that = this;
+                    that._groupsData = {
+                        groups: [{
+                                series: that.series,
+                                valueAxis: that._valueAxes[0],
+                                valueOptions: that._valueAxes[0].getOptions()
+                            }],
+                        argumentAxes: that._argumentAxes,
+                        argumentOptions: that._argumentAxes[0].getOptions()
+                    }
                 },
                 _prepareToRender: function() {
                     this._appendAxesGroups();

@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme
-* Version: 15.2.11
-* Build date: Jun 22, 2016
+* Version: 15.2.12
+* Build date: Aug 29, 2016
 *
 * Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -136,7 +136,7 @@ Globalize.addCultureInfo("de", {messages: {
         "dxDataGrid-ariaColumn": "Spalte",
         "dxDataGrid-ariaValue": "Wert",
         "dxDataGrid-ariaFilterCell": "Filterzelle",
-        "dxDataGrid-ariaCollapse": "Zusammesklappen",
+        "dxDataGrid-ariaCollapse": "Zusammenklappen",
         "dxDataGrid-ariaExpand": "Aufklappen",
         "dxDataGrid-ariaDataGrid": "Datentabelle",
         "dxDataGrid-ariaSearchInGrid": "Suchen in der Datentabelle",

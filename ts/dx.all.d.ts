@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme
-* Version: 15.2.11
-* Build date: Jun 22, 2016
+* Version: 15.2.12
+* Build date: Aug 29, 2016
 *
 * Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -1094,9 +1094,9 @@ declare module DevExpress.ui {
         onTitleRendered?: Function;
         /** The template to be used for rendering an item title. */
         itemTitleTemplate?: any;
-        /** A Boolean value specifying if the list is scrolled by content. */
+        /** A Boolean value specifying if tabs in the title are scrolled by content. */
         scrollByContent?: boolean;
-        /** A Boolean value specifying whether to enable or disable scrolling. */
+        /** A Boolean indicating whether or not to add scrolling support for tabs in the title. */
         scrollingEnabled?: boolean;
         /** A Boolean value that specifies the availability of navigation buttons. */
         showNavButtons?: boolean;
@@ -2248,6 +2248,25 @@ declare module DevExpress.ui {
         /** Resets the editor's value to undefined. */
         resetValues(): void;
     }
+    export interface dxDeferRenderingOptions extends WidgetOptions {
+        /** Indicates if a load indicator should be shown until the widget's content is rendered. */
+        showLoadIndicator?: boolean;
+        /** Specifies a jQuery.Promise or a boolean value, which upon resolving forces widget content to render. */
+        renderWhen?: any;
+        /** Specifies the animation to be used to show the rendered content. */
+        animation?: fx.AnimationOptions;
+        /** Specifies a jQuery selector of items that should be rendered using a staggered animation. */
+        staggerItemSelector?: string;
+        /** Specifies a callback function that is called when the widget's content has finished rendering but is not yet shown. */
+        onRendered?: Function;
+        /** Specifies a callback function that is called when widget content is shown and animation has completed. */
+        onShown?: Function;
+    }
+    /** A container for elements that must be rendered at a specified moment. */
+    export class dxDeferRendering extends Widget {
+        constructor(element: JQuery, options?: dxDeferRenderingOptions);
+        constructor(element: Element, options?: dxDeferRenderingOptions);
+    }
 }
 interface JQuery {
     dxProgressBar(): JQuery;
@@ -2822,7 +2841,7 @@ declare module DevExpress.data {
         child(direction: string, fieldValue: any): SummaryCell;
         /** Gets the cell located by the path of the source cell with one field value changed. */
         slice(field: PivotGridField, value: any): SummaryCell;
-        /** Gets the header cell of a row or column field to which the current cell belongs. */
+        /** Gets the row or column field to which the current cell belongs. */
         field(area: string): PivotGridField;
         /** Gets the value of the current cell. */
         value(): any;
@@ -3369,7 +3388,7 @@ declare module DevExpress.ui {
         };
         /** Specifies a precision for formatted values displayed in a column. */
         precision?: number;
-        /** Specifies a filter operation applied to a column. */
+        /** Specifies the default filter operation of a column. */
         selectedFilterOperation?: string;
         /** Specifies whether or not the column displays its values by using editors. */
         showEditorAlways?: boolean;
@@ -7428,7 +7447,7 @@ declare module DevExpress.viz.sparklines {
         /** Redraws a widget. */
         render(): void;
     }
-    export interface dxBulletOptions extends BaseSparkline {
+    export interface dxBulletOptions extends BaseSparklineOptions {
         /** Specifies a color for the bullet bar. */
         color?: string;
         /** Specifies an end value for the invisible scale. */

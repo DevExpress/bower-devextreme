@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Sparklines)
-* Version: 15.2.11
-* Build date: Jun 22, 2016
+* Version: 15.2.12
+* Build date: Aug 29, 2016
 *
 * Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -436,19 +436,21 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_SPARKLINES) {
             },
             _updateSeries: function() {
                 var that = this,
-                    groupSeries,
-                    seriesOptions;
+                    groupsData,
+                    seriesOptions,
+                    singleSeries = that._series;
                 that._prepareDataSource();
                 seriesOptions = that._prepareSeriesOptions();
-                that._series.updateOptions(seriesOptions);
-                groupSeries = [[that._series]];
-                groupSeries.argumentOptions = {type: seriesOptions.type === "bar" ? "discrete" : undefined};
-                that._simpleDataSource = viz.validateData(that._simpleDataSource, groupSeries, that._incidentOccured, {
+                singleSeries.updateOptions(seriesOptions);
+                groupsData = {groups: [{series: [singleSeries]}]};
+                groupsData.argumentOptions = {type: seriesOptions.type === "bar" ? "discrete" : undefined};
+                that._simpleDataSource = viz.validateData(that._simpleDataSource, groupsData, that._incidentOccured, {
                     checkTypeForAllData: false,
                     convertToAxisDataType: true,
                     sortingMethod: true
-                });
-                that._series.updateData(that._simpleDataSource)
+                })[singleSeries.getArgumentField()];
+                singleSeries.updateData(that._simpleDataSource);
+                that._groupsDataCategories = groupsData.categories
             },
             _handleChangedOptions: function(options) {
                 var that = this;
@@ -687,6 +689,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_SPARKLINES) {
                     }
                     else
                         rangeData.arg.stick = true;
+                rangeData.arg.categories = that._groupsDataCategories;
                 that._ranges = rangeData
             },
             _getBarWidth: function(pointsCount) {

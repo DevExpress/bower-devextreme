@@ -144,6 +144,9 @@
         showView: function(viewInfo, direction) {
             var that = this,
                 paneConfig = that._getPaneConfig(viewInfo);
+            var paneName = that._getViewPaneName(viewInfo.viewTemplateInfo);
+            if (!this._masterPaneCurrentStackKey && paneName === this._masterPaneName)
+                this._masterPaneCurrentStackKey = viewInfo.navigateOptions.stack;
             return paneConfig.controller.showView(viewInfo, direction).done(function() {
                     that._activeViews[that._getViewPaneName(viewInfo.viewTemplateInfo)] = viewInfo
                 })
