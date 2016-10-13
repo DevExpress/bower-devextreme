@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme
-* Version: 15.2.12
-* Build date: Aug 29, 2016
+* Version: 15.2.13
+* Build date: Oct 7, 2016
 *
 * Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -5768,6 +5768,10 @@
 {
   color: gray;
 }
+.dx-lookup-popup-search .dx-list
+{
+  height: calc(100% - 40px);
+}
 .dx-lookup-popup-wrapper
 {
   background-color: #000;
@@ -5799,10 +5803,6 @@
   height: 59px;
   padding: 8px 10px 0;
 }
-.dx-lookup-popup-wrapper .dx-list-item.dx-lookup-selected
-{
-  color: #00b8ff;
-}
 .dx-lookup-popup-wrapper .dx-list
 {
   padding-top: 40px;
@@ -5824,10 +5824,7 @@
 }
 .dx-lookup-search-wrapper
 {
-  position: absolute;
   width: auto;
-  left: 18px;
-  right: 18px;
 }
 .dx-lookup-search-wrapper .dx-texteditor-container
 {
@@ -5899,6 +5896,10 @@
   margin-right: -10px;
   margin-left: 0;
 }
+.dx-popup-content
+{
+  padding: 0;
+}
 .dx-popup-content.dx-lookup-invalid
 {
   padding-top: 0;
@@ -5907,25 +5908,9 @@
 {
   display: inline-block;
 }
-.dx-popup-content.dx-lookup-invalid .dx-lookup-search-wrapper
-{
-  top: 118px;
-}
-.dx-popup-content.dx-lookup-invalid .dx-list
-{
-  top: 38px;
-}
 .dx-popup-title+.dx-popup-content.dx-lookup-invalid
 {
   padding-top: 40px;
-}
-.dx-popup-title+.dx-popup-content.dx-lookup-invalid .dx-list
-{
-  top: 78px;
-}
-.dx-lookup-popup-search .dx-popup-content.dx-lookup-invalid .dx-list
-{
-  top: 90px;
 }
 .dx-actionsheet-popup-wrapper .dx-popup-content .dx-button, .dx-actionsheet-popover-wrapper .dx-popup-content .dx-button
 {

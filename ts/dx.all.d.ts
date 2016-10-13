@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme
-* Version: 15.2.12
-* Build date: Aug 29, 2016
+* Version: 15.2.13
+* Build date: Oct 7, 2016
 *
 * Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -851,7 +851,7 @@ declare module DevExpress.ui {
         validationRules?: Array<any>;
         /** Specifies the editor name to be used in the validation default messages. */
         name?: string;
-        /** An object that specifies what and when to validate and how to apply the validation result. */
+        /** An object that specifies what and when to validate, and how to apply the validation result. */
         adapter?: Object;
         /** Specifies the validation group the editor will be related to. */
         validationGroup?: string;
@@ -1096,7 +1096,7 @@ declare module DevExpress.ui {
         itemTitleTemplate?: any;
         /** A Boolean value specifying if tabs in the title are scrolled by content. */
         scrollByContent?: boolean;
-        /** A Boolean indicating whether or not to add scrolling support for tabs in the title. */
+        /** A Boolean value that indicates whether or not to add scrolling support for tabs in the title. */
         scrollingEnabled?: boolean;
         /** A Boolean value that specifies the availability of navigation buttons. */
         showNavButtons?: boolean;
@@ -2239,7 +2239,7 @@ declare module DevExpress.ui {
         itemOption(field: string, option: string, value: any): void;
         /** Updates the values of form item options. */
         itemOption(field: string, options: Object): void;
-        /** Returns an editor instance associated with the specified formData field. */
+        /** Returns an editor instance associated with the specified formData field or name of the form item. */
         getEditor(field: string): Object;
         /** Updates the dimensions of the widget contents. */
         updateDimensions(): JQueryPromise<void>;
@@ -3226,7 +3226,7 @@ declare module DevExpress.ui {
     export interface dxContextMenuOptions extends dxMenuBaseOptions {
         /** Holds an object that specifies options of alternative menu invocation. */
         alternativeInvocationMode?: {
-            /** Specifies whether or not the standard context menu invocation (on a right mouse click or on a long tap) is disabled. */
+            /** Specifies whether or not an alternative invocation mode is enabled. */
             enabled?: Boolean;
             /** Specifies the element used to invoke the context menu. */
             invokingElement?: any;
@@ -4872,7 +4872,7 @@ declare module DevExpress.viz.charts {
         select(): void;
         /** Shows the tooltip of the point. */
         showTooltip(): void;
-        /** Allows you to obtain the label of a series point. */
+        /** Allows you to obtain the label(s) of the series point. */
         getLabel(): any;
         /** Returns the series object to which the point belongs. */
         series: BaseSeries;

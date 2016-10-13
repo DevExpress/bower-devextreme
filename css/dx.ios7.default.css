@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme
-* Version: 15.2.12
-* Build date: Aug 29, 2016
+* Version: 15.2.13
+* Build date: Oct 7, 2016
 *
 * Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -5779,10 +5779,6 @@
   box-sizing: border-box;
   border-bottom: 1px solid #b5b5b5;
 }
-.dx-lookup-popup-wrapper .dx-list
-{
-  padding-top: 42px;
-}
 .dx-lookup-popup-wrapper .dx-popup-content
 {
   padding: 0;
@@ -5831,7 +5827,11 @@
 }
 .dx-lookup-popup-wrapper .dx-list
 {
-  padding-bottom: 45px;
+  padding-bottom: 8px;
+}
+.dx-lookup-popup-search .dx-list
+{
+  height: calc(100% - 50px);
 }
 .dx-lookup-search-wrapper
 {
@@ -5839,7 +5839,6 @@
   margin: 0;
   padding: 5px 7px 5px;
   background: #c9c9ce;
-  position: absolute;
   border-top: 1px solid #7e7e7e;
   border-bottom: 1px solid #b5b5b5;
 }

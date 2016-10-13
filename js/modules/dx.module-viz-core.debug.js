@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Visualization Core Library)
-* Version: 15.2.12
-* Build date: Aug 29, 2016
+* Version: 15.2.13
+* Build date: Oct 7, 2016
 *
 * Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -16053,8 +16053,11 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
             });
             return uniqueArgumentFields
         }
-        function discreteDataProcessing(data, groupsData, userArgumentCategories, uniqueArgumentFields) {
-            var categories = groupsData.categories = $.extend([], userArgumentCategories),
+        function discreteDataProcessing(data, groupsData, uniqueArgumentFields) {
+            if (groupsData.argumentAxisType !== DISCRETE)
+                return;
+            var userArgumentCategories = groupsData.argumentOptions ? groupsData.argumentOptions.categories : [],
+                categories = groupsData.categories = $.extend([], userArgumentCategories),
                 hash = {};
             categories.length && _each(categories, function(_, currentCategory) {
                 hash[currentCategory] = true
@@ -16078,7 +16081,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                     return cmpResult
                 }
         }
-        function sort(data, groupsData, sortingMethodOption, uniqueArgumentFields) {
+        function sortAndCollectCategories(data, groupsData, sortingMethodOption, uniqueArgumentFields) {
             var itemsHash = {},
                 dataByArguments = {},
                 getSortMethodByType = function(sortingByHash, hash) {
@@ -16089,16 +16092,21 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                         } : compareWithoutHash
                 },
                 getSortingMethod;
-            if (_isFunction(sortingMethodOption))
+            if (_isFunction(sortingMethodOption)) {
                 data.sort(sortingMethodOption);
-            else if (groupsData.categories) {
-                _each(groupsData.categories, function(index, value) {
-                    itemsHash[value] = index
-                });
-                getSortingMethod = getSortMethodByType(true, itemsHash)
+                discreteDataProcessing(data, groupsData, uniqueArgumentFields)
             }
-            else if (sortingMethodOption === true && groupsData.argumentType !== STRING)
-                getSortingMethod = getSortMethodByType(false, itemsHash);
+            else {
+                discreteDataProcessing(data, groupsData, uniqueArgumentFields);
+                if (groupsData.categories) {
+                    _each(groupsData.categories, function(index, value) {
+                        itemsHash[value] = index
+                    });
+                    getSortingMethod = getSortMethodByType(true, itemsHash)
+                }
+                else if (sortingMethodOption === true && groupsData.argumentType !== STRING)
+                    getSortingMethod = getSortMethodByType(false, itemsHash)
+            }
             _each(uniqueArgumentFields, function(_, argumentField) {
                 var sortMethod,
                     currentDataItem;
@@ -16209,7 +16217,6 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                 argumentOptions = groupsData.argumentOptions,
                 userArgumentCategories = argumentOptions && argumentOptions.categories || [],
                 dataLength,
-                categoriesInAxisType,
                 uniqueArgumentFields = getUniqueArgumentFields(groupsData),
                 dataByArgumentFields;
             data = verifyData(data, incidentOccurred);
@@ -16224,9 +16231,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                 data = parse(data, parsers)
             }
             groupPieData(data, groupsData);
-            categoriesInAxisType = argumentOptions && argumentOptions.categories || [];
-            groupsData.argumentAxisType === DISCRETE && discreteDataProcessing(data, groupsData, categoriesInAxisType, uniqueArgumentFields);
-            dataByArgumentFields = sort(data, groupsData, options.sortingMethod, uniqueArgumentFields);
+            dataByArgumentFields = sortAndCollectCategories(data, groupsData, options.sortingMethod, uniqueArgumentFields);
             dataLength = data.length;
             _each(skipFields, function(field, fieldValue) {
                 if (fieldValue === dataLength)
@@ -16235,7 +16240,7 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
             return dataByArgumentFields
         }
         viz.validateData = validateData;
-        viz.DEBUG_validateData_sort = sort
+        viz.DEBUG_validateData_sortAndCollectCategories = sortAndCollectCategories
     })(DevExpress, jQuery);
     /*! Module viz-core, file default.js */
     (function(DX, undefined) {

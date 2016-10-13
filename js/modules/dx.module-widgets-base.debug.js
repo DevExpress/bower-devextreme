@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Common Widgets)
-* Version: 15.2.12
-* Build date: Aug 29, 2016
+* Version: 15.2.13
+* Build date: Oct 7, 2016
 *
 * Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -8181,7 +8181,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
             SPIN_CLASS = "dx-numberbox-spin",
             SPIN_CONTAINER_CLASS = "dx-numberbox-spin-container",
             SPIN_TOUCH_FRIENDLY_CLASS = "dx-numberbox-spin-touch-friendly",
-            CONTROL_KEYS = ["Tab", "Del", "Delete", "Backspace", "Left", "ArrowLeft", "Right", "ArrowRight", "Home", "End"];
+            CONTROL_KEYS = ["Tab", "Del", "Delete", "Backspace", "Left", "ArrowLeft", "Right", "ArrowRight", "Home", "End", "Enter"];
         var NumberBox = TextEditor.inherit({
                 _supportedKeys: function() {
                     return $.extend(this.callBase(), {
@@ -8194,9 +8194,6 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                                 e.preventDefault();
                                 e.stopPropagation();
                                 this._spinDownChangeHandler()
-                            },
-                            enter: function(e) {
-                                this._input().trigger(this.option("valueChangeEvent"))
                             }
                         })
                 },
@@ -8464,6 +8461,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     if (value === "")
                         return null;
                     var number = parseFloat(value);
+                    if (isNaN(number))
+                        return null;
                     if (this.option("min") !== undefined)
                         number = math.max(number, this.option("min"));
                     if (this.option("max") !== undefined)
@@ -24376,14 +24375,15 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                             var path = fieldPath.slice();
                             item = that._getItemByFieldPath(path, fieldName, item)
                         }
-                        else if (itemType === "group" && !item.caption) {
+                        else if (itemType === "group" && !item.caption || itemType === "tabbed") {
+                            var subItemsField = that._getSubItemField(itemType);
                             item.items = that._generateItemsFromData(item.items);
                             item = that._getItemByField({
                                 fieldName: fieldName,
                                 fieldPath: fieldPath
-                            }, item.items)
+                            }, item[subItemsField])
                         }
-                        if (item && (item.dataField === fieldName || item.name === fieldName || item.itemType === "group" && that._getTextWithoutSpaces(item.caption) === fieldName || that._getTextWithoutSpaces(item.title) === fieldName)) {
+                        if (item && (item.dataField === fieldName || item.name === fieldName || that._getTextWithoutSpaces(item.title) === fieldName || item.itemType === "group" && that._getTextWithoutSpaces(item.caption) === fieldName)) {
                             resultItem = item;
                             return false
                         }
@@ -24855,6 +24855,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                         $container.addClass(FIELD_ITEM_LABEL_ALIGN_CLASS);
                     this._hasBrowserFlex() && $container.addClass(FLEX_LAYOUT_CLASS)
                 }
+                $editor.data("dx-form-item", item);
                 this._appendEditorToField({
                     $fieldItem: $container,
                     $label: $label,

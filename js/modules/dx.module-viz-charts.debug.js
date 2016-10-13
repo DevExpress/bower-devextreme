@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Charts)
-* Version: 15.2.12
-* Build date: Aug 29, 2016
+* Version: 15.2.13
+* Build date: Oct 7, 2016
 *
 * Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -3830,16 +3830,6 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CHARTS) {
                     series[func]({point: currentPoint})
             })
         }
-        function getArgumentPointsByIndex(storedSeries, argument, targetPointIndex) {
-            var points = [];
-            _each(storedSeries, function(_, series) {
-                _each(series.getPointsByArg(argument), function(_, currentPoint) {
-                    if (targetPointIndex === currentPoint.index)
-                        points.push(currentPoint)
-                })
-            });
-            return points
-        }
         var baseTrackerPrototype = {
                 ctor: function(options) {
                     var that = this,
@@ -4610,18 +4600,16 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CHARTS) {
             },
             _legendClick: function(item, e) {
                 var that = this,
-                    argument = item.argument,
-                    points;
-                if (that._storedSeries.length === 1) {
-                    points = getArgumentPointsByIndex(that._storedSeries, argument, item.id);
+                    series = that._storedSeries,
+                    points = series[item.id]._points;
+                if (series.length === 1 && points.length === 1)
                     that._trigerLegendClick({
                         target: points[0],
                         jQueryEvent: e
-                    }, POINT_CLICK)
-                }
+                    }, POINT_CLICK);
                 else
                     that._eventTrigger(LEGEND_CLICK, {
-                        target: argument,
+                        target: item.argument,
                         jQueryEvent: e
                     })
             },

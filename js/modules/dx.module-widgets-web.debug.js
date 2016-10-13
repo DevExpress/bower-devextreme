@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Web Widgets)
-* Version: 15.2.12
-* Build date: Aug 29, 2016
+* Version: 15.2.13
+* Build date: Oct 7, 2016
 *
 * Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -4178,6 +4178,15 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                             };
                         return options.customizeText ? options.customizeText.call(options, formatObject) : formatObject.valueText
                     },
+                    getFormatOptionsByColumn: function(column, target) {
+                        return {
+                                format: column.format,
+                                precision: column.precision,
+                                getDisplayFormat: column.getDisplayFormat,
+                                customizeText: column.customizeText,
+                                target: target
+                            }
+                    },
                     getDisplayValue: function(column, value, data, rowType) {
                         if (column.displayValueMap && column.displayValueMap[value] !== undefined)
                             return column.displayValueMap[value];
@@ -4432,10 +4441,10 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 that.option("selectedRowKeys", selectedRowKeys || []);
                 if (allowedPageSizes && that.option("pager.allowedPageSizes") === "auto")
                     that.option("pager").allowedPageSizes = allowedPageSizes;
+                that.component.endUpdate();
                 that.option("searchPanel.text", searchText || "");
                 that.option("paging.pageSize", scrollingMode !== "virtual" && scrollingMode !== "infinite" && state.pageSize ? state.pageSize : that._initialPageSize);
-                that.option("paging.pageIndex", state.pageIndex || 0);
-                that.component.endUpdate()
+                that.option("paging.pageIndex", state.pageIndex || 0)
             };
         dataGrid.StateStoringController = dataGrid.ViewController.inherit(function() {
             var getStorage = function(options) {
@@ -4744,7 +4753,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         for (i = 0; i < firstItems.length; i++)
                             if (firstItems[i])
                                 for (fieldName in firstItems[i])
-                                    processedFields[fieldName] = true;
+                                    if (!commonUtils.isFunction(firstItems[i][fieldName]) || knockoutUtils.isObservable(firstItems[i][fieldName]))
+                                        processedFields[fieldName] = true;
                         for (fieldName in processedFields)
                             if (fieldName.indexOf("__") !== 0) {
                                 var column = createColumn(that, fieldName);
@@ -6105,7 +6115,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     if (criteria.length > 0 || $.isFunction(criteria))
                         return criteria
                 };
-            var updateSelectedItems = function(that) {
+            var updateSelectedItems = function(that, selectedRowKeys) {
                     var changedItemIndexes = [],
                         dataController = that.getController("data"),
                         isSelectionWithCheckboxes = that.isSelectionWithCheckboxes(),
@@ -6130,14 +6140,15 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         removedItemKeys = that._removedItemKeys;
                         if (addedItemKeys.length || removedItemKeys.length) {
                             that._selectedItemsInternalChange = true;
-                            that.option("selectedRowKeys", that._selectedItemKeys.slice(0));
+                            selectedRowKeys = selectedRowKeys || that._selectedItemKeys.slice(0);
+                            that.option("selectedRowKeys", selectedRowKeys);
                             that._selectedItemsInternalChange = false;
                             that.selectionChanged.fire(that._selectedItemKeys);
                             that._addedItemKeys = [];
                             that._removedItemKeys = [];
                             that.executeAction("onSelectionChanged", {
                                 selectedRowsData: that._selectedItems,
-                                selectedRowKeys: that._selectedItemKeys,
+                                selectedRowKeys: selectedRowKeys,
                                 currentSelectedRowKeys: addedItemKeys,
                                 currentDeselectedRowKeys: removedItemKeys
                             })
@@ -6163,12 +6174,13 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         var that = this;
                         that._isSelectionWithCheckboxes = false;
                         that._focusedItemIndex = -1;
-                        that._selectedItemKeys = [];
+                        that._selectedItemKeys = that.option("selectedRowKeys") || [];
                         that._selectedItemKeyHashIndices = {};
                         that._unselectedItemKeys = [];
                         that._selectedItems = [];
                         that._addedItemKeys = [];
                         that._removedItemKeys = [];
+                        that._selectionMode = that.option(SELECTION_MODE);
                         updateSelectColumn(that);
                         that.createAction("onSelectionChanged", {excludeValidators: ["disabled", "readOnly"]})
                     },
@@ -6180,7 +6192,18 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         that.callBase(args);
                         switch (args.name) {
                             case"selection":
+                                var oldSelectionMode = that._selectionMode;
                                 that.init();
+                                var selectionMode = that._selectionMode;
+                                var selectedRowKeys = that.option("selectedRowKeys");
+                                if (oldSelectionMode !== selectionMode)
+                                    if (selectionMode === "single") {
+                                        if (selectedRowKeys.length > 1)
+                                            selectedRowKeys = [selectedRowKeys[0]]
+                                    }
+                                    else if (selectionMode !== "multiple")
+                                        selectedRowKeys = [];
+                                that.selectRows(selectedRowKeys);
                                 that.getController("columns").updateColumns();
                                 args.handled = true;
                                 break;
@@ -6238,7 +6261,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     },
                     selectedItemKeys: function(value, preserve, isDeselect, isSelectAll) {
                         var that = this,
-                            keys,
+                            keys = [],
                             criteria,
                             isFunctionCriteria,
                             deferred,
@@ -6251,7 +6274,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                             loadOptions;
                         if (commonUtils.isDefined(value)) {
                             if (store) {
-                                keys = $.isArray(value) ? $.extend([], value) : [value];
+                                keys = $.isArray(value) ? value : [value];
                                 if (keys.length || isSelectAll) {
                                     criteria = createSelectedItemsFilterCriteria(dataSource, keys, isSelectAll);
                                     isFunctionCriteria = $.isFunction(criteria);
@@ -6295,7 +6318,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                                 var i,
                                     key,
                                     item,
-                                    keys = [];
+                                    keepSelectedRowKeysInstance,
+                                    internalKeys = [];
                                 if (store && items.length > 0)
                                     for (i = 0; i < items.length; i++) {
                                         item = items[i];
@@ -6306,11 +6330,12 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                                             else
                                                 addSelectedItem(that, item);
                                         else
-                                            keys.push(key)
+                                            internalKeys.push(key)
                                     }
                                 if (!preserve)
-                                    setSelectedItems(that, keys, items);
-                                updateSelectedItems(that)
+                                    setSelectedItems(that, internalKeys, items);
+                                keepSelectedRowKeysInstance = !preserve && internalKeys.length === keys.length;
+                                updateSelectedItems(that, keepSelectedRowKeysInstance && keys)
                             });
                             return deferred
                         }
@@ -7487,47 +7512,49 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     result = dataGrid.getWidths(tableElement);
                 return result
             },
-            setColumnWidths: function(widths) {
+            setColumnWidths: function(widths, $tableElement, columns) {
                 var $cols,
                     i,
-                    j,
-                    columnIndex,
-                    columns,
-                    tableElements = this.getTableElements(true);
-                if (tableElements.length && widths)
-                    for (i = 0; i < tableElements.length; i++) {
-                        columnIndex = 0;
-                        $cols = $(tableElements[i]).find("col");
-                        columns = this.getColumns($(tableElements[i]));
-                        for (j = 0; j < columns.length; j++) {
-                            if (columns[j].colspan) {
-                                columnIndex += columns[j].colspan;
-                                continue
-                            }
-                            $cols.eq(columnIndex).css("width", widths[columnIndex] || "auto");
-                            columnIndex++
+                    columnIndex;
+                $tableElement = $tableElement || this._getTableElement();
+                if ($tableElement && $tableElement.length && widths) {
+                    columnIndex = 0;
+                    $cols = $tableElement.find("col");
+                    columns = columns || this.getColumns($tableElement);
+                    for (i = 0; i < columns.length; i++) {
+                        if (columns[i].colspan) {
+                            columnIndex += columns[i].colspan;
+                            continue
                         }
+                        $cols.eq(columnIndex).css("width", widths[columnIndex] || "auto");
+                        columnIndex++
                     }
+                }
             },
             getCellElements: function(rowIndex) {
+                return this._getCellElementsCore(rowIndex)
+            },
+            _getCellElementsCore: function(rowIndex) {
                 var $row = this._getRowElements().eq(rowIndex);
                 return $row.children()
             },
             getCellElement: function(rowIndex, columnIdentificator) {
                 var that = this,
-                    $cells = that.getCellElements(rowIndex),
                     $cell,
-                    columnsController = that._columnsController,
-                    columnIndex,
-                    columnVisibleIndex = columnIdentificator;
-                if (commonUtils.isString(columnIdentificator)) {
-                    columnIndex = columnsController.columnOption(columnIdentificator, "index");
-                    columnVisibleIndex = columnsController.getVisibleIndex(columnIndex)
-                }
+                    $cells = that.getCellElements(rowIndex),
+                    columnVisibleIndex = that._getVisibleColumnIndex($cells, rowIndex, columnIdentificator);
                 if ($cells.length && columnVisibleIndex >= 0)
                     $cell = $cells.eq(columnVisibleIndex);
                 if ($cell && $cell.length)
                     return $cell
+            },
+            _getVisibleColumnIndex: function($cells, rowIndex, columnIdentificator) {
+                var columnIndex;
+                if (commonUtils.isString(columnIdentificator)) {
+                    columnIndex = this._columnsController.columnOption(columnIdentificator, "index");
+                    return this._columnsController.getVisibleIndex(columnIndex)
+                }
+                return columnIdentificator
             },
             getColumnElements: function(){},
             getColumns: function() {
@@ -8124,6 +8151,1209 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         options.data = options.data.slice(0, options.take)
                 }
             }
+        })
+    })(jQuery, DevExpress);
+    /*! Module widgets-web, file ui.dataGrid.editing.js */
+    (function($, DX) {
+        var dataGrid = DX.ui.dxDataGrid,
+            eventUtils = DX.require("/ui/events/ui.events.utils"),
+            addNamespace = eventUtils.addNamespace,
+            objectUtils = DX.require("/utils/utils.object"),
+            commonUtils = DX.require("/utils/utils.common"),
+            dialog = DX.require("/ui/ui.dialog"),
+            Button = DX.require("/ui/widgets/ui.button"),
+            errors = DevExpress.require("/ui/ui.errors"),
+            devices = DX.require("/devices"),
+            getIndexByKey = dataGrid.getIndexByKey;
+        var DATAGRID_LINK_CLASS = "dx-link",
+            DATAGRID_EDITOR_CELL_CLASS = "dx-editor-cell",
+            DATAGRID_ROW_SELECTED = "dx-selection",
+            DATAGRID_EDIT_ROW = "dx-edit-row",
+            DATAGRID_EDIT_FORM_CLASS = "dx-datagrid-edit-form",
+            DATAGRID_EDIT_FORM_ITEM_CLASS = "dx-datagrid-edit-form-item",
+            DATAGRID_EDIT_BUTTON_CLASS = "dx-edit-button",
+            DATAGRID_INSERT_INDEX = "__DX_INSERT_INDEX__",
+            DATAGRID_ROW_CLASS = "dx-row",
+            DATAGRID_ROW_REMOVED = "dx-row-removed",
+            DATAGRID_ROW_INSERTED = "dx-row-inserted",
+            DATAGRID_ROW_MODIFIED = "dx-row-modified",
+            DATAGRID_CELL_MODIFIED = "dx-cell-modified",
+            DATAGRID_CELL_HIGHLIGHT_OUTLINE = "dx-highlight-outline",
+            DATAGRID_EDITING_NAMESPACE = "dxDataGridEditing",
+            DATAGRID_FOCUS_OVERLAY_CLASS = "dx-datagrid-focus-overlay",
+            DATAGRID_READONLY_CLASS = "dx-datagrid-readonly",
+            DATAGRID_DATA_ROW_CLASS = "dx-data-row",
+            CHECKBOX_CLASS = "dx-checkbox",
+            DATAGRID_EDITOR_INLINE_BLOCK = "dx-editor-inline-block",
+            DATAGRID_CELL_FOCUS_DISABLED_CLASS = "dx-cell-focus-disabled",
+            DATAGRID_EDIT_MODE_BATCH = "batch",
+            DATAGRID_EDIT_MODE_ROW = "row",
+            DATAGRID_EDIT_MODE_CELL = "cell",
+            DATAGRID_EDIT_MODE_FORM = "form",
+            DATA_EDIT_DATA_INSERT_TYPE = "insert",
+            DATA_EDIT_DATA_UPDATE_TYPE = "update",
+            DATA_EDIT_DATA_REMOVE_TYPE = "remove",
+            DATAGRID_POINTER_EVENTS_NONE_CLASS = "dx-pointer-events-none",
+            DATAGRID_POINTER_EVENTS_TARGET_CLASS = "dx-pointer-events-target";
+        var getEditMode = function(that) {
+                var editMode = that.option("editing.mode");
+                if (editMode === DATAGRID_EDIT_MODE_BATCH || editMode === DATAGRID_EDIT_MODE_CELL || editMode === DATAGRID_EDIT_MODE_FORM)
+                    return editMode;
+                return DATAGRID_EDIT_MODE_ROW
+            };
+        var isRowEditMode = function(that) {
+                var editMode = getEditMode(that);
+                return editMode === DATAGRID_EDIT_MODE_ROW || editMode === DATAGRID_EDIT_MODE_FORM
+            };
+        dataGrid.EditingController = dataGrid.ViewController.inherit(function() {
+            var getDefaultEditorTemplate = function(that) {
+                    return function(container, options) {
+                            var $editor = $("<div/>").appendTo(container);
+                            that.getController("editorFactory").createEditor($editor, $.extend({}, options.column, {
+                                value: options.value,
+                                setValue: options.setValue,
+                                row: options.row,
+                                parentType: "dataRow",
+                                width: null,
+                                readOnly: !options.setValue,
+                                id: options.id
+                            }))
+                        }
+                };
+            return {
+                    init: function() {
+                        var that = this;
+                        that._insertIndex = 1;
+                        that._editRowIndex = -1;
+                        that._editData = [];
+                        that._editColumnIndex = -1;
+                        that._columnsController = that.getController("columns");
+                        that._dataController = that.getController("data");
+                        if (!that._dataChangedHandler) {
+                            that._dataChangedHandler = $.proxy(that._handleDataChanged, that);
+                            that._dataController.changed.add(that._dataChangedHandler)
+                        }
+                        if (!that._saveEditorHandler) {
+                            that.createAction("onInitNewRow", {excludeValidators: ["disabled", "readOnly"]});
+                            that.createAction("onRowInserting", {excludeValidators: ["disabled", "readOnly"]});
+                            that.createAction("onRowInserted", {excludeValidators: ["disabled", "readOnly"]});
+                            that.createAction("onEditingStart", {excludeValidators: ["disabled", "readOnly"]});
+                            that.createAction("onRowUpdating", {excludeValidators: ["disabled", "readOnly"]});
+                            that.createAction("onRowUpdated", {excludeValidators: ["disabled", "readOnly"]});
+                            that.createAction("onRowRemoving", {excludeValidators: ["disabled", "readOnly"]});
+                            that.createAction("onRowRemoved", {excludeValidators: ["disabled", "readOnly"]});
+                            that._saveEditorHandler = that.createAction(function(e) {
+                                var event = e.jQueryEvent,
+                                    visibleColumns,
+                                    isEditorPopup,
+                                    isDomElement,
+                                    isFocusOverlay,
+                                    $targetCell,
+                                    allowEditing,
+                                    columnIndex,
+                                    isDataRow,
+                                    rowIndex;
+                                if (!isRowEditMode(that) && that.isEditing() && !that._editCellInProgress) {
+                                    isEditorPopup = $(event.target).closest(".dx-dropdowneditor-overlay").length;
+                                    isDomElement = $(event.target).closest(document).length;
+                                    isFocusOverlay = $(event.target).hasClass(DATAGRID_FOCUS_OVERLAY_CLASS);
+                                    isDataRow = $(event.target).closest("." + DATAGRID_DATA_ROW_CLASS).length;
+                                    visibleColumns = that._columnsController.getVisibleColumns();
+                                    $targetCell = $(event.target).closest("." + DATAGRID_ROW_CLASS + "> td");
+                                    columnIndex = $targetCell[0] && $targetCell[0].cellIndex;
+                                    rowIndex = that.getView("rowsView").getRowIndex($targetCell.parent());
+                                    allowEditing = visibleColumns[columnIndex] && visibleColumns[columnIndex].allowEditing;
+                                    if ((!isDataRow || isDataRow && !allowEditing && !that.isEditCell(rowIndex, columnIndex)) && !isEditorPopup && !isFocusOverlay && isDomElement)
+                                        that.closeEditCell()
+                                }
+                            });
+                            $(document).on("dxclick", that._saveEditorHandler)
+                        }
+                        that._updateEditColumn();
+                        that._updateEditButtons()
+                    },
+                    _handleDataChanged: function(args) {
+                        if (this.option("scrolling.mode") === "standard")
+                            this.resetRowAndPageIndeces();
+                        if (args.changeType === "prepend")
+                            $.each(this._editData, function(_, editData) {
+                                editData.rowIndex += args.items.length;
+                                if (editData.type === DATA_EDIT_DATA_INSERT_TYPE)
+                                    editData.key.rowIndex += args.items.length
+                            })
+                    },
+                    getEditMode: function() {
+                        return getEditMode(this)
+                    },
+                    getFirstEditableColumnIndex: function() {
+                        var columnsController = this.getController("columns"),
+                            visibleColumns = columnsController.getVisibleColumns(),
+                            columnIndex;
+                        $.each(visibleColumns, function(index, column) {
+                            if (column.allowEditing) {
+                                columnIndex = index;
+                                return false
+                            }
+                        });
+                        return columnIndex
+                    },
+                    getFirstEditableCellInRow: function(rowIndex) {
+                        return this.getView("rowsView").getCellElement(rowIndex ? rowIndex : 0, this.getFirstEditableColumnIndex())
+                    },
+                    getFocusedCellInRow: function(rowIndex) {
+                        return this.getFirstEditableCellInRow(rowIndex)
+                    },
+                    getIndexByKey: function(key, items) {
+                        return getIndexByKey(key, items)
+                    },
+                    hasChanges: function() {
+                        var that = this,
+                            result = false;
+                        for (var i = 0; i < that._editData.length; i++)
+                            if (that._editData[i].type) {
+                                result = true;
+                                break
+                            }
+                        return result
+                    },
+                    dispose: function() {
+                        this.callBase();
+                        $(document).off("dxclick", this._saveEditorHandler)
+                    },
+                    optionChanged: function(args) {
+                        if (args.name === "editing") {
+                            this.init();
+                            args.handled = true
+                        }
+                        else
+                            this.callBase(args)
+                    },
+                    publicMethods: function() {
+                        return ["insertRow", "addRow", "removeRow", "deleteRow", "undeleteRow", "editRow", "editCell", "closeEditCell", "saveEditData", "cancelEditData", "hasEditData"]
+                    },
+                    refresh: function() {
+                        if (getEditMode(this) !== DATAGRID_EDIT_MODE_BATCH)
+                            this.init();
+                        else {
+                            this._editRowIndex = -1;
+                            this._editColumnIndex = -1
+                        }
+                    },
+                    isEditing: function() {
+                        return this._editRowIndex > -1
+                    },
+                    isEditRow: function(rowIndex) {
+                        var editMode = getEditMode(this);
+                        return (editMode === DATAGRID_EDIT_MODE_ROW || editMode === DATAGRID_EDIT_MODE_FORM) && this._editRowIndex === rowIndex
+                    },
+                    getEditFormRowIndex: function() {
+                        return getEditMode(this) === DATAGRID_EDIT_MODE_FORM ? this._editRowIndex : -1
+                    },
+                    isEditCell: function(rowIndex, columnIndex) {
+                        return this._editRowIndex === rowIndex && this._editColumnIndex === columnIndex
+                    },
+                    _needInsertItem: function(editData, changeType) {
+                        var that = this,
+                            dataSource = that._dataController.dataSource(),
+                            srollingMode = that.option("scrolling.mode"),
+                            pageIndex = dataSource.pageIndex(),
+                            beginPageIndex = dataSource.beginPageIndex ? dataSource.beginPageIndex() : pageIndex,
+                            endPageIndex = dataSource.endPageIndex ? dataSource.endPageIndex() : pageIndex;
+                        if (srollingMode !== "standard")
+                            switch (changeType) {
+                                case"append":
+                                    return editData.key.pageIndex === endPageIndex;
+                                case"prepend":
+                                    return editData.key.pageIndex === beginPageIndex;
+                                case"refresh":
+                                    editData.key.rowIndex = 0;
+                                    editData.key.pageIndex = 0;
+                                    break;
+                                default:
+                                    return editData.key.pageIndex >= beginPageIndex && editData.key.pageIndex <= endPageIndex
+                            }
+                        return editData.key.pageIndex === pageIndex
+                    },
+                    processItems: function(items, changeType) {
+                        var that = this,
+                            i,
+                            key,
+                            data,
+                            editData = that._editData;
+                        that.update(changeType);
+                        for (i = 0; i < editData.length; i++) {
+                            key = editData[i].key;
+                            data = {key: key};
+                            if (editData[i].type === DATA_EDIT_DATA_INSERT_TYPE && that._needInsertItem(editData[i], changeType)) {
+                                data[DATAGRID_INSERT_INDEX] = key[DATAGRID_INSERT_INDEX];
+                                items.splice(key.rowIndex, 0, data)
+                            }
+                        }
+                        return items
+                    },
+                    processDataItem: function(item, columns, generateDataValues) {
+                        var that = this,
+                            editIndex,
+                            editData,
+                            data,
+                            key = item.data[DATAGRID_INSERT_INDEX] ? item.data.key : item.key,
+                            editMode;
+                        editIndex = getIndexByKey(key, that._editData);
+                        if (editIndex >= 0) {
+                            editMode = getEditMode(that);
+                            editData = that._editData[editIndex];
+                            data = editData.data;
+                            switch (editData.type) {
+                                case DATA_EDIT_DATA_INSERT_TYPE:
+                                    item.inserted = true;
+                                    item.key = key;
+                                    item.data = data;
+                                    break;
+                                case DATA_EDIT_DATA_UPDATE_TYPE:
+                                    item.modified = true;
+                                    item.oldData = item.data;
+                                    item.data = $.extend(true, {}, item.data, data);
+                                    item.modifiedValues = generateDataValues(data, columns);
+                                    break;
+                                case DATA_EDIT_DATA_REMOVE_TYPE:
+                                    if (editMode === DATAGRID_EDIT_MODE_BATCH)
+                                        item.data = $.extend(true, {}, item.data, data);
+                                    item.removed = true;
+                                    break
+                            }
+                        }
+                    },
+                    insertRow: function() {
+                        errors.log("W0002", "dxDataGrid", "insertRow", "15.2", "Use the 'addRow' method instead");
+                        return this.addRow()
+                    },
+                    addRow: function() {
+                        var that = this,
+                            dataController = that._dataController,
+                            store = dataController.store(),
+                            key = store && store.key(),
+                            rowsView = that.getView("rowsView"),
+                            param = {data: {}},
+                            insertKey = {
+                                pageIndex: dataController.pageIndex(),
+                                rowIndex: rowsView ? rowsView.getTopVisibleItemIndex() : 0
+                            },
+                            oldEditRowIndex = that._editRowIndex,
+                            editMode = getEditMode(that),
+                            $firstCell;
+                        if (editMode === DATAGRID_EDIT_MODE_CELL && that.hasChanges())
+                            that.saveEditData();
+                        that.refresh();
+                        if (editMode !== DATAGRID_EDIT_MODE_BATCH && that._insertIndex > 1)
+                            return;
+                        if (!key)
+                            param.data.__KEY__ = String(new DX.data.Guid);
+                        that.executeAction("onInitNewRow", param);
+                        if (editMode !== DATAGRID_EDIT_MODE_BATCH)
+                            that._editRowIndex = insertKey.rowIndex;
+                        insertKey[DATAGRID_INSERT_INDEX] = that._insertIndex++;
+                        that._addEditData({
+                            key: insertKey,
+                            data: param.data,
+                            type: DATA_EDIT_DATA_INSERT_TYPE
+                        });
+                        dataController.updateItems({
+                            changeType: "update",
+                            rowIndices: [oldEditRowIndex, insertKey.rowIndex]
+                        });
+                        $firstCell = that.getFirstEditableCellInRow(insertKey.rowIndex);
+                        that._delayedInputFocus($firstCell, function() {
+                            var $cell = that.getFirstEditableCellInRow(insertKey.rowIndex);
+                            $cell && $cell.trigger("dxclick")
+                        });
+                        that._afterInsertRow({
+                            key: insertKey,
+                            data: param.data
+                        })
+                    },
+                    _isEditingStart: function(options) {
+                        this.executeAction("onEditingStart", options);
+                        return options.cancel
+                    },
+                    _beforeEditCell: function(rowIndex, columnIndex, item) {
+                        if (getEditMode(this) === DATAGRID_EDIT_MODE_CELL && !item.inserted && this.hasChanges()) {
+                            this.saveEditData();
+                            if (this.hasChanges())
+                                return true
+                        }
+                    },
+                    editRow: function(rowIndex) {
+                        var that = this,
+                            dataController = that._dataController,
+                            items = dataController.items(),
+                            item = items[rowIndex],
+                            params = {
+                                data: item.data,
+                                cancel: false
+                            },
+                            oldEditRowIndex = that._editRowIndex,
+                            $editingCell;
+                        if (rowIndex === oldEditRowIndex)
+                            return true;
+                        if (!item.inserted)
+                            params.key = item.key;
+                        if (that._isEditingStart(params))
+                            return;
+                        that.init();
+                        that._pageIndex = dataController.pageIndex();
+                        that._editRowIndex = items[0].inserted ? rowIndex - 1 : rowIndex;
+                        that._addEditData({
+                            data: {},
+                            key: item.key,
+                            oldData: item.data
+                        });
+                        dataController.updateItems({
+                            changeType: "update",
+                            rowIndices: [oldEditRowIndex, rowIndex]
+                        });
+                        if (getEditMode(that) === DATAGRID_EDIT_MODE_ROW || getEditMode(that) === DATAGRID_EDIT_MODE_FORM) {
+                            $editingCell = that.getFocusedCellInRow(that._editRowIndex);
+                            that._delayedInputFocus($editingCell, function() {
+                                $editingCell && that.component.focus($editingCell)
+                            })
+                        }
+                    },
+                    editCell: function(rowIndex, columnIndex) {
+                        var that = this,
+                            $cell,
+                            columnsController = that._columnsController,
+                            dataController = that._dataController,
+                            items = dataController.items(),
+                            item = items[rowIndex],
+                            params = {
+                                data: item && item.data,
+                                cancel: false
+                            },
+                            oldEditRowIndex = that._editRowIndex,
+                            oldEditColumnIndex = that._editColumnIndex,
+                            columns = columnsController.getVisibleColumns(),
+                            showEditorAlways;
+                        if (commonUtils.isString(columnIndex)) {
+                            columnIndex = columnsController.columnOption(columnIndex, "index");
+                            columnIndex = columnsController.getVisibleIndex(columnIndex)
+                        }
+                        params.column = columnsController.getVisibleColumns()[columnIndex];
+                        showEditorAlways = params.column && params.column.showEditorAlways;
+                        if (params.column && item && item.rowType === "data" && !item.removed && !isRowEditMode(that)) {
+                            if (this.isEditCell(rowIndex, columnIndex))
+                                return true;
+                            if (that._beforeEditCell(rowIndex, columnIndex, item))
+                                return true;
+                            if (!item.inserted)
+                                params.key = item.key;
+                            if (that._isEditingStart(params))
+                                return true;
+                            that._editRowIndex = rowIndex;
+                            that._editColumnIndex = columnIndex;
+                            that._pageIndex = dataController.pageIndex();
+                            that._addEditData({
+                                data: {},
+                                key: item.key,
+                                oldData: item.data
+                            });
+                            if (!showEditorAlways || columns[oldEditColumnIndex] && !columns[oldEditColumnIndex].showEditorAlways) {
+                                that._editCellInProgress = true;
+                                that.getController("editorFactory").loseFocus();
+                                dataController.updateItems({
+                                    changeType: "update",
+                                    rowIndices: [oldEditRowIndex, that._editRowIndex]
+                                })
+                            }
+                            $cell = that.getView("rowsView").getCellElement(that._editRowIndex, that._editColumnIndex);
+                            if (!$cell.find(":focus").length)
+                                that._focusEditingCell(function() {
+                                    that._editCellInProgress = false
+                                }, $cell);
+                            else
+                                that._editCellInProgress = false;
+                            return true
+                        }
+                        return false
+                    },
+                    _delayedInputFocus: function($cell, beforeFocusCallback) {
+                        function inputFocus() {
+                            if (beforeFocusCallback)
+                                beforeFocusCallback();
+                            $cell && $cell.find("[tabindex], input").first().focus()
+                        }
+                        if (devices.real().ios || devices.real().android)
+                            inputFocus();
+                        else
+                            setTimeout(inputFocus)
+                    },
+                    _focusEditingCell: function(beforeFocusCallback, $editCell) {
+                        var that = this;
+                        $editCell = $editCell || that.getView("rowsView").getCellElement(that._editRowIndex, that._editColumnIndex);
+                        that._delayedInputFocus($editCell, beforeFocusCallback)
+                    },
+                    removeRow: function(rowIndex) {
+                        errors.log("W0002", "dxDataGrid", "removeRow", "15.2", "Use the 'deleteRow' method instead");
+                        return this.deleteRow(rowIndex)
+                    },
+                    deleteRow: function(rowIndex) {
+                        var that = this,
+                            editingOptions = that.option("editing"),
+                            editingTexts = editingOptions && editingOptions.texts,
+                            confirmDeleteTitle = editingTexts && editingTexts.confirmDeleteTitle,
+                            isBatchMode = editingOptions && editingOptions.mode === DATAGRID_EDIT_MODE_BATCH,
+                            confirmDeleteMessage = editingTexts && editingTexts.confirmDeleteMessage,
+                            dataController = that._dataController,
+                            removeByKey,
+                            showDialogTitle,
+                            oldEditRowIndex = that._editRowIndex,
+                            item = dataController.items()[rowIndex],
+                            key = item && item.key;
+                        if (item) {
+                            removeByKey = function(key) {
+                                that.refresh();
+                                var editIndex = getIndexByKey(key, that._editData);
+                                if (editIndex >= 0)
+                                    if (that._editData[editIndex].type === DATA_EDIT_DATA_INSERT_TYPE)
+                                        that._editData.splice(editIndex, 1);
+                                    else
+                                        that._editData[editIndex].type = DATA_EDIT_DATA_REMOVE_TYPE;
+                                else
+                                    that._addEditData({
+                                        key: key,
+                                        oldData: item.data,
+                                        type: DATA_EDIT_DATA_REMOVE_TYPE
+                                    });
+                                if (isBatchMode)
+                                    dataController.updateItems({
+                                        changeType: "update",
+                                        rowIndices: [oldEditRowIndex, rowIndex]
+                                    });
+                                else
+                                    that.saveEditData()
+                            };
+                            if (isBatchMode || !confirmDeleteMessage)
+                                removeByKey(key);
+                            else {
+                                showDialogTitle = commonUtils.isDefined(confirmDeleteTitle) && confirmDeleteTitle.length > 0;
+                                dialog.confirm(confirmDeleteMessage, confirmDeleteTitle, showDialogTitle).done(function(confirmResult) {
+                                    if (confirmResult)
+                                        removeByKey(key)
+                                })
+                            }
+                        }
+                    },
+                    undeleteRow: function(rowIndex) {
+                        var that = this,
+                            dataController = that._dataController,
+                            item = dataController.items()[rowIndex],
+                            oldEditRowIndex = that._editRowIndex,
+                            key = item && item.key;
+                        if (item) {
+                            var editIndex = getIndexByKey(key, that._editData),
+                                editData;
+                            if (editIndex >= 0) {
+                                editData = that._editData[editIndex];
+                                if ($.isEmptyObject(editData.data))
+                                    that._editData.splice(editIndex, 1);
+                                else
+                                    editData.type = DATA_EDIT_DATA_UPDATE_TYPE;
+                                dataController.updateItems({
+                                    changeType: "update",
+                                    rowIndices: [oldEditRowIndex, rowIndex]
+                                })
+                            }
+                        }
+                    },
+                    _saveEditDataCore: function(deferreds, processedKeys) {
+                        var that = this,
+                            store = that._dataController.store(),
+                            hasCanceledData = false;
+                        function executeEditingAction(actionName, params, func) {
+                            var deferred = $.Deferred();
+                            that.executeAction(actionName, params);
+                            function createFailureHandler(deferred) {
+                                return function(arg) {
+                                        var error = arg instanceof Error ? arg : new Error(arg && String(arg) || "Unknown error");
+                                        deferred.reject(error)
+                                    }
+                            }
+                            $.when(params.cancel).done(function(cancel) {
+                                if (cancel)
+                                    deferred.resolve("cancel");
+                                else
+                                    func(params).done(deferred.resolve).fail(createFailureHandler(deferred))
+                            }).fail(createFailureHandler(deferred));
+                            return deferred
+                        }
+                        $.each(that._editData, function(index, editData) {
+                            var data = editData.data,
+                                oldData = editData.oldData,
+                                key = editData.key,
+                                type = editData.type,
+                                deferred,
+                                doneDeferred,
+                                params;
+                            if (that._beforeSaveEditData(editData, index))
+                                return;
+                            switch (type) {
+                                case DATA_EDIT_DATA_REMOVE_TYPE:
+                                    params = {
+                                        data: oldData,
+                                        key: key,
+                                        cancel: false
+                                    };
+                                    deferred = executeEditingAction("onRowRemoving", params, function() {
+                                        return store.remove(key)
+                                    });
+                                    break;
+                                case DATA_EDIT_DATA_INSERT_TYPE:
+                                    params = {
+                                        data: data,
+                                        cancel: false
+                                    };
+                                    deferred = executeEditingAction("onRowInserting", params, function() {
+                                        return store.insert(params.data)
+                                    });
+                                    break;
+                                case DATA_EDIT_DATA_UPDATE_TYPE:
+                                    params = {
+                                        newData: data,
+                                        oldData: oldData,
+                                        key: key,
+                                        cancel: false
+                                    };
+                                    deferred = executeEditingAction("onRowUpdating", params, function() {
+                                        return store.update(key, params.newData)
+                                    });
+                                    break
+                            }
+                            if (deferred) {
+                                doneDeferred = $.Deferred();
+                                deferred.always(function() {
+                                    processedKeys.push(key)
+                                }).always(doneDeferred.resolve);
+                                deferreds.push(doneDeferred.promise())
+                            }
+                        });
+                        return hasCanceledData
+                    },
+                    _processSaveEditDataResult: function(results, processedKeys) {
+                        var that = this,
+                            dataController = that._dataController,
+                            i,
+                            arg,
+                            editIndex,
+                            isError,
+                            editMode = getEditMode(that);
+                        for (i = 0; i < results.length; i++) {
+                            arg = results[i];
+                            editIndex = getIndexByKey(processedKeys[i], that._editData);
+                            if (that._editData[editIndex]) {
+                                isError = arg && arg instanceof Error;
+                                if (isError) {
+                                    that._editData[editIndex].error = arg;
+                                    dataController.dataErrorOccurred.fire(arg);
+                                    if (editMode !== DATAGRID_EDIT_MODE_BATCH)
+                                        return false
+                                }
+                                else if (arg !== "cancel")
+                                    that._editData.splice(editIndex, 1);
+                                else
+                                    return false
+                            }
+                        }
+                        return true
+                    },
+                    _fireSaveEditDataEvents: function(editData) {
+                        var that = this;
+                        $.each(editData, function(_, itemData) {
+                            var data = itemData.data,
+                                key = itemData.key,
+                                type = itemData.type,
+                                params = {
+                                    key: key,
+                                    data: data
+                                };
+                            if (itemData.error)
+                                params.error = itemData.error;
+                            switch (type) {
+                                case DATA_EDIT_DATA_REMOVE_TYPE:
+                                    that.executeAction("onRowRemoved", $.extend({}, params, {data: itemData.oldData}));
+                                    break;
+                                case DATA_EDIT_DATA_INSERT_TYPE:
+                                    that.executeAction("onRowInserted", params);
+                                    break;
+                                case DATA_EDIT_DATA_UPDATE_TYPE:
+                                    that.executeAction("onRowUpdated", params);
+                                    break
+                            }
+                        })
+                    },
+                    saveEditData: function() {
+                        var that = this,
+                            processedKeys = [],
+                            deferreds = [],
+                            dataController = that._dataController,
+                            editData = $.extend({}, that._editData),
+                            editMode = getEditMode(that),
+                            result = $.Deferred();
+                        var resetEditIndices = function(that) {
+                                that._editColumnIndex = -1;
+                                that._editRowIndex = -1
+                            };
+                        if (that._beforeSaveEditData() || that._saving) {
+                            that._afterSaveEditData();
+                            return result.resolve().promise()
+                        }
+                        that._saveEditDataCore(deferreds, processedKeys);
+                        if (deferreds.length) {
+                            that._saving = true;
+                            $.when.apply($, deferreds).done(function() {
+                                if (that._processSaveEditDataResult(arguments, processedKeys)) {
+                                    resetEditIndices(that);
+                                    $.when(dataController.refresh()).always(function() {
+                                        that._fireSaveEditDataEvents(editData);
+                                        that._afterSaveEditData();
+                                        result.resolve()
+                                    })
+                                }
+                                else
+                                    result.resolve()
+                            }).fail(result.resolve);
+                            return result.always(function() {
+                                    that._saving = false
+                                }).promise()
+                        }
+                        if (isRowEditMode(that)) {
+                            if (!that.hasChanges())
+                                that.cancelEditData()
+                        }
+                        else if (editMode === DATAGRID_EDIT_MODE_BATCH || editMode === DATAGRID_EDIT_MODE_CELL) {
+                            resetEditIndices(that);
+                            dataController.updateItems()
+                        }
+                        else
+                            that._focusEditingCell();
+                        that._afterSaveEditData();
+                        return result.resolve().promise()
+                    },
+                    _updateEditColumn: function() {
+                        var that = this,
+                            editing = that.option("editing"),
+                            editMode = getEditMode(that),
+                            isEditColumnVisible = editing && ((editing.allowUpdating || editing.allowAdding) && editMode === DATAGRID_EDIT_MODE_ROW || editing.allowUpdating && editMode === DATAGRID_EDIT_MODE_FORM || editing.allowDeleting);
+                        that._columnsController.addCommandColumn({
+                            command: "edit",
+                            visible: isEditColumnVisible,
+                            cssClass: "dx-command-edit",
+                            width: "auto"
+                        });
+                        that._columnsController.columnOption("command:edit", "visible", isEditColumnVisible)
+                    },
+                    _updateEditButtons: function() {
+                        var that = this,
+                            saveChangesButton = that._saveChangesButton,
+                            cancelChangesButton = that._cancelChangesButton,
+                            hasChanges = that.hasChanges();
+                        if (saveChangesButton)
+                            saveChangesButton.option("disabled", !hasChanges);
+                        if (cancelChangesButton)
+                            cancelChangesButton.option("disabled", !hasChanges)
+                    },
+                    cancelEditData: function() {
+                        var that = this,
+                            dataController = that._dataController;
+                        that._beforeCancelEditData();
+                        that.init();
+                        dataController.updateItems()
+                    },
+                    hasEditData: function() {
+                        return this.hasChanges()
+                    },
+                    closeEditCell: function() {
+                        var that = this,
+                            editMode = getEditMode(that),
+                            oldEditRowIndex = that._editRowIndex,
+                            dataController = that._dataController;
+                        if (!isRowEditMode(that))
+                            setTimeout(function() {
+                                if (editMode === DATAGRID_EDIT_MODE_CELL && that.hasChanges())
+                                    that.saveEditData();
+                                else if (oldEditRowIndex >= 0) {
+                                    that._editRowIndex = -1;
+                                    that._editColumnIndex = -1;
+                                    dataController.updateItems({
+                                        changeType: "update",
+                                        rowIndices: [oldEditRowIndex]
+                                    })
+                                }
+                            })
+                    },
+                    update: function(changeType) {
+                        var that = this,
+                            dataController = that._dataController;
+                        if (dataController && that._pageIndex !== dataController.pageIndex()) {
+                            if (changeType === "refresh")
+                                that.refresh();
+                            that._pageIndex = dataController.pageIndex()
+                        }
+                        that._updateEditButtons()
+                    },
+                    updateFieldValue: function(options, value, text, forceUpdateRow) {
+                        var that = this,
+                            data = {},
+                            rowKey = options.key,
+                            $cellElement = options.cellElement,
+                            editMode = getEditMode(that),
+                            params;
+                        if (rowKey !== undefined && options.column.setCellValue) {
+                            if (editMode === DATAGRID_EDIT_MODE_BATCH && $cellElement)
+                                $cellElement.addClass(DATAGRID_CELL_MODIFIED);
+                            options.value = value;
+                            options.column.setCellValue(data, value, text);
+                            if (text && options.column.displayValueMap)
+                                options.column.displayValueMap[value] = text;
+                            params = {
+                                data: data,
+                                key: rowKey,
+                                oldData: options.data,
+                                type: DATA_EDIT_DATA_UPDATE_TYPE
+                            };
+                            that._addEditData(params);
+                            that._updateEditButtons();
+                            if (options.column.showEditorAlways && getEditMode(that) === DATAGRID_EDIT_MODE_CELL && options.row && !options.row.inserted)
+                                that.saveEditData().always(function() {
+                                    that._editColumnIndex = options.columnIndex;
+                                    that._editRowIndex = options.row.rowIndex;
+                                    that._focusEditingCell()
+                                });
+                            else if (options.row && (forceUpdateRow || options.column.setCellValue !== options.column.defaultSetCellValue))
+                                that._dataController.updateItems({
+                                    changeType: "update",
+                                    rowIndices: [options.row.rowIndex]
+                                })
+                        }
+                    },
+                    _addEditData: function(options) {
+                        var that = this,
+                            editDataIndex = getIndexByKey(options.key, that._editData);
+                        if (editDataIndex < 0) {
+                            editDataIndex = that._editData.length;
+                            that._editData.push(options)
+                        }
+                        if (that._editData[editDataIndex]) {
+                            options.type = that._editData[editDataIndex].type || options.type;
+                            objectUtils.deepExtendArraySafe(that._editData[editDataIndex], {
+                                data: options.data,
+                                type: options.type
+                            })
+                        }
+                        return editDataIndex
+                    },
+                    _formEditorPrepared: function(){},
+                    getFormEditorTemplate: function(detailCellOptions, column, item) {
+                        var that = this;
+                        return function(options, $container) {
+                                var cellOptions = $.extend({}, detailCellOptions, {
+                                        value: column.calculateCellValue(detailCellOptions.data),
+                                        column: $.extend({}, column, {editorOptions: item.editorOptions}),
+                                        id: options.component.getItemID(item.name || item.dataField),
+                                        columnIndex: column.index,
+                                        setValue: column.allowEditing && function(value) {
+                                            that.updateFieldValue(cellOptions, value)
+                                        }
+                                    });
+                                var template = column.editCellTemplate || getDefaultEditorTemplate(that);
+                                template($container, cellOptions);
+                                that._formEditorPrepared(cellOptions, $container)
+                            }
+                    },
+                    getEditFormTemplate: function(options) {
+                        var that = this;
+                        return function($container, detailOptions) {
+                                var editFormOptions = that.option("editing.form"),
+                                    items = that.option("editing.form.items"),
+                                    userCustomizeItem = that.option("editing.form.customizeItem");
+                                if (!items) {
+                                    var columns = that._columnsController.getColumns();
+                                    items = [];
+                                    $.each(columns, function(_, column) {
+                                        items.push({
+                                            column: column,
+                                            name: column.name,
+                                            dataField: column.dataField
+                                        })
+                                    })
+                                }
+                                that._createComponent($("<div>").appendTo($container), "dxForm", $.extend({}, editFormOptions, {
+                                    items: items,
+                                    formID: new DX.data.Guid,
+                                    customizeItem: function(item) {
+                                        var column = item.column || that._columnsController.columnOption(item.name || item.dataField);
+                                        if (column) {
+                                            item.label = item.label || {};
+                                            item.label.text = item.label.text || column.caption;
+                                            item.template = item.template || that.getFormEditorTemplate(detailOptions, column, item);
+                                            item.column = column;
+                                            if (column.formItem)
+                                                $.extend(item, column.formItem)
+                                        }
+                                        userCustomizeItem && userCustomizeItem.call(this, item);
+                                        item.cssClass = commonUtils.isString(item.cssClass) ? item.cssClass + " " + DATAGRID_EDIT_FORM_ITEM_CLASS : DATAGRID_EDIT_FORM_ITEM_CLASS
+                                    }
+                                }));
+                                var $buttonsContainer = $("<div>").addClass("dx-datagrid-form-buttons-container").appendTo($container);
+                                that._createComponent($("<div>").appendTo($buttonsContainer), Button, {
+                                    text: that.option("editing.texts.saveRowChanges"),
+                                    onClick: $.proxy(that.saveEditData, that)
+                                });
+                                that._createComponent($("<div>").appendTo($buttonsContainer), Button, {
+                                    text: that.option("editing.texts.cancelRowChanges"),
+                                    onClick: $.proxy(that.cancelEditData, that)
+                                })
+                            }
+                    },
+                    getColumnTemplate: function(options) {
+                        var that = this,
+                            column = options.column,
+                            rowIndex = options.row && options.row.rowIndex,
+                            template,
+                            editingOptions,
+                            editingTexts,
+                            allowUpdating,
+                            isRowMode = isRowEditMode(that),
+                            isRowEditing = that.isEditRow(rowIndex),
+                            isCellEditing = that.isEditCell(rowIndex, options.columnIndex),
+                            editingStartOptions;
+                        if ((column.showEditorAlways || column.setCellValue && (isRowEditing && column.allowEditing || isCellEditing)) && options.rowType === "data" && !commonUtils.isDefined(column.command)) {
+                            allowUpdating = that.option("editing.allowUpdating");
+                            if (((allowUpdating || isRowEditing) && column.allowEditing || isCellEditing) && (isRowMode && isRowEditing || !isRowMode)) {
+                                if (column.showEditorAlways && !isRowMode) {
+                                    editingStartOptions = {
+                                        cancel: false,
+                                        key: options.row.key,
+                                        data: options.row.data,
+                                        column: column
+                                    };
+                                    that._isEditingStart(editingStartOptions)
+                                }
+                                if (!editingStartOptions || !editingStartOptions.cancel)
+                                    options.setValue = function(value, text) {
+                                        that.updateFieldValue(options, value, text)
+                                    }
+                            }
+                            template = column.editCellTemplate || getDefaultEditorTemplate(that)
+                        }
+                        else if (column.command === "edit" && options.rowType === "data")
+                            template = function(container, options) {
+                                var createLink = function(container, text, methodName, options) {
+                                        var $link = $("<a />").addClass(DATAGRID_LINK_CLASS).text(text).on(addNamespace("dxclick", DATAGRID_EDITING_NAMESPACE), that.createAction(function(params) {
+                                                var e = params.jQueryEvent;
+                                                e.stopPropagation();
+                                                setTimeout(function() {
+                                                    options.row && that[methodName](options.row.rowIndex)
+                                                })
+                                            }));
+                                        options.rtlEnabled ? container.prepend($link, "&nbsp;") : container.append($link, "&nbsp;")
+                                    };
+                                container.css("text-align", "center");
+                                options.rtlEnabled = that.option("rtlEnabled");
+                                editingOptions = that.option("editing") || {};
+                                editingTexts = editingOptions.texts || {};
+                                if (options.row && options.row.rowIndex === that._editRowIndex && isRowMode) {
+                                    createLink(container, editingTexts.saveRowChanges, "saveEditData", options);
+                                    createLink(container, editingTexts.cancelRowChanges, "cancelEditData", options)
+                                }
+                                else {
+                                    if (editingOptions.allowUpdating && isRowMode)
+                                        createLink(container, editingTexts.editRow, "editRow", options);
+                                    if (editingOptions.allowDeleting)
+                                        if (options.row.removed)
+                                            createLink(container, editingTexts.undeleteRow, "undeleteRow", options);
+                                        else
+                                            createLink(container, editingTexts.deleteRow, "deleteRow", options)
+                                }
+                            };
+                        else if (column.command === "detail" && options.rowType === "detail" && isRowEditing)
+                            template = that.getEditFormTemplate(options);
+                        return template
+                    },
+                    renderEditButtons: function(rootElement) {
+                        var that = this,
+                            insertButton = rootElement.find("." + DATAGRID_EDIT_BUTTON_CLASS),
+                            editingOptions = that.option("editing") || {},
+                            editingTexts = that.option("editing.texts") || {},
+                            titleButtonTextByClassNames = {
+                                cancel: editingTexts.cancelAllChanges,
+                                save: editingTexts.saveAllChanges,
+                                addrow: editingTexts.addRow
+                            };
+                        var createEditButton = function(rootElement, className, methodName) {
+                                return that._createComponent($("<div />").addClass(DATAGRID_EDIT_BUTTON_CLASS).addClass("dx-datagrid-" + className + "-button").appendTo(rootElement), Button, {
+                                        icon: "edit-button-" + className,
+                                        onClick: function(options) {
+                                            var e = options.jQueryEvent;
+                                            e.stopPropagation();
+                                            that[methodName]()
+                                        },
+                                        hint: titleButtonTextByClassNames && titleButtonTextByClassNames[className]
+                                    })
+                            };
+                        if (insertButton.length)
+                            insertButton.remove();
+                        if ((editingOptions.allowUpdating || editingOptions.allowAdding || editingOptions.allowDeleting) && getEditMode(that) === DATAGRID_EDIT_MODE_BATCH) {
+                            that._cancelChangesButton = createEditButton(rootElement, "cancel", "cancelEditData");
+                            that._saveChangesButton = createEditButton(rootElement, "save", "saveEditData");
+                            that._updateEditButtons()
+                        }
+                        if (editingOptions.allowAdding)
+                            createEditButton(rootElement, "addrow", "addRow")
+                    },
+                    createHighlightCell: function($cell) {
+                        var $highlight = $cell.find("." + DATAGRID_CELL_HIGHLIGHT_OUTLINE);
+                        if (!$highlight.length)
+                            $cell.wrapInner($("<div>").addClass(DATAGRID_CELL_HIGHLIGHT_OUTLINE + " " + DATAGRID_POINTER_EVENTS_TARGET_CLASS))
+                    },
+                    resetRowAndPageIndeces: function(alwaysRest) {
+                        var that = this;
+                        $.each(that._editData, function(_, editData) {
+                            if (editData.pageIndex !== that._pageIndex || alwaysRest) {
+                                delete editData.pageIndex;
+                                delete editData.rowIndex
+                            }
+                        })
+                    },
+                    _afterInsertRow: function(options){},
+                    _beforeSaveEditData: function(editData, editIndex){},
+                    _afterSaveEditData: function(){},
+                    _beforeCancelEditData: function(){}
+                }
+        }());
+        dataGrid.registerModule("editing", {
+            defaultOptions: function() {
+                return {editing: {
+                            mode: "row",
+                            allowAdding: false,
+                            allowUpdating: false,
+                            allowDeleting: false,
+                            texts: {
+                                editRow: Globalize.localize("dxDataGrid-editingEditRow"),
+                                saveAllChanges: Globalize.localize("dxDataGrid-editingSaveAllChanges"),
+                                saveRowChanges: Globalize.localize("dxDataGrid-editingSaveRowChanges"),
+                                cancelAllChanges: Globalize.localize("dxDataGrid-editingCancelAllChanges"),
+                                cancelRowChanges: Globalize.localize("dxDataGrid-editingCancelRowChanges"),
+                                addRow: Globalize.localize("dxDataGrid-editingAddRow"),
+                                deleteRow: Globalize.localize("dxDataGrid-editingDeleteRow"),
+                                undeleteRow: Globalize.localize("dxDataGrid-editingUndeleteRow"),
+                                confirmDeleteMessage: Globalize.localize("dxDataGrid-editingConfirmDeleteMessage"),
+                                confirmDeleteTitle: Globalize.localize("dxDataGrid-editingConfirmDeleteTitle")
+                            },
+                            form: {colCount: 2}
+                        }}
+            },
+            controllers: {editing: dataGrid.EditingController},
+            extenders: {
+                controllers: {
+                    data: {
+                        init: function() {
+                            this._editingController = this.getController("editing");
+                            this.callBase()
+                        },
+                        reload: function(full) {
+                            var d,
+                                editingController = this.getController("editing");
+                            this._editingController.refresh();
+                            d = this.callBase(full);
+                            return d && d.done(function() {
+                                    editingController.resetRowAndPageIndeces(true)
+                                })
+                        },
+                        _updateItemsCore: function(change) {
+                            this.callBase(change);
+                            var editFormItem = this.items()[this.getController("editing").getEditFormRowIndex()];
+                            if (editFormItem)
+                                editFormItem.rowType = "detail"
+                        },
+                        _processItems: function(items, changeType) {
+                            items = this._editingController.processItems(items, changeType);
+                            return this.callBase(items, changeType)
+                        },
+                        _processDataItem: function(dataItem, options) {
+                            this._editingController.processDataItem(dataItem, options.visibleColumns, this.generateDataValues);
+                            return this.callBase(dataItem, options)
+                        },
+                        _processItem: function(item, options) {
+                            item = this.callBase(item, options);
+                            if (item.inserted) {
+                                options.dataIndex--;
+                                delete item.dataIndex
+                            }
+                            return item
+                        }
+                    },
+                    columnsResizer: {_startResizing: function(args) {
+                            var that = this,
+                                editingController = that.getController("editing"),
+                                isCellEditing = function() {
+                                    var editingOptions = that.option("editing");
+                                    return editingOptions && editingOptions.mode !== DATAGRID_EDIT_MODE_ROW && editingController.isEditing()
+                                };
+                            that.callBase(args);
+                            if (that.isResizing() && isCellEditing())
+                                editingController.closeEditCell()
+                        }}
+                },
+                views: {
+                    rowsView: {
+                        init: function() {
+                            this.callBase();
+                            this._editingController = this.getController("editing")
+                        },
+                        getCellElements: function(rowIndex) {
+                            var $cellElements = this.callBase(rowIndex),
+                                editFormRowIndex = this._editingController.getEditFormRowIndex();
+                            if (editFormRowIndex === rowIndex && $cellElements)
+                                return $cellElements.find("." + DATAGRID_EDIT_FORM_ITEM_CLASS);
+                            return $cellElements
+                        },
+                        _getVisibleColumnIndex: function($cells, rowIndex, columnIdentificator) {
+                            var item,
+                                visibleIndex = this.callBase($cells, rowIndex, columnIdentificator),
+                                editFormRowIndex = this._editingController.getEditFormRowIndex();
+                            if (editFormRowIndex === rowIndex)
+                                $.each($cells, function(index, cellElement) {
+                                    item = $(cellElement).find(".dx-field-item-content").data("dx-form-item");
+                                    if (item && item.column && item.column.visibleIndex === visibleIndex) {
+                                        visibleIndex = index;
+                                        return false
+                                    }
+                                });
+                            return visibleIndex
+                        },
+                        publicMethods: function() {
+                            return this.callBase().concat(["cellValue"])
+                        },
+                        _getColumnTemplate: function(options) {
+                            var that = this,
+                                template = that._editingController.getColumnTemplate(options);
+                            return template || that.callBase(options)
+                        },
+                        _isNativeClick: function() {
+                            return (devices.real().ios || devices.real().android) && this.option("editing.allowUpdating")
+                        },
+                        _createTable: function() {
+                            var that = this,
+                                $table = that.callBase.apply(that, arguments);
+                            if (!isRowEditMode(that) && that.option("editing.allowUpdating"))
+                                $table.on(addNamespace("dxhold", "dxDataGridRowsView"), "td:not(." + DATAGRID_EDITOR_CELL_CLASS + ")", that.createAction(function(e) {
+                                    if (that._editingController.isEditing())
+                                        that._editingController.closeEditCell()
+                                }));
+                            return $table
+                        },
+                        _createRow: function(row) {
+                            var $row = this.callBase(row),
+                                isEditRow,
+                                isRowRemoved,
+                                isRowInserted,
+                                isRowModified;
+                            if (row) {
+                                isEditRow = this._editingController.isEditRow(row.rowIndex);
+                                isRowRemoved = !!row.removed;
+                                isRowInserted = !!row.inserted;
+                                isRowModified = !!row.modified;
+                                if (getEditMode(this) === DATAGRID_EDIT_MODE_BATCH)
+                                    isRowRemoved && $row.addClass(DATAGRID_ROW_REMOVED);
+                                else
+                                    isEditRow && $row.addClass(DATAGRID_EDIT_ROW);
+                                isRowInserted && $row.addClass(DATAGRID_ROW_INSERTED);
+                                isRowModified && $row.addClass(DATAGRID_ROW_MODIFIED);
+                                if (isEditRow || isRowInserted || isRowRemoved)
+                                    $row.removeClass(DATAGRID_ROW_SELECTED);
+                                if (isEditRow && row.rowType === "detail")
+                                    $row.addClass(DATAGRID_EDIT_FORM_CLASS)
+                            }
+                            return $row
+                        },
+                        _rowClick: function(e) {
+                            var that = this,
+                                editingController = that._editingController,
+                                $targetCell = $(e.jQueryEvent.target).closest("." + DATAGRID_ROW_CLASS + "> td"),
+                                columnIndex = that.getCellIndex($targetCell),
+                                allowUpdating = that.option("editing.allowUpdating"),
+                                column = that._columnsController.getVisibleColumns()[columnIndex],
+                                allowEditing = column && (column.allowEditing || editingController.isEditCell(e.rowIndex, columnIndex));
+                            if ($targetCell.hasClass(DATAGRID_POINTER_EVENTS_NONE_CLASS))
+                                return;
+                            if (!(allowUpdating && allowEditing && editingController.editCell(e.rowIndex, columnIndex)) && !editingController.isEditRow(e.rowIndex))
+                                that.callBase(e)
+                        },
+                        _cellPrepared: function($cell, parameters) {
+                            var columnIndex = parameters.columnIndex,
+                                editingController = this._editingController,
+                                isCommandCell = !!parameters.column.command,
+                                isEditableCell = parameters.setValue;
+                            parameters.isEditing = editingController.isEditCell(parameters.rowIndex, parameters.columnIndex) || editingController.isEditRow(parameters.rowIndex) && parameters.column.allowEditing;
+                            if (!commonUtils.isDefined(parameters.column.command) && (parameters.isEditing || parameters.column.showEditorAlways)) {
+                                var alignment = parameters.column.alignment;
+                                $cell.addClass(DATAGRID_EDITOR_CELL_CLASS).toggleClass(DATAGRID_READONLY_CLASS, !isEditableCell).toggleClass(DATAGRID_CELL_FOCUS_DISABLED_CLASS, !isEditableCell);
+                                if (alignment)
+                                    $cell.find("input").first().css("text-align", alignment)
+                            }
+                            var firstChild = $cell.get(0).firstChild;
+                            if (firstChild && firstChild.className && firstChild.className.indexOf(CHECKBOX_CLASS) >= 0)
+                                $cell.addClass(DATAGRID_EDITOR_INLINE_BLOCK).toggleClass(DATAGRID_CELL_FOCUS_DISABLED_CLASS, isCommandCell || !isEditableCell);
+                            var modifiedValues = parameters.row && (parameters.row.inserted ? parameters.row.values : parameters.row.modifiedValues);
+                            if (modifiedValues && modifiedValues[columnIndex] !== undefined && parameters.column && !isCommandCell && parameters.column.setCellValue) {
+                                editingController.createHighlightCell($cell);
+                                $cell.addClass(DATAGRID_CELL_MODIFIED)
+                            }
+                            else if (isEditableCell)
+                                editingController.createHighlightCell($cell, true);
+                            this.callBase.apply(this, arguments)
+                        },
+                        _update: function(change) {
+                            this.callBase(change);
+                            if (change.changeType === "updateSelection")
+                                this.getTableElements().children("tbody").children("." + DATAGRID_EDIT_ROW).removeClass(DATAGRID_ROW_SELECTED)
+                        },
+                        cellValue: function(rowIndex, columnIdentificator, value, text) {
+                            var cellOptions = this.getCellOptions(rowIndex, columnIdentificator);
+                            if (cellOptions)
+                                if (value === undefined)
+                                    return cellOptions.value;
+                                else
+                                    this._editingController.updateFieldValue(cellOptions, value, text, true)
+                        }
+                    },
+                    headerPanel: {
+                        _renderCore: function() {
+                            this.callBase();
+                            this.getController("editing").renderEditButtons(this.element())
+                        },
+                        isVisible: function() {
+                            var that = this,
+                                editingOptions = that.getController("editing").option("editing");
+                            return that.callBase() || editingOptions && (editingOptions.allowAdding || (editingOptions.allowUpdating || editingOptions.allowDeleting) && editingOptions.mode === DATAGRID_EDIT_MODE_BATCH)
+                        }
+                    }
+                }
+            }
+        });
+        $.extend(dataGrid.__internals, {
+            DATAGRID_LINK_CLASS: DATAGRID_LINK_CLASS,
+            DATAGRID_EDITOR_CELL_CLASS: DATAGRID_EDITOR_CELL_CLASS,
+            DATAGRID_EDIT_ROW: DATAGRID_EDIT_ROW,
+            DATAGRID_EDIT_BUTTON_CLASS: DATAGRID_EDIT_BUTTON_CLASS,
+            DATAGRID_CELL_MODIFIED: DATAGRID_CELL_MODIFIED,
+            DATAGRID_ROW_REMOVED: DATAGRID_ROW_REMOVED,
+            DATAGRID_ROW_INSERTED: DATAGRID_ROW_INSERTED,
+            DATAGRID_ROW_MODIFIED: DATAGRID_ROW_MODIFIED,
+            DATAGRID_CELL_HIGHLIGHT_OUTLINE: DATAGRID_CELL_HIGHLIGHT_OUTLINE,
+            DATAGRID_FOCUS_OVERLAY_CLASS: DATAGRID_FOCUS_OVERLAY_CLASS,
+            DATAGRID_READONLY_CLASS: DATAGRID_READONLY_CLASS,
+            DATAGRID_CELL_FOCUS_DISABLED_CLASS: DATAGRID_CELL_FOCUS_DISABLED_CLASS,
+            DATAGRID_EDIT_FORM_CLASS: DATAGRID_EDIT_FORM_CLASS
         })
     })(jQuery, DevExpress);
     /*! Module widgets-web, file ui.dataGrid.groupingModule.js */
@@ -9583,8 +10813,10 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                                 _getColumnTemplate: function(options) {
                                     var that = this,
                                         column = options.column,
+                                        editingController = that.getController("editing"),
+                                        isEditRow = editingController && editingController.isEditRow(options.rowIndex),
                                         template;
-                                    if (column.command === "detail")
+                                    if (column.command === "detail" && !isEditRow)
                                         template = that.option("masterDetail.template") || that._getDefaultTemplate(column);
                                     else
                                         template = that.callBase.apply(that, arguments);
@@ -9640,1184 +10872,6 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                             }
                     }()}
             }
-        })
-    })(jQuery, DevExpress);
-    /*! Module widgets-web, file ui.dataGrid.editing.js */
-    (function($, DX) {
-        var dataGrid = DX.ui.dxDataGrid,
-            eventUtils = DX.require("/ui/events/ui.events.utils"),
-            addNamespace = eventUtils.addNamespace,
-            objectUtils = DX.require("/utils/utils.object"),
-            commonUtils = DX.require("/utils/utils.common"),
-            dialog = DX.require("/ui/ui.dialog"),
-            Button = DX.require("/ui/widgets/ui.button"),
-            errors = DevExpress.require("/ui/ui.errors"),
-            devices = DX.require("/devices"),
-            getIndexByKey = dataGrid.getIndexByKey;
-        var DATAGRID_LINK_CLASS = "dx-link",
-            DATAGRID_EDITOR_CELL_CLASS = "dx-editor-cell",
-            DATAGRID_ROW_SELECTED = "dx-selection",
-            DATAGRID_EDIT_ROW = "dx-edit-row",
-            DATAGRID_EDIT_FORM_CLASS = "dx-datagrid-edit-form",
-            DATAGRID_EDIT_BUTTON_CLASS = "dx-edit-button",
-            DATAGRID_INSERT_INDEX = "__DX_INSERT_INDEX__",
-            DATAGRID_ROW_CLASS = "dx-row",
-            DATAGRID_ROW_REMOVED = "dx-row-removed",
-            DATAGRID_ROW_INSERTED = "dx-row-inserted",
-            DATAGRID_ROW_MODIFIED = "dx-row-modified",
-            DATAGRID_CELL_MODIFIED = "dx-cell-modified",
-            DATAGRID_CELL_HIGHLIGHT_OUTLINE = "dx-highlight-outline",
-            DATAGRID_EDITING_NAMESPACE = "dxDataGridEditing",
-            DATAGRID_FOCUS_OVERLAY_CLASS = "dx-datagrid-focus-overlay",
-            DATAGRID_READONLY_CLASS = "dx-datagrid-readonly",
-            DATAGRID_DATA_ROW_CLASS = "dx-data-row",
-            CHECKBOX_CLASS = "dx-checkbox",
-            DATAGRID_EDITOR_INLINE_BLOCK = "dx-editor-inline-block",
-            DATAGRID_CELL_FOCUS_DISABLED_CLASS = "dx-cell-focus-disabled",
-            DATAGRID_EDIT_MODE_BATCH = "batch",
-            DATAGRID_EDIT_MODE_ROW = "row",
-            DATAGRID_EDIT_MODE_CELL = "cell",
-            DATAGRID_EDIT_MODE_FORM = "form",
-            DATA_EDIT_DATA_INSERT_TYPE = "insert",
-            DATA_EDIT_DATA_UPDATE_TYPE = "update",
-            DATA_EDIT_DATA_REMOVE_TYPE = "remove",
-            DATAGRID_POINTER_EVENTS_NONE_CLASS = "dx-pointer-events-none",
-            DATAGRID_POINTER_EVENTS_TARGET_CLASS = "dx-pointer-events-target";
-        var getEditMode = function(that) {
-                var editMode = that.option("editing.mode");
-                if (editMode === DATAGRID_EDIT_MODE_BATCH || editMode === DATAGRID_EDIT_MODE_CELL || editMode === DATAGRID_EDIT_MODE_FORM)
-                    return editMode;
-                return DATAGRID_EDIT_MODE_ROW
-            };
-        var isRowEditMode = function(that) {
-                var editMode = getEditMode(that);
-                return editMode === DATAGRID_EDIT_MODE_ROW || editMode === DATAGRID_EDIT_MODE_FORM
-            };
-        dataGrid.EditingController = dataGrid.ViewController.inherit(function() {
-            var getDefaultEditorTemplate = function(that) {
-                    return function(container, options) {
-                            var $editor = $("<div/>").appendTo(container);
-                            that.getController("editorFactory").createEditor($editor, $.extend({}, options.column, {
-                                value: options.value,
-                                setValue: options.setValue,
-                                row: options.row,
-                                parentType: "dataRow",
-                                width: null,
-                                readOnly: !options.setValue,
-                                id: options.id
-                            }))
-                        }
-                };
-            return {
-                    init: function() {
-                        var that = this;
-                        that._insertIndex = 1;
-                        that._editRowIndex = -1;
-                        that._editData = [];
-                        that._editColumnIndex = -1;
-                        that._columnsController = that.getController("columns");
-                        that._dataController = that.getController("data");
-                        if (!that._dataChangedHandler) {
-                            that._dataChangedHandler = $.proxy(that._handleDataChanged, that);
-                            that._dataController.changed.add(that._dataChangedHandler)
-                        }
-                        if (!that._saveEditorHandler) {
-                            that.createAction("onInitNewRow", {excludeValidators: ["disabled", "readOnly"]});
-                            that.createAction("onRowInserting", {excludeValidators: ["disabled", "readOnly"]});
-                            that.createAction("onRowInserted", {excludeValidators: ["disabled", "readOnly"]});
-                            that.createAction("onEditingStart", {excludeValidators: ["disabled", "readOnly"]});
-                            that.createAction("onRowUpdating", {excludeValidators: ["disabled", "readOnly"]});
-                            that.createAction("onRowUpdated", {excludeValidators: ["disabled", "readOnly"]});
-                            that.createAction("onRowRemoving", {excludeValidators: ["disabled", "readOnly"]});
-                            that.createAction("onRowRemoved", {excludeValidators: ["disabled", "readOnly"]});
-                            that._saveEditorHandler = that.createAction(function(e) {
-                                var event = e.jQueryEvent,
-                                    visibleColumns,
-                                    isEditorPopup,
-                                    isDomElement,
-                                    isFocusOverlay,
-                                    $targetCell,
-                                    allowEditing,
-                                    columnIndex,
-                                    isDataRow,
-                                    rowIndex;
-                                if (!isRowEditMode(that) && that.isEditing() && !that._editCellInProgress) {
-                                    isEditorPopup = $(event.target).closest(".dx-dropdowneditor-overlay").length;
-                                    isDomElement = $(event.target).closest(document).length;
-                                    isFocusOverlay = $(event.target).hasClass(DATAGRID_FOCUS_OVERLAY_CLASS);
-                                    isDataRow = $(event.target).closest("." + DATAGRID_DATA_ROW_CLASS).length;
-                                    visibleColumns = that._columnsController.getVisibleColumns();
-                                    $targetCell = $(event.target).closest("." + DATAGRID_ROW_CLASS + "> td");
-                                    columnIndex = $targetCell[0] && $targetCell[0].cellIndex;
-                                    rowIndex = that.getView("rowsView").getRowIndex($targetCell.parent());
-                                    allowEditing = visibleColumns[columnIndex] && visibleColumns[columnIndex].allowEditing;
-                                    if ((!isDataRow || isDataRow && !allowEditing && !that.isEditCell(rowIndex, columnIndex)) && !isEditorPopup && !isFocusOverlay && isDomElement)
-                                        that.closeEditCell()
-                                }
-                            });
-                            $(document).on("dxclick", that._saveEditorHandler)
-                        }
-                        that._updateEditColumn();
-                        that._updateEditButtons()
-                    },
-                    _handleDataChanged: function(args) {
-                        if (this.option("scrolling.mode") === "standard")
-                            this.resetRowAndPageIndeces();
-                        if (args.changeType === "prepend")
-                            $.each(this._editData, function(_, editData) {
-                                editData.rowIndex += args.items.length;
-                                if (editData.type === DATA_EDIT_DATA_INSERT_TYPE)
-                                    editData.key.rowIndex += args.items.length
-                            })
-                    },
-                    getEditMode: function() {
-                        return getEditMode(this)
-                    },
-                    getFirstEditableColumnIndex: function() {
-                        var columnsController = this.getController("columns"),
-                            visibleColumns = columnsController.getVisibleColumns(),
-                            columnIndex;
-                        $.each(visibleColumns, function(index, column) {
-                            if (column.allowEditing) {
-                                columnIndex = index;
-                                return false
-                            }
-                        });
-                        return columnIndex
-                    },
-                    getFirstEditableCellInRow: function(rowIndex) {
-                        return this.getView("rowsView").getCellElement(rowIndex ? rowIndex : 0, this.getFirstEditableColumnIndex())
-                    },
-                    getFocusedCellInRow: function(rowIndex) {
-                        return this.getFirstEditableCellInRow(rowIndex)
-                    },
-                    getIndexByKey: function(key, items) {
-                        return getIndexByKey(key, items)
-                    },
-                    hasChanges: function() {
-                        var that = this,
-                            result = false;
-                        for (var i = 0; i < that._editData.length; i++)
-                            if (that._editData[i].type) {
-                                result = true;
-                                break
-                            }
-                        return result
-                    },
-                    dispose: function() {
-                        this.callBase();
-                        $(document).off("dxclick", this._saveEditorHandler)
-                    },
-                    optionChanged: function(args) {
-                        if (args.name === "editing") {
-                            this.init();
-                            args.handled = true
-                        }
-                        else
-                            this.callBase(args)
-                    },
-                    publicMethods: function() {
-                        return ["insertRow", "addRow", "removeRow", "deleteRow", "undeleteRow", "editRow", "editCell", "closeEditCell", "saveEditData", "cancelEditData", "hasEditData"]
-                    },
-                    refresh: function() {
-                        if (getEditMode(this) !== DATAGRID_EDIT_MODE_BATCH)
-                            this.init();
-                        else {
-                            this._editRowIndex = -1;
-                            this._editColumnIndex = -1
-                        }
-                    },
-                    isEditing: function() {
-                        return this._editRowIndex > -1
-                    },
-                    isEditRow: function(rowIndex) {
-                        return (getEditMode(this) === DATAGRID_EDIT_MODE_ROW || getEditMode(this) === DATAGRID_EDIT_MODE_FORM) && this._editRowIndex === rowIndex
-                    },
-                    getEditFormRowIndex: function() {
-                        return getEditMode(this) === DATAGRID_EDIT_MODE_FORM ? this._editRowIndex : -1
-                    },
-                    isEditCell: function(rowIndex, columnIndex) {
-                        return this._editRowIndex === rowIndex && this._editColumnIndex === columnIndex
-                    },
-                    _needInsertItem: function(editData, changeType) {
-                        var that = this,
-                            dataSource = that._dataController.dataSource(),
-                            srollingMode = that.option("scrolling.mode"),
-                            pageIndex = dataSource.pageIndex(),
-                            beginPageIndex = dataSource.beginPageIndex ? dataSource.beginPageIndex() : pageIndex,
-                            endPageIndex = dataSource.endPageIndex ? dataSource.endPageIndex() : pageIndex;
-                        if (srollingMode !== "standard")
-                            switch (changeType) {
-                                case"append":
-                                    return editData.key.pageIndex === endPageIndex;
-                                case"prepend":
-                                    return editData.key.pageIndex === beginPageIndex;
-                                case"refresh":
-                                    editData.key.rowIndex = 0;
-                                    editData.key.pageIndex = 0;
-                                    break;
-                                default:
-                                    return editData.key.pageIndex >= beginPageIndex && editData.key.pageIndex <= endPageIndex
-                            }
-                        return editData.key.pageIndex === pageIndex
-                    },
-                    processItems: function(items, changeType) {
-                        var that = this,
-                            i,
-                            key,
-                            data,
-                            editData = that._editData;
-                        that.update(changeType);
-                        for (i = 0; i < editData.length; i++) {
-                            key = editData[i].key;
-                            data = {key: key};
-                            if (editData[i].type === DATA_EDIT_DATA_INSERT_TYPE && that._needInsertItem(editData[i], changeType)) {
-                                data[DATAGRID_INSERT_INDEX] = key[DATAGRID_INSERT_INDEX];
-                                items.splice(key.rowIndex, 0, data)
-                            }
-                        }
-                        return items
-                    },
-                    processDataItem: function(item, columns, generateDataValues) {
-                        var that = this,
-                            editIndex,
-                            editData,
-                            data,
-                            key = item.data[DATAGRID_INSERT_INDEX] ? item.data.key : item.key,
-                            editMode;
-                        editIndex = getIndexByKey(key, that._editData);
-                        if (editIndex >= 0) {
-                            editMode = getEditMode(that);
-                            editData = that._editData[editIndex];
-                            data = editData.data;
-                            switch (editData.type) {
-                                case DATA_EDIT_DATA_INSERT_TYPE:
-                                    item.inserted = true;
-                                    item.key = key;
-                                    item.data = data;
-                                    break;
-                                case DATA_EDIT_DATA_UPDATE_TYPE:
-                                    item.modified = true;
-                                    item.oldData = item.data;
-                                    item.data = $.extend(true, {}, item.data, data);
-                                    item.modifiedValues = generateDataValues(data, columns);
-                                    break;
-                                case DATA_EDIT_DATA_REMOVE_TYPE:
-                                    if (editMode === DATAGRID_EDIT_MODE_BATCH)
-                                        item.data = $.extend(true, {}, item.data, data);
-                                    item.removed = true;
-                                    break
-                            }
-                        }
-                    },
-                    insertRow: function() {
-                        errors.log("W0002", "dxDataGrid", "insertRow", "15.2", "Use the 'addRow' method instead");
-                        return this.addRow()
-                    },
-                    addRow: function() {
-                        var that = this,
-                            dataController = that._dataController,
-                            store = dataController.store(),
-                            key = store && store.key(),
-                            rowsView = that.getView("rowsView"),
-                            param = {data: {}},
-                            insertKey = {
-                                pageIndex: dataController.pageIndex(),
-                                rowIndex: rowsView ? rowsView.getTopVisibleItemIndex() : 0
-                            },
-                            oldEditRowIndex = that._editRowIndex,
-                            editMode = getEditMode(that),
-                            $firstCell;
-                        if (editMode === DATAGRID_EDIT_MODE_CELL && that.hasChanges())
-                            that.saveEditData();
-                        that.refresh();
-                        if (editMode !== DATAGRID_EDIT_MODE_BATCH && that._insertIndex > 1)
-                            return;
-                        if (!key)
-                            param.data.__KEY__ = String(new DX.data.Guid);
-                        that.executeAction("onInitNewRow", param);
-                        if (editMode !== DATAGRID_EDIT_MODE_BATCH)
-                            that._editRowIndex = insertKey.rowIndex;
-                        insertKey[DATAGRID_INSERT_INDEX] = that._insertIndex++;
-                        that._addEditData({
-                            key: insertKey,
-                            data: param.data,
-                            type: DATA_EDIT_DATA_INSERT_TYPE
-                        });
-                        dataController.updateItems({
-                            changeType: "update",
-                            rowIndices: [oldEditRowIndex, insertKey.rowIndex]
-                        });
-                        $firstCell = that.getFirstEditableCellInRow(insertKey.rowIndex);
-                        that._delayedInputFocus($firstCell, function() {
-                            var $cell = that.getFirstEditableCellInRow(insertKey.rowIndex);
-                            $cell && $cell.trigger("dxclick")
-                        });
-                        that._afterInsertRow({
-                            key: insertKey,
-                            data: param.data
-                        })
-                    },
-                    _isEditingStart: function(options) {
-                        this.executeAction("onEditingStart", options);
-                        return options.cancel
-                    },
-                    _beforeEditCell: function(rowIndex, columnIndex, item) {
-                        if (getEditMode(this) === DATAGRID_EDIT_MODE_CELL && !item.inserted && this.hasChanges()) {
-                            this.saveEditData();
-                            if (this.hasChanges())
-                                return true
-                        }
-                    },
-                    editRow: function(rowIndex) {
-                        var that = this,
-                            dataController = that._dataController,
-                            items = dataController.items(),
-                            item = items[rowIndex],
-                            params = {
-                                data: item.data,
-                                cancel: false
-                            },
-                            oldEditRowIndex = that._editRowIndex,
-                            $editingCell;
-                        if (rowIndex === oldEditRowIndex)
-                            return true;
-                        if (!item.inserted)
-                            params.key = item.key;
-                        if (that._isEditingStart(params))
-                            return;
-                        that.init();
-                        that._pageIndex = dataController.pageIndex();
-                        that._editRowIndex = items[0].inserted ? rowIndex - 1 : rowIndex;
-                        that._addEditData({
-                            data: {},
-                            key: item.key,
-                            oldData: item.data
-                        });
-                        dataController.updateItems({
-                            changeType: "update",
-                            rowIndices: [oldEditRowIndex, rowIndex]
-                        });
-                        if (getEditMode(that) === DATAGRID_EDIT_MODE_ROW || getEditMode(that) === DATAGRID_EDIT_MODE_FORM) {
-                            $editingCell = that.getFocusedCellInRow(that._editRowIndex);
-                            that._delayedInputFocus($editingCell, function() {
-                                $editingCell && that.component.focus($editingCell)
-                            })
-                        }
-                    },
-                    editCell: function(rowIndex, columnIndex) {
-                        var that = this,
-                            $cell,
-                            columnsController = that._columnsController,
-                            dataController = that._dataController,
-                            items = dataController.items(),
-                            item = items[rowIndex],
-                            params = {
-                                data: item && item.data,
-                                cancel: false
-                            },
-                            oldEditRowIndex = that._editRowIndex,
-                            oldEditColumnIndex = that._editColumnIndex,
-                            columns = columnsController.getVisibleColumns(),
-                            showEditorAlways;
-                        if (commonUtils.isString(columnIndex)) {
-                            columnIndex = columnsController.columnOption(columnIndex, "index");
-                            columnIndex = columnsController.getVisibleIndex(columnIndex)
-                        }
-                        params.column = columnsController.getVisibleColumns()[columnIndex];
-                        showEditorAlways = params.column && params.column.showEditorAlways;
-                        if (params.column && item && item.rowType === "data" && !item.removed && !isRowEditMode(that)) {
-                            if (this.isEditCell(rowIndex, columnIndex))
-                                return true;
-                            if (that._beforeEditCell(rowIndex, columnIndex, item))
-                                return true;
-                            if (!item.inserted)
-                                params.key = item.key;
-                            if (that._isEditingStart(params))
-                                return true;
-                            that._editRowIndex = rowIndex;
-                            that._editColumnIndex = columnIndex;
-                            that._pageIndex = dataController.pageIndex();
-                            that._addEditData({
-                                data: {},
-                                key: item.key,
-                                oldData: item.data
-                            });
-                            if (!showEditorAlways || columns[oldEditColumnIndex] && !columns[oldEditColumnIndex].showEditorAlways) {
-                                that._editCellInProgress = true;
-                                that.getController("editorFactory").loseFocus();
-                                dataController.updateItems({
-                                    changeType: "update",
-                                    rowIndices: [oldEditRowIndex, that._editRowIndex]
-                                })
-                            }
-                            $cell = that.getView("rowsView").getCellElement(that._editRowIndex, that._editColumnIndex);
-                            if (!$cell.find(":focus").length)
-                                that._focusEditingCell(function() {
-                                    that._editCellInProgress = false
-                                }, $cell);
-                            else
-                                that._editCellInProgress = false;
-                            return true
-                        }
-                        return false
-                    },
-                    _delayedInputFocus: function($cell, beforeFocusCallback) {
-                        function inputFocus() {
-                            if (beforeFocusCallback)
-                                beforeFocusCallback();
-                            $cell && $cell.find("[tabindex], input").first().focus()
-                        }
-                        if (devices.real().ios || devices.real().android)
-                            inputFocus();
-                        else
-                            setTimeout(inputFocus)
-                    },
-                    _focusEditingCell: function(beforeFocusCallback, $editCell) {
-                        var that = this;
-                        $editCell = $editCell || that.getView("rowsView").getCellElement(that._editRowIndex, that._editColumnIndex);
-                        that._delayedInputFocus($editCell, beforeFocusCallback)
-                    },
-                    removeRow: function(rowIndex) {
-                        errors.log("W0002", "dxDataGrid", "removeRow", "15.2", "Use the 'deleteRow' method instead");
-                        return this.deleteRow(rowIndex)
-                    },
-                    deleteRow: function(rowIndex) {
-                        var that = this,
-                            editingOptions = that.option("editing"),
-                            editingTexts = editingOptions && editingOptions.texts,
-                            confirmDeleteTitle = editingTexts && editingTexts.confirmDeleteTitle,
-                            isBatchMode = editingOptions && editingOptions.mode === DATAGRID_EDIT_MODE_BATCH,
-                            confirmDeleteMessage = editingTexts && editingTexts.confirmDeleteMessage,
-                            dataController = that._dataController,
-                            removeByKey,
-                            showDialogTitle,
-                            oldEditRowIndex = that._editRowIndex,
-                            item = dataController.items()[rowIndex],
-                            key = item && item.key;
-                        if (item) {
-                            removeByKey = function(key) {
-                                that.refresh();
-                                var editIndex = getIndexByKey(key, that._editData);
-                                if (editIndex >= 0)
-                                    if (that._editData[editIndex].type === DATA_EDIT_DATA_INSERT_TYPE)
-                                        that._editData.splice(editIndex, 1);
-                                    else
-                                        that._editData[editIndex].type = DATA_EDIT_DATA_REMOVE_TYPE;
-                                else
-                                    that._addEditData({
-                                        key: key,
-                                        oldData: item.data,
-                                        type: DATA_EDIT_DATA_REMOVE_TYPE
-                                    });
-                                if (isBatchMode)
-                                    dataController.updateItems({
-                                        changeType: "update",
-                                        rowIndices: [oldEditRowIndex, rowIndex]
-                                    });
-                                else
-                                    that.saveEditData()
-                            };
-                            if (isBatchMode || !confirmDeleteMessage)
-                                removeByKey(key);
-                            else {
-                                showDialogTitle = commonUtils.isDefined(confirmDeleteTitle) && confirmDeleteTitle.length > 0;
-                                dialog.confirm(confirmDeleteMessage, confirmDeleteTitle, showDialogTitle).done(function(confirmResult) {
-                                    if (confirmResult)
-                                        removeByKey(key)
-                                })
-                            }
-                        }
-                    },
-                    undeleteRow: function(rowIndex) {
-                        var that = this,
-                            dataController = that._dataController,
-                            item = dataController.items()[rowIndex],
-                            oldEditRowIndex = that._editRowIndex,
-                            key = item && item.key;
-                        if (item) {
-                            var editIndex = getIndexByKey(key, that._editData),
-                                editData;
-                            if (editIndex >= 0) {
-                                editData = that._editData[editIndex];
-                                if ($.isEmptyObject(editData.data))
-                                    that._editData.splice(editIndex, 1);
-                                else
-                                    editData.type = DATA_EDIT_DATA_UPDATE_TYPE;
-                                dataController.updateItems({
-                                    changeType: "update",
-                                    rowIndices: [oldEditRowIndex, rowIndex]
-                                })
-                            }
-                        }
-                    },
-                    _saveEditDataCore: function(deferreds, processedKeys) {
-                        var that = this,
-                            store = that._dataController.store(),
-                            hasCanceledData = false;
-                        function executeEditingAction(actionName, params, func) {
-                            var deferred = $.Deferred();
-                            that.executeAction(actionName, params);
-                            function createFailureHandler(deferred) {
-                                return function(arg) {
-                                        var error = arg instanceof Error ? arg : new Error(arg && String(arg) || "Unknown error");
-                                        deferred.reject(error)
-                                    }
-                            }
-                            $.when(params.cancel).done(function(cancel) {
-                                if (cancel)
-                                    deferred.resolve("cancel");
-                                else
-                                    func(params).done(deferred.resolve).fail(createFailureHandler(deferred))
-                            }).fail(createFailureHandler(deferred));
-                            return deferred
-                        }
-                        $.each(that._editData, function(index, editData) {
-                            var data = editData.data,
-                                oldData = editData.oldData,
-                                key = editData.key,
-                                type = editData.type,
-                                deferred,
-                                doneDeferred,
-                                params;
-                            if (that._beforeSaveEditData(editData, index))
-                                return;
-                            switch (type) {
-                                case DATA_EDIT_DATA_REMOVE_TYPE:
-                                    params = {
-                                        data: oldData,
-                                        key: key,
-                                        cancel: false
-                                    };
-                                    deferred = executeEditingAction("onRowRemoving", params, function() {
-                                        return store.remove(key)
-                                    });
-                                    break;
-                                case DATA_EDIT_DATA_INSERT_TYPE:
-                                    params = {
-                                        data: data,
-                                        cancel: false
-                                    };
-                                    deferred = executeEditingAction("onRowInserting", params, function() {
-                                        return store.insert(params.data)
-                                    });
-                                    break;
-                                case DATA_EDIT_DATA_UPDATE_TYPE:
-                                    params = {
-                                        newData: data,
-                                        oldData: oldData,
-                                        key: key,
-                                        cancel: false
-                                    };
-                                    deferred = executeEditingAction("onRowUpdating", params, function() {
-                                        return store.update(key, params.newData)
-                                    });
-                                    break
-                            }
-                            if (deferred) {
-                                doneDeferred = $.Deferred();
-                                deferred.always(function() {
-                                    processedKeys.push(key)
-                                }).always(doneDeferred.resolve);
-                                deferreds.push(doneDeferred.promise())
-                            }
-                        });
-                        return hasCanceledData
-                    },
-                    _processSaveEditDataResult: function(results, processedKeys) {
-                        var that = this,
-                            dataController = that._dataController,
-                            i,
-                            arg,
-                            editIndex,
-                            isError,
-                            editMode = getEditMode(that);
-                        for (i = 0; i < results.length; i++) {
-                            arg = results[i];
-                            editIndex = getIndexByKey(processedKeys[i], that._editData);
-                            if (that._editData[editIndex]) {
-                                isError = arg && arg instanceof Error;
-                                if (isError) {
-                                    that._editData[editIndex].error = arg;
-                                    dataController.dataErrorOccurred.fire(arg);
-                                    if (editMode !== DATAGRID_EDIT_MODE_BATCH)
-                                        return false
-                                }
-                                else if (arg !== "cancel")
-                                    that._editData.splice(editIndex, 1);
-                                else
-                                    return false
-                            }
-                        }
-                        return true
-                    },
-                    _fireSaveEditDataEvents: function(editData) {
-                        var that = this;
-                        $.each(editData, function(_, itemData) {
-                            var data = itemData.data,
-                                key = itemData.key,
-                                type = itemData.type,
-                                params = {
-                                    key: key,
-                                    data: data
-                                };
-                            if (itemData.error)
-                                params.error = itemData.error;
-                            switch (type) {
-                                case DATA_EDIT_DATA_REMOVE_TYPE:
-                                    that.executeAction("onRowRemoved", $.extend({}, params, {data: itemData.oldData}));
-                                    break;
-                                case DATA_EDIT_DATA_INSERT_TYPE:
-                                    that.executeAction("onRowInserted", params);
-                                    break;
-                                case DATA_EDIT_DATA_UPDATE_TYPE:
-                                    that.executeAction("onRowUpdated", params);
-                                    break
-                            }
-                        })
-                    },
-                    saveEditData: function() {
-                        var that = this,
-                            processedKeys = [],
-                            deferreds = [],
-                            dataController = that._dataController,
-                            editData = $.extend({}, that._editData),
-                            editMode = getEditMode(that),
-                            result = $.Deferred();
-                        var resetEditIndices = function(that) {
-                                that._editColumnIndex = -1;
-                                that._editRowIndex = -1
-                            };
-                        if (that._beforeSaveEditData() || that._saving) {
-                            that._afterSaveEditData();
-                            return result.resolve().promise()
-                        }
-                        that._saveEditDataCore(deferreds, processedKeys);
-                        if (deferreds.length) {
-                            that._saving = true;
-                            $.when.apply($, deferreds).done(function() {
-                                if (that._processSaveEditDataResult(arguments, processedKeys)) {
-                                    resetEditIndices(that);
-                                    $.when(dataController.refresh()).always(function() {
-                                        that._fireSaveEditDataEvents(editData);
-                                        that._afterSaveEditData();
-                                        result.resolve()
-                                    })
-                                }
-                                else
-                                    result.resolve()
-                            }).fail(result.resolve);
-                            return result.always(function() {
-                                    that._saving = false
-                                }).promise()
-                        }
-                        if (isRowEditMode(that)) {
-                            if (!that.hasChanges())
-                                that.cancelEditData()
-                        }
-                        else if (editMode === DATAGRID_EDIT_MODE_BATCH || editMode === DATAGRID_EDIT_MODE_CELL) {
-                            resetEditIndices(that);
-                            dataController.updateItems()
-                        }
-                        else
-                            that._focusEditingCell();
-                        that._afterSaveEditData();
-                        return result.resolve().promise()
-                    },
-                    _updateEditColumn: function() {
-                        var that = this,
-                            editing = that.option("editing"),
-                            editMode = getEditMode(that),
-                            isEditColumnVisible = editing && ((editing.allowUpdating || editing.allowAdding) && editMode === DATAGRID_EDIT_MODE_ROW || editing.allowUpdating && editMode === DATAGRID_EDIT_MODE_FORM || editing.allowDeleting);
-                        that._columnsController.addCommandColumn({
-                            command: "edit",
-                            visible: isEditColumnVisible,
-                            cssClass: "dx-command-edit",
-                            width: "auto"
-                        });
-                        that._columnsController.columnOption("command:edit", "visible", isEditColumnVisible)
-                    },
-                    _updateEditButtons: function() {
-                        var that = this,
-                            saveChangesButton = that._saveChangesButton,
-                            cancelChangesButton = that._cancelChangesButton,
-                            hasChanges = that.hasChanges();
-                        if (saveChangesButton)
-                            saveChangesButton.option("disabled", !hasChanges);
-                        if (cancelChangesButton)
-                            cancelChangesButton.option("disabled", !hasChanges)
-                    },
-                    cancelEditData: function() {
-                        var that = this,
-                            dataController = that._dataController;
-                        that._beforeCancelEditData();
-                        that.init();
-                        dataController.updateItems()
-                    },
-                    hasEditData: function() {
-                        return this.hasChanges()
-                    },
-                    closeEditCell: function() {
-                        var that = this,
-                            editMode = getEditMode(that),
-                            oldEditRowIndex = that._editRowIndex,
-                            dataController = that._dataController;
-                        if (!isRowEditMode(that))
-                            setTimeout(function() {
-                                if (editMode === DATAGRID_EDIT_MODE_CELL && that.hasChanges())
-                                    that.saveEditData();
-                                else if (oldEditRowIndex >= 0) {
-                                    that._editRowIndex = -1;
-                                    that._editColumnIndex = -1;
-                                    dataController.updateItems({
-                                        changeType: "update",
-                                        rowIndices: [oldEditRowIndex]
-                                    })
-                                }
-                            })
-                    },
-                    update: function(changeType) {
-                        var that = this,
-                            dataController = that._dataController;
-                        if (dataController && that._pageIndex !== dataController.pageIndex()) {
-                            if (changeType === "refresh")
-                                that.refresh();
-                            that._pageIndex = dataController.pageIndex()
-                        }
-                        that._updateEditButtons()
-                    },
-                    updateFieldValue: function(options, value, text, forceUpdateRow) {
-                        var that = this,
-                            data = {},
-                            rowKey = options.key,
-                            $cellElement = options.cellElement,
-                            editMode = getEditMode(that),
-                            params;
-                        if (rowKey !== undefined && options.column.setCellValue) {
-                            if (editMode === DATAGRID_EDIT_MODE_BATCH && $cellElement)
-                                $cellElement.addClass(DATAGRID_CELL_MODIFIED);
-                            options.value = value;
-                            options.column.setCellValue(data, value, text);
-                            if (text && options.column.displayValueMap)
-                                options.column.displayValueMap[value] = text;
-                            params = {
-                                data: data,
-                                key: rowKey,
-                                oldData: options.data,
-                                type: DATA_EDIT_DATA_UPDATE_TYPE
-                            };
-                            that._addEditData(params);
-                            that._updateEditButtons();
-                            if (options.column.showEditorAlways && getEditMode(that) === DATAGRID_EDIT_MODE_CELL && options.row && !options.row.inserted)
-                                that.saveEditData().always(function() {
-                                    that._editColumnIndex = options.columnIndex;
-                                    that._editRowIndex = options.row.rowIndex;
-                                    that._focusEditingCell()
-                                });
-                            else if (options.row && (forceUpdateRow || options.column.setCellValue !== options.column.defaultSetCellValue))
-                                that._dataController.updateItems({
-                                    changeType: "update",
-                                    rowIndices: [options.row.rowIndex]
-                                })
-                        }
-                    },
-                    _addEditData: function(options) {
-                        var that = this,
-                            editDataIndex = getIndexByKey(options.key, that._editData);
-                        if (editDataIndex < 0) {
-                            editDataIndex = that._editData.length;
-                            that._editData.push(options)
-                        }
-                        if (that._editData[editDataIndex]) {
-                            options.type = that._editData[editDataIndex].type || options.type;
-                            objectUtils.deepExtendArraySafe(that._editData[editDataIndex], {
-                                data: options.data,
-                                type: options.type
-                            })
-                        }
-                        return editDataIndex
-                    },
-                    _formEditorPrepared: function(){},
-                    getFormEditorTemplate: function(detailCellOptions, column, item) {
-                        var that = this;
-                        return function(options, $container) {
-                                var cellOptions = $.extend({}, detailCellOptions, {
-                                        value: column.calculateCellValue(detailCellOptions.data),
-                                        column: $.extend({}, column, {editorOptions: item.editorOptions}),
-                                        id: options.component.getItemID(item.name || item.dataField),
-                                        columnIndex: column.index,
-                                        setValue: column.allowEditing && function(value) {
-                                            that.updateFieldValue(cellOptions, value)
-                                        }
-                                    });
-                                var template = column.editCellTemplate || getDefaultEditorTemplate(that);
-                                template($container, cellOptions);
-                                that._formEditorPrepared(cellOptions, $container)
-                            }
-                    },
-                    getEditFormTemplate: function(options) {
-                        var that = this;
-                        return function($container, detailOptions) {
-                                var editFormOptions = that.option("editing.form"),
-                                    items = that.option("editing.form.items"),
-                                    userCustomizeItem = that.option("editing.form.customizeItem");
-                                if (!items) {
-                                    var columns = that.getController("columns").getColumns();
-                                    items = [];
-                                    $.each(columns, function(_, column) {
-                                        items.push({
-                                            column: column,
-                                            name: column.name,
-                                            dataField: column.dataField
-                                        })
-                                    })
-                                }
-                                that._createComponent($("<div>").appendTo($container), "dxForm", $.extend({}, editFormOptions, {
-                                    items: items,
-                                    formID: new DX.data.Guid,
-                                    customizeItem: function(item) {
-                                        var column = item.column || that._columnsController.columnOption(item.name || item.dataField);
-                                        if (column) {
-                                            item.label = item.label || {};
-                                            item.label.text = item.label.text || column.caption;
-                                            item.template = item.template || that.getFormEditorTemplate(detailOptions, column, item);
-                                            item.column = column;
-                                            if (column.formItem)
-                                                $.extend(item, column.formItem)
-                                        }
-                                        userCustomizeItem && userCustomizeItem.call(this, item)
-                                    }
-                                }));
-                                var $buttonsContainer = $("<div>").addClass("dx-datagrid-form-buttons-container").appendTo($container);
-                                that._createComponent($("<div>").appendTo($buttonsContainer), Button, {
-                                    text: that.option("editing.texts.saveRowChanges"),
-                                    onClick: $.proxy(that.saveEditData, that)
-                                });
-                                that._createComponent($("<div>").appendTo($buttonsContainer), Button, {
-                                    text: that.option("editing.texts.cancelRowChanges"),
-                                    onClick: $.proxy(that.cancelEditData, that)
-                                })
-                            }
-                    },
-                    getColumnTemplate: function(options) {
-                        var that = this,
-                            column = options.column,
-                            rowIndex = options.row && options.row.rowIndex,
-                            template,
-                            editingOptions,
-                            editingTexts,
-                            allowUpdating,
-                            isRowMode = isRowEditMode(that),
-                            isRowEditing = that.isEditRow(rowIndex),
-                            isCellEditing = that.isEditCell(rowIndex, options.columnIndex),
-                            editingStartOptions;
-                        if ((column.showEditorAlways || column.setCellValue && (isRowEditing && column.allowEditing || isCellEditing)) && options.rowType === "data" && !commonUtils.isDefined(column.command)) {
-                            allowUpdating = that.option("editing.allowUpdating");
-                            if (((allowUpdating || isRowEditing) && column.allowEditing || isCellEditing) && (isRowMode && isRowEditing || !isRowMode)) {
-                                if (column.showEditorAlways && !isRowMode) {
-                                    editingStartOptions = {
-                                        cancel: false,
-                                        key: options.row.key,
-                                        data: options.row.data,
-                                        column: column
-                                    };
-                                    that._isEditingStart(editingStartOptions)
-                                }
-                                if (!editingStartOptions || !editingStartOptions.cancel)
-                                    options.setValue = function(value, text) {
-                                        that.updateFieldValue(options, value, text)
-                                    }
-                            }
-                            template = column.editCellTemplate || getDefaultEditorTemplate(that)
-                        }
-                        else if (column.command === "edit" && options.rowType === "data")
-                            template = function(container, options) {
-                                var createLink = function(container, text, methodName, options) {
-                                        var $link = $("<a />").addClass(DATAGRID_LINK_CLASS).text(text).on(addNamespace("dxclick", DATAGRID_EDITING_NAMESPACE), that.createAction(function(params) {
-                                                var e = params.jQueryEvent;
-                                                e.stopPropagation();
-                                                setTimeout(function() {
-                                                    options.row && that[methodName](options.row.rowIndex)
-                                                })
-                                            }));
-                                        options.rtlEnabled ? container.prepend($link, "&nbsp;") : container.append($link, "&nbsp;")
-                                    };
-                                container.css("text-align", "center");
-                                options.rtlEnabled = that.option("rtlEnabled");
-                                editingOptions = that.option("editing") || {};
-                                editingTexts = editingOptions.texts || {};
-                                if (options.row && options.row.rowIndex === that._editRowIndex && isRowMode) {
-                                    createLink(container, editingTexts.saveRowChanges, "saveEditData", options);
-                                    createLink(container, editingTexts.cancelRowChanges, "cancelEditData", options)
-                                }
-                                else {
-                                    if (editingOptions.allowUpdating && isRowMode)
-                                        createLink(container, editingTexts.editRow, "editRow", options);
-                                    if (editingOptions.allowDeleting)
-                                        if (options.row.removed)
-                                            createLink(container, editingTexts.undeleteRow, "undeleteRow", options);
-                                        else
-                                            createLink(container, editingTexts.deleteRow, "deleteRow", options)
-                                }
-                            };
-                        else if (column.command === "detail" && options.rowType === "detail" && isRowEditing)
-                            template = that.getEditFormTemplate(options);
-                        return template
-                    },
-                    renderEditButtons: function(rootElement) {
-                        var that = this,
-                            insertButton = rootElement.find("." + DATAGRID_EDIT_BUTTON_CLASS),
-                            editingOptions = that.option("editing") || {},
-                            editingTexts = that.option("editing.texts") || {},
-                            titleButtonTextByClassNames = {
-                                cancel: editingTexts.cancelAllChanges,
-                                save: editingTexts.saveAllChanges,
-                                addrow: editingTexts.addRow
-                            };
-                        var createEditButton = function(rootElement, className, methodName) {
-                                return that._createComponent($("<div />").addClass(DATAGRID_EDIT_BUTTON_CLASS).addClass("dx-datagrid-" + className + "-button").appendTo(rootElement), Button, {
-                                        icon: "edit-button-" + className,
-                                        onClick: function(options) {
-                                            var e = options.jQueryEvent;
-                                            e.stopPropagation();
-                                            that[methodName]()
-                                        },
-                                        hint: titleButtonTextByClassNames && titleButtonTextByClassNames[className]
-                                    })
-                            };
-                        if (insertButton.length)
-                            insertButton.remove();
-                        if ((editingOptions.allowUpdating || editingOptions.allowAdding || editingOptions.allowDeleting) && getEditMode(that) === DATAGRID_EDIT_MODE_BATCH) {
-                            that._cancelChangesButton = createEditButton(rootElement, "cancel", "cancelEditData");
-                            that._saveChangesButton = createEditButton(rootElement, "save", "saveEditData");
-                            that._updateEditButtons()
-                        }
-                        if (editingOptions.allowAdding)
-                            createEditButton(rootElement, "addrow", "addRow")
-                    },
-                    createHighlightCell: function($cell) {
-                        var $highlight = $cell.find("." + DATAGRID_CELL_HIGHLIGHT_OUTLINE);
-                        if (!$highlight.length)
-                            $cell.wrapInner($("<div>").addClass(DATAGRID_CELL_HIGHLIGHT_OUTLINE + " " + DATAGRID_POINTER_EVENTS_TARGET_CLASS))
-                    },
-                    resetRowAndPageIndeces: function(alwaysRest) {
-                        var that = this;
-                        $.each(that._editData, function(_, editData) {
-                            if (editData.pageIndex !== that._pageIndex || alwaysRest) {
-                                delete editData.pageIndex;
-                                delete editData.rowIndex
-                            }
-                        })
-                    },
-                    _afterInsertRow: function(options){},
-                    _beforeSaveEditData: function(editData, editIndex){},
-                    _afterSaveEditData: function(){},
-                    _beforeCancelEditData: function(){}
-                }
-        }());
-        dataGrid.registerModule("editing", {
-            defaultOptions: function() {
-                return {editing: {
-                            mode: "row",
-                            allowAdding: false,
-                            allowUpdating: false,
-                            allowDeleting: false,
-                            texts: {
-                                editRow: Globalize.localize("dxDataGrid-editingEditRow"),
-                                saveAllChanges: Globalize.localize("dxDataGrid-editingSaveAllChanges"),
-                                saveRowChanges: Globalize.localize("dxDataGrid-editingSaveRowChanges"),
-                                cancelAllChanges: Globalize.localize("dxDataGrid-editingCancelAllChanges"),
-                                cancelRowChanges: Globalize.localize("dxDataGrid-editingCancelRowChanges"),
-                                addRow: Globalize.localize("dxDataGrid-editingAddRow"),
-                                deleteRow: Globalize.localize("dxDataGrid-editingDeleteRow"),
-                                undeleteRow: Globalize.localize("dxDataGrid-editingUndeleteRow"),
-                                confirmDeleteMessage: Globalize.localize("dxDataGrid-editingConfirmDeleteMessage"),
-                                confirmDeleteTitle: Globalize.localize("dxDataGrid-editingConfirmDeleteTitle")
-                            },
-                            form: {colCount: 2}
-                        }}
-            },
-            controllers: {editing: dataGrid.EditingController},
-            extenders: {
-                controllers: {
-                    data: {
-                        init: function() {
-                            this._editingController = this.getController("editing");
-                            this.callBase()
-                        },
-                        reload: function(full) {
-                            var d,
-                                editingController = this.getController("editing");
-                            this._editingController.refresh();
-                            d = this.callBase(full);
-                            return d && d.done(function() {
-                                    editingController.resetRowAndPageIndeces(true)
-                                })
-                        },
-                        _updateItemsCore: function(change) {
-                            this.callBase(change);
-                            var editFormItem = this.items()[this.getController("editing").getEditFormRowIndex()];
-                            if (editFormItem)
-                                editFormItem.rowType = "detail"
-                        },
-                        _processItems: function(items, changeType) {
-                            items = this._editingController.processItems(items, changeType);
-                            return this.callBase(items, changeType)
-                        },
-                        _processDataItem: function(dataItem, options) {
-                            this._editingController.processDataItem(dataItem, options.visibleColumns, this.generateDataValues);
-                            return this.callBase(dataItem, options)
-                        },
-                        _processItem: function(item, options) {
-                            item = this.callBase(item, options);
-                            if (item.inserted) {
-                                options.dataIndex--;
-                                delete item.dataIndex
-                            }
-                            return item
-                        }
-                    },
-                    columnsResizer: {_startResizing: function(args) {
-                            var that = this,
-                                editingController = that.getController("editing"),
-                                isCellEditing = function() {
-                                    var editingOptions = that.option("editing");
-                                    return editingOptions && editingOptions.mode !== DATAGRID_EDIT_MODE_ROW && editingController.isEditing()
-                                };
-                            that.callBase(args);
-                            if (that.isResizing() && isCellEditing())
-                                editingController.closeEditCell()
-                        }}
-                },
-                views: {
-                    rowsView: {
-                        publicMethods: function() {
-                            return this.callBase().concat(["cellValue"])
-                        },
-                        _getColumnTemplate: function(options) {
-                            var that = this,
-                                template = that.getController("editing").getColumnTemplate(options);
-                            return template || that.callBase(options)
-                        },
-                        _isNativeClick: function() {
-                            return (devices.real().ios || devices.real().android) && this.option("editing.allowUpdating")
-                        },
-                        _createTable: function() {
-                            var that = this,
-                                $table = that.callBase.apply(that, arguments);
-                            if (!isRowEditMode(that) && that.option("editing.allowUpdating"))
-                                $table.on(addNamespace("dxhold", "dxDataGridRowsView"), "td:not(." + DATAGRID_EDITOR_CELL_CLASS + ")", that.createAction(function(e) {
-                                    var editingController = that.getController("editing");
-                                    if (editingController.isEditing())
-                                        editingController.closeEditCell()
-                                }));
-                            return $table
-                        },
-                        _createRow: function(row) {
-                            var $row = this.callBase(row),
-                                editingController,
-                                isEditRow,
-                                isRowRemoved,
-                                isRowInserted,
-                                isRowModified;
-                            if (row) {
-                                editingController = this.getController("editing");
-                                isEditRow = editingController.isEditRow(row.rowIndex);
-                                isRowRemoved = !!row.removed;
-                                isRowInserted = !!row.inserted;
-                                isRowModified = !!row.modified;
-                                if (getEditMode(this) === DATAGRID_EDIT_MODE_BATCH)
-                                    isRowRemoved && $row.addClass(DATAGRID_ROW_REMOVED);
-                                else
-                                    isEditRow && $row.addClass(DATAGRID_EDIT_ROW);
-                                isRowInserted && $row.addClass(DATAGRID_ROW_INSERTED);
-                                isRowModified && $row.addClass(DATAGRID_ROW_MODIFIED);
-                                if (isEditRow || isRowInserted || isRowRemoved)
-                                    $row.removeClass(DATAGRID_ROW_SELECTED);
-                                if (isEditRow && row.rowType === "detail")
-                                    $row.addClass(DATAGRID_EDIT_FORM_CLASS)
-                            }
-                            return $row
-                        },
-                        _rowClick: function(e) {
-                            var that = this,
-                                editingController = that.getController("editing"),
-                                $targetCell = $(e.jQueryEvent.target).closest("." + DATAGRID_ROW_CLASS + "> td"),
-                                columnIndex = that.getCellIndex($targetCell),
-                                allowUpdating = that.option("editing.allowUpdating"),
-                                column = that._columnsController.getVisibleColumns()[columnIndex],
-                                allowEditing = column && (column.allowEditing || editingController.isEditCell(e.rowIndex, columnIndex));
-                            if ($targetCell.hasClass(DATAGRID_POINTER_EVENTS_NONE_CLASS))
-                                return;
-                            if (!(allowUpdating && allowEditing && editingController.editCell(e.rowIndex, columnIndex)) && !editingController.isEditRow(e.rowIndex))
-                                that.callBase(e)
-                        },
-                        _cellPrepared: function($cell, parameters) {
-                            var columnIndex = parameters.columnIndex,
-                                editingController = this.getController("editing"),
-                                isCommandCell = !!parameters.column.command,
-                                isEditableCell = parameters.setValue;
-                            parameters.isEditing = editingController.isEditCell(parameters.rowIndex, parameters.columnIndex) || editingController.isEditRow(parameters.rowIndex) && parameters.column.allowEditing;
-                            if (!commonUtils.isDefined(parameters.column.command) && (parameters.isEditing || parameters.column.showEditorAlways)) {
-                                var alignment = parameters.column.alignment;
-                                $cell.addClass(DATAGRID_EDITOR_CELL_CLASS).toggleClass(DATAGRID_READONLY_CLASS, !isEditableCell).toggleClass(DATAGRID_CELL_FOCUS_DISABLED_CLASS, !isEditableCell);
-                                if (alignment)
-                                    $cell.find("input").first().css("text-align", alignment)
-                            }
-                            var firstChild = $cell.get(0).firstChild;
-                            if (firstChild && firstChild.className && firstChild.className.indexOf(CHECKBOX_CLASS) >= 0)
-                                $cell.addClass(DATAGRID_EDITOR_INLINE_BLOCK).toggleClass(DATAGRID_CELL_FOCUS_DISABLED_CLASS, isCommandCell || !isEditableCell);
-                            var modifiedValues = parameters.row && (parameters.row.inserted ? parameters.row.values : parameters.row.modifiedValues);
-                            if (modifiedValues && modifiedValues[columnIndex] !== undefined && parameters.column && !isCommandCell && parameters.column.setCellValue) {
-                                editingController.createHighlightCell($cell);
-                                $cell.addClass(DATAGRID_CELL_MODIFIED)
-                            }
-                            else if (isEditableCell)
-                                editingController.createHighlightCell($cell, true);
-                            this.callBase.apply(this, arguments)
-                        },
-                        _update: function(change) {
-                            this.callBase(change);
-                            if (change.changeType === "updateSelection")
-                                this.getTableElements().children("tbody").children("." + DATAGRID_EDIT_ROW).removeClass(DATAGRID_ROW_SELECTED)
-                        },
-                        cellValue: function(rowIndex, columnIdentificator, value, text) {
-                            var cellOptions = this.getCellOptions(rowIndex, columnIdentificator);
-                            if (cellOptions)
-                                if (value === undefined)
-                                    return cellOptions.value;
-                                else
-                                    this.getController("editing").updateFieldValue(cellOptions, value, text, true)
-                        }
-                    },
-                    headerPanel: {
-                        _renderCore: function() {
-                            this.callBase();
-                            this.getController("editing").renderEditButtons(this.element())
-                        },
-                        isVisible: function() {
-                            var that = this,
-                                editingOptions = that.getController("editing").option("editing");
-                            return that.callBase() || editingOptions && (editingOptions.allowAdding || (editingOptions.allowUpdating || editingOptions.allowDeleting) && editingOptions.mode === DATAGRID_EDIT_MODE_BATCH)
-                        }
-                    }
-                }
-            }
-        });
-        $.extend(dataGrid.__internals, {
-            DATAGRID_LINK_CLASS: DATAGRID_LINK_CLASS,
-            DATAGRID_EDITOR_CELL_CLASS: DATAGRID_EDITOR_CELL_CLASS,
-            DATAGRID_EDIT_ROW: DATAGRID_EDIT_ROW,
-            DATAGRID_EDIT_BUTTON_CLASS: DATAGRID_EDIT_BUTTON_CLASS,
-            DATAGRID_CELL_MODIFIED: DATAGRID_CELL_MODIFIED,
-            DATAGRID_ROW_REMOVED: DATAGRID_ROW_REMOVED,
-            DATAGRID_ROW_INSERTED: DATAGRID_ROW_INSERTED,
-            DATAGRID_ROW_MODIFIED: DATAGRID_ROW_MODIFIED,
-            DATAGRID_CELL_HIGHLIGHT_OUTLINE: DATAGRID_CELL_HIGHLIGHT_OUTLINE,
-            DATAGRID_FOCUS_OVERLAY_CLASS: DATAGRID_FOCUS_OVERLAY_CLASS,
-            DATAGRID_READONLY_CLASS: DATAGRID_READONLY_CLASS,
-            DATAGRID_CELL_FOCUS_DISABLED_CLASS: DATAGRID_CELL_FOCUS_DISABLED_CLASS,
-            DATAGRID_EDIT_FORM_CLASS: DATAGRID_EDIT_FORM_CLASS
         })
     })(jQuery, DevExpress);
     /*! Module widgets-web, file ui.dataGrid.validationModule.js */
@@ -12722,11 +12776,10 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                             if (dataSource && dataSource.loadIfNeed)
                                 dataSource.loadIfNeed()
                         },
-                        getTableElements: function(isVirtualTable) {
-                            var result = this.callBase();
-                            if (isVirtualTable && this.option("scrolling.mode") === "virtual")
-                                result = result.add(this.element().find("> ." + DATAGRID_SCROLLABLE_CONTAINER + " > ." + DATAGRID_SCROLLABLE_CONTENT + "> ." + DATAGRID_CONTENT_CLASS).children(":not(." + DATAGRID_TABLE_CONTENT_CLASS + ")"));
-                            return result
+                        setColumnWidths: function(widths) {
+                            this.callBase.apply(this, arguments);
+                            if (this.option("scrolling.mode") === "virtual")
+                                this.callBase(widths, this.element().find("> ." + DATAGRID_SCROLLABLE_CONTAINER + " > ." + DATAGRID_SCROLLABLE_CONTENT + "> ." + DATAGRID_CONTENT_CLASS).children(":not(." + DATAGRID_TABLE_CONTENT_CLASS + ")"))
                         },
                         dispose: function() {
                             clearTimeout(this._scrollTimeoutID);
@@ -12841,7 +12894,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
             _renderCore: function() {
                 var that = this,
                     $container = that.element();
-                if (that._tableElement && !that._dataController.isLoaded())
+                if (that._tableElement && !that._dataController.isLoaded() && !that._hasRowElements)
                     return;
                 $container.addClass(DATAGRID_HEADERS_CLASS).toggleClass(DATAGRID_NOWRAP_CLASS, !that.option("wordWrapEnabled")).empty();
                 that._updateContent(that._renderTable());
@@ -12849,8 +12902,10 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
             },
             _renderRows: function() {
                 var that = this;
-                if (that._dataController.isLoaded())
-                    that.callBase.apply(that, arguments)
+                if (that._dataController.isLoaded() || that._hasRowElements) {
+                    that.callBase.apply(that, arguments);
+                    that._hasRowElements = true
+                }
             },
             _getRows: function() {
                 var result = [];
@@ -13100,15 +13155,18 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                             return editor
                     };
                 var getRangeTextByFilterValue = function(that, column) {
-                        var filterValue = getColumnFilterValue(that, column),
-                            result = "";
+                        var result = "",
+                            rangeEnd = "",
+                            filterValue = getColumnFilterValue(that, column),
+                            formatOptions = dataGrid.getFormatOptionsByColumn(column, "filterRow");
                         if (commonUtils.isArray(filterValue)) {
-                            result = dataGrid.formatValue(filterValue[0], column);
-                            if (dataGrid.formatValue(filterValue[1], column) !== "")
-                                result += " - " + dataGrid.formatValue(filterValue[1], column)
+                            result = dataGrid.formatValue(filterValue[0], formatOptions);
+                            rangeEnd = dataGrid.formatValue(filterValue[1], formatOptions);
+                            if (rangeEnd !== "")
+                                result += " - " + rangeEnd
                         }
                         else if (commonUtils.isDefined(filterValue))
-                            result = dataGrid.formatValue(filterValue, column);
+                            result = dataGrid.formatValue(filterValue, formatOptions);
                         return result
                     };
                 var getColumnFilterValue = function(that, column) {
@@ -13169,8 +13227,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                                 $rangeContent,
                                 $menu;
                             if (dataGrid.checkChanges(optionNames, ["filterValue", "bufferedFilterValue", "selectedFilterOperation", "bufferedSelectedFilterOperation"]) && e.columnIndex !== undefined) {
-                                visibleIndex = that.getController("columns").getVisibleIndex(e.columnIndex);
-                                column = that.getController("columns").columnOption(e.columnIndex);
+                                visibleIndex = that._columnsController.getVisibleIndex(e.columnIndex);
+                                column = that._columnsController.columnOption(e.columnIndex);
                                 $cell = that.getCellElement(that.element().find("." + DATAGRID_FILTER_ROW_CLASS).index(), visibleIndex) || $();
                                 $rangeContent = $cell.find("." + DATAGRID_FILTER_RANGE_CONTENT_CLASS);
                                 $editorContainer = $cell.find("." + DATAGRID_EDITOR_CONTAINER_CLASS).first();
@@ -13190,10 +13248,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                                         $menu = $cell.find("." + DATAGRID_MENU_CLASS);
                                         if ($menu.length) {
                                             that._updateFilterOperationChooser($menu, column, $editorContainer);
-                                            if (getColumnSelectedFilterOperation(that, column) === "between") {
+                                            if (getColumnSelectedFilterOperation(that, column) === "between")
                                                 that._renderFilterRangeContent($cell, column);
-                                                that._showFilterRange($cell, column)
-                                            }
                                             else if ($editorContainer.find("." + DATAGRID_FILTER_RANGE_CONTENT_CLASS).length) {
                                                 that._renderEditor($editorContainer, that._getEditorOptions($editorContainer, column));
                                                 that._hideFilterRange()
@@ -13238,8 +13294,10 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                                         offset: "0 -1"
                                     },
                                     contentTemplate: function(contentElement) {
-                                        var $editor = $("<div/>").addClass(DATAGRID_EDITOR_CONTAINER_CLASS + " " + DATAGRID_FILTER_RANGE_START_CLASS).appendTo(contentElement),
-                                            editorOptions = that._getEditorOptions($editor, column);
+                                        var editorOptions,
+                                            $editor = $("<div/>").addClass(DATAGRID_EDITOR_CONTAINER_CLASS + " " + DATAGRID_FILTER_RANGE_START_CLASS).appendTo(contentElement);
+                                        column = that._columnsController.columnOption(column.index);
+                                        editorOptions = that._getEditorOptions($editor, column);
                                         editorOptions.sharedData = sharedData;
                                         that._renderEditor($editor, editorOptions);
                                         $editor.find("input").on("keydown", function(e) {
@@ -13270,10 +13328,10 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                                         $editor.find("input").focus()
                                     },
                                     onHidden: function() {
-                                        var updatedColumn = that._columnsController.columnOption(column.index);
+                                        column = that._columnsController.columnOption(column.index);
                                         $cell.find("." + DATAGRID_MENU_CLASS).parent().addClass(DATAGRID_EDITOR_WITH_MENU_CLASS);
-                                        if (getColumnSelectedFilterOperation(that, updatedColumn) === "between") {
-                                            that._updateFilterRangeContent($cell, getRangeTextByFilterValue(that, updatedColumn));
+                                        if (getColumnSelectedFilterOperation(that, column) === "between") {
+                                            that._updateFilterRangeContent($cell, getRangeTextByFilterValue(that, column));
                                             that.component.updateDimensions()
                                         }
                                     }
@@ -13423,7 +13481,10 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                                     }
                                     that._columnsController.columnOption(column.index, options);
                                     that._applyFilterViewController.setHighLight($editorContainer, true);
-                                    !notFocusEditor && that._focusEditor($editorContainer)
+                                    if (!notFocusEditor)
+                                        that._focusEditor($editorContainer);
+                                    else
+                                        that._showFilterRange($editorContainer.closest("." + DATAGRID_EDITOR_CELL_CLASS), column)
                                 },
                                 onSubmenuShown: function() {
                                     isCellWasFocused = that._isEditorFocused($editorContainer);
@@ -13695,7 +13756,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
         var ui = DX.ui,
             dataGrid = ui.dxDataGrid,
             dataUtils = DX.data.utils,
-            commonUtils = DX.require("/utils/utils.common");
+            commonUtils = DX.require("/utils/utils.common"),
+            knockoutUtils = DX.require("/utils/utils.knockout");
         var DATAGRID_HEADER_FILTER_CLASS = "dx-header-filter",
             DATAGRID_HEADER_FILTER_MENU_CLASS = "dx-header-filter-menu",
             DATAGRID_CELL_CONTENT_CLASS = "dx-datagrid-text-content",
@@ -13737,7 +13799,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
         dataGrid.HeaderFilterController = dataGrid.ViewController.inherit(function() {
             var getFormatOptions = function(value, column, currentLevel) {
                     var groupInterval = dataGrid.getGroupInterval(column),
-                        result = $.extend({target: "headerFilter"}, column);
+                        result = dataGrid.getFormatOptionsByColumn(column, "headerFilter");
                     if (groupInterval) {
                         result.groupInterval = groupInterval[currentLevel];
                         if (column.dataType === "date")
@@ -13746,7 +13808,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                             result.getDisplayFormat = function() {
                                 var formatOptions = {
                                         format: column.format,
-                                        precision: column.precision
+                                        precision: column.precision,
+                                        target: "headerFilter"
                                     },
                                     firstValueText = dataGrid.formatValue(value, formatOptions),
                                     secondValue = value + groupInterval[currentLevel],
@@ -13846,7 +13909,10 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                             return dataSource
                         }
                         if (column.lookup) {
-                            dataSource = DX.data.utils.normalizeDataSourceOptions(column.lookup.dataSource);
+                            dataSource = column.lookup.dataSource;
+                            if (commonUtils.isFunction(dataSource) && !knockoutUtils.isObservable(dataSource))
+                                dataSource = dataSource({});
+                            dataSource = DX.data.utils.normalizeDataSourceOptions(dataSource);
                             dataSource.postProcess = function(items) {
                                 if (this.pageIndex() === 0) {
                                     items = items.slice(0);
@@ -14645,8 +14711,9 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                                 searchText = that.option("searchPanel.text");
                             if (searchText && that.option("searchPanel.highlightSearchText")) {
                                 if (isEquals && column) {
-                                    var value = parseValue(column, searchText);
-                                    searchText = dataGrid.formatValue(value, column);
+                                    var value = parseValue(column, searchText),
+                                        formatOptions = dataGrid.getFormatOptionsByColumn(column, "search");
+                                    searchText = dataGrid.formatValue(value, formatOptions);
                                     if (!searchText)
                                         return
                                 }
@@ -15411,7 +15478,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         that.getCellElements(rowIndex).eq(columnIndex).css({opacity: value})
                 })
             },
-            getCellElements: function(rowIndex) {
+            _getCellElementsCore: function(rowIndex) {
                 var $cells = this.callBase(rowIndex),
                     groupCellIndex;
                 if ($cells) {
@@ -17427,7 +17494,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         errorRowIndex = $(e.currentTarget).closest("." + DATAGRID_ERROR_ROW_CLASS).index();
                     e.stopPropagation();
                     $.each($tableElements, function(_, tableElement) {
-                        $errorRow = $(tableElement).find("tbody > tr").eq(errorRowIndex);
+                        $errorRow = $(tableElement).children("tbody").children("tr").eq(errorRowIndex);
                         that.removeErrorRow($errorRow)
                     })
                 }));
@@ -17446,7 +17513,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     $tableElements = viewElement.getTableElements();
                 $.each($tableElements, function(_, tableElement) {
                     $errorRow = that._createErrorRow(message, $tableElements);
-                    rowElements = $(tableElement).find("tr");
+                    rowElements = $(tableElement).children("tbody").children("tr");
                     if (rowIndex >= 0) {
                         $row = viewElement._getRowElements($(tableElement)).eq(rowIndex);
                         that.removeErrorRow(rowElements.eq($row.index() + 1));
@@ -18168,14 +18235,14 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     if (column.command !== "transparent")
                         that.callBase($cell, options)
                 },
-                getCellElements: function(rowIndex) {
+                _getCellElementsCore: function(rowIndex) {
                     var that = this,
                         fixedColumns,
                         fixedColumnIndex = 0,
                         fixedCellElements,
                         cellElements = that.callBase(rowIndex);
                     if (that._fixedTableElement && cellElements) {
-                        fixedColumns = that._columnsController.getFixedColumns(),
+                        fixedColumns = that._columnsController.getFixedColumns();
                         fixedCellElements = that._getRowElements(that._fixedTableElement).eq(rowIndex).children("td");
                         $.each(fixedColumns, function(index, column) {
                             if (column.command === "transparent") {
@@ -18273,7 +18340,21 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     this.synchronizeRows()
                 },
                 setColumnWidths: function(widths) {
-                    this.callBase(widths);
+                    var columns,
+                        scrollable,
+                        clientWidth,
+                        scrollWidth;
+                    this.callBase.apply(this, arguments);
+                    if (this._fixedTableElement) {
+                        if (widths && widths.length) {
+                            scrollable = this.getScrollable && this.getScrollable();
+                            clientWidth = scrollable ? scrollable.clientWidth() : this.element().width();
+                            scrollWidth = scrollable ? scrollable.scrollWidth() : this._tableElement.outerWidth();
+                            if (scrollWidth <= clientWidth)
+                                columns = this._columnsController.getVisibleColumns()
+                        }
+                        this.callBase(widths, this._fixedTableElement, columns)
+                    }
                     this.synchronizeRows()
                 },
                 _getClientHeight: function(element) {
@@ -28199,10 +28280,10 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     var coordinates = [{
                                 top: 0,
                                 left: 0
-                            }],
-                        startDate = this._startDate(itemData);
+                            }];
                     this.instance.notifyObserver("needCoordinates", {
-                        startDate: startDate,
+                        startDate: this._startDate(itemData),
+                        originalStartDate: this._startDate(itemData, true),
                         appointmentData: itemData,
                         callback: function(value) {
                             coordinates = value
@@ -29569,7 +29650,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         recurrenceException = this.fire("getField", "recurrenceException", appointmentData),
                         dateRange = this._workSpace.getDateRange(),
                         startViewDate = this.appointmentTakesAllDay(appointmentData) ? dateUtils.trimTime(new Date(dateRange[0])) : dateRange[0],
-                        dates = recurrenceUtils.getDatesByRecurrence(recurrenceRule, startDate, startViewDate, dateRange[1], recurrenceException);
+                        originalStartDate = options.originalStartDate || startDate;
+                    var dates = recurrenceUtils.getDatesByRecurrence(recurrenceRule, originalStartDate, startViewDate, dateRange[1], recurrenceException);
                     if (!dates.length)
                         dates.push(startDate);
                     var itemResources = this._resourcesManager.getResourcesFromItem(appointmentData),
@@ -29767,8 +29849,13 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     if (this.appointmentTakesAllDay(appointment))
                         updatedStartDate = dateUtils.normalizeDate(startDate, firstViewDate);
                     else {
-                        startDate.setHours(this.option("startDayHour"));
-                        startDate.setMinutes(0);
+                        var startDayHour = this.option("startDayHour");
+                        if (startDate.getTime() < firstViewDate.getTime())
+                            startDate = firstViewDate;
+                        else if (startDate.getHours() < startDayHour) {
+                            startDate.setHours(startDayHour);
+                            startDate.setMinutes(0)
+                        }
                         updatedStartDate = dateUtils.normalizeDate(options.startDate, new Date(startDate))
                     }
                     options.callback(updatedStartDate)
@@ -30722,27 +30809,29 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     return result
                 },
                 _getSingleAppointmentData: function(appointmentData, options, $appointment) {
-                    var target = appointmentData,
-                        updatedData = options.skipDateCalculation ? {} : this._getUpdatedData(options),
-                        appointment = $.extend({}, target, updatedData),
-                        allDay = this.fire("getField", "allDay", target),
+                    var updatedData = options.skipDateCalculation ? {} : this._getUpdatedData(options),
+                        resultAppointmentData = $.extend({}, appointmentData, updatedData),
+                        allDay = this.fire("getField", "allDay", appointmentData),
                         allowAllDay = this._workSpace.supportAllDayRow() && allDay,
-                        startDate = this.fire("getField", "startDate", appointment),
-                        endDate = this.fire("getField", "endDate", appointment),
+                        startDate = this.fire("getField", "startDate", resultAppointmentData),
+                        endDate = this.fire("getField", "endDate", resultAppointmentData),
                         appointmentDuration = endDate.getTime() - startDate.getTime(),
                         updatedStartDate;
-                    if (commonUtils.isDefined($appointment)) {
+                    if (commonUtils.isDefined($appointment) && this._needUpdateAppointmentData($appointment)) {
                         var coordinates = translator.locate($appointment),
                             cellData = this._workSpace.getCellDataByCoordinates(coordinates, allowAllDay);
                         updatedStartDate = new Date(cellData.startDate);
                         updatedStartDate.setHours(startDate.getHours());
                         updatedStartDate.setMinutes(startDate.getMinutes())
                     }
-                    else
-                        updatedStartDate = appointmentData.startDate;
-                    this.fire("setField", "startDate", appointment, updatedStartDate);
-                    this.fire("setField", "endDate", appointment, new Date(updatedStartDate.getTime() + appointmentDuration));
-                    return appointment
+                    if (updatedStartDate) {
+                        this.fire("setField", "startDate", resultAppointmentData, updatedStartDate);
+                        this.fire("setField", "endDate", resultAppointmentData, new Date(updatedStartDate.getTime() + appointmentDuration))
+                    }
+                    return resultAppointmentData
+                },
+                _needUpdateAppointmentData: function($appointment) {
+                    return $appointment.hasClass("dx-scheduler-appointment-reduced") || $appointment.hasClass("dx-scheduler-appointment-compact") || $appointment.hasClass("dx-scheduler-appointment-recurrence")
                 },
                 subscribe: function(subject, action) {
                     this._subscribes[subject] = subscribes[subject] = action
