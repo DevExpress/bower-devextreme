@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme
-* Version: 16.1.6
-* Build date: Sep 2, 2016
+* Version: 16.1.7
+* Build date: Oct 11, 2016
 *
 * Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -3482,6 +3482,10 @@
 {
   cursor: pointer;
 }
+.dx-lookup-popup-search .dx-list
+{
+  height: 90%;
+}
 .dx-lookup-search-wrapper
 {
   width: 100%;
@@ -3738,12 +3742,19 @@
 }
 .dx-tagbox.dx-tagbox-only-select .dx-texteditor-input
 {
+  border: none;
+  color: transparent;
+  text-shadow: 0 0 0 gray;
   min-width: 0;
-  width: 0;
+  width: .1px;
   margin-left: 0;
   margin-right: 0;
   padding-left: 0;
   padding-right: 0;
+}
+.dx-tagbox.dx-tagbox-only-select .dx-texteditor-input:focus
+{
+  outline: none;
 }
 .dx-tagbox.dx-state-disabled .dx-texteditor-input
 {
@@ -5497,6 +5508,7 @@ input.dx-hidden
 .dx-pivotgrid table
 {
   border-collapse: collapse;
+  table-layout: auto;
   border-spacing: 0;
 }
 .dx-pivotgrid td
@@ -5695,7 +5707,7 @@ input.dx-hidden
 {
   height: 100%;
 }
-.dx-menu-horizontal:before
+.dx-menu-horizontal:after
 {
   height: 100%;
   display: inline-block;
@@ -5715,7 +5727,7 @@ input.dx-hidden
 {
   height: 100%;
 }
-.dx-menu-vertical:before
+.dx-menu-vertical:after
 {
   height: 100%;
   display: inline-block;
@@ -5934,6 +5946,14 @@ input.dx-hidden
   left: -9999px;
   visibility: hidden;
 }
+.dx-treeview-loadindicator-wrapper
+{
+  text-align: center;
+}
+.dx-treeview-node-loadindicator
+{
+  position: absolute;
+}
 .dx-treeview
 {
   height: 100%;
@@ -6021,10 +6041,6 @@ input.dx-hidden
 .dx-treeview .dx-treeview-toggle-item-visibility.dx-state-disabled
 {
   cursor: default;
-}
-.dx-treeview .dx-loadindicator
-{
-  position: absolute;
 }
 .dx-treeview.dx-rtl .dx-treeview-node-container:first-child>.dx-treeview-node
 {

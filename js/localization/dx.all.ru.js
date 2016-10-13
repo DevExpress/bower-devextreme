@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme
-* Version: 16.1.6
-* Build date: Sep 2, 2016
+* Version: 16.1.7
+* Build date: Oct 11, 2016
 *
 * Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml

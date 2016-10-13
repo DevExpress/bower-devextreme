@@ -1,7 +1,7 @@
 ﻿/*! 
 * DevExtreme (dx.vectormaputils.debug.js)
-* Version: 16.1.6
-* Build date: Fri Sep 02 2016
+* Version: 16.1.7
+* Build date: Tue Oct 11 2016
 *
 * Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -102,7 +102,7 @@ function buildFeatures(shpData, dbfData, roundCoordinates) {
             type: "Feature",
             geometry: {
                 type: shape.gj_type || null,
-                coordinates: shape.coordinates ? roundCoordinates(shape.coordinates) : null
+                coordinates: shape.coordinates ? roundCoordinates(shape.coordinates) : []
             },
             properties: dbfData[i] || null
         };
