@@ -1,152 +1,148 @@
-﻿/*! 
-* DevExtreme (dx.vectormaputils.node.js)
-* Version: 16.1.7
-* Build date: Tue Oct 11 2016
-*
-* Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
-* EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
-*/
-﻿"use strict";
+/*!
+ * DevExtreme (dx.vectormaputils.node.js)
+ * Version: 16.2.1
+ * Build date: Mon Nov 07 2016
+ *
+ * Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
+ * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
+ */
+"use strict";
 
-function noop() { }
+function noop() {}
 
-function eigen(x) { return x; }
+function eigen(x) {
+    return x
+}
 
 function isFunction(target) {
-    return typeof target === "function";
+    return "function" === typeof target
 }
 
 function wrapSource(source) {
-    var buffer = wrapBuffer(source),
-        position = 0,
-        stream;
-
+    var stream, buffer = wrapBuffer(source),
+        position = 0;
     stream = {
-        pos: function () {
-            return position;
+        pos: function() {
+            return position
         },
-
-        skip: function (count) {
+        skip: function(count) {
             position += count;
-            return stream;
+            return stream
         },
-
-        ui8arr: function (length) {
+        ui8arr: function(length) {
             var i = 0,
                 list = [];
             list.length = length;
             for (; i < length; ++i) {
-                list[i] = stream.ui8();
+                list[i] = stream.ui8()
             }
-            return list;
+            return list
         },
-
-        ui8: function () {
+        ui8: function() {
             var val = ui8(buffer, position);
             position += 1;
-            return val;
+            return val
         },
-
-        ui16le: function () {
-            var val = ui16le(buffer, position);
+        ui16LE: function() {
+            var val = ui16LE(buffer, position);
             position += 2;
-            return val;
+            return val
         },
-
-        ui32le: function () {
-            var val = ui32le(buffer, position);
+        ui32LE: function() {
+            var val = ui32LE(buffer, position);
             position += 4;
-            return val;
+            return val
         },
-
-        ui32be: function () {
-            var val = ui32be(buffer, position);
+        ui32BE: function() {
+            var val = ui32BE(buffer, position);
             position += 4;
-            return val;
+            return val
         },
-
-        f64le: function () {
-            var val = f64le(buffer, position);
+        f64LE: function() {
+            var val = f64LE(buffer, position);
             position += 8;
-            return val;
+            return val
         }
     };
-    return stream;
+    return stream
 }
 
 function parseCore(source, roundCoordinates, errors) {
-    var shpData = source[0] ? parseShp(wrapSource(source[0]), errors) : {},
-        dbfData = source[1] ? parseDbf(wrapSource(source[1]), errors) : {},
-        features = buildFeatures(shpData.shapes || [], dbfData.records || [], roundCoordinates);
-    return features.length ? {
-        type: "FeatureCollection",
-        bbox: shpData.bbox,
-        features: features,
-    } : null;
+    var result, shapeData = source[0] ? parseShape(wrapSource(source[0]), errors) : {},
+        dataBaseFileData = source[1] ? parseDBF(wrapSource(source[1]), errors) : {},
+        features = buildFeatures(shapeData.shapes || [], dataBaseFileData.records || [], roundCoordinates);
+    if (features.length) {
+        result = {
+            type: "FeatureCollection",
+            features: features
+        };
+        result.bbox = shapeData.bBox
+    } else {
+        result = null
+    }
+    return result
 }
 
-function buildFeatures(shpData, dbfData, roundCoordinates) {
-    var features = [],
-        i,
-        ii = features.length = ii = Math.max(shpData.length, dbfData.length),
-        shape;
+function buildFeatures(shapeData, dataBaseFileData, roundCoordinates) {
+    var i, shape, features = [],
+        ii = features.length = ii = Math.max(shapeData.length, dataBaseFileData.length);
     for (i = 0; i < ii; ++i) {
-        shape = shpData[i] || {};
+        shape = shapeData[i] || {};
         features[i] = {
             type: "Feature",
             geometry: {
-                type: shape.gj_type || null,
+                type: shape.geoJSON_type || null,
                 coordinates: shape.coordinates ? roundCoordinates(shape.coordinates) : []
             },
-            properties: dbfData[i] || null
-        };
+            properties: dataBaseFileData[i] || null
+        }
     }
-    return features;
+    return features
 }
 
 function createCoordinatesRounder(precision) {
     var factor = Number("1E" + precision);
+
     function round(x) {
-        return Math.round(x * factor) / factor;
+        return Math.round(x * factor) / factor
     }
+
     function process(values) {
-        return values.map(values[0].length ? process : round);
+        return values.map(values[0].length ? process : round)
     }
-    return process;
+    return process
 }
 
 function buildParseArgs(source) {
     source = source || {};
-    return ["shp", "dbf"].map(function (key) {
-        return function (done) {
+    return ["shp", "dbf"].map(function(key) {
+        return function(done) {
             if (source.substr) {
                 key = "." + key;
-                sendRequest(source + (source.substr(-key.length).toLowerCase() === key ? "" : key), function (e, response) {
-                    done(e, response);
-                });
+                sendRequest(source + (source.substr(-key.length).toLowerCase() === key ? "" : key), function(e, response) {
+                    done(e, response)
+                })
             } else {
-                done(null, source[key] || null);
+                done(null, source[key] || null)
             }
-        };
-    });
+        }
+    })
 }
 
 function parse(source, parameters, callback) {
     var result;
-    when(buildParseArgs(source), function (errorArray, dataArray) {
-        callback = (isFunction(parameters) && parameters) || (isFunction(callback) && callback) || noop;
-        parameters = (!isFunction(parameters) && parameters) || {};
+    when(buildParseArgs(source), function(errorArray, dataArray) {
+        callback = isFunction(parameters) && parameters || isFunction(callback) && callback || noop;
+        parameters = !isFunction(parameters) && parameters || {};
         var errors = [];
-        errorArray.forEach(function (e) {
-            e && errors.push(e);
+        errorArray.forEach(function(e) {
+            e && errors.push(e)
         });
         result = parseCore(dataArray, parameters.precision >= 0 ? createCoordinatesRounder(parameters.precision) : eigen, errors);
-        // NOTE: The order of the error and the result is reversed because of backward compatibility
-        callback(result, errors.length ? errors : null);
+        callback(result, errors.length ? errors : null)
     });
-    return result;
+    return result
 }
-
 exports.parse = parse;
 
 function when(actions, callback) {
@@ -154,210 +150,191 @@ function when(actions, callback) {
         dataArray = [],
         counter = 1,
         lock = true;
-    actions.forEach(function (action, i) {
+    actions.forEach(function(action, i) {
         ++counter;
-        action(function (e, data) {
+        action(function(e, data) {
             errorArray[i] = e;
             dataArray[i] = data;
-            massDone();
-        });
+            massDone()
+        })
     });
     lock = false;
     massDone();
+
     function massDone() {
         --counter;
-        if(counter === 0 && !lock) {
-            callback(errorArray, dataArray);
+        if (0 === counter && !lock) {
+            callback(errorArray, dataArray)
         }
     }
 }
 
-function parseShp(stream, errors) {
-    var timeStart,
-        timeEnd,
-        header,
-        records = [],
-        record;
+function parseShape(stream, errors) {
+    var timeStart, timeEnd, header, record, records = [];
     try {
-        timeStart = new Date();
-        header = parseShpHeader(stream);
-    }
-    catch (e) {
+        timeStart = new Date;
+        header = parseShapeHeader(stream)
+    } catch (e) {
         errors.push("shp: header parsing error: " + e.message + " / " + e.description);
-        return;
+        return
     }
-    if (header.fileCode !== 9994) {
-        errors.push("shp: file code: " + header.fileCode + " / expected: 9994");
+    if (9994 !== header.fileCode) {
+        errors.push("shp: file code: " + header.fileCode + " / expected: 9994")
     }
-    if (header.version !== 1000) {
-        errors.push("shp: file version: " + header.version + " / expected: 1000");
+    if (1e3 !== header.version) {
+        errors.push("shp: file version: " + header.version + " / expected: 1000")
     }
     try {
         while (stream.pos() < header.fileLength) {
-            record = parseShpRecord(stream, header.type, errors);
+            record = parseShapeRecord(stream, header.type, errors);
             if (record) {
-                records.push(record);
-            }
-            else {
-                break;
+                records.push(record)
+            } else {
+                break
             }
         }
         if (stream.pos() !== header.fileLength) {
-            errors.push("shp: file length: " + header.fileLength + " / actual: " + stream.pos());
+            errors.push("shp: file length: " + header.fileLength + " / actual: " + stream.pos())
         }
-        timeEnd = new Date();
-    }
-    catch (e) {
-        errors.push("shp: records parsing error: " + e.message + " / " + e.description);
-    }
-    finally {
+        timeEnd = new Date
+    } catch (e) {
+        errors.push("shp: records parsing error: " + e.message + " / " + e.description)
+    } finally {
         return {
-            bbox: header.bbox_xy,
+            bBox: header.bBox_XY,
             type: header.shapeType,
             shapes: records,
             errors: errors,
             time: timeEnd - timeStart
-        };
+        }
     }
 }
 
 function readPointShape(stream, record) {
-    record.coordinates = readPointArray(stream, 1)[0];
+    record.coordinates = readPointArray(stream, 1)[0]
 }
 
 function readPolyLineShape(stream, record) {
-    var bbox = readBBox(stream),
+    var i, bBox = readBBox(stream),
         numParts = readInteger(stream),
         numPoints = readInteger(stream),
         parts = readIntegerArray(stream, numParts),
         points = readPointArray(stream, numPoints),
-        rings = [],
-        i;
+        rings = [];
     rings.length = numParts;
     for (i = 0; i < numParts; ++i) {
-        rings[i] = points.slice(parts[i], parts[i + 1] || numPoints);
+        rings[i] = points.slice(parts[i], parts[i + 1] || numPoints)
     }
-    record.bbox = bbox;
-    record.coordinates = rings;
+    record.bBox = bBox;
+    record.coordinates = rings
 }
 
 function readMultiPointShape(stream, record) {
-    record.bbox = readBBox(stream);
-    record.coordinates = readPointArray(stream, readInteger(stream));
+    record.bBox = readBBox(stream);
+    record.coordinates = readPointArray(stream, readInteger(stream))
 }
 
 function readPointMShape(stream, record) {
     record.coordinates = readPointArray(stream, 1)[0];
-    record.coordinates.push(readDoubleArray(stream, 1)[0]);
+    record.coordinates.push(readDoubleArray(stream, 1)[0])
 }
 
 function readMultiPointMShape(stream, record) {
-    var bbox = readBBox(stream),
+    var bBox = readBBox(stream),
         numPoints = readInteger(stream),
         points = readPointArray(stream, numPoints),
-        mbox = readPair(stream),
-        mvalues = readDoubleArray(stream, numPoints);
-    record.bbox = bbox;
-    record.mbox = mbox;
-    record.coordinates = merge_xym(points, mvalues, numPoints);
+        mBox = readPair(stream),
+        mValues = readDoubleArray(stream, numPoints);
+    record.bBox = bBox;
+    record.mBox = mBox;
+    record.coordinates = merge_XYM(points, mValues, numPoints)
 }
 
 function readPolyLineMShape(stream, record) {
-    var bbox = readBBox(stream),
+    var i, from, to, bBox = readBBox(stream),
         numParts = readInteger(stream),
         numPoints = readInteger(stream),
         parts = readIntegerArray(stream, numParts),
         points = readPointArray(stream, numPoints),
-        mbox = readPair(stream),
-        mvalues = readDoubleArray(stream, numPoints),
-        rings = [],
-        i,
-        from,
-        to;
+        mBox = readPair(stream),
+        mValues = readDoubleArray(stream, numPoints),
+        rings = [];
     rings.length = numParts;
     for (i = 0; i < numParts; ++i) {
         from = parts[i];
         to = parts[i + 1] || numPoints;
-        rings[i] = merge_xym(points.slice(from, to), mvalues.slice(from, to), to - from);
+        rings[i] = merge_XYM(points.slice(from, to), mValues.slice(from, to), to - from)
     }
-    record.bbox = bbox;
-    record.mbox = mbox;
-    record.coordinates = rings;
+    record.bBox = bBox;
+    record.mBox = mBox;
+    record.coordinates = rings
 }
 
 function readPointZShape(stream, record) {
     record.coordinates = readPointArray(stream, 1)[0];
-    record.push(readDoubleArray(stream, 1)[0], readDoubleArray(stream, 1)[0]);
+    record.push(readDoubleArray(stream, 1)[0], readDoubleArray(stream, 1)[0])
 }
 
 function readMultiPointZShape(stream, record) {
-    var bbox = readBBox(stream),
+    var bBox = readBBox(stream),
         numPoints = readInteger(stream),
         points = readPointArray(stream, numPoints),
-        zbox = readPair(stream),
-        zvalues = readDoubleArray(stream, numPoints),
-        mbox = readPair(stream),
-        mvalue = readDoubleArray(stream, numPoints);
-    record.bbox = bbox;
-    record.zbox = zbox;
-    record.mbox = mbox;
-    record.coordinates = merge_xyzm(points, zvalues, mvalue, numPoints);
+        zBox = readPair(stream),
+        zValues = readDoubleArray(stream, numPoints),
+        mBox = readPair(stream),
+        mValue = readDoubleArray(stream, numPoints);
+    record.bBox = bBox;
+    record.zBox = zBox;
+    record.mBox = mBox;
+    record.coordinates = merge_XYZM(points, zValues, mValue, numPoints)
 }
 
 function readPolyLineZShape(stream, record) {
-    var bbox = readBBox(stream),
+    var i, from, to, bBox = readBBox(stream),
         numParts = readInteger(stream),
         numPoints = readInteger(stream),
         parts = readIntegerArray(stream, numParts),
         points = readPointArray(stream, numPoints),
-        zbox = readPair(stream),
-        zvalues = readDoubleArray(stream, numPoints),
-        mbox = readPair(stream),
-        mvalues = readDoubleArray(stream, numPoints),
-        rings = [],
-        i,
-        from,
-        to;
+        zBox = readPair(stream),
+        zValues = readDoubleArray(stream, numPoints),
+        mBox = readPair(stream),
+        mValues = readDoubleArray(stream, numPoints),
+        rings = [];
     rings.length = numParts;
     for (i = 0; i < numParts; ++i) {
         from = parts[i];
         to = parts[i + 1] || numPoints;
-        rings[i] = merge_xyzm(points.slice(from, to), zvalues.slice(from, to), mvalues.slice(from, to), to - from);
+        rings[i] = merge_XYZM(points.slice(from, to), zValues.slice(from, to), mValues.slice(from, to), to - from)
     }
-    record.bbox = bbox;
-    record.zbox = zbox;
-    record.mbox = mbox;
-    record.coordinates = rings;
+    record.bBox = bBox;
+    record.zBox = zBox;
+    record.mBox = mBox;
+    record.coordinates = rings
 }
 
 function readMultiPatchShape(stream, record) {
-    var bbox = readBBox(stream),
+    var i, from, to, bBox = readBBox(stream),
         numParts = readInteger(stream),
         numPoints = readInteger(stream),
         parts = readIntegerArray(stream, numParts),
         partTypes = readIntegerArray(stream, numParts),
         points = readPointArray(stream, numPoints),
-        zbox = readPair(stream),
-        zvalues = readDoubleArray(stream, numPoints),
-        mbox = readPair(stream),
-        mvalues = readDoubleArray(stream, numPoints),
-        rings = [],
-        i,
-        from,
-        to;
+        zBox = readPair(stream),
+        zValues = readDoubleArray(stream, numPoints),
+        mBox = readPair(stream),
+        rings = [];
     rings.length = numParts;
     for (i = 0; i < numParts; ++i) {
         from = parts[i];
         to = parts[i + 1] || numPoints;
-        rings[i] = merge_xyzm(points.slice(from, to), zvalues.slice(from, to), mvalues.slice(from, to), to - from);
+        rings[i] = merge_XYZM(points.slice(from, to), zValues.slice(from, to), mValues.slice(from, to), to - from)
     }
-    record.bbox = bbox;
-    record.zbox = zbox;
-    record.mbox = mbox;
+    record.bBox = bBox;
+    record.zBox = zBox;
+    record.mBox = mBox;
     record.types = partTypes;
-    record.coordinates = rings;
+    record.coordinates = rings
 }
-
 var SHP_TYPES = {
     0: "Null",
     1: "Point",
@@ -374,7 +351,6 @@ var SHP_TYPES = {
     28: "MultiPointM",
     31: "MultiPatch"
 };
-
 var SHP_RECORD_PARSERS = {
     0: noop,
     1: readPointShape,
@@ -391,209 +367,197 @@ var SHP_RECORD_PARSERS = {
     28: readMultiPointMShape,
     31: readMultiPatchShape
 };
-
 var SHP_TYPE_TO_GEOJSON_TYPE_MAP = {
-    "Null": "Null",
-    "Point": "Point",
-    "PolyLine": "MultiLineString",
-    "Polygon": "Polygon",
-    "MultiPoint": "MultiPoint",
-    "PointZ": "Point",
-    "PolyLineZ": "MultiLineString",
-    "PolygonZ": "Polygon",
-    "MultiPointZ": "MultiPoint",
-    "PointM": "Point",
-    "PolyLineM": "MultiLineString",
-    "PolygonM": "Polygon",
-    "MultiPointM": "MultiPoint",
-    "MultiPatch": "MultiPatch"
+    Null: "Null",
+    Point: "Point",
+    PolyLine: "MultiLineString",
+    Polygon: "Polygon",
+    MultiPoint: "MultiPoint",
+    PointZ: "Point",
+    PolyLineZ: "MultiLineString",
+    PolygonZ: "Polygon",
+    MultiPointZ: "MultiPoint",
+    PointM: "Point",
+    PolyLineM: "MultiLineString",
+    PolygonM: "Polygon",
+    MultiPointM: "MultiPoint",
+    MultiPatch: "MultiPatch"
 };
 
-function parseShpHeader(stream) {
+function parseShapeHeader(stream) {
     var header = {};
-    header.fileCode = stream.ui32be();
+    header.fileCode = stream.ui32BE();
     stream.skip(20);
-    header.fileLength = stream.ui32be() << 1;
-    header.version = stream.ui32le();
-    header.type_number = stream.ui32le();
+    header.fileLength = stream.ui32BE() << 1;
+    header.version = stream.ui32LE();
+    header.type_number = stream.ui32LE();
     header.type = SHP_TYPES[header.type_number];
-    header.bbox_xy = readBBox(stream);
-    header.bbox_zm = readPointArray(stream, 2);
-    return header;
+    header.bBox_XY = readBBox(stream);
+    header.bBox_ZM = readPointArray(stream, 2);
+    return header
 }
 
 function readInteger(stream) {
-    return stream.ui32le();
+    return stream.ui32LE()
 }
 
 function readIntegerArray(stream, length) {
-    var array = [],
-        i;
+    var i, array = [];
     array.length = length;
     for (i = 0; i < length; ++i) {
-        array[i] = readInteger(stream);
+        array[i] = readInteger(stream)
     }
-    return array;
+    return array
 }
 
 function readDoubleArray(stream, length) {
-    var array = [],
-        i;
+    var i, array = [];
     array.length = length;
     for (i = 0; i < length; ++i) {
-        array[i] = stream.f64le();
+        array[i] = stream.f64LE()
     }
-    return array;
+    return array
 }
 
 function readBBox(stream) {
-    return readDoubleArray(stream, 4);
+    return readDoubleArray(stream, 4)
 }
 
 function readPair(stream) {
-    return [stream.f64le(), stream.f64le()];
+    return [stream.f64LE(), stream.f64LE()]
 }
 
 function readPointArray(stream, count) {
-    var points = [],
-        i;
+    var i, points = [];
     points.length = count;
     for (i = 0; i < count; ++i) {
-        points[i] = readPair(stream);
+        points[i] = readPair(stream)
     }
-    return points;
+    return points
 }
 
-function merge_xym(xy, m, length) {
-    var array = [],
-        i;
+function merge_XYM(xy, m, length) {
+    var i, array = [];
     array.length = length;
     for (i = 0; i < length; ++i) {
-        array[i] = [xy[i][0], xy[i][1], m[i]];
+        array[i] = [xy[i][0], xy[i][1], m[i]]
     }
-    return array;
+    return array
 }
 
-function merge_xyzm(xy, z, m, length) {
-    var array = [],
-        i;
+function merge_XYZM(xy, z, m, length) {
+    var i, array = [];
     array.length = length;
     for (i = 0; i < length; ++i) {
-        array[i] = [xy[i][0], xy[i][1], z[i], m[i]];
+        array[i] = [xy[i][0], xy[i][1], z[i], m[i]]
     }
-    return array;
+    return array
 }
 
-function parseShpRecord(stream, generalType, errors) {
-    var record = { number: stream.ui32be() },
-        length = stream.ui32be() << 1,
+function parseShapeRecord(stream, generalType, errors) {
+    var record = {
+            number: stream.ui32BE()
+        },
+        length = stream.ui32BE() << 1,
         pos = stream.pos(),
-        type = stream.ui32le();
-
+        type = stream.ui32LE();
     record.type_number = type;
     record.type = SHP_TYPES[type];
-    record.gj_type = SHP_TYPE_TO_GEOJSON_TYPE_MAP[record.type];
+    record.geoJSON_type = SHP_TYPE_TO_GEOJSON_TYPE_MAP[record.type];
     if (record.type) {
         if (record.type !== generalType) {
-            errors.push("shp: shape #" + record.number + " type: " + record.type + " / expected: " + generalType);
+            errors.push("shp: shape #" + record.number + " type: " + record.type + " / expected: " + generalType)
         }
         SHP_RECORD_PARSERS[type](stream, record);
         pos = stream.pos() - pos;
         if (pos !== length) {
-            errors.push("shp: shape #" + record.number + " length: " + length + " / actual: " + pos);
+            errors.push("shp: shape #" + record.number + " length: " + length + " / actual: " + pos)
         }
     } else {
         errors.push("shp: shape #" + record.number + " type: " + type + " / unknown");
-        record = null;
+        record = null
     }
-    return record;
+    return record
 }
 
-function parseDbf(stream, errors) {
-    var timeStart,
-        timeEnd,
-        header,
-        parseData,
-        records;
+function parseDBF(stream, errors) {
+    var timeStart, timeEnd, header, parseData, records;
     try {
-        timeStart = new Date();
-        header = parseDbfHeader(stream, errors);
-        parseData = prepareDbfRecordParseData(header, errors);
-        records = parseDbfRecords(stream, header.numberOfRecords, header.recordLength, parseData, errors);
-        timeEnd = new Date();
-    }
-    catch (e) {
-        errors.push("dbf: parsing error: " + e.message + " / " + e.description);
-    }
-    finally {
-        return { records: records, errors: errors, time: timeEnd - timeStart };
+        timeStart = new Date;
+        header = parseDataBaseFileHeader(stream, errors);
+        parseData = prepareDataBaseFileRecordParseData(header, errors);
+        records = parseDataBaseFileRecords(stream, header.numberOfRecords, header.recordLength, parseData, errors);
+        timeEnd = new Date
+    } catch (e) {
+        errors.push("dbf: parsing error: " + e.message + " / " + e.description)
+    } finally {
+        return {
+            records: records,
+            errors: errors,
+            time: timeEnd - timeStart
+        }
     }
 }
 
-function parseDbfHeader(stream, errors) {
-    var i,
-        header = {
-            versionNumber: stream.ui8(),
-            lastUpdate: new Date(1900 + stream.ui8(), stream.ui8() - 1, stream.ui8()),
-            numberOfRecords: stream.ui32le(),
-            headerLength: stream.ui16le(),
-            recordLength: stream.ui16le(),
-            fields: []
-        },
-        term;
+function parseDataBaseFileHeader(stream, errors) {
+    var i, term, header = {
+        versionNumber: stream.ui8(),
+        lastUpdate: new Date(1900 + stream.ui8(), stream.ui8() - 1, stream.ui8()),
+        numberOfRecords: stream.ui32LE(),
+        headerLength: stream.ui16LE(),
+        recordLength: stream.ui16LE(),
+        fields: []
+    };
     stream.skip(20);
     for (i = (header.headerLength - stream.pos() - 1) / 32; i > 0; --i) {
-        header.fields.push(parseFieldDescriptor(stream));
+        header.fields.push(parseFieldDescriptor(stream))
     }
     term = stream.ui8();
-    if (term !== 13) {
-        errors.push("dbf: header terminator: " + term + " / expected: 13");
+    if (13 !== term) {
+        errors.push("dbf: header terminator: " + term + " / expected: 13")
     }
-    return header;
+    return header
 }
-
 var _fromCharCode = String.fromCharCode;
 
 function getAsciiString(stream, length) {
-    return _fromCharCode.apply(null, stream.ui8arr(length));
+    return _fromCharCode.apply(null, stream.ui8arr(length))
 }
 
 function parseFieldDescriptor(stream) {
     var desc = {
-        name: getAsciiString(stream, 11).replace(/\0*$/gi, ''),
+        name: getAsciiString(stream, 11).replace(/\0*$/gi, ""),
         type: _fromCharCode(stream.ui8()),
         length: stream.skip(4).ui8(),
         count: stream.ui8()
     };
     stream.skip(14);
-    return desc;
+    return desc
 }
-
 var DBF_FIELD_PARSERS = {
-    "C": function (stream, length) {
+    C: function(stream, length) {
         var str = getAsciiString(stream, length);
-        return str.trim();
+        return str.trim()
     },
-    "N": function (stream, length) {
+    N: function(stream, length) {
         var str = getAsciiString(stream, length);
-        return parseFloat(str, 10);
+        return parseFloat(str, 10)
     },
-    "D": function (stream, length) {
+    D: function(stream, length) {
         var str = getAsciiString(stream, length);
-        return new Date(str.substring(0, 4), str.substring(4, 6) - 1, str.substring(6, 8));
+        return new Date(str.substring(0, 4), str.substring(4, 6) - 1, str.substring(6, 8))
     }
 };
 
 function DBF_FIELD_PARSER_DEFAULT(stream, length) {
     stream.skip(length);
-    return null;
+    return null
 }
 
-function prepareDbfRecordParseData(header, errors) {
-    var list = [],
+function prepareDataBaseFileRecordParseData(header, errors) {
+    var item, field, list = [],
         i = 0,
         ii = header.fields.length,
-        item, field,
         totalLength = 0;
     for (i = 0; i < ii; ++i) {
         field = header.fields[i];
@@ -604,154 +568,152 @@ function prepareDbfRecordParseData(header, errors) {
         };
         if (!item.parser) {
             item.parser = DBF_FIELD_PARSER_DEFAULT;
-            errors.push("dbf: field " + field.name + " type: " + field.type + " / unknown");
+            errors.push("dbf: field " + field.name + " type: " + field.type + " / unknown")
         }
         totalLength += field.length;
-        list.push(item);
+        list.push(item)
     }
     if (totalLength + 1 !== header.recordLength) {
-        errors.push("dbf: record length: " + header.recordLength + " / actual: " + (totalLength + 1));
+        errors.push("dbf: record length: " + header.recordLength + " / actual: " + (totalLength + 1))
     }
-    return list;
+    return list
 }
 
-function parseDbfRecords(stream, recordCount, recordLength, parseData, errors) {
-    var i,
-        j,
-        jj = parseData.length,
-        pos,
-        records = [],
-        record,
-        pd;
+function parseDataBaseFileRecords(stream, recordCount, recordLength, parseData, errors) {
+    var i, j, pos, record, pd, jj = parseData.length,
+        records = [];
     for (i = 0; i < recordCount; ++i) {
         record = {};
         pos = stream.pos();
         stream.skip(1);
         for (j = 0; j < jj; ++j) {
             pd = parseData[j];
-            record[pd.name] = pd.parser(stream, pd.length);
+            record[pd.name] = pd.parser(stream, pd.length)
         }
         pos = stream.pos() - pos;
         if (pos !== recordLength) {
-            errors.push("dbf: record #" + (i + 1) + " length: " + recordLength + " / actual: " + pos);
+            errors.push("dbf: record #" + (i + 1) + " length: " + recordLength + " / actual: " + pos)
         }
-        records.push(record);
+        records.push(record)
     }
-    return records;
+    return records
 }
 
 function wrapBuffer(buffer) {
-    return buffer;
+    return buffer
 }
 
 function ui8(stream, position) {
-    return stream[position];
+    return stream[position]
 }
 
-function ui16le(stream, position) {
-    return stream.readUInt16LE(position);
+function ui16LE(stream, position) {
+    return stream.readUInt16LE(position)
 }
 
-function ui32le(stream, position) {
-    return stream.readUInt32LE(position);
+function ui32LE(stream, position) {
+    return stream.readUInt32LE(position)
 }
 
-function ui32be(stream, position) {
-    return stream.readUInt32BE(position);
+function ui32BE(stream, position) {
+    return stream.readUInt32BE(position)
 }
 
-function f64le(stream, position) {
-    return stream.readDoubleLE(position);
+function f64LE(stream, position) {
+    return stream.readDoubleLE(position)
 }
-
 var fs = require("fs");
-function sendRequest(path, callback) {
-    fs.readFile(path, callback);
-}
 
+function sendRequest(path, callback) {
+    fs.readFile(path, callback)
+}
 var path = require("path");
 
 function normalizeJsName(value) {
-    return value.trim().replace('-', '_').replace(' ', '_');
+    return value.trim().replace("-", "_").replace(" ", "_")
 }
 
 function processFile(file, options, callback) {
     var name = path.basename(file, path.extname(file));
     options.info("%s: started", name);
-    parse(file, { precision: options.precision }, function (shapeData, errors) {
+    parse(file, {
+        precision: options.precision
+    }, function(shapeData, errors) {
         var content;
         options.info("%s: finished", name);
-        errors && errors.forEach(function (e) {
-            options.error("  " + e);
+        errors && errors.forEach(function(e) {
+            options.error("  " + e)
         });
         if (shapeData) {
             content = JSON.stringify(options.processData(shapeData), null, options.isDebug && 4);
             if (!options.isJSON) {
-                content = options.processFileContent(content, normalizeJsName(name));
+                content = options.processFileContent(content, normalizeJsName(name))
             }
-            fs.writeFile(
-                path.resolve(options.output || path.dirname(file), options.processFileName(name + (options.isJSON ? ".json" : ".js"))),
-                content, function (e) {
-                    e && options.error("  " + e.message);
-                    callback();
-                });
+            fs.writeFile(path.resolve(options.output || path.dirname(file), options.processFileName(name + (options.isJSON ? ".json" : ".js"))), content, function(e) {
+                e && options.error("  " + e.message);
+                callback()
+            })
         } else {
-            callback();
+            callback()
         }
-    });
+    })
 }
 
 function collectFiles(dir, done) {
     var input = path.resolve(dir || "");
-    fs.stat(input, function (e, stat) {
+    fs.stat(input, function(e, stat) {
         if (e) {
-            done(e, []);
-        } else if (stat.isFile()) {
-            done(null, checkFile(input) ? [path.resolve(path.dirname(input), normalizeFile(input))] : []);
-        } else if (stat.isDirectory()) {
-            fs.readdir(input, function (e, dirItems) {
-                var list = [];
-                dirItems.forEach(function (dirItem) {
-                    if (checkFile(dirItem)) {
-                        list.push(path.resolve(input, normalizeFile(dirItem)));
-                    }
-                });
-                done(null, list);
-            });
+            done(e, [])
         } else {
-            done(null, []);
+            if (stat.isFile()) {
+                done(null, checkFile(input) ? [path.resolve(path.dirname(input), normalizeFile(input))] : [])
+            } else {
+                if (stat.isDirectory()) {
+                    fs.readdir(input, function(e, dirItems) {
+                        var list = [];
+                        dirItems.forEach(function(dirItem) {
+                            if (checkFile(dirItem)) {
+                                list.push(path.resolve(input, normalizeFile(dirItem)))
+                            }
+                        });
+                        done(null, list)
+                    })
+                } else {
+                    done(null, [])
+                }
+            }
         }
     });
 
     function checkFile(name) {
-        return path.extname(name).toLowerCase() === ".shp";
+        return ".shp" === path.extname(name).toLowerCase()
     }
 
     function normalizeFile(name) {
-        return path.basename(name, ".shp");
+        return path.basename(name, ".shp")
     }
 }
 
 function importFile(file) {
     var content;
     try {
-        content = require(path.resolve(String(file)));
-    } catch (_) { }
-    return content;
+        content = require(path.resolve(String(file)))
+    } catch (_) {}
+    return content
 }
 
 function pickFunctionOption(value) {
-    return (isFunction(value) && value) || (value && importFile(String(value))) || null;
+    return isFunction(value) && value || value && importFile(String(value)) || null
 }
 
 function processFileContentByDefault(content, name) {
-    return name + " = " + content + ";";
+    return name + " = " + content + ";"
 }
 
 function prepareSettings(source, options) {
     options = Object.assign({}, options);
     if (options.settings) {
-        options = Object.assign(importFile(options.settings) || {}, options);
+        options = Object.assign(importFile(options.settings) || {}, options)
     }
     return Object.assign(options, {
         input: source ? String(source) : null,
@@ -762,89 +724,122 @@ function prepareSettings(source, options) {
         processFileContent: pickFunctionOption(options.processFileContent) || processFileContentByDefault,
         info: options.isQuiet ? noop : console.info.bind(console),
         error: options.isQuiet ? noop : console.error.bind(console)
-    });
+    })
 }
 
 function processFiles(source, options, callback) {
     var settings = prepareSettings(source, options && options.trim ? importFile(options) : options);
     settings.info("Started");
-    collectFiles(settings.input, function (e, files) {
+    collectFiles(settings.input, function(e, files) {
         e && settings.error(e.message);
-        settings.info(files.map(function (file) {
-            return "  " + path.basename(file);
+        settings.info(files.map(function(file) {
+            return "  " + path.basename(file)
         }).join("\n"));
-        when(files.map(function (file) {
-            return function (done) {
-                processFile(file, settings, done);
-            };
-        }), function () {
+        when(files.map(function(file) {
+            return function(done) {
+                processFile(file, settings, done)
+            }
+        }), function() {
             settings.info("Finished");
-            (isFunction(callback) ? callback : noop)();
-        });
-    });
+            (isFunction(callback) ? callback : noop)()
+        })
+    })
 }
-
 exports.processFiles = processFiles;
-
-var COMMAND_LINE_ARG_KEYS = [
-    { key: "--output", name: "output", arg: true, desc: "Destination directory" },
-    { key: "--process-data", name: "processData", arg: true, desc: "Process parsed data" },
-    { key: "--process-file-name", name: "processFileName", arg: true, desc: "Process output file name" },
-    { key: "--process-file-content", name: "processFileContent", arg: true, desc: "Process output file content" },
-    { key: "--precision", name: "precision", arg: true, desc: "Precision of shape coordinates" },
-    { key: "--json", name: "isJSON", desc: "Generate as a .json file" },
-    { key: "--debug", name: "isDebug", desc: "Generate non minified file" },
-    { key: "--quiet", name: "isQuiet", desc: "Suppress console output" },
-    { key: "--settings", name: "settings", arg: true, desc: "Path to settings file" },
-    { key: "--help", name: "isHelp", desc: "Print help" }
-];
+var COMMAND_LINE_ARG_KEYS = [{
+    key: "--output",
+    name: "output",
+    arg: true,
+    desc: "Destination directory"
+}, {
+    key: "--process-data",
+    name: "processData",
+    arg: true,
+    desc: "Process parsed data"
+}, {
+    key: "--process-file-name",
+    name: "processFileName",
+    arg: true,
+    desc: "Process output file name"
+}, {
+    key: "--process-file-content",
+    name: "processFileContent",
+    arg: true,
+    desc: "Process output file content"
+}, {
+    key: "--precision",
+    name: "precision",
+    arg: true,
+    desc: "Precision of shape coordinates"
+}, {
+    key: "--json",
+    name: "isJSON",
+    desc: "Generate as a .json file"
+}, {
+    key: "--debug",
+    name: "isDebug",
+    desc: "Generate non minified file"
+}, {
+    key: "--quiet",
+    name: "isQuiet",
+    desc: "Suppress console output"
+}, {
+    key: "--settings",
+    name: "settings",
+    arg: true,
+    desc: "Path to settings file"
+}, {
+    key: "--help",
+    name: "isHelp",
+    desc: "Print help"
+}];
 
 function parseCommandLineArgs() {
     var args = process.argv.slice(2),
-        options = { isEmpty: !args.length },
+        options = {
+            isEmpty: !args.length
+        },
         map = {};
-    args.forEach(function (arg, i) {
-        map[arg] = args[i + 1] || true;
+    args.forEach(function(arg, i) {
+        map[arg] = args[i + 1] || true
     });
-    COMMAND_LINE_ARG_KEYS.forEach(function (info) {
+    COMMAND_LINE_ARG_KEYS.forEach(function(info) {
         var val = map[info.key];
         if (val) {
-            options[info.name] = info.arg ? val : true;
+            options[info.name] = info.arg ? val : true
         }
     });
     if (options.isHelp || options.isEmpty) {
         options = null;
-        printCommandLineHelp();
+        printCommandLineHelp()
     }
-    return options;
+    return options
 }
 
 function printCommandLineHelp() {
-    var parts = ["node ", path.basename(process.argv[1]), " Source "],
+    var message, parts = ["node ", path.basename(process.argv[1]), " Source "],
         lines = [],
-        maxLength = Math.max.apply(null, COMMAND_LINE_ARG_KEYS.map(function (info) {
-            return info.key.length;
-        })) + 2,
-        message;
-    COMMAND_LINE_ARG_KEYS.forEach(function (info) {
+        maxLength = Math.max.apply(null, COMMAND_LINE_ARG_KEYS.map(function(info) {
+            return info.key.length
+        })) + 2;
+    COMMAND_LINE_ARG_KEYS.forEach(function(info) {
         var key = info.key;
         parts.push(key, " ");
         if (info.arg) {
-            parts.push("<", key.slice(2), ">", " ");
+            parts.push("<", key.slice(2), ">", " ")
         }
-        lines.push(["  ", key, Array(maxLength - key.length).join(" "), info.desc].join(""));
+        lines.push(["  ", key, Array(maxLength - key.length).join(" "), info.desc].join(""))
     });
     message = ["Generates dxVectorMap-compatible files from shapefiles.", "\n", parts.join("")].concat(lines).join("\n");
-    console.log(message);
+    console.log(message)
 }
 
 function runFromConsole() {
     var args = parseCommandLineArgs();
     if (args) {
-        processFiles(process.argv[2] || "", args);
+        processFiles(process.argv[2] || "", args)
     }
 }
-
 if (require.main === module) {
-    runFromConsole();
+    runFromConsole()
 }

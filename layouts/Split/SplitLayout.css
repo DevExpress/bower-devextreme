@@ -1,4 +1,4 @@
-﻿.dx-viewport {
+.dx-viewport {
     width: 100%;
     height: 100%;
     position: absolute;
@@ -9,7 +9,7 @@
     -ms-grid-columns: 620px 1fr;
     -ms-grid-rows: 104px 1fr;
     width: 100%;
-    height: 100%;    
+    height: 100%;
 }
 
 .dx-theme-win8 .split-layout .layout-header {
@@ -52,7 +52,7 @@
 }
 
 .dx-theme-win8 .split-layout .left-content {
-    -ms-grid-column: 1; 
+    -ms-grid-column: 1;
     -ms-grid-row: 2;
     padding: 60px 0 0 120px;
 }
@@ -64,7 +64,7 @@
 }
 
 .dx-theme-win8 .split-layout .right-content {
-    -ms-grid-column: 2; 
+    -ms-grid-column: 2;
     -ms-grid-row: 2;
     padding: 60px 0 0 0;
 }
@@ -80,7 +80,7 @@
 
 .dx-theme-win8 .split-layout .dx-app-bar {
     position: fixed;
-    z-index: 1000;        
+    z-index: 1000;
     width: 100%;
     bottom: -104px;
     transition: bottom .4s;
@@ -117,7 +117,7 @@
     -ms-grid-columns: 1fr 3fr;
     -ms-grid-rows: 60px 1fr;
     width: 100%;
-    height: 100%;    
+    height: 100%;
 }
 
 .dx-theme-win10 .split-layout .layout-header {
@@ -139,13 +139,13 @@
 }
 
 .dx-theme-win10 .split-layout .left-content {
-    -ms-grid-column: 1; 
+    -ms-grid-column: 1;
     -ms-grid-row: 2;
     background-color: #171717;
 }
 
 .dx-theme-win10 .split-layout .right-content {
-    -ms-grid-column: 2; 
+    -ms-grid-column: 2;
     -ms-grid-row: 2;
 }
 

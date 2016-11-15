@@ -1,4 +1,4 @@
-﻿.slideout-layout {
+.slideout-layout {
     height: 100%;
     width: 100%;
     overflow: hidden;
@@ -133,7 +133,7 @@
 
 .dx-theme-android5 .slideout-layout .layout-content,
 .dx-theme-android5 .dx-slideout .dx-slideout-item-container .dx-slideoutview-shield {
-    top: 56px;    
+    top: 56px;
 }
 
 .dx-theme-android5 .slideout-layout .layout-frame,

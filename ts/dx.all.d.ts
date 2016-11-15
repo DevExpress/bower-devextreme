@@ -1,44 +1,79 @@
-/*! 
-* DevExtreme
-* Version: 16.1.7
-* Build date: Oct 11, 2016
+/*!
+* DevExtreme (dx.all.d.ts)
+* Version: 16.2.1
+* Build date: Mon Nov 07 2016
 *
 * Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
 */
-
-
 declare module DevExpress {
-    /** Formats values. */
+    /** @docid format */
     export interface Format {
-        /** Specifies a predefined format. */
+        /** @docid format_type */
         type?: String;
-        /** Specifies the currency code for the 'currency' format. */
+        /** @docid format_currency */
         currency?: String;
-        /** Specifies a precision for values of a numeric format. */
+        /** @docid format_precision */
         precision?: number;
-        /** Parses string values into numeric or date-time values. */
+        /** @docid format_parser */
         parser?: (value: any) => any;
-        /** Specifies a custom format. */
+        /** @docid format_formatter */
         formatter?: (value: any) => any;
     }
-    /** A mixin that provides a capability to fire and subscribe to events. */
+    /** @docid EventsMixin */
     export interface EventsMixin<T> {
-        /** Subscribes to a specified event. */
+        /** @docid EventsMixinMethods_on#on(eventName,eventHandler) */
         on(eventName: string, eventHandler: Function): T;
-        /** Subscribes to the specified events. */
+        /** @docid EventsMixinMethods_on#on(events) */
         on(events: { [eventName: string]: Function; }): T;
-        /** Detaches all event handlers from the specified event. */
+        /** @docid EventsMixinMethods_off#off(eventName) */
         off(eventName: string): Object;
-        /** Detaches a particular event handler from the specified event. */
+        /** @docid EventsMixinMethods_off#off(eventName,eventHandler) */
         off(eventName: string, eventHandler: Function): T;
     }
-    /** An object that serves as a namespace for the methods required to perform validation. */
+    /** @docid validationEngine */
     export module validationEngine {
         export interface IValidator {
             validate(): ValidatorValidationResult;
             reset(): void;
         }
+        /** @docid_ignore requiredRule */
+        /** @docid_ignore requiredRuleOptions_type */
+        /** @docid_ignore requiredRuleOptions_trim */
+        /** @docid_ignore requiredRuleOptions_message */
+        /** @docid_ignore numericRule */
+        /** @docid_ignore numericRuleOptions_type */
+        /** @docid_ignore numericRuleOptions_message */
+        /** @docid_ignore rangeRule */
+        /** @docid_ignore rangeRuleOptions_type */
+        /** @docid_ignore rangeRuleOptions_min */
+        /** @docid_ignore rangeRuleOptions_max */
+        /** @docid_ignore rangeRuleOptions_message */
+        /** @docid_ignore rangeRuleOptions_reevaluate */
+        /** @docid_ignore stringLengthRule */
+        /** @docid_ignore stringLengthRuleOptions_type */
+        /** @docid_ignore stringLengthRuleOptions_min */
+        /** @docid_ignore stringLengthRuleOptions_max */
+        /** @docid_ignore stringLengthRuleOptions_trim */
+        /** @docid_ignore stringLengthRuleOptions_message */
+        /** @docid_ignore customRule */
+        /** @docid_ignore customRuleOptions_type */
+        /** @docid_ignore customRuleOptions_validationCallback */
+        /** @docid_ignore customRuleOptions_message */
+        /** @docid_ignore customRuleOptions_reevaluate */
+        /** @docid_ignore compareRule */
+        /** @docid_ignore compareRuleOptions_type */
+        /** @docid_ignore compareRuleOptions_comparisonTarget */
+        /** @docid_ignore compareRuleOptions_comparisonType */
+        /** @docid_ignore compareRuleOptions_message */
+        /** @docid_ignore compareRuleOptions_reevaluate */
+        /** @docid_ignore patternRule */
+        /** @docid_ignore patternRuleOptions_type */
+        /** @docid_ignore patternRuleOptions_pattern */
+        /** @docid_ignore patternRuleOptions_message */
+        /** @docid_ignore emailRule */
+        /** @docid_ignore emailRuleOptions_type */
+        /** @docid_ignore emailRuleOptions_message */
         export interface ValidatorValidationResult {
             isValid: boolean;
             name?: string;
@@ -57,48 +92,47 @@ declare module DevExpress {
             validate(): ValidationGroupValidationResult;
             reset(): void;
         }
-        /** Provides access to the object that represents the specified validation group. */
+        /** @docid validationEngineMethods_getGroupConfig#getGroupConfig(group) */
         export function getGroupConfig(group: any): GroupConfig
-        /** Provides access to the object that represents the default validation group. */
+        /** @docid validationEngineMethods_getGroupConfig#getGroupConfig() */
         export function getGroupConfig(): GroupConfig
-        /** Validates rules of the validators that belong to the specified validation group. */
+        /** @docid validationEngineMethods_validateGroup#validateGroup(group) */
         export function validateGroup(group: any): ValidationGroupValidationResult;
-        /** Validates rules of the validators that belong to the default validation group. */
+        /** @docid validationEngineMethods_validateGroup#validateGroup() */
         export function validateGroup(): ValidationGroupValidationResult;
-        /** Resets the values and validation result of the editors that belong to the specified validation group. */
+        /** @docid validationEngineMethods_resetGroup#resetGroup(group) */
         export function resetGroup(group: any): void;
-        /** Resets the values and validation result of the editors that belong to the default validation group. */
+        /** @docid validationEngineMethods_resetGroup#resetGroup() */
         export function resetGroup(): void;
-        /** Validates the rules that are defined within the dxValidator objects that are registered for the specified ViewModel. */
+        /** @docid validationEngineMethods_validateModel */
         export function validateModel(model: Object): ValidationGroupValidationResult;
-        /** Registers all the dxValidator objects extending fields of the specified ViewModel. */
+        /** @docid validationEngineMethods_registerModelForValidation */
         export function registerModelForValidation(model: Object): void;
-        /** Unregisters all the dxValidator objects extending fields of the specified ViewModel. */
+        /** @docid validationEngineMethods_unregisterModelForValidation */
         export function unregisterModelForValidation(model: Object): void;
     }
     export var hardwareBackButton: JQueryCallback;
-    /** Processes the hardware back button click. */
+    /** @docid processHardwareBackButton */
     export function processHardwareBackButton(): void;
-    /** Hides the last displayed overlay widget. */
+    /** @docid hideTopOverlay */
     export function hideTopOverlay(): boolean;
-    /**
-     * Specifies whether or not the entire application/site supports right-to-left representation.
-     * @deprecated Use the config(config) method instead.
-     */
+    /** @docid rtlEnabled */
     export var rtlEnabled: boolean;
-    /** Gets the current global configuration object. */
+    /** @docid config#config() */
     export function config(): Object;
-    /** Sets the global configuration object. */
+    /** @docid config#config(config) */
     export function config(config: Object): void;
-    /** Registers a new component in the DevExpress.ui namespace as a jQuery plugin, Angular directive and Knockout binding. */
+    /** @docid registerComponent#registerComponent(name,class) */
     export function registerComponent(name: string, componentClass: Object): void;
-    /** Registers a new component in the specified namespace as a jQuery plugin, Angular directive and Knockout binding. */
+    /** @docid registerComponent#registerComponent(name,namespace,class) */
     export function registerComponent(name: string, namespace: Object, componentClass: Object): void;
+    /** @docid_ignore requestAnimationFrame */
     export function requestAnimationFrame(callback: Function): number;
+    /** @docid_ignore cancelAnimationFrame */
     export function cancelAnimationFrame(requestID: number): void;
-    /** Custom Knockout binding that links an HTML element with a specific action. */
+    /** @docid dxaction */
     export class Action { }
-    /** An object used to manage OData endpoints in your application. */
+    /** @docid EndpointSelector */
     export class EndpointSelector {
         constructor(options: {
             [key: string]: {
@@ -106,103 +140,104 @@ declare module DevExpress {
                 production?: string;
             }
         });
-        /** Returns an endpoint for the specified key. */
+        /** @docid EndpointSelectorMethods_urlFor */
         urlFor(key: string): string;
     }
-    /** An object that serves as a namespace for the methods that are used to animate UI elements. */
+    /** @docid fx */
     export module fx {
-        /** Defines animation options. */
+        /** @docid animationConfig */
         export interface AnimationOptions {
-            /** A function called after animation is completed. */
+            /** @docid animationConfig_complete */
             complete?: (element: JQuery, config: AnimationOptions) => void;
-            /** A number specifying wait time before animation execution. */
+            /** @docid animationConfig_delay */
             delay?: number;
-            /** A number specifying the time period to wait before the animation of the next stagger item starts. */
+            /** @docid animationConfig_staggerDelay */
             staggerDelay?: number;
-            /** A number specifying the time in milliseconds spent on animation. */
+            /** @docid animationConfig_duration */
             duration?: number;
-            /** A string specifying the type of an easing function used for animation. */
+            /** @docid animationConfig_easing */
             easing?: string;
-            /** Specifies the initial animation state. */
+            /** @docid animationConfig_from */
             from?: any;
-            /** A function called before animation is started. */
+            /** @docid animationConfig_start */
             start?: (element: JQuery, config: AnimationOptions) => void;
-            /** Specifies a final animation state. */
+            /** @docid animationConfig_to */
             to?: any;
-            /** A string value specifying the animation type. */
+            /** @docid animationConfig_type */
             type?: string;
-            /** Specifies the animation direction for the "slideIn" and "slideOut" animation types. */
+            /** @docid animationConfig_direction */
             direction?: string;
         }
-        /** Animates the specified element. */
+        /** @docid fxmethods_animate */
         export function animate(element: HTMLElement, config: AnimationOptions): Object;
-        /** Returns a value indicating whether the specified element is being animated. */
+        /** @docid fxmethods_isAnimating */
         export function isAnimating(element: HTMLElement): boolean;
-        /** Stops the animation. */
+        /** @docid fxmethods_stop */
         export function stop(element: HTMLElement, jumpToEnd: boolean): void;
     }
-    /** The manager that performs several specified animations at a time. */
+    /** @docid TransitionExecutor */
     export class TransitionExecutor {
-        /** Deletes all the animations registered in the Transition Executor by using the enter(elements, animation) and leave(elements, animation) methods. */
+        /** @docid TransitionExecutorMethods_reset */
         reset(): void;
-        /** Registers a set of elements that should be animated as "entering" using the specified animation configuration. */
+        /** @docid TransitionExecutorMethods_enter */
         enter(elements: JQuery, animation: any): void;
-        /** Registers a set of elements that should be animated as "leaving" using the specified animation configuration. */
+        /** @docid TransitionExecutorMethods_leave */
         leave(elements: JQuery, animation: any): void;
-        /** Starts all the animations registered using the enter(elements, animation) and leave(elements, animation) methods beforehand. */
+        /** @docid TransitionExecutorMethods_start */
         start(config: Object): JQueryPromise<void>;
-        /** Stops all started animations. */
+        /** @docid TransitionExecutorMethods_stop */
         stop(): void;
     }
     export class AnimationPresetCollection {
-        /** Resets all the changes made in the animation repository. */
+        /** @docid animationPresetsMethods_resetToDefaults */
         resetToDefaults(): void;
-        /** Deletes the specified animation or clears all the animation repository, if an animation name is not passed. */
+        /** @docid animationPresetsMethods_clear */
         clear(name: string): void;
-        /** Adds the specified animation preset to the animation repository by the specified name. */
+        /** @docid animationPresetsMethods_registerPreset */
         registerPreset(name: string, config: any): void;
-        /** Applies the changes made in the animation repository. */
+        /** @docid animationPresetsMethods_applyChanges */
         applyChanges(): void;
-        /** Returns the configuration of the animation found in the animation repository by the specified name for the current device. */
+        /** @docid animationPresetsMethods_getPreset */
         getPreset(name: string): void;
-        /** Registers predefined animations in the animation repository. */
+        /** @docid animationPresetsMethods_registerDefaultPresets */
         registerDefaultPresets(): void;
     }
-    /** A repository of animations. */
+    /** @docid animationPresets */
     export var animationPresets: AnimationPresetCollection;
-    /** The device object defines the device on which the application is running. */
+    /** @docid device */
     export interface Device {
-        /** Indicates whether or not the device platform is Android. */
+        /** @docid device_android */
         android?: boolean;
-        /** Specifies the type of the device on which the application is running. */
+        /** @docid device_devicetype */
         deviceType?: string;
-        /** Indicates whether or not the device platform is generic, which means that the application will look and behave according to a generic "light" or "dark" theme. */
+        /** @docid device_generic */
         generic?: boolean;
-        /** Indicates whether or not the device platform is iOS. */
+        /** @docid device_ios */
         ios?: boolean;
-        /** Indicates whether or not the device type is 'phone'. */
+        /** @docid device_phone */
         phone?: boolean;
-        /** Specifies the platform of the device on which the application is running. */
+        /** @docid device_platform */
         platform?: string;
-        /** Indicates whether or not the device type is 'tablet'. */
+        /** @docid device_tablet */
         tablet?: boolean;
-        /** Specifies an array with the major and minor versions of the device platform. */
+        /** @docid device_version */
         version?: Array<number>;
-        /** Indicates whether or not the device platform is Windows. */
+        /** @docid device_win */
         win?: boolean;
-        /** Specifies a performance grade of the current device. */
+        /** @docid device_grade */
         grade?: string;
     }
     export class Devices implements EventsMixin<Devices> {
         constructor(options: { window: Window });
-        /** Overrides actual device information to force the application to operate as if it was running on a specified device. */
+        /** @docid devicesmethods_current#current(deviceName) */
         current(deviceName: any): void;
-        /** Returns information about the current device. */
+        /** @docid devicesmethods_current#current() */
         current(): Device;
+        /** @docid devicesevents_orientationChanged */
         orientationChanged: JQueryCallback;
-        /** Returns the current device orientation. */
+        /** @docid devicesmethods_orientation */
         orientation(): string;
-        /** Returns real information about the current device regardless of the value passed to the devices.current(deviceName) method. */
+        /** @docid devicesmethods_real */
         real(): Device;
         on(eventName: "orientationChanged", eventHandler: (e: { orientation: string }) => void): Devices;
         on(eventName: string, eventHandler: Function): Devices;
@@ -212,72 +247,86 @@ declare module DevExpress {
         off(eventName: "orientationChanged", eventHandler: (e: { orientation: string }) => void): Devices;
         off(eventName: string, eventHandler: Function): Devices;
     }
-    /** An object that serves as a namespace for the methods and events specifying information on the current device. */
+    /** @docid devices */
     export var devices: Devices;
-    /** The position object specifies the widget positioning options. */
+    /** @docid positionConfig */
     export interface PositionOptions {
-        /** The target element position that the widget is positioned against. */
+        /**
+        * @docid_ignore positionConfig_at_x
+        * @docid_ignore positionConfig_at_y
+        * @docid_ignore positionConfig_boundaryOffset_x
+        * @docid_ignore positionConfig_boundaryOffset_y
+        * @docid_ignore positionConfig_collision_x
+        * @docid_ignore positionConfig_collision_y
+        * @docid_ignore positionConfig_my_x
+        * @docid_ignore positionConfig_my_y
+        * @docid_ignore positionConfig_offset_x
+        * @docid_ignore positionConfig_offset_y
+        */
+        /** @docid positionConfig_at */
         at?: any;
-        /** The element within which the widget is positioned. */
-        boundary?: Object;
-        /** Specifies the horizontal and vertical offset from the window's boundaries. */
+        /** @docid positionConfig_boundary */
+        boundary?: any;
+        /** @docid positionConfig_boundaryOffset */
         boundaryOffset?: any;
-        /** Specifies how to move the widget if it overflows the screen. */
+        /** @docid positionConfig_collision */
         collision?: any;
-        /** The position of the widget to align against the target element. */
+        /** @docid positionConfig_my */
         my?: any;
-        /** The target element that the widget is positioned against. */
-        of?: Object;
-        /** Specifies horizontal and vertical offset in pixels. */
+        /** @docid positionConfig_of */
+        of?: any;
+        /** @docid positionConfig_offset */
         offset?: any;
     }
     export interface ComponentOptions {
-        /** A handler for the initialized event. */
+        /** @docid componentOptions_onInitialized */
         onInitialized?: Function;
-        /** A handler for the optionChanged event. */
+        /** @docid componentOptions_onOptionChanged */
         onOptionChanged?: Function;
-        /** A handler for the disposing event. */
+        /** @docid componentOptions_onDisposing */
         onDisposing?: Function;
     }
-    /** A base class for all components and widgets. */
+    /** @docid component */
     export class Component {
         constructor(options?: ComponentOptions)
-        /** Prevents the component from refreshing until the endUpdate() method is called. */
+        /** @docid componentmethods_beginupdate#beginUpdate() */
         beginUpdate(): void;
-        /** Enables the component to refresh after the beginUpdate() method call. */
+        /** @docid componentmethods_endupdate#endUpdate() */
         endUpdate(): void;
-        /** Returns an instance of this component class. */
+        /** @docid componentmethods_instance#instance() */
         instance(): Component;
-        /** Returns the configuration options of this component. */
+        /** @docid componentmethods_option#option() */
         option(): {
             [optionKey: string]: any;
         };
-        /** Sets one or more options of this component. */
+        /** @docid componentmethods_option#option(options) */
         option(options: {
             [optionKey: string]: any;
         }): void;
-        /** Gets the value of the specified configuration option of this component. */
+        /** @docid componentmethods_option#option(optionName) */
         option(optionName: string): any;
-        /** Sets a value to the specified configuration option of this component. */
+        /** @docid componentmethods_option#option(optionName,optionValue) */
         option(optionName: string, optionValue: any): void;
     }
     export interface DOMComponentOptions extends ComponentOptions {
-        /** Specifies whether or not the current component supports a right-to-left representation. */
+        /** @docid_ignore domcomponentoptions_onOptionChanged */
+        /** @docid_ignore domcomponentoptions_onDisposing */
+        /** @docid domcomponentoptions_rtlEnabled */
         rtlEnabled?: boolean;
-        /** Specifies the height of the widget. */
+        /** @docid domcomponentoptions_height */
         height?: any;
-        /** Specifies the width of the widget. */
+        /** @docid domcomponentoptions_width */
         width?: any;
         /** A bag for holding any options that require two-way binding (Angular approach specific) */
         bindingOptions?: { [key: string]: any; };
     }
-    /** A base class for all components. */
+    /** @docid domcomponent */
     export class DOMComponent extends Component {
         constructor(element: JQuery, options?: DOMComponentOptions);
         constructor(element: HTMLElement, options?: DOMComponentOptions);
-        /** Returns the root HTML element of the widget. */
+        /** @docid domcomponentmethods_element */
         element(): JQuery;
-        /** Specifies the device-dependent default configuration options for this component. */
+        /** @docid domcomponentmethods_defaultOptions */
         static defaultOptions(rule: {
             device?: any;
             options?: any;
@@ -289,29 +338,29 @@ declare module DevExpress {
             errorDetails?: any;
         }
         export interface StoreOptions {
-            /** A handler for the modified event. */
+            /** @docid StoreOptions_onModified */
             onModified?: () => void;
-            /** A handler for the modifying event. */
+            /** @docid StoreOptions_onModifying */
             onModifying?: () => void;
-            /** A handler for the removed event. */
+            /** @docid StoreOptions_onRemoved */
             onRemoved?: (key: any) => void;
-            /** A handler for the removing event. */
+            /** @docid StoreOptions_onRemoving */
             onRemoving?: (key: any) => void;
-            /** A handler for the updated event. */
+            /** @docid StoreOptions_onUpdated */
             onUpdated?: (key: any, values: Object) => void;
-            /** A handler for the updating event. */
+            /** @docid StoreOptions_onUpdating */
             onUpdating?: (key: any, values: Object) => void;
-            /** A handler for the loaded event. */
+            /** @docid  StoreOptions_onLoaded */
             onLoaded?: (result: Array<any>) => void;
-            /** A handler for the loading event. */
+            /** @docid StoreOptions_onLoading */
             onLoading?: (loadOptions: LoadOptions) => void;
-            /** A handler for the inserted event. */
+            /** @docid StoreOptions_onInserted */
             onInserted?: (values: Object, key: any) => void;
-            /** A handler for the inserting event. */
+            /** @docid StoreOptions_onInserting */
             onInserting?: (values: Object) => void;
-            /** Specifies the function called when the Store causes an error. */
+            /** @docid StoreOptions_errorHandler */
             errorHandler?: (e: Error) => void;
-            /** Specifies the key properties within the data associated with the Store. */
+            /** @docid StoreOptions_key */
             key?: any;
         }
         export interface LoadOptions {
@@ -325,27 +374,27 @@ declare module DevExpress {
             userData?: Object;
             requireTotalCount?: boolean;
         }
-        /** The base class for all Stores. */
+        /** @docid Store */
         export class Store implements EventsMixin<Store> {
             constructor(options?: StoreOptions);
-            /** Returns the data item specified by the key. */
+            /** @docid StoreMethods_byKey */
             byKey(key: any): JQueryPromise<any>;
-            /** Adds an item to the data associated with this Store. */
+            /** @docid StoreMethods_insert */
             insert(values: Object): JQueryPromise<any>;
-            /** Returns the key expression specified via the key configuration option. */
+            /** @docid StoreMethods_key */
             key(): any;
-            /** Returns the key of the Store item that matches the specified object. */
+            /** @docid StoreMethods_keyOf */
             keyOf(obj: Object): any;
-            /** Starts loading data. */
+            /** @docid StoreMethods_load */
             load(obj?: LoadOptions): JQueryPromise<any[]>;
-            /** Removes the data item specified by the key. */
+            /** @docid StoreMethods_remove */
             remove(key: any): JQueryPromise<any>;
-            /** Obtains the total count of items that will be returned by the load() function. */
+            /** @docid StoreMethods_totalCount */
             totalCount(options?: {
                 filter?: Object;
                 group?: Object;
             }): JQueryPromise<any>;
-            /** Updates the data item specified by the key. */
+            /** @docid StoreMethods_update */
             update(key: any, values: Object): JQueryPromise<any>;
             on(eventName: "removing", eventHandler: (key: any) => void): Store;
             on(eventName: "removed", eventHandler: (key: any) => void): Store;
@@ -383,157 +432,158 @@ declare module DevExpress {
             off(eventName: string, eventHandler: Function): Store;
         }
         export interface ArrayStoreOptions extends StoreOptions {
-            /** Specifies the array associated with this Store. */
+            /** @docid ArrayStoreOptions_data */
             data?: Array<any>;
         }
-        /** A Store accessing an in-memory array. */
+        /** @docid ArrayStore */
         export class ArrayStore extends Store {
             constructor(options?: ArrayStoreOptions);
-            /** Clears all data associated with the current ArrayStore. */
+            /** @docid ArrayStoreMethods_clear */
             clear(): void;
-            /** Creates the Query object for the underlying array. */
+            /** @docid ArrayStoreMethods_createQuery */
             createQuery(): Query;
         }
         interface Promise {
             then(doneFn?: Function, failFn?: Function, progressFn?: Function): Promise;
         }
         export interface CustomStoreOptions extends StoreOptions {
-            /** Specifies whether or not the store combines the search expression with the filter expression. */
+            /** @docid CustomStoreOptions_useDefaultSearch */
             useDefaultSearch?: boolean;
-            /** The user implementation of the byKey(key, extraOptions) method. */
+            /** @docid CustomStoreOptions_byKey */
             byKey?: (key: any) => Promise;
-            /** The user implementation of the insert(values) method. */
+            /** @docid CustomStoreOptions_insert */
             insert?: (values: Object) => Promise;
-            /** The user implementation of the load(options) method. */
+            /** @docid CustomStoreOptions_load */
             load?: (options?: LoadOptions) => Promise;
-            /** The user implementation of the remove(key) method. */
+            /** @docid CustomStoreOptions_remove */
             remove?: (key: any) => Promise;
-            /** The user implementation of the totalCount(options) method. */
+            /** @docid CustomStoreOptions_totalCount */
             totalCount?: (options?: {
                 filter?: Object;
                 group?: Object;
             }) => Promise;
-            /** The user implementation of the update(key, values) method. */
+            /** @docid CustomStoreOptions_update */
             update?: (key: any, values: Object) => Promise;
         }
-        /** A Store object that enables you to implement your own data access logic. */
+        /** @docid CustomStore */
         export class CustomStore extends Store {
             constructor(options: CustomStoreOptions);
         }
         export interface DataSourceOptions {
-            /** Specifies data filtering conditions. */
+            /** @docid_ignore DataSourceOptions_store_type */
+            /** @docid DataSourceOptions_filter */
             filter?: Object;
-            /** Specifies data grouping conditions. */
+            /** @docid DataSourceOptions_group */
             group?: Object;
-            /** The item mapping function. */
+            /** @docid DataSourceOptions_map */
             map?: (record: any) => any;
-            /** Specifies the maximum number of items the page can contain. */
+            /** @docid DataSourceOptions_pageSize */
             pageSize?: number;
-            /** Specifies whether a DataSource loads data by pages, or all items at once. */
+            /** @docid DataSourceOptions_paginate */
             paginate?: boolean;
-            /** The data post processing function. */
+            /** @docid DataSourceOptions_postProcess */
             postProcess?: (data: any[]) => any[];
-            /** Specifies a value by which the required items are searched. */
+            /** @docid DataSourceOptions_searchExpr */
             searchExpr?: Object;
-            /** Specifies the comparison operation used to search for the required items. */
+            /** @docid DataSourceOptions_searchOperation */
             searchOperation?: string;
-            /** Specifies the value to which the search expression is compared. */
+            /** @docid DataSourceOptions_searchValue */
             searchValue?: Object;
-            /** Specifies the initial select option value. */
+            /** @docid DataSourceOptions_select */
             select?: Object;
-            /** An array of the strings that represent the names of the navigation properties to be loaded simultaneously with the OData store's entity. */
+            /** @docid DataSourceOptions_expand */
             expand?: Object;
-            /** The bag of custom parameters passed to the query executed when the DataSource load operation is invoked. */
+            /** @docid DataSourceOptions_customQueryParams */
             customQueryParams?: Object;
-            /** Specifies whether or not the DataSource instance requests the total count of items available in the storage. */
+            /** @docid DataSourceOptions_requireTotalCount */
             requireTotalCount?: boolean;
-            /** Specifies the initial sort option value. */
+            /** @docid DataSourceOptions_sort */
             sort?: Object;
-            /** Specifies the underlying Store instance used to access data. */
+            /** @docid DataSourceOptions_store */
             store?: any;
-            /** A handler for the changed event. */
+            /** @docid DataSourceOptions_onChanged */
             onChanged?: () => void;
-            /** A handler for the loadingChanged event. */
+            /** @docid DataSourceOptions_onLoadingChanged */
             onLoadingChanged?: (isLoading: boolean) => void;
-            /** A handler for the loadError event. */
+            /** @docid DataSourceOptions_onLoadError */
             onLoadError?: (e?: Error) => void;
         }
         export interface OperationPromise<T> extends JQueryPromise<T> {
             operationId: number;
         }
-        /** An object that provides access to a data web service or local data storage for collection container widgets. */
+        /** @docid DataSource */
         export class DataSource implements EventsMixin<DataSource> {
             constructor(url: string);
             constructor(data: Array<any>);
             constructor(options: CustomStoreOptions);
             constructor(options: DataSourceOptions);
-            /** Disposes all resources associated with this DataSource. */
+            /** @docid DataSourceMethods_dispose */
             dispose(): void;
-            /** Returns the current filter option value. */
+            /** @docid DataSourceMethods_filter#filter() */
             filter(): Object;
-            /** Sets the filter option value. */
+            /** @docid DataSourceMethods_filter#filter(filterExpr) */
             filter(filterExpr: Object): void;
-            /** Returns the current group option value. */
+            /** @docid DataSourceMethods_group#group() */
             group(): Object;
-            /** Sets the group option value. */
+            /** @docid DataSourceMethods_group#group(groupExpr) */
             group(groupExpr: Object): void;
-            /** Indicates whether or not the current page contains fewer items than the number of items specified by the pageSize configuration option. */
+            /** @docid DataSourceMethods_isLastPage */
             isLastPage(): boolean;
-            /** Indicates whether or not at least one load() method execution has successfully finished. */
+            /** @docid DataSourceMethods_isLoaded */
             isLoaded(): boolean;
-            /** Indicates whether or not the DataSource is currently being loaded. */
+            /** @docid DataSourceMethods_isLoading */
             isLoading(): boolean;
-            /** Returns the array of items currently operated by the DataSource. */
+            /** @docid DataSourceMethods_items */
             items(): Array<any>;
-            /** Returns the key expression. */
+            /** @docid DataSourceMethods_key */
             key(): any;
-            /** Starts loading data. */
+            /** @docid DataSourceMethods_load */
             load(): OperationPromise<Array<any>>;
-            /** Clears currently loaded DataSource items and calls the load() method. */
+            /** @docid DataSourceMethods_reload */
             reload(): OperationPromise<Array<any>>;
-            /** Returns an object that would be passed to the load() method of the underlying Store according to the current data shaping option values of the current DataSource instance. */
+            /** @docid DataSourceMethods_loadOptions */
             loadOptions(): Object;
-            /** Returns the current pageSize option value. */
+            /** @docid DataSourceMethods_pageSize#pageSize() */
             pageSize(): number;
-            /** Sets the pageSize option value. */
+            /** @docid DataSourceMethods_pageSize#pageSize(value) */
             pageSize(value: number): void;
-            /** Specifies the index of the currently loaded page. */
+            /** @docid DataSourceMethods_pageIndex#pageIndex() */
             pageIndex(): number;
-            /** Specifies the index of the page to be loaded during the next load() method execution. */
+            /** @docid DataSourceMethods_pageIndex#pageIndex(newIndex) */
             pageIndex(newIndex: number): void;
-            /** Returns the current paginate option value. */
+            /** @docid DataSourceMethods_paginate#paginate() */
             paginate(): boolean;
-            /** Sets the paginate option value. */
+            /** @docid DataSourceMethods_paginate#paginate(value) */
             paginate(value: boolean): void;
-            /** Returns the searchExpr option value. */
+            /** @docid DataSourceMethods_searchExpr#searchExpr() */
             searchExpr(): Object;
-            /** Sets the searchExpr option value. */
+            /** @docid DataSourceMethods_searchExpr#searchExpr(expr) */
             searchExpr(...expr: Object[]): void;
-            /** Returns the currently specified search operation. */
+            /** @docid DataSourceMethods_searchOperation#searchOperation() */
             searchOperation(): string;
-            /** Sets the current search operation. */
+            /** @docid DataSourceMethods_searchOperation#searchOperation(op) */
             searchOperation(op: string): void;
-            /** Returns the searchValue option value. */
+            /** @docid DataSourceMethods_searchValue#searchValue() */
             searchValue(): Object;
-            /** Sets the searchValue option value. */
+            /** @docid DataSourceMethods_searchValue#searchValue(value) */
             searchValue(value: Object): void;
-            /** Returns the current select option value. */
+            /** @docid DataSourceMethods_select#select() */
             select(): Object;
-            /** Sets the select option value. */
+            /** @docid DataSourceMethods_select#select(expr) */
             select(expr: Object): void;
-            /** Returns the current requireTotalCount option value. */
+            /** @docid DataSourceMethods_requireTotalCount#requireTotalCount() */
             requireTotalCount(): boolean;
-            /** Sets the requireTotalCount option value. */
+            /** @docid DataSourceMethods_requireTotalCount#requireTotalCount(value) */
             requireTotalCount(value: boolean): void;
-            /** Returns the current sort option value. */
+            /** @docid DataSourceMethods_sort#sort() */
             sort(): Object;
-            /** Sets the sort option value. */
+            /** @docid DataSourceMethods_sort#sort(sortExpr) */
             sort(sortExpr: Object): void;
-            /** Returns the underlying Store instance. */
+            /** @docid DataSourceMethods_store */
             store(): Store;
-            /** Returns the number of data items available in an underlying Store after the last load() operation without paging. */
+            /** @docid DataSourceMethods_totalCount */
             totalCount(): number;
-            /** Cancels the load operation associated with the specified identifier. */
+            /** @docid DataSourceMethods_cancel */
             cancel(operationId: number): boolean;
             on(eventName: "loadingChanged", eventHandler: (isLoading: boolean) => void): DataSource;
             on(eventName: "loadError", eventHandler: (e?: Error) => void): DataSource;
@@ -549,56 +599,60 @@ declare module DevExpress {
             off(eventName: "changed", eventHandler: () => void): DataSource;
             off(eventName: string, eventHandler: Function): DataSource;
         }
-        /** An object used to work with primitive data types not supported by JavaScript when accessing an OData web service. */
+        /** @docid EdmLiteral */
         export class EdmLiteral {
-            /** Creates an EdmLiteral instance and assigns the specified value to it. */
+            /** @docid EdmLiteralMethods_ctor */
             constructor(value: string);
-            /** Returns a string representation of the value associated with this EdmLiteral object. */
+            /** @docid EdmLiteralMethods_valueOf */
             valueOf(): string;
         }
-        /** An object used to generate and hold the GUID. */
+        /** @docid Guid */
         export class Guid {
-            /** Creates a new Guid instance that holds the specified GUID. */
+            /** @docid Guidmethods_ctor#ctor(value) */
             constructor(value: string);
-            /** Creates a new Guid instance holding the generated GUID. */
+            /** @docid Guidmethods_ctor#ctor() */
             constructor();
-            /** Returns a string representation of the Guid instance. */
+            /** @docid Guidmethods_toString */
             toString(): string;
-            /** Returns a string representation of the Guid instance. */
+            /** @docid Guidmethods_valueOf */
             valueOf(): string;
         }
         export interface LocalStoreOptions extends ArrayStoreOptions {
-            /** Specifies the time (in miliseconds) after the change operation, before the data is flushed. */
+            /** @docid LocalStoreOptions_flushInterval */
             flushInterval?: number;
-            /** Specifies whether the data is flushed immediatelly after each change operation, or after the delay specified via the flushInterval option. */
+            /** @docid LocalStoreOptions_immediate */
             immediate?: boolean;
-            /** The unique identifier used to distinguish the data within the HTML5 Web Storage. */
+            /** @docid LocalStoreOptions_name */
             name?: string;
         }
-        /** A Store providing access to the HTML5 Web Storage. */
+        /** @docid LocalStore */
         export class LocalStore extends ArrayStore {
             constructor(options?: LocalStoreOptions);
-            /** Removes all data associated with this Store. */
+            /** @docid LocalStoreMethods_clear */
             clear(): void;
         }
         export interface ODataContextOptions extends ODataStoreOptions {
-            /** Specifies the list of entities to be accessed via the ODataContext. */
+            /** @docid ODataContextOptions_entities */
             entities?: Object;
-            /** Specifies the function called if the ODataContext causes an error. */
+            /** @docid ODataContextOptions_errorHandler */
             errorHandler?: (e: Error) => void;
         }
-        /** Provides access to the entire OData service. */
+        /** @docid ODataContext */
         export class ODataContext {
             constructor(options?: ODataContextOptions);
-            /** Initiates the specified WebGet service operation that returns a value. For the information on service operations, refer to the OData documentation. */
+            /** @docid ODataContextmethods_get */
             get(operationName: string, params: Object): JQueryPromise<any>;
-            /** Initiates the specified WebGet service operation that returns nothing. For the information on service operations, refer to the OData documentation. */
+            /** @docid ODataContextmethods_invoke */
             invoke(operationName: string, params: Object, httpMethod: Object): JQueryPromise<any>;
-            /** Return a special proxy object to describe the entity link. */
+            /** @docid ODataContextmethods_objectLink */
             objectLink(entityAlias: string, key: any): Object;
         }
         export interface ODataStoreOptions extends StoreOptions {
-            /** A function used to customize a web request before it is sent. */
+            /** @docid_ignore ODataStoreOptions_onLoading */
+            /**
+              * @docid ODataStoreOptions_beforeSend
+              * @docid ODataContextOptions_beforeSend
+              */
             beforeSend?: (request: {
                 url: string;
                 async: boolean;
@@ -608,616 +662,797 @@ declare module DevExpress {
                 payload: Object;
                 headers: Object;
             }) => void;
-            /** Specifies whether the ODataStore uses the JSONP approach to access non-CORS-compatible remote services. */
+            /**
+              * @docid ODataStoreOptions_jsonp
+              * @docid ODataContextOptions_jsonp
+              */
             jsonp?: boolean;
-            /** Specifies the type of the ODataStore key property. The following key types are supported out of the box: String, Int32, Int64, Boolean, Single, Decimal and Guid. */
+            /**
+              * @docid ODataStoreOptions_keyType
+              */
             keyType?: any;
-            /** Specifies whether or not dates in a response are deserialized. */
+            /**
+              * @docid ODataStoreOptions_deserializeDates
+              * @docid ODataContextOptions_deserializeDates
+              */
             deserializeDates?: boolean;
-            /** Specifies the URL of the data service being accessed via the current ODataContext. */
+            /**
+              * @docid ODataStoreOptions_url
+              * @docid ODataContextOptions_url
+              */
             url?: string;
-            /** Specifies the version of the OData protocol used to interact with the data service. */
+            /**
+              * @docid ODataStoreOptions_version
+              * @docid ODataContextOptions_version
+              */
             version?: number;
-            /** Specifies the value of the withCredentials field of the underlying jqXHR object. */
+            /**
+              * @docid ODataStoreOptions_withCredentials
+              * @docid ODataContextOptions_withCredentials
+              */
             withCredentials?: boolean;
         }
-        /** A Store providing access to a separate OData web service entity. */
+        /** @docid ODataStore */
         export class ODataStore extends Store {
+            /** @docid_ignore ODataStoreMethods_load */
             constructor(options?: ODataStoreOptions);
-            /** Creates the Query object for the OData endpoint. */
+            /** @docid ODataStoreMethods_createQuery */
             createQuery(loadOptions: Object): Object;
-            /** Returns the data item specified by the key. */
+            /** @docid ODataStoreMethods_byKey */
             byKey(key: any, extraOptions?: { expand?: Object }): JQueryPromise<any>;
         }
-        /** An universal chainable data query interface object. */
+        /** @docid Query */
         export interface Query {
-            /** Calculates a custom summary for the items in the current Query. */
+            /** @docid QueryMethods_aggregate#aggregate(step) */
             aggregate(step: (accumulator: any, value: any) => any): JQueryPromise<any>;
-            /** Calculates a custom summary for the items in the current Query. */
+            /** @docid QueryMethods_aggregate#aggregate(seed,step,finalize) */
             aggregate(seed: any, step: (accumulator: any, value: any) => any, finalize: (result: any) => any): JQueryPromise<any>;
-            /** Calculates the average item value for the current Query. */
+            /** @docid QueryMethods_avg#avg(getter) */
             avg(getter: Object): JQueryPromise<any>;
-            /** Finds the item with the maximum getter value. */
+            /** @docid QueryMethods_max#max(getter) */
             max(getter: Object): JQueryPromise<any>;
-            /** Finds the item with the maximum value in the Query. */
+            /** @docid QueryMethods_max#max() */
             max(): JQueryPromise<any>;
-            /** Finds the item with the minimum value in the Query. */
+            /** @docid QueryMethods_min#min() */
             min(): JQueryPromise<any>;
-            /** Finds the item with the minimum getter value. */
+            /** @docid QueryMethods_min#min(getter) */
             min(getter: Object): JQueryPromise<any>;
-            /** Calculates the average item value for the current Query, if each Query item has a numeric type. */
+            /** @docid QueryMethods_avg#avg() */
             avg(): JQueryPromise<any>;
-            /** Returns the total count of items in the current Query. */
+            /** @docid QueryMethods_count */
             count(): JQueryPromise<any>;
-            /** Executes the Query. */
+            /** @docid QueryMethods_enumerate */
             enumerate(): JQueryPromise<any>;
-            /** Filters the current Query data. */
+            /** @docid QueryMethods_filter#filter(criteria) */
             filter(criteria: Array<any>): Query;
-            /** Filters the current Query data. */
+            /** @docid QueryMethods_filter#filter(predicate) */
             filter(predicate: (item: any) => boolean): Query;
-            /** Groups the current Query data. */
+            /** @docid QueryMethods_groupBy */
             groupBy(getter: Object): Query;
-            /** Applies the specified transformation to each item. */
+            /** @docid QueryMethods_select */
             select(getter: Object): Query;
-            /** Limits the data item count. */
+            /** @docid QueryMethods_slice */
             slice(skip: number, take?: number): Query;
-            /** Sorts current Query data. */
+            /** @docid QueryMethods_sortBy#sortBy(getter,desc) */
             sortBy(getter: Object, desc: boolean): Query;
-            /** Sorts current Query data. */
+            /** @docid QueryMethods_sortBy#sortBy(getter) */
             sortBy(getter: Object): Query;
-            /** Calculates the sum of item getter values in the current Query. */
+            /** @docid QueryMethods_sum#sum(getter) */
             sum(getter: Object): JQueryPromise<any>;
-            /** Calculates the sum of item values in the current Query. */
+            /** @docid QueryMethods_sum#sum() */
             sum(): JQueryPromise<any>;
-            /** Adds one more sorting condition to the current Query. */
+            /** @docid QueryMethods_thenBy#thenBy(getter) */
             thenBy(getter: Object): Query;
-            /** Adds one more sorting condition to the current Query. */
+            /** @docid QueryMethods_thenBy#thenBy(getter,desc) */
             thenBy(getter: Object, desc: boolean): Query;
-            /** Returns the array of current Query items. */
+            /** @docid QueryMethods_toArray */
             toArray(): Array<any>;
         }
-        /** The global data layer error handler. */
+        /** @docid Utils_errorHandler */
         export var errorHandler: (e: Error) => void;
-        /** Encodes the specified string or array of bytes to base64 encoding. */
+        /** @docid Utils_base64encode */
         export function base64_encode(input: any): string;
-        /** Creates a Query instance. */
+        /** @docid Utils_query#query(array) */
         export function query(array: Array<any>): Query;
-        /** Creates a Query instance for accessing the remote service specified by a URL. */
+        /** @docid Utils_query#query(url,queryOptions) */
         export function query(url: string, queryOptions: Object): Query;
-        /** This section describes the utility objects provided by the DevExtreme data layer. */
-        export var utils: {
-            /** Compiles a getter function from the getter expression. */
-            compileGetter(expr: any): Function;
-            /** Compiles a setter function from the setter expression. */
-            compileSetter(expr: any): Function;
-            odata: {
-                /** Holds key value converters for OData. */
-                keyConverters: {
-                    String(value: any): string;
-                    Int32(value: any): number;
-                    Int64(value: any): EdmLiteral;
-                    Guid(value: any): Guid;
-                    Boolean(value: any): boolean;
-                    Single(value: any): EdmLiteral;
-                    Decimal(value: any): EdmLiteral;
-                };
+        /** @docid Utils */
+        export module utils {
+            /** @docid Utils_compileGetter */
+            export function compileGetter(expr: any): Function;
+            /** @docid Utils_compileSetter */
+            export function compileSetter(expr: any): Function;
+            export module odata {
+                /** @docid Utils_odatakeyConverters */
+                export module keyConverters {
+                    export function String(value: any): string;
+                    export function Int32(value: any): number;
+                    export function Int64(value: any): EdmLiteral;
+                    export function Guid(value: any): Guid;
+                    export function Boolean(value: any): boolean;
+                    export function Single(value: any): EdmLiteral;
+                    export function Decimal(value: any): EdmLiteral;
+                }
             }
         }
     }
-    /** An object that serves as a namespace for DevExtreme UI widgets as well as for methods implementing UI logic in DevExtreme sites/applications. */
+    /** @docid ui */
     export module ui {
+        /** @docid_ignore dxTemplate */
+        /** @docid_ignore dxTemplateOptions_name */
         export interface WidgetOptions extends DOMComponentOptions {
-            /** A Boolean value specifying whether or not the widget changes its state when interacting with a user. */
+            /** @docid_ignore WidgetOptions_onContentReady */
+            /** @docid_ignore WidgetOptions_onFocusIn */
+            /** @docid_ignore WidgetOptions_onFocusOut */
+            /** @docid WidgetOptions_activeStateEnabled */
             activeStateEnabled?: boolean;
-            /** A Boolean value specifying whether or not the widget can respond to user interaction. */
+            /** @docid WidgetOptions_disabled */
             disabled?: boolean;
-            /** A Boolean value specifying whether or not the widget changes its state when being hovered by an end user. */
+            /** @docid WidgetOptions_hoverStateEnabled */
             hoverStateEnabled?: boolean;
-            /** Specifies whether or not the widget can be focused. */
+            /** @docid WidgetOptions_focusStateEnabled */
             focusStateEnabled?: boolean;
-            /** Specifies a shortcut key that sets focus on the widget element. */
+            /** @docid WidgetOptions_accessKey */
             accessKey?: string;
-            /** A Boolean value specifying whether or not the widget is visible. */
+            /** @docid WidgetOptions_visible */
             visible?: boolean;
-            /** Specifies the widget tab index. */
+            /** @docid WidgetOptions_tabIndex */
             tabIndex?: number;
-            /** Specifies the text of the hint displayed for the widget. */
+            /** @docid WidgetOptions_hint */
             hint?: string;
         }
-        /** The base class for widgets. */
+        /** @docid Widget */
         export class Widget extends DOMComponent {
+            /** @docid_ignore dxItem */
             constructor(options?: WidgetOptions);
-            /** Redraws the widget. */
+            /** @docid WidgetMethods_repaint */
             repaint(): void;
-            /** Sets focus on the widget. */
+            /** @docid WidgetMethods_focus */
             focus(): void;
-            /** Registers a handler when a specified key is pressed. */
+            /** @docid WidgetMethods_registerKeyHandler */
             registerKeyHandler(key: string, handler: Function): void;
         }
         export interface CollectionWidgetOptions extends WidgetOptions {
-            /** A data source used to fetch data to be displayed by the widget. */
+            /** @docid_ignore CollectionWidgetOptions_selectOnFocus */
+            /** @docid_ignore CollectionWidgetOptions_selectionMode */
+            /** @docid_ignore CollectionWidgetOptions_selectionByClick */
+            /** @docid_ignore CollectionWidgetOptions_selectionRequired */
+            /** @docid_ignore CollectionWidgetOptions_focusedElement */
+            /** @docid CollectionWidgetOptions_datasource */
             dataSource?: any;
-            /** The time period in milliseconds before the onItemHold event is raised. */
+            /** @docid CollectionWidgetOptions_itemHoldTimeout */
             itemHoldTimeout?: number;
-            /** An array of items displayed by the widget. */
+            /** @docid CollectionWidgetOptions_items */
             items?: Array<any>;
-            /** The template to be used for rendering items. */
+            /** @docid CollectionWidgetOptions_itemTemplate */
             itemTemplate?: any;
+            /** @docid CollectionWidgetOptions_loopItemFocus */
             loopItemFocus?: boolean;
-            /** The text or HTML markup displayed by the widget if the item collection is empty. */
+            /** @docid CollectionWidgetOptions_noDataText */
             noDataText?: string;
+            /** @docid CollectionWidgetOptions_onContentReady */
             onContentReady?: any;
-            /** A handler for the itemClick event. */
+            /** @docid CollectionWidgetOptions_onItemClick */
             onItemClick?: any;
-            /** A handler for the itemContextMenu event. */
+            /** @docid CollectionWidgetOptions_onItemContextMenu */
             onItemContextMenu?: Function;
-            /** A handler for the itemHold event. */
+            /** @docid CollectionWidgetOptions_onItemHold */
             onItemHold?: Function;
-            /** A handler for the itemRendered event. */
+            /** @docid CollectionWidgetOptions_onItemRendered */
             onItemRendered?: Function;
-            /** A handler for the selectionChanged event. */
+            /** @docid CollectionWidgetOptions_onSelectionChanged */
             onSelectionChanged?: Function;
-            /** The index of the currently selected widget item. */
+            /** @docid CollectionWidgetOptions_selectedIndex */
             selectedIndex?: number;
-            /** The selected item object. */
+            /** @docid CollectionWidgetOptions_selectedItem */
             selectedItem?: Object;
-            /** An array of currently selected item objects. */
+            /** @docid CollectionWidgetOptions_selectedItems */
             selectedItems?: Array<any>;
-            /** A handler for the itemDeleting event. */
+            /** @docid CollectionWidgetOptions_onItemDeleting */
             onItemDeleting?: Function;
-            /** A handler for the itemDeleted event. */
+            /** @docid CollectionWidgetOptions_onItemDeleted */
             onItemDeleted?: Function;
-            /** A handler for the itemReordered event. */
+            /** @docid CollectionWidgetOptions_onItemReordered */
             onItemReordered?: Function;
         }
-        /** The base class for widgets containing an item collection. */
-        export class CollectionWidget extends Widget {
+        /** @docid DataHelperMixin */
+        export interface DataHelperMixin {
+            /** @docid DataHelperMixinMethods_getDataSource */
+            getDataSource(): DevExpress.data.DataSource;
+        }
+        /** @docid CollectionWidget */
+        export class CollectionWidget extends Widget implements DataHelperMixin
+        {
             constructor(element: JQuery, options?: CollectionWidgetOptions);
             constructor(element: HTMLElement, options?: CollectionWidgetOptions);
+            /** @docid_ignore CollectionWidgetItemTemplate_disabled */
+            /** @docid_ignore CollectionWidgetItemTemplate_html */
+            /** @docid_ignore CollectionWidgetItemTemplate_text */
+            /** @docid_ignore CollectionWidgetItemTemplate_visible */
+            /** @docid_ignore CollectionWidgetItemTemplate_template */
+            /** @docid_ignore CollectionWidgetEvents_ItemClick */
+            /** @docid_ignore CollectionWidgetEvents_ItemContextMenu */
+            /** @docid_ignore CollectionWidgetEvents_ItemHold */
+            /** @docid_ignore CollectionWidgetEvents_ItemRendered */
+            /** @docid_ignore CollectionWidgetmethods_itemElements */
+            /** @docid_ignore CollectionWidgetmethods_itemsContainer */
+            /** @docid_ignore CollectionWidgetmethods_getFocusedItemId */
+            /** @docid CollectionWidgetMethods_selectItem */
             selectItem(itemElement: any): void;
+            /** @docid CollectionWidgetMethods_unselectItem */
             unselectItem(itemElement: any): void;
+            /** @docid CollectionWidgetMethods_deleteItem */
             deleteItem(itemElement: any): JQueryPromise<void>;
+            /** @docid CollectionWidgetMethods_isItemSelected */
             isItemSelected(itemElement: any): boolean;
+            /** @docid CollectionWidgetMethods_reorderItem */
             reorderItem(itemElement: any, toItemElement: any): JQueryPromise<void>;
+            getDataSource(): DevExpress.data.DataSource;
         }
+        /** @docid DataExpressionMixin */
         export interface DataExpressionMixinOptions {
-            /** A data source used to fetch data to be displayed by the widget. */
+            /** @docid_ignore DataExpressionMixinItemTemplate_disabled */
+            /** @docid_ignore DataExpressionMixinItemTemplate_html */
+            /** @docid_ignore DataExpressionMixinItemTemplate_text */
+            /** @docid_ignore DataExpressionMixinItemTemplate_visible */
+            /** @docid_ignore DataExpressionMixinItemTemplate_template */
+            /** @docid DataExpressionMixinOptions_dataSource */
             dataSource?: any;
-            /** Specifies the name of the data source item field whose value is displayed by the widget. */
+            /** @docid DataExpressionMixinOptions_displayExpr  */
             displayExpr?: any;
-            /** Specifies the name of a data source item field whose value is held in the value configuration option. */
+            /** @docid DataExpressionMixinOptions_valueExpr  */
             valueExpr?: any;
-            /** An array of items displayed by the widget. */
+            /** @docid DataExpressionMixinOptions_items */
             items?: Array<any>;
-            /** The template to be used for rendering items. */
+            /** @docid DataExpressionMixinOptions_itemTemplate  */
             itemTemplate?: any;
-            /** The currently selected value in the widget. */
+            /** @docid DataExpressionMixinOptions_value */
             value?: Object;
         }
         export interface EditorOptions extends WidgetOptions {
-            /** The currently specified value. */
+            /** @docid EditorOptions_value */
             value?: Object;
-            /** A handler for the valueChanged event. */
+            /** @docid EditorOptions_name */
+            name?: string;
+            /** @docid EditorOptions_onValueChanged */
             onValueChanged?: Function;
-            /** A Boolean value specifying whether or not the widget is read-only. */
+            /** @docid EditorOptions_readOnly */
             readOnly?: boolean;
-            /** Holds the object that defines the error that occurred during validation. */
+            /** @docid EditorOptions_validationError */
             validationError?: Object;
-            /** Specifies whether the editor's value is valid. */
+            /** @docid EditorOptions_isValid */
             isValid?: boolean;
-            /** Specifies how the message about the validation rules that are not satisfied by this editor's value is displayed. */
+            /** @docid EditorOptions_validationMessageMode */
             validationMessageMode?: string;
         }
-        /** A base class for editors. */
+        /** @docid Editor */
         export class Editor extends Widget {
-            /** Resets the editor's value to undefined. */
+            /** @docid EditorMethods_reset */
             reset(): void;
         }
-        /** An object that serves as a namespace for methods displaying a message in an application/site. */
+        /** @docid ui_dialog */
         export var dialog: {
-            /** Creates an alert dialog message containing a single "OK" button. */
+            /** @docid ui_dialogmethods_alert */
             alert(message: string, title: string): JQueryPromise<void>;
-            /** Creates a confirm dialog that contains "Yes" and "No" buttons. */
+            /** @docid ui_dialogmethods_confirm */
             confirm(message: string, title: string): JQueryPromise<boolean>;
-            /** Creates a custom dialog using the options specified by the passed configuration object. */
+            /** @docid ui_dialogmethods_custom */
             custom(options: { title?: string; message?: string; buttons?: Array<Object>; }): {
                 show(): JQueryPromise<any>;
                 hide(): void;
                 hide(value: any): void;
             };
         };
-        /** Creates a toast message. */
+        /** @docid ui_notify#notify(message,type,displayTime) */
         export function notify(message: any, type: string, displayTime: number): void;
-        /** Creates a toast message. */
+        /** @docid ui_notify#notify(options) */
         export function notify(options: Object): void;
-        /** An object that serves as a namespace for the methods that work with DevExtreme CSS Themes. */
+        /** @docid ui_themes */
         export var themes: {
-            /** Returns the name of the currently applied theme. */
+            /** @docid ui_themesmethods_current#current() */
             current(): string;
-            /** Changes the current theme to the specified one. */
+            /** @docid ui_themesmethods_current#current(themeName) */
             current(themeName: string): void;
         };
-        /** Sets a specified template engine. */
+        /** @docid ui_setTemplateEngine#setTemplateEngine(name) */
         export function setTemplateEngine(name: string): void;
-        /** Sets a custom template engine defined via custom compile and render functions. */
+        /** @docid ui_setTemplateEngine#setTemplateEngine(options) */
         export function setTemplateEngine(options: Object): void;
     }
-    /** An object that serves as a namespace for utility methods that can be helpful when working with the DevExtreme framework and UI widgets. */
-    export var utils: {
-        /** Sets parameters for the viewport meta tag. */
-        initMobileViewport(options: { allowZoom?: boolean; allowPan?: boolean; allowSelection?: boolean }): void;
-        /** Requests that the browser call a specified function to update animation before the next repaint. */
-        requestAnimationFrame(callback: Function): number;
-        /** Cancels an animation frame request scheduled with the requestAnimationFrame method. */
-        cancelAnimationFrame(requestID: number): void;
-    };
-    /** An object that serves as a namespace for DevExtreme Data Visualization Widgets. */
+    /** @docid utils */
+    export module utils {
+        /** @docid utils_initMobileViewport */
+        export function initMobileViewport(options: { allowZoom?: boolean; allowPan?: boolean; allowSelection?: boolean }): void;
+        /** @docid utils_requestAnimationFrame */
+        export function requestAnimationFrame(callback: Function): number;
+        /** @docid utils_cancelAnimationFrame */
+        export function cancelAnimationFrame(requestID: number): void;
+    }
+    /** @docid viz */
     export module viz {
-        /** Applies a theme for the entire page with several DevExtreme visualization widgets. */
+        /** @docid vizmethods_currentTheme#currentTheme(theme) */
         export function currentTheme(theme: string): void;
-        /** Applies a new theme (with the color scheme defined separately) for the entire page with several DevExtreme visualization widgets. */
+        /** @docid vizmethods_currentTheme#currentTheme(platform, colorScheme) */
         export function currentTheme(platform: string, colorScheme: string): void;
-        /** Registers a new theme based on the existing one. */
+        /** @docid vizmethods_registerTheme */
         export function registerTheme(customTheme: Object, baseTheme: string): void;
-        /** Allows you to export widgets using their SVG markup. */
+        /** @docid vizmethods_exportFromMarkup */
         export function exportFromMarkup(markup: string, options: Object): void;
-        /** Applies a predefined or registered custom palette to all visualization widgets at once. */
+        /** @docid vizmethods_currentPalette */
         export function currentPalette(paletteName: string): void;
-        /** Obtains the color sets of a predefined or registered palette. */
+        /** @docid vizmethods_getPalette */
         export function getPalette(paletteName: string): Object;
-        /** Registers a new palette. */
+        /** @docid vizmethods_registerPalette */
         export function registerPalette(paletteName: string, palette: Object): void;
     }
 }
 declare module DevExpress.ui {
+    /** @docid_ignore template */
     export interface dxValidatorValidationAdapter {
-        /** A function that returns the value to be validated. */
+        /** @docid dxValidatorOptions_adapter_getValue */
         getValue?: Function;
-        /** The jQuery.Callbacks() object that is fired when the specified value should be validated. */
+        /** @docid dxValidatorOptions_adapter_validationRequestsCallbacks */
         validationRequestsCallbacks?: JQueryCallback;
-        /** A function that the dxValidator widget calls after validating a specified value. */
+        /** @docid dxValidatorOptions_adapter_applyValidationResults */
         applyValidationResults?: (params: validationEngine.ValidatorValidationResult) => void;
-        /** A function that resets the validated values. */
+        /** @docid dxValidatorOptions_adapter_reset */
         reset?: Function;
-        /** A function that sets focus to the validated editors when the dxValidationSummary is focused. */
+        /** @docid dxValidatorOptions_adapter_focus */
         focus?: Function;
-        /** A function that returns a Boolean value specifying whether or not to bypass validation. */
+        /** @docid dxValidatorOptions_adapter_bypass */
         bypass?: Function;
     }
     export interface dxValidatorOptions extends DOMComponentOptions {
-        /** An array of validation rules to be checked for the editor with which the dxValidator object is associated. */
+        /** @docid dxValidatorOptions_validationRules */
         validationRules?: Array<any>;
-        /** Specifies the editor name to be used in the validation default messages. */
+        /** @docid dxValidatorOptions_name */
         name?: string;
-        /** An object that specifies what and when to validate, and how to apply the validation result. */
+        /** @docid dxValidatorOptions_adapter */
         adapter?: dxValidatorValidationAdapter;
-        /** Specifies the validation group the editor will be related to. */
+        /** @docid dxValidatorOptions_validationGroup */
         validationGroup?: string;
-        /** A handler for the validated event. */
+        /** @docid dxValidatorOptions_onValidated */
         onValidated?: (params: validationEngine.ValidatorValidationResult) => void;
     }
-    /** A widget that is used to validate the associated DevExtreme editors against the defined validation rules. */
+    /** @docid dxValidator */
     export class dxValidator extends DOMComponent implements validationEngine.IValidator {
         constructor(element: JQuery, options?: dxValidatorOptions);
         constructor(element: Element, options?: dxValidatorOptions);
-        /** Validates the value of the editor that is controlled by the current dxValidator object against the list of the specified validation rules. */
+        /** @docid_ignore dxValidatorMethods_beginUpdate */
+        /** @docid_ignore dxValidatorMethods_defaultOptions */
+        /** @docid_ignore dxValidatorMethods_endUpdate */
+        /** @docid_ignore dxValidatorOptions_rtlEnabled */
+        /** @docid dxValidatorMethods_validate */
         validate(): validationEngine.ValidatorValidationResult;
-        /** Resets the value and validation result of the editor associated with the current dxValidator object. */
+        /** @docid dxValidatorMethods_reset */
         reset(): void;
     }
-    /** The widget that is used in the Knockout and Angular approaches to combine the editors to be validated. */
+    /** @docid dxValidationGroup */
     export class dxValidationGroup extends DOMComponent {
-        constructor(element: JQuery);
-        constructor(element: Element);
-        /** Validates rules of the validators that belong to the current validation group. */
+        constructor(element: JQuery, options?: DOMComponentOptions);
+        constructor(element: Element, options?: DOMComponentOptions);
+        /** @docid_ignore dxValidationGroupMethods_beginUpdate */
+        /** @docid_ignore dxValidationGroupMethods_defaultOptions */
+        /** @docid_ignore dxValidationGroupMethods_endUpdate */
+        /** @docid_ignore dxValidationGroupOptions_rtlEnabled */
+        /** @docid dxValidationGroupMethods_validate */
         validate(): validationEngine.ValidationGroupValidationResult;
-        /** Resets the value and validation result of the editors that are included to the current validation group. */
+        /** @docid dxValidationGroupMethods_reset */
         reset(): void;
     }
     export interface dxValidationSummaryOptions extends CollectionWidgetOptions {
-        /** Specifies the validation group for which summary should be generated. */
+        /** @docid_ignore dxValidationSummaryOptions_focusStateEnabled */
+        /** @docid_ignore dxValidationSummaryOptions_noDataText */
+        /** @docid_ignore dxValidationSummaryOptions_itemRender */
+        /** @docid_ignore dxValidationSummaryOptions_activeStateEnabled */
+        /** @docid_ignore dxValidationSummaryOptions_dataSource */
+        /** @docid_ignore dxValidationSummaryOptions_disabled */
+        /** @docid_ignore dxValidationSummaryOptions_height */
+        /** @docid_ignore dxValidationSummaryOptions_hint */
+        /** @docid_ignore dxValidationSummaryOptions_itemHoldTimeout */
+        /** @docid_ignore dxValidationSummaryOptions_onItemContextMenu */
+        /** @docid_ignore dxValidationSummaryOptions_onItemHold */
+        /** @docid_ignore dxValidationSummaryOptions_onItemRendered */
+        /** @docid_ignore dxValidationSummaryOptions_onItemSelect */
+        /** @docid_ignore dxValidationSummaryOptions_onSelectionChanged */
+        /** @docid_ignore dxValidationSummaryOptions_rtlEnabled */
+        /** @docid_ignore dxValidationSummaryOptions_selectedIndex */
+        /** @docid_ignore dxValidationSummaryOptions_selectedItem */
+        /** @docid_ignore dxValidationSummaryOptions_selectedItems */
+        /** @docid_ignore dxValidationSummaryOptions_visible */
+        /** @docid_ignore dxValidationSummaryOptions_width */
+        /** @docid_ignore dxValidationSummaryOptions_accessKey */
+        /** @docid_ignore dxValidationSummaryOptions_tabIndex */
+        /** @docid dxValidationSummaryOptions_validationGroup */
         validationGroup?: string;
     }
-    /** A widget for displaying the result of checking validation rules for editors. */
+    /** @docid dxValidationSummary */
     export class dxValidationSummary extends CollectionWidget {
         constructor(element: JQuery, options?: dxValidationSummaryOptions);
         constructor(element: Element, options?: dxValidationSummaryOptions);
+        /** @docid_ignore dxValidationSummaryMethods_registerKeyHandler */
+        /** @docid_ignore dxValidationSummaryMethods_focus */
+        /** @docid_ignore dxValidationSummaryMethods_getDataSource */
     }
     export interface dxResizableOptions extends DOMComponentOptions {
-        /** Specifies which borders of the widget element are used as a handle. */
+        /** @docid_ignore dxResizableOptions_stepPrecision */
+        /** @docid dxResizableOptions_handles */
         handles?: string;
-        /** Specifies the lower width boundary for resizing. */
+        /** @docid dxResizableOptions_minWidth */
         minWidth?: number;
-        /** Specifies the upper width boundary for resizing. */
+        /** @docid dxResizableOptions_maxWidth */
         maxWidth?: number;
-        /** Specifies the lower height boundary for resizing. */
+        /** @docid dxResizableOptions_minHeight */
         minHeight?: number;
-        /** Specifies the upper height boundary for resizing. */
+        /** @docid dxResizableOptions_maxHeight */
         maxHeight?: number;
-        /** A handler for the resizeStart event. */
+        /** @docid dxResizableOptions_onResizeStart */
         onResizeStart?: Function;
-        /** A handler for the resize event. */
+        /** @docid dxResizableOptions_onResize */
         onResize?: Function;
-        /** A handler for the resizeEnd event. */
+        /** @docid dxResizableOptions_onResizeEnd */
         onResizeEnd?: Function;
     }
-    /** A widget that displays required content in a resizable element. */
+    /** @docid dxResizable */
     export class dxResizable extends DOMComponent {
         constructor(element: JQuery, options?: dxResizableOptions);
         constructor(element: Element, options?: dxResizableOptions);
     }
     export interface dxTooltipOptions extends dxPopoverOptions {
+        /** @docid_ignore dxTooltipOptions_showtitle*/
+        /** @docid_ignore dxTooltipOptions_title*/
+        /** @docid_ignore dxTooltipOptions_titleTemplate */
+        /** @docid_ignore dxTooltipOptions_toolbarItems*/
+        /** @docid_ignore dxTooltipOptions_showCloseButton*/
+        /** @docid_ignore dxTooltipOptions_onTitleRendered */
     }
-    /** A tooltip widget. */
+    /** @docid dxTooltip */
     export class dxTooltip extends dxPopover {
         constructor(element: JQuery, options?: dxTooltipOptions);
         constructor(element: Element, options?: dxTooltipOptions);
     }
     export interface dxDropDownListOptions extends dxDropDownEditorOptions, DataExpressionMixinOptions {
-        /** Returns the value currently displayed by the widget. */
+        /** @docid_ignore dxDropDownListOptions_fieldTemplate*/
+        /** @docid_ignore dxDropDownListOptions_fieldRender*/
+        /** @docid_ignore dxDropDownListOptions_contentTemplate*/
+        /** @docid_ignore dxDropDownListOptions_contentRender*/
+        /** @docid_ignore dxDropDownListOptions_applyValueMode*/
+        /** @docid_ignore dxDropDownListOptions_value*/
+        /** @docid dxDropDownListOptions_displayValue */
         displayValue?: string;
-        /** The minimum number of characters that must be entered into the text box to begin a search. */
+        /** @docid dxDropDownListOptions_minSearchLength */
         minSearchLength?: number;
-        /** Specifies whether or not the widget displays unfiltered values until a user types a number of characters exceeding the minSearchLength option value. */
+        /** @docid dxDropDownListOptions_showDataBeforeSearch */
         showDataBeforeSearch?: boolean;
-        /** Specifies the name of a data source item field or an expression whose value is compared to the search criterion. */
+        /** @docid dxDropDownListOptions_searchExpr */
         searchExpr?: any;
-        /** Specifies the binary operation used to filter data. */
+        /** @docid dxDropDownListOptions_searchMode */
         searchMode?: string;
-        /** Specifies the time delay, in milliseconds, after the last character has been typed in, before a search is executed. */
+        /** @docid dxDropDownListOptions_searchTimeout */
         searchTimeout?: number;
-        /** A handler for the valueChanged event. */
+        /** @docid dxDropDownListOptions_onValueChanged */
         onValueChanged?: Function;
-        /** Specifies DOM event names that update a widget's value. */
+        /** @docid dxDropDownListOptions_valueChangeEvent */
         valueChangeEvent?: string;
-        /** Specifies whether or not the widget supports searching. */
+        /** @docid dxDropDownListOptions_searchEnabled */
         searchEnabled?: boolean;
-        /**
-         * Specifies whether or not the widget displays items by pages.
-         * @deprecated Use the DataSource paging opportunities instead.
-         */
+        /** @docid dxDropDownListOptions_pagingEnabled */
         pagingEnabled?: boolean;
-        /** The text or HTML markup displayed by the widget if the item collection is empty. */
+        /** @docid dxDropDownListOptions_noDataText */
         noDataText?: string;
-        /** A handler for the selectionChanged event. */
+        /** @docid dxDropDownListOptions_onSelectionChanged */
         onSelectionChanged?: Function;
-        /** A handler for the itemClick event. */
+        /** @docid dxDropDownListOptions_onItemClick */
         onItemClick?: Function;
+        /** @docid dxDropDownListOptions_onContentReady */
         onContentReady?: Function;
     }
-    /** A base class for drop-down list widgets. */
-    export class dxDropDownList extends dxDropDownEditor {
+    /** @docid dxDropDownList */
+    export class dxDropDownList extends dxDropDownEditor implements DataHelperMixin  {
         constructor(element: JQuery, options?: dxDropDownListOptions);
         constructor(element: Element, options?: dxDropDownListOptions);
+        getDataSource(): DevExpress.data.DataSource;
     }
     export interface dxToolbarOptions extends CollectionWidgetOptions {
-        /** The template used to render menu items. */
+        /** @docid_ignore dxToolbarOptions_activeStateEnabled */
+        /** @docid_ignore dxToolbarOptions_selectedIndex */
+        /** @docid_ignore dxToolbarOptions_selectedItem */
+        /** @docid_ignore dxToolbarOptions_selectedItems */
+        /** @docid_ignore dxToolbarOptions_submenuType */
+        /** @docid_ignore dxToolbarOptions_onSelectionChanged */
+        /** @docid_ignore dxToolbarOptions_focusStateEnabled */
+        /** @docid_ignore dxToolbarOptions_accessKey */
+        /** @docid_ignore dxToolbarOptions_tabIndex */
+        /** @docid dxToolbarOptions_menuItemTemplate */
         menuItemTemplate?: any;
-        /** Informs the widget about its location in a view HTML markup. */
+        /** @docid dxToolbarOptions_renderAs */
         renderAs?: string;
     }
-    /** A toolbar widget. */
+    /** @docid dxToolbar */
     export class dxToolbar extends CollectionWidget {
         constructor(element: JQuery, options?: dxToolbarOptions);
         constructor(element: Element, options?: dxToolbarOptions);
+        /** @docid_ignore dxToolbarItemTemplate_location */
+        /** @docid_ignore dxToolbarItemTemplate_locateInMenu */
+        /** @docid_ignore dxToolbarItemTemplate_showText */
+        /** @docid_ignore dxToolbarItemTemplate_menuItemTemplate */
+        /** @docid_ignore dxToolbarItemTemplate_options */
+        /** @docid_ignore dxToolbarItemTemplate_widget */
+        /** @docid_ignore dxToolbarMethods_registerKeyHandler */
+        /** @docid_ignore dxToolbarMethods_focus */
     }
     export interface dxToastOptions extends dxOverlayOptions {
+        /** @docid_ignore dxToastOptions_disabled */
+        /** @docid_ignore dxToastOptions_dragEnabled */
+        /** @docid_ignore dxToastOptions_resizeEnabled */
+        /** @docid_ignore dxToastOptions_closeOnOutsideClick */
+        /** @docid dxToastOptions_animation */
         animation?: {
-            /** An object that defines the animation options used when the widget is being shown. */
+            /** @docid dxToastOptions_animation_show */
             show?: fx.AnimationOptions;
-            /** An object that defines the animation options used when the widget is being hidden. */
+            /** @docid dxToastOptions_animation_hide */
             hide?: fx.AnimationOptions;
         };
-        /** The time span in milliseconds during which the dxToast widget is visible. */
+        /** @docid dxToastOptions_displaytime */
         displayTime?: number;
+        /** @docid dxToastOptions_height */
         height?: any;
-        /** The dxToast message text. */
+        /** @docid dxToastOptions_message */
         message?: string;
+        /** @docid dxToastOptions_position */
         position?: PositionOptions;
+        /** @docid dxToastOptions_shading */
         shading?: boolean;
-        /** Specifies the dxToast widget type. */
+        /** @docid dxToastOptions_type */
         type?: string;
+        /** @docid dxToastOptions_width */
         width?: any;
+        /** @docid dxToastOptions_closeOnBackButton */
         closeOnBackButton?: boolean;
-        /** A Boolean value specifying whether or not the toast is closed if a user swipes it out of the screen boundaries. */
+        /** @docid dxToastOptions_closeOnSwipe */
         closeOnSwipe?: boolean;
-        /** A Boolean value specifying whether or not the toast is closed if a user clicks it. */
+        /** @docid dxToastOptions_closeOnClick */
         closeOnClick?: boolean;
     }
-    /** The toast message widget. */
+    /** @docid dxToast */
     export class dxToast extends dxOverlay {
         constructor(element: JQuery, options?: dxToastOptions);
         constructor(element: Element, options?: dxToastOptions);
     }
     export interface dxTextEditorOptions extends EditorOptions {
-        /** A handler for the change event. */
+        /** @docid dxTextEditorOptions_onChange */
         onChange?: Function;
-        /** A handler for the copy event. */
+        /** @docid dxTextEditorOptions_onCopy */
         onCopy?: Function;
-        /** A handler for the cut event. */
+        /** @docid dxTextEditorOptions_onCut */
         onCut?: Function;
-        /** A handler for the enterKey event. */
+        /** @docid dxTextEditorOptions_onEnterKey */
         onEnterKey?: Function;
-        /** A handler for the focusIn event. */
+        /** @docid dxTextEditorOptions_onFocusIn */
         onFocusIn?: Function;
-        /** A handler for the focusOut event. */
+        /** @docid dxTextEditorOptions_onFocusOut */
         onFocusOut?: Function;
-        /** A handler for the input event. */
+        /** @docid dxTextEditorOptions_onInput */
         onInput?: Function;
-        /** A handler for the keyDown event. */
+        /** @docid dxTextEditorOptions_onKeyDown */
         onKeyDown?: Function;
-        /** A handler for the keyPress event. */
+        /** @docid dxTextEditorOptions_onKeyPress */
         onKeyPress?: Function;
-        /** A handler for the keyUp event. */
+        /** @docid dxTextEditorOptions_onKeyUp */
         onKeyUp?: Function;
-        /** A handler for the paste event. */
+        /** @docid dxTextEditorOptions_onPaste */
         onPaste?: Function;
-        /** The text displayed by the widget when the widget value is empty. */
+        /** @docid dxTextEditorOptions_placeholder */
         placeholder?: string;
-        /** Specifies whether to display the Clear button in the widget. */
+        /** @docid dxTextEditorOptions_showClearButton */
         showClearButton?: boolean;
-        /** Specifies the current value displayed by the widget. */
+        /** @docid dxTextEditorOptions_value */
         value?: any;
-        /** Specifies DOM event names that update a widget's value. */
+        /** @docid dxTextEditorOptions_valueChangeEvent */
         valueChangeEvent?: string;
-        /** Specifies whether or not the widget checks the inner text for spelling mistakes. */
+        /** @docid dxTextEditorOptions_spellcheck */
         spellcheck?: boolean;
-        /** Specifies HTML attributes applied to the inner input element of the widget. */
+        /** @docid dxTextEditorOptions_attr */
         attr?: Object;
-        /** The read-only option that holds the text displayed by the widget input element. */
+        /** @docid dxTextEditorOptions_text */
         text?: string;
+        /** @docid dxTextEditorOptions_focusStateEnabled */
         focusStateEnabled?: boolean;
+        /** @docid dxTextEditorOptions_hoverStateEnabled */
         hoverStateEnabled?: boolean;
-        /** The editor mask that specifies the format of the entered string. */
+        /** @docid dxTextEditorOptions_mask */
         mask?: string;
-        /** Specifies a mask placeholder character. */
+        /** @docid dxTextEditorOptions_maskChar */
         maskChar?: string;
-        /** Specifies custom mask rules. */
+        /** @docid dxTextEditorOptions_maskRules */
         maskRules?: Object;
-        /** A message displayed when the entered text does not match the specified pattern. */
+        /** @docid dxTextEditorOptions_maskInvalidMessage */
         maskInvalidMessage?: string;
-        /** Specifies whether the value option holds only characters entered by a user or prompt characters as well. */
+        /** @docid dxTextEditorOptions_useMaskedValue */
         useMaskedValue?: boolean;
+        /** @docid dxTextEditorOptions_name */
+        name?: string;
     }
-    /** A base class for text editing widgets. */
+    /** @docid dxTextEditor */
     export class dxTextEditor extends Editor {
         constructor(element: JQuery, options?: dxTextEditorOptions);
         constructor(element: Element, options?: dxTextEditorOptions);
-        /** Removes focus from the input element. */
+        /** @docid dxTextEditorMethods_blur */
         blur(): void;
-        /** Sets focus to the input element representing the widget. */
+        /** @docid dxTextEditorMethods_focus */
         focus(): void;
     }
     export interface dxTextBoxOptions extends dxTextEditorOptions {
-        /** Specifies the maximum number of characters you can enter into the textbox. */
+        /** @docid dxTextBoxOptions_maxlength */
         maxLength?: any;
-        /** The "mode" attribute value of the actual HTML input element representing the text box. */
+        /** @docid dxTextBoxOptions_mode */
         mode?: string;
     }
-    /** A single-line text box widget. */
+    /** @docid dxTextbox */
     export class dxTextBox extends dxTextEditor {
         constructor(element: JQuery, options?: dxTextBoxOptions);
         constructor(element: Element, options?: dxTextBoxOptions);
     }
     export interface dxTextAreaOptions extends dxTextBoxOptions {
-        /** Specifies whether or not the widget checks the inner text for spelling mistakes. */
+        /** @docid_ignore dxTextAreaOptions_mode */
+        /** @docid_ignore dxTextAreaOptions_showClearButton */
+        /** @docid_ignore dxTextAreaOptions_mask */
+        /** @docid_ignore dxTextAreaOptions_maskChar */
+        /** @docid_ignore dxTextAreaOptions_maskRules */
+        /** @docid_ignore dxTextAreaOptions_maskInvalidMessage */
+        /** @docid_ignore dxTextAreaOptions_useMaskedValue */
+        /** @docid dxTextAreaOptions_spellcheck */
         spellcheck?: boolean;
-        /** Specifies the minimum height of the widget. */
+        /** @docid dxTextAreaOptions_minHeight */
         minHeight?: any;
-        /** Specifies the maximum height of the widget. */
+        /** @docid dxTextAreaOptions_maxHeight */
         maxHeight?: any;
-        /** A Boolean value specifying whether or not the auto resizing mode is enabled. */
+        /** @docid dxTextAreaOptions_autoResizeEnabled */
         autoResizeEnabled?: boolean;
     }
-    /** A widget used to display and edit multi-line text. */
+    /** @docid dxTextArea */
     export class dxTextArea extends dxTextBox {
         constructor(element: JQuery, options?: dxTextAreaOptions);
         constructor(element: Element, options?: dxTextAreaOptions);
     }
     export interface dxTabsOptions extends CollectionWidgetOptions {
-        /** Specifies whether the widget enables an end-user to select only a single item or multiple items. */
+        /** @docid_ignore dxTabsOptions_activeStateEnabled*/
+        /** @docid_ignore dxTabsOptions_noDataText */
+        /** @docid_ignore dxTabsOptions_selectedItems */
+        /** @docid_ignore dxTabsOptions_hoverStateEnabled */
+        /** @docid_ignore dxTabsOptions_focusStateEnabled */
+        /** @docid dxTabsOptions_selectionMode */
         selectionMode?: string;
-        /** Specifies whether or not an end-user can scroll tabs by swiping. */
+        /** @docid dxTabsOptions_scrollByContent */
         scrollByContent?: boolean;
-        /** Specifies whether or not an end-user can scroll tabs. */
+        /** @docid dxTabsOptions_scrollingEnabled */
         scrollingEnabled?: boolean;
-        /** A Boolean value that specifies the availability of navigation buttons. */
+        /** @docid dxTabsOptions_showNavButtons */
         showNavButtons?: boolean;
     }
-    /** A tab strip used to switch between pages. */
+    /** @docid dxTabs */
     export class dxTabs extends CollectionWidget {
         constructor(element: JQuery, options?: dxTabsOptions);
         constructor(element: Element, options?: dxTabsOptions);
+        /** @docid_ignore dxTabsItemTemplate_icon */
+        /** @docid_ignore dxTabsItemTemplate_iconSrc */
+        /** @docid_ignore dxTabsItemTemplate_badge */
     }
     export interface dxTabPanelOptions extends dxMultiViewOptions {
-        /** A handler for the titleClick event. */
+        /** @docid_ignore dxTabPanelItemTemplate_title */
+        /** @docid_ignore dxTabPanelOptions_animationEnabled */
+        /** @docid_ignore dxTabPanelOptions_hoverStateEnabled */
+        /** @docid_ignore dxTabPanelOptions_focusStateEnabled */
+        /** @docid_ignore dxTabPanelOptions_swipeEnabled */
+        /** @docid dxTabPanelOptions_onTitleClick */
         onTitleClick?: any;
-        /** A handler for the titleHold event. */
+        /** @docid dxTabPanelOptions_onTitleHold */
         onTitleHold?: Function;
-        /** A handler for the titleRendered event. */
+        /** @docid dxTabPanelOptions_onTitleRendered */
         onTitleRendered?: Function;
-        /** The template to be used for rendering an item title. */
+        /** @docid dxTabPanelOptions_itemTitleTemplate */
         itemTitleTemplate?: any;
-        /** A Boolean value specifying if tabs in the title are scrolled by content. */
+        /** @docid dxTabPanelOptions_scrollByContent */
         scrollByContent?: boolean;
-        /** A Boolean indicating whether or not to add scrolling support for tabs in the title. */
+        /** @docid dxTabPanelOptions_scrollingEnabled */
         scrollingEnabled?: boolean;
-        /** A Boolean value that specifies the availability of navigation buttons. */
+        /** @docid dxTabPanelOptions_showNavButtons */
         showNavButtons?: boolean;
     }
-    /** A widget used to display a view and to switch between several views by clicking the appropriate tabs. */
+    /** @docid dxTabPanel */
     export class dxTabPanel extends dxMultiView {
         constructor(element: JQuery, options?: dxTabPanelOptions);
         constructor(element: Element, options?: dxTabPanelOptions);
+        /** @docid_ignore dxTabPanelItemTemplate_icon */
+        /** @docid_ignore dxTabPanelItemTemplate_iconSrc */
+        /** @docid_ignore dxTabPanelItemTemplate_badge */
+        /** @docid_ignore dxTabPanelItemTemplate_visible */
+        /** @docid_ignore dxTabPanelItemTemplate_tabtemplate */
     }
     export interface dxSelectBoxOptions extends dxDropDownListOptions {
-        /** Specifies DOM event names that update a widget's value. */
+        /** @docid_ignore dxSelectBoxOptions_autocompletionEnabled */
+        /** @docid_ignore dxSelectBoxOptions_allowClearing */
+        /** @docid dxSelectBoxOptions_valueChangeEvent */
         valueChangeEvent?: string;
-        /** The template to be used for rendering the widget text field. */
+        /** @docid dxSelectBoxOptions_fieldTemplate */
         fieldTemplate?: any;
-        /** The text that is provided as a hint in the select box editor. */
+        /** @docid dxSelectBoxOptions_placeholder */
         placeholder?: string;
-        /** Specifies whether or not the widget allows an end-user to enter a custom value. */
+        /** @docid dxSelectBoxOptions_acceptCustomValue */
         acceptCustomValue?: boolean;
-        /** Specifies whether or not to display selection controls. */
+        /** @docid dxSelectBoxOptions_showSelectionControls */
         showSelectionControls?: boolean;
-        /** A handler for the customItemCreating event. */
+        /** @docid dxSelectBoxOptions_onCustomItemCreating */
         onCustomItemCreating?: Function;
     }
-    /** A widget that allows you to select an item in a dropdown list. */
+    /** @docid dxSelectbox */
     export class dxSelectBox extends dxDropDownList {
         constructor(element: JQuery, options?: dxSelectBoxOptions);
         constructor(element: Element, options?: dxSelectBoxOptions);
     }
     export interface dxTagBoxOptions extends dxSelectBoxOptions {
+        /** @docid_ignore dxTagBoxOptions_closeAction */
+        /** @docid_ignore dxTagBoxOptions_hiddenAction */
+        /** @docid_ignore dxTagBoxOptions_itemRender */
+        /** @docid_ignore dxTagBoxOptions_openAction */
+        /** @docid_ignore dxTagBoxOptions_shownAction */
+        /** @docid_ignore dxTagBoxOptions_maxLength */
+        /** @docid_ignore dxTagBoxOptions_onCopy */
+        /** @docid_ignore dxTagBoxOptions_onCut */
+        /** @docid_ignore dxTagBoxOptions_onPaste */
+        /** @docid_ignore dxTagBoxOptions_spellcheck */
+        /** @docid_ignore dxTagBoxOptions_displayValue */
+        /** @docid_ignore dxTagBoxOptions_valueChangeEvent */
+        /** @docid_ignore dxTagBoxOptions_selectedItem */
+        /** @docid dxTagBoxOptions_values */
         values?: Array<any>;
-        /** Specifies the selected items. */
+        /** @docid dxTagBoxOptions_value */
         value?: Array<any>;
-        /** Gets the currently selected items. */
+        /** @docid dxTagBoxOptions_selectedItems */
         selectedItems?: Array<any>;
-        /** Specifies how the widget applies values. */
+        /** @docid dxTagBoxOptions_applyValueMode */
         applyValueMode?: string;
-        /** A Boolean value specifying whether or not to hide selected items. */
+        /** @docid dxTagBoxOptions_hideSelectedItems */
         hideSelectedItems?: boolean;
-        /** A handler for the selectAllValueChanged event. */
+        /** @docid dxTagBoxOptions_onSelectAllValueChanged */
         onSelectAllValueChanged?: Function;
-        /** A Boolean value specifying whether or not the widget is multiline. */
+        /** @docid dxTagBoxOptions_multiline */
         multiline?: boolean;
-        /** A handler for the selectionChanged event. */
+        /** @docid dxTagBoxOptions_onSelectionChanged */
         onSelectionChanged?: Function;
-        /** The template to be used for rendering tags. */
+        /** @docid dxTagBoxOptions_tagTemplate */
         tagTemplate?: any;
     }
-    /** A widget that allows you to select multiple items from a dropdown list. */
+    /** @docid dxTagBox */
     export class dxTagBox extends dxSelectBox {
         constructor(element: JQuery, options?: dxTagBoxOptions);
         constructor(element: Element, options?: dxTagBoxOptions);
     }
     export interface dxScrollViewOptions extends dxScrollableOptions {
-        /** A handler for the pullDown event. */
+        /** @docid dxScrollViewOptions_onPullDown */
         onPullDown?: Function;
-        /** Specifies the text shown in the pullDown panel when pulling the content down lowers the refresh threshold. */
+        /** @docid dxScrollViewOptions_pulledDownText */
         pulledDownText?: string;
-        /** Specifies the text shown in the pullDown panel while pulling the content down to the refresh threshold. */
+        /** @docid dxScrollViewOptions_pullingDownText */
         pullingDownText?: string;
-        /** A handler for the reachBottom event. */
+        /** @docid dxScrollViewOptions_onReachBottom */
         onReachBottom?: Function;
-        /** Specifies the text shown in the pullDown panel displayed when content is scrolled to the bottom. */
+        /** @docid dxScrollViewOptions_reachBottomText */
         reachBottomText?: string;
-        /** Specifies the text shown in the pullDown panel displayed when the content is being refreshed. */
+        /** @docid dxScrollViewOptions_refreshingText */
         refreshingText?: string;
     }
-    /** A widget used to display scrollable content. */
+    /** @docid dxscrollview */
     export class dxScrollView extends dxScrollable {
         constructor(element: JQuery, options?: dxScrollViewOptions);
         constructor(element: Element, options?: dxScrollViewOptions);
-        /** Returns a value indicating if the scrollView content is larger then the widget container. */
+        /** @docid dxscrollviewmethods_isFull */
         isFull(): boolean;
-        /** Locks the widget until the release(preventScrollBottom) method is called and executes the function passed to the onPullDown option and the handler assigned to the pullDown event. */
+        /** @docid dxscrollviewmethods_refresh */
         refresh(): void;
-        /** Notifies the scroll view that data loading is finished. */
+        /** @docid dxscrollviewmethods_release */
         release(preventScrollBottom: boolean): JQueryPromise<void>;
-        /** Toggles the loading state of the widget. */
+        /** @docid dxscrollviewmethods_toggleLoading */
         toggleLoading(showOrHide: boolean): void;
     }
     export interface dxScrollableLocation {
@@ -1225,1170 +1460,1425 @@ declare module DevExpress.ui {
         left?: number;
     }
     export interface dxScrollableOptions extends DOMComponentOptions {
-        /** A string value specifying the available scrolling directions. */
+        /** @docid dxScrollableOptions_direction */
         direction?: string;
-        /** A Boolean value specifying whether or not the widget can respond to user interaction. */
+        /** @docid dxScrollableOptions_disabled */
         disabled?: boolean;
-        /** A handler for the scroll event. */
+        /** @docid dxScrollableOptions_onScroll */
         onScroll?: Function;
-        /** Specifies when the widget shows the scrollbar. */
+        /** @docid dxScrollableOptions_showScrollbar */
         showScrollbar?: string;
-        /** A handler for the update event. */
+        /** @docid dxScrollableOptions_onUpdated */
         onUpdated?: Function;
-        /** Indicates whether to use native or simulated scrolling. */
+        /** @docid dxScrollableOptions_useNative */
         useNative?: boolean;
-        /** A Boolean value specifying whether to enable or disable the bounce-back effect. */
+        /** @docid dxScrollableOptions_bounceEnabled */
         bounceEnabled?: boolean;
-        /** A Boolean value specifying whether or not an end-user can scroll the widget content swiping it up or down. */
+        /** @docid dxScrollableOptions_scrollByContent */
         scrollByContent?: boolean;
-        /** A Boolean value specifying whether or not an end-user can scroll the widget content using the scrollbar. */
+        /** @docid dxScrollableOptions_scrollByThumb */
         scrollByThumb?: boolean;
     }
-    /** A widget used to display scrollable content. */
+    /** @docid dxscrollable */
     export class dxScrollable extends DOMComponent {
         constructor(element: JQuery, options?: dxScrollableOptions);
         constructor(element: Element, options?: dxScrollableOptions);
-        /** Returns the height of the scrollable widget in pixels. */
+        /** @docid dxscrollablemethods_clientHeight */
         clientHeight(): number;
-        /** Returns the width of the scrollable widget in pixels. */
+        /** @docid dxscrollablemethods_clientWidth */
         clientWidth(): number;
-        /** Returns an HTML element of the widget. */
+        /** @docid dxscrollablemethods_content */
         content(): JQuery;
-        /** Scrolls the widget content by the specified number of pixels. */
+        /** @docid dxscrollablemethods_scrollBy#scrollBy(distance) */
         scrollBy(distance: number): void;
-        /** Scrolls widget content by the specified number of pixels in horizontal and vertical directions. */
+        /** @docid dxscrollablemethods_scrollBy#scrollBy(distanceObject) */
         scrollBy(distanceObject: dxScrollableLocation): void;
-        /** Returns the height of the scrollable content in pixels. */
+        /** @docid dxscrollablemethods_scrollHeight */
         scrollHeight(): number;
-        /** Returns the current scroll position against the leftmost position. */
+        /** @docid dxscrollablemethods_scrollLeft */
         scrollLeft(): number;
-        /** Returns how far the scrollable content is scrolled from the top and from the left. */
+        /** @docid dxscrollablemethods_scrollOffset */
         scrollOffset(): dxScrollableLocation;
-        /** Scrolls widget content to the specified position. */
+        /** @docid dxscrollablemethods_scrollTo#scrollTo(targetLocation) */
         scrollTo(targetLocation: number): void;
-        /** Scrolls widget content to a specified position. */
+        /** @docid dxscrollablemethods_scrollTo#scrollTo(targetLocationObject) */
         scrollTo(targetLocation: dxScrollableLocation): void;
-        /** Scrolls widget content to the specified element. */
+        /** @docid dxscrollablemethods_scrollToElement */
         scrollToElement(element: Element): void;
-        /** Returns the current scroll position against the topmost position. */
+        /** @docid dxscrollablemethods_scrollTop */
         scrollTop(): number;
-        /** Returns the width of the scrollable content in pixels. */
+        /** @docid dxscrollablemethods_scrollWidth */
         scrollWidth(): number;
-        /** Updates the dimensions of the scrollable contents. */
+        /** @docid dxscrollablemethods_update */
         update(): void;
     }
     export interface dxRadioGroupOptions extends EditorOptions, DataExpressionMixinOptions {
+        /** @docid_ignore dxRadioGroupOptions_hoverStateEnabled */
+        /** @docid_ignore dxRadioGroupOptions_focusStateEnabled */
+        /** @docid_ignore dxRadioGroupOptions_value */
+        /** @docid dxRadioGroupOptions_activeStateEnabled */
         activeStateEnabled?: boolean;
-        /** Specifies the radio group layout. */
+        /** @docid dxRadioGroupOptions_layout */
         layout?: string;
+        /** @docid dxRadioGroupOptions_name */
+        name?: string;
     }
-    /** A widget that enables a user to select one item within a list of items represented by radio buttons. */
+    /** @docid_ignore dxRadioButton */
+    /** @docid dxRadioGroup */
     export class dxRadioGroup extends CollectionWidget {
         constructor(element: JQuery, options?: dxRadioGroupOptions);
         constructor(element: Element, options?: dxRadioGroupOptions);
     }
     export interface dxPopupToolbarItemOptions {
-        /** Specifies whether or not a toolbar item must be displayed disabled. */
+        /** @docid dxPopupOptions_toolbarItems_disabled */
         disabled?: boolean;
-        /** Specifies html code inserted into the toolbar item element. */
+        /** @docid dxPopupOptions_toolbarItems_html */
         html?: string;
-        /** Specifies a location for the item on the toolbar. */
+        /** @docid dxPopupOptions_toolbarItems_location */
         location?: string;
-        /** Specifies a configuration object for the widget that presents a toolbar item. */
+        /** @docid dxPopupOptions_toolbarItems_options */
         options?: Object;
-        /** Specifies an item template that should be used to render this item only. */
+        /** @docid dxPopupOptions_toolbarItems_template */
         template?: any;
-        /** Specifies text displayed for the toolbar item. */
+        /** @docid dxPopupOptions_toolbarItems_text */
         text?: string;
-        /** Specifies whether the item is displayed on a top or bottom toolbar. */
+        /** @docid dxPopupOptions_toolbarItems_toolbar */
         toolbar?: string;
-        /** Specifies whether or not a widget item must be displayed. */
+        /** @docid dxPopupOptions_toolbarItems_visible */
         visible?: boolean;
-        /** A widget that presents a toolbar item. */
+        /** @docid dxPopupOptions_toolbarItems_widget */
         widget?: string;
     }
     export interface dxPopupOptions extends dxOverlayOptions {
-        /** Specifies whether or not to allow a user to drag the popup window. */
+        /** @docid_ignore dxPopupOptions_focusStateEnabled * /
+        /** @docid_ignore dxPopupOptions_animation */
+        /** @docid dxPopupOptions_dragEnabled */
         dragEnabled?: boolean;
-        /** Specifies whether or not an end user can resize the widget. */
+        /** @docid dxPopupOptions_resizeEnabled */
         resizeEnabled?: boolean;
-        /** A handler for the resizeStart event. */
+        /** @docid dxPopupOptions_onResizeStart */
         onResizeStart?: Function;
-        /** A handler for the resize event. */
+        /** @docid dxPopupOptions_onResize */
         onResize?: Function;
-        /** A handler for the resizeEnd event. */
+        /** @docid dxPopupOptions_onResizeEnd */
         onResizeEnd?: Function;
-        /** A Boolean value specifying whether or not to display the widget in full-screen mode. */
+        /** @docid dxPopupOptions_fullScreen */
         fullScreen?: boolean;
+        /** @docid dxPopupOptions_position */
         position?: PositionOptions;
-        /** A Boolean value specifying whether or not to display the title in the popup window. */
+        /** @docid dxPopupOptions_showtitle */
         showTitle?: boolean;
-        /** The title in the overlay window. */
+        /** @docid dxPopupOptions_title */
         title?: string;
-        /** A template to be used for rendering the widget title. */
+        /** @docid dxPopupOptions_titleTemplate */
         titleTemplate?: any;
+        /** @docid dxPopupOptions_width */
         width?: any;
-        /** Specifies items displayed on the top or bottom toolbar of the popup window. */
+        /** @docid_ignore dxPopupOptions_buttons */
+        /** @docid dxPopupOptions_toolbarItems */
         toolbarItems?: Array<dxPopupToolbarItemOptions>;
-        /** Specifies whether or not the widget displays the Close button. */
+        /** @docid dxPopupOptions_showCloseButton */
         showCloseButton?: boolean;
-        /** A handler for the titleRendered event. */
+        /** @docid dxPopupOptions_onTitleRendered */
         onTitleRendered?: Function;
     }
-    /** A widget that displays required content in a popup window. */
+    /** @docid dxPopup */
     export class dxPopup extends dxOverlay {
         constructor(element: JQuery, options?: dxPopupOptions);
         constructor(element: Element, options?: dxPopupOptions);
     }
     export interface dxPopoverOptions extends dxPopupOptions {
-        /** An object defining the animation options of the widget. */
+        /** @docid_ignore dxPopoverOptions_closeOnOutsideClick*/
+        /** @docid_ignore dxPopoverOptions_dragEnabled*/
+        /** @docid_ignore dxPopoverOptions_resizeEnabled*/
+        /** @docid_ignore dxPopoverOptions_onResizeStart*/
+        /** @docid_ignore dxPopoverOptions_onResize*/
+        /** @docid_ignore dxPopoverOptions_onResizeEnd*/
+        /** @docid_ignore dxPopoverOptions_fullScreen*/
+        /** @docid_ignore dxPopoverOptions_focusStateEnabled */
+        /** @docid_ignore dxPopoverOptions_accessKey */
+        /** @docid_ignore dxPopoverOptions_tabIndex */
+        /** @docid dxPopoverOptions_animation */
         animation?: {
-            /** An object that defines the animation options used when the widget is being shown. */
+            /** @docid dxPopoverOptions_animation_show */
             show?: fx.AnimationOptions;
-            /** An object that defines the animation options used when the widget is being hidden. */
+            /** @docid dxPopoverOptions_animation_hide */
             hide?: fx.AnimationOptions;
         };
-        /** Specifies the height of the widget. */
+        /** @docid dxPopoverOptions_height */
         height?: any;
-        /** An object defining widget positioning options. */
+        /** @docid dxPopoverOptions_position */
         position?: PositionOptions;
+        /** @docid dxPopoverOptions_shading */
         shading?: boolean;
-        /** A Boolean value specifying whether or not to display the title in the overlay window. */
+        /** @docid dxPopoverOptions_showtitle */
         showTitle?: boolean;
-        /** The target element associated with a popover. */
+        /** @docid dxPopoverOptions_target */
         target?: any;
-        /** Specifies the width of the widget. */
+        /** @docid dxPopoverOptions_width */
         width?: any;
+        /** @docid dxPopoverOptions_showEvent */
+        showEvent?: {
+        /** @docid dxPopoverOptions_showEvent_name */
+            name?: String;
+            /** @docid dxPopoverOptions_showEvent_delay */
+            delay?: Number;
+        };
+        /** @docid dxPopoverOptions_hideEvent */
+        hideEvent?: {
+        /** @docid dxPopoverOptions_hideEvent_name */
+            name?: String;
+            /** @docid dxPopoverOptions_hideEvent_delay */
+            delay?: Number;
+        };
     }
-    /** A widget that displays the required content in a popup window. */
+    /** @docid dxPopover */
     export class dxPopover extends dxPopup {
         constructor(element: JQuery, options?: dxPopoverOptions);
         constructor(element: Element, options?: dxPopoverOptions);
-        /** Displays the widget for the specified target element. */
+        /** @docid dxPopoverMethods_show */
         show(target?: any): JQueryPromise<void>;
+        /** @docid_ignore dxPopoverMethods_registerKeyHandler */
+        /** @docid_ignore dxPopoverMethods_focus */
     }
     export interface dxOverlayOptions extends WidgetOptions {
-        /** An object defining the animation options of the widget. */
+        /** @docid_ignore dxOverlayOptions_activeStateEnabled*/
+        /** @docid dxOverlayOptions_animation */
         animation?: {
-            /** An object that defines the animation options used when the widget is being shown. */
+            /** @docid dxOverlayOptions_animation_show */
             show?: fx.AnimationOptions;
-            /** An object that defines the animation options used when the widget is being hidden. */
+            /** @docid dxOverlayOptions_animation_hide */
             hide?: fx.AnimationOptions;
         };
-        /** A Boolean value specifying whether or not the widget is closed if a user presses the Back hardware button. */
+        /** @docid dxOverlayOptions_closeOnBackButton */
         closeOnBackButton?: boolean;
-        /** A Boolean value specifying whether or not the widget is closed if a user clicks outside of the overlapping window. */
+        /** @docid dxOverlayOptions_closeOnOutsideClick */
         closeOnOutsideClick?: any;
-        /** A template to be used for rendering widget content. */
+        /** @docid dxOverlayOptions_contentTemplate */
         contentTemplate?: any;
-        /** Specifies whether widget content is rendered when the widget is shown or when rendering the widget. */
+        /** @docid dxOverlayOptions_deferRendering */
         deferRendering?: boolean;
-        /** Specifies whether or not an end-user can drag the widget. */
+        /** @docid dxOverlayOptions_dragEnabled */
         dragEnabled?: boolean;
-        /** The height of the widget in pixels. */
+        /** @docid dxOverlayOptions_height */
         height?: any;
-        /** Specifies the maximum height the widget can reach while resizing. */
+        /** @docid dxOverlayOptions_maxHeight */
         maxHeight?: any;
-        /** Specifies the maximum width the widget can reach while resizing. */
+        /** @docid dxOverlayOptions_maxWidth */
         maxWidth?: any;
-        /** Specifies the minimum height the widget can reach while resizing. */
+        /** @docid dxOverlayOptions_minHeight */
         minHeight?: any;
-        /** Specifies the minimum width the widget can reach while resizing. */
+        /** @docid dxOverlayOptions_minWidth */
         minWidth?: any;
-        /** A handler for the hidden event. */
+        /** @docid dxOverlayOptions_onHidden */
         onHidden?: Function;
-        /** A handler for the hiding event. */
+        /** @docid dxOverlayOptions_onHiding */
         onHiding?: Function;
-        /** An object defining widget positioning options. */
+        /** @docid dxOverlayOptions_position */
         position?: PositionOptions;
-        /** A Boolean value specifying whether or not the main screen is inactive while the widget is active. */
+        /** @docid dxOverlayOptions_shading */
         shading?: boolean;
-        /** Specifies the shading color. */
+        /** @docid dxOverlayOptions_shadingColor */
         shadingColor?: string;
-        /** A handler for the showing event. */
+        /** @docid dxOverlayOptions_onShowing */
         onShowing?: Function;
-        /** A handler for the shown event. */
+        /** @docid dxOverlayOptions_onShown */
         onShown?: Function;
+        /** @docid dxOverlayOptions_onContentReady */
         onContentReady?: Function;
-        /** A Boolean value specifying whether or not the widget is visible. */
+        /** @docid dxOverlayOptions_visible */
         visible?: boolean;
-        /** The widget width in pixels. */
+        /** @docid dxOverlayOptions_width */
         width?: any;
     }
-    /** A widget displaying the required content in an overlay window. */
+    /** @docid dxOverlay */
     export class dxOverlay extends Widget {
         constructor(element: JQuery, options?: dxOverlayOptions);
         constructor(element: Element, options?: dxOverlayOptions);
-        /** An HTML element of the widget. */
+        /** @docid dxOverlaymethods_content */
         content(): JQuery;
-        /** Hides the widget. */
+        /** @docid dxOverlaymethods_hide */
         hide(): JQueryPromise<void>;
-        /** Recalculates the overlay's size and position. */
+        /** @docid dxOverlaymethods_repaint */
         repaint(): void;
-        /** Shows the widget. */
+        /** @docid dxOverlaymethods_show */
         show(): JQueryPromise<void>;
-        /** Toggles the visibility of the widget. */
+        /** @docid dxOverlaymethods_toggle */
         toggle(showing: boolean): JQueryPromise<void>;
-        /** A static method that specifies the base z-index for all overlay widgets. */
+        /** @docid dxOverlayMethods_baseZIndex */
         static baseZIndex(zIndex: number): void;
     }
     export interface dxNumberBoxOptions extends dxTextEditorOptions {
-        /** The maximum value accepted by the number box. */
+        /** @docid_ignore dxNumberBoxOptions_mask */
+        /** @docid_ignore dxNumberBoxOptions_maskChar */
+        /** @docid_ignore dxNumberBoxOptions_maskRules */
+        /** @docid_ignore dxNumberBoxOptions_maskInvalidMessage */
+        /** @docid_ignore dxNumberBoxOptions_useMaskedValue */
+        /** @docid_ignore dxNumberBoxOptions_spellcheck */
+        /** @docid dxNumberBoxOptions_max */
         max?: number;
-        /** The minimum value accepted by the number box. */
+        /** @docid dxNumberBoxOptions_min */
         min?: number;
-        /** Specifies whether or not to show spin buttons. */
+        /** @docid dxNumberBoxOptions_showSpinButtons */
         showSpinButtons?: boolean;
+        /** @docid dxNumberBoxOptions_useTouchSpinButtons */
         useTouchSpinButtons?: boolean;
-        /** Specifies by which value the widget value changes when a spin button is clicked. */
+        /** @docid dxNumberBoxOptions_step */
         step?: number;
-        /** The current number box value. */
+        /** @docid dxNumberBoxOptions_value */
         value?: number;
-        /** The "mode" attribute value of the actual HTML input element representing the widget. */
+        /** @docid dxNumberBoxOptions_mode */
         mode?: string;
-        /** Specifies the text of the message displayed if the specified value is not a number. */
+        /** @docid dxNumberBoxOptions_invalidValueMessage */
         invalidValueMessage?: string;
     }
-    /** A textbox widget that enables a user to enter numeric values. */
+    /** @docid dxNumberBox */
     export class dxNumberBox extends dxTextEditor {
         constructor(element: JQuery, options?: dxNumberBoxOptions);
         constructor(element: Element, options?: dxNumberBoxOptions);
     }
     export interface dxNavBarOptions extends dxTabsOptions {
+        /** @docid dxNavBarOptions_scrollingEnabled */
         scrollingEnabled?: boolean;
+        /** @docid_ignore dxNavBarOptions_showNavButtons */
+        /** @docid_ignore dxNavBarOptions_scrollByContent */
     }
-    /** A widget that contains items used to navigate through application views. */
+    /** @docid dxNavBar */
     export class dxNavBar extends dxTabs {
         constructor(element: JQuery, options?: dxNavBarOptions);
         constructor(element: Element, options?: dxNavBarOptions);
+        /** @docid_ignore dxNavBarItemTemplate_badge */
     }
     export interface dxMultiViewOptions extends CollectionWidgetOptions {
-        /** Specifies whether or not to animate the displayed item change. */
+        /** @docid_ignore dxMultiViewOptions_noDataText */
+        /** @docid_ignore dxMultiViewOptions_selectedItems */
+        /** @docid_ignore dxMultiViewOptions_focusStateEnabled */
+        /** @docid dxMultiViewOptions_animationenabled */
         animationEnabled?: boolean;
-        /** A Boolean value specifying whether or not to scroll back to the first item after the last item is swiped. */
+        /** @docid dxMultiViewOptions_loop */
         loop?: boolean;
-        /** The index of the currently displayed item. */
+        /** @docid dxMultiViewOptions_selectedIndex */
         selectedIndex?: number;
-        /** A Boolean value specifying whether or not to allow users to change the selected index by swiping. */
+        /** @docid dxMultiViewOptions_swipeenabled */
         swipeEnabled?: boolean;
-        /** Specifies whether widget content is rendered when the widget is shown or when rendering the widget. */
+        /** @docid dxMultiViewOptions_deferRendering */
         deferRendering?: boolean;
     }
-    /** A widget used to display a view and to switch between several views. */
+    /** @docid dxMultiView */
     export class dxMultiView extends CollectionWidget {
         constructor(element: JQuery, options?: dxMultiViewOptions);
         constructor(element: Element, options?: dxMultiViewOptions);
+        /** @docid_ignore dxMultiViewItemTemplate_visible */
     }
+    /** @docid MapLocation */
     export interface dxMapLocation {
-        /** The latitude location of the widget. */
+        /** @docid MapLocation_lat */
         lat?: number;
-        /** The longitude location of the widget. */
+        /** @docid MapLocation_lng */
         lng?: number;
     }
     export interface dxMapMarker {
-        /** A URL pointing to the custom icon to be used for the marker. */
+        /** @docid dxMapOptions_markers_iconSrc */
         iconSrc?: string;
-        /** Specifies the marker location. */
+        /** @docid dxMapOptions_markers_location */
         location?: dxMapLocation;
-        /** A callback function performed when the marker is clicked. */
+        /** @docid dxMapOptions_markers_onClick */
         onClick?: Function;
-        /** A tooltip to be used for the marker. */
+        /** @docid dxMapOptions_markers_tooltip */
         tooltip?: {
-            /** Specifies whether a tooltip is visible by default or not. */
+            /** @docid dxMapOptions_markers_tooltip_isShown */
             isShown?: boolean;
-            /** Specifies the tooltip text. */
+            /** @docid dxMapOptions_markers_tooltip_text */
             text?: string;
         }
     }
     export interface dxMapRoute {
-        /** Specifies the color of the line displaying the route. */
+        /** @docid dxMapOptions_routes_color */
         color?: string;
-        /** Specifies a transportation mode to be used in the displayed route. */
+        /** @docid dxMapOptions_routes_mode */
         mode?: string;
-        /** Specifies the opacity of the line displaying the route. */
+        /** @docid dxMapOptions_routes_opacity */
         opacity?: number;
-        /** Contains an array of objects making up the route. */
+        /** @docid dxMapOptions_routes_locations */
         locations?: Array<dxMapLocation>;
-        /** Specifies the thickness of the line displaying the route in pixels. */
+        /** @docid dxMapOptions_routes_weight */
         weight?: number;
     }
     export interface dxMapOptions extends WidgetOptions {
-        /** Specifies whether or not the widget automatically adjusts center and zoom option values when adding a new marker or route, or when creating a widget if it initially contains markers or routes. */
+        /** @docid dxMapOptions_autoAdjust */
         autoAdjust?: boolean;
+        /** @docid_ignore dxMapOptions_bounds */
+        /** @docid_ignore dxMapOptions_bounds_northEast */
+        /** @docid_ignore dxMapOptions_bounds_northEast_lat */
+        /** @docid_ignore dxMapOptions_bounds_northEast_lng */
+        /** @docid_ignore dxMapOptions_bounds_southWest */
+        /** @docid_ignore dxMapOptions_bounds_southWest_lat */
+        /** @docid_ignore dxMapOptions_bounds_southWest_lng */
+        /** @docid_ignore dxMapOptions_focusStateEnabled  * /
+        /** @docid dxMapOptions_center */
         center?: dxMapLocation;
-        /** A handler for the click event. */
+        /** @docid dxMapOptions_onClick */
         onClick?: any;
-        /** Specifies whether or not map widget controls are available. */
+        /** @docid dxMapOptions_controls */
         controls?: boolean;
-        /** Specifies the height of the widget. */
+        /** @docid dxMapOptions_height */
         height?: any;
-        /** A key used to authenticate the application within the required map provider. */
+        /** @docid dxMapOptions_key */
         key?: {
-            /** A key used to authenticate the application within the "Bing" map provider. */
+            /** @docid dxMapOptions_key_bing */
             bing?: string;
-            /** A key used to authenticate the application within the "Google" map provider. */
+            /** @docid dxMapOptions_key_google */
             google?: string;
-            /** A key used to authenticate the application within the "Google Static" map provider. */
+            /** @docid dxMapOptions_key_googleStatic */
             googleStatic?: string;
         }
-        /** A handler for the markerAdded event. */
+        /** @docid dxMapOptions_onMarkerAdded */
         onMarkerAdded?: Function;
-        /** A URL pointing to the custom icon to be used for map markers. */
+        /** @docid dxMapOptions_markerIconSrc */
         markerIconSrc?: string;
-        /** A handler for the markerRemoved event. */
+        /** @docid dxMapOptions_onMarkerRemoved */
         onMarkerRemoved?: Function;
-        /** An array of markers displayed on a map. */
+        /** @docid dxMapOptions_markers */
         markers?: Array<dxMapMarker>;
-        /** The name of the current map data provider. */
+        /** @docid dxMapOptions_provider */
         provider?: string;
-        /** A handler for the ready event. */
+        /** @docid dxMapOptions_onReady */
         onReady?: Function;
-        /** A handler for the routeAdded event. */
+        /** @docid dxMapOptions_onRouteAdded */
         onRouteAdded?: Function;
-        /** A handler for the routeRemoved event. */
+        /** @docid dxMapOptions_onRouteRemoved */
         onRouteRemoved?: Function;
-        /** An array of routes shown on the map. */
+        /** @docid dxMapOptions_routes */
         routes?: Array<dxMapRoute>;
-        /** The type of a map to display. */
+        /** @docid dxMapOptions_type */
         type?: string;
-        /** Specifies the width of the widget. */
+        /** @docid dxMapOptions_width */
         width?: any;
-        /** The zoom level of the map. */
+        /** @docid dxMapOptions_zoom */
         zoom?: number;
     }
-    /** An interactive map widget. */
+    /** @docid dxmap */
     export class dxMap extends Widget {
         constructor(element: JQuery, options?: dxMapOptions);
         constructor(element: Element, options?: dxMapOptions);
-        /** Adds a marker to the map. */
+        /** @docid dxmapmethods_addmarker */
         addMarker(markerOptions: Object): JQueryPromise<Object>;
-        /** Adds a route to the map. */
+        /** @docid dxmapmethods_addroute */
         addRoute(routeOptions: Object): JQueryPromise<Object>;
-        /** Removes a marker from the map. */
+        /** @docid dxmapmethods_removemarker */
         removeMarker(marker: Object): JQueryPromise<void>;
-        /** Removes a route from the map. */
+        /** @docid dxmapmethods_removeroute */
         removeRoute(route: any): JQueryPromise<void>;
     }
     export interface dxLookupOptions extends dxDropDownListOptions {
+        /** @docid_ignore dxLookupOptions_onChange*/
+        /** @docid_ignore dxLookupOptions_onCopy*/
+        /** @docid_ignore dxLookupOptions_onCut*/
+        /** @docid_ignore dxLookupOptions_onEnterKey*/
+        /** @docid_ignore dxLookupOptions_onFocusIn*/
+        /** @docid_ignore dxLookupOptions_onFocusOut*/
+        /** @docid_ignore dxLookupOptions_onInput*/
+        /** @docid_ignore dxLookupOptions_onKeyDown*/
+        /** @docid_ignore dxLookupOptions_onKeyPress*/
+        /** @docid_ignore dxLookupOptions_onKeyUp*/
+        /** @docid_ignore dxLookupOptions_maxlength*/
+        /** @docid_ignore dxLookupOptions_showClearButton*/
+        /** @docid_ignore dxLookupOptions_onPaste*/
+        /** @docid_ignore dxLookupOptions_readOnly*/
+        /** @docid_ignore dxLookupOptions_pagingEnabled */
+        /** @docid_ignore dxLookupOptions_acceptCustomValue */
+        /** @docid_ignore dxLookupOptions_spellcheck */
+        /** @docid dxLookupOptions_applyValueMode */
         applyValueMode?: string;
-        /** An object that defines widget animation options. */
+        /** @docid dxLookupOptions_animation */
         animation?: {
-            /** An object that defines the animation options used when the widget is being shown. */
+            /** @docid dxLookupOptions_animation_show */
             show?: fx.AnimationOptions;
-            /** An object that defines the animation options used when the widget is being hidden. */
+            /** @docid dxLookupOptions_animation_hide */
             hide?: fx.AnimationOptions;
         };
-        /** The text displayed on the Cancel button. */
+        /** @docid dxLookupOptions_cancelButtonText */
         cancelButtonText?: string;
-        /** The text displayed on the Clear button. */
+        /** @docid dxLookupOptions_clearButtonText */
         clearButtonText?: string;
-        /** Specifies whether or not the widget cleans the search box when the popup window is displayed. */
+        /** @docid dxLookupOptions_cleanSearchOnOpening */
         cleanSearchOnOpening?: boolean;
-        /** A Boolean value specifying whether or not a widget is closed if a user clicks outside of the overlaying window. */
+        /** @docid dxLookupOptions_closeOnOutsideClick */
         closeOnOutsideClick?: any;
-        /** The text displayed on the Apply button. */
+        /** @docid dxLookupOptions_applyButtonText */
         applyButtonText?: string;
-        /** A Boolean value specifying whether or not to display the lookup in full-screen mode. */
+        /** @docid dxLookupOptions_fullScreen */
         fullScreen?: boolean;
+        /** @docid dxLookupOptions_focusStateEnabled */
         focusStateEnabled?: boolean;
-        /** A Boolean value specifying whether or not to group widget items. */
+        /** @docid dxLookupOptions_grouped */
         grouped?: boolean;
-        /** The name of the template used to display a group header. */
+        /** @docid dxLookupOptions_groupTemplate */
         groupTemplate?: any;
-        /** The text displayed on the button used to load the next page from the data source. */
+        /** @docid dxLookupOptions_nextButtonText */
         nextButtonText?: string;
-        /** A handler for the pageLoading event. */
+        /** @docid dxLookupOptions_onPageLoading */
         onPageLoading?: Function;
-        /** Specifies whether the next page is loaded when a user scrolls the widget to the bottom or when the "next" button is clicked. */
+        /** @docid dxLookupOptions_pageLoadMode */
         pageLoadMode?: string;
-        /** Specifies the text shown in the pullDown panel, which is displayed when the widget is scrolled to the bottom. */
+        /** @docid dxLookupOptions_pageLoadingText */
         pageLoadingText?: string;
-        /** The text displayed by the widget when nothing is selected. */
+        /** @docid dxLookupOptions_placeholder */
         placeholder?: string;
-        /** The height of the widget popup element. */
+        /** @docid dxLookupOptions_popupHeight */
         popupHeight?: any;
-        /** The width of the widget popup element. */
+        /** @docid dxLookupOptions_popupWidth */
         popupWidth?: any;
-        /** An object defining widget positioning options. */
+        /** @docid dxLookupOptions_position */
         position?: PositionOptions;
-        /** Specifies the text displayed in the pullDown panel when the widget is pulled below the refresh threshold. */
+        /** @docid dxLookupOptions_pulledDownText */
         pulledDownText?: string;
-        /** Specifies the text shown in the pullDown panel while the list is being pulled down to the refresh threshold. */
+        /** @docid dxLookupOptions_pullingDownText */
         pullingDownText?: string;
-        /** A handler for the pullRefresh event. */
+        /** @docid dxLookupOptions_onPullRefresh */
         onPullRefresh?: Function;
-        /** A Boolean value specifying whether or not the widget supports the "pull down to refresh" gesture. */
+        /** @docid dxLookupOptions_pullRefreshEnabled */
         pullRefreshEnabled?: boolean;
-        /** Specifies the text displayed in the pullDown panel while the widget is being refreshed. */
+        /** @docid dxLookupOptions_refreshingText */
         refreshingText?: string;
-        /** A handler for the scroll event. */
+        /** @docid dxLookupOptions_onScroll */
         onScroll?: Function;
-        /** A Boolean value specifying whether or not the search bar is visible. */
+        /** @docid dxLookupOptions_searchEnabled */
         searchEnabled?: boolean;
-        /** The text that is provided as a hint in the lookup's search bar. */
+        /** @docid dxLookupOptions_searchPlaceholder */
         searchPlaceholder?: string;
-        /** A Boolean value specifying whether or not the main screen is inactive while the lookup is active. */
+        /** @docid dxLookupOptions_shading */
         shading?: boolean;
-        /** Specifies whether to display the Cancel button in the lookup window. */
+        /** @docid dxLookupOptions_showCancelButton */
         showCancelButton?: boolean;
-        /**
-         * A Boolean value specifying whether the widget loads the next page automatically when you reach the bottom of the list or when a button is clicked.
-         * @deprecated Use the pageLoadMode option instead.
-         */
+        /** @docid dxLookupOptions_showNextButton */
         showNextButton?: boolean;
-        /** The title of the lookup window. */
+        /** @docid dxLookupOptions_title */
         title?: string;
-        /** A template to be used for rendering the widget title. */
+        /** @docid dxLookupOptions_titleTemplate */
         titleTemplate?: any;
-        /** Specifies whether or not the widget uses native scrolling. */
+        /** @docid dxLookupOptions_useNativeScrolling */
         useNativeScrolling?: boolean;
-        /** Specifies whether or not to show lookup contents in a dxPopover widget. */
+        /** @docid dxLookupOptions_usePopover */
         usePopover?: boolean;
-        /** A handler for the valueChanged event. */
+        /** @docid dxLookupOptions_onValueChanged */
         onValueChanged?: Function;
-        /** A handler for the titleRendered event. */
+        /** @docid dxLookupOptions_onTitleRendered */
         onTitleRendered?: Function;
-        /** A Boolean value specifying whether or not to display the title in the popup window. */
+        /** @docid dxLookupOptions_showPopupTitle */
         showPopupTitle?: boolean;
-        /** The template to be used for rendering the widget text field. */
+        /** @docid dxLookupOptions_fieldTemplate */
         fieldTemplate?: any;
     }
-    /** A widget that allows a user to select predefined values from a lookup window. */
+    /** @docid dxlookup */
     export class dxLookup extends dxDropDownList {
         constructor(element: JQuery, options?: dxLookupOptions);
         constructor(element: Element, options?: dxLookupOptions);
     }
     export interface dxLoadPanelOptions extends dxOverlayOptions {
-        /** An object defining the animation options of the widget. */
+        /** @docid_ignore dxLoadPanelOptions_closeOnBackButton */
+        /** @docid_ignore dxLoadPanelOptions_disabled */
+        /** @docid_ignore dxLoadPanelOptions_dragEnabled */
+        /** @docid_ignore dxLoadPanelOptions_resizeEnabled */
+        /** @docid_ignore dxLoadPanelOptions_contentTemplate */
+        /** @docid_ignore dxLoadPanelOptions_accessKey */
+        /** @docid_ignore dxLoadPanelOptions_tabIndex */
+        /** @docid_ignore dxLoadPanelOptions_shadingColor */
+        /** @docid dxLoadPanelOptions_animation */
         animation?: fx.AnimationOptions;
-        /** The delay in milliseconds after which the load panel is displayed. */
+        /** @docid dxLoadPanelOptions_delay */
         delay?: number;
-        /** The height of the widget. */
+        /** @docid dxLoadPanelOptions_height */
         height?: number;
-        /** A URL pointing to an image to be used as a load indicator. */
+        /** @docid dxLoadPanelOptions_indicatorSrc */
         indicatorSrc?: string;
-        /** The text displayed in the load panel. */
+        /** @docid dxLoadPanelOptions_message */
         message?: string;
-        /** A Boolean value specifying whether or not to show a load indicator. */
+        /** @docid dxLoadPanelOptions_showIndicator */
         showIndicator?: boolean;
-        /** A Boolean value specifying whether or not to show the pane behind the load indicator. */
+        /** @docid dxLoadPanelOptions_showPane */
         showPane?: boolean;
-        /** The width of the widget. */
+        /** @docid dxLoadPanelOptions_width */
         width?: number;
-        /** Specifies whether or not the widget can be focused. */
+        /** @docid dxLoadPanelOptions_focusStateEnabled */
         focusStateEnabled?: boolean;
     }
-    /** A widget used to indicate whether or not an element is loading. */
+    /** @docid dxLoadPanel */
     export class dxLoadPanel extends dxOverlay {
         constructor(element: JQuery, options?: dxLoadPanelOptions);
         constructor(element: Element, options?: dxLoadPanelOptions);
+        /** @docid_ignore dxLoadPanelMethods_registerKeyHandler */
+        /** @docid_ignore dxLoadPanelMethods_focus */
     }
     export interface dxLoadIndicatorOptions extends WidgetOptions {
-        /** Specifies the path to an image used as the indicator. */
+        /** @docid_ignore dxLoadIndicatoroptions_disabled */
+        /** @docid_ignore dxLoadIndicatoroptions_hoverStateEnabled */
+        /** @docid_ignore dxLoadIndicatoroptions_activeStateEnabled */
+        /** @docid_ignore dxLoadIndicatoroptions_focusStateEnabled */
+        /** @docid_ignore dxLoadIndicatoroptions_accessKey */
+        /** @docid_ignore dxLoadIndicatoroptions_tabIndex */
+        /** @docid dxLoadIndicatoroptions_indicatorsrc */
         indicatorSrc?: string;
     }
-    /** The widget used to indicate the loading process. */
+    /** @docid dxLoadIndicator */
     export class dxLoadIndicator extends Widget {
         constructor(element: JQuery, options?: dxLoadIndicatorOptions);
         constructor(element: Element, options?: dxLoadIndicatorOptions);
+        /** @docid_ignore dxLoadIndicatorMethods_registerKeyHandler */
+        /** @docid_ignore dxLoadIndicatorMethods_focus */
     }
     export interface ListOptionsMenuItem {
-        /** Specifies the menu item text. */
+        /** @docid dxListOptions_menuItems_text */
         text?: string;
-        /** Holds on a function called when the item is clicked. */
+        /** @docid dxListOptions_menuItems_action */
         action?: (itemElement: Element, itemData: any) => void;
     }
     export interface dxListOptions extends CollectionWidgetOptions {
-        /** A Boolean value specifying whether or not to display a grouped list. */
+        /** @docid_ignore dxListOptions_selectedIndex */
+        /** @docid_ignore dxListOptions_selectedItem */
+        /** @docid_ignore dxListOptions_focusStateEnabled */
+        /** @docid_ignore dxListOptions_autoPagingEnabled */
+        /** @docid_ignore dxListOptions_showNextButton */
+        /** @docid_ignore dxListOptions_hoverStateEnabled */
+        /** @docid dxListOptions_grouped */
         grouped?: boolean;
-        /** The template to be used for rendering item groups. */
+        /** @docid dxListOptions_groupTemplate */
         groupTemplate?: any;
+        /** @docid dxListOptions_onItemDeleting */
         onItemDeleting?: Function;
-        /** A handler for the itemDeleted event. */
+        /** @docid dxListOptions_onItemDeleted */
         onItemDeleted?: Function;
-        /** A handler for the groupRendered event. */
+        /** @docid dxListOptions_onGroupRendered */
         onGroupRendered?: Function;
-        /** A handler for the itemReordered event. */
+        /** @docid dxListOptions_onItemReordered */
         onItemReordered?: Function;
-        /** A handler for the itemClick event. */
+        /** @docid dxListOptions_onItemClick */
         onItemClick?: any;
-        /** A handler for the itemSwipe event. */
+        /** @docid dxListOptions_onItemSwipe */
         onItemSwipe?: Function;
-        /** The text displayed on the button used to load the next page from the data source. */
+        /** @docid dxListOptions_nextButtonText */
         nextButtonText?: string;
-        /** A handler for the pageLoading event. */
+        /** @docid dxListOptions_onPageLoading */
         onPageLoading?: Function;
-        /** Specifies the text shown in the pullDown panel, which is displayed when the list is scrolled to the bottom. */
+        /** @docid dxListOptions_pageLoadingText */
         pageLoadingText?: string;
-        /** Specifies the text displayed in the pullDown panel when the list is pulled below the refresh threshold. */
+        /** @docid dxListOptions_pulledDownText */
         pulledDownText?: string;
-        /** Specifies the text shown in the pullDown panel while the list is being pulled down to the refresh threshold. */
+        /** @docid dxListOptions_pullingDownText */
         pullingDownText?: string;
-        /** A handler for the pullRefresh event. */
+        /** @docid dxListOptions_onPullRefresh */
         onPullRefresh?: Function;
-        /** A Boolean value specifying whether or not the widget supports the "pull down to refresh" gesture. */
+        /** @docid dxListOptions_pullRefreshEnabled */
         pullRefreshEnabled?: boolean;
-        /** Specifies the text displayed in the pullDown panel while the list is being refreshed. */
+        /** @docid dxListOptions_refreshingText */
         refreshingText?: string;
-        /** A handler for the scroll event. */
+        /** @docid dxListOptions_onScroll */
         onScroll?: Function;
-        /** A Boolean value specifying whether to enable or disable list scrolling. */
+        /** @docid dxListOptions_scrollingEnabled */
         scrollingEnabled?: boolean;
-        /** Specifies when the widget shows the scrollbar. */
+        /** @docid dxListOptions_showScrollbar */
         showScrollbar?: string;
-        /** Specifies whether or not the widget uses native scrolling. */
+        /** @docid dxListOptions_useNativeScrolling */
         useNativeScrolling?: boolean;
-        /** A Boolean value specifying whether to enable or disable the bounce-back effect. */
+        /** @docid dxListOptions_bounceEnabled */
         bounceEnabled?: boolean;
-        /** A Boolean value specifying if the list is scrolled by content. */
+        /** @docid dxListOptions_scrollByContent */
         scrollByContent?: boolean;
-        /** A Boolean value specifying if the list is scrolled using the scrollbar. */
+        /** @docid dxListOptions_scrollByThumb */
         scrollByThumb?: boolean;
+        /** @docid dxListOptions_onItemContextMenu */
         onItemContextMenu?: Function;
+        /** @docid dxListOptions_onItemHold */
         onItemHold?: Function;
-        /** Specifies whether or not an end-user can collapse groups. */
+        /** @docid dxListOptions_collapsibleGroups */
         collapsibleGroups?: boolean;
-        /** Specifies whether the next page is loaded when a user scrolls the widget to the bottom or when the "next" button is clicked. */
+        /** @docid dxListOptions_pageLoadMode */
         pageLoadMode?: string;
-        /** Specifies whether or not to display controls used to select list items. */
+        /** @docid dxListOptions_showSelectionControls */
         showSelectionControls?: boolean;
-        /** Specifies item selection mode. */
+        /** @docid dxListOptions_selectionMode */
         selectionMode?: string;
+        /** @docid dxListOptions_selectAllText */
         selectAllText?: string;
-        /** A handler for the selectAllValueChanged event. */
+        /** @docid dxListOptions_onSelectAllValueChanged */
         onSelectAllValueChanged?: Function;
-        /** Specifies the array of items for a context menu called for a list item. */
+        /** @docid dxListOptions_menuItems */
         menuItems?: Array<ListOptionsMenuItem>;
-        /** Specifies whether an item context menu is shown when a user holds or swipes an item. */
+        /** @docid dxListOptions_menuMode */
         menuMode?: string;
-        /** Specifies whether or not an end user can delete list items. */
+        /** @docid dxListOptions_allowItemDeleting */
         allowItemDeleting?: boolean;
-        /** Specifies the way a user can delete items from the list. */
+        /** @docid dxListOptions_itemDeleteMode */
         itemDeleteMode?: string;
-        /** Specifies whether or not an end user can reorder list items. */
+        /** @docid dxListOptions_allowItemReordering */
         allowItemReordering?: boolean;
-        /** Specifies whether or not to show the loading panel when the DataSource bound to the widget is loading data. */
+        /** @docid dxListOptions_indicateLoading */
         indicateLoading?: boolean;
+        /** @docid dxListOptions_activeStateEnabled */
         activeStateEnabled?: boolean;
     }
-    /** A list widget. */
+    /** @docid dxList */
     export class dxList extends CollectionWidget {
         constructor(element: JQuery, options?: dxListOptions);
         constructor(element: Element, options?: dxListOptions);
-        /** Returns the height of the widget in pixels. */
+        /** @docid_ignore dxListItemTemplate_key */
+        /** @docid_ignore dxListItemTemplate_badge */
+        /** @docid_ignore dxListItemTemplate_showChevron */
+        /** @docid_ignore dxListMethods_getFlatIndexByItemElement */
+        /** @docid_ignore dxListMethods_getItemByIndex */
+        /** @docid_ignore dxListMethods_getItemElementByFlatIndex */
+        /** @docid dxListMethods_clientHeight */
         clientHeight(): number;
-        /** Removes the specified item from the list. */
+        /** @docid dxListMethods_deleteItem#deleteItem(itemIndex) */
         deleteItem(itemIndex: any): JQueryPromise<void>;
-        /** Removes the specified item from the list. */
+        /** @docid dxListMethods_deleteItem#deleteItem(itemElement) */
         deleteItem(itemElement: Element): JQueryPromise<void>;
-        /** Returns a Boolean value that indicates whether or not the specified item is selected. */
+        /** @docid dxListMethods_isItemSelected#isItemSelected(itemIndex) */
         isItemSelected(itemIndex: any): boolean;
-        /** Returns a Boolean value that indicates whether or not the specified item is selected. */
+        /** @docid dxListMethods_isItemSelected#isItemSelected(itemElement) */
         isItemSelected(itemElement: Element): boolean;
-        /** Reloads list data. */
+        /** @docid dxListMethods_reload */
         reload(): void;
-        /** Moves the specified item to the specified position in the list. */
+        /** @docid dxListMethods_reorderItem#reorderItem(itemElement,toItemElement) */
         reorderItem(itemElement: Element, toItemElement: Element): JQueryPromise<void>;
-        /** Moves the specified item to the specified position in the list. */
+        /** @docid dxListMethods_reorderItem#reorderItem(itemIndex,toItemIndex) */
         reorderItem(itemIndex: any, toItemIndex: any): JQueryPromise<void>;
-        /** Scrolls the list content by the specified number of pixels. */
+        /** @docid dxListMethods_scrollBy */
         scrollBy(distance: number): void;
-        /** Returns the height of the list content in pixels. */
+        /** @docid dxListMethods_scrollHeight */
         scrollHeight(): number;
-        /** Scrolls list content to the specified position. */
+        /** @docid dxListMethods_scrollTo */
         scrollTo(location: number): void;
-        /** Scrolls the list to the specified item. */
+        /** @docid dxListMethods_scrollToItem#scrollToItem(itemElement) */
         scrollToItem(itemElement: Element): void;
-        /** Scrolls the list to the specified item. */
+        /** @docid dxListMethods_scrollToItem#scrollToItem(itemIndex) */
         scrollToItem(itemIndex: any): void;
-        /** Returns how far the list content is scrolled from the top. */
+        /** @docid dxListMethods_scrollTop */
         scrollTop(): number;
-        /** Selects the specified item from the list. */
+        /** @docid dxListMethods_selectItem#selectItem(itemElement) */
         selectItem(itemElement: Element): void;
-        /** Selects the specified item from the list. */
+        /** @docid dxListMethods_selectItem#selectItem(itemIndex) */
         selectItem(itemIndex: any): void;
-        /** Deselects the specified item from the list. */
+        /** @docid dxListMethods_unselectItem#unselectItem(itemElement) */
         unselectItem(itemElement: Element): void;
-        /** Unselects the specified item from the list. */
+        /** @docid dxListMethods_unselectItem#unselectItem(itemIndex) */
         unselectItem(itemIndex: any): void;
-        /** Updates the widget scrollbar according to widget content size. */
+        /** @docid dxListMethods_updateDimensions */
         updateDimensions(): JQueryPromise<void>;
-        /** Expands the specified group. */
+        /** @docid dxListMethods_expandGroup */
         expandGroup(groupIndex: number): JQueryPromise<void>;
-        /** Collapses the specified group. */
+        /** @docid dxListMethods_collapseGroup */
         collapseGroup(groupIndex: number): JQueryPromise<void>;
     }
     export interface dxGalleryOptions extends CollectionWidgetOptions {
-        /** The time, in milliseconds, spent on slide animation. */
+        /** @docid_ignore dxGalleryOptions_activeStateEnabled */
+        /** @docid_ignore dxGalleryOptions_focusStateEnabled */
+        /** @docid_ignore dxGalleryOptions_noDataText */
+        /** @docid_ignore dxGalleryOptions_selectedItems */
+        /** @docid dxGalleryOptions_animationDuration */
         animationDuration?: number;
-        /** Specifies whether or not to animate the displayed item change. */
+        /** @docid dxGalleryOptions_animationEnabled */
         animationEnabled?: boolean;
-        /** A Boolean value specifying whether or not to allow users to switch between items by clicking an indicator. */
+        /** @docid dxGalleryOptions_indicatorEnabled */
         indicatorEnabled?: boolean;
-        /** A Boolean value specifying whether or not to scroll back to the first item after the last item is swiped. */
+        /** @docid dxGalleryOptions_loop */
         loop?: boolean;
-        /** The index of the currently active gallery item. */
+        /** @docid dxGalleryOptions_selectedindex */
         selectedIndex?: number;
-        /** A Boolean value specifying whether or not to display an indicator that points to the selected gallery item. */
+        /** @docid dxGalleryOptions_showIndicator */
         showIndicator?: boolean;
-        /** A Boolean value that specifies the availability of the "Forward" and "Back" navigation buttons. */
+        /** @docid dxGalleryOptions_showNavButtons */
         showNavButtons?: boolean;
-        /** The time interval in milliseconds, after which the gallery switches to the next item. */
+        /** @docid dxGalleryOptions_slideshowdelay */
         slideshowDelay?: number;
-        /** A Boolean value specifying whether or not to allow users to switch between items by swiping. */
+        /** @docid dxGalleryOptions_swipeEnabled */
         swipeEnabled?: boolean;
-        /** Specifies whether or not to display parts of previous and next images along the sides of the current image. */
+        /** @docid dxGalleryOptions_wrapAround */
         wrapAround?: boolean;
-        /** Specifies if the widget stretches images to fit the total gallery width. */
+        /** @docid dxGalleryOptions_stretchImages */
         stretchImages?: boolean;
-        /** Specifies the width of an area used to display a single image. */
+        /** @docid dxGalleryOptions_initialItemWidth */
         initialItemWidth?: number;
     }
-    /** An image gallery widget. */
+    /** @docid dxgallery */
     export class dxGallery extends CollectionWidget {
         constructor(element: JQuery, options?: dxGalleryOptions);
         constructor(element: Element, options?: dxGalleryOptions);
-        /** Shows the specified gallery item. */
+        /** @docid_ignore dxGalleryItemTemplate_imageSrc */
+        /** @docid_ignore dxGalleryItemTemplate_imageAlt */
+        /** @docid_ignore dxGalleryItemTemplate_visible */
+        /** @docid dxgallerymethods_goToItem */
         goToItem(itemIndex: number, animation: boolean): JQueryPromise<any>;
-        /** Shows the next gallery item. */
+        /** @docid dxgallerymethods_nextItem */
         nextItem(animation: boolean): JQueryPromise<any>;
-        /** Shows the previous gallery item. */
+        /** @docid dxgallerymethods_prevItem */
         prevItem(animation: boolean): JQueryPromise<any>;
     }
     export interface dxDropDownEditorOptions extends dxTextBoxOptions {
-        /** Specifies the current value displayed by the widget. */
+        /** @docid_ignore dxDropDownEditorOptions_mask */
+        /** @docid_ignore dxDropDownEditorOptions_maskChar */
+        /** @docid_ignore dxDropDownEditorOptions_maskRules */
+        /** @docid_ignore dxDropDownEditorOptions_maskInvalidMessage */
+        /** @docid_ignore dxDropDownEditorOptions_useMaskedValue */
+        /** @docid_ignore dxDropDownEditorOptions_mode */
+        /** @docid dxDropDownEditorOptions_value */
         value?: Object;
-        /** A handler for the closed event. */
+        /** @docid dxDropDownEditorOptions_onClosed */
         onClosed?: Function;
-        /** A handler for the opened event. */
+        /** @docid dxDropDownEditorOptions_onOpened */
         onOpened?: Function;
-        /** Specifies whether or not the drop-down editor is displayed. */
+        /** @docid dxDropDownEditorOptions_opened */
         opened?: boolean;
+        /** @docid dxDropDownEditorOptions_fieldEditEnabled */
         fieldEditEnabled?: boolean;
-        /** Specifies whether or not the widget allows an end-user to enter a custom value. */
+        /** @docid dxDropDownEditorOptions_acceptCustomValue */
         acceptCustomValue?: boolean;
-        /** Specifies the way an end-user applies the selected value. */
+        /** @docid dxDropDownEditorOptions_applyValueMode */
         applyValueMode?: string;
-        /** Specifies whether widget content is rendered when the widget is shown or when rendering the widget. */
+        /** @docid dxDropDownEditorOptions_deferRendering */
         deferRendering?: boolean;
+        /** @docid dxDropDownEditorOptions_activeStateEnabled */
         activeStateEnabled?: boolean;
     }
-    /** A drop-down editor widget. */
+    /** @docid dxDropDownEditor */
     export class dxDropDownEditor extends dxTextBox {
         constructor(element: JQuery, options?: dxDropDownEditorOptions);
         constructor(element: Element, options?: dxDropDownEditorOptions);
-        /** Closes the drop-down editor. */
+        /** @docid dxDropDownEditorMethods_close */
         close(): void;
-        /** Opens the drop-down editor. */
+        /** @docid dxDropDownEditorMethods_open */
         open(): void;
-        /** Resets the widget's value to null. */
+        /** @docid dxDropDownEditorMethods_reset */
         reset(): void;
-        /** Returns an &lt;input&gt; element of the widget. */
+        /** @docid dxDropDownEditorMethods_field */
         field(): JQuery;
-        /** Returns an HTML element of the popup window content. */
+        /** @docid dxDropDownEditorMethods_content */
         content(): JQuery;
     }
     export interface dxDateBoxOptions extends dxTextEditorOptions {
+        /** @docid dxDateBoxOptions_formatString */
         formatString?: any;
-        /** Specifies the date display format. Applies only if the pickerType option is 'native' */
+        /** @docid dxDateBoxOptions_displayFormat */
         displayFormat?: any;
+        /** @docid dxDateBoxOptions_format */
         format?: string;
-        /** A format used to display date/time information. */
+        /** @docid dxDateBoxOptions_type */
         type?: string;
-        /** The last date that can be selected within the widget. */
+        /** @docid dxDateBoxOptions_max */
         max?: any;
-        /** The minimum date that can be selected within the widget. */
+        /** @docid dxDateBoxOptions_min */
         min?: any;
-        /** The text displayed by the widget when the widget value is not yet specified. This text is also used as a title of the date picker. */
+        /** @docid dxDateBoxOptions_placeholder */
         placeholder?: string;
-        /**
-         * Specifies whether or not a user can pick out a date using the drop-down calendar.
-         * @deprecated Use the pickerType option instead.
-         */
+        /** @docid dxDateBoxOptions_useCalendar */
         useCalendar?: boolean;
-        /** An object or a value, specifying the date and time currently selected using the date box. */
+        /** @docid dxDateBoxOptions_value */
         value?: any;
-        /**
-         * Specifies whether or not the widget uses the native HTML input element.
-         * @deprecated Use the pickerType option instead.
-         */
+        /** @docid dxDateBoxOptions_useNative */
         useNative?: boolean;
-        /** Specifies the interval between neighboring values in the popup list in minutes. */
+        /** @docid dxDateBoxOptions_interval */
         interval?: number;
-        /** Specifies the maximum zoom level of a calendar, which is used to pick the date. */
+        /** @docid dxDateBoxOptions_maxZoomLevel */
         maxZoomLevel?: string;
-        /** Specifies the minimal zoom level of a calendar, which is used to pick the date. */
+        /** @docid dxDateBoxOptions_minZoomLevel */
         minZoomLevel?: string;
-        /** Specifies the type of date/time picker. */
+        /** @docid dxDateBoxOptions_pickerType */
         pickerType?: string;
-        /** Specifies the message displayed if the typed value is not a valid date or time. */
+        /** @docid dxDateBoxOptions_invalidDateMessage */
         invalidDateMessage?: string;
-        /** Specifies the message displayed if the specified date is later than the max value or earlier than the min value. */
+        /** @docid dxDateBoxOptions_dateOutOfRangeMessage */
         dateOutOfRangeMessage?: string;
-        /** The text displayed on the Apply button. */
+        /** @docid dxDateBoxOptions_applyButtonText */
         applyButtonText?: string;
-        /** Specifies whether or not adaptive widget rendering is enabled on a small screen. */
+        /** @docid dxDateBoxOptions_adaptivityEnabled */
         adaptivityEnabled?: boolean;
-        /** The text displayed on the Cancel button. */
+        /** @docid dxDateBoxOptions_cancelButtonText */
         cancelButtonText?: string;
     }
-    /** A date box widget. */
+    /** @docid dxDateBox */
     export class dxDateBox extends dxDropDownEditor {
+        /** @docid_ignore dxDateBoxMethods_open */
+        /** @docid_ignore dxDateBoxMethods_close */
         constructor(element: JQuery, options?: dxDateBoxOptions);
         constructor(element: Element, options?: dxDateBoxOptions);
     }
     export interface dxCheckBoxOptions extends EditorOptions {
+        /** @docid_ignore dxCheckBoxOptions_hoverStateEnabled */
+        /** @docid_ignore dxCheckBoxOptions_focusStateEnabled */
+        /** @docid dxCheckBoxOptions_activeStateEnabled */
         activeStateEnabled?: boolean;
-        /** Specifies the widget state. */
+        /** @docid dxCheckBoxOptions_value */
         value?: boolean;
-        /** Specifies the text displayed by the check box. */
+        /** @docid dxCheckBoxOptions_text */
         text?: string;
+        /** @docid dxCheckBoxOptions_name */
+        name?: string;
     }
-    /** A check box widget. */
+    /** @docid dxcheckbox */
     export class dxCheckBox extends Editor {
         constructor(element: JQuery, options?: dxCheckBoxOptions);
         constructor(element: Element, options?: dxCheckBoxOptions);
     }
     export interface dxCalendarOptions extends EditorOptions {
+        /** @docid_ignore dxCalendarOptions_hoverStateEnabled */
+        /** @docid_ignore dxCalendarOptions_focusStateEnabled */
+        /** @docid_ignore dxCalendarCellTemplate_text */
+        /** @docid_ignore dxCalendarCellTemplate_date */
+        /** @docid_ignore dxCalendarCellTemplate_view */
+        /** @docid dxCalendarOptions_activeStateEnabled */
         activeStateEnabled?: boolean;
-        /** Specifies a date displayed on the current calendar page. */
+        /** @docid dxCalendarOptions_currentDate */
         currentDate?: Date;
-        /** Specifies the first day of a week. */
+        /** @docid dxCalendarOptions_firstDayOfWeek */
         firstDayOfWeek?: number;
-        /** An object or a value, specifying the date and time currently selected in the calendar. */
+        /** @docid dxCalendarOptions_value */
         value?: any;
-        /** The latest date the widget allows to select. */
+        /** @docid dxCalendarOptions_max */
         max?: any;
-        /** The earliest date the widget allows to select. */
+        /** @docid dxCalendarOptions_min */
         min?: any;
-        /** Specifies whether or not the widget displays a button that selects the current date. */
+        /** @docid dxCalendarOptions_showTodayButton */
         showTodayButton?: boolean;
-        /** Specifies the current calendar zoom level. */
+        /** @docid dxCalendarOptions_zoomLevel */
         zoomLevel?: string;
-        /** Specifies the maximum zoom level of the calendar. */
+        /** @docid dxCalendarOptions_maxZoomLevel */
         maxZoomLevel?: string;
-        /** Specifies the minimum zoom level of the calendar. */
+        /** @docid dxCalendarOptions_minZoomLevel */
         minZoomLevel?: string;
-        /** The template to be used for rendering calendar cells. */
+        /** @docid dxCalendarOptions_cellTemplate */
         cellTemplate?: any;
+        /** @docid dxCalendarOptions_name */
+        name?: string;
     }
-    /** A calendar widget. */
+    /** @docid dxCalendar */
     export class dxCalendar extends Editor {
         constructor(element: JQuery, options?: dxCalendarOptions);
         constructor(element: Element, options?: dxCalendarOptions);
     }
     export interface dxButtonOptions extends WidgetOptions {
-        /** A Boolean value specifying whether or not the widget changes its state when interacting with a user. */
+        /** @docid_ignore dxButtonDefaultTemplate_text */
+        /** @docid_ignore dxButtonDefaultTemplate_icon */
+        /** @docid_ignore dxButtonOptions_hoverStateEnabled */
+        /** @docid_ignore dxButtonOptions_focusStateEnabled  */
+        /** @docid dxButtonOptions_activeStateEnabled */
         activeStateEnabled?: boolean;
-        /** A handler for the click event. */
+        /** @docid dxButtonOptions_onClick */
         onClick?: any;
-        /** Specifies the icon to be displayed on the button. */
+        /** @docid dxButtonOptions_icon */
         icon?: string;
+        /** @docid dxbuttonoptions_iconSrc */
         iconSrc?: string;
-        /** A template to be used for rendering the dxButton widget. */
+        /** @docid dxButtonOptions_template */
         template?: any;
-        /** The text displayed on the button. */
+        /** @docid dxButtonOptions_text */
         text?: string;
-        /** Specifies the button type. */
+        /** @docid dxButtonOptions_type */
         type?: string;
-        /** Specifies the name of the validation group to be accessed in the click event handler. */
+        /** @docid dxButtonOptions_validationgroup */
         validationGroup?: string;
+        /** @docid dxButtonOptions_useSubmitBehavior */
+        useSubmitBehavior?: boolean;
     }
-    /** A button widget. */
+    /** @docid dxbutton */
     export class dxButton extends Widget {
         constructor(element: JQuery, options?: dxButtonOptions);
         constructor(element: Element, options?: dxButtonOptions);
     }
     export interface dxBoxOptions extends CollectionWidgetOptions {
-        /** Specifies how widget items are aligned along the main direction. */
+        /** @docid_ignore dxBoxOptions_focusStateEnabled */
+        /** @docid_ignore dxBoxOptions_activeStateEnabled */
+        /** @docid_ignore dxBoxOptions_hint */
+        /** @docid_ignore dxBoxOptions_noDataText */
+        /** @docid_ignore dxBoxOptions_onSelectionChanged */
+        /** @docid_ignore dxBoxOptions_selectedIndex */
+        /** @docid_ignore dxBoxOptions_selectedItem */
+        /** @docid_ignore dxBoxOptions_selectedItems */
+        /** @docid_ignore dxBoxOptions_tabIndex */
+        /** @docid_ignore dxBoxOptions_accessKey */
+        /** @docid dxBoxOptions_align */
         align?: string;
-        /** Specifies the direction of item positioning in the widget. */
+        /** @docid dxBoxOptions_direction */
         direction?: string;
-        /** Specifies how widget items are aligned cross-wise. */
+        /** @docid dxBoxOptions_crossAlign */
         crossAlign?: string;
+        /** @docid_ignore dxBoxItemTemplate_ratio */
+        /** @docid_ignore dxBoxItemTemplate_baseSize */
+        /** @docid_ignore dxBoxItemTemplate_box */
     }
-    /** A container widget used to arrange inner elements. */
+    /** @docid dxBox */
     export class dxBox extends CollectionWidget {
         constructor(element: JQuery, options?: dxBoxOptions);
         constructor(element: Element, options?: dxBoxOptions);
+        /** @docid_ignore dxBoxMethods_registerKeyHandler */
+        /** @docid_ignore dxBoxMethods_focus */
     }
     export interface dxResponsiveBoxOptions extends CollectionWidgetOptions {
-        /** Specifies the collection of rows for the grid used to position layout elements. */
+        /** @docid_ignore dxResponsiveBoxOptions_activeStateEnabled */
+        /** @docid_ignore dxResponsiveBoxOptions_focusStateEnabled */
+        /** @docid_ignore dxResponsiveBoxOptions_hint */
+        /** @docid_ignore dxResponsiveBoxOptions_noDataText */
+        /** @docid_ignore dxResponsiveBoxOptions_onSelectionChanged */
+        /** @docid_ignore dxResponsiveBoxOptions_selectedIndex */
+        /** @docid_ignore dxResponsiveBoxOptions_selectedItem */
+        /** @docid_ignore dxResponsiveBoxOptions_selectedItems */
+        /** @docid_ignore dxResponsiveBoxOptions_tabIndex */
+        /** @docid_ignore dxResponsiveBoxOptions_width */
+        /** @docid_ignore dxResponsiveBoxOptions_height */
+        /** @docid_ignore dxResponsiveBoxOptions_accessKey */
+        /** @docid dxResponsiveBoxOptions_rows */
         rows?: Array<Object>;
-        /** Specifies the collection of columns for the grid used to position layout elements. */
+        /** @docid dxResponsiveBoxOptions_cols */
         cols?: Array<Object>;
-        /** Specifies the function returning the screen factor depending on the screen width. */
+        /** @docid dxResponsiveBoxOptions_screenByWidth */
         screenByWidth?: (width: number) => string;
-        /** Specifies the screen factor with which all elements are located in a single column. */
+        /** @docid dxResponsiveBoxOptions_singleColumnScreen */
         singleColumnScreen?: string;
+        /** @docid_ignore dxResponsiveBoxItemTemplate_location */
+        /** @docid_ignore dxResponsiveBoxItemTemplate_location_colspan */
+        /** @docid_ignore dxResponsiveBoxItemTemplate_location_row */
+        /** @docid_ignore dxResponsiveBoxItemTemplate_location_col */
+        /** @docid_ignore dxResponsiveBoxItemTemplate_location_rowspan */
+        /** @docid_ignore dxResponsiveBoxItemTemplate_location_screen */
+        /** @docid_ignore dxResponsiveBoxOptions_cols_baseSize */
+        /** @docid_ignore dxResponsiveBoxOptions_cols_ratio */
+        /** @docid_ignore dxResponsiveBoxOptions_cols_screen */
+        /** @docid_ignore dxResponsiveBoxOptions_rows_baseSize */
+        /** @docid_ignore dxResponsiveBoxOptions_rows_ratio */
+        /** @docid_ignore dxResponsiveBoxOptions_rows_screen */
     }
-    /** A widget used to build an adaptive markup that is dependent on screen resolution. */
+    /** @docid dxResponsiveBox */
     export class dxResponsiveBox extends CollectionWidget {
         constructor(element: JQuery, options?: dxBoxOptions);
         constructor(element: Element, options?: dxBoxOptions);
+        /** @docid_ignore dxResponsiveBoxMethods_registerKeyHandler */
+        /** @docid_ignore dxResponsiveBoxMethods_focus */
     }
     export interface dxAutocompleteOptions extends dxDropDownListOptions {
-        /** Specifies the current value displayed by the widget. */
+        /** @docid_ignore dxAutocompleteOptions_searchEnabled */
+        /** @docid_ignore dxAutocompleteOptions_fieldEditEnabled */
+        /** @docid_ignore dxAutocompleteOptions_acceptCustomValue */
+        /** @docid_ignore dxAutocompleteOptions_noDataText */
+        /** @docid_ignore dxAutocompleteOptions_showDataBeforeSearch */
+        /** @docid_ignore dxAutocompleteOptions_displayExpr */
+        /** @docid dxAutocompleteOptions_value */
         value?: string;
-        /** The minimum number of characters that must be entered into the text box to begin a search. */
+        /** @docid dxAutocompleteOptions_minSearchLength */
         minSearchLength?: number;
-        /** Specifies the maximum count of items displayed by the widget. */
+        /** @docid dxAutocompleteOptions_maxItemCount */
         maxItemCount?: number;
-        /** Gets the currently selected item. */
+        /** @docid dxDropDownListOptions_selectedItem */
         selectedItem?: Object;
     }
-    /** A textbox widget that supports autocompletion. */
+    /** @docid dxAutocomplete */
     export class dxAutocomplete extends dxDropDownList {
         constructor(element: JQuery, options?: dxAutocompleteOptions);
         constructor(element: Element, options?: dxAutocompleteOptions);
-        /** Opens the drop-down editor. */
+        /** @docid_ignore dxAutocompleteOptions_pagingEnabled */
+        /** @docid dxAutocompletemethods_open */
         open(): void;
-        /** Closes the drop-down editor. */
+        /** @docid dxAutocompletemethods_close */
         close(): void;
     }
     export interface dxAccordionOptions extends CollectionWidgetOptions {
-        /** A number specifying the time in milliseconds spent on the animation of the expanding or collapsing of a panel. */
+        /** @docid_ignore dxAccordionItemTemplate_title */
+        /** @docid_ignore dxAccordionOptions_hoverStateEnabled */
+        /** @docid_ignore dxAccordionOptions_focusStateEnabled */
+        /** @docid dxAccordionOptions_animationDuration */
         animationDuration?: number;
-        /** Specifies the height of the widget. */
+        /** @docid dxAccordionOptions_height */
         height?: any;
-        /** Specifies whether all items can be collapsed or whether at least one item must always be expanded. */
+        /** @docid dxAccordionOptions_collapsible */
         collapsible?: boolean;
-        /** Specifies whether the widget can expand several items or only a single item at once. */
+        /** @docid dxAccordionOptions_multiple */
         multiple?: boolean;
-        /** The template to be used for rendering dxAccordion items. */
+        /** @docid dxAccordionOptions_itemTemplate */
         itemTemplate?: any;
-        /** A handler for the itemTitleClick event. */
+        /** @docid dxAccordionOptions_onItemTitleClick */
         onItemTitleClick?: any;
-        /** The template to be used for rendering an item title. */
+        /** @docid dxAccordionOptions_itemTitleTemplate */
         itemTitleTemplate?: any;
-        /** The index number of the currently selected item. */
+        /** @docid dxAccordionOptions_selectedIndex */
         selectedIndex?: number;
-        /** Specifies whether widget content is rendered when the widget is shown or when rendering the widget. */
+        /** @docid dxAccordionOptions_deferRendering */
         deferRendering?: boolean;
     }
-    /** A widget that displays data source items on collapsible panels. */
+    /** @docid dxAccordion */
     export class dxAccordion extends CollectionWidget {
         constructor(element: JQuery, options?: dxAccordionOptions);
         constructor(element: Element, options?: dxAccordionOptions);
-        /** Collapses the specified item. */
+        /** @docid_ignore dxAccordionItemTemplate_icon */
+        /** @docid_ignore dxAccordionItemTemplate_iconSrc */
+        /** @docid_ignore dxAccordionEvents_ItemTitleClick */
+        /** @docid dxAccordionMethods_collapseItem */
         collapseItem(index: number): JQueryPromise<dxAccordion>;
-        /** Expands the specified item. */
+        /** @docid dxAccordionMethods_expandItem */
         expandItem(index: number): JQueryPromise<dxAccordion>;
-        /** Updates the dimensions of the widget contents. */
+        /** @docid dxAccordionMethods_updateDimensions */
         updateDimensions(): JQueryPromise<dxAccordion>;
     }
     export interface dxFileUploaderOptions extends EditorOptions {
-        /** A read-only option that holds a File instance representing the selected file. */
+        /** @docid_ignore dxFileUploaderOptions_focusStateEnabled */
+        /** @docid_ignore dxFileUploaderOptions_validationMessageMode */
+        /** @docid_ignore dxFileUploaderOptions_extendSelection */
+        /** @docid dxFileUploaderOptions_value */
         value?: Array<File>;
+        /** @docid dxFileUploaderOptions_values */
         values?: Array<File>;
+        /** @docid dxFileUploaderOptions_buttonText */
         buttonText?: string;
-        /** The text displayed on the button that opens the file browser. */
+        /** @docid dxFileUploaderOptions_selectButtonText */
         selectButtonText?: string;
-        /** The text displayed on the button that starts uploading. */
+        /** @docid dxFileUploaderOptions_uploadButtonText */
         uploadButtonText?: string;
-        /** Specifies the text displayed on the area to which an end-user can drop a file. */
+        /** @docid dxFileUploaderOptions_labelText */
         labelText?: string;
-        /** Specifies the value passed to the name attribute of the underlying input element. */
+        /** @docid dxFileUploaderOptions_name */
         name?: string;
-        /** Specifies whether the widget enables an end-user to select a single file or multiple files. */
+        /** @docid dxFileUploaderOptions_multiple */
         multiple?: boolean;
-        /** Specifies a file type or several types accepted by the widget. */
+        /** @docid dxFileUploaderOptions_accept */
         accept?: string;
-        /** Specifies a target Url for the upload request. */
+        /** @docid dxFileUploaderOptions_uploadUrl */
         uploadUrl?: string;
-        /** Specifies if an end user can remove a file from the selection and interrupt uploading. */
+        /** @docid dxFileUploaderOptions_allowCanceling */
         allowCanceling?: boolean;
-        /** Specifies whether or not the widget displays the list of selected files. */
+        /** @docid dxFileUploaderOptions_showFileList */
         showFileList?: boolean;
-        /** Gets the current progress in percentages. */
+        /** @docid dxFileUploaderOptions_progress */
         progress?: number;
-        /** The message displayed by the widget when it is ready to upload the specified files. */
+        /** @docid dxFileUploaderOptions_readyToUploadMessage */
         readyToUploadMessage?: string;
-        /** The message displayed by the widget when uploading is finished. */
+        /** @docid dxFileUploaderOptions_uploadedMessage */
         uploadedMessage?: string;
-        /** The message displayed by the widget on uploading failure. */
+        /** @docid dxFileUploaderOptions_uploadFailedMessage */
         uploadFailedMessage?: string;
-        /** Specifies how the widget uploads files. */
+        /** @docid dxFileUploaderOptions_uploadMode */
         uploadMode?: string;
-        /** Specifies the method for the upload request. */
+        /** @docid dxFileUploaderOptions_uploadMethod */
         uploadMethod?: string;
-        /** Specifies headers for the upload request. */
+        /** @docid dxFileUploaderOptions_uploadHeaders */
         uploadHeaders?: Object;
-        /** A handler for the uploadStarted event. */
+        /** @docid dxFileUploaderOptions_onUploadStarted */
         onUploadStarted?: Function;
-        /** A handler for the uploaded event. */
+        /** @docid dxFileUploaderOptions_onUploaded */
         onUploaded?: Function;
-        /** A handler for the uploaded event. */
+        /** @docid dxFileUploaderOptions_onProgress */
         onProgress?: Function;
-        /** A handler for the uploadError event. */
+        /** @docid dxFileUploaderOptions_onUploadError */
         onUploadError?: Function;
-        /** A handler for the uploadAborted event. */
+        /** @docid dxFileUploaderOptions_onUploadAborted */
         onUploadAborted?: Function;
-        /** A handler for the valueChanged event. */
+        /** @docid dxFileUploaderOptions_onValueChanged */
         onValueChanged?: Function;
     }
-    /** A widget used to select and upload a file or multiple files. */
+    /** @docid dxFileUploader */
     export class dxFileUploader extends Editor {
         constructor(element: JQuery, options?: dxFileUploaderOptions);
         constructor(element: Element, options?: dxFileUploaderOptions);
     }
     export interface dxTrackBarOptions extends EditorOptions {
-        /** The minimum value the widget can accept. */
+        /** @docid dxTrackBarOptions_min */
         min?: number;
-        /** The maximum value the widget can accept. */
+        /** @docid dxTrackBarOptions_max */
         max?: number;
-        /** The current widget value. */
+        /** @docid dxTrackBarOptions_value */
         value?: number;
     }
-    /** A base class for track bar widgets. */
+    /** @docid dxTrackBar */
     export class dxTrackBar extends Editor {
         constructor(element: JQuery, options?: dxTrackBarOptions);
         constructor(element: Element, options?: dxTrackBarOptions);
     }
     export interface dxProgressBarOptions extends dxTrackBarOptions {
-        /** Specifies a format for the progress status. */
+        /** @docid_ignore dxProgressBarOptions_activeStateEnabled */
+        /** @docid_ignore dxProgressBarOptions_focusStateEnabled */
+        /** @docid_ignore dxProgressBarOptions_accessKey */
+        /** @docid_ignore dxProgressBarOptions_tabIndex */
+        /** @docid dxProgressBarOptions_statusFormat */
         statusFormat?: any;
-        /** Specifies whether or not the widget displays a progress status. */
+        /** @docid dxProgressBarOptions_showStatus */
         showStatus?: boolean;
-        /** A handler for the complete event. */
+        /** @docid dxProgressBarOptions_onComplete */
         onComplete?: Function;
     }
-    /** A widget used to indicate progress. */
+    /** @docid dxProgressBar */
     export class dxProgressBar extends dxTrackBar {
         constructor(element: JQuery, options?: dxProgressBarOptions);
         constructor(element: Element, options?: dxProgressBarOptions);
+        /** @docid_ignore dxProgressBarMethods_registerKeyHandler */
+        /** @docid_ignore dxProgressBarMethods_focus */
     }
     export interface dxSliderOptions extends dxTrackBarOptions {
+        /** @docid_ignore dxSliderOptions_hoverStateEnabled */
+        /** @docid_ignore dxSliderOptions_focusStateEnabled */
+        /** @docid dxSliderOptions_activeStateEnabled */
         activeStateEnabled?: boolean;
-        /** The slider step size. */
+        /** @docid dxSliderOptions_step */
         step?: number;
-        /** The current slider value. */
+        /** @docid dxSliderOptions_value */
         value?: number;
-        /** Specifies whether or not to highlight a range selected within the widget. */
+        /** @docid dxSliderOptions_showRange */
         showRange?: boolean;
-        /** Specifies the size of a step by which a slider handle is moved when a user uses the Page up or Page down keyboard shortcuts. */
+        /** @docid dxSliderOptions_keyStep */
         keyStep?: number;
-        /** Specifies options for the slider tooltip. */
+        /** @docid dxSliderOptions_tooltip */
         tooltip?: {
-            /** Specifies whether or not the tooltip is enabled. */
+            /** @docid dxSliderOptions_tooltip_enabled */
             enabled?: boolean;
-            /** Specifies format for the tooltip. */
+            /** @docid dxSliderOptions_tooltip_format */
             format?: any;
-            /** Specifies whether the tooltip is located over or under the slider. */
+            /** @docid dxSliderOptions_tooltip_position */
             position?: string;
-            /** Specifies whether the widget always shows a tooltip or only when a pointer is over the slider. */
+            /** @docid dxSliderOptions_tooltip_showMode */
             showMode?: string;
         };
-        /** Specifies options for labels displayed at the min and max values. */
+        /** @docid dxSliderOptions_label */
         label?: {
-            /** Specifies whether or not slider labels are visible. */
+            /** @docid dxSliderOptions_label_visible */
             visible?: boolean;
-            /** Specifies whether labels are located over or under the scale. */
+            /** @docid dxSliderOptions_label_position */
             position?: string;
-            /** Specifies a format for labels. */
+            /** @docid dxSliderOptions_label_format */
             format?: any;
         };
+        /** @docid dxSliderOptions_name */
+        name?: string;
     }
-    /** A widget that allows a user to select a numeric value within a given range. */
+    /** @docid dxSlider */
     export class dxSlider extends dxTrackBar {
         constructor(element: JQuery, options?: dxSliderOptions);
         constructor(element: Element, options?: dxSliderOptions);
     }
     export interface dxRangeSliderOptions extends dxSliderOptions {
-        /** The left edge of the interval currently selected using the range slider. */
+        /** @docid_ignore dxRangeSliderOptions_value */
+        /** @docid_ignore dxRangeSliderOptions_onValueChanged */
+        /** @docid_ignore dxRangeSliderOptions_name */
+        /** @docid dxRangeSliderOptions_start */
         start?: number;
-        /** The right edge of the interval currently selected using the range slider. */
+        /** @docid dxRangeSliderOptions_end */
         end?: number;
+        /** @docid dxRangeSliderOptions_startName */
+        startName?: string;
+        /** @docid dxRangeSliderOptions_endName */
+        endName?: string;
     }
-    /** A widget that enables a user to select a range of numeric values. */
+    /** @docid dxRangeSlider */
     export class dxRangeSlider extends dxSlider {
         constructor(element: JQuery, options?: dxRangeSliderOptions);
         constructor(element: Element, options?: dxRangeSliderOptions);
     }
     export interface dxFormItemLabel {
-        /** Specifies the label text. */
+        /** @docid dxFormSimpleItem_label_text */
         text?: string;
-        /** Specifies whether or not the label is visible. */
+        /** @docid dxFormSimpleItem_label_visible */
         visible?: boolean;
-        /** Specifies whether or not a colon is displayed at the end of the current label. */
+        /** @docid dxFormSimpleItem_label_showColon */
         showColon?: boolean;
-        /** Specifies the location of a label against the editor. */
+        /** @docid dxFormSimpleItem_label_location */
         location?: string;
-        /** Specifies the label horizontal alignment. */
+        /** @docid dxFormSimpleItem_label_alignment */
         alignment?: string;
     }
     export interface dxFormItem {
-        /** Specifies the type of the current item. */
+        /**
+         * @docid dxFormEmptyItem_itemType
+         * @docid dxFormGroupItem_itemType
+         * @docid dxFormTabbedItem_itemType
+         * @docid dxFormSimpleItem_itemType
+        */
         itemType?: string;
-        /** Specifies whether or not the current form item is visible. */
+        /**
+         * @docid dxFormEmptyItem_visible
+         * @docid dxFormGroupItem_visible
+         * @docid dxFormTabbedItem_visible
+         * @docid dxFormSimpleItem_visible
+        */
         visible?: boolean;
-        /** Specifies the sequence number of the item in a form, group or tab. */
+        /**
+         * @docid dxFormEmptyItem_visibleIndex
+         * @docid dxFormGroupItem_visibleIndex
+         * @docid dxFormTabbedItem_visibleIndex
+         * @docid dxFormSimpleItem_visibleIndex
+        */
         visibleIndex?: number;
-        /** Specifies a CSS class to be applied to the form item. */
+        /**
+         * @docid dxFormEmptyItem_cssClass
+         * @docid dxFormGroupItem_cssClass
+         * @docid dxFormTabbedItem_cssClass
+         * @docid dxFormSimpleItem_cssClass
+        */
         cssClass?: string;
-        /** Specifies the number of columns spanned by the item. */
+        /**
+         * @docid dxFormEmptyItem_colSpan
+         * @docid dxFormSimpleItem_colSpan
+         * @docid dxFormGroupItem_colSpan
+         * @docid dxFormTabbedItem_colSpan
+         */
         colSpan?: number;
     }
     export interface dxFormEmptyItem extends dxFormItem {
-        /** Specifies the form item name. */
+        /** @docid dxFormEmptyItem_name */
         name?: string;
     }
     export interface dxFormSimpleItem extends dxFormItem {
-        /** Specifies the path to the formData object field bound to the current form item. */
+        /** @docid dxFormSimpleItem_dataField */
         dataField?: string;
-        /** Specifies the form item name. */
+        /** @docid dxFormSimpleItem_name */
         name?: string;
-        /** Specifies which editor widget is used to display and edit the form item value. */
+        /** @docid dxFormSimpleItem_editorType */
         editorType?: string;
-        /** Specifies configuration options for the editor widget of the current form item. */
+        /** @docid dxFormSimpleItem_editorOptions */
         editorOptions?: Object;
-        /** A template to be used for rendering the form item. */
+        /** @docid dxFormSimpleItem_template */
         template?: any;
-        /** Specifies the help text displayed for the current form item. */
+        /** @docid dxFormSimpleItem_helpText */
         helpText?: string;
-        /** Specifies whether the current form item is required. */
+        /** @docid dxFormSimpleItem_isRequired */
         isRequired?: boolean;
-        /** Specifies options for the form item label. */
+        /** @docid dxFormSimpleItem_label */
         label?: dxFormItemLabel;
-        /** An array of validation rules to be checked for the form item editor. */
+        /** @docid dxFormSimpleItem_validationRules */
         validationRules?: Array<any>;
     }
-    /** Specifies dependency between the screen factor and the count of columns. */
+    /** @docid ColCountResponsible */
     export interface ColCountResponsible {
-        /** The count of columns for an extra small-sized screen. */
+        /** @docid ColCountResponsible_xs */
         xs?: number;
-        /** The count of columns for a small-sized screen. */
+        /** @docid ColCountResponsible_sm */
         sm?: number;
-        /** The count of columns for a middle-sized screen. */
+        /** @docid ColCountResponsible_md */
         md?: number;
-        /** The count of columns for a large screen size. */
+        /** @docid ColCountResponsible_lg */
         lg?: number;
     }
     export interface dxFormGroupItem extends dxFormItem {
-        /** Specifies the group caption. */
+        /** @docid dxFormGroupItem_caption */
         caption?: string;
-        /** A template to be used for rendering a group item. */
+        /** @docid dxFormGroupItem_template */
         template?: any;
-        /** The count of columns in the group layout. */
+        /** @docid dxFormGroupItem_colCount */
         colCount?: number;
-        /** Specifies dependency between the screen factor and the count of columns in the tab layout. */
+        /** @docid dxFormTabbedItem_tabs_colCountByScreen */
         colCountByScreen?: ColCountResponsible;
-        /** Specifies whether or not all group item labels are aligned. */
+        /** @docid dxFormGroupItem_alignItemLabels */
         alignItemLabels?: boolean;
-        /** Holds an array of form items displayed within the group. */
+        /** @docid dxFormGroupItem_items */
         items?: Array<dxFormItem>;
     }
     export interface dxFormTab {
-        /** Specifies the tab title. */
+        /** @docid dxFormTabbedItem_tabs_title */
         title?: string;
-        /** The count of columns in the tab layout. */
+        /** @docid dxFormTabbedItem_tabs_colCount */
         colCount?: number;
-        /** Specifies dependency between the screen factor and the count of columns in the group layout. */
+        /** @docid dxFormGroupItem_colCountByScreen */
         colCountByScreen?: ColCountResponsible;
-        /** Specifies whether or not labels of items displayed within the current tab are aligned. */
+        /** @docid dxFormTabbedItem_tabs_alignItemLabels */
         alignItemLabels?: boolean;
-        /** Holds an array of form items displayed within the tab. */
+        /** @docid dxFormTabbedItem_tabs_items */
         items?: Array<dxFormItem>;
-        /** Specifies a badge text for the tab. */
+        /** @docid dxFormTabbedItem_tabs_badge */
         badge?: string;
-        /** A Boolean value specifying whether or not the tab can respond to user interaction. */
+        /** @docid dxFormTabbedItem_tabs_disabled */
         disabled?: boolean;
-        /** Specifies the icon to be displayed on the tab. */
+        /** @docid dxFormTabbedItem_tabs_icon */
         icon?: string;
-        /** The template to be used for rendering the tab. */
+        /** @docid dxFormTabbedItem_tabs_tabTemplate */
         tabTemplate?: any;
-        /** The template to be used for rendering the tab content. */
+        /** @docid dxFormTabbedItem_tabs_template */
         template?: any;
     }
     export interface dxFormTabbedItem extends dxFormItem {
-        /** Holds a configuration object for the dxTabPanel widget used to display the current form item. */
+        /** @docid dxFormTabbedItem_tabPanelOptions */
         tabPanelOptions?: Object;
-        /** An array of tab configuration objects. */
+        /** @docid dxFormTabbedItem_tabs */
         tabs?: Array<dxFormTab>;
     }
     export interface dxFormOptions extends WidgetOptions {
-        /** An object providing data for the form. */
+        /** @docid dxFormOptions_formData */
         formData?: Object;
-        /** The count of columns in the form layout. */
+        /** @docid dxFormOptions_colCount */
         colCount?: any;
-        /** Specifies dependency between the screen factor and the count of columns in the form layout. */
+        /** @docid dxFormOptions_colCountByScreen */
         colCountByScreen?: ColCountResponsible;
-        /** Specifies the function returning the screen factor depending on the screen width. */
+        /** @docid dxFormOptions_screenByWidth */
         screenByWidth?: (width: number) => string;
-        /** Specifies the location of a label against the editor. */
+        /** @docid dxFormOptions_labelLocation */
         labelLocation?: string;
-        /** Specifies whether or not all editors on the form are read-only. */
+        /** @docid dxFormOptions_readOnly */
         readOnly?: boolean;
-        /** A handler for the fieldDataChanged event. */
+        /** @docid dxFormOptions_onFieldDataChanged */
         onFieldDataChanged?: (e: Object) => void;
-        /** A handler for the editorEnterKey event. */
+        /** @docid dxFormOptions_onEditorEnterKey */
         onEditorEnterKey?: (e: Object) => void;
-        /** Specifies a function that customizes a form item after it has been created. */
+        /** @docid dxFormOptions_customizeItem */
         customizeItem?: Function;
-        /** The minimum column width used for calculating column count in the form layout. */
+        /** @docid dxFormOptions_minColWidth */
         minColWidth?: number;
-        /** Specifies whether or not all root item labels are aligned. */
+        /** @docid dxFormOptions_alignItemLabels */
         alignItemLabels?: boolean;
-        /** Specifies whether or not item labels in all groups are aligned. */
+        /** @docid dxFormOptions_alignItemLabelsInAllGroups */
         alignItemLabelsInAllGroups?: boolean;
-        /** Specifies whether or not a colon is displayed at the end of form labels. */
+        /** @docid dxFormOptions_showColonAfterLabel */
         showColonAfterLabel?: boolean;
-        /** Specifies whether or not the required mark is displayed for required fields. */
+        /** @docid dxFormOptions_showRequiredMark */
         showRequiredMark?: boolean;
-        /** Specifies whether or not the optional mark is displayed for optional fields. */
+        /** @docid dxFormOptions_showOptionalMark */
         showOptionalMark?: boolean;
-        /** The text displayed for required fields. */
+        /** @docid dxFormOptions_requiredMark */
         requiredMark?: string;
-        /** The text displayed for optional fields. */
+        /** @docid dxFormOptions_optionalMark */
         optionalMark?: string;
-        /** Specifies the message that is shown for end-users if a required field value is not specified. */
+        /** @docid dxFormOptions_requiredMessage */
         requiredMessage?: string;
-        /** Specifies whether or not the total validation summary is displayed on the form. */
+        /** @docid dxFormOptions_showValidationSummary */
         showValidationSummary?: boolean;
-        /** Holds an array of form items. */
+        /** @docid dxFormOptions_items */
         items?: Array<dxFormItem>;
-        /** A Boolean value specifying whether to enable or disable form scrolling. */
+        /** @docid dxFormOptions_scrollingEnabled */
         scrollingEnabled?: boolean;
+        /** @docid dxFormOptions_validationGroup */
+        validationGroup?: string;
+        /** @docid dxFormOptions_onContentReady */
         onContentReady?: Function;
     }
-    /** A form widget used to display and edit values of object fields. */
+    /** @docid dxForm */
     export class dxForm extends Widget {
         constructor(element: JQuery, options?: dxFormOptions);
         constructor(element: Element, options?: dxFormOptions);
-        /** Updates the specified field of the formData object and the corresponding editor on the form. */
+        /** @docid dxFormMethods_updateData#updateData(dataField,value) */
         updateData(dataField: string, value: any): void;
-        /** Updates the specified fields of the formData object and the corresponding editors on the form. */
+        /** @docid dxFormMethods_updateData#updateData(data) */
         updateData(data: Object): void;
-        /** Updates the value of a form item option. */
+        /** @docid dxFormMethods_itemOption#itemOption(field,option,value) */
         itemOption(field: string, option: string, value: any): void;
-        /** Updates the values of form item options. */
+        /** @docid dxFormMethods_itemOption#itemOption(field,options) */
         itemOption(field: string, options: Object): void;
-        /** Gets the value of the form item option. */
+        /** @docid dxFormMethods_itemOption#itemOption(field) */
         itemOption(field: string): any;
-        /** Returns an editor instance associated with the specified formData field or name of the form item. */
+        /** @docid dxFormMethods_getEditor */
         getEditor(field: string): Object;
-        /** Updates the dimensions of the widget contents. */
+        /** @docid dxFormMethods_updateDimensions */
         updateDimensions(): JQueryPromise<void>;
-        /** Validates the values of all editors on the form against the list of the validation rules specified for each form item. */
+        /** @docid dxFormMethods_validate */
         validate(): Object;
-        /** Resets the editor's value to undefined. */
+        /** @docid dxFormMethods_resetValues */
         resetValues(): void;
     }
     export interface dxDeferRenderingOptions extends WidgetOptions {
-        /** Indicates if a load indicator should be shown until the widget's content is rendered. */
+        /** @docid dxDeferRenderingOptions_showLoadIndicator */
         showLoadIndicator?: boolean;
-        /** Specifies the jQuery.Promise or boolean value, which when resolved, forces widget content to render. */
+        /** @docid dxDeferRenderingOptions_renderWhen */
         renderWhen?: any;
-        /** Specifies the animation to be used to show the rendered content. */
+        /** @docid dxDeferRenderingOptions_animation */
         animation?: fx.AnimationOptions;
-        /** Specifies a jQuery selector of items that should be rendered using a staggered animation. */
+        /** @docid dxDeferRenderingOptions_staggerItemSelector */
         staggerItemSelector?: string;
-        /** Specifies a callback function that is called when the widget's content has finished rendering but is not yet shown. */
+        /** @docid dxDeferRenderingOptions_onRendered */
         onRendered?: Function;
-        /** Specifies a callback function that is called when widget content is shown and animation has completed. */
+        /** @docid dxDeferRenderingOptions_onShown */
         onShown?: Function;
     }
-    /** A container for elements that must be rendered at a specified moment. */
+    /** @docid dxDeferRendering */
     export class dxDeferRendering extends Widget {
         constructor(element: JQuery, options?: dxDeferRenderingOptions);
         constructor(element: Element, options?: dxDeferRenderingOptions);
@@ -2615,203 +3105,267 @@ interface JQuery {
     dxForm(options: string, ...params: any[]): any;
     dxForm(options: DevExpress.ui.dxFormOptions): JQuery;
 }
-
 declare module DevExpress.ui {
     export interface dxTileViewOptions extends CollectionWidgetOptions {
-        /** A Boolean value specifying whether or not the widget changes its state when interacting with a user. */
+        /** @docid_ignore dxTileViewOptions_selectedIndex */
+        /** @docid_ignore dxTileViewOptions_selectedItem */
+        /** @docid_ignore dxTileViewOptions_selectedItems */
+        /** @docid_ignore dxTileViewOptions_onSelectionChanged */
+        /** @docid_ignore dxTileViewOptions_hoverStateEnabled */
+        /** @docid_ignore dxTileViewOptions_focusStateEnabled */
+        /** @docid dxTileViewOptions_activeStateEnabled */
         activeStateEnabled?: boolean;
-        /** Specifies the height of the base tile view item. */
+        /** @docid dxTileViewOptions_baseItemHeight */
         baseItemHeight?: number;
-        /** Specifies the width of the base tile view item. */
+        /** @docid dxTileViewOptions_baseItemwidth */
         baseItemWidth?: number;
-        /** Specifies whether tiles are placed horizontally or vertically. */
+        /** @docid dxTileViewOptions_direction */
         direction?: string;
-        /** Specifies the height of the widget. */
+        /** @docid dxTileViewOptions_height */
         height?: any;
-        /** Specifies the distance in pixels between adjacent tiles. */
+        /** @docid dxTileViewOptions_itemMargin */
         itemMargin?: number;
-        /** A Boolean value specifying whether or not to display a scrollbar. */
+        /** @docid dxTileViewOptions_showScrollbar */
         showScrollbar?: boolean;
     }
-    /** A widget displaying several blocks of data as tiles. */
+    /** @docid dxtileview */
     export class dxTileView extends CollectionWidget {
         constructor(element: JQuery, options?: dxTileViewOptions);
         constructor(element: Element, options?: dxTileViewOptions);
-        /** Returns the current scroll position of the widget content. */
+        /** @docid_ignore dxTileViewItemTemplate_heightRatio */
+        /** @docid_ignore dxTileViewItemTemplate_widthRatio */
+        /** @docid dxtileviewmethods_scrollPosition */
         scrollPosition(): number;
     }
     export interface dxSwitchOptions extends EditorOptions {
+        /** @docid_ignore dxSwitchOptions_hoverStateEnabled */
+        /** @docid_ignore dxSwitchOptions_focusStateEnabled */
+	    /** @docid dxSwitchOptions_activeStateEnabled */
 	    activeStateEnabled?: boolean;
-        /** Text displayed when the widget is in a disabled state. */
+        /** @docid dxSwitchOptions_offText */
         offText?: string;
-        /** Text displayed when the widget is in an enabled state. */
+        /** @docid dxSwitchOptions_onText */
         onText?: string;
-        /** A Boolean value specifying whether the current switch state is "On" or "Off". */
+        /** @docid dxSwitchOptions_value */
         value?: boolean;
+        /** @docid dxSwitchOptions_name */
+        name?: string;
     }
-    /** A switch widget. */
+    /** @docid dxSwitch */
     export class dxSwitch extends Editor {
         constructor(element: JQuery, options?: dxSwitchOptions);
         constructor(element: Element, options?: dxSwitchOptions);
     }
     export interface dxSlideOutViewOptions extends WidgetOptions {
-        /** Specifies the current menu position. */
+        /** @docid_ignore dxSlideOutViewOptions_contentOffset */
+        /** @docid_ignore dxSlideOutViewOptions_focusStateEnabled */
+        /** @docid_ignore dxSlideOutViewOptions_accessKey */
+        /** @docid_ignore dxSlideOutViewOptions_tabIndex */
+        /** @docid dxSlideOutViewOptions_menuPosition */
         menuPosition?: string;
-        /** Specifies whether or not the menu panel is visible. */
+        /** @docid dxSlideOutViewOptions_menuVisible */
         menuVisible?: boolean;
-        /** Specifies whether or not the menu is shown when a user swipes the widget content. */
+        /** @docid dxSlideOutViewOptions_swipeEnabled */
         swipeEnabled?: boolean;
-        /** A template to be used for rendering menu panel content. */
+        /** @docid dxSlideOutViewOptions_menuTemplate */
         menuTemplate?: any;
-        /** A template to be used for rendering widget content. */
+        /** @docid dxSlideOutViewOptions_contentTemplate */
         contentTemplate?: any;
     }
-    /** The widget that allows you to slide-out the current view to reveal a custom menu. */
+    /** @docid dxSlideOutView */
     export class dxSlideOutView extends Widget {
         constructor(element: JQuery, options?: dxSlideOutViewOptions);
         constructor(element: Element, options?: dxSlideOutViewOptions);
-        /** Returns an HTML element of the widget menu block. */
+        /** @docid_ignore dxSlideOutViewMethods_registerKeyHandler */
+        /** @docid_ignore dxSlideOutViewMethods_focus */
+        /** @docid dxSlideOutViewMethods_menuContent */
         menuContent(): JQuery;
-        /** Returns an HTML element of the widget content block. */
+        /** @docid dxSlideOutViewMethods_content */
         content(): JQuery;
-        /** Displays the widget's menu block. */
+        /** @docid dxSlideOutViewMethods_showMenu */
         showMenu(): JQueryPromise<void>;
-        /** Hides the widget's menu block. */
+        /** @docid dxSlideOutViewMethods_hideMenu */
         hideMenu(): JQueryPromise<void>;
-        /** Toggles the visibility of the widget's menu block. */
+        /** @docid dxSlideOutViewMethods_toggleMenuVisibility */
         toggleMenuVisibility(): JQueryPromise<void>;
     }
     export interface dxSlideOutOptions extends CollectionWidgetOptions {
-        /** A Boolean value specifying whether or not the widget changes its state when interacting with a user. */
+        /** @docid_ignore dxSlideOutOptions_selectedItems */
+        /** @docid_ignore dxSlideOutOptions_focusStateEnabled */
+        /** @docid_ignore dxSlideOutOptions_accessKey */
+        /** @docid_ignore dxSlideOutOptions_tabIndex */
+        /** @docid dxSlideOutOptions_activeStateEnabled */
         activeStateEnabled?: boolean;
-        /** A Boolean value specifying whether or not to display a grouped menu. */
+        /** @docid dxSlideOutOptions_menuGrouped */
         menuGrouped?: boolean;
-        /** Specifies the current menu position. */
+        /** @docid dxSlideOutOptions_menuPosition */
         menuPosition?: string;
-        /** The name of the template used to display a group header. */
+        /** @docid dxSlideOutOptions_menuGroupTemplate */
         menuGroupTemplate?: any;
-        /** The template used to render menu items. */
+        /** @docid dxSlideOutOptions_menuItemTemplate */
         menuItemTemplate?: any;
-        /** A handler for the menuGroupRendered event. */
+        /** @docid dxSlideOutOptions_onMenuGroupRendered */
         onMenuGroupRendered?: Function;
-        /** A handler for the menuItemRendered event. */
+        /** @docid dxSlideOutOptions_onMenuItemRendered */
         onMenuItemRendered?: Function;
-        /** Specifies whether or not the slide-out menu is displayed. */
+        /** @docid dxSlideOutOptions_menuVisible */
         menuVisible?: boolean;
-        /** Indicates whether the menu can be shown/hidden by swiping the widget's main panel. */
+        /** @docid dxSlideOutOptions_swipeEnabled */
         swipeEnabled?: boolean;
-        /** A template to be used for rendering widget content. */
+        /** @docid dxSlideOutOptions_contentTemplate */
         contentTemplate?: any;
     }
-    /** The widget that allows you to slide-out the current view to reveal an item list. */
+    /** @docid dxSlideout */
     export class dxSlideOut extends CollectionWidget {
         constructor(element: JQuery, options?: dxSlideOutOptions);
         constructor(element: Element, options?: dxSlideOutOptions);
-        /** Hides the widget's slide-out menu. */
+        /** @docid_ignore dxSlideOutItemTemplate_menutemplate */
+        /** @docid_ignore dxslideoutmethods_registerKeyHandler */
+        /** @docid_ignore dxslideoutmethods_focus */
+        /** @docid dxslideoutmethods_hide */
         hideMenu(): JQueryPromise<void>;
-        /** Displays the widget's slide-out menu. */
+        /** @docid dxslideoutmethods_show */
         showMenu(): JQueryPromise<void>;
-        /** Toggles the visibility of the widget's slide-out menu. */
+        /** @docid dxslideoutmethods_toggleMenuVisibility */
         toggleMenuVisibility(showing: boolean): JQueryPromise<void>;
     }
     export interface dxPivotOptions extends CollectionWidgetOptions {
-        /** The index of the currently active pivot item. */
+        /** @docid_ignore dxPivotOptions_noDataText */
+        /** @docid_ignore dxPivotOptions_selectedItems */
+        /** @docid_ignore dxPivotOptions_focusStateEnabled */
+        /** @docid_ignore dxPivotOptions_accessKey */
+        /** @docid_ignore dxPivotOptions_tabIndex */
+        /** @docid dxPivotOptions_selectedIndex */
         selectedIndex?: number;
-        /** A Boolean value specifying whether or not to allow users to switch between items by swiping. */
+        /** @docid dxPivotOptions_swipeEnabled */
         swipeEnabled?: boolean;
-        /** A template to be used for rendering widget content. */
+        /** @docid dxPivotOptions_contentTemplate */
         contentTemplate?: any;
-        /** The template to be used for rendering an item title. */
+        /** @docid dxPivotOptions_itemTitleTemplate */
         itemTitleTemplate?: any;
     }
-    /** A widget that is similar to a traditional tab control, but optimized for the phone with simplified end-user interaction. */
+    /** @docid dxPivot */
     export class dxPivot extends CollectionWidget {
         constructor(element: JQuery, options?: dxPivotOptions);
         constructor(element: Element, options?: dxPivotOptions);
+        /** @docid_ignore dxPivotItemTemplate_title */
+        /** @docid_ignore dxPivotItemTemplate_visible */
+        /** @docid_ignore dxPivotItemTemplate_titleTemplate */
+        /** @docid_ignore dxPivotMethods_registerKeyHandler */
+        /** @docid_ignore dxPivotMethods_focus */
     }
     export interface dxPanoramaOptions extends CollectionWidgetOptions {
-        /** An object exposing options for setting a background image for the panorama. */
+        /** @docid_ignore dxPanoramaOptions_noDataText */
+        /** @docid_ignore dxPanoramaOptions_selectedItems */
+        /** @docid_ignore dxPanoramaOptions_focusStateEnabled */
+        /** @docid_ignore dxPanoramaOptions_accessKey */
+        /** @docid_ignore dxPanoramaOptions_tabIndex */
+        /** @docid dxPanoramaOptions_backgroundImage */
         backgroundImage?: {
-            /** Specifies the height of the panorama's background image. */
+            /** @docid dxPanoramaOptions_backgroundImage_height */
             height?: number;
-            /** Specifies the URL of the image that is used as the panorama's background image. */
+            /** @docid dxPanoramaOptions_backgroundImage_url */
             url?: string;
-            /** Specifies the width of the panorama's background image. */
+            /** @docid dxPanoramaOptions_backgroundImage_width */
             width?: number;
         };
-        /** The index of the currently active panorama item. */
+        /** @docid dxPanoramaOptions_selectedIndex */
         selectedIndex?: number;
-        /** Specifies the widget content title. */
+        /** @docid dxPanoramaOptions_title */
         title?: string;
     }
-    /** A widget displaying the required content in a long horizontal canvas that extends beyond the frames of the screen. */
+    /** @docid dxPanorama */
     export class dxPanorama extends CollectionWidget {
         constructor(element: JQuery, options?: dxDropDownEditorOptions);
         constructor(element: Element, options?: dxDropDownEditorOptions);
+        /** @docid_ignore dxPanoramaItemTemplate_title */
+        /** @docid_ignore dxPanoramaItemTemplate_visible */
+        /** @docid_ignore dxPanoramaMethods_registerKeyHandler */
+        /** @docid_ignore dxPanoramaMethods_focus */
     }
     export interface dxDropDownMenuOptions extends WidgetOptions {
-        /** A handler for the buttonClick event. */
+        /** @docid_ignore dxDropDownMenuOptions_onContentReady */
+        /** @docid dxDropDownMenuOptions_onButtonClick */
         onButtonClick?: any;
-        /** The name of the icon to be displayed by the DropDownMenu button. */
+        /** @docid dxDropDownMenuOptions_buttonIcon */
         buttonIcon?: string;
-        /** The text displayed in the DropDownMenu button. */
+        /** @docid dxDropDownMenuOptions_buttontext */
         buttonText?: string;
+        /** @docid dxDropDownMenuOptions_buttonIconSrc */
         buttonIconSrc?: string;
-        /** A data source used to fetch data to be displayed by the widget. */
+        /** @docid dxDropDownMenuOptions_dataSource */
         dataSource?: any;
-        /** A handler for the itemClick event. */
+        /** @docid dxDropDownMenuOptions_onItemClick */
         onItemClick?: any;
-        /** An array of items displayed by the widget. */
+        /** @docid dxDropDownMenuOptions_items */
         items?: Array<any>;
-        /** The template to be used for rendering items. */
+        /** @docid dxDropDownMenuOptions_itemTemplate */
         itemTemplate?: any;
-        /** Specifies whether or not to show the drop down menu within a dxPopover widget. */
+        /** @docid dxDropDownMenuOptions_usePopover */
         usePopover?: boolean;
-        /** The width of the menu popup in pixels. */
+        /** @docid dxDropDownMenuOptions_popupWidth */
         popupWidth?: any;
-        /** The height of the menu popup in pixels. */
+        /** @docid dxDropDownMenuOptions_popupHeight */
         popupHeight?: any;
-        /** Specifies whether or not the drop-down menu is displayed. */
+        /** @docid dxDropDownMenuOptions_opened */
         opened?: boolean;
+        /** @docid dxDropDownMenuOptions_hoverStateEnabled */
         hoverStateEnabled?: boolean;
+        /** @docid dxDropDownMenuOptions_activeStateEnabled */
         activeStateEnabled?: boolean;
     }
-    /** A drop-down menu widget. */
+    /** @docid dxdropdownmenu */
     export class dxDropDownMenu extends Widget {
         constructor(element: JQuery, options?: dxDropDownEditorOptions);
         constructor(element: Element, options?: dxDropDownEditorOptions);
-        /** Opens the drop-down menu. */
+        /** @docid dxDropDownMenuMethods_open */
         open(): void;
-        /** Closes the drop-down menu. */
+        /** @docid dxDropDownMenuMethods_close */
         close(): void;
     }
     export interface dxActionSheetOptions extends CollectionWidgetOptions {
-        /** A handler for the cancelClick event. */
+        /** @docid_ignore dxActionSheetOptions_activeStateEnabled */
+        /** @docid_ignore dxActionSheetOptions_selectedIndex */
+        /** @docid_ignore dxActionSheetOptions_selectedItem */
+        /** @docid_ignore dxActionSheetOptions_selectedItems */
+        /** @docid_ignore dxActionSheetOptions_noDataText */
+        /** @docid_ignore dxActionSheetOptions_onSelectionChanged */
+        /** @docid_ignore dxActionSheetOptions_focusStateEnabled */
+        /** @docid_ignore dxActionSheetOptions_accessKey */
+        /** @docid_ignore dxActionSheetOptions_tabIndex */
+        /** @docid dxActionSheetOptions_onCancelClick */
         onCancelClick?: any;
-        /** The text displayed in the button that closes the action sheet. */
+        /** @docid dxActionSheetOptions_cancelText */
         cancelText?: string;
-        /** Specifies whether or not to display the Cancel button in action sheet. */
+        /** @docid dxActionSheetOptions_showCancelButton */
         showCancelButton?: boolean;
-        /** A Boolean value specifying whether or not the title of the action sheet is visible. */
+        /** @docid dxActionSheetOptions_showTitle */
         showTitle?: boolean;
-        /** Specifies the element the action sheet popover points at. */
+        /** @docid dxActionSheetOptions_target */
         target?: any;
-        /** The title of the action sheet. */
+        /** @docid dxActionSheetOptions_title */
         title?: string;
-        /** Specifies whether or not to show the action sheet within a dxPopover widget. */
+        /** @docid dxActionSheetOptions_usePopover */
         usePopover?: boolean;
-        /** A Boolean value specifying whether or not the dxActionSheet widget is visible. */
+        /** @docid dxActionSheetOptions_visible */
         visible?: boolean;
     }
-    /** A widget consisting of a set of choices related to a certain task. */
+    /** @docid dxactionsheet */
     export class dxActionSheet extends CollectionWidget {
         constructor(element: JQuery, options?: dxActionSheetOptions);
         constructor(element: Element, options?: dxActionSheetOptions);
-        /** Hides the widget. */
+        /** @docid_ignore dxActionSheetItemTemplate_html */
+        /** @docid_ignore dxActionSheetItemtemplate_type */
+        /** @docid_ignore dxActionSheetItemTemplate_visible */
+        /** @docid_ignore dxActionSheetItemTemplate_onClick */
+        /** @docid_ignore dxActionSheetItemTemplate_icon */
+        /** @docid_ignore dxactionsheetmethods_registerKeyHandler */
+        /** @docid_ignore dxactionsheetmethods_focus */
+        /** @docid dxactionsheetmethods_hide */
         hide(): JQueryPromise<dxActionSheet>;
-        /** Shows the widget. */
+        /** @docid dxactionsheetmethods_show */
         show(): JQueryPromise<dxActionSheet>;
-        /** Shows or hides the widget depending on the Boolean value passed as the parameter. */
+        /** @docid dxactionsheetmethods_toggle */
         toggle(showing: boolean): JQueryPromise<dxActionSheet>;
     }
 }
@@ -2854,189 +3408,190 @@ interface JQuery {
 }
 declare module DevExpress.data {
     export interface XmlaStoreOptions {
-        /** The HTTP address to an XMLA OLAP server. */
+        /** @docid XmlaStoreOptions_url */
         url?: string;
-        /** The name of the database associated with the Store. */
+        /** @docid XmlaStoreOptions_catalog */
         catalog?: string;
-        /** The cube name. */
+        /** @docid XmlaStoreOptions_cube */
         cube?: string;
-        /** A function used to customize a web request before it is sent. */
+        /** @docid XmlaStoreOptions_beforeSend */
         beforeSend?: (request: Object) => void;
     }
-    /** A Store that provides access to an OLAP cube using the XMLA standard. */
+    /** @docid XmlaStore */
     export class XmlaStore {
         constructor(options: XmlaStoreOptions);
     }
     export interface PivotGridField {
+        /** @docid PivotGridDataSourceOptions_fields_index */
         index?: number;
-        /** A boolean value specifying whether or not the field is visible in the pivot grid and the Field Chooser. */
+        /** @docid PivotGridDataSourceOptions_fields_visible */
         visible?: boolean;
-        /** Name of the data source field containing data for the pivot grid field. */
+        /** @docid PivotGridDataSourceOptions_fields_dataField */
         dataField?: string;
-        /** A caption that will be displayed in the pivot grid's field chooser and field panel to identify the field. */
+        /** @docid PivotGridDataSourceOptions_fields_caption */
         caption?: string;
-        /** Specifies a type of field values. */
+        /** @docid PivotGridDataSourceOptions_fields_dataType */
         dataType?: string;
-        /** Specifies how the values of the current field are combined into groups. Cannot be used for the XmlaStore store type. */
+        /** @docid PivotGridDataSourceOptions_fields_groupInterval */
         groupInterval?: any;
-        /** Specifies how to aggregate field data. Cannot be used for the XmlaStore store type. */
+        /** @docid PivotGridDataSourceOptions_fields_summaryType */
         summaryType?: string;
-        /** Allows you to use a custom aggregate function to calculate the summary values. Cannot be used for the XmlaStore store type. */
+        /** @docid PivotGridDataSourceOptions_fields_calculateCustomSummary*/
         calculateCustomSummary?: (options: {
             summaryProcess?: string;
             value?: any;
             totalValue?: any;
         }) => void;
-        /** Specifies the function that determines how to split data from the data source into ranges for header items. Cannot be used for the XmlaStore store type. */
+        /** @docid PivotGridDataSourceOptions_fields_selector */
         selector?: (data: Object) => any;
-        /** Type of the area where the field is located. */
+        /** @docid PivotGridDataSourceOptions_fields_area */
         area?: string;
-        /** Index among the other fields displayed within the same area. */
+        /** @docid PivotGridDataSourceOptions_fields_areaIndex */
         areaIndex?: number;
-        /** The name of the folder in which the field is located. */
+        /** @docid PivotGridDataSourceOptions_fields_displayFolder */
         displayFolder?: string;
-        /** The name of the group to which the field belongs. */
+        /** @docid PivotGridDataSourceOptions_fields_groupName */
         groupName?: string;
-        /** The index of the field within a group. */
+        /** @docid PivotGridDataSourceOptions_fields_groupIndex */
         groupIndex?: number;
-        /** Specifies the sort order of field values. */
+        /** @docid PivotGridDataSourceOptions_fields_sortOrder */
         sortOrder?: string;
-        /** Specifies how field data should be sorted. Can be used for the XmlaStore store type only. */
+        /** @docid PivotGridDataSourceOptions_fields_sortBy */
         sortBy?: string;
-        /** Sorts the header items of this field by the summary values of another field. */
+        /** @docid PivotGridDataSourceOptions_fields_sortBySummaryField */
         sortBySummaryField?: string;
-        /** The array of field names that specify a path to column/row whose summary field is used for sorting of this field's header items. */
+        /** @docid PivotGridDataSourceOptions_fields_sortBySummaryPath */
         sortBySummaryPath?: Array<any>;
-        /** The filter values for the current field. */
+        /** @docid PivotGridDataSourceOptions_fields_filterValues */
         filterValues?: Array<any>;
-        /** The filter type for the current field. */
+        /** @docid PivotGridDataSourceOptions_fields_filterType */
         filterType?: string;
-        /** Indicates whether all header items of the field's header level are expanded. */
+        /** @docid PivotGridDataSourceOptions_fields_expanded */
         expanded?: boolean;
-        /** Specifies whether the field should be treated as a Data Field. */
+        /** @docid PivotGridDataSourceOptions_fields_isMeasure */
         isMeasure?: boolean;
-        /** Specifies whether or not long text in header items should be wrapped. */
+        /** @docid PivotGridDataSourceOptions_fields_wordWrapEnabled */
         wordWrapEnabled?: boolean;
-        /** Specifies a display format for field values. */
+        /** @docid PivotGridDataSourceOptions_fields_format */
         format?: any;
-        /** Specifies a callback function that returns the text to be displayed in the cells of a field. */
+        /** @docid PivotGridDataSourceOptions_fields_customizeText */
         customizeText?: (cellInfo: { value: any; valueText: string }) => string;
-        /**
-         * Specifies a precision for formatted field values.
-         * @deprecated Use the format | precision option instead.
-         */
+        /** @docid PivotGridDataSourceOptions_fields_precision */
         precision?: number;
-        /** Specifies how to sort the header items. */
+        /** @docid PivotGridDataSourceOptions_fields_sortingMethod */
         sortingMethod?: (a: Object, b: Object) => number;
-        /** Allows an end-user to change sorting options. */
+        /** @docid PivotGridDataSourceOptions_fields_allowSorting */
         allowSorting?: boolean;
-        /** Allows an end-user to sort columns by summary values. */
+        /** @docid PivotGridDataSourceOptions_fields_allowSortingBySummary */
         allowSortingBySummary?: boolean;
-        /** Allows an end-user to change filtering options. */
+        /** @docid PivotGridDataSourceOptions_fields_allowFiltering */
         allowFiltering?: boolean;
-        /** Allows an end-user to expand/collapse all header items within a header level. */
+        /** @docid PivotGridDataSourceOptions_fields_allowExpandAll */
         allowExpandAll?: boolean;
-        /** Specifies the absolute width of the field in the pivot grid. */
+        /** @docid PivotGridDataSourceOptions_fields_width */
         width?: number;
-        /** Specifies the summary post-processing algorithm. */
+        /** @docid PivotGridDataSourceOptions_fields_summaryDisplayMode */
         summaryDisplayMode?: string;
-        /** Specifies whether to summarize each next summary value with the previous one by rows or columns. */
+        /** @docid PivotGridDataSourceOptions_fields_runningTotal */
         runningTotal?: string;
-        /** Specifies whether to allow the predefined summary post-processing functions ('absoluteVariation' and 'percentVariation') and runningTotal to take values of different groups into account. */
+        /** @docid PivotGridDataSourceOptions_fields_allowCrossGroupCalculation */
         allowCrossGroupCalculation?: boolean;
-        /** Specifies a callback function that allows you to modify summary values after they are calculated. */
+        /** @docid PivotGridDataSourceOptions_fields_calculateSummaryValue */
         calculateSummaryValue?: (e: Object) => number;
-        /** Specifies whether or not to display Total values for the field. */
+        /** @docid PivotGridDataSourceOptions_fields_showTotals */
         showTotals?: boolean;
-        /** Specifies whether or not to display Grand Total values for the field. */
+        /** @docid PivotGridDataSourceOptions_fields_showGrandTotals */
         showGrandTotals?: boolean;
     }
     export class SummaryCell {
-        /** Gets the parent cell in a specified direction. */
+        /** @docid dxPivotGridSummaryCell_parent */
         parent(direction: string): SummaryCell;
-        /** Gets all children cells in a specified direction. */
+        /** @docid dxPivotGridSummaryCell_children */
         children(direction: string): Array<SummaryCell>;
-        /** Gets a partial Grand Total cell of a row or column. */
+        /** @docid dxPivotGridSummaryCell_grandTotal#grandTotal(direction) */
         grandTotal(direction: string): SummaryCell;
-        /** Gets the Grand Total of the entire pivot grid. */
+        /** @docid dxPivotGridSummaryCell_grandTotal#grandTotal() */
         grandTotal(): SummaryCell;
-        /** Gets the cell next to the current one in a specified direction. */
+        /** @docid dxPivotGridSummaryCell_next#next(direction) */
         next(direction: string): SummaryCell;
-        /** Gets the cell next to current in a specified direction. */
+        /** @docid dxPivotGridSummaryCell_next#next(direction, allowCrossGroup) */
         next(direction: string, allowCrossGroup: boolean): SummaryCell;
-        /** Gets the cell prior to the current one in a specified direction. */
+        /** @docid dxPivotGridSummaryCell_prev#prev(direction) */
         prev(direction: string): SummaryCell;
-        /** Gets the cell previous to current in a specified direction. */
+        /** @docid dxPivotGridSummaryCell_prev#prev(direction, allowCrossGroup) */
         prev(direction: string, allowCrossGroup: boolean): SummaryCell;
-        /** Gets the child cell in a specified direction. */
+        /** @docid dxPivotGridSummaryCell_child */
         child(direction: string, fieldValue: any): SummaryCell;
-        /** Gets the cell located by the path of the source cell with one field value changed. */
+        /** @docid dxPivotGridSummaryCell_slice */
         slice(field: PivotGridField, value: any): SummaryCell;
-        /** Gets the row or column field to which the current cell belongs. */
+        /** @docid dxPivotGridSummaryCell_field */
         field(area: string): PivotGridField;
-        /** Gets the value of the current cell. */
+        /** @docid dxPivotGridSummaryCell_value#value() */
         value(): any;
-        /** Gets the value of the current cell. */
+        /** @docid dxPivotGridSummaryCell_value#value(isCalculatedValue) */
         value(isCalculatedValue: boolean): any;
-        /** Gets the value of any field linked with the current cell. */
+        /** @docid dxPivotGridSummaryCell_value#value(field) */
         value(field: PivotGridField): any;
-        /** Gets the value of any field linked with the current cell. */
+        /** @docid dxPivotGridSummaryCell_value#value(field, isCalculatedValue) */
         value(field: PivotGridField, isCalculatedValue: boolean): any;
     }
     export interface PivotGridDataSourceOptions {
-        /** Specifies the underlying Store instance used to access data. */
+        /** @docid_ignore PivotGridDataSourceOptions_store_type */
+        /** @docid PivotGridDataSourceOptions_store */
         store?: any;
-        /** Indicates whether or not the automatic field generation from data in the Store is enabled. */
+        /** @docid PivotGridDataSourceOptions_retrieveFields */
         retrieveFields?: boolean;
-        /** Specifies data filtering conditions. Cannot be used for the XmlaStore store type. */
+        /** @docid PivotGridDataSourceOptions_filter */
         filter?: Object;
-        /** An array of pivot grid fields. */
+        /** @docid PivotGridDataSourceOptions_fields */
         fields?: Array<PivotGridField>;
-        /** A handler for the changed event. */
+        /** @docid PivotGridDataSourceOptions_remoteOperations */
+        remoteOperations?: boolean;
+        /** @docid PivotGridDataSourceOptions_onChanged */
         onChanged?: () => void;
-        /** A handler for the loadingChanged event. */
+        /** @docid PivotGridDataSourceOptions_onLoadingChanged */
         onLoadingChanged?: (isLoading: boolean) => void;
-        /** A handler for the loadError event. */
+        /** @docid PivotGridDataSourceOptions_onLoadError */
         onLoadError?: (e?: Object) => void;
-        /** A handler for the fieldsPrepared event. */
+        /** @docid PivotGridDataSourceOptions_onFieldsPrepared */
         onFieldsPrepared?: (e?: Array<PivotGridField>) => void;
     }
-    /** An object that provides access to data for the dxPivotGrid widget. */
+    /** @docid PivotGridDataSource */
     export class PivotGridDataSource implements EventsMixin<PivotGridDataSource> {
         constructor(options?: PivotGridDataSourceOptions);
-        /** Starts reloading data from any store and updating the data source. */
+        /** @docid PivotGridDataSourceMethods_reload */
         reload(): JQueryPromise<any>;
-        /** Starts updating the data source. Reloads data from the XMLA store only. */
+        /** @docid PivotGridDataSourceMethods_load */
         load(): JQueryPromise<any>;
-        /** Indicates whether or not the PivotGridDataSource is currently being loaded. */
+        /** @docid PivotGridDataSourceMethods_isLoading */
         isLoading(): boolean;
-        /** Gets data displayed in a PivotGrid. */
+        /** @docid PivotGridDataSourceMethods_getData */
         getData(): Object;
-        /** Gets all fields within a specified area. */
+        /** @docid PivotGridDataSourceMethods_getAreaFields */
         getAreaFields(area: string, collectGroups: boolean): Array<PivotGridField>;
-        /** Gets all fields from the data source. */
+        /** @docid PivotGridDataSourceMethods_fields#fields() */
         fields(): Array<PivotGridField>;
-        /** Sets the fields option. */
+        /** @docid PivotGridDataSourceMethods_fields#fields(fields) */
         fields(fields: Array<PivotGridField>): void;
-        /** Gets current options of a specified field. */
+        /** @docid PivotGridDataSourceMethods_field#field(id) */
         field(id: any): PivotGridField;
-        /** Sets one or more options of a specified field. */
+        /** @docid PivotGridDataSourceMethods_field#field(id, options) */
         field(id: any, field: PivotGridField): void;
-        /** Collapses a specified header item. */
+        /** @docid PivotGridDataSourceMethods_collapseHeaderItem */
         collapseHeaderItem(area: string, path: Array<any>): void;
-        /** Expands a specified header item. */
+        /** @docid PivotGridDataSourceMethods_expandHeaderItem */
         expandHeaderItem(area: string, path: Array<any>): void;
-        /** Expands all header items of a field. */
+        /** @docid PivotGridDataSourceMethods_expandAll */
         expandAll(id: any): void;
-        /** Collapses all header items of a field. */
+        /** @docid PivotGridDataSourceMethods_collapseAll */
         collapseAll(id: any): void;
-        /** Disposes of all resources associated with this PivotGridDataSource. */
+        /** @docid PivotGridDataSourceMethods_dispose */
         dispose(): void;
-        /** Gets the current filter expression. Cannot be used for the XmlaStore store type. */
+        /** @docid PivotGridDataSourceMethods_filter#filter() */
         filter(): Object;
-        /** Applies a new filter expression. Cannot be used for the XmlaStore store type. */
+        /** @docid PivotGridDataSourceMethods_filter#filter(filterExpr) */
         filter(filterExpr: Object): void;
-        /** Provides access to a list of records (facts) that were used to calculate a specific summary. */
+        /** @docid PivotGridDataSourceMethods_createDrillDownDataSource */
         createDrillDownDataSource(options: {
             columnPath?: Array<any>;
             rowPath?: Array<any>;
@@ -3044,9 +3599,9 @@ declare module DevExpress.data {
             maxRowCount?: number;
             customColumns?: Array<string>;
         }): DevExpress.data.DataSource;
-        /** Gets the current PivotGridDataSource state (fields configuration, sorting, filters, expanded headers, etc.) */
+        /** @docid PivotGridDataSourceMethods_state#state() */
         state(): Object;
-        /** Sets the PivotGridDataSource state. */
+        /** @docid PivotGridDataSourceMethods_state#state(state) */
         state(state: Object): void;
         on(eventName: string, eventHandler: Function): PivotGridDataSource;
         on(events: { [eventName: string]: Function; }): PivotGridDataSource;
@@ -3055,387 +3610,533 @@ declare module DevExpress.data {
     }
 }
 declare module DevExpress.ui {
-    export interface dxSchedulerOptions extends WidgetOptions {
-        /** Specifies a date displayed on the current scheduler view by default. */
-        currentDate?: any;
-        /** The earliest date the widget allows you to select. */
-        min?: Date;
-        /** The latest date the widget allows you to select. */
-        max?: Date;
-        /** Specifies the view used in the scheduler by default. */
-        currentView?: string;
-        /** A data source used to fetch data to be displayed by the widget. */
-        dataSource?: any;
-        /** Specifies the first day of a week. */
-        firstDayOfWeek?: number;
-        /** The template to be used for rendering appointments. */
-        appointmentTemplate?: any;
-        /** The template to be used for rendering an appointment tooltip. */
-        appointmentTooltipTemplate?: any;
-        /** Lists the views to be available within the scheduler's View Selector. */
-        views?: Array<string>;
-        /** Specifies the resource kinds by which the scheduler's appointments are grouped in a timetable. */
+    export interface dxSchedulerViewOptions {
+        /** @docid dxSchedulerOptions_views_type */
+        type?: string;
+        /** @docid dxSchedulerOptions_views_firstDayOfWeek */
+        firstDayOfWeek?: number;        
+        /** @docid dxSchedulerOptions_views_groups */
         groups?: Array<string>;
-        /** Specifies a start hour in the scheduler view's time interval. */
+        /** @docid dxSchedulerOptions_views_startDayHour */
         startDayHour?: number;
-        /** Specifies an end hour in the scheduler view's time interval. */
+        /** @docid dxSchedulerOptions_views_endDayHour */
         endDayHour?: number;
-        /** Specifies whether or not the "All-day" panel is visible. */
-        showAllDayPanel?: boolean;
-        /** Specifies cell duration in minutes. */
+        /** @docid dxSchedulerOptions_views_cellDuration */
         cellDuration?: number;
-        /** Specifies the edit mode for recurring appointments. */
+        /** @docid dxSchedulerOptions_views_agendaDuration */
+        agendaDuration?: number;
+        /** @docid dxSchedulerOptions_views_appointmentTemplate */
+        appointmentTemplate?: any;
+        /** @docid dxSchedulerOptions_views_appointmentTooltipTemplate */
+        appointmentTooltipTemplate?: any;
+        /** @docid dxSchedulerOptions_views_dataCellTemplate */
+        dataCellTemplate?: any;
+        /** @docid dxSchedulerOptions_views_timeCellTemplate */
+        timeCellTemplate?: any;
+        /** @docid dxSchedulerOptions_views_dateCellTemplate */
+        dateCellTemplate?: any;
+        /** @docid dxSchedulerOptions_views_resourceCellTemplate */
+        resourceCellTemplate?: any;
+    }
+    export interface dxSchedulerOptions extends WidgetOptions {
+        /** @docid_ignore dxSchedulerAppointmentTemplate_text */
+        /** @docid_ignore dxSchedulerAppointmentTemplate_startDate */
+        /** @docid_ignore dxSchedulerAppointmentTemplate_endDate */
+        /** @docid_ignore dxSchedulerAppointmentTemplate_description */
+        /** @docid_ignore dxSchedulerAppointmentTemplate_recurrenceRule */
+        /** @docid_ignore dxSchedulerAppointmentTemplate_recurrenceException */
+        /** @docid_ignore dxSchedulerAppointmentTemplate_allDay */
+        /** @docid_ignore dxSchedulerAppointmentTemplate_html */
+        /** @docid_ignore dxSchedulerAppointmentTemplate_disabled */
+        /** @docid_ignore dxSchedulerAppointmentTemplate_visible */
+        /** @docid_ignore dxSchedulerAppointmentTemplate_template */
+        /** @docid_ignore dxSchedulerAppointmentTemplate_startDateTimeZone */
+        /** @docid_ignore dxSchedulerAppointmentTemplate_endDateTimeZone */
+        /** @docid_ignore dxSchedulerAppointmentTooltipTemplate_text */
+        /** @docid_ignore dxSchedulerAppointmentTooltipTemplate_startDate */
+        /** @docid_ignore dxSchedulerAppointmentTooltipTemplate_endDate */
+        /** @docid_ignore dxSchedulerAppointmentTooltipTemplate_description */
+        /** @docid_ignore dxSchedulerAppointmentTooltipTemplate_recurrenceRule */
+        /** @docid_ignore dxSchedulerAppointmentTooltipTemplate_recurrenceException */
+        /** @docid_ignore dxSchedulerAppointmentTooltipTemplate_allDay */
+        /** @docid_ignore dxSchedulerAppointmentTooltipTemplate_startDateTimeZone */
+        /** @docid_ignore dxSchedulerAppointmentTooltipTemplate_endDateTimeZone */
+        /** @docid_ignore dxSchedulerOptions_focusStateEnabled */
+        /** @docid_ignore dxSchedulerOptions_appointmentPopupTemplate */
+        /** @docid_ignore dxSchedulerOptions_activeStateEnabled */
+        /** @docid_ignore dxSchedulerOptions_hoverStateEnabled */
+        /** @docid dxSchedulerOptions_currentDate */
+        currentDate?: any;
+        /** @docid dxSchedulerOptions_min */
+        min?: Date;
+        /** @docid dxSchedulerOptions_max */
+        max?: Date;
+        /** @docid dxSchedulerOptions_currentView */
+        currentView?: string;
+        /** @docid dxSchedulerOptions_dataSource */
+        dataSource?: any;
+        /** @docid dxSchedulerOptions_firstDayOfWeek */
+        firstDayOfWeek?: number;
+        /** @docid dxSchedulerOptions_appointmentTemplate */
+        appointmentTemplate?: any;
+        /** @docid dxSchedulerOptions_appointmentTooltipTemplate */
+        appointmentTooltipTemplate?: any;
+        /** @docid dxSchedulerOptions_dataCellTemplate */
+        dataCellTemplate?: any;
+        /** @docid dxSchedulerOptions_timeCellTemplate */
+        timeCellTemplate?: any;
+        /** @docid dxSchedulerOptions_dateCellTemplate */
+        dateCellTemplate?: any;
+        /** @docid dxSchedulerOptions_resourceCellTemplate */
+        resourceCellTemplate?: any;
+        /** @docid dxSchedulerOptions_views */
+        views?: Array<any>;
+        /** @docid dxSchedulerOptions_groups */
+        groups?: Array<string>;
+        /** @docid dxSchedulerOptions_startDayHour */
+        startDayHour?: number;
+        /** @docid dxSchedulerOptions_endDayHour */
+        endDayHour?: number;
+        /** @docid dxSchedulerOptions_showAllDayPanel */
+        showAllDayPanel?: boolean;
+        /** @docid dxSchedulerOptions_cellDuration */
+        cellDuration?: number;
+        /** @docid dxSchedulerOptions_recurrenceEditMode */
         recurrenceEditMode?: string;
-        /** Specifies which editing operations an end-user can perform on appointments. */
+        /** @docid dxSchedulerOptions_editing */
         editing?: {
-            /** Specifies whether or not an end-user can add appointments. */
+            /** @docid dxSchedulerOptions_editing_allowAdding */
             allowAdding?: boolean;
-            /** Specifies whether or not an end-user can change appointment options. */
+            /** @docid dxSchedulerOptions_editing_allowUpdating */
             allowUpdating?: boolean;
-            /** Specifies whether or not an end-user can delete appointments. */
+            /** @docid dxSchedulerOptions_editing_allowDeleting */
             allowDeleting?: boolean;
-            /** Specifies whether or not an end-user can change an appointment duration. */
+            /** @docid dxSchedulerOptions_editing_allowResizing */
             allowResizing?: boolean;
-            /** Specifies whether or not an end-user can drag appointments. */
+            /** @docid dxSchedulerOptions_editing_allowDragging */
             allowDragging?: boolean;
         }
-        /** Specifies an array of resources available in the scheduler. */
+        /** @docid dxSchedulerOptions_resources */
         resources?: Array<{
-            /** Indicates whether or not several resources of this kind can be assigned to an appointment. */
+            /** @docid dxSchedulerOptions_resources_allowMultiple */
             allowMultiple?: boolean;
-            /**
-             * Indicates whether or not resources of this kind have priority in the color identification of the appointments that have resources of different kinds assigned.
-             * @deprecated Use the useColorAsDefault option instead.
-             */
+            /** @docid dxSchedulerOptions_resources_mainColor */
             mainColor?: boolean;
-            /** Indicates whether or not resources of this kind have priority in the color identification of the appointments that have resources of different kinds assigned. */
+            /** @docid dxSchedulerOptions_resources_useColorAsDefault */
             useColorAsDefault?: boolean;
-            /** A data source used to fetch resources to be available in the scheduler. */
+            /** @docid dxSchedulerOptions_resources_dataSource */
             dataSource?: any;
-            /** Specifies the resource object field whose value is displayed by the Resource editor in the Appointment popup window. */
+            /** @docid dxSchedulerOptions_resources_displayExpr */
             displayExpr?: any;
-            /** Specifies the resource object field that is used as a value of the Resource editor in the Appointment popup window. */
+            /** @docid dxSchedulerOptions_resources_valueExpr */
             valueExpr?: any;
-            /**
-             * The name of the appointment object field that specifies a resource of this kind.
-             * @deprecated Use the fieldExpr option instead.
-             */
+            /** @docid dxSchedulerOptions_resources_field */
             field?: string;
-            /** The name of the appointment object field that specifies a resource of this kind. */
+            /** @docid dxSchedulerOptions_resources_fieldExpr */
             fieldExpr?: string;
-            /** Specifies the label of the Appointment popup window field that allows end users to assign a resource of this kind. */
+            /** @docid dxSchedulerOptions_resources_colorExpr */
+            colorExpr?: string;
+            /** @docid dxSchedulerOptions_resources_label */
             label?: string;
         }>;
-        /** A handler for the AppointmentAdding event. */
+        /** @docid dxSchedulerOptions_onAppointmentAdding */
         onAppointmentAdding?: Function;
-        /** A handler for the appointmentAdded event. */
+        /** @docid dxSchedulerOptions_onAppointmentAdded */
         onAppointmentAdded?: Function;
-        /** A handler for the AppointmentUpdating event. */
+        /** @docid dxSchedulerOptions_onAppointmentUpdating */
         onAppointmentUpdating?: Function;
-        /** A handler for the appointmentUpdated event. */
+        /** @docid dxSchedulerOptions_onAppointmentUpdated */
         onAppointmentUpdated?: Function;
-        /** A handler for the AppointmentDeleting event. */
+        /** @docid dxSchedulerOptions_onAppointmentDeleting */
         onAppointmentDeleting?: Function;
-        /** A handler for the appointmentDeleted event. */
+        /** @docid dxSchedulerOptions_onAppointmentDeleted */
         onAppointmentDeleted?: Function;
-        /** A handler for the appointmentRendered event. */
+        /** @docid dxSchedulerOptions_onAppointmentRendered */
         onAppointmentRendered?: Function;
-        /** A handler for the appointmentClick event. */
+        /** @docid dxSchedulerOptions_onAppointmentClick */
         onAppointmentClick?: any;
-        /** A handler for the appointmentDblClick event. */
+        /** @docid dxSchedulerOptions_onAppointmentDblClick */
         onAppointmentDblClick?: any;
-        /** A handler for the cellClick event. */
+        /** @docid dxSchedulerOptions_onCellClick */
         onCellClick?: any;
-        /** A handler for the appointmentFormCreated event. */
+        /** @docid dxSchedulerOptions_onAppointmentFormCreated */
         onAppointmentFormCreated?: Function;
-        /** A handler for the contentReady event. */
+        /** @docid dxSchedulerOptions_onContentReady */
         onContentReady?: Function;
+        /** @docid dxSchedulerOptions_horizontalScrollingEnabled */
         horizontalScrollingEnabled?: boolean;
-        /** Specifies whether or not an end-user can scroll the view in both directions at the same time. */
+        /** @docid dxSchedulerOptions_crossScrollingEnabled */
         crossScrollingEnabled?: boolean;
-        /** Specifies whether a user can switch views using tabs or a drop-down menu. */
+        /** @docid dxSchedulerOptions_useDropDownViewSwitcher */
         useDropDownViewSwitcher?: boolean;
-        /** Specifies the name of the data source item field that defines the start of an appointment. */
+        /** @docid dxSchedulerOptions_startDateExpr */
         startDateExpr?: string;
-        /** Specifies the name of the data source item field that defines the ending of an appointment. */
+        /** @docid dxSchedulerOptions_endDateExpr */
         endDateExpr?: string;
-        /** Specifies the name of the data source item field that holds the subject of an appointment. */
+        /** @docid dxSchedulerOptions_textExpr */
         textExpr?: string;
-        /** Specifies the name of the data source item field whose value holds the description of the corresponding appointment. */
+        /** @docid dxSchedulerOptions_descriptionExpr */
         descriptionExpr?: string;
-        /** Specifies the name of the data source item field whose value defines whether or not the corresponding appointment is an all-day appointment. */
+        /** @docid dxSchedulerOptions_allDayExpr */
         allDayExpr?: string;
-        /** Specifies the name of the data source item field that defines a recurrence rule for generating recurring appointments. */
+        /** @docid dxSchedulerOptions_recurrenceRuleExpr */
         recurrenceRuleExpr?: string;
-        /** Specifies the name of the data source item field that defines exceptions for the current recurring appointment. */
+        /** @docid dxSchedulerOptions_recurrenceExceptionExpr */
         recurrenceExceptionExpr?: string;
-        /** Specifies the name of the data source item field that defines the timezone of the appointment start date. */
+        /** @docid dxSchedulerOptions_startDateTimeZoneExpr */
         startDateTimeZoneExpr?: string;
-        /** Specifies the name of the data source item field that defines the timezone of the appointment end date. */
+        /** @docid dxSchedulerOptions_endDateTimeZoneExpr */
         endDateTimeZoneExpr?: string;
-        /** Specifies whether filtering is performed on the server or client side. */
+        /** @docid dxSchedulerOptions_remoteFiltering */
         remoteFiltering?: boolean;
-        /** Specifies the timezone of the widget. */
+        /** @docid dxSchedulerOptions_timeZone */
         timeZone?: string;
-        /** The text or HTML markup displayed by the widget if the item collection is empty. Available for the Agenda view only. */
+        /** @docid dxSchedulerOptions_noDataText */
         noDataText?: string;
     }
-    /** A widget that displays scheduled data using different views and provides the capability to load, add and edit appointments. */
-    export class dxScheduler extends Widget {
+    /** @docid dxScheduler */
+    export class dxScheduler extends Widget
+    implements DataHelperMixin
+    {
+        /** @docid_ignore dxSchedulerMethods_registerKeyHandler */
         constructor(element: JQuery, options?: dxSchedulerOptions);
         constructor(element: Element, options?: dxSchedulerOptions);
-        /** Add the appointment defined by the object passed as a parameter to the data associated with the widget. */
+        /** @docid dxSchedulerMethods_addAppointment */
         addAppointment(appointment: Object): void;
-        /** Updates the appointment specified by the first method parameter by the appointment object specified by the second method parameter in the the data associated with the widget. */
+        /** @docid dxSchedulerMethods_updateAppointment */
         updateAppointment(target: Object, appointment: Object): void;
-        /** Deletes the appointment defined by the parameter from the the data associated with the widget. */
+        /** @docid dxSchedulerMethods_deleteAppointment */
         deleteAppointment(appointment: Object): void;
-        /** Scrolls the scheduler work space to the specified time of the specified day. */
+        /** @docid dxSchedulerMethods_scrollToTime */
         scrollToTime(hours: number, minutes: number, date: Date): void;
-        /** Displayes the Appointment Details popup. */
+        /** @docid dxSchedulerMethods_showAppointmentPopup */
         showAppointmentPopup(appointmentData: Object, createNewAppointment?: boolean, currentAppointmentData?: Object): void;
-        /** Returns the start date of the current view. */
+        /** @docid dxSchedulerMethods_hideAppointmentPopup */
+        hideAppointmentPopup(saveChanges?: boolean): void;
+        /** @docid dxSchedulerMethods_showAppointmentTooltip */
+        showAppointmentTooltip(appointmentData: Object, target?: JQuery, currentAppointmentData?: Object): void;
+        showAppointmentTooltip(appointmentData: Object, target?: Element, currentAppointmentData?: Object): void;
+        showAppointmentTooltip(appointmentData: Object, target?: string, currentAppointmentData?: Object): void;
+        /** @docid dxSchedulerMethods_hideAppointmentTooltip */
+        hideAppointmentTooltip(): void;     
+        /** @docid dxSchedulerMethods_getStartViewDate */
         getStartViewDate(): Date;
-        /** Returns the end date of the current view. */
+        /** @docid dxSchedulerMethods_getEndViewDate */
         getEndViewDate(): Date;
+        getDataSource(): DevExpress.data.DataSource;
     }
     export interface dxColorBoxOptions extends dxDropDownEditorOptions {
-        /** Specifies the text displayed on the button that applies changes and closes the drop-down editor. */
+        /** @docid_ignore dxColorBoxOptions_fieldEditEnabled */
+        /** @docid_ignore dxColorBoxOptions_acceptCustomValue */
+        /** @docid_ignore dxColorBoxOptions_maxLength */
+        /** @docid_ignore dxColorBoxOptions_showClearButton */
+        /** @docid_ignore dxColorBoxOptions_valueChangeEvent */
+        /** @docid_ignore dxColorBoxOptions_value */
+        /** @docid_ignore dxColorBoxOptions_spellcheck */
+        /** @docid dxColorBoxOptions_applyButtonText */
         applyButtonText?: string;
+        /** @docid dxColorBoxOptions_applyValueMode */
         applyValueMode?: string;
-        /** Specifies the text displayed on the button that cancels changes and closes the drop-down editor. */
+        /** @docid dxColorBoxOptions_cancelButtonText */
         cancelButtonText?: string;
-        /** Specifies whether or not the widget value includes the alpha channel component. */
+        /** @docid dxColorBoxOptions_editAlphaChannel */
         editAlphaChannel?: boolean;
-        /** Specifies the size of a step by which a handle is moved using a keyboard shortcut. */
+        /** @docid dxColorBoxOptions_keyStep */
         keyStep?: number;
     }
-    /** A widget used to specify a color value. */
+    /** @docid dxColorBox */
     export class dxColorBox extends dxDropDownEditor {
         constructor(element: JQuery, options?: dxColorBoxOptions);
         constructor(element: Element, options?: dxColorBoxOptions);
     }
     export interface HierarchicalCollectionWidgetOptions extends CollectionWidgetOptions {
-        /** Specifies the name of the data source item field whose value is displayed by the widget. */
+        /** @docid HierarchicalCollectionWidgetOptions_displayExpr */
         displayExpr?: any;
-        /** Specifies the name of the data source item field used as a key. */
+        /** @docid HierarchicalCollectionWidgetOptions_keyExpr */
         keyExpr?: any;
-        /** Specifies the name of the data source item field whose value defines whether or not the corresponding widget items is selected. */
+        /** @docid HierarchicalCollectionWidgetOptions_selectedExpr */
         selectedExpr?: any;
-        /** Specifies the name of the data source item field that contains an array of nested items. */
+        /** @docid HierarchicalCollectionWidgetOptions_itemsExpr */
         itemsExpr?: any;
-        /** Specifies the name of the data source item field whose value defines whether or not the corresponding widget item is disabled. */
+        /** @docid HierarchicalCollectionWidgetOptions_disabledExpr */
         disabledExpr?: any;
+        /** @docid HierarchicalCollectionWidgetOptions_hoverStateEnabled */
         hoverStateEnabled?: boolean;
+        /** @docid HierarchicalCollectionWidgetOptions_focusStateEnabled */
         focusStateEnabled?: boolean;
     }
+    /** @docid HierarchicalCollectionWidget */
     export class HierarchicalCollectionWidget extends CollectionWidget {
     }
     export interface dxTreeViewOptions extends HierarchicalCollectionWidgetOptions {
-        /** Specifies whether or not to animate item collapsing and expanding. */
+        /** @docid_ignore dxTreeViewItemTemplate_icon */
+        /** @docid_ignore dxTreeViewItemTemplate_iconSrc */
+        /** @docid_ignore dxTreeViewItemTemplate_selected */
+        /** @docid_ignore dxTreeViewItemTemplate_expanded */
+        /** @docid_ignore dxTreeViewItemTemplate_items */
+        /** @docid_ignore dxTreeViewItemTemplate_parentId */
+        /** @docid_ignore dxTreeViewItemTemplate_hasItems */
+        /** @docid_ignore dxTreeViewOptions_selectedItems */
+        /** @docid_ignore dxTreeViewOptions_selectedItem */
+        /** @docid_ignore dxTreeViewOptions_selectedIndex */
+        /** @docid dxTreeViewOptions_animationEnabled */
         animationEnabled?: boolean;
-        /** Specifies whether a nested or plain array is used as a data source. */
+        /** @docid dxTreeViewOptions_dataStructure */
         dataStructure?: string;
-        /** Specifies whether or not a user can expand all tree view items by the "*" hot key. */
+        /** @docid dxTreeViewOptions_expandAllEnabled */
         expandAllEnabled?: boolean;
-        /**
-         * Specifies whether or not a check box is displayed at each tree view item.
-         * @deprecated Use the showCheckBoxesMode options instead.
-         */
+        /** @docid dxTreeViewOptions_showCheckBoxes */
         showCheckBoxes?: boolean;
-        /** Specifies the current check boxes display mode. */
+        /** @docid dxTreeViewOptions_showCheckBoxesMode */
         showCheckBoxesMode?: string;
-        /** Specifies the name of the data source item field whose value defines whether or not the corresponding widget item is displayed expanded. */
+        /** @docid dxTreeViewOptions_expandedExpr */
         expandedExpr?: any;
-        /** Specifies whether or not to select nodes recursively. */
+        /** @docid dxTreeViewOptions_selectNodesRecursive */
         selectNodesRecursive?: boolean;
-        /** Specifies whether or not all parent nodes of an initially expanded node are displayed expanded. */
+        /** @docid dxTreeViewOptions_expandNodesRecursive */
         expandNodesRecursive?: boolean;
-        /**
-         * Specifies whether the "Select All" check box is displayed over the tree view.
-         * @deprecated Use the showCheckBoxesMode options instead.
-         */
+        /** @docid dxTreeViewOptions_selectAllEnabled */
         selectAllEnabled?: boolean;
-        /** Specifies whether or not an item becomes selected if a user clicks it. */
+        /** @docid dxTreeViewOptions_selectByClick */
         selectByClick?: boolean;
-        /** Specifies item selection mode. */
+        /** @docid dxTreeViewOptions_selectionMode */
         selectionMode?: string;
-        /** Specifies the text displayed at the "Select All" check box. */
+        /** @docid dxTreeViewOptions_selectAllText */
         selectAllText?: string;
-        /** Specifies the name of the data source item field whose value defines whether or not the corresponding node includes child nodes. */
+        /** @docid dxTreeViewOptions_hasItemsExpr */
         hasItemsExpr?: any;
-        /** Specifies the name of the data source item field for holding the parent key of the corresponding node. */
+        /** @docid dxTreeViewOptions_parentIdExpr */
         parentIdExpr?: any;
-        /** Specifies if the virtual mode is enabled. */
+        /** @docid dxTreeViewOptions_virtualModeEnabled */
         virtualModeEnabled?: boolean;
-        /** Specifies the parent ID value of the root item. */
+        /** @docid dxTreeViewOptions_rootValue */
         rootValue?: Object;
-        /** Specifies the current value used to filter tree view items. */
+        /** @docid dxTreeViewOptions_searchValue */
         searchValue?: string;
-        /** A string value specifying available scrolling directions. */
+        /** @docid dxTreeViewOptions_scrollDirection */
         scrollDirection?: string;
-        /** A handler for the itemSelectionChanged event. */
+        /** @docid_ignore dxTreeViewOptions_onItemSelected */
+        /** @docid dxTreeViewOptions_onItemSelectionChanged */
         onItemSelectionChanged?: Function;
-        /** A handler for the itemExpanded event. */
+        /** @docid dxTreeViewOptions_onItemExpanded */
         onItemExpanded?: Function;
-        /** A handler for the itemCollapsed event. */
+        /** @docid dxTreeViewOptions_onItemCollapsed */
         onItemCollapsed?: Function;
+        /** @docid dxTreeViewOptions_onItemClick */
         onItemClick?: Function;
+        /** @docid dxTreeViewOptions_onItemContextMenu */
         onItemContextMenu?: Function;
+        /** @docid dxTreeViewOptions_onItemRendered */
         onItemRendered?: Function;
+        /** @docid dxTreeViewOptions_onItemHold */
         onItemHold?: Function;
+        /** @docid dxTreeViewOptions_createChildren */
+        createChildren?: Function;
     }
-    /** A widget displaying specified data items as a tree. */
+    export interface dxTreeViewNode {
+        /** @docid_ignore dxTreeViewNode_children */
+        /** @docid_ignore dxTreeViewNode_disabled */
+        /** @docid_ignore dxTreeViewNode_expanded */
+        /** @docid_ignore dxTreeViewNode_itemData */
+        /** @docid_ignore dxTreeViewNode_key */
+        /** @docid_ignore dxTreeViewNode_parent */
+        /** @docid_ignore dxTreeViewNode_selected */
+        /** @docid_ignore dxTreeViewNode_text */
+        children: Array<dxTreeViewNode>;
+        disabled: boolean;
+        expanded: boolean;
+        itemData: Object;
+        key: any;
+        parent: dxTreeViewNode;
+        selected: boolean;
+        text: string;
+    }
+    /** @docid dxTreeView */
     export class dxTreeView extends HierarchicalCollectionWidget {
+        /** @docid_ignore dxTreeViewOptions_onSelectionChanged */
         constructor(element: JQuery, options?: dxTreeViewOptions);
         constructor(element: Element, options?: dxTreeViewOptions);
-        /** Updates the tree view scrollbars according to the current size of the widget content. */
+        /** @docid dxTreeViewMethods_updateDimensions */
         updateDimensions(): JQueryPromise<void>;
-        /** Selects the specified item. */
+        /** @docid dxTreeViewMethods_selectItem */
         selectItem(itemElement: any): void;
-        /** Unselects the specified item. */
+        /** @docid dxTreeViewMethods_unselectItem */
         unselectItem(itemElement: any): void;
-        /** Expands the specified item. */
+        /** @docid dxTreeViewMethods_expandItem */
         expandItem(itemElement: any): void;
-        /** Collapses the specified item. */
+        /** @docid dxTreeViewMethods_collapseItem */
         collapseItem(itemElement: any): void;
-        /** Returns all nodes of the tree view. */
+        /** @docid dxTreeViewMethods_getNodes */
         getNodes(): Array<Object>;
-        /** Selects all widget items. */
+        /** @docid dxTreeViewMethods_selectAll */
         selectAll(): void;
-        /** Unselects all widget items. */
+        /** @docid dxTreeViewMethods_unselectAll */
         unselectAll(): void;
     }
     export interface dxMenuBaseOptions extends HierarchicalCollectionWidgetOptions {
-        /** An object that defines the animation options of the widget. */
+        /** @docid_ignore dxMenuBaseOptions_itemHoldTimeout */
+        /** @docid_ignore dxMenuBaseOptions_onItemHold */
+        /** @docid_ignore dxMenuBaseOptions_noDataText */
+        /** @docid_ignore dxMenuBaseOptions_selectedIndex */
+        /** @docid_ignore dxMenuBaseOptions_keyExpr */
+        /** @docid_ignore dxMenuBaseOptions_parentIdExpr */
+        /** @docid_ignore dxMenuBaseOptions_expandedExpr */
+        /** @docid_ignore dxMenuBaseItemTemplate_beginGroup */
+        /** @docid dxMenuBaseOptions_animation */
         animation?: {
-            /** An object that defines the animation options used when the widget is being shown. */
+            /** @docid dxMenuBaseOptions_animation_show */
             show?: fx.AnimationOptions;
-            /** An object that defines the animation options used when the widget is being hidden. */
+            /** @docid dxMenuBaseOptions_animation_hide */
             hide?: fx.AnimationOptions;
         };
-        /** A Boolean value specifying whether or not the widget changes its state when interacting with a user. */
+        /** @docid dxMenuBaseOptions_activeStateEnabled */
         activeStateEnabled?: boolean;
-        /** Specifies the name of the CSS class associated with the menu. */
+        /** @docid dxMenuBaseOptions_cssClass */
         cssClass?: string;
-        /** Holds an array of menu items. */
+        /** @docid dxMenuBaseOptions_items */
         items?: Array<any>;
-        /**
-         * Specifies whether or not an item becomes selected if an end-user clicks it.
-         * @deprecated Use the selectByClick option instead.
-         */
-        selectionByClick?: boolean;        
-        /** Specifies whether or not an item becomes selected if a user clicks it. */
+        /** @docid dxMenuBaseOptions_selectionByClick */
+        selectionByClick?: boolean;
+        /** @docid dxMenuBaseOptions_selectByClick */
         selectByClick?: boolean;
-        /** Specifies the selection mode supported by the menu. */
+        /** @docid dxMenuBaseOptions_selectionMode */
         selectionMode?: string;
-        /** Specifies options of submenu showing and hiding. */
+        /** @docid dxMenuBaseOptions_showSubmenuMode */
         showSubmenuMode?: {
-            /** Specifies the mode name. */
+            /** @docid dxMenuBaseOptions_showSubmenuMode_name */
             name?: string;
-            /** Specifies the delay of submenu show and hiding. */
+            /** @docid dxMenuBaseOptions_showSubmenuMode_delay */
             delay?: {
-                /** The time span after which the submenu is shown. */
+                /** @docid dxMenuBaseOptions_showSubmenuMode_delay_show */
                 show?: number;
-                /** The time span after which the submenu is hidden. */
+                /** @docid dxMenuBaseOptions_showSubmenuMode_delay_hide */
                 hide?: number;
             };
         };
     }
+    /** @docid dxMenuBase */
     export class dxMenuBase extends HierarchicalCollectionWidget {
         constructor(element: JQuery, options?: dxMenuBaseOptions);
         constructor(element: Element, options?: dxMenuBaseOptions);
-        /** Selects the specified item. */
+        /** @docid dxMenuBaseMethods_selectItem */
         selectItem(itemElement: any): void;
-        /** Unselects the specified item. */
+        /** @docid dxMenuBaseMethods_unselectItem */
         unselectItem(itemElement: any): void;
     }
     export interface dxMenuOptions extends dxMenuBaseOptions {
-        /** Specifies whether or not the submenu is hidden when the mouse pointer leaves it. */
+        /** @docid_ignore dxMenuOptions_onItemReordered */
+        /** @docid_ignore dxMenuOptions_onSelectionChange */
+        /** @docid_ignore dxMenuOptions_selectedItems */
+        /** @docid dxMenuOptions_hideSubmenuOnMouseLeave */
         hideSubmenuOnMouseLeave?: boolean;
-        /** Specifies whether the menu has horizontal or vertical orientation. */
+        /** @docid dxMenuOptions_orientation */
         orientation?: string;
-        /** Specifies options for showing and hiding the first level submenu. */
+        /** @docid dxMenuOptions_showFirstSubmenuMode */
         showFirstSubmenuMode?: {
-            /** Specifies the mode name. */
+            /** @docid dxMenuOptions_showFirstSubmenuMode_name */
             name?: string;
-            /** Specifies the delay in submenu showing and hiding. */
+            /** @docid dxMenuOptions_showFirstSubmenuMode_delay */
             delay?: {
-                /** The time span after which the submenu is shown. */
+                /** @docid dxMenuOptions_showFirstSubmenuMode_delay_show */
                 show?: number;
-                /** The time span after which the submenu is hidden. */
+                /** @docid dxMenuOptions_showFirstSubmenuMode_delay_hide */
                 hide?: number;
             };
         };
-        /** Specifies the direction at which the submenus are displayed. */
+        /** @docid dxMenuOptions_submenuDirection */
         submenuDirection?: string;
-        /** A handler for the submenuHidden event. */
+        /** @docid dxMenuOptions_onSubmenuHidden */
         onSubmenuHidden?: Function;
-        /** Specifies whether or not adaptive widget rendering is enabled on a small screen. */
+        /** @docid dxMenuOptions_adaptivityEnabled */
         adaptivityEnabled?: boolean;
-        /** A handler for the submenuHiding event. */
+        /** @docid dxMenuOptions_onSubmenuHiding */
         onSubmenuHiding?: Function;
-        /** A handler for the submenuShowing event. */
+        /** @docid dxMenuOptions_onSubmenuShowing */
         onSubmenuShowing?: Function;
-        /** A handler for the submenuShown event. */
+        /** @docid dxMenuOptions_onSubmenuShown */
         onSubmenuShown?: Function;
     }
-    /** A menu widget. */
+    /** @docid dxMenu */
     export class dxMenu extends dxMenuBase {
         constructor(element: JQuery, options?: dxMenuOptions);
         constructor(element: Element, options?: dxMenuOptions);
+        /** @docid_ignore dxMenuBaseItemTemplate_disabled */
+        /** @docid_ignore dxMenuBaseItemTemplate_html */
+        /** @docid_ignore dxMenuBaseItemTemplate_icon */
+        /** @docid_ignore dxMenuBaseItemTemplate_iconSrc */
+        /** @docid_ignore dxMenuBaseItemTemplate_items */
+        /** @docid_ignore dxMenuBaseItemTemplate_selectable */
+        /** @docid_ignore dxMenuBaseItemTemplate_selected */
+        /** @docid_ignore dxMenuBaseItemTemplate_text */
+        /** @docid_ignore dxMenuBaseItemTemplate_visible */
+        /** @docid_ignore dxMenuBaseItemTemplate_closeMenuOnClick */
     }
     export interface dxContextMenuOptions extends dxMenuBaseOptions {
-        /** Holds an object that specifies options of alternative menu invocation. */
-        alternativeInvocationMode?: {
-            /** Specifies whether or not an alternative invocation mode is enabled. */
-            enabled?: Boolean;
-            /** Specifies the element used to invoke the context menu. */
-            invokingElement?: any;
+        /** @docid_ignore dxContextMenuOptions_itemHoldAction */
+        /** @docid_ignore dxContextMenuOptions_onItemReordered */
+        /** @docid dxContextMenuOptions_showEvent */
+        showEvent?: {
+            /** @docid dxContextMenuOptions_showEvent_name */
+            name?: String;
+            /** @docid dxContextMenuOptions_showEvent_delay */
+            delay?: Number;
         };
-        /** A handler for the hidden event. */
+        /** @docid dxContextMenuOptions_closeOnOutsideClick */
+        closeOnOutsideClick?: any;
+        /** @docid dxContextMenuOptions_onHidden */
         onHidden?: Function;
-        /** A handler for the hiding event. */
+        /** @docid dxContextMenuOptions_onHiding */
         onHiding?: Function;
-        /** A handler for the positioning event. */
+        /** @docid dxContextMenuOptions_onPositioning */
         onPositioning?: Function;
-        /** A handler for the showing event. */
+        /** @docid dxContextMenuOptions_onShowing */
         onShowing?: Function;
-        /** A handler for the shown event. */
+        /** @docid dxContextMenuOptions_onShown */
         onShown?: Function;
-        /** An object defining widget positioning options. */
+        /** @docid dxContextMenuOptions_position */
         position?: PositionOptions;
-        /** Specifies the direction at which submenus are displayed. */
+        /** @docid dxContextMenuOptions_submenuDirection */
         submenuDirection?: string;
-        /** The target element associated with a popover. */
+        /** @docid dxContextMenuOptions_target */
         target?: any;
-        /** A Boolean value specifying whether or not the widget is visible. */
+        /** @docid dxContextMenuOptions_visible */
         visible?: boolean;
     }
-    /** A context menu widget. */
+    /** @docid dxContextMenu */
     export class dxContextMenu extends dxMenuBase {
         constructor(element: JQuery, options?: dxContextMenuOptions);
         constructor(element: Element, options?: dxContextMenuOptions);
-        /** Toggles the visibility of the widget. */
+        /** @docid dxContextMenuMethods_toggle */
         toggle(showing: boolean): JQueryPromise<void>;
-        /** Shows the widget. */
+        /** @docid dxContextMenuMethods_show */
         show(): JQueryPromise<void>;
-        /** Hides the widget. */
+        /** @docid dxContextMenuMethods_hide */
         hide(): JQueryPromise<void>;
     }
     export interface dxRemoteOperations {
-        /** Specifies whether or not filtering must be performed on the server side. */
+        /** @docid dxDataGridOptions_remoteOperations_filtering */
         filtering?: boolean;
-        /** Specifies whether or not paging must be performed on the server side. */
+        /** @docid dxDataGridOptions_remoteOperations_paging */
         paging?: boolean;
-        /** Specifies whether or not sorting must be performed on the server side. */
+        /** @docid dxDataGridOptions_remoteOperations_sorting */
         sorting?: boolean;
-        /** Specifies whether or not grouping must be performed on the server side. */
+        /** @docid dxDataGridOptions_remoteOperations_grouping */
         grouping?: boolean;
-        /** Specifies whether or not summaries calculation must be performed on the server side. */
+        /** @docid dxDataGridOptions_remoteOperations_groupPaging */
+        groupPaging?: boolean;
+        /** @docid dxDataGridOptions_remoteOperations_summary */
         summary?: boolean;
     }
     export interface dxDataGridRow {
+        /** @docid_ignore dxDataGridRowObject_data */
+        /** @docid_ignore dxDataGridRowObject_key */
+        /** @docid_ignore dxDataGridRowObject_rowIndex */
+        /** @docid_ignore dxDataGridRowObject_rowType */
+        /** @docid_ignore dxDataGridRowObject_groupIndex */
+        /** @docid_ignore dxDataGridRowObject_isExpanded */
+        /** @docid_ignore dxDataGridRowObject_isSelected */
+        /** @docid_ignore dxDataGridRowObject_isEditing */
+        /** @docid_ignore dxDataGridRowObject_values */
         data: Object;
         key: any;
         rowIndex: number;
@@ -3443,661 +4144,685 @@ declare module DevExpress.ui {
         groupIndex: number;
         isExpanded: boolean;
         isSelected: boolean;
+        isEditing: boolean;
         values: Array<any>;
     }
     export interface dxDataGridColumn {
-        /** Specifies the content alignment within column cells. */
+        /** @docid_ignore dxDataGridOptions_columns_resized*/
+        /** @docid_ignore dxDataGridOptions_columns_grouped*/
+        /** @docid dxDataGridOptions_columns_alignment */
         alignment?: string;
-        /** Specifies whether the values in a column can be edited at runtime. Setting this option makes sense only when editing is enabled for a grid. */
+        /** @docid dxDataGridOptions_columns_allowEditing */
         allowEditing?: boolean;
-        /** Specifies whether or not a column can be used for filtering grid records. Setting this option makes sense only when the filter row and column header filtering are visible. */
+        /** @docid dxDataGridOptions_columns_allowFiltering */
         allowFiltering?: boolean;
-        /** Specifies whether or not to allow filtering by this column using its header. */
+        /** @docid dxDataGridOptions_columns_allowHeaderFiltering */
         allowHeaderFiltering?: boolean;
-        /** Specifies whether or not the column can be anchored to a grid edge by end users. Setting this option makes sense only when the columnFixing | enabled option is set to true. */
+        /** @docid dxDataGridOptions_columns_allowFixing */
         allowFixing?: boolean;
-        /** Specifies if a column can be used for searching grid records. Setting this option makes sense only when the search panel is visible. */
+        /** @docid dxDataGridOptions_columns_allowSearch */
         allowSearch?: boolean;
-        /** Specifies whether the user can group data by values of this column. Applies only when grouping is enabled. */
+        /** @docid dxDataGridOptions_columns_allowGrouping */
         allowGrouping?: boolean;
-        /** Specifies whether or not a column can be hidden by a user. Setting this option makes sense only when the column chooser is visible. */
+        /** @docid dxDataGridOptions_columns_allowHiding */
         allowHiding?: boolean;
-        /** Specifies whether or not a particular column can be used in column reordering. Setting this option makes sense only when the allowColumnReordering option is set to true. */
+        /** @docid dxDataGridOptions_columns_allowReordering */
         allowReordering?: boolean;
-        /** Specifies whether or not a particular column can be resized by a user. Setting this option makes sense only when the allowColumnResizing option is true. */
+        /** @docid dxDataGridOptions_columns_allowResizing */
         allowResizing?: boolean;
-        /** Specifies whether grid records can be sorted by a specific column at runtime. Setting this option makes sense only when the sorting mode differs from none. */
+        /** @docid dxDataGridOptions_columns_allowSorting */
         allowSorting?: boolean;
-        /** Specifies whether groups appear expanded or not when records are grouped by a specific column. Setting this option makes sense only when grouping is allowed for this column. */
+        /** @docid dxDataGridOptions_columns_autoExpandGroup */
         autoExpandGroup?: boolean;
-        /** Specifies a callback function that returns a value to be displayed in a column cell. */
+        /** @docid dxDataGridOptions_columns_calculateCellValue */
         calculateCellValue?: (rowData: Object) => string;
-        /** Specifies a callback function to be invoked after the cell value is edited by an end-user and before the new value is saved to the data source. */
+        /** @docid dxDataGridOptions_columns_setCellValue */
         setCellValue?: (rowData: Object, value: any) => void;
-        /** Specifies a callback function that defines filters for customary calculated grid cells. */
+        /** @docid dxDataGridOptions_columns_calculateFilterExpression */
         calculateFilterExpression?: (filterValue: any, selectedFilterOperation: string, target: string) => Array<any>;
-        /** Specifies a caption for a column. */
+        /** @docid dxDataGridOptions_columns_caption */
         caption?: string;
-        /** Specifies a custom template for grid column cells. */
+        /** @docid dxDataGridOptions_columns_cellTemplate */
         cellTemplate?: any;
-        /** Specifies a CSS class to be applied to a column. */
+        /** @docid dxDataGridOptions_columns_cssClass */
         cssClass?: string;
-        /** Specifies how to get a value to be displayed in a cell when it is not in an editing state. */
+        /** @docid dxDataGridOptions_columns_calculateDisplayValue */
         calculateDisplayValue?: any;
-        /** Specifies a field name or a function that returns a field name or a value to be used for grouping column cells. */
+        /** @docid dxDataGridOptions_columns_calculateGroupValue */
         calculateGroupValue?: any;
-        /** Specifies a field name or a function that returns a field name or a value to be used for sorting column cells. */
+        /** @docid dxDataGridOptions_columns_calculateSortValue */
         calculateSortValue?: any;
-        /** Specifies a callback function that returns the text to be displayed in the cells of a column. */
+        /** @docid dxDataGridOptions_columns_customizeText */
         customizeText?: (cellInfo: { value: any; valueText: string; target: string; groupInterval: any }) => string;
-        /** Specifies the field of a data source that provides data for a column. */
+        /** @docid dxDataGridOptions_columns_dataField */
         dataField?: string;
-        /** Specifies the required type of column values. */
+        /** @docid dxDataGridOptions_columns_dataType */
         dataType?: string;
-        /** Specifies a custom template for the cell of a grid column when it is in an editing state. */
+        /** @docid dxDataGridOptions_columns_editCellTemplate */
         editCellTemplate?: any;
-        /** Specifies configuration options for the editor widget of the current column. */
+        /** @docid dxDataGridOptions_columns_editorOptions */
         editorOptions?: Object;
-        /** Specifies whether HTML tags are displayed as plain text or applied to the values of the column. */
+        /** @docid dxDataGridOptions_columns_encodeHtml */
         encodeHtml?: boolean;
-        /** In a boolean column, replaces all false items with a specified text. */
+        /** @docid dxDataGridOptions_columns_falseText */
         falseText?: string;
-        /** Specifies the set of available filter operations. */
+        /** @docid dxDataGridOptions_columns_filterOperations */
         filterOperations?: Array<any>;
-        /** Specifies a filter value for a column. */
+        /** @docid dxDataGridOptions_columns_filterValue */
         filterValue?: any;
-        /** Specifies initial filter values for the column's header filter. */
+        /** @docid dxDataGridOptions_columns_filterValues */
         filterValues?: Array<any>;
-        /** Specifies whether to include or exclude the records with the values selected in the column's header filter. */
+        /** @docid dxDataGridOptions_columns_filterType */
         filterType?: string;
-        /** Indicates whether the column takes part in horizontal grid scrolling or is anchored to a grid edge. */
+        /** @docid dxDataGridOptions_columns_fixed */
         fixed?: boolean;
-        /** Specifies the order according to which grid columns must be concealed when the widget adapts to the screen or container size. */
+        /** @docid dxDataGridOptions_columns_hidingPriority */
         hidingPriority?: number;
-        /** Specifies the grid edge to which the column is anchored. */
+        /** @docid dxDataGridOptions_columns_fixedPosition */
         fixedPosition?: string;
-        /** Specifies a format for the values displayed in a column. */
+        /** @docid dxDataGridOptions_columns_format */
         format?: any;
-        /** Specifies a custom template for the group cell of a grid column. */
+        /** @docid dxDataGridOptions_columns_groupCellTemplate */
         groupCellTemplate?: any;
-        /** Specifies the index of a column when grid records are grouped by the values of this column. */
+        /** @docid dxDataGridOptions_columns_groupIndex */
         groupIndex?: number;
-        /** Specifies a custom template for the header of a grid column. */
+        /** @docid dxDataGridOptions_columns_headerCellTemplate */
         headerCellTemplate?: any;
-        /** Specifies options of a lookup column. */
+        /** @docid dxDataGridOptions_columns_lookup */
         lookup?: {
-            /** Specifies whether or not a user can nullify values of a lookup column. */
+            /** @docid dxDataGridOptions_columns_lookup_allowClearing */
             allowClearing?: boolean;
-            /** Specifies the data source providing data for a lookup column. */
+            /** @docid dxDataGridOptions_columns_lookup_dataSource */
             dataSource?: any;
-            /** Specifies the expression defining the data source field whose values must be displayed. */
+            /** @docid dxDataGridOptions_columns_lookup_displayExpr */
             displayExpr?: any;
-            /** Specifies the expression defining the data source field whose values must be replaced. */
+            /** @docid dxDataGridOptions_columns_lookup_valueExpr */
             valueExpr?: string;
         };
-        /** Specifies column-level options for filtering using a column header filter. */
+        /** @docid dxDataGridOptions_columns_headerFilter */
         headerFilter?: {
-            /** Specifies the data source to be used for the header filter. */
+            /** @docid dxDataGridOptions_columns_headerFilter_dataSource */
             dataSource?: any;
-            /** Specifies how header filter values should be combined into groups. */
+            /** @docid dxDataGridOptions_columns_headerFilter_groupInterval */
             groupInterval?: any;
         };
-        /**
-         * Specifies a precision for formatted values displayed in a column.
-         * @deprecated Use the format | precision option instead.
-         */
+        /** @docid dxDataGridOptions_columns_precision */
         precision?: number;
-        /** Specifies the default filter operation of a column. */
+        /** @docid dxDataGridOptions_columns_selectedFilterOperation */
         selectedFilterOperation?: string;
-        /** Specifies whether or not the column displays its values by using editors. */
+        /** @docid dxDataGridOptions_columns_showEditorAlways */
         showEditorAlways?: boolean;
-        /** Specifies whether or not to display the column when grid records are grouped by it. */
+        /** @docid dxDataGridOptions_columns_showWhenGrouped */
         showWhenGrouped?: boolean;
-        /** Specifies the index of a column when grid records are sorted by the values of this column. */
+        /** @docid dxDataGridOptions_columns_sortIndex */
         sortIndex?: number;
-        /** Specifies the initial sort order of column values. */
+        /** @docid dxDataGridOptions_columns_sortOrder */
         sortOrder?: string;
-        /** In a boolean column, replaces all true items with a specified text. */
+        /** @docid dxDataGridOptions_columns_trueText */
         trueText?: string;
-        /** Specifies whether a column is visible or not. */
+        /** @docid dxDataGridOptions_columns_visible */
         visible?: boolean;
-        /** Specifies the sequence number of the column in the grid. */
+        /** @docid dxDataGridOptions_columns_visibleIndex */
         visibleIndex?: number;
-        /** Specifies a column width in pixels or percentages. */
+        /** @docid dxDataGridOptions_columns_width */
         width?: any;
-        /** Specifies an array of validation rules to be checked when updating column cell values. */
+        /** @docid dxDataGridOptions_columns_validationRules */
         validationRules?: Array<Object>;
-        /** Specifies whether or not to display the header of a hidden column in the column chooser. */
+        /** @docid dxDataGridOptions_columns_showInColumnChooser */
         showInColumnChooser?: boolean;
-        /** Specifies the identifier of the column. */
+        /** @docid dxDataGridOptions_columns_name */
         name?: string;
-        /** The form item configuration object. Used only when the editing mode is "form". */
+        /** @docid dxDataGridOptions_columns_formItem */
         formItem?: DevExpress.ui.dxFormItem;
-        /** An array of grid columns. */
+        /** @docid dxDataGridOptions_columns_columns */
         columns?: Array<dxDataGridColumn>;
-        /** Specifies the band column that owns the current column. Accepts the index of the band column in the columns array. */
+        /** @docid dxDataGridOptions_columns_ownerBand */
         ownerBand?: number;
-        /** Specifies whether the column bands other columns or not. */
+        /** @docid dxDataGridOptions_columns_isBand */
         isBand?: boolean;
     }
     export interface dxDataGridOptions extends WidgetOptions {
-        /** Specifies whether the outer borders of the grid are visible or not. */
+        /** @docid_ignore dxDataGridOptions_regenerateColumnsByVisibleItems */
+        /** @docid dxDataGridOptions_showBorders */
         showBorders?: boolean;
-        /** Indicates whether to show the error row for the grid. */
+        /** @docid dxDataGridOptions_errorRowEnabled */
         errorRowEnabled?: boolean;
-        /** A handler for the rowValidating event. */
+        /** @docid dxDataGridOptions_onRowValidating */
         onRowValidating?: (e: Object) => void;
-        /** A handler for the contextMenuPreparing event. */
+        /** @docid dxDataGridOptions_onContextMenuPreparing */
         onContextMenuPreparing?: (e: Object) => void;
-        /** A handler for the initNewRow event. */
+        /** @docid dxDataGridOptions_onToolbarPreparing */
+        onToolbarPreparing?: (e: Object) => void;
+        /** @docid dxDataGridOptions_onInitNewRow */
         onInitNewRow?: (e: { data: Object }) => void;
-        /** A handler for the rowInserted event. */
+        /** @docid dxDataGridOptions_onRowInserted */
         onRowInserted?: (e: { data: Object; key: any }) => void;
-        /** A handler for the rowInserting event. */
+        /** @docid dxDataGridOptions_onRowInserting */
         onRowInserting?: (e: { data: Object; cancel: any }) => void;
-        /** A handler for the rowRemoved event. */
+        /** @docid dxDataGridOptions_onRowRemoved */
         onRowRemoved?: (e: { data: Object; key: any }) => void;
-        /** A handler for the rowRemoving event. */
+        /** @docid dxDataGridOptions_onRowRemoving */
         onRowRemoving?: (e: { data: Object; key: any; cancel: any }) => void;
-        /** A handler for the rowUpdated event. */
+        /** @docid dxDataGridOptions_onRowUpdated */
         onRowUpdated?: (e: { data: Object; key: any }) => void;
-        /** A handler for the rowUpdating event. */
+        /** @docid dxDataGridOptions_onRowUpdating */
         onRowUpdating?: (e: { oldData: Object; newData: Object; key: any; cancel: any }) => void;
-        /** Enables a hint that appears when a user hovers the mouse pointer over a cell with truncated content. */
+        /** @docid dxDataGridOptions_cellHintEnabled */
         cellHintEnabled?: boolean;
-        /** Specifies whether or not the widget should hide columns in order to adapt to the screen or container size. */
+        /** @docid dxDataGridOptions_columnHidingEnabled */
         columnHidingEnabled?: boolean;
-        /** Specifies whether or not grid columns can be reordered by a user. */
+        /** @docid dxDataGridOptions_allowColumnReordering */
         allowColumnReordering?: boolean;
-        /** Specifies whether or not grid columns can be resized by a user. */
+        /** @docid dxDataGridOptions_allowColumnResizing */
         allowColumnResizing?: boolean;
-        /** A handler for the cellClick event. */
+        /** @docid dxDataGridOptions_onCellClick */
         onCellClick?: any;
-        /** A handler for the cellHoverChanged event. */
+        /** @docid dxDataGridOptions_onCellHoverChanged */
         onCellHoverChanged?: (e: Object) => void;
-        /** A handler for the cellPrepared event. */
+        /** @docid dxDataGridOptions_onCellPrepared */
         onCellPrepared?: (e: Object) => void;
-        /** A handler for the adaptiveDetailRowPreparing event. */
+        /** @docid dxDataGridOptions_onAdaptiveDetailRowPreparing */
         onAdaptiveDetailRowPreparing?: (e: Object) => void;
-        /** Specifies whether or not the width of grid columns depends on column content. */
+        /** @docid dxDataGridOptions_columnAutoWidth */
         columnAutoWidth?: boolean;
-        /** Specifies the options of a column chooser. */
+        /** @docid dxDataGridOptions_columnChooser */
         columnChooser?: {
-            /** Specifies text displayed by the column chooser panel when it does not contain any columns. */
+            /** @docid dxDataGridOptions_columnChooser_emptyPanelText */
             emptyPanelText?: string;
-            /** Specifies whether a user can invoke the column chooser or not. */
+            /** @docid dxDataGridOptions_columnChooser_enabled */
             enabled?: boolean;
-            /** Specifies how the end-user chooses columns. */
+            /** @docid dxDataGridOptions_columnChooser_mode */
             mode?: string;
-            /** Specifies the height of the column chooser panel. */
+            /** @docid dxDataGridOptions_columnChooser_height */
             height?: number;
-            /** Specifies text displayed in the title of the column chooser panel. */
+            /** @docid dxDataGridOptions_columnChooser_title */
             title?: string;
-            /** Specifies the width of the column chooser panel. */
+            /** @docid dxDataGridOptions_columnChooser_width */
             width?: number;
         };
-        /** Specifies options for column fixing. */
+        /** @docid dxDataGridOptions_columnFixing */
         columnFixing?: {
-            /** Indicates if column fixing is enabled. */
+            /** @docid dxDataGridOptions_columnFixing_enabled */
             enabled?: boolean;
-            /** Contains options that specify texts for column-fixing related commands in the column header's context menu. */
+            /** @docid dxDataGridOptions_columnFixing_texts */
             texts?: {
-                /** Specifies text for a context menu item that fixes the column for which the context menu is invoked. */
+                /** @docid dxDataGridOptions_columnFixing_texts_fix */
                 fix?: string;
-                /** Specifies text for a context menu item that unfixes the column for which the context menu is invoked. */
+                /** @docid dxDataGridOptions_columnFixing_texts_unfix */
                 unfix?: string;
-                /** Specifies text for a context menu subitem that fixes a column, for which the context menu is invoked, to the left grid edge. */
+                /** @docid dxDataGridOptions_columnFixing_texts_leftPosition */
                 leftPosition?: string;
-                /** Specifies text for a context menu subitem that fixes a column, for which the context menu is invoked, to the right grid edge. */
+                /** @docid dxDataGridOptions_columnFixing_texts_rightPosition */
                 rightPosition?: string;
             };
         };
-        /** Specifies options for filtering using a column header filter. */
+        /** @docid dxDataGridOptions_headerFilter */
         headerFilter?: {
-            /** Indicates whether or not the column header filter button is visible. */
+            /** @docid dxDataGridOptions_headerFilter_visible */
             visible?: boolean;
-            /** Specifies the height of the dropdown menu invoked when using a column header filter. */
+            /** @docid dxDataGridOptions_headerFilter_height */
             height?: number;
-            /** Specifies the width of the dropdown menu invoked when using a column header filter. */
+            /** @docid dxDataGridOptions_headerFilter_width */
             width?: number;
-            /** Contains options that specify texts for the dropdown menu invoked when you use a column header filter. */
+            /** @docid dxDataGridOptions_headerFilter_texts */
             texts?: {
-                /** Specifies text for the item specifying an empty value in the column header filter's dropdown menu. */
+                /** @docid dxDataGridOptions_headerFilter_texts_emptyValue */
                 emptyValue?: string;
-                /** Specifies text for a button that closes the column header filter's dropdown menu and applies specified filtering. */
+                /** @docid dxDataGridOptions_headerFilter_texts_ok */
                 ok?: string;
-                /** Specifies text for a button that closes the column header filter's dropdown menu without applying performed selection. */
+                /** @docid dxDataGridOptions_headerFilter_texts_cancel */
                 cancel?: string;
             }
         };
-        /** An array of grid columns. */
+        /** @docid dxDataGridOptions_columns */
         columns?: Array<dxDataGridColumn>;
+        /** @docid dxDataGridOptions_onContentReady */
         onContentReady?: Function;
-        /** Specifies a function that customizes grid columns after they are created. */
+        /** @docid dxDataGridOptions_customizeColumns */
         customizeColumns?: (columns: Array<dxDataGridColumn>) => void;
-        /** Customizes grid columns and data before exporting. */
+        /** @docid dxDataGridOptions_customizeExportData */
         customizeExportData?: (columns: Array<dxDataGridColumn>, rows: Array<dxDataGridRow>) => void;
-        /** Specifies a data source for the grid. */
+        /** @docid dxDataGridOptions_dataSource */
         dataSource?: any;
-        /** Specifies whether or not to enable data caching. */
+        /** @docid dxDataGridOptions_cacheEnabled */
         cacheEnabled?: boolean;
-        /** A handler for the editingStart event. */
+        /** @docid dxDataGridOptions_onEditingStart */
         onEditingStart?: (e: {
             data: Object;
             key: any;
             cancel: boolean;
             column: dxDataGridColumn
         }) => void;
-        /** A handler for the editorPrepared event. */
+        /** @docid dxDataGridOptions_onEditorPrepared */
         onEditorPrepared?: (e: Object) => void;
-        /** A handler for the editorPreparing event. */
+        /** @docid dxDataGridOptions_onEditorPreparing */
         onEditorPreparing?: (e: Object) => void;
-        /** Contains options that specify how grid content can be changed. */
+        /** @docid dxDataGridOptions_editing */
         editing?: {
+            /** @docid dxDataGridOptions_editing_editMode */
             editMode?: string;
+            /** @docid dxDataGridOptions_editing_editEnabled */
             editEnabled?: boolean;
+            /** @docid dxDataGridOptions_editing_insertEnabled */
             insertEnabled?: boolean;
+            /** @docid dxDataGridOptions_editing_removeEnabled */
             removeEnabled?: boolean;
-            /** Specifies how grid values can be edited manually. */
+            /** @docid dxDataGridOptions_editing_mode */
             mode?: string;
-            /** Specifies whether or not grid records can be edited at runtime. */
+            /** @docid dxDataGridOptions_editing_allowUpdating */
             allowUpdating?: boolean;
-            /** Specifies whether or not new grid records can be added at runtime. */
+            /** @docid dxDataGridOptions_editing_allowAdding */
             allowAdding?: boolean;
-            /** Specifies whether or not grid records can be deleted at runtime. */
+            /** @docid dxDataGridOptions_editing_allowDeleting */
             allowDeleting?: boolean;
-            /** The form configuration object. Used only when the editing mode is "form". */
+            /** @docid dxDataGridOptions_editing_form */
             form?: DevExpress.ui.dxFormOptions;
-            /** Contains options that specify texts for editing-related grid controls. */
+            /** @docid dxDataGridOptions_editing_texts */
             texts?: {
-                /** Specifies text for a hint that appears when a user hovers the mouse pointer over the "Save" button. Setting this option makes sense only when the mode option is set to batch. */
+                /** @docid dxDataGridOptions_editing_texts_saveAllChanges */
                 saveAllChanges?: string;
-                /** Specifies text for a cancel button displayed when a row is in the editing state. Setting this option makes sense only when the allowUpdating option is set to true. */
+                /** @docid dxDataGridOptions_editing_texts_cancelRowChanges */
                 cancelRowChanges?: string;
-                /** Specifies text for a hint that appears when a user hovers the mouse pointer over the "Revert" button. Setting this option makes sense only when the mode option is set to batch. */
+                /** @docid dxDataGridOptions_editing_texts_cancelAllChanges */
                 cancelAllChanges?: string;
-                /** Specifies a message to be displayed by a confirmation window. Setting this option makes sense only when the edit mode is "row". */
+                /** @docid dxDataGridOptions_editing_texts_confirmDeleteMessage */
                 confirmDeleteMessage?: string;
-                /** Specifies text to be displayed in the title of a confirmation window. Setting this option makes sense only when the edit mode is "row". */
+                /** @docid dxDataGridOptions_editing_texts_confirmDeleteTitle */
                 confirmDeleteTitle?: string;
-                /** Specifies text for a hint that appears when a user hovers the mouse pointer over the "Cancel changes" button. Setting this option makes sense only when the mode option is set to cell and the validation capabilities are enabled.
-#####See Also#####
-- Validation Engine
-- Validation Engine - MVVM Approach */
+                /** @docid dxDataGridOptions_editing_texts_validationCancelChanges */
                 validationCancelChanges?: string;
-                /** Specifies text for a button that deletes a row from a grid. Setting this option makes sense only when the allowDeleting option is set to true. */
+                /** @docid dxDataGridOptions_editing_texts_deleteRow */
                 deleteRow?: string;
-                /** Specifies text for a hint that appears when a user hovers the mouse pointer over the "Add" button. Setting this option makes sense only when the allowAdding option is true. */
+                /** @docid dxDataGridOptions_editing_texts_addRow */
                 addRow?: string;
-                /** Specifies text for a button that turns a row into the editing state. Setting this option makes sense only when the allowUpdating option is set to true. */
+                /** @docid dxDataGridOptions_editing_texts_editRow */
                 editRow?: string;
-                /** Specifies text for a save button displayed when a row is in the editing state. Setting this option makes sense only when the allowUpdating option is set to true. */
+                /** @docid dxDataGridOptions_editing_texts_saveRowChanges */
                 saveRowChanges?: string;
-                /** Specifies text for a button that recovers a deleted row. Setting this option makes sense only if the grid uses the batch edit mode and the allowDeleting option is set to true. */
+                /** @docid dxDataGridOptions_editing_texts_undeleteRow */
                 undeleteRow?: string;
             };
         };
-        /** Specifies filter row options. */
+        /** @docid dxDataGridOptions_filterRow */
         filterRow?: {
-            /** Specifies when to apply a filter. */
+            /** @docid dxDataGridOptions_filterRow_applyFilter */
             applyFilter?: string;
-            /** Specifies text for the hint that pops up when a user hovers the mouse pointer over the "Apply Filter" button. */
+            /** @docid dxDataGridOptions_filterRow_applyFilterText */
             applyFilterText?: string;
-            /** Specifies descriptions for filter operations. */
+            /** @docid dxDataGridOptions_filterRow_operationDescriptions */
             operationDescriptions?: {
-                "=": string;
-                "<>": string;
-                "<": string;
-                "<=": string;
-                ">": string;
-                ">=": string;
-                "startswith": string;
-                "contains": string;
-                "notcontains": string;
-                "endswith": string;
+                /** @docid dxDataGridOptions_filterRow_operationDescriptions_equal */
+                equal?: string;
+                /** @docid dxDataGridOptions_filterRow_operationDescriptions_notEqual */
+                notEqual?: string;
+                /** @docid dxDataGridOptions_filterRow_operationDescriptions_lessThan */
+                lessThan?: string;
+                /** @docid dxDataGridOptions_filterRow_operationDescriptions_lessThanOrEqual */
+                lessThanOrEqual?: string;
+                /** @docid dxDataGridOptions_filterRow_operationDescriptions_greaterThan */
+                greaterThan?: string;
+                /** @docid dxDataGridOptions_filterRow_operationDescriptions_greaterThanOrEqual */
+                greaterThanOrEqual?: string;
+                /** @docid dxDataGridOptions_filterRow_operationDescriptions_startsWith */
+                startsWith?: string;
+                /** @docid dxDataGridOptions_filterRow_operationDescriptions_contains */
+                contains?: string;
+                /** @docid dxDataGridOptions_filterRow_operationDescriptions_notContains */
+                notContains?: string;
+                /** @docid dxDataGridOptions_filterRow_operationDescriptions_endsWith */
+                endsWith?: string;
+                /** @docid dxDataGridOptions_filterRow_operationDescriptions_between */
+                between?: string;
             };
-            /** Specifies text for the reset operation in a filter list. */
+            /** @docid dxDataGridOptions_filterRow_resetOperationText */
             resetOperationText?: string;
-            /** Specifies text for the operation of clearing the applied filter when a select box is used. */
+            /** @docid dxDataGridOptions_filterRow_showAllText */
             showAllText?: string;
-            /** Specifies text for the range start in the 'between' filter type. */
+            /** @docid dxDataGridOptions_filterRow_betweenStartText */
             betweenStartText?: string;
-            /** Specifies text for the range end in the 'between' filter type. */
+            /** @docid dxDataGridOptions_filterRow_betweenEndText */
             betweenEndText?: string;
-            /** Specifies whether or not an icon that allows the user to choose a filter operation is visible. */
+            /** @docid dxDataGridOptions_filterRow_showOperationChooser */
             showOperationChooser?: boolean;
-            /** Specifies whether the filter row is visible or not. */
+            /** @docid dxDataGridOptions_filterRow_visible */
             visible?: boolean;
         };
-        /** Specifies grouping settings and the behavior of grouped grid records. */
+        /** @docid dxDataGridOptions_grouping */
         grouping?: {
-            /** Specifies whether the user can collapse grouped records in a grid or not. */
+            /** @docid dxDataGridOptions_grouping_allowCollapsing */
             allowCollapsing?: boolean;
-            /** Specifies whether groups appear expanded or not. */
+            /** @docid dxDataGridOptions_grouping_autoExpandAll */
             autoExpandAll?: boolean;
-            /** Enables the user to group data using the context menu. */
+            /** @docid dxDataGridOptions_grouping_contextMenuEnabled */
             contextMenuEnabled?: boolean;
-            /** Specifies the event on which a group will be expanded/collapsed. */
+            /** @docid dxDataGridOptions_grouping_expandMode */
             expandMode?: string;
+            /** @docid dxDataGridOptions_grouping_groupContinuedMessage */
                 groupContinuedMessage?: string;
+            /** @docid dxDataGridOptions_grouping_groupContinuesMessage */
             groupContinuesMessage?: string;
-            /** Defines the texts of grouping-related visual elements. */
+            /** @docid dxDataGridOptions_grouping_texts */
             texts?: {
-                /** Specifies the message displayed in a group row when the corresponding group is continued from the previous page. */
+                /** @docid dxDataGridOptions_grouping_texts_groupContinuedMessage */
                 groupContinuedMessage?: string;
-                /** Specifies the message displayed in a group row when the corresponding group continues on the next page. */
+                /** @docid dxDataGridOptions_grouping_texts_groupContinuesMessage */
                 groupContinuesMessage?: string;
-                /** Specifies the text of the context menu item that groups data by a specific column. */
+                /** @docid dxDataGridOptions_grouping_texts_groupByThisColumn */
                 groupByThisColumn?: string;
-                /** Specifies the text of the context menu item that clears grouping settings of a specific column. */
+                /** @docid dxDataGridOptions_grouping_texts_ungroup */
                 ungroup?: string;
-                /** Specifies the text of the context menu item that clears grouping settings of all columns. */
+                /** @docid dxDataGridOptions_grouping_texts_ungroupAll */
                 ungroupAll?: string;
             }
         };
-        /** Configures the group panel. */
+        /** @docid dxDataGridOptions_groupPanel */
         groupPanel?: {
-            /** Specifies whether columns can be dragged onto or from the group panel. */
+            /** @docid dxDataGridOptions_groupPanel_allowColumnDragging */
             allowColumnDragging?: boolean;
-            /** Specifies text displayed by the group panel when it does not contain any columns. */
+            /** @docid dxDataGridOptions_groupPanel_emptyPanelText */
             emptyPanelText?: string;
-            /** Specifies whether the group panel is visible or not. */
+            /** @docid dxDataGridOptions_groupPanel_visible */
             visible?: any;
         };
-        /** Specifies options configuring the load panel. */
+        /** @docid dxDataGridOptions_loadPanel */
         loadPanel?: {
-            /** Specifies whether to show the load panel or not. */
+            /** @docid dxDataGridOptions_loadPanel_enabled */
             enabled?: any;
-            /** Specifies the height of the load panel in pixels. */
+            /** @docid dxDataGridOptions_loadPanel_height */
             height?: number;
-            /** Specifies a URL pointing to an image to be used as a loading indicator. */
+            /** @docid dxDataGridOptions_loadPanel_indicatorSrc */
             indicatorSrc?: string;
-            /** Specifies whether or not a loading indicator must be displayed on the load panel. */
+            /** @docid dxDataGridOptions_loadPanel_showIndicator */
             showIndicator?: boolean;
-            /** Specifies whether or not the pane of the load panel must be displayed. */
+            /** @docid dxDataGridOptions_loadPanel_showPane */
             showPane?: boolean;
-            /** Specifies text displayed by the load panel. */
+            /** @docid dxDataGridOptions_loadPanel_text */
             text?: string;
-            /** Specifies the width of the load panel in pixels. */
+            /** @docid dxDataGridOptions_loadPanel_width */
             width?: number;
         };
-        /** Specifies text displayed when a grid does not contain any records. */
+        /** @docid dxDataGridOptions_noDataText */
         noDataText?: string;
-        /** Specifies the options of a grid pager. */
+        /** @docid dxDataGridOptions_pager */
         pager?: {
-            /** Specifies the page sizes that can be selected at runtime. */
+            /** @docid dxDataGridOptions_pager_allowedPageSizes */
             allowedPageSizes?: any;
-            /** Specifies whether to show the page size selector or not. */
+            /** @docid dxDataGridOptions_pager_showPageSizeSelector */
             showPageSizeSelector?: boolean;
-            /** Specifies whether to show the pager or not. */
+            /** @docid dxDataGridOptions_pager_visible */
             visible?: any;
-            /** Specifies the text accompanying the page navigator. */
+            /** @docid dxDataGridOptions_pager_infoText */
             infoText?: string;
-            /** Specifies whether or not to display the text accompanying the page navigator. This text is specified by the infoText option. */
+            /** @docid dxDataGridOptions_pager_showInfo */
             showInfo?: boolean;
-            /** Specifies whether or not to display buttons that switch the grid to the previous or next page. */
+            /** @docid dxDataGridOptions_pager_showNavigationButtons */
             showNavigationButtons?: boolean;
         };
-        /** Specifies paging options. */
+        /** @docid dxDataGridOptions_paging */
         paging?: {
-            /** Specifies whether dxDataGrid loads data page by page or all at once. */
+            /** @docid dxDataGridOptions_paging_enabled */
             enabled?: boolean;
-            /** Specifies the grid page that should be displayed by default. */
+            /** @docid dxDataGridOptions_paging_pageIndex */
             pageIndex?: number;
-            /** Specifies the size of grid pages. */
+            /** @docid dxDataGridOptions_paging_pageSize */
             pageSize?: number;
         };
-        /** Specifies whether or not grid rows must be shaded in a different way. */
+        /** @docid dxDataGridOptions_rowAlternationEnabled */
         rowAlternationEnabled?: boolean;
-        /** Specifies whether to enable two-way data binding. */
+        /** @docid dxDataGridOptions_twoWayBindingEnabled */
         twoWayBindingEnabled?: boolean;
-        /** A handler for the rowClick event. */
+        /** @docid dxDataGridOptions_onRowClick */
         onRowClick?: any;
-        /** A handler for the rowPrepared event. */
+        /** @docid dxDataGridOptions_onRowPrepared */
         onRowPrepared?: (e: Object) => void;
-        /** Specifies a custom template for grid rows. */
+        /** @docid dxDataGridOptions_rowTemplate */
         rowTemplate?: any;
-        /** A configuration object specifying scrolling options. */
+        /** @docid dxDataGridOptions_scrolling */
         scrolling?: {
-            /** Specifies the scrolling mode. */
+            /** @docid dxDataGridOptions_scrolling_mode */
             mode?: string;
-            /** Specifies whether or not a grid must preload pages adjacent to the current page when using virtual scrolling. */
+            /** @docid dxDataGridOptions_scrolling_preloadEnabled */
             preloadEnabled?: boolean;
-            /** Specifies whether or not the widget uses native scrolling. */
+            /** @docid dxDataGridOptions_scrolling_useNative */
             useNative?: any;
-            /** Specifies the scrollbar display policy. */
+            /** @docid dxDataGridOptions_scrolling_showScrollbar */
             showScrollbar?: string;
-            /** Specifies whether or not the scrolling by content is enabled. */
+            /** @docid dxDataGridOptions_scrolling_scrollByContent */
             scrollByContent?: boolean;
-            /** Specifies whether or not the scrollbar thumb scrolling enabled. */
+            /** @docid dxDataGridOptions_scrolling_scrollByThumb */
             scrollByThumb?: boolean;
         };
-        /** Specifies options of the search panel. */
+        /** @docid dxDataGridOptions_searchPanel */
         searchPanel?: {
-            /** Specifies whether or not search strings in the located grid records should be highlighted. */
+            /** @docid dxDataGridOptions_searchPanel_highlightSearchText */
             highlightSearchText?: boolean;
-            /** Specifies text displayed by the search panel when no search string was typed. */
+            /** @docid dxDataGridOptions_searchPanel_placeholder */
             placeholder?: string;
-            /** Specifies whether the search panel is visible or not. */
+            /** @docid dxDataGridOptions_searchPanel_visible */
             visible?: boolean;
-            /** Specifies whether to search all columns or only visible ones. */
+            /** @docid dxDataGridOptions_searchPanel_searchVisibleColumnsOnly */
             searchVisibleColumnsOnly?: boolean;
-            /** Specifies the width of the search panel in pixels. */
+            /** @docid dxDataGridOptions_searchPanel_width */
             width?: number;
-            /** Sets a search string for the search panel. */
+            /** @docid dxDataGridOptions_searchPanel_text */
             text?: string;
         };
-        /** Specifies the operations that must be performed on the server side. */
+        /** @docid dxDataGridOptions_remoteOperations */
         remoteOperations?: any;
-        /** Allows you to sort groups according to the values of group summary items. */
+        /** @docid dxDataGridOptions_sortByGroupSummaryInfo */
         sortByGroupSummaryInfo?: Array<{
-            /** Specifies the group summary item whose values must be used to sort groups. */
+            /** @docid dxDataGridOptions_sortByGroupSummaryInfo_summaryItem */
             summaryItem?: string;
-            /** Specifies the identifier of the column that must be used in grouping so that sorting by group summary item values be applied. */
+            /** @docid dxDataGridOptions_sortByGroupSummaryInfo_groupColumn */
             groupColumn?: string;
-            /** Specifies the sort order of group summary item values. */
+            /** @docid dxDataGridOptions_sortByGroupSummaryInfo_sortOrder */
             sortOrder?: string;
         }>;
-        /** Allows you to build a master-detail interface in the grid. */
+        /** @docid dxDataGridOptions_masterDetail */
         masterDetail?: {
-            /** Enables an end-user to expand/collapse detail sections. */
+            /** @docid dxDataGridOptions_masterDetail_enabled */
             enabled?: boolean;
-            /** Specifies whether detail sections appear expanded or collapsed. */
+            /** @docid dxDataGridOptions_masterDetail_autoExpandAll */
             autoExpandAll?: boolean;
-            /** Specifies the template for detail sections. */
+            /** @docid dxDataGridOptions_masterDetail_template */
             template?: any;
         };
-        /** Configures client-side export. */
+        /** @docid dxDataGridOptions_export */
         export?: {
-            /** Enables the client-side export feature. */
+            /** @docid dxDataGridOptions_export_enabled */
             enabled?: boolean;
-            /** Specifies a default name for the file to which grid data is exported. */
+            /** @docid dxDataGridOptions_export_fileName */
             fileName?: string;
-            /** Specifies whether to enable Excel filtering for the exported data in the resulting XLSX file. */
+            /** @docid dxDataGridOptions_export_excelFilterEnabled */
             excelFilterEnabled?: boolean;
-            /** Specifies whether to enable word wrapping for the exported data in the resulting XLSX file. */
+            /** @docid dxDataGridOptions_export_excelWrapTextEnabled */
             excelWrapTextEnabled?: boolean;
-            /** Specifies the URL of the server-side proxy that streams the resulting file to the end user to enable export in IE9 and Safari browsers. */
+            /** @docid dxDataGridOptions_export_proxyUrl */
             proxyUrl?: string;
-            /** Allows an end user to export selected rows only. */
+            /** @docid dxDataGridOptions_export_allowExportSelectedData */
             allowExportSelectedData?: boolean;
-            /** Contains options that specify texts for the export-related commands and hints. */
+            /** @docid dxDataGridOptions_export_texts */
             texts?: {
-                /** Specifies the hint of the Export button when the allowExportSelectedData option is true. */
+                /** @docid dxDataGridOptions_export_texts_exportTo */
                 exportTo?: string;
+                /** @docid dxDataGridOptions_export_texts_exportToExcel */
                 exportToExcel?: string;
+                /** @docid dxDataGridOptions_export_texts_excelFormat */
                 excelFormat?: string;
+                /** @docid dxDataGridOptions_export_texts_selectedRows */
                 selectedRows?: string;
-                /** Specifies the text of the command that exports all data. */
+                /** @docid dxDataGridOptions_export_texts_exportAll */
                 exportAll?: string;
-                /** Specifies the text of the drop-down menu command that exports selected rows. */
+                /** @docid dxDataGridOptions_export_texts_exportSelectedRows */
                 exportSelectedRows?: string;
             }
         };
-        /** Specifies the keys of the records that must appear selected initially. */
+        /** @docid dxDataGridOptions_selectedRowKeys */
         selectedRowKeys?: Array<any>;
-        /** Specifies options of runtime selection. */
+        /** @docid dxDataGridOptions_selectionFilter */
+        selectionFilter?: Object;
+        /** @docid dxDataGridOptions_selection */
         selection?: {
-            /** Specifies the checkbox row display policy in the multiple mode. */
+            /** @docid dxDataGridOptions_selection_showCheckBoxesMode*/
             showCheckBoxesMode?: string;
-            /** Specifies whether the user can select all grid records at once. */
+            /** @docid dxDataGridOptions_selection_allowSelectAll */
             allowSelectAll?: boolean;
-            /** Specifies the selection mode. */
+            /** @docid dxDataGridOptions_selection_mode */
             mode?: string;
+            /** @docid dxDataGridOptions_selection_maxFilterLengthInRequest */
+            maxFilterLengthInRequest?: number;
+            /** @docid dxDataGridOptions_selection_selectAllMode */
+            selectAllMode?: string;
+            /** @docid dxDataGridOptions_selection_async */
+            async?: boolean;
         };
-        /** A handler for the dataErrorOccured event. */
+        /** @docid dxDataGridOptions_onDataErrorOccurred */
         onDataErrorOccurred?: (e: { error: Error }) => void;
-        /** A handler for the selectionChanged event. */
+        /** @docid dxDataGridOptions_onSelectionChanged */
         onSelectionChanged?: (e: {
             currentSelectedRowKeys: Array<any>;
             currentDeselectedRowKeys: Array<any>;
             selectedRowKeys: Array<any>;
             selectedRowsData: Array<any>;
         }) => void;
-        /** A handler for the exporting event. */
+        /** @docid dxDataGridOptions_onExporting */
         onExporting?: (e: {
             fileName: string;
             cancel: boolean;
         }) => void;
-        /** A handler for the fileSaving event. */
+        /** @docid dxDataGridOptions_onFileSaving */
         onFileSaving?: (e: {
             fileName: string;
             format: string;
             data: any;
             cancel: boolean;
         }) => void;
-        /** A handler for the exported event. */
+        /** @docid dxDataGridOptions_onExported */
         onExported?: (e: Object) => void;
-        /** A handler for the keyDown event. */
+        /** @docid dxDataGridOptions_onKeyDown */
         onKeyDown?: (e: Object) => void;
-        /** A handler for the rowExpanding event. */
+        /** @docid dxDataGridOptions_onRowExpanding */
         onRowExpanding?: (e: Object) => void;
-        /** A handler for the rowExpanded event. */
+        /** @docid dxDataGridOptions_onRowExpanded */
         onRowExpanded?: (e: Object) => void;
-        /** A handler for the rowCollapsing event. */
+        /** @docid dxDataGridOptions_onRowCollapsing */
         onRowCollapsing?: (e: Object) => void;
-        /** A handler for the rowCollapsed event. */
+        /** @docid dxDataGridOptions_onRowCollapsed */
         onRowCollapsed?: (e: Object) => void;
-        /** Specifies whether column headers are visible or not. */
+        /** @docid dxDataGridOptions_showColumnHeaders */
         showColumnHeaders?: boolean;
-        /** Specifies whether or not vertical lines separating one grid column from another are visible. */
+        /** @docid dxDataGridOptions_showColumnLines */
         showColumnLines?: boolean;
-        /** Specifies whether or not horizontal lines separating one grid row from another are visible. */
+        /** @docid dxDataGridOptions_showRowLines */
         showRowLines?: boolean;
-        /** Specifies options of runtime sorting. */
+        /** @docid dxDataGridOptions_sorting */
         sorting?: {
-            /** Specifies text for the context menu item that sets an ascending sort order in a column. */
+            /** @docid dxDataGridOptions_sorting_ascendingText */
             ascendingText?: string;
-            /** Specifies text for the context menu item that resets sorting settings for a column. */
+            /** @docid dxDataGridOptions_sorting_clearText */
             clearText?: string;
-            /** Specifies text for the context menu item that sets a descending sort order in a column. */
+            /** @docid dxDataGridOptions_sorting_descendingText */
             descendingText?: string;
-            /** Specifies the runtime sorting mode. */
+            /** @docid dxDataGridOptions_sorting_sortingMode */
             mode?: string;
         };
-        /** Specifies options of state storing. */
+        /** @docid dxDataGridOptions_stateStoring */
         stateStoring?: {
-            /** Specifies a callback function that performs specific actions on state loading. */
+            /** @docid dxDataGridOptions_stateStoring_customLoad */
             customLoad?: () => JQueryPromise<Object>;
-            /** Specifies a callback function that performs specific actions on state saving. */
+            /** @docid dxDataGridOptions_stateStoring_customSave */
             customSave?: (state: Object) => void;
-            /** Specifies whether or not a grid saves its state. */
+            /** @docid dxDataGridOptions_stateStoring_enabled */
             enabled?: boolean;
-            /** Specifies the delay between the last change of a grid state and the operation of saving this state in milliseconds. */
+            /** @docid dxDataGridOptions_stateStoring_savingTimeout */
             savingTimeout?: number;
-            /** Specifies a unique key to be used for storing the grid state. */
+            /** @docid dxDataGridOptions_stateStoring_storageKey */
             storageKey?: string;
-            /** Specifies the type of storage to be used for state storing. */
+            /** @docid dxDataGridOptions_stateStoring_type */
             type?: string;
         };
-        /** Specifies the options of the grid summary. */
+        /** @docid dxDataGridOptions_summary */
         summary?: {
-            /** Contains options that specify text patterns for summary items. */
+            /** @docid dxDataGridOptions_summary_texts */
             texts?: {
-                /** Specifies a pattern for the 'sum' summary items when they are displayed in the parent column. */
+                /** @docid dxDataGridOptions_summary_texts_sum */
                 sum?: string;
-                /** Specifies a pattern for the 'sum' summary items displayed in a group row or in any other column rather than the parent one. */
+                /** @docid dxDataGridOptions_summary_texts_sumOtherColumn */
                 sumOtherColumn?: string;
-                /** Specifies a pattern for the 'min' summary items when they are displayed in the parent column. */
+                /** @docid dxDataGridOptions_summary_texts_min */
                 min?: string;
-                /** Specifies a pattern for the 'min' summary items displayed in a group row or in any other column rather than the parent one. */
+                /** @docid dxDataGridOptions_summary_texts_minOtherColumn */
                 minOtherColumn?: string;
-                /** Specifies a pattern for the 'max' summary items when they are displayed in the parent column. */
+                /** @docid dxDataGridOptions_summary_texts_max */
                 max?: string;
-                /** Specifies a pattern for the 'max' summary items displayed in a group row or in any other column rather than the parent one. */
+                /** @docid dxDataGridOptions_summary_texts_maxOtherColumn */
                 maxOtherColumn?: string;
-                /** Specifies a pattern for the 'avg' summary items when they are displayed in the parent column. */
+                /** @docid dxDataGridOptions_summary_texts_avg */
                 avg?: string;
-                /** Specifies a pattern for the 'avg' summary items displayed in a group row or in any other column rather than the parent one. */
+                /** @docid dxDataGridOptions_summary_texts_avgOtherColumn */
                 avgOtherColumn?: string;
-                /** Specifies a pattern for the 'count' summary items. */
+                /** @docid dxDataGridOptions_summary_texts_count */
                 count?: string;
             };
-            /** Specifies items of the group summary. */
+            /** @docid dxDataGridOptions_summary_groupItems */
             groupItems?: Array<{
-                /** Specifies the identifier of a summary item. */
+                /** @docid dxDataGridOptions_summary_groupItems_name */
                 name?: string;
-                /** Specifies the column that provides data for a group summary item. */
+                /** @docid dxDataGridOptions_summary_groupItems_column */
                 column?: string;
-                /** Customizes the text to be displayed in the summary item. */
+                /** @docid dxDataGridOptions_summary_groupItems_customizeText */
                 customizeText?: (itemInfo: {
                     value: any;
                     valueText: string;
                 }) => string;
-                /** Specifies a pattern for the summary item text. */
+                /** @docid dxDataGridOptions_summary_groupItems_displayFormat */
                 displayFormat?: string;
-                /**
-                 * Specifies a precision for the summary item value of a numeric format.
-                 * @deprecated Use the valueFormat | precision option instead.
-                 */
+                /** @docid dxDataGridOptions_summary_groupItems_precision */
                 precision?: number;
-                /** Specifies whether or not a summary item must be displayed in the group footer. */
+                /** @docid dxDataGridOptions_summary_groupItems_showInGroupFooter */
                 showInGroupFooter?: boolean;
-                /** Indicates whether to display group summary items in parentheses after the group row header or to align them by the corresponding columns within the group row. */
+                /** @docid dxDataGridOptions_summary_groupItems_alignByColumn */
                 alignByColumn?: boolean;
-                /** Specifies the column that must hold the summary item when this item is displayed in the group footer or aligned by a column in the group row. */
+                /** @docid dxDataGridOptions_summary_groupItems_showInColumn */
                 showInColumn?: string;
-                /** Specifies how to aggregate data for a summary item. */
+                /** @docid dxDataGridOptions_summary_groupItems_summaryType */
                 summaryType?: string;
-                /** Specifies a format for the summary item value. */
+                /** @docid dxDataGridOptions_summary_groupItems_valueFormat */
                 valueFormat?: any;
-                /** Specifies whether or not to skip empty strings, null and undefined values when calculating a summary. */
+                /** @docid dxDataGridOptions_summary_groupItems_skipEmptyValues */
                 skipEmptyValues?: boolean;
             }>;
-            /** Specifies items of the total summary. */
+            /** @docid dxDataGridOptions_summary_totalItems */
             totalItems?: Array<{
-                /** Specifies the identifier of a summary item. */
+                /** @docid dxDataGridOptions_summary_totalItems_name */
                 name?: string;
-                /** Specifies the alignment of a summary item. */
+                /** @docid dxDataGridOptions_summary_totalItems_alignment */
                 alignment?: string;
-                /** Specifies the column that provides data for a summary item. */
+                /** @docid dxDataGridOptions_summary_totalItems_column */
                 column?: string;
-                /** Specifies a CSS class to be applied to a summary item. */
+                /** @docid dxDataGridOptions_summary_totalItems_cssClass */
                 cssClass?: string;
-                /** Customizes the text to be displayed in the summary item. */
+                /** @docid dxDataGridOptions_summary_totalItems_customizeText */
                 customizeText?: (itemInfo: {
                     value: any;
                     valueText: string;
                 }) => string;
-                /** Specifies a pattern for the summary item text. */
+                /** @docid dxDataGridOptions_summary_totalItems_displayFormat */
                 displayFormat?: string;
-                /**
-                 * Specifies a precision for the summary item value of a numeric format.
-                 * @deprecated Use the valueFormat | precision option instead.
-                 */
+                /** @docid dxDataGridOptions_summary_totalItems_precision */
                 precision?: number;
-                /** Specifies the column that must hold the summary item. */
+                /** @docid dxDataGridOptions_summary_totalItems_showInColumn */
                 showInColumn?: string;
-                /** Specifies how to aggregate data for a summary item. */
+                /** @docid dxDataGridOptions_summary_totalItems_summaryType */
                 summaryType?: string;
-                /** Specifies a format for the summary item value. */
+                /** @docid dxDataGridOptions_summary_totalItems_valueFormat */
                 valueFormat?: any;
-                /** Specifies whether or not to skip empty strings, null and undefined values when calculating a summary. */
+                /** @docid dxDataGridOptions_summary_totalItems_skipEmptyValues */
                 skipEmptyValues?: boolean;
             }>;
-            /** Specifies whether or not to skip empty strings, null and undefined values when calculating a summary. */
+            /** @docid dxDataGridOptions_summary_skipEmptyValues */
             skipEmptyValues?: boolean;
-            /** Allows you to use a custom aggregate function to calculate the value of a summary item. */
+            /** @docid dxDataGridOptions_summary_calculateCustomSummary */
             calculateCustomSummary?: (options: {
                 component: dxDataGrid;
                 name?: string;
@@ -4106,351 +4831,377 @@ declare module DevExpress.ui {
                 summaryProcess: string
             }) => void;
         };
-        /** Specifies whether text that does not fit into a column should be wrapped. */
+        /** @docid dxDataGridOptions_wordWrapEnabled */
         wordWrapEnabled?: boolean;
     }
-    /** A data grid widget. */
-    export class dxDataGrid extends Widget {
+    /** @docid dxdataGrid */
+    export class dxDataGrid extends Widget implements DataHelperMixin {
         constructor(element: JQuery, options?: dxDataGridOptions);
         constructor(element: Element, options?: dxDataGridOptions);
-        /** Ungroups grid records. */
+        /** @docid_ignore dxDataGridMethods_stopSelectionWithCheckboxes */
+        /** @docid dxDataGridMethods_clearGrouping */
         clearGrouping(): void;
-        /** Clears sorting settings of all grid columns at once. */
+        /** @docid dxDataGridMethods_clearSorting */
         clearSorting(): void;
-        /** Allows you to obtain a cell by its row index and the data field of its column. */
+        /** @docid dxDataGridMethods_getCellElement#getCellElement(rowIndex,dataField) */
         getCellElement(rowIndex: number, dataField: string): any;
-        /** Allows you to obtain a cell by its row index and the visible index of its column. */
+        /** @docid dxDataGridMethods_getCellElement#getCellElement(rowIndex,visibleColumnIndex) */
         getCellElement(rowIndex: number, visibleColumnIndex: number): any;
-        /** Returns the current state of the grid. */
+        /** @docid dxDataGridMethods_getRowElement */
+        getRowElement(rowIndex: number): any;
+        /** @docid dxDataGridMethods_state#state() */
         state(): Object;
-        /** Sets the grid state. */
+        /** @docid dxDataGridMethods_state#state(state) */
         state(state: Object): void;
-        /** Allows you to obtain the row index by a data key. */
+        /** @docid dxDataGridMethods_getRowIndexByKey */
         getRowIndexByKey(key: any): number;
-        /** Allows you to obtain the data key by a row index. */
+        /** @docid dxDataGridMethods_getKeyByRowIndex */
         getKeyByRowIndex(rowIndex: number): any;
-        /** Adds a new column to a grid. */
+        /** @docid dxDataGridMethods_addColumn */
         addColumn(columnOptions: dxDataGridColumn): void;
-        /** Removes the column from the grid. */
+        /** @docid dxDataGridMethods_deleteColumn */
         deleteColumn(id: any): void;
-        /** Displays the load panel. */
+        /** @docid dxDataGridMethods_beginCustomLoading */
         beginCustomLoading(messageText: string): void;
-        /** Discards changes made in a grid. */
+        /** @docid dxDataGridMethods_cancelEditData */
         cancelEditData(): void;
-        /** Checks whether or not the grid contains unsaved changes. */
+        /** @docid dxDataGridMethods_hasEditData */
         hasEditData(): boolean;
-        /** Clears all the filters of a specific type applied to grid records. */
+        /** @docid dxDataGridMethods_clearFilter */
         clearFilter(): void;
-        /** Deselects all grid records. */
+        /** @docid dxDataGridMethods_clearSelection */
         clearSelection(): void;
-        /** Draws the cell being edited from the editing state. Use this method when the edit mode is batch. */
+        /** @docid dxDataGridMethods_closeEditCell */
         closeEditCell(): void;
-        /** Collapses groups or master rows in a grid. */
+        /** @docid dxDataGridMethods_collapseAll */
         collapseAll(groupIndex?: number): void;
-        /** Returns the number of data columns in a grid. */
+        /** @docid dxDataGridMethods_columnCount */
         columnCount(): number;
-        /** Returns the value of a specific column option. */
+        /** @docid dxDataGridMethods_columnOption#columnOption(id,optionName) */
         columnOption(id: any, optionName: string): any;
-        /** Sets an option of a specific column. */
+        /** @docid dxDataGridMethods_columnOption#columnOption(id,optionName,optionValue) */
         columnOption(id: any, optionName: string, optionValue: any): void;
-        /** Returns the options of a column by an identifier. */
+        /** @docid dxDataGridMethods_columnOption#columnOption(id) */
         columnOption(id: any): Object;
-        /** Sets several options of a column at once. */
+        /** @docid dxDataGridMethods_columnOption#columnOption(id,options) */
         columnOption(id: any, options: Object): void;
-        /** Sets a specific cell into the editing state. */
+        /** @docid dxDataGridMethods_getVisibleColumns#getVisibleColumns() */
+        getVisibleColumns(): Array<dxDataGridColumn>;
+        /** @docid dxDataGridMethods_getVisibleColumns#getVisibleColumns(headerLevel) */
+        getVisibleColumns(headerLevel?: number): Array<dxDataGridColumn>;
+        /** @docid dxDataGridMethods_getVisibleRows */
+        getVisibleRows(): Array<dxDataGridRow>;
+        /** @docid dxDataGridMethods_editCell#editCell(rowIndex,visibleColumnIndex) */
         editCell(rowIndex: number, visibleColumnIndex: number): void;
-        /** Sets a specific cell into the editing state. */
+        /** @docid dxDataGridMethods_editCell#editCell(rowIndex,dataField) */
         editCell(rowIndex: number, dataField: string): void;
-        /** Sets a specific row into the editing state. */
+        /** @docid dxDataGridMethods_editRow */
         editRow(rowIndex: number): void;
-        /** Gets the cell value. */
+        /** @docid dxDataGridMethods_cellValue#cellValue(rowIndex,dataField) */
         cellValue(rowIndex: number, dataField: string): any;
-        /** Gets the cell value. */
+        /** @docid dxDataGridMethods_cellValue#cellValue(rowIndex,visibleColumnIndex) */
         cellValue(rowIndex: number, visibleColumnIndex: number): any;
-        /** Sets the cell value. */
+        /** @docid dxDataGridMethods_cellValue#cellValue(rowIndex,dataField,value) */
         cellValue(rowIndex: number, dataField: string, value: any): void;
-        /** Sets the cell value. */
+        /** @docid dxDataGridMethods_cellValue#cellValue(rowIndex,visibleColumnIndex,value) */
         cellValue(rowIndex: number, visibleColumnIndex: number, value: any): void;
-        /** Hides the load panel. */
+        /** @docid dxDataGridMethods_endCustomLoading */
         endCustomLoading(): void;
-        /** Expands groups or master rows in a grid. */
+        /** @docid dxDataGridMethods_expandAll */
         expandAll(groupIndex: number): void;
-        /** Allows you to find out whether a specific group or master row is expanded or collapsed. */
+        /** @docid dxDataGridMethods_isRowExpanded */
         isRowExpanded(key: any): boolean;
-        /** Allows you to expand a specific group or master row by its key. */
+        /** @docid dxDataGridMethods_expandRow */
         expandRow(key: any): void;
-        /** Allows you to collapse a specific group or master row by its key. */
+        /** @docid dxDataGridMethods_collapseRow */
         collapseRow(key: any): void;
-        /** Checks whether a specific adaptive detail row is expanded or collapsed. */
+        /** @docid dxDataGridMethods_isAdaptiveDetailRowExpanded */
         isAdaptiveDetailRowExpanded(key: any): void;
-        /** Expands an adaptive detail row by the key of its parent data row. */
+        /** @docid dxDataGridMethods_expandAdaptiveDetailRow */
         expandAdaptiveDetailRow(key: any): void;
-        /** Collapses the currently expanded adaptive detail row (if there is one). */
+        /** @docid dxDataGridMethods_collapseAdaptiveDetailRow */
         collapseAdaptiveDetailRow(): void;
-        /** Applies a filter to the grid's data source. */
+        /** @docid dxDataGridMethods_filter#filter(filterExpr) */
         filter(filterExpr?: any): void;
-        /** Returns a filter expression applied to the grid's data source using the filter(filterExpr) method. */
+        /** @docid dxDataGridMethods_filter#filter() */
         filter(): any;
-        /** Returns a filter expression applied to the grid using all possible scenarious. */
+        /** @docid dxDataGridMethods_getCombinedFilter#getCombinedFilter() */
         getCombinedFilter(): any;
-        /** Gets the keys of currently selected grid records. */
-        getSelectedRowKeys(): Array<Object>;
-        /** Gets the data objects of currently selected grid records. */
-        getSelectedRowsData(): Array<Object>;
-        /** Hides the column chooser panel. */
+        /** @docid dxDataGridMethods_getCombinedFilter#getCombinedFilter(returnDataField) */
+        getCombinedFilter(returnDataField?: boolean): any;
+        /** @docid dxDataGridMethods_getSelectedRowKeys */
+        getSelectedRowKeys(): any;
+        /** @docid dxDataGridMethods_getSelectedRowsData */
+        getSelectedRowsData(): any;
+        /** @docid dxDataGridMethods_hideColumnChooser */
         hideColumnChooser(): void;
-        /** Adds a new data row to a grid. */
+        /** @docid dxDataGridMethods_addRow */
         addRow(): void;
-        /**
-         * Adds a new data row to a grid.
-         * @deprecated Use the addRow() method instead.
-         */
+        /** @docid dxDataGridMethods_insertRow */
         insertRow(): void;
-        /** Returns the key corresponding to the passed data object. */
+        /** @docid dxDataGridMethods_keyOf */
         keyOf(obj: Object): any;
-        /** Switches a grid to a specified page. */
+        /** @docid dxDataGridMethods_pageIndex#pageIndex(newIndex) */
         pageIndex(newIndex: number): void;
-        /** Gets the index of the current page. */
+        /** @docid dxDataGridMethods_pageIndex#pageIndex() */
         pageIndex(): number;
-        /** Sets the page size. */
+        /** @docid dxDataGridMethods_pageSize#pageSize(value) */
         pageSize(value: number): void;
-        /** Gets the current page size. */
+        /** @docid dxDataGridMethods_pageSize#pageSize() */
         pageSize(): number;
-        /** Refreshes grid data. */
+        /** @docid dxDataGridMethods_refresh */
         refresh(): JQueryPromise<any>;
-        /** Removes a specific row from a grid. */
+        /** @docid dxDataGridMethods_deleteRow */
         deleteRow(rowIndex: number): void;
-        /**
-         * Removes a specific row from a grid.
-         * @deprecated Use the deleteRow(rowIndex) method instead.
-         */
+        /** @docid dxDataGridMethods_removeRow */
         removeRow(rowIndex: number): void;
-        /** Saves changes made in a grid. */
+        /** @docid dxDataGridMethods_saveEditData */
         saveEditData(): JQueryPromise<any>;
-        /** Searches grid records by a search string. */
+        /** @docid dxDataGridMethods_searchByText */
         searchByText(text: string): void;
-        /** Selects all grid records. */
+        /** @docid dxDataGridMethods_selectAll */
         selectAll(): void;
-        /** Deselects the rows that are currently selected within the applied filter. */
+        /** @docid dxDataGridMethods_deselectAll */
         deselectAll(): void;
-        /** Selects specific grid records. */
+        /** @docid dxDataGridMethods_selectRows */
         selectRows(keys: Array<any>, preserve: boolean): void;
-        /** Deselects specific grid records. */
+        /** @docid dxDataGridMethods_deselectRows */
         deselectRows(keys: Array<any>): void;
-        /** Selects grid rows by indexes. */
+        /** @docid dxDataGridMethods_selectRowsByIndexes */
         selectRowsByIndexes(indexes: Array<any>): void;
-        /** Allows you to find out whether a row is selected or not. */
-        isRowSelected(key: any): boolean;
-        /** Invokes the column chooser panel. */
+        /** @docid_ignore dxDataGridMethods_isRowSelected(key) */
+        /** @docid dxDataGridMethods_isRowSelected(data) */
+        isRowSelected(arg: any): boolean;
+        /** @docid dxDataGridMethods_showColumnChooser */
         showColumnChooser(): void;
+        /** @docid dxDataGridMethods_startSelectionWithCheckboxes */
         startSelectionWithCheckboxes(): boolean;
-        /** Returns how many pages the grid contains. */
+        /** @docid dxDataGridMethods_pageCount */
         pageCount(): number;
-        /** Returns the number of records currently held by a grid. */
+        /** @docid dxDataGridMethods_totalCount */
         totalCount(): number;
-        /** Recovers a row deleted in the batch edit mode. */
+        /** @docid dxDataGridMethods_undeleteRow */
         undeleteRow(rowIndex: number): void;
-        /** Allows you to obtain a data object by its key. */
+        /** @docid dxDataGridMethods_byKey */
         byKey(key: any): JQueryPromise<any>;
-        /** Gets the value of a total summary item. */
+        /** @docid dxDataGridMethods_getTotalSummaryValue */
         getTotalSummaryValue(summaryItemName: string): any;
-        /** Exports grid data to Excel. */
+        /** @docid dxDataGridMethods_exportToExcel */
         exportToExcel(selectionOnly: boolean): void;
-        /** Updates the grid to the size of its content. */
+        /** @docid dxDataGridMethods_updateDimensions */
         updateDimensions(): void;
-        /** Focuses the specified cell element in the grid. */
+        /** @docid dxDataGridMethods_focus */
         focus(element?: JQuery): void;
+        getDataSource(): DevExpress.data.DataSource;
+        /** @docid dxDataGridMethods_getScrollable */
+        getScrollable(): dxScrollable;
     }
     export interface dxPivotGridOptions extends WidgetOptions {
+        /** @docid_ignore dxPivotGridOptions_activeStateEnabled */
+        /** @docid_ignore dxPivotGridOptions_hoverStateEnabled */
+        /** @docid_ignore dxPivotGridOptions_focusStateEnabled */
+        /** @docid_ignore dxPivotGridOptions_accessKey */
+        /** @docid_ignore dxPivotGridPivotGridCell_text */
+        /** @docid_ignore dxPivotGridPivotGridCell_value */
+        /** @docid_ignore dxPivotGridPivotGridCell_rowPath */
+        /** @docid_ignore dxPivotGridPivotGridCell_columnPath */
+        /** @docid_ignore dxPivotGridPivotGridCell_dataIndex */
+        /** @docid_ignore dxPivotGridPivotGridCell_path */
+        /** @docid_ignore dxPivotGridPivotGridCell_columnType */
+        /** @docid_ignore dxPivotGridPivotGridCell_rowType */
+        /** @docid_ignore dxPivotGridPivotGridCell_type */
+        /** @docid_ignore dxPivotGridPivotGridCell_expanded */
+        /** @docid dxPivotGridOptions_onContentReady */
         onContentReady?: Function;
-        /** Specifies a data source for the pivot grid. */
+        /** @docid dxPivotGridOptions_dataSource */
         dataSource?: any;
+        /** @docid dxPivotGridOptions_useNativeScrolling */
         useNativeScrolling?: any;
-        /** A configuration object specifying scrolling options. */
+        /** @docid dxPivotGridOptions_scrolling */
         scrolling?: {
-            /** Specifies the scrolling mode. */
+            /** @docid dxPivotGridOptions_scrolling_mode */
             mode?: string;
-            /** Specifies whether or not the widget uses native scrolling. */
+            /** @docid dxPivotGridOptions_scrolling_useNative */
             useNative?: any;
         };
-        /** Allows an end-user to change sorting options. */
+        /** @docid dxPivotGridOptions_allowSorting */
         allowSorting?: boolean;
-        /** Allows an end-user to sort columns by summary values. */
+        /** @docid dxPivotGridOptions_allowSortingBySummary */
         allowSortingBySummary?: boolean;
-        /** Allows an end-user to change filtering options. */
+        /** @docid dxPivotGridOptions_allowFiltering */
         allowFiltering?: boolean;
-        /** Specifies the area to which data field headers must belong. */
+        /** @docid dxPivotGridOptions_dataFieldArea */
         dataFieldArea?: string;
-         /** Configures the field panel. */
+         /** @docid dxPivotGridOptions_fieldPanel */
         fieldPanel?: {
-            /** Makes fields on the field panel draggable. */
+            /** @docid dxPivotGridOptions_fieldPanel_allowFieldDragging */
             allowFieldDragging?: boolean;
-            /** Shows/hides filter fields on the field panel. */
+            /** @docid dxPivotGridOptions_fieldPanel_showFilterFields */
             showFilterFields?: boolean;
-            /** Shows/hides data fields on the field panel. */
+            /** @docid dxPivotGridOptions_fieldPanel_showDataFields */
             showDataFields?: boolean;
-            /** Shows/hides column fields on the field panel. */
+            /** @docid dxPivotGridOptions_fieldPanel_showColumnFields */
             showColumnFields?: boolean;
-            /** Shows/hides row fields on the field panel. */
+            /** @docid dxPivotGridOptions_fieldPanel_showRowFields */
             showRowFields?: boolean;
-            /** Shows/hides the field panel. */
+            /** @docid dxPivotGridOptions_fieldPanel_visible */
             visible?: boolean;
-            /** Specifies the placeholders of the field areas. */
+            /** @docid dxPivotGridOptions_fieldPanel_texts */
             texts?: {
-                /** Specifies the placeholder of the column field area. */
+                /** @docid dxPivotGridOptions_fieldPanel_texts_columnFieldArea */
                 columnFieldArea?: string;
-                /** Specifies the placeholder of the row field area. */
+                /** @docid dxPivotGridOptions_fieldPanel_texts_rowFieldArea */
                 rowFieldArea?: string;
-                /** Specifies the placeholder of the filter field area. */
+                /** @docid dxPivotGridOptions_fieldPanel_texts_filterFieldArea */
                 filterFieldArea?: string;
-                /** Specifies the placeholder of the data field area. */
+                /** @docid dxPivotGridOptions_fieldPanel_texts_dataFieldArea */
                 dataFieldArea?: string;
             }
         }
-        /** Allows an end-user to expand/collapse all header items within a header level. */
+        /** @docid dxPivotGridOptions_allowExpandAll */
         allowExpandAll?: boolean;
-        /** Specifies whether long text in header items should be wrapped. */
+        /** @docid dxPivotGridOptions_wordWrapEnabled */
         wordWrapEnabled?: boolean;
-        /** Specifies whether to display the Total rows. */
+        /** @docid dxPivotGridOptions_showRowTotals */
         showRowTotals?: boolean;
-        /** Specifies whether to display the Grand Total row. */
+        /** @docid dxPivotGridOptions_showRowGrandTotals */
         showRowGrandTotals?: boolean;
-        /** Specifies whether to display the Total columns. */
+        /** @docid dxPivotGridOptions_showColumnTotals */
         showColumnTotals?: boolean;
-        /** Specifies whether to display the Grand Total column. */
+        /** @docid dxPivotGridOptions_showColumnGrandTotals */
         showColumnGrandTotals?: boolean;
-        /** Specifies whether or not to hide rows and columns with no data. */
+        /** @docid dxPivotGridOptions_hideEmptySummaryCells */
         hideEmptySummaryCells?: boolean;
-        /** Specifies where to show the total rows or columns. */
+        /** @docid dxPivotGridOptions_showTotalsPrior*/
         showTotalsPrior?: string;
-        /** Specifies the layout of items in the row header. */
+        /** @docid dxPivotGridOptions_rowHeaderLayout*/
         rowHeaderLayout?: string;
-        /** Specifies whether the outer borders of the grid are visible or not. */
+        /** @docid dxPivotGridOptions_showBorders */
         showBorders?: boolean;
-        /** The Field Chooser configuration options. */
+        /** @docid dxPivotGridOptions_fieldChooser */
         fieldChooser?: {
-            /** Enables or disables the field chooser. */
+            /** @docid dxPivotGridOptions_fieldChooser_enabled */
             enabled?: boolean;
-            /** Specifies the field chooser layout. */
+            /** @docid dxPivotGridOptions_fieldChooser_layout */
             layout?: number;
-            /** Specifies the text to display as a title of the field chooser popup window. */
+            /** @docid dxPivotGridOptions_fieldChooser_title */
             title?: string;
-            /** Specifies the field chooser width. */
+            /** @docid dxPivotGridOptions_fieldChooser_width */
             width?: number;
-            /** Specifies the field chooser height. */
+            /** @docid dxPivotGridOptions_fieldChooser_height */
             height?: number;
-            /** Strings that can be changed or localized in the pivot grid's integrated Field Chooser. */
+            /** @docid dxPivotGridOptions_fieldChooser_texts */
             texts?: {
-                /** The string to display instead of Row Fields. */
+                /** @docid dxPivotGridOptions_fieldChooser_texts_rowFields */
                 rowFields?: string;
-                /** The string to display instead of Column Fields. */
+                /** @docid dxPivotGridOptions_fieldChooser_texts_columnFields */
                 columnFields?: string;
-                /** The string to display instead of Data Fields. */
+                /** @docid dxPivotGridOptions_fieldChooser_texts_dataFields */
                 dataFields?: string;
-                /** The string to display instead of Filter Fields. */
+                /** @docid dxPivotGridOptions_fieldChooser_texts_filterFields */
                 filterFields?: string;
-                /** The string to display instead of All Fields. */
+                /** @docid dxPivotGridOptions_fieldChooser_texts_allFields */
                 allFields?: string;
             };
         }
-        /** Strings that can be changed or localized in the dxPivotGrid widget. */
+        /** @docid dxPivotGridOptions_texts */
         texts?: {
-            /** The string to display as a header of the Grand Total row and column. */
+            /** @docid dxPivotGridOptions_texts_grandTotal */
             grandTotal?: string;
-            /** The string to display as a header of the Total row and column. */
+            /** @docid dxPivotGridOptions_texts_total */
             total?: string;
-            /** Specifies the text displayed when a pivot grid does not contain any fields. */
+            /** @docid dxPivotGridOptions_texts_noData */
             noData?: string;
-            /** The string to display as a Show Field Chooser context menu item. */
+            /** @docid dxPivotGridOptions_texts_showFieldChooser */
             showFieldChooser?: string;
-            /** The string to display as an Expand All context menu item. */
+            /** @docid dxPivotGridOptions_texts_expandAll */
             expandAll?: string;
-            /** The string to display as a Collapse All context menu item. */
+            /** @docid dxPivotGridOptions_texts_collapseAll */
             collapseAll?: string;
-            /** The string to display as a Sort Column by Summary Value context menu item. */
+            /** @docid dxPivotGridOptions_texts_sortColumnBySummary */
             sortColumnBySummary?: string;
-            /** The string to display as a Sort Row by Summary Value context menu item. */
+            /** @docid dxPivotGridOptions_texts_sortRowBySummary */
             sortRowBySummary?: string;
-            /** The string to display as a Remove All Sorting context menu item. */
+            /** @docid dxPivotGridOptions_texts_removeAllSorting */
             removeAllSorting?: string;
-            /** The string to display as an Export to Excel file context menu item. */
+            /** @docid dxPivotGridOptions_texts_exportToExcel */
             exportToExcel?: string;
         };
-        /** Specifies options configuring the load panel. */
+        /** @docid dxPivotGridOptions_loadPanel */
         loadPanel?: {
-            /** Enables or disables the load panel. */
+            /** @docid dxPivotGridOptions_loadPanel_enabled */
             enabled?: boolean;
-            /** Specifies the height of the load panel. */
+            /** @docid dxPivotGridOptions_loadPanel_height */
             height?: number;
-            /** Specifies the URL pointing to an image that will be used as a load indicator. */
+            /** @docid dxPivotGridOptions_loadPanel_indicatorSrc */
             indicatorSrc?: string;
-            /** Specifies whether or not to show a load indicator. */
+            /** @docid dxPivotGridOptions_loadPanel_showIndicator */
             showIndicator?: boolean;
-            /** Specifies whether or not to show load panel background. */
+            /** @docid dxPivotGridOptions_loadPanel_showPane */
             showPane?: boolean;
-            /** Specifies the text to display inside a load panel. */
+            /** @docid dxPivotGridOptions_loadPanel_text */
             text?: string;
-            /** Specifies the width of the load panel. */
+            /** @docid dxPivotGridOptions_loadPanel_width */
             width?: number;
         };
-        /** A handler for the cellClick event. */
+        /** @docid dxPivotGridOptions_onCellClick */
         onCellClick?: (e: any) => void;
-        /** A handler for the cellPrepared event. */
+        /** @docid dxPivotGridOptions_onCellPrepared */
         onCellPrepared?: (e: any) => void;
-        /** A handler for the contextMenuPreparing event. */
+        /** @docid dxPivotGridOptions_onContextMenuPreparing */
         onContextMenuPreparing?: (e: Object) => void;
-        /** Configures client-side export. */
+        /** @docid dxPivotGridOptions_export */
         export?: {
-            /** Enables client-side export. */
+            /** @docid dxPivotGridOptions_export_enabled */
             enabled?: boolean;
-            /** Specifies a default name for the file to which grid data is exported. */
+            /** @docid dxPivotGridOptions_export_fileName */
             fileName?: string;
-            /** Specifies the URL of the server-side proxy that streams the resulting file to the end user to enable export in IE9 and Safari browsers. */
+            /** @docid dxPivotGridOptions_export_proxyUrl */
             proxyUrl?: string;
         };
-        /** A handler for the exporting event. */
+        /** @docid dxPivotGridOptions_onExporting */
         onExporting?: (e: {
             fileName: string;
             cancel: boolean;
         }) => void;
-        /** A handler for the fileSaving event. */
+        /** @docid dxPivotGridOptions_onFileSaving */
         onFileSaving?: (e: {
             fileName: string;
             format: string;
             data: any;
             cancel: boolean;
         }) => void;
-        /** A handler for the exported event. */
+        /** @docid dxPivotGridOptions_onExported */
         onExported?: (e: Object) => void;
-        /** A configuration object specifying options related to state storing. */
+        /** @docid dxPivotGridOptions_stateStoring */
         stateStoring?: {
-            /** Specifies a callback function that performs specific actions on state loading. */
+            /** @docid dxPivotGridOptions_stateStoring_customLoad */
             customLoad?: () => JQueryPromise<Object>;
-            /** Specifies a callback function that performs specific actions on state saving. */
+            /** @docid dxPivotGridOptions_stateStoring_customSave */
             customSave?: (gridState: Object) => void;
-            /** Specifies whether or not a grid saves its state. */
+            /** @docid dxPivotGridOptions_stateStoring_enabled */
             enabled?: boolean;
-            /** Specifies the delay between the last change of a grid state and the operation of saving this state in milliseconds. */
+            /** @docid dxPivotGridOptions_stateStoring_savingTimeout */
             savingTimeout?: number;
-            /** Specifies a unique key to be used for storing the grid state. */
+            /** @docid dxPivotGridOptions_stateStoring_storageKey */
             storageKey?: string;
-            /** Specifies the type of storage to be used for state storing. */
+            /** @docid dxPivotGridOptions_stateStoring_type */
             type?: string;
         };
     }
-    /** A data summarization widget for multi-dimensional data analysis and data mining. */
+    /** @docid dxPivotGrid */
     export class dxPivotGrid extends Widget {
         constructor(element: JQuery, options?: dxPivotGridOptions);
         constructor(element: Element, options?: dxPivotGridOptions);
-        /** Gets the PivotGridDataSource instance. */
+        /** @docid dxPivotGridMethods_getDataSource */
         getDataSource(): DevExpress.data.PivotGridDataSource;
-        /** Gets the dxPopup instance of the field chooser window. */
+        /** @docid dxPivotGridMethods_getFieldChooserPopup */
         getFieldChooserPopup(): DevExpress.ui.dxPopup;
-        /** Updates the widget to the size of its content. */
+        /** @docid dxPivotGridMethods_updateDimensions */
         updateDimensions(): void;
-        /** Exports pivot grid data to the Excel file. */
+        /** @docid dxPivotGridMethods_exportToExcel */
         exportToExcel(): void;
-        /** Binds a dxChart to the dxPivotGrid. */
+        /** @docid dxPivotGridMethods_bindChart */
         bindChart(chart: any, integrationOptions?: {
             inverted?: boolean;
             dataFieldsDisplayMode?: string;
@@ -4462,36 +5213,37 @@ declare module DevExpress.ui {
         }): any;
     }
     export interface dxPivotGridFieldChooserOptions extends WidgetOptions {
-        /** Specifies the height of the widget. */
+        /** @docid dxPivotGridFieldChooserOptions_height*/
         height?: any;
-        /** Specifies the field chooser layout. */
+        /** @docid dxPivotGridFieldChooserOptions_layout */
         layout?: number;
-        /** The data source of a dxPivotGrid widget. */
+        /** @docid dxPivotGridFieldChooserOptions_dataSource */
         dataSource?: DevExpress.data.PivotGridDataSource;
+        /** @docid dxPivotGridFieldChooserOptions_onContentReady */
         onContentReady?: Function;
-        /** A handler for the contextMenuPreparing event. */
+        /** @docid dxPivotGridFieldChooserOptions_onContextMenuPreparing */
         onContextMenuPreparing?: (e: Object) => void;
-        /** Strings that can be changed or localized in the dxPivotGridFieldChooser widget. */
+        /** @docid dxPivotGridFieldChooserOptions_texts */
         texts?: {
-            /** The string to display instead of Row Fields. */
+            /** @docid dxPivotGridFieldChooserOptions_texts_rowFields */
             rowFields?: string;
-            /** The string to display instead of Column Fields. */
+            /** @docid dxPivotGridFieldChooserOptions_texts_columnFields */
             columnFields?: string;
-            /** The string to display instead of Data Fields. */
+            /** @docid dxPivotGridFieldChooserOptions_texts_dataFields */
             dataFields?: string;
-            /** The string to display instead of Filter Fields. */
+            /** @docid dxPivotGridFieldChooserOptions_texts_filterFields */
             filterFields?: string;
-            /** The string to display instead of All Fields. */
+            /** @docid dxPivotGridFieldChooserOptions_texts_allFields */
             allFields?: string;
         };
     }
-    /** A complementary widget for dxPivotGrid that allows you to manage data displayed in the dxPivotGrid. */
+    /** @docid dxPivotGridFieldChooser */
     export class dxPivotGridFieldChooser extends Widget {
         constructor(element: JQuery, options?: dxPivotGridFieldChooserOptions);
         constructor(element: Element, options?: dxPivotGridFieldChooserOptions);
-        /** Updates the widget to the size of its content. */
+        /** @docid dxPivotGridFieldChooserMethods_updateDimensions */
         updateDimensions(): void;
-        /** Gets the PivotGridDataSource instance. */
+        /** @docid dxPivotGridFieldChooserMethods_getDataSource */
         getDataSource(): DevExpress.data.PivotGridDataSource;
     }
 }
@@ -4543,71 +5295,97 @@ interface JQuery {
     dxScheduler(options: DevExpress.ui.dxSchedulerOptions): JQuery;
 }
 declare module DevExpress.framework {
-    /** An object used to store information on the views displayed in an application. */
+    /** @docid_ignore dxCommandContainer */
+    /** @docid_ignore dxCommandContaineroptions_id */
+    /** @docid_ignore dxcontent */
+    /** @docid_ignore dxcontentoptions_targetPlaceholder */
+    /** @docid_ignore dxcontentplaceholderoptions_contentCssPosition */
+    /** @docid_ignore dxcontentplaceholderoptions_name */
+    /** @docid_ignore dxcontentplaceholderoptions_transition */
+    /** @docid_ignore dxcontentplaceholderoptions_animation */
+    /** @docid_ignore dxcontentplaceholder */
+    /** @docid_ignore dxtransitionoptions_name */
+    /** @docid_ignore dxtransitionoptions_type */
+    /** @docid_ignore dxtransitionoptions_animation */
+    /** @docid_ignore dxtransition */
+    /** @docid_ignore dxlayoutoptions_name */
+    /** @docid_ignore dxlayout */
+    /** @docid_ignore dxviewoptions_disableCache */
+    /** @docid_ignore dxviewoptions_modal */
+    /** @docid_ignore dxviewoptions_name */
+    /** @docid_ignore dxviewoptions_orientation */
+    /** @docid_ignore dxviewoptions_pane */
+    /** @docid_ignore dxviewoptions_title */
+    /** @docid_ignore dxview */
+    /** @docid_ignore dxviewPlaceholderoptions_viewName */
+    /** @docid_ignore dxviewPlaceholder */
+    /** @docid ViewCache */
     export class ViewCache {
+        /** @docid ViewCacheevents_viewRemoved */
         viewRemoved: JQueryCallback;
-        /** Removes all the viewInfo objects from the cache. */
+        /** @docid ViewCachemethods_clear */
         clear(): void;
-        /** Obtains a viewInfo object from the cache by the specified key. */
+        /** @docid ViewCachemethods_getView */
         getView(key: string): Object;
-        /** Checks whether or not a viewInfo object is contained in the view cache under the specified key. */
+        /** @docid ViewCachemethods_hasView */
         hasView(key: string): boolean;
-        /** Removes a viewInfo object from the cache by the specified key. */
+        /** @docid ViewCachemethods_removeView */
         removeView(key: string): Object;
-        /** Adds the specified viewInfo object to the cache under the specified key. */
+        /** @docid ViewCachemethods_setView */
         setView(key: string, viewInfo: Object): void;
     }
     export interface dxCommandOptions extends DOMComponentOptions {
-        /** Specifies an action performed when the execute() method of the command is called. */
+        /** @docid dxCommandOptions_onExecute */
         onExecute?: any;
-        /** Indicates whether or not the widget that displays this command is disabled. */
+        /** @docid dxCommandOptions_disabled */
         disabled?: boolean;
-        /** Specifies whether the current command is rendered when a view is being rendered or after a view is shown. */
+        /** @docid dxCommandOptions_renderStage */
         renderStage?: string;
-        /** Specifies the name of the icon shown inside the widget associated with this command. */
+        /** @docid dxCommandOptions_icon */
         icon?: string;
+        /** @docid dxCommandOptions_iconSrc */
         iconSrc?: string;
-        /** The identifier of the command. */
+        /** @docid dxCommandOptions_id */
         id?: string;
-        /** Specifies the title of the widget associated with this command. */
+        /** @docid dxCommandOptions_title */
         title?: string;
-        /** Specifies the type of the button, if the command is rendered as a dxButton widget. */
+        /** @docid dxCommandOptions_type */
         type?: string;
-        /** A Boolean value specifying whether or not the widget associated with this command is visible. */
+        /** @docid dxCommandOptions_visible */
         visible?: boolean;
     }
-    /** A markup component used to define markup options for a command. */
+    /** @docid dxcommand */
     export class dxCommand extends DOMComponent {
         constructor(element: JQuery, options: dxCommandOptions);
         constructor(options: dxCommandOptions);
-        /** Executes the action associated with this command. */
+        /** @docid dxcommandmethods_execute */
         execute(): void;
     }
-    /** An object responsible for routing. */
+    /** @docid Router */
     export class Router {
-        /** Adds a routing rule to the list of registered rules. */
+        /** @docid RouterMethods_register */
         register(pattern: string, defaults?: Object, constraints?: Object): void;
-        /** Decodes the specified URI to an object using the registered routing rules. */
+        /** @docid RouterMethods_parse */
         parse(uri: string): Object;
-        /** Formats an object to a URI. */
+        /** @docid RouterMethods_format */
         format(obj: Object): string;
     }
     export interface StateManagerOptions {
-        /** A storage to which the state manager saves the application state. */
+        /** @docid StateManageroptions_storage */
         storage?: Object;
     }
-    /** An object used to store the current application state. */
+    /** @docid StateManager */
     export class StateManager {
         constructor(options?: StateManagerOptions);
-        /** Adds an object that implements an interface of a state source to the state manager's collection of state sources. */
+        /** @docid StateManagerMethods_addStateSource */
         addStateSource(stateSource: Object): void;
-        /** Removes a specified state source from the state manager's collection of state sources. */
+        /** @docid StateManagerMethods_removeStateSource */
         removeStateSource(stateSource: Object): void;
-        /** Saves the current application state. */
+        /** @docid StateManagerMethods_saveState */
         saveState(): void;
-        /** Restores the application state that has been saved by the saveState() method to the state storage. */
+        /** @docid StateManagerMethods_restoreState */
         restoreState(): void;
-        /** Removes the application state that has been saved by the saveState() method to the state storage. */
+        /** @docid StateManagerMethods_clearState */
         clearState(): void;
     }
     export module html {
@@ -4617,40 +5395,40 @@ declare module DevExpress.framework {
             [animationName: string]: any
         }
         export interface HtmlApplicationOptions {
-            /** Specifies where the commands that are defined in the application's views must be displayed. */
+            /** @docid HtmlApplicationoptions_commandMapping */
             commandMapping?: Object;
-            /** Specifies whether or not view caching is disabled. */
+            /** @docid HtmlApplicationoptions_disableViewCache */
             disableViewCache?: boolean;
-            /** An array of layout controllers that should be used to show application views in the current navigation context. */
+            /** @docid HtmlApplicationoptions_layoutSet */
             layoutSet?: any;
-            /** Specifies the animation presets that are used to animate different UI elements in the current application. */
+            /** @docid HtmlApplicationoptions_animationSet */
             animationSet?: AnimationSet;
-            /** Specifies whether the current application must behave as a mobile or web application. */
+            /** @docid HtmlApplicationoptions_mode */
             mode?: string;
-            /** Specifies the object that represents a root namespace of the application. */
+            /** @docid HtmlApplicationoptions_namespace */
             namespace?: Object;
-            /** Specifies application behavior when the user navigates to a root view. */
+            /** @docid HtmlApplicationoptions_navigateToRootViewMode */
             navigateToRootViewMode?: string;
-            /** An array of dxCommand configuration objects used to define commands available from the application's global navigation. */
+            /** @docid HtmlApplicationoptions_navigation */
             navigation?: Array<any>;
-            /** A state manager to be used in the application. */
+            /** @docid HtmlApplicationOptions_stateManager */
             stateManager?: StateManager;
-            /** Specifies the storage to be used by the application's state manager to store the application state. */
+            /** @docid HtmlApplicationOptions_stateStorage */
             stateStorage?: Object;
-            /** Indicates whether on not to use the title of the previously displayed view as text on the Back button. */
+            /** @docid HtmlApplicationoptions_useViewTitleAsBackText */
             useViewTitleAsBackText?: boolean;
-            /** A custom view cache to be used in the application. */
+            /** @docid HtmlApplicationoptions_viewCache */
             viewCache?: Object;
-            /** Specifies a limit for the views that can be cached. */
+            /** @docid HtmlApplicationoptions_viewCacheSize */
             viewCacheSize?: number;
-            /** Specifies the current version of application templates. */
+            /** @docid HtmlApplicationoptions_templatesVersion */
             templatesVersion?: string;
-            /** Specifies options for the viewport meta tag of a mobile browser. */
+            /** @docid HtmlApplicationoptions_viewPort */
             viewPort?: JQuery;
-            /** A custom router to be used in the application. */
+            /** @docid HtmlApplicationOptions_router */
             router?: Router;
         }
-        /** An object used to manage views, as well as control the application life cycle. */
+        /** @docid HtmlApplication */
         export class HtmlApplication implements EventsMixin<HtmlApplication> {
             constructor(options: HtmlApplicationOptions);
             afterViewSetup: JQueryCallback;
@@ -4666,37 +5444,37 @@ declare module DevExpress.framework {
             viewRendered: JQueryCallback;
             viewShowing: JQueryCallback;
             viewShown: JQueryCallback;
-            /** Provides access to the ViewCache object. */
+            /** @docid HtmlApplicationfields_viewCache */
             viewCache: ViewCache;
-            /** An array of dxCommand components that are created based on the application's navigation option value. */
+            /** @docid HtmlApplicationfields_navigation */
             navigation: Array<any>;
-            /** Provides access to the StateManager object. */
+            /** @docid HtmlApplicationFields_stateManager */
             stateManager: StateManager;
-            /** Provides access to the Router object. */
+            /** @docid HtmlApplicationFields_router */
             router: Router;
-            /** Navigates to the URI preceding the current one in the navigation history. */
+            /** @docid HtmlApplicationmethods_back */
             back(): void;
-            /** Returns a Boolean value indicating whether or not backwards navigation is currently possible. */
+            /** @docid HtmlApplicationmethods_canBack */
             canBack(): boolean;
-            /** Calls the clearState() method of the application's StateManager object. */
+            /** @docid HtmlApplicationmethods_clearState */
             clearState(): void;
-            /** Creates global navigation commands. */
+            /** @docid HtmlApplicationmethods_createNavigation */
             createNavigation(navigationConfig: Array<any>): void;
-            /** Returns an HTML template of the specified view. */
+            /** @docid HtmlApplicationmethods_getViewTemplate */
             getViewTemplate(viewName: string): JQuery;
-            /** Returns a configuration object used to create a dxView component for a specified view. */
+            /** @docid HtmlApplicationmethods_getViewTemplateInfo */
             getViewTemplateInfo(viewName: string): Object;
-            /** Adds a specified HTML template to a collection of view or layout templates. */
+            /** @docid HtmlApplicationmethods_loadTemplates */
             loadTemplates(source: any): JQueryPromise<any>;
-            /** Navigates to the specified URI. */
+            /** @docid HtmlApplicationmethods_navigate */
             navigate(uri?: any, options?: Object): void;
-            /** Renders navigation commands to the navigation command containers that are located in the layouts used in the application. */
+            /** @docid HtmlApplicationmethods_renderNavigation */
             renderNavigation(): void;
-            /** Calls the restoreState() method of the application's StateManager object. */
+            /** @docid HtmlApplicationmethods_restoreState */
             restoreState(): void;
-            /** Calls the saveState method of the application's StateManager object. */
+            /** @docid HtmlApplicationmethods_saveState */
             saveState(): void;
-            /** Provides access to the object that defines the current context to be considered when choosing an appropriate template for a view. */
+            /** @docid HtmlApplicationmethods_templateContext */
             templateContext(): Object;
             on(eventName: "initialized", eventHandler: () => void): HtmlApplication;
             on(eventName: "afterViewSetup", eventHandler: (e: {
@@ -4825,230 +5603,619 @@ declare module DevExpress.framework {
     }
 }
 declare module DevExpress.viz.core {
+    /** @docid_ignore viz_core */
     export interface Border {
-        /** Sets a border color for a selected series. */
+        /**
+          * @docid dxChartSeriesTypes_CommonSeries_border_color
+          * @docid dxChartSeriesTypes_CommonSeries_hoverstyle_border_color
+          * @docid dxChartSeriesTypes_CommonSeries_label_border_color
+          * @docid dxChartSeriesTypes_CommonSeries_point_border_color
+          * @docid dxChartSeriesTypes_CommonSeries_point_hoverstyle_border_color
+          * @docid dxChartSeriesTypes_CommonSeries_point_selectionstyle_border_color
+          * @docid dxChartSeriesTypes_CommonSeries_selectionstyle_border_color
+          * @docid basechartoptions_legend_border_color
+          * @docid dxvectormapoptions_legends_border_color
+          * @docid BaseWidgetOptions_tooltip_border_color
+          * @docid dxchartoptions_commonpanesettings_border_color
+          * @docid dxchartoptions_crosshair_horizontalline_color
+          * @docid dxchartoptions_crosshair_verticalline_color
+          * @docid dxPieChartSeriesTypes_CommonPieChartSeries_border_color
+          * @docid dxPieChartSeriesTypes_CommonPieChartSeries_hoverstyle_border_color
+          * @docid dxPieChartSeriesTypes_CommonPieChartSeries_label_border_color
+          * @docid dxPieChartSeriesTypes_CommonPieChartSeries_selectionstyle_border_color
+          * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_border_color
+          * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_hoverstyle_border_color
+          * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_label_border_color
+          * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_point_border_color
+          * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_point_hoverstyle_border_color
+          * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_point_selectionstyle_border_color
+          * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_selectionstyle_border_color
+          */
         color?: string;
-        /** Sets border visibility for a selected series. */
+        /**
+          * @docid dxChartSeriesTypes_CommonSeries_border_visible
+          * @docid dxChartSeriesTypes_CommonSeries_hoverstyle_border_visible
+          * @docid dxChartSeriesTypes_CommonSeries_label_border_visible
+          * @docid dxChartSeriesTypes_CommonSeries_point_border_visible
+          * @docid dxChartSeriesTypes_CommonSeries_point_hoverstyle_border_visible
+          * @docid dxChartSeriesTypes_CommonSeries_point_selectionstyle_border_visible
+          * @docid dxChartSeriesTypes_CommonSeries_selectionstyle_border_visible
+          * @docid basechartoptions_legend_border_visible
+          * @docid dxvectormapoptions_legends_border_visible
+          * @docid BaseWidgetOptions_tooltip_border_visible
+          * @docid dxchartoptions_commonpanesettings_border_visible
+          * @docid dxchartoptions_crosshair_horizontalline_visible
+          * @docid dxchartoptions_crosshair_verticalline_visible
+          * @docid dxChartSeriesTypes_stepareaseries_selectionstyle_border_visible
+          * @docid dxChartSeriesTypes_stepareaseries_hoverstyle_border_visible
+          * @docid dxChartSeriesTypes_stepareaseries_border_visible
+          * @docid dxPieChartSeriesTypes_CommonPieChartSeries_border_visible
+          * @docid dxPieChartSeriesTypes_CommonPieChartSeries_hoverstyle_border_visible
+          * @docid dxPieChartSeriesTypes_CommonPieChartSeries_label_border_visible
+          * @docid dxPieChartSeriesTypes_CommonPieChartSeries_selectionstyle_border_visible
+          * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_border_visible
+          * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_hoverstyle_border_visible
+          * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_label_border_visible
+          * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_point_border_visible
+          * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_point_hoverstyle_border_visible
+          * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_point_selectionstyle_border_visible
+          * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_selectionstyle_border_visible
+          */
         visible?: boolean;
-        /** Sets a border width for a selected series. */
+        /**
+          * @docid dxChartSeriesTypes_CommonSeries_border_width
+          * @docid dxChartSeriesTypes_CommonSeries_hoverstyle_border_width
+          * @docid dxChartSeriesTypes_CommonSeries_label_border_width
+          * @docid dxChartSeriesTypes_CommonSeries_point_border_width
+          * @docid dxChartSeriesTypes_CommonSeries_point_hoverstyle_border_width
+          * @docid dxChartSeriesTypes_CommonSeries_point_selectionstyle_border_width
+          * @docid dxChartSeriesTypes_CommonSeries_selectionstyle_border_width
+          * @docid basechartoptions_legend_border_width
+          * @docid dxvectormapoptions_legends_border_width
+          * @docid BaseWidgetOptions_tooltip_border_width
+          * @docid dxchartoptions_commonpanesettings_border_width
+          * @docid dxchartoptions_crosshair_horizontalline_width
+          * @docid dxchartoptions_crosshair_verticalline_width
+          * @docid dxPieChartSeriesTypes_CommonPieChartSeries_border_width
+          * @docid dxPieChartSeriesTypes_CommonPieChartSeries_hoverstyle_border_width
+          * @docid dxPieChartSeriesTypes_CommonPieChartSeries_label_border_width
+          * @docid dxPieChartSeriesTypes_CommonPieChartSeries_selectionstyle_border_width
+          * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_border_width
+          * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_hoverstyle_border_width
+          * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_label_border_width
+          * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_point_border_width
+          * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_point_hoverstyle_border_width
+          * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_point_selectionstyle_border_width
+          * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_selectionstyle_border_width
+          */
         width?: number;
     }
     export interface DashedBorder extends Border {
-        /** Specifies a dash style for the border of a selected series point. */
+        /**
+          * @docid dxChartSeriesTypes_CommonSeries_border_dashstyle
+          * @docid dxChartSeriesTypes_CommonSeries_label_border_dashstyle
+          * @docid basechartoptions_legend_border_dashstyle
+          * @docid dxvectormapoptions_legends_border_dashstyle
+          * @docid BaseWidgetOptions_tooltip_border_dashstyle
+          * @docid dxchartoptions_commonpanesettings_border_dashstyle
+          * @docid dxchartoptions_crosshair_horizontalline_dashstyle
+          * @docid dxchartoptions_crosshair_verticalline_dashstyle
+          * @docid dxPieChartSeriesTypes_CommonPieChartSeries_label_border_dashstyle
+          * @docid dxChartSeriesTypes_CommonSeries_hoverstyle_border_dashstyle
+          * @docid dxChartSeriesTypes_CommonSeries_selectionstyle_border_dashstyle
+          * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_border_dashstyle
+          * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_label_border_dashstyle
+          * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_hoverstyle_border_dashstyle
+          * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_selectionstyle_border_dashstyle
+          * @docid dxPieChartSeriesTypes_CommonPieChartSeries_border_dashstyle
+          * @docid dxPieChartSeriesTypes_CommonPieChartSeries_hoverstyle_border_dashstyle
+          * @docid dxPieChartSeriesTypes_CommonPieChartSeries_selectionstyle_border_dashstyle
+          */
         dashStyle?: string;
     }
     export interface DashedBorderWithOpacity extends DashedBorder {
-        /** Specifies how transparent the vertical crosshair line should be. */
+        /**
+          * @docid basechartoptions_legend_border_opacity
+          * @docid dxvectormapoptions_legends_border_opacity
+          * @docid dxchartoptions_commonpanesettings_border_opacity
+          * @docid BaseWidgetOptions_tooltip_border_opacity
+          * @docid dxchartoptions_crosshair_horizontalline_opacity
+          * @docid dxchartoptions_crosshair_verticalline_opacity
+          */
         opacity?: number;
     }
     export interface Font {
-        /** Colors the text displayed by the group labels. */
+        /**
+          * @docid dxChartSeriesTypes_CommonSeries_label_font_color
+          * @docid BaseWidgetOptions_loadingindicator_font_color
+          * @docid basechartoptions_legend_font_color
+          * @docid dxvectormapoptions_legends_font_color
+          * @docid BaseWidgetOptions_title_font_color
+          * @docid BaseWidgetOptions_title_subtitle_font_color
+          * @docid BaseWidgetOptions_tooltip_font_color
+          * @docid basegaugeoptions_scale_label_font_color
+          * @docid basegaugeoptions_subtitle_font_color
+          * @docid commonIndicatoroptions_text_font_color
+          * @docid linearTextCloudoptions_text_font_color
+          * @docid circularTextCloudoptions_text_font_color
+          * @docid dxbargaugeoptions_label_font_color
+          * @docid dxchartoptions_commonaxissettings_constantlinestyle_label_font_color
+          * @docid dxchartoptions_commonaxissettings_label_font_color
+          * @docid dxchartoptions_commonaxissettings_stripstyle_label_font_color
+          * @docid dxchartoptions_commonaxissettings_title_font_color
+          * @docid dxchartoptions_crosshair_label_font_color
+          * @docid dxchartoptions_crosshair_horizontalline_label_font_color
+          * @docid dxchartoptions_crosshair_verticalline_label_font_color
+          * @docid dxPieChartSeriesTypes_CommonPieChartSeries_label_font_color
+          * @docid dxrangeselectoroptions_scale_label_font_color
+          * @docid dxrangeselectoroptions_slidermarker_font_color
+          * @docid dxvectormapoptions_areaSettings_label_font_color
+          * @docid dxvectormapoptions_markerSettings_label_font_color
+          * @docid dxvectormapoptions_layers_label_font_color
+          * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_label_font_color
+          * @docid dxpolarchartoptions_commonaxissettings_constantlinestyle_label_font_color
+          * @docid dxpolarchartoptions_commonaxissettings_label_font_color
+          * @docid dxpolarchartoptions_commonaxissettings_stripstyle_label_font_color
+          * @docid dxtreemapoptions_tile_label_font_color
+          * @docid dxtreemapoptions_group_label_font_color
+          */
         color?: string;
-        /** Specifies the font family of the text displayed by the group labels. */
+        /**
+          * @docid dxChartSeriesTypes_CommonSeries_label_font_family
+          * @docid BaseWidgetOptions_loadingindicator_font_family
+          * @docid basechartoptions_legend_font_family
+          * @docid dxvectormapoptions_legends_font_family
+          * @docid BaseWidgetOptions_title_font_family
+          * @docid BaseWidgetOptions_title_subtitle_font_family
+          * @docid BaseWidgetOptions_tooltip_font_family
+          * @docid basegaugeoptions_scale_label_font_family
+          * @docid basegaugeoptions_subtitle_font_family
+          * @docid commonIndicatoroptions_text_font_family
+          * @docid dxbargaugeoptions_label_font_family
+          * @docid dxchartoptions_commonaxissettings_constantlinestyle_label_font_family
+          * @docid dxchartoptions_commonaxissettings_label_font_family
+          * @docid dxchartoptions_commonaxissettings_stripstyle_label_font_family
+          * @docid dxchartoptions_commonaxissettings_title_font_family
+          * @docid dxchartoptions_crosshair_label_font_family
+          * @docid dxchartoptions_crosshair_horizontalline_label_font_family
+          * @docid dxchartoptions_crosshair_verticalline_label_font_family
+          * @docid dxPieChartSeriesTypes_CommonPieChartSeries_label_font_family
+          * @docid dxrangeselectoroptions_scale_label_font_family
+          * @docid dxrangeselectoroptions_slidermarker_font_family
+          * @docid dxvectormapoptions_areaSettings_label_font_family
+          * @docid dxvectormapoptions_markerSettings_label_font_family
+          * @docid dxvectormapoptions_layers_label_font_family
+          * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_label_font_family
+          * @docid dxpolarchartoptions_commonaxissettings_constantlinestyle_label_font_family
+          * @docid dxpolarchartoptions_commonaxissettings_label_font_family
+          * @docid dxpolarchartoptions_commonaxissettings_stripstyle_label_font_family
+          * @docid dxtreemapoptions_tile_label_font_family
+          * @docid dxtreemapoptions_group_label_font_family
+          */
         family?: string;
-        /** Specifies how transparent the text displayed by the group labels should be. */
+        /**
+          * @docid dxChartSeriesTypes_CommonSeries_label_font_opacity
+          * @docid BaseWidgetOptions_loadingindicator_font_opacity
+          * @docid basechartoptions_legend_font_opacity
+          * @docid dxvectormapoptions_legends_font_opacity
+          * @docid BaseWidgetOptions_title_font_opacity
+          * @docid BaseWidgetOptions_title_subtitle_font_opacity
+          * @docid BaseWidgetOptions_tooltip_font_opacity
+          * @docid dxchartoptions_commonaxissettings_constantlinestyle_label_font_opacity
+          * @docid dxchartoptions_commonaxissettings_label_font_opacity
+          * @docid dxchartoptions_commonaxissettings_stripstyle_label_font_opacity
+          * @docid dxchartoptions_commonaxissettings_title_font_opacity
+          * @docid dxchartoptions_crosshair_label_font_opacity
+          * @docid dxchartoptions_crosshair_horizontalline_label_font_opacity
+          * @docid dxchartoptions_crosshair_verticalline_label_font_opacity
+          * @docid dxPieChartSeriesTypes_CommonPieChartSeries_label_font_opacity
+          * @docid commonIndicatoroptions_text_font_opacity
+          * @docid dxbargaugeoptions_label_font_opacity
+          * @docid basegaugeoptions_subtitle_font_opacity
+          * @docid basegaugeoptions_scale_label_font_opacity
+          * @docid dxrangeselectoroptions_scale_label_font_opacity
+          * @docid dxrangeselectoroptions_slidermarker_font_opacity
+          * @docid dxvectormapoptions_areaSettings_label_font_opacity
+          * @docid dxvectormapoptions_markerSettings_label_font_opacity
+          * @docid dxvectormapoptions_layers_label_font_opacity
+          * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_label_font_opacity
+          * @docid dxpolarchartoptions_commonaxissettings_constantlinestyle_label_font_opacity
+          * @docid dxpolarchartoptions_commonaxissettings_label_font_opacity
+          * @docid dxpolarchartoptions_commonaxissettings_stripstyle_label_font_opacity
+          * @docid dxtreemapoptions_tile_label_font_opacity
+          * @docid dxtreemapoptions_group_label_font_opacity
+          */
         opacity?: number;
-        /** Specifies the size of the text displayed by the group labels. */
+        /**
+          * @docid dxChartSeriesTypes_CommonSeries_label_font_size
+          * @docid BaseWidgetOptions_loadingindicator_font_size
+          * @docid basechartoptions_legend_font_size
+          * @docid dxvectormapoptions_legends_font_size
+          * @docid BaseWidgetOptions_title_font_size
+          * @docid BaseWidgetOptions_title_subtitle_font_size
+          * @docid BaseWidgetOptions_tooltip_font_size
+          * @docid basegaugeoptions_scale_label_font_size
+          * @docid basegaugeoptions_subtitle_font_size
+          * @docid commonIndicatoroptions_text_font_size
+          * @docid circularTextCloudoptions_text_font_size
+          * @docid linearTextCloudoptions_text_font_size
+          * @docid dxbargaugeoptions_label_font_size
+          * @docid dxchartoptions_commonaxissettings_constantlinestyle_label_font_size
+          * @docid dxchartoptions_commonaxissettings_label_font_size
+          * @docid dxchartoptions_commonaxissettings_stripstyle_label_font_size
+          * @docid dxchartoptions_commonaxissettings_title_font_size
+          * @docid dxchartoptions_crosshair_label_font_size
+          * @docid dxchartoptions_crosshair_horizontalline_label_font_size
+          * @docid dxchartoptions_crosshair_verticalline_label_font_size
+          * @docid dxPieChartSeriesTypes_CommonPieChartSeries_label_font_size
+          * @docid dxrangeselectoroptions_scale_label_font_size
+          * @docid dxrangeselectoroptions_slidermarker_font_size
+          * @docid dxvectormapoptions_areaSettings_label_font_size
+          * @docid dxvectormapoptions_markerSettings_label_font_size
+          * @docid dxvectormapoptions_layers_label_font_size
+          * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_label_font_size
+          * @docid dxpolarchartoptions_commonaxissettings_constantlinestyle_label_font_size
+          * @docid dxpolarchartoptions_commonaxissettings_label_font_size
+          * @docid dxpolarchartoptions_commonaxissettings_stripstyle_label_font_size
+          * @docid dxtreemapoptions_tile_label_font_size
+          * @docid dxtreemapoptions_group_label_font_size
+          */
         size?: any;
-        /** Specifies the font weight of the text displayed by the group labels. */
+        /**
+          * @docid dxChartSeriesTypes_CommonSeries_label_font_weight
+          * @docid BaseWidgetOptions_loadingindicator_font_weight
+          * @docid basechartoptions_legend_font_weight
+          * @docid dxvectormapoptions_legends_font_weight
+          * @docid BaseWidgetOptions_title_font_weight
+          * @docid BaseWidgetOptions_title_subtitle_font_weight
+          * @docid BaseWidgetOptions_tooltip_font_weight
+          * @docid basegaugeoptions_scale_label_font_weight
+          * @docid basegaugeoptions_subtitle_font_weight
+          * @docid commonIndicatoroptions_text_font_weight
+          * @docid dxbargaugeoptions_label_font_weight
+          * @docid dxchartoptions_commonaxissettings_constantlinestyle_label_font_weight
+          * @docid dxchartoptions_commonaxissettings_label_font_weight
+          * @docid dxchartoptions_commonaxissettings_stripstyle_label_font_weight
+          * @docid dxchartoptions_commonaxissettings_title_font_weight
+          * @docid dxchartoptions_crosshair_label_font_weight
+          * @docid dxchartoptions_crosshair_horizontalline_label_font_weight
+          * @docid dxchartoptions_crosshair_verticalline_label_font_weight
+          * @docid dxPieChartSeriesTypes_CommonPieChartSeries_label_font_weight
+          * @docid dxrangeselectoroptions_scale_label_font_weight
+          * @docid dxrangeselectoroptions_slidermarker_font_weight
+          * @docid dxvectormapoptions_areaSettings_label_font_weight
+          * @docid dxvectormapoptions_markerSettings_label_font_weight
+          * @docid dxvectormapoptions_layers_label_font_weight
+          * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_label_font_weight
+          * @docid dxpolarchartoptions_commonaxissettings_constantlinestyle_label_font_weight
+          * @docid dxpolarchartoptions_commonaxissettings_label_font_weight
+          * @docid dxpolarchartoptions_commonaxissettings_stripstyle_label_font_weight
+          * @docid dxtreemapoptions_tile_label_font_weight
+          * @docid dxtreemapoptions_group_label_font_weight
+          */
         weight?: number;
     }
     export interface Hatching {
+        /**
+          * @docid dxChartSeriesTypes_CommonSeries_hoverstyle_hatching_direction
+          * @docid dxChartSeriesTypes_CommonSeries_selectionstyle_hatching_direction
+          * @docid dxPieChartSeriesTypes_CommonPieChartSeries_hoverstyle_hatching_direction
+          * @docid dxPieChartSeriesTypes_CommonPieChartSeries_selectionstyle_hatching_direction
+          * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_hoverstyle_hatching_direction
+          * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_selectionstyle_hatching_direction
+          * @docid dxChartSeriesTypes_candlestickseries_hoverstyle_hatching_direction
+          * @docid dxChartSeriesTypes_candlestickseries_selectionstyle_hatching_direction
+          */
         direction?: string;
-        /** Specifies the opacity of hatching lines. */
+        /**
+          * @docid dxChartSeriesTypes_CommonSeries_hoverstyle_hatching_opacity
+          * @docid dxChartSeriesTypes_CommonSeries_selectionstyle_hatching_opacity
+          * @docid dxPieChartSeriesTypes_CommonPieChartSeries_hoverstyle_hatching_opacity
+          * @docid dxPieChartSeriesTypes_CommonPieChartSeries_selectionstyle_hatching_opacity
+          * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_hoverstyle_hatching_opacity
+          * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_selectionstyle_hatching_opacity
+          */
         opacity?: number;
-        /** Specifies the distance between hatching lines in pixels. */
+        /**
+          * @docid dxChartSeriesTypes_CommonSeries_hoverstyle_hatching_step
+          * @docid dxChartSeriesTypes_CommonSeries_selectionstyle_hatching_step
+          * @docid dxPieChartSeriesTypes_CommonPieChartSeries_hoverstyle_hatching_step
+          * @docid dxPieChartSeriesTypes_CommonPieChartSeries_selectionstyle_hatching_step
+          * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_hoverstyle_hatching_step
+          * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_selectionstyle_hatching_step
+          */
         step?: number;
-        /** Specifies the width of hatching lines in pixels. */
+        /**
+          * @docid dxChartSeriesTypes_CommonSeries_hoverstyle_hatching_width
+          * @docid dxChartSeriesTypes_CommonSeries_selectionstyle_hatching_width
+          * @docid dxPieChartSeriesTypes_CommonPieChartSeries_hoverstyle_hatching_width
+          * @docid dxPieChartSeriesTypes_CommonPieChartSeries_selectionstyle_hatching_width
+          * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_hoverstyle_hatching_width
+          * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_selectionstyle_hatching_width
+          */
         width?: number;
     }
     export interface Margins {
-        /** Specifies the legend's bottom margin in pixels. */
+        /**
+          * @docid BaseWidgetOptions_margin_bottom
+          * @docid basechartoptions_legend_margin_bottom
+          * @docid BaseWidgetOptions_title_margin_bottom
+          * @docid dxvectormapoptions_legends_margin_bottom
+          */
         bottom?: number;
-        /** Specifies the legend's left margin in pixels. */
+        /**
+          * @docid BaseWidgetOptions_margin_left
+          * @docid basechartoptions_legend_margin_left
+          * @docid BaseWidgetOptions_title_margin_left
+          * @docid dxvectormapoptions_legends_margin_left
+          */
         left?: number;
-        /** Specifies the legend's right margin in pixels. */
+        /**
+          * @docid BaseWidgetOptions_margin_right
+          * @docid basechartoptions_legend_margin_right
+          * @docid BaseWidgetOptions_title_margin_right
+          * @docid dxvectormapoptions_legends_margin_right
+          */
         right?: number;
-        /** Specifies the legend's bottom margin in pixels. */
+        /**
+          * @docid BaseWidgetOptions_margin_top
+          * @docid basechartoptions_legend_margin_top
+          * @docid BaseWidgetOptions_title_margin_top
+          * @docid dxvectormapoptions_legends_margin_top
+          */
         top?: number;
     }
     export interface MarginOptions {
-        /** Generates space around the widget. */
+        /** @docid BaseWidgetOptions_margin */
         margin?: Margins;
     }
     export interface RedrawOnResizeOptions {
-        /** Specifies whether to redraw the widget when the size of the parent browser window changes or a mobile device rotates. */
+        /** @docid BaseWidgetOptions_redrawonresize */
         redrawOnResize?: boolean;
     }
     export interface TitleOptions {
-        /** Specifies the widget title. */
+        /** @docid BaseWidgetOptions_title */
         title?: Title;
     }
     export interface ExportOptions {
-        /** Configures the exporting and printing features. */
+        /** @docid BaseWidgetOptions_export */
         export?: Export;
     }
     export interface LoadingIndicatorOptions {
-        /** Configures the loading indicator. */
+        /** @docid BaseWidgetOptions_loadingindicator */
         loadingIndicator?: LoadingIndicator;
     }
     export interface LoadingIndicatorMethods {
-        /** Displays the loading indicator. */
+        /** @docid BaseWidgetMethods_showLoadingIndicator */
         showLoadingIndicator(): void;
-        /** Conceals the loading indicator. */
+        /** @docid BaseWidgetMethods_hideLoadingIndicator */
         hideLoadingIndicator(): void;
     }
     export interface Size {
-        /** Specifies the width of the widget in pixels. */
+        /** @docid BaseWidgetOptions_size_width */
         width?: number;
-        /** Specifies the height of the widget in pixels. */
+        /** @docid BaseWidgetOptions_size_height */
         height?: number;
     }
     export interface Title {
-        /** Specifies font options for the title. */
+        /** @docid BaseWidgetOptions_title_font */
         font?: viz.core.Font;
-        /** Specifies the title's alignment in a horizontal direction. */
+        /** @docid BaseWidgetOptions_title_horizontalalignment */
         horizontalAlignment?: string;
-       /** Specifies the title's alignment in a vertical direction. */
+       /** @docid BaseWidgetOptions_title_verticalalignment */
         verticalAlignment?: string;
-        /** Generates space around the title. */
+        /** @docid BaseWidgetOptions_title_margin */
         margin?: Margins;
-         /** Specifies the minimum height that the title occupies. */
+         /** @docid BaseWidgetOptions_title_placeholdersize */
         placeholderSize?: number;
-        /** Specifies the title text. */
+        /** @docid BaseWidgetOptions_title_text */
         text?: string;
-        /** Specifies the widget subtitle. */
+        /** @docid BaseWidgetOptions_title_subtitle */
         subtitle?: {
-            /** Specifies font options for the subtitle. */
+            /** @docid BaseWidgetOptions_title_subtitle_font */
             font?: viz.core.Font;
-           /** Specifies text for the subtitle. */
+           /** @docid BaseWidgetOptions_title_subtitle_text */
             text?: string;
         }
     }
     export interface Export {
-        /** Enables the client-side exporting in the widget. */
+        /** @docid BaseWidgetOptions_export_enabled */
         enabled?: boolean;
-        /** Enables the printing feature in the widget. Applies only if the export | enabled option is true. */
+        /** @docid BaseWidgetOptions_export_printingenabled */
         printingEnabled?: boolean;
-        /** Specifies a set of formats available for exporting into. */
+        /** @docid BaseWidgetOptions_export_formats*/
         formats?: Array<string>;
-        /** Specifies a default name for the file to which the widget will be exported. */
+        /** @docid BaseWidgetOptions_export_filename*/
         fileName?: string;
-        /** Specifies the URL of the server-side proxy that streams the resulting file to the end user to enable exporting in IE9 and Safari browsers. */
+        /** @docid BaseWidgetOptions_export_proxyurl*/
         proxyUrl?: string;
-        /** Specifies the color that will fill transparent regions in the resulting file or document. */
+        /** @docid BaseWidgetOptions_export_backgroundcolor*/
         backgroundColor?: string;
     }
     export interface Tooltip {
-        /** Specifies the length of the tooltip's arrow in pixels. */
+        /** @docid BaseWidgetOptions_tooltip_arrowlength */
         arrowLength?: number;
-        /** Specifies the appearance of the tooltip's border. */
+        /** @docid BaseWidgetOptions_tooltip_border */
         border?: DashedBorderWithOpacity;
-        /** Specifies the color of tooltips. */
+        /** @docid BaseWidgetOptions_tooltip_color */
         color?: string;
-        /** Specifies the z-index of tooltips. */
+        /** @docid BaseWidgetOptions_tooltip_zindex */
         zIndex?: number;
-        /** Specifies the container to draw tooltips inside of it. */
+        /** @docid BaseWidgetOptions_tooltip_container */
         container?: any;
-        /** Allows you to change tooltip appearance. */
-        customizeTooltip?: (arg: Object) => { color?: string; text?: string };
-        enabled?: boolean;
-        /** Specifies the font of the text displayed by a tooltip. */
-        font?: Font;
-        /** Specifies the format of the value displayed by a tooltip. */
-        format?: any;
-        /** Specifies the opacity of tooltips. */
-        opacity?: number;
-        /** Generates space on the left and the right of the text displayed by a tooltip. */
-        paddingLeftRight?: number;
-        /** Generates space above and below the text displayed by a tooltip. */
-        paddingTopBottom?: number;
         /**
-         * Specifies the precision of formatted values in a tooltip.
-         * @deprecated Use the tooltip | format | precision option instead.
-         */
+          * @docid basechartoptions_tooltip_customizetooltip
+          * @docid basegaugeoptions_tooltip_customizetooltip
+          * @docid dxbargaugeoptions_tooltip_customizetooltip
+          * @docid basesparklineoptions_tooltip_customizetooltip
+          * @docid dxvectormapoptions_tooltip_customizetooltip
+          * @docid dxtreemapoptions_tooltip_customizetooltip
+          */
+        customizeTooltip?: (arg: Object) => { color?: string; text?: string };
+        /**
+          * @docid BaseWidgetOptions_tooltip_enabled
+          * @docid basesparklineoptions_tooltip_enabled
+          */
+        enabled?: boolean;
+        /** @docid BaseWidgetOptions_tooltip_font */
+        font?: Font;
+        /** @docid BaseWidgetOptions_tooltip_format */
+        format?: any;
+        /** @docid BaseWidgetOptions_tooltip_opacity */
+        opacity?: number;
+        /** @docid BaseWidgetOptions_tooltip_paddingleftright */
+        paddingLeftRight?: number;
+        /** @docid BaseWidgetOptions_tooltip_paddingtopbottom */
+        paddingTopBottom?: number;
+        /** @docid BaseWidgetOptions_tooltip_precision */
         precision?: number;
-        /** Specifies the appearance of the tooltip's shadow. */
+        /** @docid BaseWidgetOptions_tooltip_shadow */
         shadow?: {
-            /** Specifies the blur distance of the tooltip's shadow. */
+            /** @docid BaseWidgetOptions_tooltip_shadow_blur */
             blur?: number;
-            /** Specifies the color of the tooltip's shadow. */
+            /** @docid BaseWidgetOptions_tooltip_shadow_color */
             color?: string;
-            /** Specifies the horizontal offset of the tooltip's shadow relative to the tooltip itself measured in pixels. */
+            /** @docid BaseWidgetOptions_tooltip_shadow_offsetx */
             offsetX?: number;
-            /** Specifies the vertical offset of the tooltip's shadow relative to the tooltip itself measured in pixels. */
+            /** @docid BaseWidgetOptions_tooltip_shadow_offsety */
             offsetY?: number;
-            /** Specifies the opacity of the tooltip's shadow. */
+            /** @docid BaseWidgetOptions_tooltip_shadow_opacity */
             opacity?: number;
         };
     }
     export interface Animation {
-        /** Determines how long animation runs. */
+        /**
+          * @docid basechartoptions_animation_duration
+          * @docid basegaugeoptions_animation_duration
+          */
         duration?: number;
-        /** Specifies the animation easing mode. */
+        /**
+          * @docid basechartoptions_animation_easing
+          * @docid basegaugeoptions_animation_easing
+          */
         easing?: string;
-        /** Indicates whether or not animation is enabled. */
+        /**
+          * @docid basechartoptions_animation_enabled
+          * @docid basegaugeoptions_animation_enabled
+          */
         enabled?: boolean;
     }
     export interface LoadingIndicator {
-        /** Colors the background of the loading indicator. */
+        /** @docid BaseWidgetOptions_loadingindicator_backgroundcolor */
         backgroundColor?: string;
-        /** Specifies font options for the loading indicator. */
+        /** @docid BaseWidgetOptions_loadingindicator_font */
         font?: viz.core.Font;
-        /** Specifies whether to show the loading indicator or not. */
+        /** @docid BaseWidgetOptions_loadingindicator_show */
         show?: boolean;
-        /** Specifies the text to be displayed by the loading indicator. */
+        /** @docid BaseWidgetOptions_loadingindicator_text */
         text?: string;
     }
     export interface LegendBorder extends viz.core.DashedBorderWithOpacity {
-        /** Specifies a radius for the corners of the legend border. */
+        /**
+          * @docid basechartoptions_legend_border_cornerradius
+          * @docid dxvectormapoptions_legends_border_cornerradius
+          */
         cornerRadius?: number;
     }
     export interface BaseLegend {
-        /** Specifies the color of the legend's background. */
+        /**
+          * @docid basechartoptions_legend_backgroundcolor
+          * @docid dxvectormapoptions_legends_backgroundcolor
+          */
         backgroundColor?: string;
-        /** Specifies legend border settings. */
+        /**
+          * @docid basechartoptions_legend_border
+          * @docid dxvectormapoptions_legends_border
+          */
         border?: viz.core.LegendBorder;
-        /** Specifies how many columns must be taken to arrange legend items. */
+        /**
+          * @docid basechartoptions_legend_columncount
+          * @docid dxvectormapoptions_legends_columncount
+          */
         columnCount?: number;
-        /** Specifies the spacing between a pair of neighboring legend columns in pixels. */
+        /**
+          * @docid basechartoptions_legend_columnitemspacing
+          * @docid dxvectormapoptions_legends_columnitemspacing
+          */
         columnItemSpacing?: number;
-        /** Specifies font options for legend items. */
+        /**
+          * @docid basechartoptions_legend_font
+          * @docid dxvectormapoptions_legends_font
+          */
         font?: viz.core.Font;
-        /** Specifies the legend's position on the map. */
+        /**
+          * @docid basechartoptions_legend_horizontalalignment
+          * @docid dxvectormapoptions_legends_horizontalalignment
+          */
         horizontalAlignment?: string;
-        /** Specifies the alignment of legend items. */
+        /**
+          * @docid basechartoptions_legend_itemsalignment
+          * @docid dxvectormapoptions_legends_itemsalignment
+          */
         itemsAlignment?: string;
-        /** Specifies the position of text relative to the item marker. */
+        /**
+          * @docid basechartoptions_legend_itemtextposition
+          * @docid dxvectormapoptions_legends_itemtextposition
+          */
         itemTextPosition?: string;
-        /** Specifies the distance between the legend and the container borders in pixels. */
+        /**
+          * @docid basechartoptions_legend_margin
+          * @docid dxvectormapoptions_legends_margin
+          */
         margin?: viz.core.Margins;
-        /** Specifies the size of item markers in the legend in pixels. */
+        /**
+          * @docid basechartoptions_legend_markersize
+          * @docid dxvectormapoptions_legends_markerSize
+          */
         markerSize?: number;
-        /** Specifies whether to arrange legend items horizontally or vertically. */
+        /**
+          * @docid basechartoptions_legend_orientation
+          * @docid dxvectormapoptions_legends_orientation
+          */
         orientation?: string;
-        /** Specifies the spacing between the legend left/right border and legend items in pixels. */
+        /**
+          * @docid basechartoptions_legend_paddingleftright
+          * @docid dxvectormapoptions_legends_paddingleftright
+          */
         paddingLeftRight?: number;
-        /** Specifies the spacing between the legend top/bottom border and legend items in pixels. */
+        /**
+          * @docid basechartoptions_legend_paddingtopbottom
+          * @docid dxvectormapoptions_legends_paddingtopbottom
+          */
         paddingTopBottom?: number;
-        /** Specifies how many rows must be taken to arrange legend items. */
+        /**
+          * @docid basechartoptions_legend_rowcount
+          * @docid dxvectormapoptions_legends_rowcount
+          */
         rowCount?: number;
-        /** Specifies the spacing between a pair of neighboring legend rows in pixels. */
+        /**
+          * @docid basechartoptions_legend_rowitemspacing
+          * @docid dxvectormapoptions_legends_rowitemspacing
+          */
         rowItemSpacing?: number;
-        /** Specifies the legend's position on the map. */
+        /**
+          * @docid basechartoptions_legend_verticalalignment
+          * @docid dxvectormapoptions_legends_verticalalignment
+          */
         verticalAlignment?: string;
-        /** Specifies whether or not the legend is visible on the map. */
+        /**
+          * @docid basechartoptions_legend_visible
+          * @docid dxvectormapoptions_legends_visible
+          */
         visible?: boolean;
     }
     export interface BaseWidgetOptions extends DOMComponentOptions {
-        /** Specifies the size of the widget in pixels. */
+        /** @docid_ignore BaseWidgetOptions_width */
+        /** @docid_ignore BaseWidgetOptions_height */
+        /** @docid_ignore BaseWidgetOptions_tooltip */
+        /** @docid BaseWidgetOptions_size */
         size?: Size;
-        /** A handler for the drawn event. */
+        /** @docid BaseWidgetOptions_onDrawn */
         onDrawn?: (e: {
             component: BaseWidget;
             element: Element;
         }) => void;
-        /** A handler for the incidentOccurred event. */
+        /** @docid BaseWidgetOptions_onIncidentoccurred */
         onIncidentOccurred?: (
         component: BaseWidget,
         element: Element,
@@ -5061,176 +6228,169 @@ declare module DevExpress.viz.core {
             version: string;
         }
         ) => void;
-        /** A handler for the exporting event. */
+        /** @docid BaseWidgetOptions_onexporting */
         onExporting?: (e: {
             fileName: string;
             cancel: boolean;
         }) => void;
-        /** A handler for the fileSaving event. */
+        /** @docid BaseWidgetOptions_onfilesaving */
         onFileSaving?: (e: {
             fileName: string;
             format: string;
             data: any;
             cancel: boolean;
         }) => void;
-        /** A handler for the exported event. */
+        /** @docid BaseWidgetOptions_onexported */
         onExported?: (e: Object) => void;
-        /** Notifies a widget that it is embedded into an HTML page that uses a path modifier. */
+        /** @docid BaseWidgetOptions_pathmodified */
         pathModified?: boolean;
-        /** Specifies whether or not the widget supports right-to-left representation. */
+        /** @docid BaseWidgetOptions_rtlEnabled */
         rtlEnabled?: boolean;
-        /** Sets the name of the theme to be used in the widget. */
+        /** @docid BaseWidgetOptions_theme */
         theme?: string;
     }
-    /** This section describes options and methods that are common to all widgets. */
+    /** @docid BaseWidget */
     export class BaseWidget extends DOMComponent {
-        /** Returns the widget's SVG markup. */
+        /** @docid_ignore BaseWidgetMethods_defaultOptions */
+        /** @docid BaseWidgetMethods_svg */
         svg(): string;
-        /** Exports the widget into a document with a specified name and format. */
+        /** @docid BaseWidgetMethods_exportTo */
         exportTo(): void;
-        /** Opens the browser's print window. */
+        /** @docid BaseWidgetMethods_print */
         print(): void;
-        /** Redraws the widget. */
+        /** @docid BaseWidgetMethods_render */
         render(): void;
     }
+    /** @docid_ignore VizTimeInterval */
+    /** @docid_ignore VizTimeInterval_years */
+    /** @docid_ignore VizTimeInterval_quarters */
+    /** @docid_ignore VizTimeInterval_months */
+    /** @docid_ignore VizTimeInterval_weeks */
+    /** @docid_ignore VizTimeInterval_days */
+    /** @docid_ignore VizTimeInterval_hours */
+    /** @docid_ignore VizTimeInterval_minutes */
+    /** @docid_ignore VizTimeInterval_seconds */
+    /** @docid_ignore VizTimeInterval_milliseconds */
 }
 declare module DevExpress.viz {
-    /**
-     * Applies a theme for the entire page with several DevExtreme visualization widgets.
-     * @deprecated Use the DevExpress.viz.currentTheme(theme) method instead.
-     */
+    /** @docid viz_coremethods_currentTheme#currentTheme(theme) */
     export function currentTheme(theme: string): void;
-    /**
-     * Applies a new theme (with the color scheme defined separately) for the entire page with several DevExtreme visualization widgets.
-     * @deprecated Use the DevExpress.viz.currentTheme(platform, colorScheme) method instead.
-     */
+    /** @docid viz_coremethods_currentTheme#currentTheme(platform, colorScheme) */
     export function currentTheme(platform: string, colorScheme: string): void;
-    /**
-     * Registers a new theme based on the existing one.
-     * @deprecated Use the DevExpress.viz.registerTheme(customTheme, baseTheme) method instead.
-     */
+    /** @docid viz_coremethods_registerTheme */
     export function registerTheme(customTheme: Object, baseTheme: string): void;
-    /**
-     * Applies a predefined or registered custom palette to all visualization widgets at once.
-     * @deprecated Use the DevExpress.viz.currentPalette(paletteName) method instead.
-     */
+    /** @docid viz_coremethods_currentPalette */
     export function currentPalette(paletteName: string): void;
-    /**
-     * Obtains the color sets of a predefined or registered palette.
-     * @deprecated Use the DevExpress.viz.getPalette(paletteName) method instead.
-     */
+    /** @docid viz_coremethods_getPalette */
     export function getPalette(paletteName: string): Object;
-    /**
-     * Registers a new palette.
-     * @deprecated Use the DevExpress.viz.registerPalette(paletteName, palette) method instead.
-     */
+    /** @docid viz_coremethods_registerPalette */
     export function registerPalette(paletteName: string, palette: Object): void;
 }
 declare module DevExpress.viz.charts {
-    /** This section describes the fields and methods that can be used in code to manipulate the Series object. */
+    /** @docid baseSeriesObject*/
     export interface BaseSeries {
-        /** Provides information about the state of the series object. */
+        /** @docid baseSeriesObjectFields_fullstate */
         fullState: number;
-        /** Returns the type of the series. */
+        /** @docid baseSeriesObjectFields_type */
         type: string;
-        /** Unselects all the selected points of the series. The points are displayed in an initial style. */
+        /** @docid baseSeriesObjectmethods_clearselection */
         clearSelection(): void;
-        /** Gets the color of a particular series. */
+        /** @docid baseSeriesObjectmethods_getcolor */
         getColor(): string;
-        /** Gets points from the series point collection based on the specified argument. */
+        /** @docid baseSeriesObjectmethods_getpointsbyarg */
         getPointsByArg(pointArg: any): Array<BasePoint>;
-        /** Gets a point from the series point collection based on the specified point position. */
+        /** @docid baseSeriesObjectmethods_getpointbypos */
         getPointByPos(positionIndex: number): Object;
-        /** Selects the series. The series is displayed in a 'selected' style until another series is selected or the current series is deselected programmatically. */
+        /** @docid baseSeriesObjectmethods_select */
         select(): void;
-        /** Selects the specified point. The point is displayed in a 'selected' style. */
+        /** @docid baseSeriesObjectmethods_selectpoint */
         selectPoint(point: BasePoint): void;
-        /** Deselects the specified point. The point is displayed in an initial style. */
+        /** @docid baseSeriesObjectmethods_deselectpoint */
         deselectPoint(point: BasePoint): void;
-        /** Returns an array of all points in the series. */
+        /** @docid baseSeriesObjectmethods_getallpoints */
         getAllPoints(): Array<BasePoint>;
-        /** Returns visible series points. */
+        /** @docid baseSeriesObjectmethods_getvisiblepoints */
         getVisiblePoints(): Array<BasePoint>;
-        /** Returns the name of the series. */
+        /** @docid baseSeriesObjectFields_name */
         name: string;
-        /** Returns the tag of the series. */
+        /** @docid baseSeriesObjectFields_tag */
         tag: string;
-        /** Hides a series. */
+        /** @docid baseSeriesObjectmethods_hide */
         hide(): void;
-        /** Provides information about the hover state of a series. */
+        /** @docid baseSeriesObjectmethods_isHovered */
         isHovered(): boolean;
-        /** Provides information about the selection state of a series. */
+        /** @docid baseSeriesObjectmethods_isSelected */
         isSelected(): boolean;
-        /** Provides information about the visibility state of a series. */
+        /** @docid baseSeriesObjectmethods_isvisible */
         isVisible(): boolean;
-        /** Makes a particular series visible. */
+        /** @docid baseSeriesObjectmethods_show */
         show(): void;
     }
-    /** This section describes the methods that can be used in code to manipulate the Point object. */
+    /** @docid basePointObject */
     export interface BasePoint {
-        /** Provides information about the state of the point object. */
+        /** @docid basePointObjectFields_fullstate */
         fullState: number;
-        /** Returns the point's argument value that was set in the data source. */
+        /** @docid basePointObjectFields_originalArgument */
         originalArgument: any;
-        /** Returns the point's value that was set in the data source. */
+        /** @docid basePointObjectFields_originalValue */
         originalValue: any;
-        /** Returns the tag of the point. */
+        /** @docid basePointObjectFields_tag */
         tag: string;
-        /** Deselects the point. */
+        /** @docid basePointObjectmethods_clearselection */
         clearSelection(): void;
-        /** Gets the color of a particular point. */
+        /** @docid basePointObjectmethods_getcolor */
         getColor(): string;
-        /** Hides the tooltip of the point. */
+        /** @docid basePointObjectmethods_hideTooltip */
         hideTooltip(): void;
-        /** Provides information about the hover state of a point. */
+        /** @docid basePointObjectmethods_isHovered */
         isHovered(): boolean;
-        /** Provides information about the selection state of a point. */
+        /** @docid basePointObjectmethods_isSelected */
         isSelected(): boolean;
-        /** Selects the point. The point is displayed in a 'selected' style until another point is selected or the current point is deselected programmatically. */
+        /** @docid basePointObjectmethods_select */
         select(): void;
-        /** Shows the tooltip of the point. */
+        /** @docid basePointObjectmethods_showTooltip */
         showTooltip(): void;
-        /** Allows you to obtain the label(s) of the series point. */
+        /** @docid basePointObjectmethods_getlabel */
         getLabel(): any;
-        /** Returns the series object to which the point belongs. */
+        /** @docid basePointObjectFields_series */
         series: BaseSeries;
     }
-    /** This section describes the fields and methods that can be used in code to manipulate the Series object. */
+    /** @docid chartSeriesObject */
     export interface ChartSeries extends BaseSeries {
-        /** Returns the name of the series pane. */
+        /** @docid chartSeriesObjectFields_pane */
         pane: string;
-        /** Returns the name of the value axis of the series. */
+        /** @docid chartSeriesObjectFields_axis */
         axis: string;
         selectPoint(point: ChartPoint): void;
         deselectPoint(point: ChartPoint): void;
         getAllPoints(): Array<ChartPoint>;
         getVisiblePoints(): Array<ChartPoint>;
     }
-    /** This section describes the methods that can be used in code to manipulate the Point object. */
+    /** @docid chartPointObject */
     export interface ChartPoint extends BasePoint {
-        /** Contains the close value of the point. This field is useful for points belonging to a series of the candle stick or stock type only. */
+        /** @docid chartPointObjectFields_originalCloseValue */
         originalCloseValue: any;
-        /** Contains the high value of the point. This field is useful for points belonging to a series of the candle stick or stock type only. */
+        /** @docid chartPointObjectFields_originalHighValue */
         originalHighValue: any;
-        /** Contains the low value of the point. This field is useful for points belonging to a series of the candle stick or stock type only. */
+        /** @docid chartPointObjectFields_originalLowValue */
         originalLowValue: any;
-        /** Contains the first value of the point. This field is useful for points belonging to a series of the range area or range bar type only. */
+        /** @docid chartPointObjectFields_originalMinValue */
         originalMinValue: any;
-        /** Contains the open value of the point. This field is useful for points belonging to a series of the candle stick or stock type only. */
+        /** @docid chartPointObjectFields_originalOpenValue */
         originalOpenValue: any;
-        /** Contains the size of the bubble as it was set in the data source. This field is useful for points belonging to a series of the bubble type only. */
+        /** @docid chartPointObjectFields_size */
         size: any;
-        /** Gets the parameters of the point's minimum bounding rectangle (MBR). */
+        /** @docid chartPointObjectmethods_getboundingrect */
         getBoundingRect(): { x: number; y: number; width: number; height: number; };
         series: ChartSeries;
     }
-    /** This section describes the methods that can be used in code to manipulate the Label object. */
+    /** @docid baseLabelObject */
     export interface Label {
-        /** Gets the parameters of the label's minimum bounding rectangle (MBR). */
+        /** @docid baseLabelObjectmethods_getboundingrect*/
         getBoundingRect(): { x: number; y: number; width: number; height: number; };
-        /** Hides the point label. */
+        /** @docid baseLabelObjectmethods_hide */
         hide(): void;
-        /** Shows the point label. */
+        /** @docid baseLabelObjectmethods_show */
         show(): void;
     }
     export interface PieSeries extends BaseSeries {
@@ -5239,876 +6399,1534 @@ declare module DevExpress.viz.charts {
         getAllPoints(): Array<PiePoint>;
         getVisiblePoints(): Array<PiePoint>;
     }
-    /** This section describes the methods that can be used in code to manipulate the Point object. */
+    /** @docid piePointObject */
     export interface PiePoint extends BasePoint {
-        /** Gets the percentage value of the specific point. */
+        /** @docid piePointObjectFields_percent */
         percent: any;
-        /** Provides information about the visibility state of a point. */
+        /** @docid piePointObjectmethods_isvisible */
         isVisible(): boolean;
-        /** Makes a specific point visible. */
+        /** @docid piePointObjectmethods_show */
         show(): void;
-        /** Hides a specific point. */
+        /** @docid piePointObjectmethods_hide */
         hide(): void;
         series: PieSeries;
     }
-    /** This section describes the fields and methods that can be used in code to manipulate the Series object. */
+    /** @docid polarChartSeriesObject */
     export interface PolarSeries extends BaseSeries {
-        /** Returns the name of the value axis of the series. */
+        /** @docid polarChartSeriesObjectFields_axis */
         axis: string;
         selectPoint(point: PolarPoint): void;
         deselectPoint(point: PolarPoint): void;
         getAllPoints(): Array<PolarPoint>;
         getVisiblePoints(): Array<PolarPoint>;
     }
-    /** This section describes the methods that can be used in code to manipulate the Point object. */
+    /** @docid polarPointObject */
     export interface PolarPoint extends BasePoint {
+        /** @docid_ignore polarPointObjectmethods_getboundingrect */
         series: PolarSeries;
     }
     export interface Strip {
-        /** Specifies a color for a strip. */
+        /**
+          * @docid dxchartoptions_argumentaxis_strips_color
+          * @docid dxchartoptions_valueaxis_strips_color
+          * @docid dxpolarchartoptions_argumentaxis_strips_color
+          * @docid dxpolarchartoptions_valueaxis_strips_color
+          */
         color?: string;
-        /** An object that defines the label configuration options of a strip. */
+        /**
+          * @docid dxchartoptions_argumentaxis_strips_label
+          * @docid dxchartoptions_valueaxis_strips_label
+          * @docid dxpolarchartoptions_argumentaxis_strips_label
+          * @docid dxpolarchartoptions_valueaxis_strips_label
+          */
         label?: {
-            /** Specifies the text displayed in a strip. */
+            /**
+              * @docid dxchartoptions_argumentaxis_strips_label_text
+              * @docid dxchartoptions_valueaxis_strips_label_text
+              * @docid dxpolarchartoptions_argumentaxis_strips_label_text
+              * @docid dxpolarchartoptions_valueaxis_strips_label_text
+              */
             text?: string;
         };
-        /** Specifies a start value for a strip. */
+        /**
+          * @docid dxchartoptions_argumentaxis_strips_startvalue
+          * @docid dxchartoptions_valueaxis_strips_startvalue
+          * @docid dxpolarchartoptions_argumentaxis_strips_startvalue
+          * @docid dxpolarchartoptions_valueaxis_strips_startvalue
+          */
         startValue?: any;
-        /** Specifies an end value for a strip. */
+        /**
+          * @docid dxchartoptions_argumentaxis_strips_endvalue
+          * @docid dxchartoptions_valueaxis_strips_endvalue
+          * @docid dxpolarchartoptions_argumentaxis_strips_endvalue
+          * @docid dxpolarchartoptions_valueaxis_strips_endvalue
+          */
         endValue?: any;
     }
     export interface BaseSeriesConfigLabel {
-        /** Specifies a format for arguments displayed by point labels. */
+        /**
+        * @docid dxChartSeriesTypes_CommonSeries_label_argumentFormat
+        * @docid dxPieChartSeriesTypes_CommonPieChartSeries_label_argumentFormat
+        * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_label_argumentFormat
+        */
         argumentFormat?: any;
         /**
-         * Specifies a precision for formatted point arguments displayed in point labels.
-         * @deprecated Use the series | label | argumentFormat | precision instead.
-         */
+        * @docid dxChartSeriesTypes_CommonSeries_label_argumentprecision
+        * @docid dxPieChartSeriesTypes_CommonPieChartSeries_label_argumentprecision
+        * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_label_argumentprecision
+        */
         argumentPrecision?: number;
-        /** Specifies a background color for point labels. */
+        /**
+        * @docid dxChartSeriesTypes_CommonSeries_label_backgroundcolor
+        * @docid dxPieChartSeriesTypes_CommonPieChartSeries_label_backgroundcolor
+        * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_label_backgroundcolor
+        */
         backgroundColor?: string;
-        /** Specifies border options for point labels. */
+        /**
+        * @docid dxChartSeriesTypes_CommonSeries_label_border
+        * @docid dxPieChartSeriesTypes_CommonPieChartSeries_label_border
+        * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_label_border
+        */
         border?: viz.core.DashedBorder;
-        /** Specifies connector options for series point labels. */
+        /**
+        * @docid dxChartSeriesTypes_CommonSeries_label_connector
+        * @docid dxPieChartSeriesTypes_CommonPieChartSeries_label_connector
+        * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_label_connector
+        */
         connector?: {
-            /** Specifies the color of label connectors. */
+            /**
+            * @docid dxChartSeriesTypes_CommonSeries_label_connector_color
+            * @docid dxPieChartSeriesTypes_CommonPieChartSeries_label_connector_color
+            * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_label_connector_color
+            */
             color?: string;
-            /** Indicates whether or not label connectors are visible. */
+            /**
+            * @docid dxChartSeriesTypes_CommonSeries_label_connector_visible
+            * @docid dxPieChartSeriesTypes_CommonPieChartSeries_label_connector_visible
+            * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_label_connector_visible
+            */
             visible?: boolean;
-            /** Specifies the width of label connectors. */
+            /**
+            * @docid dxChartSeriesTypes_CommonSeries_label_connector_width
+            * @docid dxPieChartSeriesTypes_CommonPieChartSeries_label_connector_width
+            * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_label_connector_width
+            */
             width?: number;
         };
-        /** Specifies a callback function that returns the text to be displayed by point labels. */
+        /**
+          * @docid dxChartSeriesTypes_CommonSeries_label_customizetext
+          * @docid dxChartSeriesTypes_areaseries_label_customizetext
+          * @docid dxChartSeriesTypes_barseries_label_customizetext
+          * @docid dxChartSeriesTypes_bubbleseries_label_customizetext
+          * @docid dxChartSeriesTypes_candlestickseries_label_customizetext
+          * @docid dxChartSeriesTypes_fullstackedareaseries_label_customizetext
+          * @docid dxChartSeriesTypes_fullstackedbarseries_label_customizetext
+          * @docid dxChartSeriesTypes_fullstackedlineseries_label_customizetext
+          * @docid dxChartSeriesTypes_fullstackedsplineareaseries_label_customizetext
+          * @docid dxChartSeriesTypes_fullstackedsplineseries_label_customizetext
+          * @docid dxChartSeriesTypes_lineseries_label_customizetext
+          * @docid dxChartSeriesTypes_rangeareaseries_label_customizetext
+          * @docid dxChartSeriesTypes_rangebarseries_label_customizetext
+          * @docid dxChartSeriesTypes_scatterseries_label_customizetext
+          * @docid dxChartSeriesTypes_splineareaseries_label_customizetext
+          * @docid dxChartSeriesTypes_splineseries_label_customizetext
+          * @docid dxChartSeriesTypes_stackedareaseries_label_customizetext
+          * @docid dxChartSeriesTypes_stackedbarseries_label_customizetext
+          * @docid dxChartSeriesTypes_stackedlineseries_label_customizetext
+          * @docid dxChartSeriesTypes_stackedsplineareaseries_label_customizetext
+          * @docid dxChartSeriesTypes_stackedsplineseries_label_customizetext
+          * @docid dxChartSeriesTypes_stepareaseries_label_customizetext
+          * @docid dxChartSeriesTypes_steplineseries_label_customizetext
+          * @docid dxChartSeriesTypes_stockseries_label_customizetext
+          * @docid dxPieChartSeriesTypes_CommonPieChartSeries_label_customizetext
+          * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_label_customizetext
+          */
         customizeText?: (pointInfo: Object) => string;
-        /** Specifies font options for the text displayed in point labels. */
+        /**
+          * @docid dxChartSeriesTypes_CommonSeries_label_font
+          * @docid dxPieChartSeriesTypes_CommonPieChartSeries_label_font
+          * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_label_font
+          */
         font?: viz.core.Font;
-        /** Specifies a format for the text displayed by point labels. */
+        /**
+          * @docid dxChartSeriesTypes_CommonSeries_label_format
+          * @docid dxPieChartSeriesTypes_CommonPieChartSeries_label_format
+          * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_label_format
+          */
         format?: any;
+        /**
+          * @docid dxChartSeriesTypes_CommonSeries_label_position
+          * @docid dxChartSeriesTypes_fullstackedbarseries_label_position
+          * @docid dxChartSeriesTypes_stackedbarseries_label_position
+          * @docid dxPieChartSeriesTypes_CommonPieChartSeries_label_position
+          * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_label_position
+          * @docid dxPolarChartSeriesTypes_stackedbarpolarseries_label_position
+          */
         position?: string;
         /**
-         * Specifies a precision for formatted point values displayed in point labels.
-         * @deprecated Use the series | label | format | precision option instead.
-         */
+          * @docid dxChartSeriesTypes_CommonSeries_label_precision
+          * @docid dxPieChartSeriesTypes_CommonPieChartSeries_label_precision
+          * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_label_precision
+          */
         precision?: number;
-        /** Specifies the angle used to rotate point labels from their initial position. */
+        /**
+          * @docid dxChartSeriesTypes_CommonSeries_label_rotationangle
+          * @docid dxPieChartSeriesTypes_CommonPieChartSeries_label_rotationangle
+          * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_label_rotationangle
+          */
         rotationAngle?: number;
-        /** Specifies the visibility of point labels. */
+        /**
+          * @docid dxChartSeriesTypes_CommonSeries_label_visible
+          * @docid dxPieChartSeriesTypes_CommonPieChartSeries_label_visible
+          * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_label_visible
+          */
         visible?: boolean;
     }
     export interface SeriesConfigLabel extends BaseSeriesConfigLabel {
-        /** Specifies whether or not to show labels for points with zero value. Applies only to bar-like series. */
+        /**
+         * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_label_showforzerovalues
+         * @docid dxChartSeriesTypes_CommonSeries_label_showforzerovalues
+         */
         showForZeroValues?: boolean;
     }
     export interface ChartSeriesConfigLabel extends SeriesConfigLabel {
-        /** Aligns point labels in relation to their points. */
-        alignment?: string;
-        /** Along with verticalOffset, shifts point labels from their initial positions. */
-        horizontalOffset?: number;
-        /** Along with horizontalOffset, shifts point labels from their initial positions. */
-        verticalOffset?: number;
         /**
-         * Specifies a precision for the percentage values displayed in the labels of a full-stacked-like series.
-         * @deprecated Use the series | label | format | percentPrecision instead.
-         */
+        * @docid dxChartSeriesTypes_CommonSeries_label_alignment
+        */
+        alignment?: string;
+        /**
+        * @docid dxChartSeriesTypes_CommonSeries_label_horizontaloffset
+        */
+        horizontalOffset?: number;
+        /**
+        * @docid dxChartSeriesTypes_CommonSeries_label_verticaloffset
+        */
+        verticalOffset?: number;
+        /** * @docid dxChartSeriesTypes_CommonSeries_label_percentprecision */
         percentPrecision?: number;
     }
     export interface BaseCommonSeriesConfig {
-        /** Specifies the data source field that provides arguments for series points. */
+        /**
+          * @docid dxChartSeriesTypes_CommonSeries_argumentfield
+          * @docid dxChartSeriesTypes_candlestickseries_argumentfield
+          * @docid dxChartSeriesTypes_stockseries_argumentfield
+          * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_argumentfield
+          */
         argumentField?: string;
+        /**
+        * @docid dxChartSeriesTypes_CommonSeries_axis
+        * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_axis
+        */
         axis?: string;
+        /**
+        * @docid dxChartSeriesTypes_CommonSeries_label
+        * @docid dxChartSeriesTypes_areaseries_label
+        * @docid dxChartSeriesTypes_barseries_label
+        * @docid dxChartSeriesTypes_bubbleseries_label
+        * @docid dxChartSeriesTypes_candlestickseries_label
+        * @docid dxChartSeriesTypes_fullstackedareaseries_label
+        * @docid dxChartSeriesTypes_fullstackedbarseries_label
+        * @docid dxChartSeriesTypes_fullstackedlineseries_label
+        * @docid dxChartSeriesTypes_fullstackedsplineareaseries_label
+        * @docid dxChartSeriesTypes_fullstackedsplineseries_label
+        * @docid dxChartSeriesTypes_lineseries_label
+        * @docid dxChartSeriesTypes_rangeareaseries_label
+        * @docid dxChartSeriesTypes_rangebarseries_label
+        * @docid dxChartSeriesTypes_scatterseries_label
+        * @docid dxChartSeriesTypes_splineareaseries_label
+        * @docid dxChartSeriesTypes_splineseries_label
+        * @docid dxChartSeriesTypes_stackedareaseries_label
+        * @docid dxChartSeriesTypes_stackedbarseries_label
+        * @docid dxChartSeriesTypes_stackedlineseries_label
+        * @docid dxChartSeriesTypes_stackedsplineareaseries_label
+        * @docid dxChartSeriesTypes_stackedsplineseries_label
+        * @docid dxChartSeriesTypes_stepareaseries_label
+        * @docid dxChartSeriesTypes_steplineseries_label
+        * @docid dxChartSeriesTypes_stockseries_label
+        */
         label?: ChartSeriesConfigLabel;
+        /**
+        * @docid dxChartSeriesTypes_CommonSeries_border
+        * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_border
+        * @docid dxChartSeriesTypes_stepareaseries_border
+        */
         border?: viz.core.DashedBorder;
-        /** Specifies a series color. */
+        /**
+        * @docid dxChartSeriesTypes_CommonSeries_color
+        * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_color
+        */
         color?: string;
-        /** Specifies the dash style of the series' line. */
+        /**
+        * @docid dxChartSeriesTypes_CommonSeries_dashstyle
+        * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_dashstyle
+        */
         dashStyle?: string;
+        /**
+          * @docid dxChartSeriesTypes_CommonSeries_hovermode
+          * @docid dxChartSeriesTypes_areaseries_hovermode
+          * @docid dxChartSeriesTypes_barseries_hovermode
+          * @docid dxChartSeriesTypes_bubbleseries_hovermode
+          * @docid dxChartSeriesTypes_candlestickseries_hovermode
+          * @docid dxChartSeriesTypes_fullstackedareaseries_hovermode
+          * @docid dxChartSeriesTypes_fullstackedbarseries_hovermode
+          * @docid dxChartSeriesTypes_fullstackedlineseries_hovermode
+          * @docid dxChartSeriesTypes_fullstackedsplineareaseries_hovermode
+          * @docid dxChartSeriesTypes_fullstackedsplineseries_hovermode
+          * @docid dxChartSeriesTypes_lineseries_hovermode
+          * @docid dxChartSeriesTypes_rangeareaseries_hovermode
+          * @docid dxChartSeriesTypes_rangebarseries_hovermode
+          * @docid dxChartSeriesTypes_splineareaseries_hovermode
+          * @docid dxChartSeriesTypes_splineseries_hovermode
+          * @docid dxChartSeriesTypes_stackedareaseries_hovermode
+          * @docid dxChartSeriesTypes_stackedbarseries_hovermode
+          * @docid dxChartSeriesTypes_stackedlineseries_hovermode
+          * @docid dxChartSeriesTypes_stackedsplineareaseries_hovermode
+          * @docid dxChartSeriesTypes_stackedsplineseries_hovermode
+          * @docid dxChartSeriesTypes_stepareaseries_hovermode
+          * @docid dxChartSeriesTypes_steplineseries_hovermode
+          * @docid dxChartSeriesTypes_stockseries_hovermode
+          * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_hovermode
+          * @docid dxPolarChartSeriesTypes_areapolarseries_hovermode
+          * @docid dxPolarChartSeriesTypes_barpolarseries_hovermode
+          * @docid dxPolarChartSeriesTypes_linepolarseries_hovermode
+          * @docid dxPolarChartSeriesTypes_stackedbarpolarseries_hovermode
+          */
         hoverMode?: string;
+        /**
+        * @docid dxChartSeriesTypes_CommonSeries_hoverstyle
+        * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_hoverstyle
+        * @docid dxChartSeriesTypes_stepareaseries_hoverstyle
+        * @docid dxChartSeriesTypes_candlestickseries_hoverstyle
+        */
         hoverStyle?: {
+            /**
+            * @docid dxChartSeriesTypes_CommonSeries_hoverstyle_border
+            * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_hoverstyle_border
+            * @docid dxChartSeriesTypes_stepareaseries_hoverstyle_border
+            */
             border?: viz.core.DashedBorder;
-            /** <p>Sets a color for a series when it is hovered over.</p> */
+            /**
+            * @docid dxChartSeriesTypes_CommonSeries_hoverstyle_color
+            * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_hoverstyle_color
+            */
             color?: string;
-            /** Specifies the dash style for the line in a hovered series. */
+            /**
+            * @docid dxChartSeriesTypes_CommonSeries_hoverstyle_dashstyle
+            * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_hoverstyle_dashstyle
+            */
             dashStyle?: string;
+            /**
+            * @docid dxChartSeriesTypes_CommonSeries_hoverstyle_hatching
+            * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_hoverstyle_hatching
+            * @docid dxChartSeriesTypes_candlestickseries_hoverstyle_hatching
+            */
             hatching?: viz.core.Hatching;
-            /** Specifies the width of a line in a hovered series. */
+            /**
+            * @docid dxChartSeriesTypes_CommonSeries_hoverstyle_width
+            * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_hoverstyle_width
+            */
             width?: number;
         };
-        /** Specifies whether a chart ignores null data points or not. */
+        /**
+        * @docid dxChartSeriesTypes_CommonSeries_ignoreemptypoints
+        * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_ignoreemptypoints
+        */
         ignoreEmptyPoints?: boolean;
-        /** Specifies how many points are acceptable to be in a series to display all labels for these points. Otherwise, the labels will not be displayed. */
+        /**
+        * @docid dxChartSeriesTypes_CommonSeries_maxlabelcount
+        * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_maxlabelcount
+        */
         maxLabelCount?: number;
-        /** Specifies the minimal length of a displayed bar in pixels. */
+        /**
+        * @docid dxChartSeriesTypes_CommonSeries_minbarsize
+        * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_minbarsize
+        */
         minBarSize?: number;
-        /** Specifies opacity for a series. */
+        /**
+        * @docid dxChartSeriesTypes_CommonSeries_opacity
+        * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_opacity
+        */
         opacity?: number;
-        /** Specifies series elements to be highlighted when a user selects a point. */
+        /**
+          * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_selectionmode
+          * @docid dxPolarChartSeriesTypes_areapolarseries_selectionmode
+          * @docid dxPolarChartSeriesTypes_barpolarseries_selectionmode
+          * @docid dxPolarChartSeriesTypes_linepolarseries_selectionmode
+          * @docid dxPolarChartSeriesTypes_stackedbarpolarseries_selectionmode
+          * @docid dxChartSeriesTypes_CommonSeries_selectionmode
+          * @docid dxChartSeriesTypes_areaseries_selectionmode
+          * @docid dxChartSeriesTypes_barseries_selectionmode
+          * @docid dxChartSeriesTypes_bubbleseries_selectionmode
+          * @docid dxChartSeriesTypes_candlestickseries_selectionmode
+          * @docid dxChartSeriesTypes_fullstackedareaseries_selectionmode
+          * @docid dxChartSeriesTypes_fullstackedbarseries_selectionmode
+          * @docid dxChartSeriesTypes_fullstackedlineseries_selectionmode
+          * @docid dxChartSeriesTypes_fullstackedsplineareaseries_selectionmode
+          * @docid dxChartSeriesTypes_fullstackedsplineseries_selectionmode
+          * @docid dxChartSeriesTypes_lineseries_selectionmode
+          * @docid dxChartSeriesTypes_rangeareaseries_selectionmode
+          * @docid dxChartSeriesTypes_rangebarseries_selectionmode
+          * @docid dxChartSeriesTypes_splineareaseries_selectionmode
+          * @docid dxChartSeriesTypes_splineseries_selectionmode
+          * @docid dxChartSeriesTypes_stackedareaseries_selectionmode
+          * @docid dxChartSeriesTypes_stackedbarseries_selectionmode
+          * @docid dxChartSeriesTypes_stackedlineseries_selectionmode
+          * @docid dxChartSeriesTypes_stackedsplineareaseries_selectionmode
+          * @docid dxChartSeriesTypes_stackedsplineseries_selectionmode
+          * @docid dxChartSeriesTypes_stepareaseries_selectionmode
+          * @docid dxChartSeriesTypes_steplineseries_selectionmode
+          * @docid dxChartSeriesTypes_stockseries_selectionmode
+          */
         selectionMode?: string;
+        /**
+        * @docid dxChartSeriesTypes_CommonSeries_selectionstyle
+        * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_selectionstyle
+        * @docid dxChartSeriesTypes_stepareaseries_selectionStyle
+        * @docid dxChartSeriesTypes_candlestickseries_selectionstyle
+        */
         selectionStyle?: {
+            /**
+            * @docid dxChartSeriesTypes_CommonSeries_selectionstyle_border
+            * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_selectionstyle_border
+            * @docid dxChartSeriesTypes_stepareaseries_selectionStyle_border
+            */
             border?: viz.core.DashedBorder;
-            /** Sets a color for a series when it is selected. */
+            /**
+            * @docid dxChartSeriesTypes_CommonSeries_selectionstyle_color
+            * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_selectionstyle_color
+            */
             color?: string;
-            /** Specifies the dash style for the line in a selected series. */
+            /**
+            * @docid dxChartSeriesTypes_CommonSeries_selectionstyle_dashstyle
+            * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_selectionstyle_dashstyle
+            */
             dashStyle?: string;
+            /**
+            * @docid dxChartSeriesTypes_CommonSeries_selectionstyle_hatching
+            * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_selectionstyle_hatching
+            * @docid dxChartSeriesTypes_candlestickseries_selectionstyle_hatching
+            */
             hatching?: viz.core.Hatching;
-            /** Specifies the width of a line in a selected series. */
+            /**
+            * @docid dxChartSeriesTypes_CommonSeries_selectionstyle_width
+            * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_selectionstyle_width
+            */
             width?: number;
         };
-        /** Specifies whether or not to show the series in the chart's legend. */
+        /**
+        * @docid dxChartSeriesTypes_CommonSeries_showinlegend
+        * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_showinlegend
+        */
         showInLegend?: boolean;
-        /** Specifies the name of the stack where the values of the _stackedBar_ series must be located. */
+        /**
+        * @docid dxChartSeriesTypes_CommonSeries_stack
+        * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_stack
+        */
         stack?: string;
-        /** Specifies the name of the data source field that provides data about a point. */
+        /**
+        * @docid dxChartSeriesTypes_CommonSeries_tagfield
+        * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_tagfield
+        */
         tagField?: string;
-        /** Specifies the data source field that provides values for series points. */
+        /**
+        * @docid dxChartSeriesTypes_CommonSeries_valuefield
+        * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_valuefield
+        */
         valueField?: string;
-        /** Specifies the visibility of a series. */
+        /**
+        * @docid dxChartSeriesTypes_CommonSeries_visible
+        * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_visible
+        */
         visible?: boolean;
-        /** Specifies a line width. */
+        /**
+        * @docid dxChartSeriesTypes_CommonSeries_width
+        * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_width
+        */
         width?: number;
-        /** Configures error bars. */
+        /**
+        * @docid dxChartSeriesTypes_CommonSeries_valueerrorbar
+        * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_valueerrorbar
+        */
         valueErrorBar?: {
-            /** Specifies whether error bars must be displayed in full or partially. */
+            /**
+            * @docid dxChartSeriesTypes_CommonSeries_valueerrorbar_displaymode
+            * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_valueerrorbar_displaymode
+            */
             displayMode?: string;
-            /** Specifies the data field that provides data for low error values. */
+            /**
+            * @docid dxChartSeriesTypes_CommonSeries_valueerrorbar_lowvaluefield
+            * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_valueerrorbar_lowvaluefield
+            */
             lowValueField?: string;
-            /** Specifies the data field that provides data for high error values. */
+            /**
+            * @docid dxChartSeriesTypes_CommonSeries_valueerrorbar_highvaluefield
+            * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_valueerrorbar_highvaluefield
+            */
             highValueField?: string;
-            /** Specifies how error bar values must be calculated. */
+            /**
+            * @docid dxChartSeriesTypes_CommonSeries_valueerrorbar_type
+            * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_valueerrorbar_type
+            */
             type?: string;
-            /** Specifies the value to be used for generating error bars. */
+            /**
+            * @docid dxChartSeriesTypes_CommonSeries_valueerrorbar_value
+            * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_valueerrorbar_value
+            */
             value?: number;
-            /** Specifies the color of error bars. */
+            /**
+            * @docid dxChartSeriesTypes_CommonSeries_valueerrorbar_color
+            * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_valueerrorbar_color
+            */
             color?: string;
-            /** Specifies the opacity of error bars. */
+            /**
+            * @docid dxChartSeriesTypes_CommonSeries_valueerrorbar_opacity
+            * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_valueerrorbar_opacity
+            */
             opacity?: number;
-            /** Specifies the length of the lines that indicate the error bar edges. */
+            /**
+            * @docid dxChartSeriesTypes_CommonSeries_valueerrorbar_edgelength
+            * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_valueerrorbar_edgelength
+            */
             edgeLength?: number;
-            /** Specifies the width of the error bar line. */
+            /**
+            * @docid dxChartSeriesTypes_CommonSeries_valueerrorbar_linewidth
+            * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_valueerrorbar_linewidth
+            */
             lineWidth?: number;
         };
     }
     export interface CommonPointOptions {
-        /** Specifies border options for points in the line and area series. */
+        /**
+        * @docid dxChartSeriesTypes_CommonSeries_point_border
+        * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_point_border
+        */
         border?: viz.core.Border;
-        /** Specifies the points color. */
+        /**
+        * @docid dxChartSeriesTypes_CommonSeries_point_color
+        * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_point_color
+        */
         color?: string;
-        /** Specifies what series points to highlight when a point is hovered over. */
+        /**
+        * @docid dxChartSeriesTypes_CommonSeries_point_hovermode
+        * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_point_hovermode
+        */
         hoverMode?: string;
-        /** An object defining configuration options for a hovered point. */
+        /**
+        * @docid dxChartSeriesTypes_CommonSeries_point_hoverstyle
+        * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_point_hoverstyle
+        */
         hoverStyle?: {
-            /** An object defining the border options for a hovered point. */
+            /**
+            * @docid dxChartSeriesTypes_CommonSeries_point_hoverstyle_border
+            * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_point_hoverstyle_border
+            */
             border?: viz.core.Border;
-            /** Sets a color for a point when it is hovered over. */
+            /**
+            * @docid dxChartSeriesTypes_CommonSeries_point_hoverstyle_color
+            * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_point_hoverstyle_color
+            */
             color?: string;
-            /** Specifies the diameter of a hovered point in the series that represents data points as symbols (not as bars for instance). */
+            /**
+            * @docid dxChartSeriesTypes_CommonSeries_point_hoverstyle_size
+            * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_point_hoverstyle_size
+            */
             size?: number;
         };
-        /** Specifies what series points to highlight when a point is selected. */
+        /**
+        * @docid dxChartSeriesTypes_CommonSeries_point_selectionmode
+        * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_point_selectionmode
+        */
         selectionMode?: string;
-        /** An object defining configuration options for a selected point. */
+        /**
+        * @docid dxChartSeriesTypes_CommonSeries_point_selectionstyle
+        * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_point_selectionstyle
+        */
         selectionStyle?: {
-            /** An object defining the border options for a selected point. */
+            /**
+            * @docid dxChartSeriesTypes_CommonSeries_point_selectionstyle_border
+            * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_point_selectionstyle_border
+            */
             border?: viz.core.Border;
-            /** <p>Sets a color for a point when it is selected.</p> */
+            /**
+            * @docid dxChartSeriesTypes_CommonSeries_point_selectionstyle_color
+            * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_point_selectionstyle_color
+            */
             color?: string;
-            /** Specifies the diameter of a selected point in the series that represents data points as symbols (not as bars for instance). */
+            /**
+            * @docid dxChartSeriesTypes_CommonSeries_point_selectionstyle_size
+            * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_point_selectionstyle_size
+            */
             size?: number;
         };
-        /** Specifies the point diameter in pixels for those series that represent data points as symbols (not as bars for instance). */
+        /**
+        * @docid dxChartSeriesTypes_CommonSeries_point_size
+        * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_point_size
+        */
         size?: number;
-        /** Specifies a symbol for presenting points of the line and area series. */
+        /**
+        * @docid dxChartSeriesTypes_CommonSeries_point_symbol
+        * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_point_symbol
+        */
         symbol?: string;
+        /**
+          * @docid dxChartSeriesTypes_CommonSeries_point_visible
+          * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_point_visible
+          * @docid dxChartSeriesTypes_areaseries_point_visible
+          * @docid dxChartSeriesTypes_fullstackedareaseries_point_visible
+          * @docid dxChartSeriesTypes_fullstackedsplineareaseries_point_visible
+          * @docid dxChartSeriesTypes_rangeareaseries_point_visible
+          * @docid dxChartSeriesTypes_splineareaseries_point_visible
+          * @docid dxChartSeriesTypes_stackedareaseries_point_visible
+          * @docid dxChartSeriesTypes_stackedsplineareaseries_point_visible
+          * @docid dxChartSeriesTypes_stepareaseries_point_visible
+          * @docid dxPolarChartSeriesTypes_areapolarseries_point_visible
+          */
         visible?: boolean;
     }
     export interface ChartCommonPointOptions extends CommonPointOptions {
-        /** Substitutes the standard point symbols with an image. */
+        /** @docid dxChartSeriesTypes_CommonSeries_point_image */
         image?: {
-            /** Specifies the height of the image used instead of a point marker. */
+            /** @docid dxChartSeriesTypes_CommonSeries_point_image_height */
             height?: any;
-            /** Specifies the URL of the image to be used as a point marker. */
+            /** @docid_ignore dxChartSeriesTypes_CommonSeries_point_image_height_rangemaxpoint */
+            /** @docid_ignore dxChartSeriesTypes_CommonSeries_point_image_height_rangeminpoint */
+            /** @docid dxChartSeriesTypes_CommonSeries_point_image_url */
             url?: any;
-            /** Specifies the width of an image that is used as a point marker. */
+            /** @docid_ignore dxChartSeriesTypes_CommonSeries_point_image_url_rangemaxpoint */
+            /** @docid_ignore dxChartSeriesTypes_CommonSeries_point_image_url_rangeminpoint */
+            /** @docid dxChartSeriesTypes_CommonSeries_point_image_width */
             width?: any;
+            /** @docid_ignore dxChartSeriesTypes_CommonSeries_point_image_width_rangemaxpoint */
+            /** @docid_ignore dxChartSeriesTypes_CommonSeries_point_image_width_rangeminpoint */
         };
     }
     export interface PolarCommonPointOptions extends CommonPointOptions {
-        /** An object specifying the parameters of an image that is used as a point marker. */
+        /** @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_point_image */
         image?: {
-            /** Specifies the height of an image that is used as a point marker. */
+            /** @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_point_image_height */
             height?: number;
-            /** Specifies a URL leading to the image to be used as a point marker. */
+            /** @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_point_image_url */
             url?: string;
-            /** Specifies the width of an image that is used as a point marker. */
+            /** @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_point_image_width */
             width?: number;
         };
     }
-    /** An object that defines configuration options for chart series. */
+    /** @docid dxChartSeriesTypes_CommonSeries */
     export interface CommonSeriesConfig extends BaseCommonSeriesConfig {
-        /** Specifies which data source field provides close values for points of a financial series. */
+        /** @docid dxChartSeriesTypes_CommonSeries_closevaluefield */
         closeValueField?: string;
-        /** Makes bars look rounded. Applies only to bar-like series. */
+        /** @docid dxChartSeriesTypes_CommonSeries_cornerradius */
         cornerRadius?: number;
-        /** Specifies which data source field provides high values for points of a financial series. */
+        /** @docid dxChartSeriesTypes_CommonSeries_highvaluefield */
         highValueField?: string;
-        /** Specifies a filling color for the body of a series point that visualizes a non-reduced value. Applies only to candlestick series. */
+        /** @docid dxChartSeriesTypes_CommonSeries_innercolor */
         innerColor?: string;
-        /** Specifies which data source field provides low values for points of a financial series. */
+        /** @docid dxChartSeriesTypes_CommonSeries_lowvaluefield */
         lowValueField?: string;
-        /** Specifies which data source field provides open values for points of a financial series. */
+        /** @docid dxChartSeriesTypes_CommonSeries_openvaluefield */
         openValueField?: string;
-        /** Specifies which pane the series should belong to. Accepts the name of the pane. */
+        /** @docid dxChartSeriesTypes_CommonSeries_pane */
         pane?: string;
+        /**
+        * @docid dxChartSeriesTypes_CommonSeries_point
+        * @docid dxChartSeriesTypes_fullstackedareaseries_point
+        * @docid dxChartSeriesTypes_fullstackedsplineareaseries_point
+        * @docid dxChartSeriesTypes_rangeareaseries_point
+        * @docid dxChartSeriesTypes_splineareaseries_point
+        * @docid dxChartSeriesTypes_stackedareaseries_point
+        * @docid dxChartSeriesTypes_stackedsplineareaseries_point
+        * @docid dxChartSeriesTypes_stepareaseries_point
+        * @docid dxChartSeriesTypes_areaseries_point
+        */
         point?: ChartCommonPointOptions;
-        /** Coupled with the rangeValue2Field option, specifies which data source field provides values for a range-like series. */
+        /** @docid dxChartSeriesTypes_CommonSeries_rangevalue1field */
         rangeValue1Field?: string;
-        /** Coupled with the rangeValue1Field option, specifies which data source field provides values for a range-like series. */
+        /** @docid dxChartSeriesTypes_CommonSeries_rangevalue2field */
         rangeValue2Field?: string;
-        /** Specifies reduction options for financial series. */
+        /** @docid dxChartSeriesTypes_CommonSeries_reduction */
         reduction?: {
-            /** Specifies a color for the points whose price has decreased in comparison to the price of the previous point. */
+            /** @docid dxChartSeriesTypes_CommonSeries_reduction_color */
             color?: string;
-            /** Specifies whether high, low, open or close prices of points should be compared. */
+            /** @docid dxChartSeriesTypes_CommonSeries_reduction_level */
             level?: string;
         };
-        /** Specifies which data source field provides size values for bubbles. Required by and applies only to bubble series. */
+        /** @docid dxChartSeriesTypes_CommonSeries_sizefield */
         sizeField?: string;
     }
     export interface CommonSeriesSettings extends CommonSeriesConfig {
-        /** Defines common settings for all area series. */
+        /** @docid dxchartoptions_commonseriessettings_area */
         area?: CommonSeriesConfig;
-        /** Defines common settings for all bar series. */
+        /** @docid dxchartoptions_commonseriessettings_bar */
         bar?: CommonSeriesConfig;
-        /** Defines common settings for all bubble series. */
+        /** @docid dxchartoptions_commonseriessettings_bubble */
         bubble?: CommonSeriesConfig;
-        /** Defines common settings for all candlestick series. */
+        /** @docid dxchartoptions_commonseriessettings_candlestick */
         candlestick?: CommonSeriesConfig;
-        /** Defines common settings for all full-stacked area series. */
+        /** @docid dxchartoptions_commonseriessettings_fullstackedarea */
         fullstackedarea?: CommonSeriesConfig;
-        /** Defines common settings for all full-stacked spline area series. */
+        /** @docid dxchartoptions_commonseriessettings_fullstackedsplinearea */
         fullstackedsplinearea?: CommonSeriesConfig;
-        /** Defines common settings for all full-stacked bar series. */
+        /** @docid dxchartoptions_commonseriessettings_fullstackedbar */
         fullstackedbar?: CommonSeriesConfig;
-        /** Defines common settings for all full-stacked line series. */
+        /** @docid dxchartoptions_commonseriessettings_fullstackedline */
         fullstackedline?: CommonSeriesConfig;
-        /** Defines common settings for all full-stacked spline series. */
+        /** @docid dxchartoptions_commonseriessettings_fullstackedspline */
         fullstackedspline?: CommonSeriesConfig;
-        /** Defines common settings for all line series. */
+        /** @docid dxchartoptions_commonseriessettings_line */
         line?: CommonSeriesConfig;
-        /** Defines common settings for all range area series. */
+        /** @docid dxchartoptions_commonseriessettings_rangearea */
         rangearea?: CommonSeriesConfig;
-        /** Defines common settings for all range bar series. */
+        /** @docid dxchartoptions_commonseriessettings_rangebar */
         rangebar?: CommonSeriesConfig;
-        /** Defines common settings for all scatter series. */
+        /** @docid dxchartoptions_commonseriessettings_scatter */
         scatter?: CommonSeriesConfig;
-        /** Defines common settings for all spline series. */
+        /** @docid dxchartoptions_commonseriessettings_spline */
         spline?: CommonSeriesConfig;
-        /** Defines common settings for all spline area series. */
+        /** @docid dxchartoptions_commonseriessettings_splinearea */
         splinearea?: CommonSeriesConfig;
-        /** Defines common settings for all stacked area series. */
+        /** @docid dxchartoptions_commonseriessettings_stackedarea */
         stackedarea?: CommonSeriesConfig;
-        /** Defines common settings for all stacked spline area series. */
+        /** @docid dxchartoptions_commonseriessettings_stackedsplinearea */
         stackedsplinearea?: CommonSeriesConfig;
-        /** Defines common settings for all stacked bar series. */
+        /** @docid dxchartoptions_commonseriessettings_stackedbar */
         stackedbar?: CommonSeriesConfig;
-        /** Defines common settings for all stacked line series. */
+        /** @docid dxchartoptions_commonseriessettings_stackedline */
         stackedline?: CommonSeriesConfig;
-        /** Defines common settings for all stacked spline series. */
+        /** @docid dxchartoptions_commonseriessettings_stackedspline */
         stackedspline?: CommonSeriesConfig;
-        /** Defines common settings for all step area series. */
+        /** @docid dxchartoptions_commonseriessettings_steparea */
         steparea?: CommonSeriesConfig;
-        /** Defines common settings for all step line series. */
+        /** @docid dxchartoptions_commonseriessettings_stepline */
         stepline?: CommonSeriesConfig;
-        /** Defines common settings for all stock series. */
+        /** @docid dxchartoptions_commonseriessettings_stock */
         stock?: CommonSeriesConfig;
-        /** Specifies the type of the series. */
+        /** @docid dxchartoptions_commonseriessettings_type */
         type?: string;
     }
     export interface SeriesConfig extends CommonSeriesConfig {
-        /** Specifies the name that identifies the series. */
+        /** @docid dxchartoptions_series_name */
         name?: string;
-        /** Specifies data about a series. */
+        /** @docid dxchartoptions_series_tag */
         tag?: any;
-        /** Sets the series type. */
+        /** @docid dxchartoptions_series_type */
         type?: string;
     }
-    /** An object that defines configuration options for polar chart series. */
+    /** @docid dxPolarChartSeriesTypes_CommonPolarChartSeries */
     export interface CommonPolarSeriesConfig extends BaseCommonSeriesConfig {
-        /** Specifies whether or not to close the chart by joining the end point with the first point. */
+        /** @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_closed */
         closed?: boolean;
+        /**
+         * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_label
+         * @docid dxPolarChartSeriesTypes_stackedbarpolarseries_label
+         */
         label?: SeriesConfigLabel;
+        /**
+        * @docid dxPolarChartSeriesTypes_CommonPolarChartSeries_point
+        * @docid dxPolarChartSeriesTypes_areapolarseries_point
+        */
         point?: PolarCommonPointOptions;
     }
     export interface CommonPolarSeriesSettings extends CommonPolarSeriesConfig {
-        /** An object that specifies configuration options for all series of the <i>area</i> type in the chart. */
+        /** @docid dxpolarchartoptions_commonseriessettings_area */
         area?: CommonPolarSeriesConfig;
-        /** An object that specifies configuration options for all series of the _bar_ type in the chart. */
+        /** @docid dxpolarchartoptions_commonseriessettings_bar */
         bar?: CommonPolarSeriesConfig;
-        /** An object that specifies configuration options for all series of the _line_ type in the chart. */
+        /** @docid dxpolarchartoptions_commonseriessettings_line */
         line?: CommonPolarSeriesConfig;
-        /** An object that specifies configuration options for all series of the _scatter_ type in the chart. */
+        /** @docid dxpolarchartoptions_commonseriessettings_scatter */
         scatter?: CommonPolarSeriesConfig;
-        /** An object that specifies configuration options for all series of the _stackedBar_ type in the chart. */
+        /** @docid dxpolarchartoptions_commonseriessettings_stackedbar */
         stackedbar?: CommonPolarSeriesConfig;
-        /** Sets a series type. */
+        /** @docid dxpolarchartoptions_commonseriessettings_type */
         type?: string;
     }
     export interface PolarSeriesConfig extends CommonPolarSeriesConfig {
-        /** Specifies the name that identifies the series. */
+        /** @docid dxpolarchartoptions_series_name */
         name?: string;
-        /** Specifies data about a series. */
+        /** @docid dxpolarchartoptions_series_tag */
         tag?: any;
-        /** Sets the series type. */
+        /** @docid dxpolarchartoptions_series_type */
         type?: string;
     }
+    /** @docid_ignore dxChartSeriesTypes_areaseries */
+    /** @docid_ignore dxChartSeriesTypes_barseries */
+    /** @docid_ignore dxChartSeriesTypes_bubbleseries */
+    /** @docid_ignore dxChartSeriesTypes_candlestickseries */
+    /** @docid_ignore dxChartSeriesTypes_fullstackedareaseries */
+    /** @docid_ignore dxChartSeriesTypes_fullstackedbarseries */
+    /** @docid_ignore dxChartSeriesTypes_fullstackedlineseries */
+    /** @docid_ignore dxChartSeriesTypes_fullstackedsplineareaseries */
+    /** @docid_ignore dxChartSeriesTypes_fullstackedsplineseries */
+    /** @docid_ignore dxChartSeriesTypes_lineseries */
+    /** @docid_ignore dxChartSeriesTypes_rangeareaseries */
+    /** @docid_ignore dxChartSeriesTypes_rangebarseries */
+    /** @docid_ignore dxChartSeriesTypes_scatterseries */
+    /** @docid_ignore dxChartSeriesTypes_splineareaseries */
+    /** @docid_ignore dxChartSeriesTypes_splineseries */
+    /** @docid_ignore dxChartSeriesTypes_stackedareaseries */
+    /** @docid_ignore dxChartSeriesTypes_stackedbarseries */
+    /** @docid_ignore dxChartSeriesTypes_stackedlineseries */
+    /** @docid_ignore dxChartSeriesTypes_stackedsplineareaseries */
+    /** @docid_ignore dxChartSeriesTypes_stackedsplineseries */
+    /** @docid_ignore dxChartSeriesTypes_stepareaseries */
+    /** @docid_ignore dxChartSeriesTypes_steplineseries */
+    /** @docid_ignore dxChartSeriesTypes_stockseries */
+    /** @docid_ignore dxPolarChartSeriesTypes_areapolarseries */
+    /** @docid_ignore dxPolarChartSeriesTypes_barpolarseries */
+    /** @docid_ignore dxPolarChartSeriesTypes_linepolarseries */
+    /** @docid_ignore dxPolarChartSeriesTypes_scatterpolarseries */
+    /** @docid_ignore dxPolarChartSeriesTypes_stackedbarpolarseries */
     export interface PieSeriesConfigLabel extends BaseSeriesConfigLabel {
-        /** Specifies how to shift labels from their initial position in a radial direction in pixels. */
+        /** @docid dxPieChartSeriesTypes_CommonPieChartSeries_label_radialoffset */
         radialOffset?: number;
-        /**
-         * Specifies a precision for the percentage values displayed in labels.
-         * @deprecated Use the series | label | format | percentPrecision instead.
-         */
+        /** @docid dxPieChartSeriesTypes_CommonPieChartSeries_label_percentprecision */
         percentPrecision?: number;
     }
-    /** An object that defines configuration options for chart series. */
+    /** @docid dxPieChartSeriesTypes_CommonPieChartSeries */
     export interface CommonPieSeriesConfig {
-        /** Specifies the data source field that provides arguments for series points. */
+        /** @docid dxPieChartSeriesTypes_CommonPieChartSeries_argumentfield */
         argumentField?: string;
-        /** Specifies the required type for series arguments. */
+        /** @docid dxPieChartSeriesTypes_CommonPieChartSeries_argumentType */
         argumentType?: string;
-        /** An object defining the series border configuration options. */
+        /** @docid dxPieChartSeriesTypes_CommonPieChartSeries_border */
         border?: viz.core.DashedBorder;
-        /** Specifies a series color. */
+        /** @docid dxPieChartSeriesTypes_CommonPieChartSeries_color */
         color?: string;
-        /** Specifies the chart elements to highlight when a series is hovered over. */
+        /** @docid dxPieChartSeriesTypes_CommonPieChartSeries_hovermode */
         hoverMode?: string;
-        /** An object defining configuration options for a hovered series. */
+        /** @docid dxPieChartSeriesTypes_CommonPieChartSeries_hoverstyle */
         hoverStyle?: {
-            /** An object defining the border options for a hovered series. */
+            /** @docid dxPieChartSeriesTypes_CommonPieChartSeries_hoverstyle_border */
             border?: viz.core.DashedBorder;
-            /** Sets a color for the series when it is hovered over. */
+            /** @docid dxPieChartSeriesTypes_CommonPieChartSeries_hoverstyle_color */
             color?: string;
-            /** Specifies the hatching options to be applied when a point is hovered over. */
+            /** @docid dxPieChartSeriesTypes_CommonPieChartSeries_hoverstyle_hatching */
             hatching?: viz.core.Hatching;
         };
-        /**
-         * Specifies the fraction of the inner radius relative to the total radius in the series of the 'doughnut' type.
-         * @deprecated Use the innerRadius option instead.
-         */
+        /** @docid dxPieChartSeriesTypes_CommonPieChartSeries_innerradius */
         innerRadius?: number;
-        /** An object defining the label configuration options. */
+        /** @docid dxPieChartSeriesTypes_CommonPieChartSeries_label */
         label?: PieSeriesConfigLabel;
-        /** Specifies how many points are acceptable to be in a series to display all labels for these points. Otherwise, the labels will not be displayed. */
+        /** @docid dxPieChartSeriesTypes_CommonPieChartSeries_maxlabelcount */
         maxLabelCount?: number;
-        /** Specifies a minimal size of a displayed pie segment. */
+        /** @docid dxPieChartSeriesTypes_CommonPieChartSeries_minsegmentsize */
         minSegmentSize?: number;
-        /**
-         * Specifies the direction in which the dxPieChart series points are located.
-         * @deprecated Use the segmentsDirection option instead.
-         */
+        /** @docid dxPieChartSeriesTypes_CommonPieChartSeries_segmentsdirection */
         segmentsDirection?: string;
-        /** <p>Specifies the chart elements to highlight when the series is selected.</p> */
+        /** @docid dxPieChartSeriesTypes_CommonPieChartSeries_selectionmode */
         selectionMode?: string;
-        /** An object defining configuration options for the series when it is selected. */
+        /** @docid dxPieChartSeriesTypes_CommonPieChartSeries_selectionstyle */
         selectionStyle?: {
-            /** An object defining the border options for a selected series. */
+            /** @docid dxPieChartSeriesTypes_CommonPieChartSeries_selectionstyle_border */
             border?: viz.core.DashedBorder;
-            /** Sets a color for a series when it is selected. */
+            /** @docid dxPieChartSeriesTypes_CommonPieChartSeries_selectionstyle_color */
             color?: string;
-            /** Specifies the hatching options to be applied when a point is selected. */
+            /** @docid dxPieChartSeriesTypes_CommonPieChartSeries_selectionstyle_hatching */
             hatching?: viz.core.Hatching;
         };
-        /** Specifies chart segment grouping options. */
+        /** @docid dxPieChartSeriesTypes_CommonPieChartSeries_smallvaluesgrouping */
         smallValuesGrouping?: {
-            /** Specifies the name of the grouped chart segment. This name represents the segment in the chart legend. */
+            /** @docid dxPieChartSeriesTypes_CommonPieChartSeries_smallvaluesgrouping_groupname */
             groupName?: string;
-            /** Specifies the segment grouping mode. */
+            /** @docid dxPieChartSeriesTypes_CommonPieChartSeries_smallvaluesgrouping_mode */
             mode?: string;
-            /** Specifies a threshold for segment values. */
+            /** @docid dxPieChartSeriesTypes_CommonPieChartSeries_smallvaluesgrouping_threshold */
             threshold?: number;
-            /** Specifies how many segments must not be grouped. */
+            /** @docid dxPieChartSeriesTypes_CommonPieChartSeries_smallvaluesgrouping_topcount */
             topCount?: number;
         };
-        /**
-         * Specifies a start angle for a pie chart in arc degrees.
-         * @deprecated Use the startAngle option instead.
-         */
+        /** @docid dxPieChartSeriesTypes_CommonPieChartSeries_startangle */
         startAngle?: number;
-        /** <p>Specifies the name of the data source field that provides data about a point.</p> */
+        /** @docid dxPieChartSeriesTypes_CommonPieChartSeries_tagfield */
         tagField?: string;
-        /** Specifies the data source field that provides values for series points. */
+        /** @docid dxPieChartSeriesTypes_CommonPieChartSeries_valuefield */
         valueField?: string;
     }
     export interface CommonPieSeriesSettings extends CommonPieSeriesConfig {
-        /**
-         * Specifies the type of the pie chart series.
-         * @deprecated Use the type option instead.
-         */
+        /** @docid dxpiechartoptions_commonseriessettings_type */
         type?: string;
     }
     export interface PieSeriesConfig extends CommonPieSeriesConfig {
-        /**
-         * Sets the series type.
-         * @deprecated Use the type option instead.
-         */
+        /** @docid dxpiechartoptions_series_type */
         type?: string;
-        /** Specifies the name that identifies the series. */
+        /** @docid dxpiechartoptions_series_name */
         name?: string;
-        /** Specifies data about a series. */
+        /** @docid dxpiechartoptions_series_tag */
         tag?: any;
     }
+    /** @docid_ignore dxPieChartSeriesTypes_PieSeries */
+    /** @docid_ignore dxPieChartSeriesTypes_DoughnutSeries */
     export interface SeriesTemplate {
-        /** Specifies a callback function that returns a series object with individual series settings. */
+        /**
+          * @docid dxchartoptions_seriestemplate_customizeSeries
+          * @docid dxrangeselectoroptions_chart_seriestemplate_customizeSeries
+          */
         customizeSeries?: (seriesName: string) => SeriesConfig;
-        /** Specifies a data source field that represents the series name. */
+        /**
+          * @docid dxchartoptions_seriestemplate_nameField
+          * @docid dxrangeselectoroptions_chart_seriestemplate_nameField
+          */
         nameField?: string;
     }
     export interface PolarSeriesTemplate {
-        /** Specifies a callback function that returns a series object with individual series settings. */
+        /** @docid dxpolarchartoptions_seriestemplate_customizeSeries */
         customizeSeries?: (seriesName: string) => PolarSeriesConfig;
-        /** Specifies a data source field that represents the series name. */
+        /** @docid dxpolarchartoptions_seriestemplate_nameField */
         nameField?: string;
     }
     export interface ChartCommonConstantLineLabel {
-        /** Specifies font options for constant line labels. */
+        /** @docid dxchartoptions_commonaxissettings_constantlinestyle_label_font */
         font?: viz.core.Font;
-        /** Specifies the position of constant line labels on the chart plot. */
+        /** @docid dxchartoptions_commonaxissettings_constantlinestyle_label_position */
         position?: string;
-        /** Makes constant line labels visible. */
+        /** @docid dxchartoptions_commonaxissettings_constantlinestyle_label_visible */
         visible?: boolean;
     }
     export interface PolarCommonConstantLineLabel {
-        /** Indicates whether or not to display labels for the axis constant lines. */
+        /** @docid dxpolarchartoptions_commonaxissettings_constantlinestyle_label_visible */
         visible?: boolean;
-        /** Specifies font options for a constant line label. */
+        /** @docid dxpolarchartoptions_commonaxissettings_constantlinestyle_label_font */
         font?: viz.core.Font;
     }
     export interface ConstantLineStyle {
-        /** Specifies a color for a constant line. */
+        /**
+        * @docid dxchartoptions_commonaxissettings_constantlinestyle_color
+        * @docid dxpolarchartoptions_commonaxissettings_constantlinestyle_color
+        */
         color?: string;
-        /** Specifies a dash style for a constant line. */
+        /**
+        * @docid dxchartoptions_commonaxissettings_constantlinestyle_dashstyle
+        * @docid dxpolarchartoptions_commonaxissettings_constantlinestyle_dashstyle
+        */
         dashStyle?: string;
-        /** Specifies a constant line width in pixels. */
+        /**
+        * @docid dxchartoptions_commonaxissettings_constantlinestyle_width
+        * @docid dxpolarchartoptions_commonaxissettings_constantlinestyle_width
+        */
         width?: number;
     }
     export interface ChartCommonConstantLineStyle extends ConstantLineStyle {
-        /** Configures constant line labels. */
+        /** @docid dxchartoptions_commonaxissettings_constantlinestyle_label */
         label?: ChartCommonConstantLineLabel;
-        /** Generates a pixel-measured empty space between the left/right side of a constant line and the constant line label. */
+        /** @docid dxchartoptions_commonaxissettings_constantlinestyle_paddingleftright */
         paddingLeftRight?: number;
-        /** Generates a pixel-measured empty space between the top/bottom side of a constant line and the constant line label. */
+        /** @docid dxchartoptions_commonaxissettings_constantlinestyle_paddingtopbottom */
         paddingTopBottom?: number;
     }
     export interface PolarCommonConstantLineStyle extends ConstantLineStyle {
-        /** An object defining constant line label options. */
+        /** @docid dxpolarchartoptions_commonaxissettings_constantlinestyle_label */
         label?: PolarCommonConstantLineLabel;
     }
     export interface CommonAxisLabel {
-        /** Specifies font options for axis labels. */
+        /**
+        * @docid dxchartoptions_commonaxissettings_label_font
+        * @docid dxpolarchartoptions_commonaxissettings_label_font
+        */
         font?: viz.core.Font;
-        /** Specifies the spacing between an axis and its labels in pixels. */
+        /**
+        * @docid dxchartoptions_commonaxissettings_label_indentfromaxis
+        * @docid dxpolarchartoptions_commonaxissettings_label_indentfromaxis
+        */
         indentFromAxis?: number;
-        /** Indicates whether or not axis labels are visible. */
+        /**
+        * @docid dxchartoptions_commonaxissettings_label_visible
+        * @docid dxpolarchartoptions_commonaxissettings_label_visible
+        */
         visible?: boolean;
     }
     export interface ChartCommonAxisLabel extends CommonAxisLabel {
-        /** Aligns axis labels in relation to ticks. */
+        /** @docid dxchartoptions_commonaxissettings_label_alignment */
         alignment?: string;
-        /** Decides how to arrange axis labels when there is not enough space to keep all of them. */
+        /** @docid dxchartoptions_commonaxissettings_label_overlappingBehavior */
         overlappingBehavior?: {
-            /** Decides how to arrange axis labels when there is not enough space to keep all of them. */
+            /** @docid dxchartoptions_commonaxissettings_label_overlappingBehavior_mode */
             mode?: string;
-            /** Specifies the rotation angle of axis labels. Applies only if the mode option is "rotate". */
+            /** @docid dxchartoptions_commonaxissettings_label_overlappingBehavior_rotationangle */
             rotationAngle?: number;
-            /** Adds a pixel-measured empty space between two staggered rows of axis labels. Applies only if the mode option is "stagger". */
+            /** @docid dxchartoptions_commonaxissettings_label_overlappingBehavior_staggeringSpacing */
             staggeringSpacing?: number;
         };
     }
     export interface PolarCommonAxisLabel extends CommonAxisLabel {
-        /** Specifies the overlap resolving algorithm to be applied to axis labels. */
+        /** @docid dxpolarchartoptions_commonaxissettings_label_overlappingBehavior */
         overlappingBehavior?: string;
     }
     export interface CommonAxisTitle {
-        /** Specifies font options for the axis title. */
+        /** @docid dxchartoptions_commonaxissettings_title_font */
         font?: viz.core.Font;
-        /** Adds a pixel-measured empty space between the axis title and axis labels. */
+        /** @docid dxchartoptions_commonaxissettings_title_margin */
         margin?: number;
     }
     export interface BaseCommonAxisSettings {
-        /** Specifies the color of the line that represents an axis. */
+        /**
+        * @docid dxchartoptions_commonaxissettings_color
+        * @docid dxpolarchartoptions_commonaxissettings_color
+        */
         color?: string;
-        /** Specifies whether ticks/grid lines of a discrete axis are located between labels or cross the labels. */
+        /**
+        * @docid dxchartoptions_commonaxissettings_discreteaxisdivisionMode
+        * @docid dxpolarchartoptions_commonaxissettings_discreteaxisdivisionMode
+        */
         discreteAxisDivisionMode?: string;
-        /** An object defining the configuration options for the grid lines of an axis in the dxPolarChart widget. */
+        /**
+        * @docid dxchartoptions_commonaxissettings_grid
+        * @docid dxpolarchartoptions_commonaxissettings_grid
+        */
         grid?: {
-            /** Specifies a color for grid lines. */
+            /**
+            * @docid dxchartoptions_commonaxissettings_grid_color
+            * @docid dxpolarchartoptions_commonaxissettings_grid_color
+            */
             color?: string;
-            /** Specifies an opacity for grid lines. */
+            /**
+            * @docid dxchartoptions_commonaxissettings_grid_opacity
+            * @docid dxpolarchartoptions_commonaxissettings_grid_opacity
+            */
             opacity?: number;
-            /** Indicates whether or not the grid lines of an axis are visible. */
+            /**
+            * @docid dxchartoptions_commonaxissettings_grid_visible
+            * @docid dxpolarchartoptions_commonaxissettings_grid_visible
+            */
             visible?: boolean;
-            /** Specifies the width of grid lines. */
+            /**
+            * @docid dxchartoptions_commonaxissettings_grid_width
+            * @docid dxpolarchartoptions_commonaxissettings_grid_width
+            */
             width?: number;
         };
-        /** Specifies the options of the minor grid. */
+        /**
+        * @docid dxchartoptions_commonaxissettings_minorgrid
+        * @docid dxpolarchartoptions_commonaxissettings_minorgrid
+        */
         minorGrid?: {
-            /** Specifies a color for the lines of the minor grid. */
+            /**
+            * @docid dxchartoptions_commonaxissettings_minorgrid_color
+            * @docid dxpolarchartoptions_commonaxissettings_minorgrid_color
+            */
             color?: string;
-            /** Specifies an opacity for the lines of the minor grid. */
+            /**
+            * @docid dxchartoptions_commonaxissettings_minorgrid_opacity
+            * @docid dxpolarchartoptions_commonaxissettings_minorgrid_opacity
+            */
             opacity?: number;
-            /** Indicates whether the minor grid is visible or not. */
+            /**
+            * @docid dxchartoptions_commonaxissettings_minorgrid_visible
+            * @docid dxpolarchartoptions_commonaxissettings_minorgrid_visible
+            */
             visible?: boolean;
-            /** Specifies a width for the lines of the minor grid. */
+            /**
+            * @docid dxchartoptions_commonaxissettings_minorgrid_width
+            * @docid dxpolarchartoptions_commonaxissettings_minorgrid_width
+            */
             width?: number;
         };
-        /** Indicates whether or not an axis is inverted. */
+        /**
+        * @docid dxchartoptions_commonaxissettings_inverted
+        * @docid dxpolarchartoptions_commonaxissettings_inverted
+        */
         inverted?: boolean;
-        /** Specifies the opacity of the line that represents an axis. */
+        /**
+        * @docid dxchartoptions_commonaxissettings_opacity
+        * @docid dxpolarchartoptions_commonaxissettings_opacity
+        */
         opacity?: number;
-        /** Indicates whether or not to set ticks/grid lines of a continuous axis of the 'date-time' type at the beginning of each date-time interval. */
+        /**
+        * @docid dxchartoptions_commonaxissettings_setticksatunitbeginning
+        * @docid dxpolarchartoptions_commonaxissettings_setticksatunitbeginning
+        */
         setTicksAtUnitBeginning?: boolean;
-        /** An object defining the configuration options for axis ticks. */
+        /**
+        * @docid dxchartoptions_commonaxissettings_tick
+        * @docid dxpolarchartoptions_commonaxissettings_tick
+        */
         tick?: {
-            /** Specifies ticks color. */
+            /**
+            * @docid dxchartoptions_commonaxissettings_tick_color
+            * @docid dxpolarchartoptions_commonaxissettings_tick_color
+            */
             color?: string;
-            /** Specifies tick opacity. */
+            /**
+            * @docid dxchartoptions_commonaxissettings_tick_opacity
+            * @docid dxpolarchartoptions_commonaxissettings_tick_opacity
+            */
             opacity?: number;
-            /** Indicates whether or not ticks are visible on an axis. */
+            /**
+            * @docid dxchartoptions_commonaxissettings_tick_visible
+            * @docid dxpolarchartoptions_commonaxissettings_tick_visible
+            */
             visible?: boolean;
-            /** Specifies tick width. */
+            /**
+            * @docid dxchartoptions_commonaxissettings_tick_width
+            * @docid dxpolarchartoptions_commonaxissettings_tick_width
+            */
             width?: number;
-            /** Specifies tick length. */
+            /**
+            * @docid dxchartoptions_commonaxissettings_tick_length
+            * @docid dxpolarchartoptions_commonaxissettings_tick_length
+            */
             length?: number;
         };
-        /** Specifies the options of the minor ticks. */
+        /**
+        * @docid dxchartoptions_commonaxissettings_minortick
+        * @docid dxpolarchartoptions_commonaxissettings_minortick
+        */
         minorTick?: {
-            /** Specifies a color for the minor ticks. */
+            /**
+            * @docid dxchartoptions_commonaxissettings_minortick_color
+            * @docid dxpolarchartoptions_commonaxissettings_minortick_color
+            */
             color?: string;
-            /** Specifies an opacity for the minor ticks. */
+            /**
+            * @docid dxchartoptions_commonaxissettings_minortick_opacity
+            * @docid dxpolarchartoptions_commonaxissettings_minortick_opacity
+            */
             opacity?: number;
-            /** Indicates whether or not the minor ticks are displayed on an axis. */
+            /**
+            * @docid dxchartoptions_commonaxissettings_minortick_visible
+            * @docid dxpolarchartoptions_commonaxissettings_minortick_visible
+            */
             visible?: boolean;
-            /** Specifies minor tick width. */
+            /**
+            * @docid dxchartoptions_commonaxissettings_minortick_width
+            * @docid dxpolarchartoptions_commonaxissettings_minortick_width
+            */
             width?: number;
-            /** Specifies minor tick length. */
+            /**
+            * @docid dxchartoptions_commonaxissettings_minortick_length
+            * @docid dxpolarchartoptions_commonaxissettings_minortick_length
+            */
             length?: number;
         };
-        /** Indicates whether or not the line that represents an axis in a chart is visible. */
+        /**
+        * @docid dxchartoptions_commonaxissettings_visible
+        * @docid dxpolarchartoptions_commonaxissettings_visible
+        */
         visible?: boolean;
-        /** Specifies the width of the line that represents an axis in the chart. */
+        /**
+        * @docid dxchartoptions_commonaxissettings_width
+        * @docid dxpolarchartoptions_commonaxissettings_width
+        */
         width?: number;
     }
     export interface ChartCommonAxisSettings extends BaseCommonAxisSettings {
-        /** Configures the appearance of all constant lines in the widget. */
+        /** @docid dxchartoptions_commonaxissettings_constantlinestyle */
         constantLineStyle?: ChartCommonConstantLineStyle;
-        /** Configures axis labels. */
+        /** @docid dxchartoptions_commonaxissettings_label */
         label?: ChartCommonAxisLabel;
-        /** Controls the empty space between the maximum series points and the axis. Applies only to the axes of the "continuous" and "logarithmic" type. */
+        /** @docid dxchartoptions_commonaxissettings_maxvaluemargin */
         maxValueMargin?: number;
-        /** Controls the empty space between the minimum series points and the axis. Applies only to the axes of the "continuous" and "logarithmic" type. */
+        /** @docid dxchartoptions_commonaxissettings_minvaluemargin */
         minValueMargin?: number;
-        /** Reserves a pixel-measured space for the axis. */
+        /** @docid dxchartoptions_commonaxissettings_placeholdersize */
         placeholderSize?: number;
-        /** Configures the appearance of strips. */
+        /** @docid dxchartoptions_commonaxissettings_stripstyle */
         stripStyle?: {
-            /** Configures the appearance of strip labels. */
+            /** @docid dxchartoptions_commonaxissettings_stripstyle_label */
             label?: {
-                /** Specifies font options for strip labels. */
+                /** @docid dxchartoptions_commonaxissettings_stripstyle_label_font */
                 font?: viz.core.Font;
-                /** Aligns strip labels in the horizontal direction. */
+                /** @docid dxchartoptions_commonaxissettings_stripstyle_label_horizontalalignment */
                 horizontalAlignment?: string;
-                /** Aligns strip labels in the vertical direction. */
+                /** @docid dxchartoptions_commonaxissettings_stripstyle_label_verticalalignment */
                 verticalAlignment?: string;
             };
-            /** Generates a pixel-measured empty space between the left/right border of a strip and the strip label. */
+            /** @docid dxchartoptions_commonaxissettings_stripstyle_paddingleftright */
             paddingLeftRight?: number;
-            /** Generates a pixel-measured empty space between the top/bottom border of a strip and the strip label. */
+            /** @docid dxchartoptions_commonaxissettings_stripstyle_paddingtopbottom */
             paddingTopBottom?: number;
         };
-        /** Configures axis titles. */
+        /** @docid dxchartoptions_commonaxissettings_title */
         title?: CommonAxisTitle;
-        /** Adds an empty space between the axis and the minimum and maximum series points. */
+        /** @docid dxchartoptions_commonaxissettings_valuemarginsenabled */
         valueMarginsEnabled?: boolean;
     }
     export interface PolarCommonAxisSettings extends BaseCommonAxisSettings {
-        /** Specifies the appearance of all the widget's constant lines. */
+        /** @docid dxpolarchartoptions_commonaxissettings_constantlinestyle */
         constantLineStyle?: PolarCommonConstantLineStyle;
-        /** An object defining the label configuration options that are common for all axes in the dxPolarChart widget. */
+        /** @docid dxpolarchartoptions_commonaxissettings_label */
         label?: PolarCommonAxisLabel;
-        /** An object defining configuration options for strip style. */
+        /** @docid dxpolarchartoptions_commonaxissettings_stripstyle */
         stripStyle?: {
-            /** An object defining the configuration options for a strip label style. */
+            /** @docid dxpolarchartoptions_commonaxissettings_stripstyle_label */
             label?: {
-                /** Specifies font options for a strip label. */
+                /** @docid dxpolarchartoptions_commonaxissettings_stripstyle_label_font */
                 font?: viz.core.Font;
             };
         };
     }
     export interface ChartConstantLineLabel extends ChartCommonConstantLineLabel {
-        /** Aligns constant line labels in the horizontal direction. */
+        /**
+        * @docid dxchartoptions_argumentaxis_constantlinestyle_label_horizontalalignment
+        * @docid dxchartoptions_valueaxis_constantlinestyle_label_horizontalalignment
+        */
         horizontalAlignment?: string;
-        /** Aligns constant line labels in the vertical direction. */
+        /**
+        * @docid dxchartoptions_argumentaxis_constantlinestyle_label_verticalalignment
+        * @docid dxchartoptions_valueaxis_constantlinestyle_label_verticalalignment
+        */
         verticalAlignment?: string;
-        /** Specifies the text of a constant line label. By default, equals to the value of the constant line. */
+        /**
+        * @docid dxchartoptions_argumentaxis_constantlines_label_text
+        * @docid dxchartoptions_valueaxis_constantlines_label_text
+        */
         text?: string;
     }
     export interface PolarConstantLineLabel extends PolarCommonConstantLineLabel {
-        /** Specifies the text to be displayed in a constant line label. */
+        /**
+        * @docid dxpolarchartoptions_argumentaxis_constantlines_label_text
+        * @docid dxpolarchartoptions_valueaxis_constantlines_label_text
+        */
         text?: string;
     }
     export interface AxisLabel {
-        /** Specifies the text for a hint that appears when a user hovers the mouse pointer over a label on the value axis. */
+        /**
+        * @docid dxchartoptions_argumentaxis_label_customizehint
+        * @docid dxchartoptions_valueaxis_label_customizehint
+        * @docid dxpolarchartoptions_argumentaxis_label_customizehint
+        * @docid dxpolarchartoptions_valueaxis_label_customizehint
+        */
         customizeHint?: (argument: { value: any; valueText: string }) => string;
-        /** Specifies a callback function that returns the text to be displayed in value axis labels. */
+        /**
+        * @docid dxchartoptions_argumentaxis_label_customizetext
+        * @docid dxchartoptions_valueaxis_label_customizetext
+        * @docid dxpolarchartoptions_argumentaxis_label_customizetext
+        * @docid dxpolarchartoptions_valueaxis_label_customizetext
+        */
         customizeText?: (argument: { value: any; valueText: string }) => string;
-        /** Specifies a format for the text displayed by axis labels. */
+        /**
+        * @docid dxchartoptions_argumentaxis_label_format
+        * @docid dxchartoptions_valueaxis_label_format
+        * @docid dxpolarchartoptions_argumentaxis_label_format
+        * @docid dxpolarchartoptions_valueaxis_label_format
+        */
         format?: any;
         /**
-         * Specifies a precision for the formatted value displayed in the axis labels.
-         * @deprecated Use the valueAxis | label | format | precision option instead.
-         */
+        * @docid dxchartoptions_argumentaxis_label_precision
+        * @docid dxchartoptions_valueaxis_label_precision
+        * @docid dxpolarchartoptions_argumentaxis_label_precision
+        * @docid dxpolarchartoptions_valueaxis_label_precision
+        */
         precision?: number;
     }
     export interface ChartAxisLabel extends ChartCommonAxisLabel, AxisLabel { }
     export interface PolarAxisLabel extends PolarCommonAxisLabel, AxisLabel { }
     export interface AxisTitle extends CommonAxisTitle {
-        /** Specifies the text of the axis title. */
+        /**
+        * @docid dxchartoptions_argumentaxis_title_text
+        * @docid dxchartoptions_valueaxis_title_text
+        */
         text?: string;
     }
     export interface ChartConstantLineStyle extends ChartCommonConstantLineStyle {
-        /** Specifies the appearance of the labels of those constant lines that belong to the value axis. */
+        /**
+        * @docid dxchartoptions_argumentaxis_constantlinestyle_label
+        * @docid dxchartoptions_valueaxis_constantlinestyle_label
+        */
         label?: ChartConstantLineLabel;
     }
     export interface ChartConstantLine extends ChartConstantLineStyle {
-        /** Configures the constant line label. */
+        /**
+        * @docid dxchartoptions_argumentaxis_constantlines_label
+        * @docid dxchartoptions_valueaxis_constantlines_label
+        */
         label?: ChartConstantLineLabel;
-        /** Specifies the value indicated by a constant line. Setting this option is necessary. */
+        /**
+        * @docid dxchartoptions_argumentaxis_constantlines_value
+        * @docid dxchartoptions_valueaxis_constantlines_value
+        */
         value?: any;
     }
     export interface PolarConstantLine extends PolarCommonConstantLineStyle {
-        /** An object defining constant line label options. */
+        /**
+            * @docid dxpolarchartoptions_argumentaxis_constantlines_label
+            * @docid dxpolarchartoptions_valueaxis_constantlines_label
+            */
         label?: PolarConstantLineLabel;
-        /** Specifies a value to be displayed by a constant line. */
+        /**
+        * @docid dxpolarchartoptions_argumentaxis_constantlines_value
+        * @docid dxpolarchartoptions_valueaxis_constantlines_value
+        */
         value?: any;
     }
     export interface Axis {
-        /** Specifies a coefficient for dividing the value axis. */
+        /**
+        * @docid dxchartoptions_argumentaxis_axisdivisionfactor
+        * @docid dxchartoptions_valueaxis_axisdivisionfactor
+        * @docid dxpolarchartoptions_argumentaxis_axisdivisionfactor
+        * @docid dxpolarchartoptions_valueaxis_axisdivisionfactor
+        */
         axisDivisionFactor?: number;
-        /** Specifies the order in which discrete values are arranged on the value axis. */
+        /**
+        * @docid dxchartoptions_argumentaxis_categories
+        * @docid dxchartoptions_valueaxis_categories
+        * @docid dxpolarchartoptions_argumentaxis_categories
+        * @docid dxpolarchartoptions_valueaxis_categories
+        */
         categories?: Array<any>;
-        /** Specifies the value to be raised to a power when generating ticks for a logarithmic axis. */
+        /**
+        * @docid dxchartoptions_argumentaxis_logarithmbase
+        * @docid dxchartoptions_valueaxis_logarithmbase
+        * @docid dxpolarchartoptions_argumentaxis_logarithmbase
+        * @docid dxpolarchartoptions_valueaxis_logarithmbase
+        */
         logarithmBase?: number;
-        /** Specifies an interval between axis ticks/grid lines. */
+        /**
+        * @docid dxchartoptions_argumentaxis_tickInterval
+        * @docid dxchartoptions_valueaxis_tickInterval
+        * @docid dxpolarchartoptions_argumentaxis_tickInterval
+        * @docid dxpolarchartoptions_valueaxis_tickInterval
+        */
         tickInterval?: any;
-        /** Specifies the interval between minor ticks. */
+        /**
+          * @docid dxchartoptions_argumentaxis_minortickinterval
+          * @docid dxchartoptions_valueaxis_minortickinterval
+          * @docid dxpolarchartoptions_argumentaxis_minortickinterval
+          * @docid dxpolarchartoptions_valueaxis_minortickinterval
+          */
         minorTickInterval?: any;
-        /** Specifies the number of minor ticks between two neighboring major ticks. */
+        /**
+        * @docid dxchartoptions_argumentaxis_minortickcount
+        * @docid dxchartoptions_valueaxis_minortickcount
+        * @docid dxpolarchartoptions_argumentaxis_minortickcount
+        * @docid dxpolarchartoptions_valueaxis_minortickcount
+        */
         minorTickCount?: number;
-        /** Specifies the required type of the value axis. */
+        /**
+          * @docid dxchartoptions_argumentaxis_type
+          * @docid dxchartoptions_valueaxis_type
+          * @docid dxpolarchartoptions_argumentaxis_type
+          * @docid dxpolarchartoptions_valueaxis_type
+          */
         type?: string;
-        /** Binds the value axis to a pane. */
+        /**
+          * @docid dxchartoptions_valueaxis_pane
+          */
         pane?: string;
-        /** Specifies options for value axis strips. */
+        /**
+        * @docid dxchartoptions_argumentaxis_strips
+        * @docid dxchartoptions_valueaxis_strips
+        * @docid dxpolarchartoptions_argumentaxis_strips
+        * @docid dxpolarchartoptions_valueaxis_strips
+        */
         strips?: Array<Strip>;
     }
     export interface ChartAxis extends ChartCommonAxisSettings, Axis {
-        /** Declares a collection of constant lines belonging to the value axis. */
+        /**
+          * @docid dxchartoptions_argumentaxis_constantlines
+          * @docid dxchartoptions_valueaxis_constantlines
+          */
         constantLines?: Array<ChartConstantLine>;
-        /** Specifies the appearance of those constant lines that belong to the value axis. */
+        /**
+          * @docid dxchartoptions_argumentaxis_constantlinestyle
+          * @docid dxchartoptions_valueaxis_constantlinestyle
+          */
         constantLineStyle?: ChartCommonConstantLineStyle;
-        /** Configures the labels of the value axis. */
+        /**
+          * @docid dxchartoptions_argumentaxis_label
+          * @docid dxchartoptions_valueaxis_label
+          */
         label?: ChartAxisLabel;
-        /** Coupled with the min option, focuses the widget on a specific chart segment. Applies only to the axes of the "continuous" and "logarithmic" type. */
+        /**
+          * @docid dxchartoptions_argumentaxis_max
+          * @docid dxchartoptions_valueaxis_max
+          */
         max?: any;
-        /** Coupled with the max option, focuses the widget on a specific chart segment. Applies only to the axes of the "continuous" and "logarithmic" type. */
+        /**
+          * @docid dxchartoptions_argumentaxis_min
+          * @docid dxchartoptions_valueaxis_min
+          */
         min?: any;
-        /** Relocates the value axis. */
+        /**
+          * @docid dxchartoptions_argumentaxis_position
+          * @docid dxchartoptions_valueaxis_position
+          */
         position?: string;
-        /** Configures the axis title. */
+        /**
+          * @docid dxchartoptions_argumentaxis_title
+          * @docid dxchartoptions_valueaxis_title
+          */
         title?: any;
     }
     export interface PolarAxis extends PolarCommonAxisSettings, Axis {
-        /** Defines an array of the value axis constant lines. */
+        /**
+          * @docid dxpolarchartoptions_argumentaxis_constantlines
+          * @docid dxpolarchartoptions_valueaxis_constantlines
+          */
         constantLines?: Array<PolarConstantLine>;
-        /** Specifies options for value axis labels. */
+        /**
+          * @docid dxpolarchartoptions_argumentaxis_label
+          * @docid dxpolarchartoptions_valueaxis_label
+          */
         label?: PolarAxisLabel;
     }
     export interface ArgumentAxis {
-        /** Specifies the desired type of axis values. */
+        /**
+        * @docid dxchartoptions_argumentaxis_argumenttype
+        * @docid dxpolarchartoptions_argumentaxis_argumenttype
+        */
         argumentType?: string;
-        /** Specifies the elements that will be highlighted when the argument axis is hovered over. */
+        /**
+        * @docid dxchartoptions_argumentaxis_hovermode
+        * @docid dxpolarchartoptions_argumentaxis_hovermode
+        */
         hoverMode?: string;
     }
     export interface ChartArgumentAxis extends ChartAxis, ArgumentAxis { }
     export interface PolarArgumentAxis extends PolarAxis, ArgumentAxis {
-        /** Specifies the angle in arc degrees to which the argument axis should be rotated. The positive values rotate the axis clockwise. */
+        /** @docid dxpolarchartoptions_argumentaxis_startangle */
         startAngle?: number;
-        /** Specifies whether or not to display the first point at the angle specified by the startAngle option. */
+        /** @docid dxpolarchartoptions_argumentaxis_firstpointonstartangle */
         firstPointOnStartAngle?: boolean;
-        /** Specifies the value to be used as the origin for the argument axis. */
+        /** @docid dxpolarchartoptions_argumentaxis_originvalue */
         originValue?: number;
-        /** Specifies the period of the argument values in the data source. */
+        /** @docid dxpolarchartoptions_argumentaxis_period */
         period?: number;
     }
     export interface ValueAxis {
-        /** Specifies the name of the value axis. */
+        /** @docid dxchartoptions_valueaxis_name */
         name?: string;
-        /** Specifies whether or not to indicate a zero value on the value axis. */
+        /**
+        * @docid dxchartoptions_valueaxis_showZero
+        * @docid dxpolarchartoptions_valueaxis_showZero
+        */
         showZero?: boolean;
-        /** Specifies the desired type of axis values. */
+        /**
+        * @docid dxchartoptions_valueaxis_valuetype
+        * @docid dxpolarchartoptions_valueaxis_valuetype
+        */
         valueType?: string;
     }
     export interface ChartValueAxis extends ChartAxis, ValueAxis {
-        /** Adds a pixel-measured empty space between two side-by-side value axes. Applies if several value axes are located on one side of the chart. */
+        /** @docid dxchartoptions_valueaxis_multipleaxesspacing */
         multipleAxesSpacing?: number;
-        /** Synchronizes two or more value axes with each other at a specific value. */
+        /** @docid dxchartoptions_valueaxis_synchronizedvalue */
         synchronizedValue?: number;
     }
     export interface PolarValueAxis extends PolarAxis, ValueAxis {
-        /** Indicates whether to display series with indents from axis boundaries. */
+        /** @docid dxpolarchartoptions_valueaxis_valuemarginsenabled */
         valueMarginsEnabled?: boolean;
-        /** Specifies a coefficient that determines the spacing between the maximum series point and the axis. */
+        /** @docid dxpolarchartoptions_valueaxis_maxvaluemargin */
         maxValueMargin?: number;
-        /** Specifies a coefficient that determines the spacing between the minimum series point and the axis. */
+        /** @docid dxpolarchartoptions_valueaxis_minvaluemargin */
         minValueMargin?: number;
+        /** @docid dxpolarchartoptions_valueaxis_tick */
         tick?: {
+            /** @docid dxpolarchartoptions_valueaxis_tick_visible */
             visible?: boolean;
         }
     }
     export interface CommonPane {
-        /** Specifies the color of the pane's background. */
+        /** @docid dxchartoptions_commonpanesettings_backgroundcolor */
         backgroundColor?: string;
-        /** Configures the pane border. */
+        /** @docid dxchartoptions_commonpanesettings_border */
         border?: PaneBorder;
     }
     export interface Pane extends CommonPane {
-        /** Specifies the name of the pane. */
+        /** @docid dxchartoptions_panes_name */
         name?: string;
     }
     export interface PaneBorder extends viz.core.DashedBorderWithOpacity {
-        /** Shows/hides the bottom border of the pane. Applies only when the border | visible option is true. */
+        /** @docid dxchartoptions_commonpanesettings_border_bottom */
         bottom?: boolean;
-        /** Shows/hides the left border of the pane. Applies only when the border | visible option is true. */
+        /** @docid dxchartoptions_commonpanesettings_border_left */
         left?: boolean;
-        /** Shows/hides the right border of the pane. Applies only when the border | visible option is true. */
+        /** @docid dxchartoptions_commonpanesettings_border_right */
         right?: boolean;
-        /** Shows/hides the top border of the pane. Applies only when the border | visible option is true. */
+        /** @docid dxchartoptions_commonpanesettings_border_top */
         top?: boolean;
     }
     export interface ChartAnimation extends viz.core.Animation {
-        /** Specifies how many series points the widget should have before the animation will be disabled. */
+        /** @docid basechartoptions_animation_maxpointcountsupported */
         maxPointCountSupported?: number;
     }
     export interface BaseChartTooltip extends viz.core.Tooltip {
-        /** Specifies a format for arguments of the chart's series points. */
+        /** @docid basechartoptions_tooltip_argumentformat */
         argumentFormat?: any;
-        /**
-         * Specifies a precision for formatted arguments displayed in tooltips.
-         * @deprecated Use the tooltip | argumentFormat | precision option instead.
-         */
+        /** @docid basechartoptions_tooltip_argumentprecision */
         argumentPrecision?: number;
-        /**
-         * Specifies a precision for a percent value displayed in tooltips for stacked series and dxPieChart series.
-         * @deprecated Use the tooltip | format | percentPrecision option instead.
-         */
+        /** @docid basechartoptions_tooltip_percentprecision */
         percentPrecision?: number;
     }
     export interface BaseChartOptions<TPoint> extends viz.core.BaseWidgetOptions, viz.core.MarginOptions, viz.core.RedrawOnResizeOptions, viz.core.TitleOptions, viz.core.LoadingIndicatorOptions, viz.core.ExportOptions {
-        /** Specifies adaptive layout options. */
+        /** @docid basechartoptions_adaptiveLayout */
         adaptiveLayout?: {
-            /** Specifies the widget's width small enough for the layout to begin adapting. */
+            /** @docid basechartoptions_adaptiveLayout_width */
             width?: number;
-            /** Specifies the widget's height small enough for the layout to begin adapting. */
+            /** @docid basechartoptions_adaptiveLayout_height */
             height?: number;
-            /** Specifies whether or not point labels should be kept when the layout is adapting. */
+            /** @docid basechartoptions_adaptiveLayout_keepLabels */
             keepLabels?: boolean;
         };
-        /** Specifies animation options. */
+        /** @docid basechartoptions_animation */
         animation?: ChartAnimation;
-        /** Customizes the appearance of an individual point label. */
+        /** @docid basechartoptions_customizelabel */
         customizeLabel?: (pointInfo: Object) => Object;
-        /** Customizes the appearance of an individual series point. */
+        /** @docid basechartoptions_customizepoint */
         customizePoint?: (pointInfo: Object) => Object;
-        /** Specifies the origin of data for the widget. */
+        /** @docid basechartoptions_datasource */
         dataSource?: any;
-        /** Specifies options of a dxChart's (dxPieChart's) legend. */
+        /** @docid basechartoptions_legend */
         legend?: core.BaseLegend;
-        /** Sets the name of the palette to be used in the chart. Alternatively, an array of colors can be set as a custom palette to be used within this chart. */
+        /**
+          * @docid basechartoptions_palette
+          * @docid dxpiechartoptions_palette
+          */
         palette?: any;
-        /** A handler for the done event. */
+        /** @docid basechartoptions_ondone */
         onDone?: (e: {
             component: BaseChart;
             element: Element;
         }) => void;
-        /** A handler for the pointClick event. */
+        /** @docid basechartoptions_onpointclick */
         onPointClick?: any;
-        /** A handler for the pointHoverChanged event. */
+        /** @docid basechartoptions_onpointhoverchanged */
         onPointHoverChanged?: (e: {
             component: BaseChart;
             element: Element;
             target: TPoint;
         }) => void;
-        /** A handler for the pointSelectionChanged event. */
+        /** @docid basechartoptions_onpointselectionchanged */
         onPointSelectionChanged?: (e: {
             component: BaseChart;
             element: Element;
             target: TPoint;
         }) => void;
-        /** Specifies whether a single point or multiple points can be selected in the chart. */
+        /** @docid basechartoptions_pointSelectionMode */
         pointSelectionMode?: string;
-        /** Specifies options for the dxChart and dxPieChart widget series. */
+        /** @docid basechartoptions_series */
         series?: any;
-        /** Configures tooltips. */
+        /** @docid basechartoptions_tooltip */
         tooltip?: BaseChartTooltip;
-        /** A handler for the tooltipShown event. */
+        /** @docid basechartoptions_ontooltipshown */
         onTooltipShown?: (e: {
             component: BaseChart;
             element: Element;
             target: BasePoint;
         }) => void;
-        /** A handler for the tooltipHidden event. */
+        /** @docid basechartoptions_ontooltiphidden */
         onTooltipHidden?: (e: {
             component: BaseChart;
             element: Element;
             target: BasePoint;
         }) => void;
     }
-    /** A base class for all chart widgets included in the ChartJS library. */
+    /** @docid basechart **/
     export class BaseChart extends viz.core.BaseWidget implements viz.core.LoadingIndicatorMethods {
-        /** Deselects the chart's selected series. The series is displayed in an initial style. */
+        /** @docid basechartmethods_clearselection */
         clearSelection(): void;
-        /** Gets the current size of the widget. */
+        /** @docid basechartmethods_getsize */
         getSize(): { width: number; height: number };
-        /** Returns an array of all series in the chart. */
+        /** @docid basechartmethods_getallseries */
         getAllSeries(): Array<BaseSeries>;
-        /** Gets a series within the chart's series collection by the specified name (see the name option). */
+        /** @docid basechartmethods_getseriesbyname */
         getSeriesByName(seriesName: string): BaseSeries;
-        /** Gets a series within the chart's series collection by its position number. */
+        /** @docid basechartmethods_getseriesbypos */
         getSeriesByPos(seriesIndex: number): BaseSeries;
-        /** Hides all widget tooltips. */
+        /** @docid basechartmethods_hideTooltip */
         hideTooltip(): void;
         showLoadingIndicator(): void;
         hideLoadingIndicator(): void;
-        /** Redraws a widget. */
+        /** @docid basechartmethods_render */
         render(renderOptions?: {
             force?: boolean;
             animate?: boolean;
@@ -6116,267 +7934,338 @@ declare module DevExpress.viz.charts {
         }): void;
     }
     export interface AdvancedLegend extends core.BaseLegend {
-        /** Specifies the text for a hint that appears when a user hovers the mouse pointer over a legend item. */
+        /**
+        * @docid dxchartoptions_legend_customizehint
+        * @docid dxpolarchartoptions_legend_customizehint
+        */
         customizeHint?: (seriesInfo: { seriesName: string; seriesIndex: number; seriesColor: string; }) => string;
-        /** <p>Specifies a callback function that returns the text to be displayed by legend items.</p> */
+        /**
+        * @docid dxchartoptions_legend_customizetext
+        * @docid dxpolarchartoptions_legend_customizetext
+        */
         customizeText?: (seriesInfo: { seriesName: string; seriesIndex: number; seriesColor: string; }) => string;
-        /** Specifies what series elements to highlight when a corresponding item in the legend is hovered over. */
+        /**
+        * @docid dxchartoptions_legend_hovermode
+        * @docid dxpolarchartoptions_legend_hovermode
+        */
         hoverMode?: string;
     }
     export interface AdvancedOptions<TPoint, TSeries> extends BaseChartOptions<TPoint> {
-        /** A handler for the argumentAxisClick event. */
+        /**
+        * @docid dxchartoptions_onargumentaxisclick
+        * @docid dxpolarchartoptions_onargumentaxisclick
+        */
         onArgumentAxisClick?: any;
-        /** Specifies the color of the parent page element. */
+        /**
+        *  @docid dxchartoptions_containerbackgroundcolor
+        *  @docid dxpolarchartoptions_containerbackgroundcolor
+        */
         containerBackgroundColor?: string;
-        /** An object providing options for managing data from a data source. */
+        /**
+        * @docid dxchartoptions_dataPrepareSettings
+        * @docid dxpolarchartoptions_dataPrepareSettings
+        */
         dataPrepareSettings?: {
-            /** Specifies whether or not to validate the values from a data source. */
+            /**
+            * @docid dxchartoptions_dataPrepareSettings_checkTypeForAllData
+            * @docid dxpolarchartoptions_dataPrepareSettings_checkTypeForAllData
+            */
             checkTypeForAllData?: boolean;
-            /** Specifies whether or not to convert the values from a data source into the data type of an axis. */
+            /**
+            * @docid dxchartoptions_dataPrepareSettings_convertToAxisDataType
+            * @docid dxpolarchartoptions_dataPrepareSettings_convertToAxisDataType
+            */
             convertToAxisDataType?: boolean;
-            /** Specifies how to sort the series points. */
+            /**
+            * @docid dxchartoptions_dataPrepareSettings_sortingMethod
+            * @docid dxpolarchartoptions_dataPrepareSettings_sortingMethod
+            */
             sortingMethod?: any;
         };
-        /** A handler for the legendClick event. */
+        /**
+        * @docid dxchartoptions_onlegendclick
+        * @docid dxpolarchartoptions_onlegendclick
+        */
         onLegendClick?: any;
-        /** A handler for the seriesClick event. */
+        /**
+        * @docid dxchartoptions_onseriesclick
+        * @docid dxpolarchartoptions_onseriesclick
+        */
         onSeriesClick?: any;
-        /** A handler for the seriesHoverChanged event. */
+        /**
+        * @docid dxchartoptions_onserieshoverchanged
+        * @docid dxpolarchartoptions_onserieshoverchanged
+        */
         onSeriesHoverChanged?: (e: {
             component: BaseChart;
             element: Element;
             target: TSeries;
         }) => void;
-        /** A handler for the seriesSelectionChanged event. */
+        /**
+        * @docid dxchartoptions_onseriesselectionchanged
+        * @docid dxpolarchartoptions_onseriesselectionchanged
+        */
         onSeriesSelectionChanged?: (e: {
             component: BaseChart;
             element: Element;
             target: TSeries;
         }) => void;
-        /** Specifies whether a single series or multiple series can be selected in the chart. */
+        /**
+        * @docid dxchartoptions_seriesSelectionMode
+        * @docid dxpolarchartoptions_seriesSelectionMode
+        */
         seriesSelectionMode?: string;
-        /** Specifies how the chart must behave when series point labels overlap. */
+        /**
+        * @docid dxchartoptions_resolvelabeloverlapping
+        * @docid dxpolarchartoptions_resolvelabeloverlapping
+        */
         resolveLabelOverlapping?: string;
-        /** Specifies whether or not all bars in a series must have the same angle, or may have different angles if any points in other series are missing. */
+        /**
+        * @docid dxchartoptions_equalbarwidth
+        * @docid dxpolarchartoptions_equalbarwidth
+        */
         equalBarWidth?: boolean;
-        /** Specifies a common bar width as a percentage from 0 to 1. */
+        /**
+        * @docid dxchartoptions_barwidth
+        * @docid dxpolarchartoptions_barwidth
+        */
         barWidth?: number;
-        /** Forces the widget to treat negative values as zeroes. Applies to stacked-like series only. */
+        /**
+        * @docid dxchartoptions_negativesaszeroes
+        * @docid dxpolarchartoptions_negativesaszeroes
+        */
         negativesAsZeroes?: boolean;
     }
     export interface Legend extends AdvancedLegend {
-        /** Specifies whether the legend is located outside or inside the chart's plot. */
+        /** @docid dxchartoptions_legend_position */
         position?: string;
     }
     export interface ChartTooltip extends BaseChartTooltip {
-        /** Specifies whether the tooltip must be located in the center of a series point or on its edge. Applies to bar-like and bubble series only. */
+        /** @docid dxchartoptions_tooltip_location */
         location?: string;
-        /** Specifies the kind of information to display in a tooltip. */
+        /** @docid dxchartoptions_tooltip_shared */
         shared?: boolean;
     }
     export interface dxChartOptions extends AdvancedOptions<ChartPoint, ChartSeries> {
-        /** Indicates whether or not to synchronize value axes when they are displayed on a single pane. */
+        /** @docid dxchartoptions_synchronizemultiaxes */
         synchronizeMultiAxes?: boolean;
-        /** Specifies whether or not to filter the series points depending on their quantity. */
+        /** @docid dxchartoptions_useAggregation */
         useAggregation?: boolean;
-        /** Specifies whether or not to adjust the value axis when zooming the widget. */
+        /** @docid dxchartoptions_adjustonzoom */
         adjustOnZoom?: boolean;
-        /** Configures the argument axis. */
+        /** @docid dxchartoptions_argumentaxis */
         argumentAxis?: ChartArgumentAxis;
-        /** Defines common settings for both the argument and value axis in a chart. */
+        /** @docid dxchartoptions_commonaxissettings */
         commonAxisSettings?: ChartCommonAxisSettings;
-        /** Defines common settings for all panes in a chart. */
+        /** @docid dxchartoptions_commonpanesettings */
         commonPaneSettings?: CommonPane;
-        /** Specifies settings common for all series in the chart. */
+        /** @docid dxchartoptions_commonseriessettings */
         commonSeriesSettings?: CommonSeriesSettings;
-        /** Configures the crosshair feature. */
+        /** @docid dxchartoptions_crosshair */
         crosshair?: {
-            /** Specifies the color of the crosshair lines. */
+            /** @docid dxchartoptions_crosshair_color */
             color?: string;
-            /** Specifies the dash style of the crosshair lines. */
+            /** @docid dxchartoptions_crosshair_dashstyle */
             dashStyle?: string;
-            /** Enables the crosshair. */
+            /** @docid dxchartoptions_crosshair_enabled */
             enabled?: boolean;
-            /** Specifies how transparent the crosshair lines should be. */
+            /** @docid dxchartoptions_crosshair_opacity */
             opacity?: number;
-            /** Specifies the width of the crosshair lines. */
+            /** @docid dxchartoptions_crosshair_width */
             width?: number;
-            /** Configures the horizontal crosshair line individually. */
+            /** @docid dxchartoptions_crosshair_horizontalline */
             horizontalLine?: CrosshaierWithLabel;
-            /** Configures the vertical crosshair line individually. */
+            /** @docid dxchartoptions_crosshair_verticalline */
             verticalLine?: CrosshaierWithLabel;
-            /** Configures the crosshair labels. */
+            /** @docid dxchartoptions_crosshair_label */
             label?: {
-                /** Paints the background of the crosshair labels. */
+                /** @docid dxchartoptions_crosshair_label_backgroundcolor */
                 backgroundColor?: string;
-                /** Makes the crosshair labels visible. Applies only if the crosshair feature is enabled. */
+                /** @docid dxchartoptions_crosshair_label_visible */
                 visible?: boolean;
-                /** Specifies font options for the crosshair labels. */
+                /** @docid dxchartoptions_crosshair_label_font */
                 font?: viz.core.Font;
-                /** Formats the point value/argument before it will be displayed in the crosshair label. */
+                /** @docid dxchartoptions_crosshair_label_format */
                 format?: any;
-                /**
-                 * Specifies a precision for formatted values.
-                 * @deprecated Use the crosshair | label | format | precision option instead.
-                 */
+                /** @docid dxchartoptions_crosshair_label_precision */
                 precision?: number;
-                /** Customizes the text displayed by the crosshair labels. */
+                /** @docid dxchartoptions_crosshair_label_customizetext */
                 customizeText?: (info: { value: any; valueText: string; point: ChartPoint; }) => string;
             }
         };
-        /** Specifies which pane should be used by default. */
+        /** @docid dxchartoptions_defaultpane */
         defaultPane?: string;
-        /** Specifies a coefficient determining the diameter of the largest bubble. */
+        /** @docid dxchartoptions_maxbubblesize */
         maxBubbleSize?: number;
-        /** Specifies the diameter of the smallest bubble measured in pixels. */
+        /** @docid dxchartoptions_minbubblesize */
         minBubbleSize?: number;
-        /** Declares a collection of panes. */
+        /** @docid dxchartoptions_panes */
         panes?: Array<Pane>;
-        /** Swaps the axes around making the value axis horizontal and the argument axis vertical. */
+        /** @docid dxchartoptions_rotated */
         rotated?: boolean;
-        /** Specifies the options of a chart's legend. */
+        /** @docid dxchartoptions_legend */
         legend?: Legend;
-        /** A handler for the zoomStart event. */
+        /** @docid dxchartoptions_onzoomstart */
         onZoomStart?: (e: {
             component: BaseChart;
             element: Element;
         }) => void;
-        /** A handler for the zoomEnd event. */
+        /** @docid dxchartoptions_onzoomend */
         onZoomEnd?: (e: {
             component: BaseChart;
             element: Element;
             rangeStart: any;
             rangeEnd: any;
         }) => void;
-        /** Specifies options for dxChart widget series. */
+        /** @docid dxchartoptions_series */
         series?: Array<SeriesConfig>;
-        /** Defines options for the series template. */
+        /** @docid dxchartoptions_seriestemplate */
         seriesTemplate?: SeriesTemplate;
+        /** @docid dxchartoptions_tooltip */
         tooltip?: ChartTooltip;
-        /** Configures the value axis. */
+        /** @docid dxchartoptions_valueaxis */
         valueAxis?: Array<ChartValueAxis>;
-        /** Enables scrolling in your chart. */
+        /** @docid dxchartoptions_scrollingmode */
         scrollingMode?: string;
-        /** Enables zooming in your chart. */
+        /** @docid dxchartoptions_zoomingmode */
         zoomingMode?: string;
-        /** Specifies the settings of the scroll bar. */
+        /** @docid dxchartoptions_scrollbar */
         scrollBar?: {
-            /** Specifies whether the scroll bar is visible or not. */
+            /** @docid dxchartoptions_scrollbar_visible */
             visible?: boolean;
-            /** Specifies the spacing between the scroll bar and the chart's plot in pixels. */
+            /** @docid dxchartoptions_scrollbar_offset */
             offset?: number;
-            /** Specifies the color of the scroll bar. */
+            /** @docid dxchartoptions_scrollbar_color */
             color?: string;
-            /** Specifies the width of the scroll bar in pixels. */
+            /** @docid dxchartoptions_scrollbar_width */
             width?: number;
-            /** Specifies the opacity of the scroll bar. */
+            /** @docid dxchartoptions_scrollbar_opacity */
             opacity?: number;
-            /** Specifies the position of the scroll bar in the chart. */
+            /** @docid dxchartoptions_scrollbar_position */
             position?: string;
         };
     }
     interface CrosshaierWithLabel extends viz.core.DashedBorderWithOpacity {
-        /** Configures the label that belongs to the horizontal crosshair line. */
+        /**
+        * @docid dxchartoptions_crosshair_verticalline_label
+        * @docid dxchartoptions_crosshair_horizontalline_label
+        */
         label?: {
-            /** Paints the background of the label that belongs to the horizontal crosshair line. */
+            /**
+            * @docid dxchartoptions_crosshair_verticalline_label_backgroundcolor
+            * @docid dxchartoptions_crosshair_horizontalline_label_backgroundcolor
+            */
             backgroundColor?: string;
-            /** Makes the label of the horizontal crosshair line visible. Applies only if the crosshair feature is enabled and the horizontal line is visible. */
+            /**
+            * @docid dxchartoptions_crosshair_verticalline_label_visible
+            * @docid dxchartoptions_crosshair_horizontalline_label_visible
+            */
             visible?: boolean;
-            /** Specifies font options for the label of the horizontal crosshair line. */
+            /**
+            * @docid dxchartoptions_crosshair_verticalline_label_font
+            * @docid dxchartoptions_crosshair_horizontalline_label_font
+            */
             font?: viz.core.Font;
-            /** Formats the point value before it will be displayed in the crosshair label. */
+            /**
+            * @docid dxchartoptions_crosshair_verticalline_label_format
+            * @docid dxchartoptions_crosshair_horizontalline_label_format
+            */
             format?: any;
             /**
-             * Specifies a precision for formatted values.
-             * @deprecated Use the crosshair | horizontalLine | label | format | precision option instead.
-             */
+            * @docid dxchartoptions_crosshair_verticalline_label_precision
+            * @docid dxchartoptions_crosshair_horizontalline_label_precision
+            */
             precision?: number;
-            /** Customizes the text displayed by the label that belongs to the horizontal crosshair line. */
+            /**
+            * @docid dxchartoptions_crosshair_verticalline_label_customizetext
+            * @docid dxchartoptions_crosshair_horizontalline_label_customizetext
+            */
             customizeText?: (info: { value: any; valueText: string; point: ChartPoint; }) => string;
         }
     }
     export interface PolarChartTooltip extends BaseChartTooltip {
-        /** Specifies the kind of information to display in a tooltip. */
+        /** @docid dxpolarchartoptions_tooltip_shared */
         shared?: boolean;
     }
     export interface dxPolarChartOptions extends AdvancedOptions<PolarPoint, PolarSeries> {
-        /** Specifies adaptive layout options. */
+        /** @docid dxpolarchartoptions_adaptiveLayout */
         adaptiveLayout?: {
+            /** @docid dxpolarchartoptions_adaptiveLayout_width */
             width?: number;
+            /** @docid dxpolarchartoptions_adaptiveLayout_height */
             height?: number;
         };
-        /** Indicates whether or not to display a "spider web". */
+        /** @docid dxpolarchartoptions_usespiderweb */
         useSpiderWeb?: boolean;
-        /** Specifies argument axis options for the dxPolarChart widget. */
+        /** @docid dxpolarchartoptions_argumentaxis */
         argumentAxis?: PolarArgumentAxis;
-        /** An object defining the configuration options that are common for all axes of the dxPolarChart widget. */
+        /** @docid dxpolarchartoptions_commonaxissettings */
         commonAxisSettings?: PolarCommonAxisSettings;
-        /** An object defining the configuration options that are common for all series of the dxPolarChart widget. */
+        /** @docid dxpolarchartoptions_commonseriessettings */
         commonSeriesSettings?: CommonPolarSeriesSettings;
-        /** Specifies the options of a chart's legend. */
+        /** @docid dxpolarchartoptions_legend */
         legend?: AdvancedLegend;
-        /** Specifies options for dxPolarChart widget series. */
+        /** @docid dxpolarchartoptions_series */
         series?: Array<PolarSeriesConfig>;
-        /** Defines options for the series template. */
+        /** @docid dxpolarchartoptions_seriestemplate */
         seriesTemplate?: PolarSeriesTemplate;
+        /** @docid dxpolarchartoptions_tooltip */
         tooltip?: PolarChartTooltip;
-        /** Specifies value axis options for the dxPolarChart widget. */
+        /** @docid dxpolarchartoptions_valueaxis */
         valueAxis?: PolarValueAxis;
     }
     export interface PieLegend extends core.BaseLegend {
-        /** Specifies what chart elements to highlight when a corresponding item in the legend is hovered over. */
+        /** @docid dxpiechartoptions_legend_hovermode */
         hoverMode?: string;
-        /** Specifies the text for a hint that appears when a user hovers the mouse pointer over a legend item. */
+        /** @docid dxpiechartoptions_legend_customizehint */
         customizeHint?: (pointInfo: { pointName: string; pointIndex: number; pointColor: string; }) => string;
-        /** Specifies a callback function that returns the text to be displayed by a legend item. */
+        /** @docid dxpiechartoptions_legend_customizetext */
         customizeText?: (pointInfo: { pointName: string; pointIndex: number; pointColor: string; }) => string;
     }
     export interface dxPieChartOptions extends BaseChartOptions<PiePoint> {
-        /** Specifies adaptive layout options. */
+        /** @docid dxpiechartoptions_adaptiveLayout */
         adaptiveLayout?: {
+            /** @docid dxpiechartoptions_adaptiveLayout_keepLabels */
             keepLabels?: boolean;
         };
-        /** Specifies dxPieChart legend options. */
+        /** @docid dxpiechartoptions_legend */
         legend?: PieLegend;
-        /** Specifies options for the series of the dxPieChart widget. */
+        /** @docid dxpiechartoptions_series */
         series?: Array<PieSeriesConfig>;
-        /** Specifies the diameter of the pie. */
+        /** @docid dxpiechartoptions_diameter */
         diameter?: number;
-        /** Specifies the direction that the pie chart segments will occupy. */
+        /** @docid dxpiechartoptions_segmentsdirection */
         segmentsDirection?: string;
-        /** Specifies the angle in arc degrees from which the first segment of a pie chart should start. */
+        /** @docid dxpiechartoptions_startangle */
         startAngle?: number;
-        /** Specifies the fraction of the inner radius relative to the total radius in the series of the 'doughnut' type. The value should be between 0 and 1. */
+        /** @docid dxpiechartoptions_innerradius */
         innerRadius?: number;
-        /** A handler for the legendClick event. */
+        /** @docid dxpiechartoptions_onlegendclick */
         onLegendClick?: any;
-        /** Specifies how a chart must behave when series point labels overlap. */
+        /** @docid dxpiechartoptions_resolvelabeloverlapping */
         resolveLabelOverlapping?: string;
-        /** An object defining the configuration options that are common for all series of the dxPieChart widget. */
+        /** @docid dxpiechartoptions_commonseriessettings */
         commonSeriesSettings?: CommonPieSeriesSettings;
-        /** Specifies the type of the pie chart series. */
+        /** @docid dxpiechartoptions_type */
         type?: string;
     }
 }
 declare module DevExpress.viz {
-    /** A widget providing charts of various types for web applications. */
+    /** @docid dxchart */
     export class dxChart extends DevExpress.viz.charts.BaseChart {
         constructor(element: JQuery, options?: DevExpress.viz.charts.dxChartOptions);
         constructor(element: Element, options?: DevExpress.viz.charts.dxChartOptions);
-        /** Sets the specified start and end values for the chart's argument axis. */
+        /** @docid dxchartmethods_zoomargument */
         zoomArgument(startValue: any, endValue: any): void;
     }
-    /** A circular chart widget for web applications. */
+    /** @docid dxpiechart */
     export class dxPieChart extends DevExpress.viz.charts.BaseChart {
         constructor(element: JQuery, options?: DevExpress.viz.charts.dxPieChartOptions);
         constructor(element: Element, options?: DevExpress.viz.charts.dxPieChartOptions);
-        /**
-         * Provides access to the dxPieChart series.
-         * @deprecated Use the getAllSeries() method instead.
-         */
+        /** @docid dxpiechartmethods_getseries */
         getSeries(): DevExpress.viz.charts.PieSeries;
     }
-    /** A chart widget displaying data in a polar coordinate system. */
+    /** @docid dxpolarchart */
     export class dxPolarChart extends DevExpress.viz.charts.BaseChart {
         constructor(element: JQuery, options?: DevExpress.viz.charts.dxPolarChartOptions);
         constructor(element: Element, options?: DevExpress.viz.charts.dxPolarChartOptions);
@@ -6395,212 +8284,267 @@ interface JQuery {
 }
 declare module DevExpress.viz.gauges {
     export interface BaseRangeContainer {
-        /** Specifies a range container's background color. */
+        /** @docid basegaugeoptions_rangeContainer_backgroundColor */
         backgroundColor?: string;
-        /** Specifies the offset of the range container from an invisible scale line in pixels. */
+        /** @docid basegaugeoptions_rangeContainer_offset */
         offset?: number;
-        /** Sets the name of the palette or an array of colors to be used for coloring the gauge range container. */
+        /** @docid basegaugeoptions_rangeContainer_palette */
         palette?: any;
-        /** An array of objects representing ranges contained in the range container. */
+        /** @docid basegaugeoptions_rangeContainer_ranges */
         ranges?: Array<{ startValue: number; endValue: number; color: string }>;
-        /** Specifies a color of a range. */
+        /** @docid basegaugeoptions_rangeContainer_ranges_color */
         color?: string;
-        /** Specifies an end value of a range. */
+        /** @docid basegaugeoptions_rangeContainer_ranges_endValue */
         endValue?: number;
-        /** Specifies a start value of a range. */
+        /** @docid basegaugeoptions_rangeContainer_ranges_startValue */
         startValue?: number;
     }
     export interface ScaleTick {
-        /** Specifies the color of the scale's minor ticks. */
+        /**
+          * @docid basegaugeoptions_scale_majorTick_color
+          * @docid basegaugeoptions_scale_minorTick_color
+          */
         color?: string;
         /**
-         * Specifies an array of custom minor ticks.
-         * @deprecated Use the scale | customMinorTicks option instead.
-         */
+          * @docid basegaugeoptions_scale_majorTick_customTickValues
+          * @docid basegaugeoptions_scale_minorTick_customTickValues
+          */
         customTickValues?: Array<any>;
-        /** Specifies the length of the scale's minor ticks. */
+        /**
+          * @docid basegaugeoptions_scale_majorTick_length
+          * @docid basegaugeoptions_scale_minorTick_length
+          */
         length?: number;
         /**
-         * Indicates whether automatically calculated minor ticks are visible or not.
-         * @deprecated This feature is no longer available.
-         */
+          * @docid basegaugeoptions_scale_majorTick_showCalculatedTicks
+          * @docid basegaugeoptions_scale_minorTick_showCalculatedTicks
+          */
         showCalculatedTicks?: boolean;
         /**
-         * Specifies an interval between minor ticks.
-         * @deprecated Use the scale | minorTickInterval option instead.
-         */
+          * @docid basegaugeoptions_scale_majorTick_tickInterval
+          * @docid basegaugeoptions_scale_minorTick_tickInterval
+          */
         tickInterval?: number;
-        /** Indicates whether scale minor ticks are visible or not. */
+        /**
+          * @docid basegaugeoptions_scale_majorTick_visible
+          * @docid basegaugeoptions_scale_minorTick_visible
+          */
         visible?: boolean;
-        /** Specifies the width of the scale's minor ticks. */
+        /**
+          * @docid basegaugeoptions_scale_majorTick_width
+          * @docid basegaugeoptions_scale_minorTick_width
+          */
         width?: number;
     }
     export interface ScaleMajorTick extends ScaleTick {
-        /**
-         * Specifies whether or not to expand the current major tick interval if labels overlap each other.
-         * @deprecated Use the overlappingBehavior | useAutoArrangement option instead.
-         */
+        /** @docid basegaugeoptions_scale_majorTick_useTicksAutoArrangement */
         useTicksAutoArrangement?: boolean;
     }
     export interface ScaleMinorTick extends ScaleTick {
-        /** Specifies the opacity of the scale's minor ticks. */
+        /** @docid basegaugeoptions_scale_minorTick_opacity */
         opacity?: number;
     }
     export interface BaseScaleLabel {
-        /** Specifies whether or not scale labels should be colored similarly to their corresponding ranges in the range container. */
+        /** @docid basegaugeoptions_scale_label_useRangeColors */
         useRangeColors?: boolean;
-        /** Specifies a callback function that returns the text to be displayed in scale labels. */
+        /** @docid basegaugeoptions_scale_label_customizeText */
         customizeText?: (scaleValue: { value: number; valueText: string }) => string;
-        /** Specifies the overlap resolving options to be applied to scale labels. */
+        /** @docid basegaugeoptions_scale_label_overlappingBehavior */
         overlappingBehavior?: {
-            /** Specifies whether or not to expand the current major tick interval if labels overlap each other. */
+            /** @docid basegaugeoptions_scale_label_overlappingBehavior_useAutoArrangement */
             useAutoArrangement?: boolean;
-            /** Specifies what label to hide in case of overlapping. */
+            /** @docid basegaugeoptions_scale_label_overlappingBehavior_hideFirstOrLast */
             hideFirstOrLast?: string;
         };
-        /** Specifies font options for the text displayed in the scale labels of the gauge. */
+        /** @docid basegaugeoptions_scale_label_font */
         font?: viz.core.Font;
-        /** Specifies a format for the text displayed in scale labels. */
+        /** @docid basegaugeoptions_scale_label_format */
         format?: any;
-        /**
-         * Specifies a precision for the formatted value displayed in the scale labels.
-         * @deprecated Use the scale | label | format | precision option instead.
-         */
+        /** @docid basegaugeoptions_scale_label_precision */
         precision?: number;
-        /** Specifies whether or not scale labels are visible on the gauge. */
+        /** @docid basegaugeoptions_scale_label_visible */
         visible?: boolean;
     }
     export interface BaseScale {
-        /** Specifies the end value for the scale of the gauge. */
+        /** @docid basegaugeoptions_scale_endValue */
         endValue?: number;
-        /**
-         * Specifies whether or not to hide the first scale label.
-         * @deprecated This feature is no longer available.
-         */
+        /** @docid basegaugeoptions_scale_hideFirstLabel */
         hideFirstLabel?: boolean;
-        /**
-         * Specifies whether or not to hide the first major tick on the scale.
-         * @deprecated This feature is no longer available.
-         */
+        /** @docid basegaugeoptions_scale_hideFirstTick */
         hideFirstTick?: boolean;
-        /**
-         * Specifies whether or not to hide the last scale label.
-         * @deprecated This feature is no longer available.
-         */
+        /** @docid basegaugeoptions_scale_hideLastLabel */
         hideLastLabel?: boolean;
-        /**
-         * Specifies whether or not to hide the last major tick on the scale.
-         * @deprecated This feature is no longer available.
-         */
+        /** @docid basegaugeoptions_scale_hideLastTick */
         hideLastTick?: boolean;
-        /** Specifies an interval between major ticks. */
+        /** @docid basegaugeoptions_scale_tickInterval */
         tickInterval?: number;
-        /** Specifies an interval between minor ticks. */
+        /** @docid basegaugeoptions_scale_minorTickInterval */
         minorTickInterval?: number;
-        /** Specifies an array of custom major ticks. */
+        /** @docid basegaugeoptions_scale_customTicks */
         customTicks?: Array<any>;
-        /** Specifies an array of custom minor ticks. */
+        /** @docid basegaugeoptions_scale_customMinorTicks */
         customMinorTicks?: Array<any>;
-        /** Specifies common options for scale labels. */
-        label?: BaseScaleLabel;
         /**
-         * Specifies options of the gauge's major ticks.
-         * @deprecated Use the tick option instead.
-         */
+          * @docid basegaugeoptions_scale_label
+          * @docid dxlineargaugeoptions_scale_label
+          * @docid dxcirculargaugeoptions_scale_label
+          */
+        label?: BaseScaleLabel;
+        /** @docid basegaugeoptions_scale_majorTick */
         majorTick?: ScaleMajorTick;
-        /** Specifies options of the gauge's major ticks. */
+        /** @docid basegaugeoptions_scale_tick */
         tick?: {
-            /** Specifies the color of the scale's major ticks. */
+            /** @docid basegaugeoptions_scale_tick_color */
             color?: string;
-            /** Specifies the length of the scale's major ticks. */
+            /** @docid basegaugeoptions_scale_tick_length */
             length?: number;
-            /** Indicates whether scale major ticks are visible or not. */
+            /** @docid basegaugeoptions_scale_tick_visible */
             visible?: boolean;
-            /** Specifies the width of the scale's major ticks. */
+            /** @docid basegaugeoptions_scale_tick_width */
             width?: number;
-            /** Specifies the opacity of the scale's major ticks. */
+            /** @docid basegaugeoptions_scale_tick_opacity */
             opacity?: number;
         };
-        /** Specifies options of the gauge's minor ticks. */
+        /** @docid basegaugeoptions_scale_minorTick */
         minorTick?: ScaleMinorTick;
-        /** Specifies the start value for the scale of the gauge. */
+        /** @docid basegaugeoptions_scale_startValue */
         startValue?: number;
     }
+    /**
+      * @docid_ignore commonIndicator
+      * @docid_ignore circularRectangleNeedle
+      * @docid_ignore circularTriangleNeedle
+      * @docid_ignore circularTwoColorNeedle
+      * @docid_ignore circularRangeBar
+      * @docid_ignore circularTriangleMarker
+      * @docid_ignore circularTextCloud
+      * @docid_ignore linearRectangle
+      * @docid_ignore linearCircle
+      * @docid_ignore linearRhombus
+      * @docid_ignore linearRangeBar
+      * @docid_ignore linearTriangleMarker
+      * @docid_ignore linearTextCloud
+      */
     export interface BaseValueIndicator {
-        /** Specifies the type of subvalue indicators. */
+        /**
+          * @docid dxcirculargaugeoptions_valueIndicator_type
+          * @docid dxcirculargaugeoptions_subvalueIndicator_type
+          * @docid dxlineargaugeoptions_valueIndicator_type
+          * @docid dxlineargaugeoptions_subvalueIndicator_type
+          */
         type?: string;
-        /** Specifies the background color for the indicator of the rangeBar type. */
+        /** @docid commonIndicatoroptions_backgroundColor */
         backgroundColor?: string;
-        /** Specifies the base value for the indicator of the rangeBar type. */
+        /** @docid commonIndicatoroptions_baseValue */
         baseValue?: number;
-        /** Specifies a color of the indicator. */
+        /** @docid commonIndicatoroptions_color */
         color?: string;
-        /** Specifies the range bar size for an indicator of the rangeBar type. */
+        /** @docid commonIndicatoroptions_size */
         size?: number;
+        /**
+          * @docid commonIndicatoroptions_text
+          * @docid circularTextCloudoptions_text
+          * @docid linearTextCloudoptions_text
+          */
         text?: {
-            /** Specifies a callback function that returns the text to be displayed in an indicator. */
+            /** @docid commonIndicatoroptions_text_customizeText */
             customizeText?: (indicatedValue: { value: number; valueText: string }) => string;
-            font?: viz.core.Font;
-            /** Specifies a format for the text displayed in an indicator. */
-            format?: any;
-            /** Specifies the range bar's label indent in pixels. */
-            indent?: number;
             /**
-             * Specifies a precision for the formatted value displayed by an indicator.
-             * @deprecated Use the text | format | precision option instead.
-             */
+              * @docid commonIndicatoroptions_text_font
+              * @docid linearTextCloudoptions_text_font
+              * @docid circularTextCloudoptions_text_font
+              */
+            font?: viz.core.Font;
+            /** @docid commonIndicatoroptions_text_format */
+            format?: any;
+            /** @docid commonIndicatoroptions_text_indent */
+            indent?: number;
+            /** @docid commonIndicatoroptions_text_precision */
             precision?: number;
         };
+        /**
+          * @docid commonIndicatoroptions_offset
+          * @docid linearRectangleoptions_offset
+          * @docid linearCircleoptions_offset
+          * @docid linearRhombusoptions_offset
+          * @docid linearRangeBaroptions_offset
+          * @docid linearTriangleMarkeroptions_offset
+          * @docid linearTextCloudoptions_offset
+          */
         offset?: number;
+        /**
+          * @docid commonIndicatoroptions_length
+          * @docid circularTriangleMarkeroptions_length
+          * @docid linearTriangleMarkeroptions_length
+          */
         length?: number;
+        /**
+          * @docid commonIndicatoroptions_width
+          * @docid linearRectangleoptions_width
+          * @docid linearRhombusoptions_width
+          * @docid circularTriangleMarkeroptions_width
+          * @docid linearTriangleMarkeroptions_width
+          */
         width?: number;
-        /** Specifies the length of an arrow for the indicator of the textCloud type in pixels. */
+        /** @docid commonIndicatoroptions_arrowLength */
         arrowLength?: number;
-        /** Sets the array of colors to be used for coloring subvalue indicators. */
+        /** @docid commonIndicatoroptions_palette */
         palette?: any;
-        /** Specifies the distance between the needle and the center of a gauge for the indicator of a needle-like type. */
+        /** @docid commonIndicatoroptions_indentFromCenter */
         indentFromCenter?: number;
-        /** Specifies the second color for the indicator of the twoColorNeedle type. */
+        /** @docid commonIndicatoroptions_secondColor */
         secondColor?: string;
-        /** Specifies the length of a twoNeedleColor type indicator tip as a percentage. */
+        /** @docid commonIndicatoroptions_secondFraction */
         secondFraction?: number;
-        /** Specifies the spindle's diameter in pixels for the indicator of a needle-like type. */
+        /** @docid commonIndicatoroptions_spindleSize */
         spindleSize?: number;
-        /** Specifies the inner diameter in pixels, so that the spindle has the shape of a ring. */
+        /** @docid commonIndicatoroptions_spindleGapSize */
         spindleGapSize?: number;
-        /** Specifies the orientation of the rangeBar indicator on a vertically oriented dxLinearGauge widget. */
+        /** @docid commonIndicatoroptions_horizontalOrientation */
         horizontalOrientation?: string;
-        /** Specifies the orientation of the rangeBar indicator on a horizontally oriented dxLinearGauge widget. */
+        /** @docid commonIndicatoroptions_verticalOrientation */
         verticalOrientation?: string;
     }
     export interface SharedGaugeOptions extends viz.core.MarginOptions, viz.core.RedrawOnResizeOptions, viz.core.TitleOptions, viz.core.LoadingIndicatorOptions, viz.core.ExportOptions {
-        /** Specifies animation options. */
+        /**
+          * @docid_ignore basegaugeoptions_title
+          * @docid_ignore dxbargaugeoptions_title
+          * @docid_ignore basegaugeoptions_title_position
+          * @docid_ignore dxbargaugeoptions_title_position
+          */
+        /**
+          * @docid basegaugeoptions_animation
+          * @docid dxbargaugeoptions_animation
+          */
         animation?: viz.core.Animation;
         /**
-         * Specifies a subtitle for the widget.
-         * @deprecated Use the title | subtitle option instead.
-         */
+          * @docid basegaugeoptions_subtitle
+          * @docid dxbargaugeoptions_subtitle
+          */
         subtitle?: {
-            /**
-             * Specifies font options for the subtitle.
-             * @deprecated Use the title | subtitle | font option instead.
-             */
+            /** @docid basegaugeoptions_subtitle_font */
             font?: viz.core.Font;
-            /**
-             * Specifies a text for the subtitle.
-             * @deprecated Use the title | subtitle | text option instead.
-             */
+            /** @docid basegaugeoptions_subtitle_text */
             text?: string;
         };
-        /** Configures tooltips. */
+        /**
+          * @docid basegaugeoptions_tooltip
+          * @docid dxbargaugeoptions_tooltip
+          */
         tooltip?: viz.core.Tooltip;
-        /** A handler for the tooltipShown event. */
+        /**
+          * @docid basegaugeoptions_ontooltipshown
+          * @docid dxbargaugeoptions_ontooltipshown
+          */
         onTooltipShown?: (e: {
             component: dxBaseGauge;
             element: Element;
             target: {};
         }) => void;
-        /** A handler for the tooltipHidden event. */
+        /**
+          * @docid basegaugeoptions_ontooltiphidden
+          * @docid dxbargaugeoptions_ontooltiphidden
+          */
         onTooltipHidden?: (e: {
             component: dxBaseGauge;
             element: Element;
@@ -6608,162 +8552,169 @@ declare module DevExpress.viz.gauges {
         }) => void;
     }
     export interface BaseGaugeOptions extends viz.core.BaseWidgetOptions, SharedGaugeOptions {
-        /** Specifies the color of the parent page element. */
+        /** @docid basegaugeoptions_containerBackgroundColor */
         containerBackgroundColor?: string;
-        /** Specifies options of the gauge's range container. */
+        /** @docid basegaugeoptions_rangeContainer */
         rangeContainer?: BaseRangeContainer;
-        /** Specifies a gauge's scale options. */
+        /**
+          * @docid basegaugeoptions_scale
+          * @docid dxlineargaugeoptions_scale
+          * @docid dxcirculargaugeoptions_scale
+          */
         scale?: BaseScale;
-        /** Specifies the appearance options of subvalue indicators. */
+        /**
+          * @docid dxlineargaugeoptions_subvalueIndicator
+          * @docid dxcirculargaugeoptions_subvalueIndicator
+          */
         subvalueIndicator?: BaseValueIndicator;
-        /** Specifies a set of subvalues to be designated by the subvalue indicators. */
+        /** @docid basegaugeoptions_subvalues */
         subvalues?: Array<number>;
-        /** Specifies the main value on a gauge. */
+        /** @docid basegaugeoptions_value */
         value?: number;
-        /** Specifies the appearance options of the value indicator. */
+        /**
+          * @docid dxlineargaugeoptions_valueIndicator
+          * @docid dxcirculargaugeoptions_valueIndicator
+          */
         valueIndicator?: BaseValueIndicator;
     }
-    /** A gauge widget. */
+    /** @docid basegauge */
     export class dxBaseGauge extends viz.core.BaseWidget implements viz.core.LoadingIndicatorMethods {
         showLoadingIndicator(): void;
         hideLoadingIndicator(): void;
-        /** Returns the main gauge value. */
+        /** @docid basegaugemethods_value#value() */
         value(): number;
-        /** Updates a gauge value. */
+        /** @docid basegaugemethods_value#value(value) */
         value(value: number): void;
-        /** Returns an array of gauge subvalues. */
+        /** @docid basegaugemethods_subvalues#subvalues() */
         subvalues(): Array<number>;
-        /** Updates gauge subvalues. */
+        /** @docid basegaugemethods_subvalues#subvalues(subvalues) */
         subvalues(subvalues: Array<number>): void;
     }
     export interface LinearRangeContainer extends BaseRangeContainer {
-        /** Specifies the orientation of the range container on a vertically oriented dxLinearGauge widget. */
+        /** @docid dxlineargaugeoptions_rangeContainer_horizontalOrientation */
         horizontalOrientation?: string;
-        /** Specifies the orientation of a range container on a horizontally oriented dxLinearGauge widget. */
+        /** @docid dxlineargaugeoptions_rangeContainer_verticalOrientation */
         verticalOrientation?: string;
-        /** Specifies the width of the range container's start and end boundaries in the dxLinearGauge widget. */
+        /** @docid dxlineargaugeoptions_rangeContainer_width */
         width?: any;
-        /** Specifies an end width of a range container. */
+        /** @docid dxlineargaugeoptions_rangeContainer_width_end */
         end?: number;
-        /** Specifies a start width of a range container. */
+        /** @docid dxlineargaugeoptions_rangeContainer_width_start */
         start?: number;
     }
     export interface LinearScaleLabel extends BaseScaleLabel {
-        /** Specifies the spacing between scale labels and ticks. */
+        /** @docid dxlineargaugeoptions_scale_label_indentFromTick */
         indentFromTick?: number;
     }
     export interface LinearScale extends BaseScale {
-        /** Specifies the orientation of scale ticks on a vertically oriented dxLinearGauge widget. */
+        /** @docid dxlineargaugeoptions_scale_horizontalOrientation */
         horizontalOrientation?: string;
         label?: LinearScaleLabel;
-        /** Specifies the orientation of scale ticks on a horizontally oriented dxLinearGauge widget. */
+        /** @docid dxlineargaugeoptions_scale_verticalOrientation */
         verticalOrientation?: string;
     }
     export interface dxLinearGaugeOptions extends BaseGaugeOptions {
-        /** Specifies the options required to set the geometry of the dxLinearGauge widget. */
+        /** @docid dxlineargaugeoptions_geometry */
         geometry?: {
-            /** Indicates whether to display the dxLinearGauge widget vertically or horizontally. */
+            /** @docid dxlineargaugeoptions_geometry_orientation */
             orientation?: string;
         };
-        /** Specifies gauge range container options. */
+        /** @docid dxlineargaugeoptions_rangeContainer */
         rangeContainer?: LinearRangeContainer;
         scale?: LinearScale;
     }
     export interface CircularRangeContainer extends BaseRangeContainer {
-        /** Specifies the orientation of the range container in the dxCircularGauge widget. */
+        /** @docid dxcirculargaugeoptions_rangeContainer_orientation */
         orientation?: string;
-        /** Specifies the range container's width in pixels. */
+        /** @docid dxcirculargaugeoptions_rangeContainer_width */
         width?: number;
     }
     export interface CircularScaleLabel extends BaseScaleLabel {
-        /** Specifies the spacing between scale labels and ticks. */
+        /** @docid dxcirculargaugeoptions_scale_label_indentFromTick */
         indentFromTick?: number;
     }
     export interface CircularScale extends BaseScale {
         label?: CircularScaleLabel;
-        /** Specifies the orientation of scale ticks. */
+        /** @docid dxcirculargaugeoptions_scale_orientation */
         orientation?: string;
     }
     export interface dxCircularGaugeOptions extends BaseGaugeOptions {
-        /** Specifies the options required to set the geometry of the dxCircularGauge widget. */
+        /** @docid dxcirculargaugeoptions_geometry */
         geometry?: {
-            /** Specifies the end angle of the circular gauge's arc. */
+            /** @docid dxcirculargaugeoptions_geometry_endAngle */
             endAngle?: number;
-            /** Specifies the start angle of the circular gauge's arc. */
+            /** @docid dxcirculargaugeoptions_geometry_startAngle */
             startAngle?: number;
         };
-        /** Specifies gauge range container options. */
+        /** @docid dxcirculargaugeoptions_rangeContainer */
         rangeContainer?: CircularRangeContainer;
         scale?: CircularScale;
     }
     export interface dxBarGaugeOptions extends viz.core.BaseWidgetOptions, SharedGaugeOptions {
-        /** Specifies a color for the remaining segment of the bar's track. */
+        /** @docid dxbargaugeoptions_backgroundColor */
         backgroundColor?: string;
-        /** Specifies a distance between bars in pixels. */
+        /** @docid dxbargaugeoptions_barSpacing */
         barSpacing?: number;
-        /** Specifies a base value for bars. */
+        /** @docid dxbargaugeoptions_baseValue */
         baseValue?: number;
-        /** Specifies an end value for the gauge's invisible scale. */
+        /** @docid dxbargaugeoptions_endValue */
         endValue?: number;
-        /** Defines the shape of the gauge's arc. */
+        /** @docid dxbargaugeoptions_geometry */
         geometry?: {
-            /** Specifies the end angle of the bar gauge's arc. */
+            /** @docid dxbargaugeoptions_geometry_endAngle */
             endAngle?: number;
-            /** Specifies the start angle of the bar gauge's arc. */
+            /** @docid dxbargaugeoptions_geometry_startAngle */
             startAngle?: number;
         };
-        /** Specifies the options of the labels that accompany gauge bars. */
+        /** @docid dxbargaugeoptions_label */
         label?: {
-            /** Specifies a color for the label connector text. */
+            /** @docid dxbargaugeoptions_label_connectorColor */
             connectorColor?: string;
-            /** Specifies the width of the label connector in pixels. */
+            /** @docid dxbargaugeoptions_label_connectorWidth */
             connectorWidth?: number;
-            /** Specifies a callback function that returns a text for labels. */
+            /** @docid dxbargaugeoptions_label_customizeText */
             customizeText?: (barValue: { value: number; valueText: string }) => string;
-            /** Specifies font options for bar labels. */
+            /** @docid dxbargaugeoptions_label_font */
             font?: viz.core.Font;
-            /** Specifies a format for bar labels. */
+            /** @docid dxbargaugeoptions_label_format */
             format?: any;
-            /** Specifies the distance between the upper bar and bar labels in pixels. */
+            /** @docid dxbargaugeoptions_label_indent */
             indent?: number;
-            /**
-             * Specifies a precision for the formatted value displayed by labels.
-             * @deprecated Use the label | format | precision option instead.
-             */
+            /** @docid dxbargaugeoptions_label_precision */
             precision?: number;
-            /** Specifies whether bar labels appear on a gauge or not. */
+            /** @docid dxbargaugeoptions_label_visible */
             visible?: boolean;
         };
-        /** Sets the name of the palette or an array of colors to be used for coloring the gauge range container. */
+        /** @docid dxbargaugeoptions_palette */
         palette?: any;
-        /** Defines the radius of the bar that is closest to the center relatively to the radius of the topmost bar. */
+        /** @docid dxbargaugeoptions_relativeInnerRadius */
         relativeInnerRadius?: number;
-        /** Specifies a start value for the gauge's invisible scale. */
+        /** @docid dxbargaugeoptions_startValue */
         startValue?: number;
-        /** Specifies the array of values to be indicated on a bar gauge. */
+        /** @docid dxbargaugeoptions_values */
         values?: Array<number>;
     }
 }
 declare module DevExpress.viz {
-    /** A widget that represents a gauge with a linear scale. */
+    /** @docid dxlineargauge */
     export class dxLinearGauge extends DevExpress.viz.gauges.dxBaseGauge {
         constructor(element: JQuery, options?: DevExpress.viz.gauges.dxLinearGaugeOptions);
         constructor(element: Element, options?: DevExpress.viz.gauges.dxLinearGaugeOptions);
     }
-    /** A widget that represents a gauge with a circular scale. */
+    /** @docid dxcirculargauge */
     export class dxCircularGauge extends DevExpress.viz.gauges.dxBaseGauge {
         constructor(element: JQuery, options?: DevExpress.viz.gauges.dxCircularGaugeOptions);
         constructor(element: Element, options?: DevExpress.viz.gauges.dxCircularGaugeOptions);
     }
-    /** A circular bar widget. */
+    /** @docid dxbargauge */
     export class dxBarGauge extends viz.core.BaseWidget implements viz.core.LoadingIndicatorMethods {
         constructor(element: JQuery, options?: DevExpress.viz.gauges.dxBarGaugeOptions);
         constructor(element: Element, options?: DevExpress.viz.gauges.dxBarGaugeOptions);
         showLoadingIndicator(): void;
         hideLoadingIndicator(): void;
-        /** Returns an array of gauge values. */
+        /** @docid dxbargaugemethods_values#values() */
         values(): Array<number>;
-        /** Updates the values displayed by a gauge. */
+        /** @docid dxbargaugemethods_values#values(newValues) */
         values(values: Array<number>): void;
     }
 }
@@ -6780,288 +8731,278 @@ interface JQuery {
 }
 declare module DevExpress.viz.rangeSelector {
     export interface dxRangeSelectorOptions extends viz.core.BaseWidgetOptions, viz.core.MarginOptions, viz.core.RedrawOnResizeOptions, viz.core.TitleOptions, viz.core.LoadingIndicatorOptions, viz.core.ExportOptions {
-        /** Specifies the options for the range selector's background. */
+        /** @docid_ignore dxrangeselectoroptions_tooltip */
+        /** @docid dxrangeselectoroptions_background */
         background?: {
-            /** Specifies the background color for the dxRangeSelector. */
+            /** @docid dxrangeselectoroptions_background_color */
             color?: string;
-            /** Specifies image options. */
+            /** @docid dxrangeselectoroptions_background_image */
             image?: {
-                /** Specifies a location for the image in the background of a range selector. */
+                /** @docid dxrangeselectoroptions_background_image_location */
                 location?: string;
-                /** Specifies the image's URL. */
+                /** @docid dxrangeselectoroptions_background_image_url */
                 url?: string;
             };
-            /** Indicates whether or not the background (background color and/or image) is visible. */
+            /** @docid dxrangeselectoroptions_background_visible */
             visible?: boolean;
         };
-        /** Specifies the dxRangeSelector's behavior options. */
+        /** @docid dxrangeselectoroptions_behavior */
         behavior?: {
-            /** Indicates whether or not you can swap sliders. */
+            /** @docid dxrangeselectoroptions_behavior_allowslidersswap */
             allowSlidersSwap?: boolean;
-            /** Indicates whether or not animation is enabled. */
+            /** @docid dxrangeselectoroptions_behavior_animationenabled */
             animationEnabled?: boolean;
-            /** Specifies when to call the onSelectedRangeChanged function. */
+            /** @docid dxrangeselectoroptions_behavior_callselectedrangechanged */
             callSelectedRangeChanged?: string;
-            /** Indicates whether or not an end user can specify the range using a mouse, without the use of sliders. */
+            /** @docid dxrangeselectoroptions_behavior_manualrangeselectionenabled */
             manualRangeSelectionEnabled?: boolean;
-            /** Indicates whether or not an end user can shift the selected range to the required location on a scale by clicking. */
+            /** @docid dxrangeselectoroptions_behavior_moveselectedrangebyclick */
             moveSelectedRangeByClick?: boolean;
-            /** Indicates whether to snap a slider to ticks. */
+            /** @docid dxrangeselectoroptions_behavior_snaptoticks */
             snapToTicks?: boolean;
         };
-        /** Specifies the options required to display a chart as the range selector's background. */
+        /** @docid dxrangeselectoroptions_chart */
         chart?: {
-            /** Specifies a coefficient for determining an indent from the bottom background boundary to the lowest chart point. */
+            /** @docid dxrangeselectoroptions_chart_bottomindent */
             bottomIndent?: number;
-            /** An object defining the common configuration options for the chart’s series. */
+            /** @docid dxrangeselectoroptions_chart_commonseriessettings */
             commonSeriesSettings?: viz.charts.CommonSeriesSettings;
-            /** An object providing options for managing data from a data source. */
+            /** @docid dxrangeselectoroptions_chart_dataPrepareSettings */
             dataPrepareSettings?: {
-                /** Specifies whether or not to validate values from a data source. */
+                /** @docid dxrangeselectoroptions_chart_dataPrepareSettings_checkTypeForAllData */
                 checkTypeForAllData?: boolean;
-                /** Specifies whether or not to convert the values from a data source into the data type of an axis. */
+                /** @docid dxrangeselectoroptions_chart_dataPrepareSettings_convertToAxisDataType */
                 convertToAxisDataType?: boolean;
-                /** Specifies how to sort series points. */
+                /** @docid dxrangeselectoroptions_chart_dataPrepareSettings_sortingMethod */
                 sortingMethod?: any;
             };
-            /** Specifies whether all bars in a series must have the same width, or may have different widths if any points in other series are missing. */
+            /** @docid dxrangeselectoroptions_chart_equalbarwidth */
             equalBarWidth?: boolean;
-            /** Specifies a common bar width as a percentage from 0 to 1. */
+            /** @docid dxrangeselectoroptions_chart_barwidth */
             barWidth?: number;
-            /** Forces the widget to treat negative values as zeroes. Applies to stacked-like series only. */
+            /** @docid dxrangeselectoroptions_chart_negativesaszeroes */
             negativesAsZeroes?: boolean;
-            /** Sets the name of the palette to be used in the range selector's chart. Alternatively, an array of colors can be set as a custom palette to be used within this chart. */
+            /** @docid dxrangeselectoroptions_chart_palette */
             palette?: any;
-            /** An object defining the chart’s series. */
+            /** @docid dxrangeselectoroptions_chart_series */
             series?: Array<viz.charts.SeriesConfig>;
-            /** Defines options for the series template. */
+            /** @docid dxrangeselectoroptions_chart_seriestemplate */
             seriesTemplate?: viz.charts.SeriesTemplate;
-            /** Specifies a coefficient for determining an indent from the background's top boundary to the topmost chart point. */
+            /** @docid dxrangeselectoroptions_chart_topindent */
             topIndent?: number;
-            /** Specifies whether or not to filter the series points depending on their quantity. */
+            /** @docid dxrangeselectoroptions_chart_useAggregation */
             useAggregation?: boolean;
-            /** Specifies options for the chart's value axis. */
+            /** @docid dxrangeselectoroptions_chart_valueaxis */
             valueAxis?: {
-                /** Indicates whether or not the chart's value axis must be inverted. */
+                /** @docid dxrangeselectoroptions_chart_valueaxis_inverted */
                 inverted?: boolean;
-                /** Specifies the value to be raised to a power when generating ticks for a logarithmic value axis. */
+                /** @docid dxrangeselectoroptions_chart_valueaxis_logarithmbase */
                 logarithmBase?: number;
-                /** Specifies the maximum value of the chart's value axis. */
+                /** @docid dxrangeselectoroptions_chart_valueaxis_max */
                 max?: number;
-                /** Specifies the minimum value of the chart's value axis. */
+                /** @docid dxrangeselectoroptions_chart_valueaxis_min */
                 min?: number;
-                /** Specifies the type of the value axis. */
+                /** @docid dxrangeselectoroptions_chart_valueaxis_type */
                 type?: string;
-                /** Specifies the desired type of axis values. */
+                /** @docid dxrangeselectoroptions_chart_valueaxis_valuetype */
                 valueType?: string;
             };
         };
-        /** Specifies the color of the parent page element. */
+        /** @docid dxrangeselectoroptions_containerbackgroundcolor */
         containerBackgroundColor?: string;
-        /** Specifies a data source for the scale values and for the chart at the background. */
+        /** @docid dxrangeselectoroptions_datasource */
         dataSource?: any;
-        /** Specifies the data source field that provides data for the scale. */
+        /** @docid dxrangeselectoroptions_datasourcefield */
         dataSourceField?: string;
-        /** Specifies options of the range selector's scale. */
+        /** @docid dxrangeselectoroptions_scale */
         scale?: {
-            /** Specifies the scale's end value. */
+            /** @docid dxrangeselectoroptions_scale_endvalue */
             endValue?: any;
-            /** Specifies common options for scale labels. */
+            /** @docid dxrangeselectoroptions_scale_label */
             label?: {
-                /** Specifies a callback function that returns the text to be displayed in scale labels. */
+                /** @docid dxrangeselectoroptions_scale_label_customizetext */
                 customizeText?: (scaleValue: { value: any; valueText: string; }) => string;
-                /** Specifies font options for the text displayed in the range selector's scale labels. */
+                /** @docid dxrangeselectoroptions_scale_label_font */
                 font?: viz.core.Font;
-                /** Specifies a format for the text displayed in scale labels. */
+                /** @docid dxrangeselectoroptions_scale_label_format */
                 format?: any;
-                /**
-                 * Specifies a precision for the formatted value displayed in the scale labels.
-                 * @deprecated Use the scale | label | format | precision option instead.
-                 */
+                /** @docid dxrangeselectoroptions_scale_label_precision */
                 precision?: number;
-                /** Specifies a spacing between scale labels and the background bottom edge. */
+                /** @docid dxrangeselectoroptions_scale_label_topindent */
                 topIndent?: number;
-                /** Specifies whether or not the scale's labels are visible. */
+                /** @docid dxrangeselectoroptions_scale_label_visible */
                 visible?: boolean;
             };
-            /** Specifies the value to be raised to a power when generating ticks for a logarithmic scale. */
+            /** @docid dxrangeselectoroptions_scale_logarithmbase */
             logarithmBase?: number;
-            /**
-             * Specifies an interval between major ticks.
-             * @deprecated Use the tickInterval option instead.
-             */
+            /** @docid dxrangeselectoroptions_scale_majortickinterval */
             majorTickInterval?: any;
-            /** Specifies an interval between axis ticks. */
+            /** @docid_ignore dxrangeselectoroptions_scale_majortickinterval_years */
+            /** @docid_ignore dxrangeselectoroptions_scale_majortickinterval_months */
+            /** @docid_ignore dxrangeselectoroptions_scale_majortickinterval_days */
+            /** @docid_ignore dxrangeselectoroptions_scale_majortickinterval_hours */
+            /** @docid_ignore dxrangeselectoroptions_scale_majortickinterval_minutes */
+            /** @docid_ignore dxrangeselectoroptions_scale_majortickinterval_seconds */
+            /** @docid_ignore dxrangeselectoroptions_scale_majortickinterval_milliseconds */
+            /** @docid dxrangeselectoroptions_scale_tickinterval */
             tickInterval?: any;
-            /** Specifies options for the date-time scale's markers. */
+            /** @docid dxrangeselectoroptions_scale_marker */
             marker?: {
-                /** Defines the options that can be set for the text that is displayed by the scale markers. */
+                /** @docid dxrangeselectoroptions_scale_marker_label */
                 label?: {
-                    /** Specifies a callback function that returns the text to be displayed in scale markers. */
+                    /** @docid dxrangeselectoroptions_scale_marker_label_customizeText */
                     customizeText?: (markerValue: { value: any; valueText: string }) => string;
-                    /** Specifies a format for the text displayed in scale markers. */
+                    /** @docid dxrangeselectoroptions_scale_marker_label_format */
                     format?: any;
                 };
-                /** Specifies the height of the marker's separator. */
+                /** @docid dxrangeselectoroptions_scale_marker_separatorheight */
                 separatorHeight?: number;
-                /** Specifies the space between the marker label and the marker separator. */
+                /** @docid dxrangeselectoroptions_scale_marker_textleftindent */
                 textLeftIndent?: number;
-                /** Specifies the space between the marker's label and the top edge of the marker's separator. */
+                /** @docid dxrangeselectoroptions_scale_marker_texttopindent */
                 textTopIndent?: number;
-                /** Specified the indent between the marker and the scale lables. */
+                /** @docid dxrangeselectoroptions_scale_marker_topindent */
                 topIndent?: number;
-                /** Indicates whether scale markers are visible. */
+                /** @docid dxrangeselectoroptions_scale_marker_visible */
                 visible?: boolean;
             };
-            /** Specifies the maximum range that can be selected. */
+            /** @docid dxrangeselectoroptions_scale_maxrange */
             maxRange?: any;
-            /** Specifies the number of minor ticks between neighboring major ticks. */
+            /** @docid dxrangeselectoroptions_scale_minorTickCount */
             minorTickCount?: number;
-            /** Specifies an interval between minor ticks. */
+            /** @docid dxrangeselectoroptions_scale_minortickinterval */
             minorTickInterval?: any;
-            /** Specifies the minimum range that can be selected. */
+            /** @docid dxrangeselectoroptions_scale_minrange */
             minRange?: any;
-            /** Specifies the height of the space reserved for the scale in pixels. */
+            /** @docid dxrangeselectoroptions_scale_placeholderheight */
             placeholderHeight?: number;
-            /** Indicates whether or not to set ticks of a date-time scale at the beginning of each date-time interval. */
+            /** @docid dxrangeselectoroptions_scale_setticksatunitbeginning */
             setTicksAtUnitBeginning?: boolean;
-            /** Specifies whether or not to show ticks for the boundary scale values, when neither major ticks nor minor ticks are created for these values. */
+            /** @docid dxrangeselectoroptions_scale_showBoundaryTicks */
             showCustomBoundaryTicks?: boolean;
-            /**
-             * Indicates whether or not to show minor ticks on the scale.
-             * @deprecated Use the minorTick | visible option instead.
-             */
+            /** @docid dxrangeselectoroptions_scale_showminorticks */
             showMinorTicks?: boolean;
-            /** Specifies the scale's start value. */
+            /** @docid dxrangeselectoroptions_scale_startvalue */
             startValue?: any;
-            /** Specifies options defining the appearance of scale ticks. */
+            /** @docid dxrangeselectoroptions_scale_tick */
             tick?: {
-                /** Specifies the color of scale ticks (both major and minor ticks). */
+                /** @docid dxrangeselectoroptions_scale_tick_color */
                 color?: string;
-                /** Specifies the opacity of scale ticks (both major and minor ticks). */
+                /** @docid dxrangeselectoroptions_scale_tick_opacity */
                 opacity?: number;
-                /** Specifies the width of the scale's ticks (both major and minor ticks). */
+                /** @docid dxrangeselectoroptions_scale_tick_width */
                 width?: number;
             };
-            /** Specifies options of the range selector's minor ticks. */
+            /** @docid dxrangeselectoroptions_scale_minortick */
             minorTick?: {
-                /** Specifies the color of the scale's minor ticks. */
+                /** @docid dxrangeselectoroptions_scale_minortick_color */
                 color?: string;
-                /** Specifies the opacity of the scale's minor ticks. */
+                /** @docid dxrangeselectoroptions_scale_minortick_opacity */
                 opacity?: number;
-                /** Specifies the width of the scale's minor ticks. */
+                /** @docid dxrangeselectoroptions_scale_minortick_width */
                 width?: number;
-                /** Indicates whether scale minor ticks are visible or not. */
+                /** @docid dxrangeselectoroptions_scale_minortick_visible */
                 visible?: boolean;
             };
-            /** Specifies the type of the scale. */
+            /** @docid dxrangeselectoroptions_scale_type */
             type?: string;
-            /** Specifies whether or not to expand the current tick interval if labels overlap each other. */
+            /** @docid dxrangeselectoroptions_scale_useticksautoarrangement */
             useTicksAutoArrangement?: boolean;
-            /** Specifies the type of values on the scale. */
+            /** @docid dxrangeselectoroptions_scale_valueType */
             valueType?: string;
-			/** Specifies the order of arguments on a discrete scale. */
+			/** @docid dxrangeselectoroptions_scale_categories */
 			categories?: Array<any>;
         };
-        /** Specifies the range to be selected when displaying the dxRangeSelector. */
+        /** @docid dxrangeselectoroptions_selectedrange */
         selectedRange?: {
-            /** Specifies the start value of the range to be selected when displaying the dxRangeSelector widget on a page. */
+            /** @docid dxrangeselectoroptions_selectedrange_startvalue */
             startValue?: any;
-            /** Specifies the end value of the range to be selected when displaying the dxRangeSelector widget on a page. */
+            /** @docid dxrangeselectoroptions_selectedrange_endvalue */
             endValue?: any;
         };
-        /** Specifies the color of the selected range. */
+        /** @docid dxrangeselectoroptions_selectedrangecolor */
         selectedRangeColor?: string;
-        /** Range selector's indent options. */
+        /** @docid dxrangeselectoroptions_indent */
         indent?: {
-            /** Specifies range selector's left indent. */
+            /** @docid dxrangeselectoroptions_indent_left */
             left?: number;
-            /** Specifies range selector's right indent. */
+            /** @docid dxrangeselectoroptions_indent_right */
             right?: number;
         };
-        /** A handler for the selectedRangeChanged event. */
+        /** @docid dxrangeselectoroptions_onselectedrangechanged */
         onSelectedRangeChanged?: (e: {
             startValue: any;
             endValue: any;
             component: dxRangeSelector;
             element: Element;
         }) => void;
-        /** Specifies range selector shutter options. */
+        /** @docid dxrangeselectoroptions_shutter */
         shutter?: {
-            /** Specifies shutter color. */
+            /** @docid dxrangeselectoroptions_shutter_color */
             color?: string;
-            /** Specifies the opacity of the color of shutters. */
+            /** @docid dxrangeselectoroptions_shutter_opacity */
             opacity?: number;
         };
-        /** Specifies the appearance of the range selector's slider handles. */
+        /** @docid dxrangeselectoroptions_sliderhandle */
         sliderHandle?: {
-            /** Specifies the color of the slider handles. */
+            /** @docid dxrangeselectoroptions_sliderhandle_color */
             color?: string;
-            /** Specifies the opacity of the slider handles. */
+            /** @docid dxrangeselectoroptions_sliderhandle_opacity */
             opacity?: number;
-            /** Specifies the width of the slider handles. */
+            /** @docid dxrangeselectoroptions_sliderhandle_width */
             width?: number;
         };
-        /** Defines the options of the range selector slider markers. */
+        /** @docid dxrangeselectoroptions_slidermarker */
         sliderMarker?: {
-            /** Specifies the color of the slider markers. */
+            /** @docid dxrangeselectoroptions_slidermarker_color */
             color?: string;
-            /** Specifies a callback function that returns the text to be displayed by slider markers. */
+            /** @docid dxrangeselectoroptions_slidermarker_customizetext */
             customizeText?: (scaleValue: { value: any; valueText: any; }) => string;
-            /** Specifies font options for the text displayed by the range selector slider markers. */
+            /** @docid dxrangeselectoroptions_slidermarker_font */
             font?: viz.core.Font;
-            /** Specifies a format for the text displayed in slider markers. */
+            /** @docid dxrangeselectoroptions_slidermarker_format */
             format?: any;
-            /** Specifies the color used for the slider marker text when the currently selected range does not match the minRange and maxRange values. */
+            /** @docid dxrangeselectoroptions_slidermarker_invalidrangecolor */
             invalidRangeColor?: string;
-            /**
-             * Specifies the empty space between the marker's border and the marker’s text.
-             * @deprecated Use the paddingTopBottom and paddingLeftRight options instead.
-             */
+            /** @docid dxrangeselectoroptions_slidermarker_padding */
             padding?: number;
-            /** Specifies the empty space between the marker's top and bottom borders and the marker's text. */
+            /** @docid dxrangeselectoroptions_slidermarker_paddingtopbottom */
             paddingTopBottom?: number;
-            /** Specifies the empty space between the marker's left and right borders and the marker's text. */
+            /** @docid dxrangeselectoroptions_slidermarker_paddingleftright */
             paddingLeftRight?: number;
-            /** Specifies the placeholder height of the slider marker. */
+            /** @docid dxrangeselectoroptions_slidermarker_placeholderHeight */
             placeholderHeight?: number;
-            /**
-             * Specifies in pixels the height and width of the space reserved for the range selector slider markers.
-             * @deprecated Use the placeholderHeight and indent options instead.
-             */
+            /** @docid dxrangeselectoroptions_slidermarker_placeholdersize */
             placeholderSize?: {
-                /** Specifies the height of the placeholder for the left and right slider markers. */
+                /** @docid dxrangeselectoroptions_slidermarker_placeholdersize_height */
                 height?: number;
-                /** Specifies the width of the placeholder for the left and right slider markers. */
+                /** @docid dxrangeselectoroptions_slidermarker_placeholdersize_width */
                 width?: {
-                    /** Specifies the width of the left slider marker's placeholder. */
+                    /** @docid dxrangeselectoroptions_slidermarker_placeholdersize_width_left */
                     left?: number;
-                    /** Specifies the width of the right slider marker's placeholder. */
+                    /** @docid dxrangeselectoroptions_slidermarker_placeholdersize_width_right */
                     right?: number;
                 };
             };
-            /**
-             * Specifies a precision for the formatted value displayed in slider markers.
-             * @deprecated Use the sliderMarker | format | precision option instead.
-             */
+            /** @docid dxrangeselectoroptions_slidermarker_precision */
             precision?: number;
-            /** Indicates whether or not the slider markers are visible. */
+            /** @docid dxrangeselectoroptions_slidermarker_visible */
             visible?: boolean;
         };
     }
 }
 declare module DevExpress.viz {
-    /** A widget that allows end users to select a range of values on a scale. */
+    /** @docid dxrangeselector */
     export class dxRangeSelector extends viz.core.BaseWidget implements viz.core.LoadingIndicatorMethods {
         constructor(element: JQuery, options?: DevExpress.viz.rangeSelector.dxRangeSelectorOptions);
         constructor(element: Element, options?: DevExpress.viz.rangeSelector.dxRangeSelectorOptions);
         showLoadingIndicator(): void;
         hideLoadingIndicator(): void;
-        /** Redraws a widget. */
+        /** @docid dxrangeselectormethods_render */
         render(skipChartAnimation?: boolean): void;
-        /** Returns the currently selected range. */
+        /** @docid dxrangeselectormethods_getSelectedRange */
         getSelectedRange(): { startValue: any; endValue: any; };
-        /** Sets a specified range. */
+        /** @docid dxrangeselectormethods_setSelectedRange */
         setSelectedRange(selectedRange: { startValue: any; endValue: any; }): void;
     }
 }
@@ -7071,630 +9012,419 @@ interface JQuery {
     dxRangeSelector(methodName: "instance"): DevExpress.viz.dxRangeSelector;
 }
 declare module DevExpress.viz.map {
-    /** This section describes the fields and methods that can be used in code to manipulate the Layer object. */
+    /** @docid mapLayer */
     export interface MapLayer {
-        /** The name of the layer. */
+        /** @docid mapLayerfields_name */
         name: string;
-        /** The layer index in the layers array. */
+        /** @docid mapLayerfields_index */
         index: number;
-        /** The layer type. Can be "area", "line" or "marker". */
+        /** @docid mapLayerfields_type */
         type: string;
-        /** The type of the layer elements. */
+        /** @docid mapLayerfields_elementType */
         elementType: string;
-        /** Gets all layer elements. */
+        /** @docid mapLayermethods_getElements */
         getElements(): Array<MapLayerElement>;
-        /** Deselects all layer elements. */
+        /** @docid mapLayermethods_clearSelection */
         clearSelection(): void;
     }
-    /** This section describes the fields and methods that can be used in code to manipulate the Layer Element object. */
+    /** @docid mapLayerElement */
     export interface MapLayerElement {
-        /** The parent layer of the layer element. */
+        /** @docid mapLayerElementfields_layer */
         layer: MapLayer;
-        /** Gets the layer element coordinates. */
+        /** @docid mapLayerElementmethods_coordinates */
         coordinates(): Object;
-        /** Sets the value of an attribute. */
+        /** @docid mapLayerElementmethods_attribute#attribute(name, value) */
         attribute(name: string, value: any): void;
-        /** Gets the value of an attribute. */
+        /** @docid mapLayerElementmethods_attribute#attribute(name) */
         attribute(name: string): any;
-        /** Gets the selection state of the layer element. */
+        /** @docid mapLayerElementmethods_selected#selected() */
         selected(): boolean;
-        /** Sets the selection state of the layer element. */
+        /** @docid mapLayerElementmethods_selected#selected(state) */
         selected(state: boolean): void;
-        /** Applies the layer element settings and updates element appearance. */
+        /** @docid mapLayerElementmethods_applySettings */
         applySettings(settings: any): void;
     }
-    /**
-     * This section describes the fields and methods that can be used in code to manipulate the Area object.
-     * @deprecated Use the Layer Element instead.
-     */
+    /** @docid areaObjects */
     export interface Area {
-        /**
-         * Contains the element type.
-         * @deprecated Use the Layer | type instead.
-         */
+        /** @docid areaObjectsfields_type */
         type: string;
-        /**
-         * Return the value of an attribute.
-         * @deprecated Use the Layer Element | attribute(name, value) method instead.
-         */
+        /** @docid areaObjectsmethods_attribute */
         attribute(name: string): any;
-        /**
-         * Provides information about the selection state of an area.
-         * @deprecated Use the Layer Element | selected() method instead.
-         */
+        /** @docid areaObjectsmethods_selected#selected() */
         selected(): boolean;
-        /**
-         * Sets a new selection state for an area.
-         * @deprecated Use the Layer Element | selected(state) method instead.
-         */
+        /** @docid areaObjectsmethods_selected#selected(state) */
         selected(state: boolean): void;
-        /**
-         * Applies the area settings specified as a parameter and updates the area appearance.
-         * @deprecated Use the Layer Element | applySettings(settings) method instead.
-         */
+        /** @docid areaObjectsmethods_applySettings */
         applySettings(settings: any): void;
     }
-    /**
-     * This section describes the fields and methods that can be used in code to manipulate the Markers object.
-     * @deprecated Use the Layer Element instead.
-     */
+    /** @docid markerObjects */
     export interface Marker {
-        /**
-         * Contains the descriptive text accompanying the map marker.
-         * @deprecated Get the text using the Layer Element | attribute(name) method. The name parameter value for text is set at the dataField option.
-         */
+        /** @docid markerObjectsfields_text */
         text: string;
-        /**
-         * Contains the type of the element.
-         * @deprecated Use the Layer | type instead.
-         */
+        /** @docid markerObjectsfields_type */
         type: string;
-        /**
-         * Contains the URL of an image map marker.
-         * @deprecated Get the image URL using the Layer Element | attribute(name) method. The name parameter value for the image URL is set at the dataField option.
-         */
+        /** @docid markerObjectsfields_url */
         url: string;
-        /**
-         * Contains the value of a bubble map marker.
-         * @deprecated Get the bubble value using the Layer Element | attribute(name) method. The name parameter for the bubble value is set at the dataField option.
-         */
+        /** @docid markerObjectsfields_value */
         value: number;
-        /**
-         * Contains the values of a pie map marker.
-         * @deprecated Get the pie values using the Layer Element | attribute(name) method. The name parameter for pie values is set at the dataField option.
-         */
+        /** @docid markerObjectsfields_values */
         values: Array<number>;
-        /**
-         * Returns the value of an attribute.
-         * @deprecated Use the Layer Element | attribute(name, value) method instead.
-         */
+        /** @docid markerObjectsmethods_attribute */
         attribute(name: string): any;
-        /**
-         * Returns the coordinates of a specific marker.
-         * @deprecated Use the Layer Element | coordinates() method instead.
-         */
+        /** @docid markerObjectsmethods_coordinates */
         coordinates(): Array<number>;
-        /**
-         * Provides information about the selection state of a marker.
-         * @deprecated Use the Layer Element | selected() method instead.
-         */
+        /** @docid markerObjectsmethods_selected#selected() */
         selected(): boolean;
-        /**
-         * Sets a new selection state for a marker.
-         * @deprecated Use the Layer Element | selected(state) method instead.
-         */
+        /** @docid markerObjectsmethods_selected#selected(state) */
         selected(state: boolean): void;
-        /**
-         * Applies the marker settings specified as a parameter and updates marker appearance.
-         * @deprecated Use the Layer Element | applySettings(settings) method instead.
-         */
+        /** @docid markerObjectsmethods_applySettings */
         applySettings(settings: any): void;
     }
     export interface MapLayerSettings {
-        /** Specifies the layer name. */
+        /** @docid_ignore dxvectormapoptions_layers_data */
+        /** @docid dxvectormapoptions_layers_name */
         name?: string;
-        /** Specifies layer type. */
+        /** @docid dxvectormapoptions_layers_type */
         type?: string;
-        /** Specifies the type of a marker element. Setting this option makes sense only if the layer type is "marker". */
+        /** @docid dxvectormapoptions_layers_elementType */
         elementType?: string;
-        /** Specifies a data source for the layer. */
+        /** @docid dxvectormapoptions_layers_dataSource */
         dataSource?: any;
-        /** Specifies the line width (for layers of a line type) or width of the layer elements border in pixels. */
+        /** @docid dxvectormapoptions_layers_borderWidth */
         borderWidth?: number;
-        /** Specifies a color for the border of the layer elements. */
+        /** @docid dxvectormapoptions_layers_borderColor */
         borderColor?: string;
-        /** Specifies a color for layer elements. */
+        /** @docid dxvectormapoptions_layers_color */
         color?: string;
-        /** Specifies a color for the border of the layer element when it is hovered over. */
+        /** @docid dxvectormapoptions_layers_hoveredBorderColor */
         hoveredBorderColor?: string;
-        /** Specifies the pixel-measured line width (for layers of a line type) or width for the border of the layer element when it is hovered over. */
+        /** @docid dxvectormapoptions_layers_hoveredBorderWidth */
         hoveredBorderWidth?: number;
-        /** Specifies a color for a layer element when it is hovered over. */
+        /** @docid dxvectormapoptions_layers_hoveredColor */
         hoveredColor?: string;
-        /** Specifies a pixel-measured line width (for layers of a line type) or width for the border of the layer element when it is selected. */
+        /** @docid dxvectormapoptions_layers_selectedBorderWidth */
         selectedBorderWidth?: number;
-        /** Specifies a color for the border of the layer element when it is selected. */
+        /** @docid dxvectormapoptions_layers_selectedBorderColor */
         selectedBorderColor?: string;
-        /** Specifies a color for the layer element when it is selected. */
+        /** @docid dxvectormapoptions_layers_selectedColor */
         selectedColor?: string;
-        /** Specifies the layer opacity (from 0 to 1). */
+        /** @docid dxvectormapoptions_layers_opacity */
         opacity?: number;
-        /** Specifies the size of markers. Setting this option makes sense only if the layer type is "marker" and the elementType is "dot", "pie" or "image". */
+        /** @docid dxvectormapoptions_layers_size */
         size?: number;
-        /** Specifies the pixel-measured diameter of the marker that represents the smallest value. Setting this option makes sense only if the layer type is "marker". */
+        /** @docid dxvectormapoptions_layers_minSize */
         minSize?: number;
-        /** Specifies the pixel-measured diameter of the marker that represents the biggest value. Setting this option makes sense only if the layer type is "marker". */
+        /** @docid dxvectormapoptions_layers_maxSize */
         maxSize?: number;
-        /** Specifies whether or not to change the appearance of a layer element when it is hovered over. */
+        /** @docid dxvectormapoptions_layers_hoverEnabled */
         hoverEnabled?: boolean;
-        /** Specifies whether single or multiple map elements can be selected on a vector map. */
+        /** @docid dxvectormapoptions_layers_selectionMode */
         selectionMode?: string;
-        /** Specifies the name of the palette or a custom range of colors to be used for coloring a layer. */
+        /** @docid dxvectormapoptions_layers_palette */
         palette?: any;
-        /** Specifies the number of colors in a palette. */
+        /** @docid dxvectormapoptions_layers_paletteSize */
         paletteSize?: number;
-        /** Allows you to paint layer elements with similar attributes in the same color. */
+        /** @docid dxvectormapoptions_layers_colorGroups */
         colorGroups?: Array<number>;
-        /** Specifies the field that provides data to be used for coloring of layer elements. */
+        /** @docid dxvectormapoptions_layers_colorGroupingField */
         colorGroupingField?: string;
-        /** Allows you to display bubbles with similar attributes in the same size. Setting this option makes sense only if the layer type is "marker" and the elementType is "bubble". */
+        /** @docid dxvectormapoptions_layers_sizeGroups */
         sizeGroups?: Array<number>;
-        /** Specifies the field that provides data to be used for sizing bubble markers. Setting this option makes sense only if the layer type is "marker" and the elementType is "bubble". */
+        /** @docid dxvectormapoptions_layers_sizeGroupingField */
         sizeGroupingField?: string;
-        /** Specifies the name of the attribute containing marker data. Setting this option makes sense only if the layer type is "marker" and the elementType is "bubble", "pie" or "image". */
+        /** @docid dxvectormapoptions_layers_dataField */
         dataField?: string;
-        /** Specifies the function that customizes each layer element individually. */
+        /** @docid dxvectormapoptions_layers_customize */
         customize?: (eleemnts: Array<MapLayerElement>) => void;
-        /** Specifies marker label options. */
+        /** @docid dxvectormapoptions_layers_label */
         label?: {
-            /** The name of the data source attribute containing marker texts. */
+            /** @docid dxvectormapoptions_layers_label_dataField */
             dataField?: string;
-            /** Enables marker labels. */
+            /** @docid dxvectormapoptions_layers_label_enabled */
             enabled?: boolean;
-            /** Specifies font options for marker labels. */
+            /** @docid dxvectormapoptions_layers_label_font */
             font?: viz.core.Font;
         };
     }
     export interface AreaSettings {
-        /**
-         * Specifies the width of the area border in pixels.
-         * @deprecated Use the layers | borderWidth option instead.
-         */
+        /** @docid dxvectormapoptions_areaSettings_borderWidth */
         borderWidth?: number;
-        /**
-         * Specifies a color for the area border.
-         * @deprecated Use the layers | borderColor option instead.
-         */
+        /** @docid dxvectormapoptions_areaSettings_borderColor */
         borderColor?: string;
-        /**
-         * Specifies a color for an area.
-         * @deprecated Use the layers | color option instead.
-         */
+        /** @docid dxvectormapoptions_areaSettings_color */
         color?: string;
-        /**
-         * Specifies the function that customizes each area individually.
-         * @deprecated Use the layers | customize option instead.
-         */
+        /** @docid dxvectormapoptions_areaSettings_customize */
         customize?: (areaInfo: Area) => AreaSettings;
-        /**
-         * Specifies a color for the area border when the area is hovered over.
-         * @deprecated Use the layers | hoveredBorderColor option instead.
-         */
+        /** @docid dxvectormapoptions_areaSettings_hoveredBorderColor */
         hoveredBorderColor?: string;
-        /**
-         * Specifies the pixel-measured width of the area border when the area is hovered over.
-         * @deprecated Use the layers | hoveredBorderWidth option instead.
-         */
+        /** @docid dxvectormapoptions_areaSettings_hoveredBorderWidth */
         hoveredBorderWidth?: number;
-        /**
-         * Specifies a color for an area when this area is hovered over.
-         * @deprecated Use the layers | hoveredColor option instead.
-         */
+        /** @docid dxvectormapoptions_areaSettings_hoveredColor */
         hoveredColor?: string;
-        /**
-         * Specifies whether or not to change the appearance of an area when it is hovered over.
-         * @deprecated Use the layers | hoverEnabled option instead.
-         */
+        /** @docid dxvectormapoptions_areaSettings_hoverEnabled */
         hoverEnabled?: boolean;
-        /**
-         * Configures area labels.
-         * @deprecated Use the layers | label option instead.
-         */
+        /** @docid dxvectormapoptions_areaSettings_label */
         label?: {
-            /**
-             * Specifies the data field that provides data for area labels.
-             * @deprecated Use the layers | label | dataField option instead.
-             */
+            /** @docid dxvectormapoptions_areaSettings_label_dataField */
             dataField?: string;
-            /**
-             * Enables area labels.
-             * @deprecated Use the layers | label | enabled option instead.
-             */
+            /** @docid dxvectormapoptions_areaSettings_label_enabled */
             enabled?: boolean;
-            /**
-             * Specifies font options for area labels.
-             * @deprecated Use the layers | label | font option instead.
-             */
+            /** @docid dxvectormapoptions_areaSettings_label_font */
             font?: viz.core.Font;
         };
-        /**
-         * Specifies the name of the palette or a custom range of colors to be used for coloring a map.
-         * @deprecated Use the layers | palette option instead.
-         */
+        /** @docid dxvectormapoptions_areaSettings_palette */
         palette?: any;
-        /**
-         * Specifies the number of colors in a palette.
-         * @deprecated Use the layers | paletteSize option instead.
-         */
+        /** @docid dxvectormapoptions_areaSettings_paletteSize */
         paletteSize?: number;
-        /**
-         * Allows you to paint areas with similar attributes in the same color.
-         * @deprecated Use the layers | colorGroups option instead.
-         */
+        /** @docid dxvectormapoptions_areaSettings_colorGroups */
         colorGroups?: Array<number>;
-        /**
-         * Specifies the field that provides data to be used for coloring areas.
-         * @deprecated Use the layers | colorGroupingField option instead.
-         */
+        /** @docid dxvectormapoptions_areaSettings_colorGroupingField */
         colorGroupingField?: string;
-        /**
-         * Specifies a color for the area border when the area is selected.
-         * @deprecated Use the layers | selectedBorderColor option instead.
-         */
+        /** @docid dxvectormapoptions_areaSettings_selectedBorderColor */
         selectedBorderColor?: string;
-        /**
-         * Specifies a color for an area when this area is selected.
-         * @deprecated Use the layers | selectedColor option instead.
-         */
+        /** @docid dxvectormapoptions_areaSettings_selectedColor */
         selectedColor?: string;
-        /**
-         * Specifies the pixel-measured width of the area border when the area is selected.
-         * @deprecated Use the layers | selectedBorderWidth option instead.
-         */
+        /** @docid dxvectormapoptions_areaSettings_selectedBorderWidth */
         selectedBorderWidth?: number;
-        /**
-         * Specifies whether single or multiple areas can be selected on a vector map.
-         * @deprecated Use the layers | selectionMode option instead.
-         */
+        /** @docid dxvectormapoptions_areaSettings_selectionMode */
         selectionMode?: string;
     }
     export interface MarkerSettings {
-        /**
-         * Specifies a color for the marker border.
-         * @deprecated Use the layers | borderColor option instead.
-         */
+        /** @docid dxvectormapoptions_markerSettings_borderColor */
         borderColor?: string;
-        /**
-         * Specifies the width of the marker border in pixels.
-         * @deprecated Use the layers | borderWidth option instead.
-         */
+        /** @docid dxvectormapoptions_markerSettings_borderWidth */
         borderWidth?: number;
-        /**
-         * Specifies a color for a marker of the dot or bubble type.
-         * @deprecated Use the layers | color option instead.
-         */
+        /** @docid dxvectormapoptions_markerSettings_color */
         color?: string;
-        /**
-         * Specifies the function that customizes each marker individually.
-         * @deprecated Use the layers | customize option instead.
-         */
+        /** @docid dxvectormapoptions_markerSettings_customize */
         customize?: (markerInfo: Marker) => MarkerSettings;
-        /**
-         * Specifies the pixel-measured width of the marker border when the marker is hovered over.
-         * @deprecated Use the layers | hoveredBorderWidth option instead.
-         */
+        /** @docid dxvectormapoptions_markerSettings_hoveredBorderWidth */
         hoveredBorderWidth?: number;
-        /**
-         * Specifies a color for the marker border when the marker is hovered over.
-         * @deprecated Use the layers | hoveredBorderColor option instead.
-         */
+        /** @docid dxvectormapoptions_markerSettings_hoveredBorderColor */
         hoveredBorderColor?: string;
-        /**
-         * Specifies a color for a marker of the dot or bubble type when this marker is hovered over.
-         * @deprecated Use the layers | hoveredColor option instead.
-         */
+        /** @docid dxvectormapoptions_markerSettings_hoveredColor */
         hoveredColor?: string;
-        /**
-         * Specifies whether or not to change the appearance of a marker when it is hovered over.
-         * @deprecated Use the layers | hoverEnabled option instead.
-         */
+        /** @docid dxvectormapoptions_markerSettings_hoverEnabled */
         hoverEnabled?: boolean;
-        /**
-         * Specifies marker label options.
-         * @deprecated Use the layers | label option instead.
-         */
+        /** @docid dxvectormapoptions_markerSettings_label */
         label?: {
-            /**
-             * Enables marker labels.
-             * @deprecated Use the layers | label | enabled option instead.
-             */
+            /** @docid dxvectormapoptions_markerSettings_label_enabled */
             enabled?: boolean;
-            /**
-             * Specifies font options for marker labels.
-             * @deprecated Use the layers | label | font option instead.
-             */
+            /** @docid dxvectormapoptions_markerSettings_label_font */
             font?: viz.core.Font;
         };
-        /**
-         * Specifies the pixel-measured diameter of the marker that represents the biggest value. Setting this option makes sense only if you use markers of the bubble type.
-         * @deprecated Use the layers | maxSize option instead.
-         */
+        /** @docid dxvectormapoptions_markerSettings_maxSize */
         maxSize?: number;
-        /**
-         * Specifies the pixel-measured diameter of the marker that represents the smallest value. Setting this option makes sense only if you use markers of the bubble type.
-         * @deprecated Use the layers | minSize option instead.
-         */
+        /** @docid dxvectormapoptions_markerSettings_minSize */
         minSize?: number;
-        /**
-         * Specifies the opacity of markers. Setting this option makes sense only if you use markers of the bubble type.
-         * @deprecated Use the layers | opacity option instead.
-         */
+        /** @docid dxvectormapoptions_markerSettings_opacity */
         opacity?: number;
-        /**
-         * Specifies the pixel-measured width of the marker border when the marker is selected.
-         * @deprecated Use the layers | selectedBorderWidth option instead.
-         */
+        /** @docid dxvectormapoptions_markerSettings_selectedBorderWidth */
         selectedBorderWidth?: number;
-        /**
-         * Specifies a color for the marker border when the marker is selected.
-         * @deprecated Use the layers | selectedBorderColor option instead.
-         */
+        /** @docid dxvectormapoptions_markerSettings_selectedBorderColor */
         selectedBorderColor?: string;
-        /**
-         * Specifies a color for a marker of the dot or bubble type when this marker is selected.
-         * @deprecated Use the layers | selectedColor option instead.
-         */
+        /** @docid dxvectormapoptions_markerSettings_selectedColor */
         selectedColor?: string;
-        /**
-         * Specifies whether a single or multiple markers can be selected on a vector map.
-         * @deprecated Use the layers | selectionMode option instead.
-         */
+        /** @docid dxvectormapoptions_markerSettings_selectionMode */
         selectionMode?: string;
-        /**
-         * Specifies the size of markers. Setting this option makes sense for any type of marker except bubble.
-         * @deprecated Use the layers | size option instead.
-         */
+        /** @docid dxvectormapoptions_markerSettings_size */
         size?: number;
-        /**
-         * Specifies the type of markers to be used on the map.
-         * @deprecated Use the layers | elementType option instead.
-         */
+        /** @docid dxvectormapoptions_markerSettings_type */
         type?: string;
-        /**
-         * Specifies the name of a palette or a custom set of colors to be used for coloring markers of the pie type.
-         * @deprecated Use the layers | palette option instead.
-         */
+        /** @docid dxvectormapoptions_markerSettings_palette */
         palette?: any;
-        /**
-         * Allows you to paint markers with similar attributes in the same color.
-         * @deprecated Use the layers | colorGroups option instead.
-         */
+        /** @docid dxvectormapoptions_markerSettings_colorGroups */
         colorGroups?: Array<number>;
-        /**
-         * Specifies the field that provides data to be used for coloring markers.
-         * @deprecated Use the layers | colorGroupingField option instead.
-         */
+        /** @docid dxvectormapoptions_markerSettings_colorGroupingField */
         colorGroupingField?: string;
-        /**
-         * Allows you to display bubbles with similar attributes in the same size.
-         * @deprecated Use the layers | sizeGroups option instead.
-         */
+        /** @docid dxvectormapoptions_markerSettings_sizeGroups */
         sizeGroups?: Array<number>;
-        /**
-         * Specifies the field that provides data to be used for sizing bubble markers.
-         * @deprecated Use the layers | sizeGroupingField option instead.
-         */
+        /** @docid dxvectormapoptions_markerSettings_sizeGroupingField */
         sizeGroupingField?: string;
     }
     export interface dxVectorMapOptions extends viz.core.BaseWidgetOptions, viz.core.RedrawOnResizeOptions, viz.core.TitleOptions, viz.core.LoadingIndicatorOptions, viz.core.ExportOptions {
-        /**
-         * An object specifying options for the map areas.
-         * @deprecated Use the "area" type element of the layers array.
-         */
+        /** @docid_ignore dxvectormapoptions_margin */
+        /** @docid_ignore dxvectormapoptions_tooltip_format */
+        /** @docid_ignore dxvectormapoptions_tooltip_precision */
+        /** @docid_ignore dxvectormapoptions_markers_attributes */
+        /** @docid_ignore dxvectormapoptions_markers_coordinates */
+        /** @docid_ignore dxvectormapoptions_markers_text */
+        /** @docid_ignore dxvectormapoptions_markers_url */
+        /** @docid_ignore dxvectormapoptions_markers_value */
+        /** @docid_ignore dxvectormapoptions_markers_values */
+        /** @docid dxvectormapoptions_areaSettings */
         areaSettings?: AreaSettings;
-        /** Specifies the options for the map background. */
+        /** @docid dxvectormapoptions_background */
         background?: {
-            /** Specifies a color for the background border. */
+            /** @docid dxvectormapoptions_background_borderColor */
             borderColor?: string;
-            /** Specifies a color for the background. */
+            /** @docid dxvectormapoptions_background_color */
             color?: string;
         };
-        /** Specifies options for dxVectorMap widget layers. */
+        /** @docid dxvectormapoptions_layers */
         layers?: Array<MapLayerSettings>;
-        /** Specifies the map projection. */
+        /** @docid dxvectormapoptions_projection */
         projection?: Object;
-        /** Specifies the positioning of a map in geographical coordinates. */
+        /** @docid dxvectormapoptions_bounds */
         bounds?: Array<number>;
-        /** Specifies the options of the control bar. */
+        /** @docid dxvectormapoptions_controlbar */
         controlBar?: {
-            /** Specifies a color for the outline of the control bar elements. */
+            /** @docid dxvectormapoptions_controlbar_borderColor */
             borderColor?: string;
-            /** Specifies a color for the inner area of the control bar elements. */
+            /** @docid dxvectormapoptions_controlbar_color */
             color?: string;
-            /** Specifies whether or not to display the control bar. */
+            /** @docid dxvectormapoptions_controlbar_enabled */
             enabled?: boolean;
-            /** Specifies the margin of the control bar in pixels. */
+            /** @docid dxvectormapoptions_controlbar_margin */
             margin?: number;
-            /** Specifies the position of the control bar. */
+            /** @docid dxvectormapoptions_controlbar_horizontalAlignment */
             horizontalAlignment?: string;
-            /** Specifies the position of the control bar. */
+            /** @docid dxvectormapoptions_controlbar_verticalAlignment */
             verticalAlignment?: string;
-            /** Specifies the opacity of the control bar. */
+            /** @docid dxvectormapoptions_controlbar_opacity */
             opacity?: number;
         };
-        /**
-         * Specifies a data source for the map area.
-         * @deprecated Use the layers | dataSource option instead.
-         */
+        /** @docid dxvectormapoptions_mapData */
         mapData?: any;
-        /**
-         * Specifies a data source for the map markers.
-         * @deprecated Use the layers | dataSource option instead.
-         */
+        /** @docid dxvectormapoptions_markers */
         markers?: any;
-        /**
-         * An object specifying options for the map markers.
-         * @deprecated Use the "marker" type element of the layers array.
-         */
+        /** @docid dxvectormapoptions_markerSettings */
         markerSettings?: MarkerSettings;
-        /** Configures tooltips. */
+        /** @docid dxvectormapoptions_tooltip */
         tooltip?: viz.core.Tooltip;
-        /** Configures map legends. */
+        /** @docid dxvectormapoptions_legends */
         legends?: Array<Legend>;
-        /** Specifies whether or not the map should respond when a user rolls the mouse wheel. */
+        /** @docid dxvectormapoptions_wheelEnabled */
         wheelEnabled?: boolean;
-        /** Specifies whether the map should respond to touch gestures. */
+        /** @docid dxvectormapoptions_touchEnabled */
         touchEnabled?: boolean;
-        /** Disables the zooming capability. */
+        /** @docid dxvectormapoptions_zoomingEnabled */
         zoomingEnabled?: boolean;
-        /** Specifies the geographical coordinates of the center for a map. */
+        /** @docid dxvectormapoptions_center */
         center?: Array<number>;
-        /** A handler for the centerChanged event. */
+        /** @docid dxvectormapoptions_onCenterChanged */
         onCenterChanged?: (e: {
 			center: Array<number>;
 			component: dxVectorMap;
 			element: Element;
         }) => void;
-        /** A handler for the tooltipShown event. */
+        /** @docid dxvectormapoptions_ontooltipshown*/
         onTooltipShown?: (e: {
             component: dxVectorMap;
             element: Element;
             target: {};
         }) => void;
-        /** A handler for the tooltipHidden event. */
+        /** @docid dxvectormapoptions_ontooltiphidden*/
         onTooltipHidden?: (e: {
             component: dxVectorMap;
             element: Element;
             target: {};
         }) => void;
-        /** Specifies a number that is used to zoom a map initially. */
+        /** @docid dxvectormapoptions_zoomFactor */
         zoomFactor?: number;
-        /** Specifies a map's maximum zoom factor. */
+        /** @docid dxvectormapoptions_maxZoomFactor */
         maxZoomFactor?: number;
-        /** A handler for the zoomFactorChanged event. */
+        /** @docid dxvectormapoptions_onZoomFactorChanged */
         onZoomFactorChanged?: (e: {
             component: dxVectorMap;
             element: Element;
             zoomFactor: number;
         }) => void;
-        /** A handler for the click event. */
+        /** @docid dxvectormapoptions_onClick */
         onClick?: any;
-        /** A handler for the selectionChanged event. */
+        /** @docid dxvectormapoptions_onSelectionChanged */
         onSelectionChanged?: (e: {
             component: dxVectorMap;
             element: Element;
             target: MapLayerElement;
         }) => void;
-        /**
-         * A handler for the areaClick event.
-         * @deprecated Use the onClick option instead.
-         */
+        /** @docid dxvectormapoptions_onAreaClick */
         onAreaClick?: any;
-        /**
-         * A handler for the areaSelectionChanged event.
-         * @deprecated Use the onSelectionChanged option instead.
-         */
+        /** @docid dxvectormapoptions_onAreaSelectionChanged */
         onAreaSelectionChanged?: (e: {
             target: Area;
             component: dxVectorMap;
             element: Element;
         }) => void;
-        /**
-         * A handler for the markerClick event.
-         * @deprecated Use the onClick option instead.
-         */
+        /** @docid dxvectormapoptions_onMarkerClick */
         onMarkerClick?: any;
-        /**
-         * A handler for the markerSelectionChanged event.
-         * @deprecated Use the onSelecitonChanged option instead.
-         */
+        /** @docid dxvectormapoptions_onMarkerSelectionChanged */
         onMarkerSelectionChanged?: (e: {
             target: Marker;
             component: dxVectorMap;
             element: Element;
         }) => void;
-        /** Disables the panning capability. */
+        /** @docid dxvectormapoptions_panningEnabled */
         panningEnabled?: boolean;
     }
     export interface Legend extends viz.core.BaseLegend {
-        /** Specifies the color of item markers in the legend. The specified color applied only when the legend uses 'size' source. */
+        /** @docid dxvectormapoptions_legends_markerColor */
         markerColor?: string;
-        /** Specifies the shape of item markers. */
+        /** @docid dxvectormapoptions_legends_markerShape */
         markerShape?: string;
-        /** Specifies text for legend items. */
+        /** @docid dxvectormapoptions_legends_customizetext */
         customizeText?: (itemInfo: { start: number; end: number; index: number; color: string; size: number; }) => string;
-        /** Specifies text for a hint that appears when a user hovers the mouse pointer over the text of a legend item. */
+        /** @docid dxvectormapoptions_legends_customizehint */
         customizeHint?: (itemInfo: { start: number; end: number; index: number; color: string; size: number }) => string;
-        /** Specifies the source of data for the legend. */
+        /** @docid dxvectormapoptions_legends_source */
         source?: {
-            /** Specifies a layer to which the legend belongs. */
+            /** @docid dxvectormapoptions_legends_source_layer */
             layer?: string;
-            /** Specifies the type of the legend grouping. */
+            /** @docid dxvectormapoptions_legends_source_grouping */
             grouping?: string;
         }
     }
+    /** @docid_ignore viz_map */
     export var projection: ProjectionCreator;
     export interface ProjectionCreator {
-        /** Creates a new projection. */
+        /** @docid viz_mapmethods_projection */
         (data: {
             to?: (coordinates: Array<number>) => Array<number>;
             from?: (coordinates: Array<number>) => Array<number>;
             aspectRatio?: number;
         }): Object;
-        /** Gets the default or custom projection from the projection storage. */
+        /** @docid viz_mapmethods_projection_get */
         get(name: string): Object;
-        /** Adds a new projection to the internal projections storage. */
+        /** @docid viz_mapmethods_projection_add */
         add(name: string, projection: Object): void;
     }
 }
 declare module DevExpress.viz{
-    /** A vector map widget. */
+    /** @docid dxvectormap */
     export class dxVectorMap extends viz.core.BaseWidget implements viz.core.LoadingIndicatorMethods {
         constructor(element: JQuery, options?: DevExpress.viz.map.dxVectorMapOptions);
         constructor(element: Element, options?: DevExpress.viz.map.dxVectorMapOptions);
         showLoadingIndicator(): void;
         hideLoadingIndicator(): void;
-        /** Gets the current coordinates of the map center. */
+        /** @docid dxvectormapmethods_center#center() */
         center(): Array<number>;
-        /** Sets the coordinates of the map center. */
+        /** @docid dxvectormapmethods_center#center(centerCoordinates) */
         center(centerCoordinates: Array<number>): void;
-        /**
-         * Deselects all the selected areas on a map. The areas are displayed in their initial style after.
-         * @deprecated Use the layer's clearSelection() method instead.
-         */
+        /** @docid dxvectormapmethods_clearAreaSelection */
         clearAreaSelection(): void;
-        /**
-         * Deselects all the selected markers on a map. The markers are displayed in their initial style after.
-         * @deprecated Use the layer's clearSelection() method instead.
-         */
+        /** @docid dxvectormapmethods_clearMarkerSelection */
         clearMarkerSelection(): void;
-        /** Deselects all the selected area and markers on a map at once. The areas and markers are displayed in their initial style after. */
+        /** @docid dxvectormapmethods_clearSelection */
         clearSelection(): void;
-        /** Converts client area coordinates into map coordinates. */
+        /** @docid dxvectormapmethods_convertCoordinates */
         convertCoordinates(x: number, y: number): Array<number>;
-        /** Gets all map layers. */
+        /** @docid dxvectormapmethods_getLayers */
         getLayers(): Array<DevExpress.viz.map.MapLayer>;
-        /** Gets the layer by its index. */
+        /** @docid dxvectormapmethods_getLayerByIndex */
         getLayerByIndex(index: number): DevExpress.viz.map.MapLayer;
-        /** Gets the layer by its name. */
+        /** @docid dxvectormapmethods_getLayerByName */
         getLayerByName(name: string): DevExpress.viz.map.MapLayer;
-        /**
-         * Returns an array with all the map areas.
-         * @deprecated Use the layer's getElements() method instead.
-         */
+        /** @docid dxvectormapmethods_getAreas */
         getAreas(): Array<DevExpress.viz.map.Area>;
-        /**
-         * Returns an array with all the map markers.
-         * @deprecated Use the layer's getElements() method instead.
-         */
+        /** @docid dxvectormapmethods_getMarkers */
         getMarkers(): Array<DevExpress.viz.map.Marker>;
-        /** Gets the current coordinates of the map viewport. */
+        /** @docid dxvectormapmethods_viewport#viewport() */
         viewport(): Array<any>;
-        /** Sets the coordinates of the map viewport. */
+        /** @docid dxvectormapmethods_viewport#viewport(viewportCoordinates) */
         viewport(viewportCoordinates: Array<number>): void;
-        /** Gets the current value of the map zoom factor. */
+        /** @docid dxvectormapmethods_zoomFactor#zoomFactor() */
         zoomFactor(): number;
-        /** Sets the value of the map zoom factor. */
+        /** @docid dxvectormapmethods_zoomFactor#zoomFactor(zoomFactor) */
         zoomFactor(zoomFactor: number): void;
     }
 }
@@ -7705,108 +9435,108 @@ interface JQuery {
 }
 declare module DevExpress.viz.sparklines {
     export interface SparklineTooltip extends viz.core.Tooltip {
-        /**
-         * Specifies how a tooltip is horizontally aligned relative to the graph.
-         * @deprecated Tooltip alignment is no longer useful because the tooltips are aligned automatically.
-         */
+        /** @docid basesparklineoptions_tooltip_horizontalalignment */
         horizontalAlignment?: string;
-        /**
-         * Specifies how a tooltip is vertically aligned relative to the graph.
-         * @deprecated Tooltip alignment is no longer useful because the tooltips are aligned automatically.
-         */
+        /** @docid basesparklineoptions_tooltip_verticalalignment */
         verticalAlignment?: string;
     }
     export interface BaseSparklineOptions extends viz.core.BaseWidgetOptions, viz.core.MarginOptions {
-        /** Configures the tooltip. */
+        /** @docid_ignore basesparklineoptions_redrawOnResize */
+        /** @docid_ignore basesparklineoptions_title */
+        /** @docid_ignore basesparklineoptions_export */
+        /** @docid_ignore basesparklineoptions_loadingIndicator */
+        /** @docid basesparklineoptions_tooltip */
         tooltip?: SparklineTooltip;
-        /** A handler for the tooltipShown event. */
+        /** @docid basesparklineoptions_ontooltipshown */
         onTooltipShown?: (e: {
             component: BaseSparkline;
             element: Element;
         }) => void;
-        /** A handler for the tooltipHidden event. */
+        /** @docid basesparklineoptions_ontooltiphidden */
         onTooltipHidden?: (e: {
             component: BaseSparkline;
             element: Element;
         }) => void;
     }
-    /** Overridden by descriptions for particular widgets. */
+    /** @docid_ignore basesparklinemethods_showLoadingIndicator */
+    /** @docid_ignore basesparklinemethods_hideLoadingIndicator */
+    /** @docid basesparkline */
     export class BaseSparkline extends viz.core.BaseWidget {
     }
     export interface dxBulletOptions extends BaseSparklineOptions {
-        /** Specifies a color for the bullet bar. */
+        /** @docid dxbulletoptions_color */
         color?: string;
-        /** Specifies an end value for the invisible scale. */
+        /** @docid dxbulletoptions_endscalevalue */
         endScaleValue?: number;
-        /** Specifies whether or not to show the target line. */
+        /** @docid dxbulletoptions_showtarget */
         showTarget?: boolean;
-        /** Specifies whether or not to show the line indicating zero on the invisible scale. */
+        /** @docid dxbulletoptions_showzerolevel */
         showZeroLevel?: boolean;
-        /** Specifies a start value for the invisible scale. */
+        /** @docid dxbulletoptions_startscalevalue */
         startScaleValue?: number;
-        /** Specifies the value indicated by the target line. */
+        /** @docid dxbulletoptions_target */
         target?: number;
-        /** Specifies a color for both the target and zero level lines. */
+        /** @docid dxbulletoptions_targetcolor */
         targetColor?: string;
-        /** Specifies the width of the target line. */
+        /** @docid dxbulletoptions_targetwidth */
         targetWidth?: number;
-        /** Specifies the primary value indicated by the bullet bar. */
+        /** @docid dxbulletoptions_value */
         value?: number;
     }
     export interface dxSparklineOptions extends BaseSparklineOptions {
-        /** Specifies the data source field that provides arguments for a sparkline. */
+        /** @docid dxsparklineoptions_argumentfield */
         argumentField?: string;
-        /** Sets a color for the bars indicating negative values. Available for a sparkline of the bar type only. */
+        /** @docid dxsparklineoptions_barnegativecolor */
         barNegativeColor?: string;
-        /** Sets a color for the bars indicating positive values. Available for a sparkline of the bar type only. */
+        /** @docid dxsparklineoptions_barpositivecolor */
         barPositiveColor?: string;
-        /** Specifies a data source for the sparkline. */
+        /** @docid dxsparklineoptions_datasource */
         dataSource?: any;
-        /** Sets a color for the boundary of both the first and last points on a sparkline. */
+        /** @docid dxsparklineoptions_firstlastcolor */
         firstLastColor?: string;
-        /** Specifies whether a sparkline ignores null data points or not. */
+        /** @docid dxsparklineoptions_ignoreemptypoints */
         ignoreEmptyPoints?: boolean;
-        /** Sets a color for a line on a sparkline. Available for the sparklines of the line- and area-like types. */
+        /** @docid dxsparklineoptions_linecolor */
         lineColor?: string;
-        /** Specifies a width for a line on a sparkline. Available for the sparklines of the line- and area-like types. */
+        /** @docid dxsparklineoptions_linewidth */
         lineWidth?: number;
-        /** Sets a color for the bars indicating the values that are less than the winloss threshold. Available for a sparkline of the winloss type only. */
+        /** @docid dxsparklineoptions_losscolor */
         lossColor?: string;
-        /** Sets a color for the boundary of the maximum point on a sparkline. */
+        /** @docid dxsparklineoptions_maxcolor */
         maxColor?: string;
-        /** Sets a color for the boundary of the minimum point on a sparkline. */
+        /** @docid dxsparklineoptions_mincolor */
         minColor?: string;
-        /** Sets a color for points on a sparkline. Available for the sparklines of the line- and area-like types. */
+        /** @docid dxsparklineoptions_pointcolor */
         pointColor?: string;
-        /** Specifies the diameter of sparkline points in pixels. Available for the sparklines of line- and area-like types. */
+        /** @docid dxsparklineoptions_pointsize */
         pointSize?: number;
-        /** Specifies a symbol to use as a point marker on a sparkline. Available for the sparklines of the line- and area-like types. */
+        /** @docid dxsparklineoptions_pointsymbol */
         pointSymbol?: string;
-        /** Specifies whether or not to indicate both the first and last values on a sparkline. */
+        /** @docid dxsparklineoptions_showfirstlast */
         showFirstLast?: boolean;
-        /** Specifies whether or not to indicate both the minimum and maximum values on a sparkline. */
+        /** @docid dxsparklineoptions_showminmax */
         showMinMax?: boolean;
-        /** Determines the type of a sparkline. */
+        /** @docid dxsparklineoptions_type */
         type?: string;
-        /** Specifies the data source field that provides values for a sparkline. */
+        /** @docid dxsparklineoptions_valuefield */
         valueField?: string;
-        /** Sets a color for the bars indicating the values greater than a winloss threshold. Available for a sparkline of the winloss type only. */
+        /** @docid dxsparklineoptions_wincolor */
         winColor?: string;
-        /** Specifies a value that serves as a threshold for the sparkline of the winloss type. */
+        /** @docid dxsparklineoptions_winlossthreshold */
         winlossThreshold?: number;
-        /** Specifies the minimum value of the sparkline value axis. */
+        /** @docid dxsparklineoptions_minvalue*/
         minValue?: number;
-        /** Specifies the maximum value of the sparkline's value axis. */
+        /** @docid dxsparklineoptions_maxvalue */
         maxValue?: number;
     }
 }
 declare module DevExpress.viz {
-    /** A bullet graph widget. */
+    /** @docid dxbullet */
     export class dxBullet extends DevExpress.viz.sparklines.BaseSparkline {
         constructor(element: JQuery, options?: DevExpress.viz.sparklines.dxBulletOptions);
         constructor(element: Element, options?: DevExpress.viz.sparklines.dxBulletOptions);
     }
-    /** A sparkline widget. */
+    /** @docid dxsparkline */
     export class dxSparkline extends DevExpress.viz.sparklines.BaseSparkline {
         constructor(element: JQuery, options?: DevExpress.viz.sparklines.dxSparklineOptions);
         constructor(element: Element, options?: DevExpress.viz.sparklines.dxSparklineOptions);
@@ -7822,227 +9552,231 @@ interface JQuery {
 }
 declare module DevExpress.viz.treeMap {
     export interface dxTreeMapOptions extends viz.core.BaseWidgetOptions, viz.core.RedrawOnResizeOptions, viz.core.TitleOptions, viz.core.LoadingIndicatorOptions, viz.core.ExportOptions {
-        /** Specifies the origin of data for the widget. */
+        /** @docid_ignore dxtreemapoptions_margin */
+        /** @docid dxtreemapoptions_datasource */
         dataSource?: any;
-        /** Specifies the name of the data source field that provides nested items for a group. Applies to hierarchical data sources only. */
+        /** @docid dxtreemapoptions_childrenfield */
         childrenField?: string;
-        /** Specifies the name of the data source field that provides values for tiles. */
+        /** @docid dxtreemapoptions_valuefield */
         valueField?: string;
-        /** Specifies the name of the data source field that provides colors for tiles. */
+        /** @docid dxtreemapoptions_colorfield */
         colorField?: string;
-        /** Specifies the name of the data source field that provides texts for tile and group labels. */
+        /** @docid dxtreemapoptions_labelfield */
         labelField?: string;
-        /** Specifies the name of the data source field that provides IDs for items. Applies to flat data sources only. */
+        /** @docid dxtreemapoptions_idfield */
         idField?: string;
-        /** Specifies the name of the data source field that provides parent IDs for items. Applies to flat data sources only. */
+        /** @docid dxtreemapoptions_parentfield */
         parentField?: string;
-        /** Specifies the layout algorithm. */
+        /** @docid dxtreemapoptions_layoutalgorithm */
         layoutAlgorithm?: any;
-        /** Specifies the direction in which the items will be laid out. */
+        /** @docid dxtreemapoptions_layoutdirection */
         layoutDirection?: string;
-        /** Configures tiles. */
+        /** @docid dxtreemapoptions_resolvelabeloverflow */
+        resolveLabelOverflow?: string;
+        /** @docid dxtreemapoptions_tile */
         tile?: {
-            /** Configures the tile borders. */
+            /** @docid dxtreemapoptions_tile_border */
             border?: {
-                /** Specifies the width of the tile borders in pixels. */
+                /** @docid dxtreemapoptions_tile_border_width */
                 width?: number;
-                /** Colors the tile borders. */
+                /** @docid dxtreemapoptions_tile_border_color */
                 color?: string;
             };
-            /** Specifies a single color for all tiles. */
+            /** @docid dxtreemapoptions_tile_color */
             color?: string;
-            /** Specifies the appearance of tiles in the hover state. */
+            /** @docid dxtreemapoptions_tile_hoverstyle */
             hoverStyle?: {
-                /** Configures the appearance of the tile borders in the hover state. */
+                /** @docid dxtreemapoptions_tile_hoverstyle_border */
                 border?: {
-                    /** Specifies the width of the tile borders in pixels. Applies to a tile in the hover state. */
+                    /** @docid dxtreemapoptions_tile_hoverstyle_border_width */
                     width?: number;
-                    /** Colors the tile borders in the hover state. */
+                    /** @docid dxtreemapoptions_tile_hoverstyle_border_color */
                     color?: string;
                 };
-                /** Colors tiles in the hover state. */
+                /** @docid dxtreemapoptions_tile_hoverstyle_color */
                 color?: string;
             };
-            /** Specifies the appearance of tiles in the selected state. */
+            /** @docid dxtreemapoptions_tile_selectionstyle */
             selectionStyle?: {
-                /** Configures the appearance of the tile borders in the selected state. */
+                /** @docid dxtreemapoptions_tile_selectionstyle_border */
                 border?: {
-                    /** Specifies the width of the tile borders in pixels. Applies to a tile in the selected state. */
+                    /** @docid dxtreemapoptions_tile_selectionstyle_border_width */
                     width?: number;
-                    /** Colors the tile borders in the selected state. */
+                    /** @docid dxtreemapoptions_tile_selectionstyle_border_color */
                     color?: string;
                 };
-                /** Colors tiles in the selected state. */
+                /** @docid dxtreemapoptions_tile_selectionstyle_color */
                 color?: string;
             };
-            /** Configures the tile labels. */
+            /** @docid dxtreemapoptions_tile_label */
             label?: {
-                /** Changes the visibility of the tile labels. */
+                /** @docid dxtreemapoptions_tile_label_visible */
                 visible?: boolean;
-                /** Specifies the font settings of the tile labels. */
+                /** @docid dxtreemapoptions_tile_label_font */
                 font?: viz.core.Font;
             };
         };
-        /** Configures groups. */
+        /** @docid dxtreemapoptions_group */
         group?: {
-            /** Specifies the height of the group headers in pixels. */
+            /** @docid dxtreemapoptions_group_headerheight */
             headerHeight?: number;
-            /** Configures the group borders. */
+            /** @docid dxtreemapoptions_group_border */
             border?: {
-                /** Specifies the width of the group borders in pixels. */
+                /** @docid dxtreemapoptions_group_border_width */
                 width?: number;
-                /** Colors the group borders. */
+                /** @docid dxtreemapoptions_group_border_color */
                 color?: string;
             };
-            /** Colors the group headers. */
+            /** @docid dxtreemapoptions_group_color */
             color?: string;
-            /** Specifies the appearance of groups in the hover state. */
+            /** @docid dxtreemapoptions_group_hoverstyle */
             hoverStyle?: {
-                /** Configures the appearance of the group borders in the hover state. */
+                /** @docid dxtreemapoptions_group_hoverstyle_border */
                 border?: {
-                    /** Specifies the width of the group borders in pixels. Applies to a group in the hover state. */
+                    /** @docid dxtreemapoptions_group_hoverstyle_border_width */
                     width?: number;
-                    /** Colors the group borders in the hover state. */
+                    /** @docid dxtreemapoptions_group_hoverstyle_border_color */
                     color?: string;
                 };
-                /** Colors the group headers in the hover state. */
+                /** @docid dxtreemapoptions_group_hoverstyle_color */
                 color?: string;
             };
-            /** Specifies the appearance of groups in the selected state. */
+            /** @docid dxtreemapoptions_group_selectionstyle */
             selectionStyle?: {
-                /** Configures the appearance of the group borders in the selected state. */
+                /** @docid dxtreemapoptions_group_selectionstyle_border */
                 border?: {
-                    /** Specifies the width of the group borders in pixels. Applies to a group in the selected state. */
+                    /** @docid dxtreemapoptions_group_selectionstyle_border_width */
                     width?: number;
-                    /** Colors the group borders in the selected state. */
+                    /** @docid dxtreemapoptions_group_selectionstyle_border_color */
                     color?: string;
                 };
-                /** Colors the group headers in the selected state. */
+                /** @docid dxtreemapoptions_group_selectionstyle_color */
                 color?: string;
             };
-            /** Configures the group labels. */
+            /** @docid dxtreemapoptions_group_label */
             label?: {
-                /** Changes the visibility of the group labels. */
+                /** @docid dxtreemapoptions_group_label_visible */
                 visible?: boolean;
-                /** Specifies the font settings of the group labels. */
+                /** @docid dxtreemapoptions_group_label_font */
                 font?: viz.core.Font;
             };
         };
-        /** Manages the color settings. */
+        /** @docid dxtreemapoptions_colorizer */
         colorizer?: {
-            /** Specifies the colorizing algorithm. */
+            /** @docid dxtreemapoptions_colorizer_type */
             type?: string;
-            /** Sets the palette to be used for colorizing tiles. */
+            /** @docid dxtreemapoptions_colorizer_palette */
             palette?: any;
-            /** Specifies whether or not all tiles in a group must be colored uniformly. Applies only if the type option is "discrete". */
+            /** @docid dxtreemapoptions_colorizer_colorizegroups */
             colorizeGroups?: boolean;
-            /** Allows you to paint tiles with similar values uniformly. Applies only if the type option is "gradient" or "range". */
+            /** @docid dxtreemapoptions_colorizer_range */
             range?: Array<number>;
-            /** Specifies the name of the data source field whose values define the color of a tile. Applies only if the type option is "gradient" or "range". */
+            /** @docid dxtreemapoptions_colorizer_colorcodefield */
             colorCodeField?: string;
         };
-        /** Specifies whether tiles and groups change their style in the hover state. */
+        /** @docid dxtreemapoptions_hoverenabled */
         hoverEnabled?: boolean;
-        /** Specifies whether a single or multiple nodes can be in the selected state simultaneously. */
+        /** @docid dxtreemapoptions_selectionmode */
         selectionMode?: string;
-        /** Specifies how many hierarchical levels must be visualized. */
+        /** @docid dxtreemapoptions_maxdepth */
         maxDepth?: number;
-        /** Specifies whether the user will interact with a single tile or its group. */
+        /** @docid dxtreemapoptions_interactwithgroup */
         interactWithGroup?: boolean;
+        /** @docid dxtreemapoptions_tooltip */
         tooltip?: viz.core.Tooltip;
-        /** A handler for the nodesInitialized event. */
+        /** @docid dxtreemapoptions_onnodesinitialized */
         onNodesInitialized?: (e: {
             component: dxTreeMap;
             element: Element;
             root: TreeMapNode
         }) => void;
-        /** A handler for the nodesRendering event. */
+        /** @docid dxtreemapoptions_onnodesrendering */
         onNodesRendering?: (e: {
             component: dxTreeMap;
             element: Element;
             node: TreeMapNode
         }) => void;
-        /** A handler for the click event. */
+        /** @docid dxtreemapoptions_onclick */
         onClick?: any;
-        /** A handler for the hoverChanged event. */
+        /** @docid dxtreemapoptions_onhoverchanged */
         onHoverChanged?: (e: {
             component: dxTreeMap;
             element: Element;
             node: TreeMapNode;
         }) => void;
-        /** A handler for the selectionChanged event. */
+        /** @docid dxtreemapoptions_onselectionchanged */
         onSelectionChanged?: (e: {
             component: dxTreeMap;
             element: Element;
             node: TreeMapNode;
         }) => void;
-        /** A handler for the drill event. */
+        /** @docid dxtreemapoptions_ondrill */
         onDrill?: (e: {
             component: dxTreeMap;
             element: Element;
             node: TreeMapNode
         }) => void;
     }
-    /** This section describes fields and methods that can be used in code to manipulate a Node object. */
+    /** @docid dxtreemapnode */
     export interface TreeMapNode {
-        /** The level that the current node occupies in the hierarchy of nodes. */
+        /** @docid dxtreemapnodefields_level */
         level: number;
-        /** The index of the current node in the array of all nodes on the same level. */
+        /** @docid dxtreemapnodefields_index */
         index: number;
-        /** The object from the data source visualized by the node. */
+        /** @docid dxtreemapnodefields_data */
         data: Object;
-        /** Returns the parent node of the current node. */
+        /** @docid dxtreemapnodemethods_getparent */
         getParent(): TreeMapNode;
-        /** Indicates how many direct descendants the current node has. */
+        /** @docid dxtreemapnodemethods_getchildrencount */
         getChildrenCount(): number;
-        /** Returns all nodes nested in the current node. */
+        /** @docid dxtreemapnodemethods_getallchildren */
         getAllChildren(): Array<TreeMapNode>;
-        /** Returns all descendant nodes. */
+        /** @docid dxtreemapnodemethods_getallnodes */
         getAllNodes(): Array<TreeMapNode>;
-        /** Gets a specific node from a collection of direct descendants. */
+        /** @docid dxtreemapnodemethods_getchild */
         getChild(index: number): TreeMapNode;
-        /** Gets the raw value of the node. */
+        /** @docid dxtreemapnodemethods_value */
         value(): number;
-        /** Returns the label of the node. */
+        /** @docid dxtreemapnodemethods_label#label() */
         label(): string;
-        /** Sets the label to the node. */
+        /** @docid dxtreemapnodemethods_label#label(label) */
         label(label: string): void;
-        /** Customizes the node. */
+        /** @docid dxtreemapnodemethods_customize */
         customize(options: any): void;
-        /** Reverts the appearance of the node to the initial state. */
+        /** @docid dxtreemapnodemethods_resetcustomization */
         resetCustomization(): void;
-        /** Indicates whether the node is in the hover state or not. */
+        /** @docid dxtreemapnodemethods_ishovered */
         isHovered(): boolean;
-        /** Sets the selection state of a node. */
+        /** @docid dxtreemapnodemethods_select */
         select(state: boolean): void;
-        /** Indicates whether the node is selected or not. */
+        /** @docid dxtreemapnodemethods_isselected */
         isSelected(): boolean;
-        /** Indicates whether the node is visualized by a tile or a group of tiles. */
+        /** @docid dxtreemapnodemethods_isleaf */
         isLeaf(): boolean;
-        /** Indicates whether the current node is active. */
+        /** @docid dxtreemapnodemethods_isactive */
         isActive(): boolean;
-        /** Shows the tooltip. */
+        /** @docid dxtreemapnodemethods_showtooltip */
         showTooltip(): void;
-        /** Drills down into the node. */
+        /** @docid dxtreemapnodemethods_drilldown */
         drillDown(): void;
     }
 }
 declare module DevExpress.viz {
-    /** A widget for displaying hierarchical data by using nested rectangles. */
+    /** @docid dxtreemap */
     export class dxTreeMap extends viz.core.BaseWidget implements viz.core.LoadingIndicatorMethods {
         constructor(element: JQuery, options?: DevExpress.viz.treeMap.dxTreeMapOptions);
         constructor(element: Element, options?: DevExpress.viz.treeMap.dxTreeMapOptions);
-        /** Returns the root node. */
+        /** @docid dxtreemapmethods_getrootnode */
         getRootNode(): DevExpress.viz.treeMap.TreeMapNode;
-        /** Returns the current node. */
+        /** @docid dxtreemapmethods_getcurrentnode */
         getCurrentNode(): DevExpress.viz.treeMap.TreeMapNode;
-        /** Deselects all nodes in the widget. */
+        /** @docid dxtreemapmethods_clearselection */
         clearSelection(): void;
-        /** Hides the tooltip. */
+        /** @docid dxtreemapmethods_hidetooltip */
         hideTooltip(): void;
-        /** Drills one level up. */
+        /** @docid dxtreemapmethods_drillup */
         drillUp(): void;
-        /** Resets the drill down level. */
+        /** @docid dxtreemapmethods_resetdrilldown */
         resetDrillDown(): void;
         showLoadingIndicator(): void;
         hideLoadingIndicator(): void;
