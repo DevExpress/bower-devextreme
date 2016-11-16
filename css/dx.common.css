@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme
-* Version: 16.1.7
-* Build date: Oct 11, 2016
+* Version: 16.1.8
+* Build date: Nov 14, 2016
 *
 * Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -4871,7 +4871,7 @@ input.dx-hidden
 {
   overflow: hidden;
 }
-.dx-datagrid-content .dx-datagrid-table .dx-row .dx-cell-modified, .dx-datagrid-content .dx-datagrid-table .dx-row .dx-datagrid-invalid
+.dx-datagrid-content .dx-datagrid-table .dx-row .dx-cell-modified:not(.dx-field-item-content), .dx-datagrid-content .dx-datagrid-table .dx-row .dx-datagrid-invalid:not(.dx-field-item-content)
 {
   padding: 0;
 }
@@ -5259,6 +5259,11 @@ input.dx-hidden
 {
   border-color: transparent;
 }
+.dx-datagrid-rowsview .dx-command-adaptive.dx-command-adaptive-hidden
+{
+  padding-left: 0;
+  padding-right: 0;
+}
 .dx-datagrid-group-opened, .dx-datagrid-group-closed
 {
   cursor: pointer;
@@ -5276,6 +5281,14 @@ input.dx-hidden
   position: absolute;
   top: 50%;
   left: 50%;
+}
+.dx-datagrid-hidden-column
+{
+  white-space: nowrap;
+}
+.dx-datagrid-hidden-column>*
+{
+  display: none !important;
 }
 .dx-datagrid-bottom-load-panel
 {
