@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.all.d.ts)
-* Version: 16.2.1
-* Build date: Mon Nov 07 2016
+* Version: 16.2.3
+* Build date: Tue Dec 13 2016
 *
 * Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -317,6 +317,8 @@ declare module DevExpress {
         height?: any;
         /** @docid domcomponentoptions_width */
         width?: any;
+        /** @docid domcomponentoptions_elementAttr */
+        elementAttr?: Object;
         /** A bag for holding any options that require two-way binding (Angular approach specific) */
         bindingOptions?: { [key: string]: any; };
     }
@@ -364,6 +366,9 @@ declare module DevExpress {
             key?: any;
         }
         export interface LoadOptions {
+            searchValue?: Object;
+            searchExpr?: Object;
+            searchOperation?: Object;
             filter?: Object;
             sort?: Object;
             select?: Object;
@@ -776,6 +781,15 @@ declare module DevExpress {
             }
         }
     }
+    /** @docid localization */
+    export module localization {
+        /** @docid localization_locale#locale() */
+        export function locale(): string;
+        /** @docid localization_locale#locale(locale) */
+        export function locale(locale: string): void;
+        /** @docid localization_loadMessages */
+        export function loadMessages(messages: any): void;
+    }
     /** @docid ui */
     export module ui {
         /** @docid_ignore dxTemplate */
@@ -815,6 +829,7 @@ declare module DevExpress {
         export interface CollectionWidgetOptions extends WidgetOptions {
             /** @docid_ignore CollectionWidgetOptions_selectOnFocus */
             /** @docid_ignore CollectionWidgetOptions_selectionMode */
+            /** @docid_ignore CollectionWidgetOptions_selectAllMode */
             /** @docid_ignore CollectionWidgetOptions_selectionByClick */
             /** @docid_ignore CollectionWidgetOptions_selectionRequired */
             /** @docid_ignore CollectionWidgetOptions_focusedElement */
@@ -848,6 +863,10 @@ declare module DevExpress {
             selectedItem?: Object;
             /** @docid CollectionWidgetOptions_selectedItems */
             selectedItems?: Array<any>;
+            /** @docid CollectionWidgetOptions_selectedItemKeys */
+            selectedItemKeys?: Array<any>;
+            /** @docid CollectionWidgetOptions_keyExpr */
+            keyExpr?: any;
             /** @docid CollectionWidgetOptions_onItemDeleting */
             onItemDeleting?: Function;
             /** @docid CollectionWidgetOptions_onItemDeleted */
@@ -1026,6 +1045,8 @@ declare module DevExpress.ui {
         validate(): validationEngine.ValidatorValidationResult;
         /** @docid dxValidatorMethods_reset */
         reset(): void;
+        /** @docid dxValidatorMethods_focus */
+        focus(): void;
     }
     /** @docid dxValidationGroup */
     export class dxValidationGroup extends DOMComponent {
@@ -1059,6 +1080,8 @@ declare module DevExpress.ui {
         /** @docid_ignore dxValidationSummaryOptions_selectedIndex */
         /** @docid_ignore dxValidationSummaryOptions_selectedItem */
         /** @docid_ignore dxValidationSummaryOptions_selectedItems */
+        /** @docid_ignore dxValidationSummaryOptions_selectedItemKeys */
+        /** @docid_ignore dxValidationSummaryOptions_keyExpr */
         /** @docid_ignore dxValidationSummaryOptions_visible */
         /** @docid_ignore dxValidationSummaryOptions_width */
         /** @docid_ignore dxValidationSummaryOptions_accessKey */
@@ -1158,6 +1181,8 @@ declare module DevExpress.ui {
         /** @docid_ignore dxToolbarOptions_selectedIndex */
         /** @docid_ignore dxToolbarOptions_selectedItem */
         /** @docid_ignore dxToolbarOptions_selectedItems */
+        /** @docid_ignore dxToolbarOptions_selectedItemKeys */
+        /** @docid_ignore dxToolbarOptions_keyExpr */
         /** @docid_ignore dxToolbarOptions_submenuType */
         /** @docid_ignore dxToolbarOptions_onSelectionChanged */
         /** @docid_ignore dxToolbarOptions_focusStateEnabled */
@@ -1254,6 +1279,8 @@ declare module DevExpress.ui {
         spellcheck?: boolean;
         /** @docid dxTextEditorOptions_attr */
         attr?: Object;
+        /** @docid dxTextEditorOptions_inputAttr */
+        inputAttr?: Object;
         /** @docid dxTextEditorOptions_text */
         text?: string;
         /** @docid dxTextEditorOptions_focusStateEnabled */
@@ -1752,6 +1779,8 @@ declare module DevExpress.ui {
     export interface dxMultiViewOptions extends CollectionWidgetOptions {
         /** @docid_ignore dxMultiViewOptions_noDataText */
         /** @docid_ignore dxMultiViewOptions_selectedItems */
+        /** @docid_ignore dxMultiViewOptions_selectedItemKeys */
+        /** @docid_ignore dxMultiViewOptions_keyExpr */
         /** @docid_ignore dxMultiViewOptions_focusStateEnabled */
         /** @docid dxMultiViewOptions_animationenabled */
         animationEnabled?: boolean;
@@ -2098,6 +2127,8 @@ declare module DevExpress.ui {
         showSelectionControls?: boolean;
         /** @docid dxListOptions_selectionMode */
         selectionMode?: string;
+        /** @docid dxListOptions_selectAllMode */
+        selectAllMode?: string;
         /** @docid dxListOptions_selectAllText */
         selectAllText?: string;
         /** @docid dxListOptions_onSelectAllValueChanged */
@@ -2175,6 +2206,8 @@ declare module DevExpress.ui {
         /** @docid_ignore dxGalleryOptions_focusStateEnabled */
         /** @docid_ignore dxGalleryOptions_noDataText */
         /** @docid_ignore dxGalleryOptions_selectedItems */
+        /** @docid_ignore dxGalleryOptions_selectedItemKeys */
+        /** @docid_ignore dxGalleryOptions_keyExpr */
         /** @docid dxGalleryOptions_animationDuration */
         animationDuration?: number;
         /** @docid dxGalleryOptions_animationEnabled */
@@ -2393,6 +2426,8 @@ declare module DevExpress.ui {
         /** @docid_ignore dxBoxOptions_selectedIndex */
         /** @docid_ignore dxBoxOptions_selectedItem */
         /** @docid_ignore dxBoxOptions_selectedItems */
+        /** @docid_ignore dxBoxOptions_selectedItemKeys */
+        /** @docid_ignore dxBoxOptions_keyExpr */
         /** @docid_ignore dxBoxOptions_tabIndex */
         /** @docid_ignore dxBoxOptions_accessKey */
         /** @docid dxBoxOptions_align */
@@ -2421,6 +2456,8 @@ declare module DevExpress.ui {
         /** @docid_ignore dxResponsiveBoxOptions_selectedIndex */
         /** @docid_ignore dxResponsiveBoxOptions_selectedItem */
         /** @docid_ignore dxResponsiveBoxOptions_selectedItems */
+        /** @docid_ignore dxResponsiveBoxOptions_selectedItemKeys */
+        /** @docid_ignore dxResponsiveBoxOptions_keyExpr */
         /** @docid_ignore dxResponsiveBoxOptions_tabIndex */
         /** @docid_ignore dxResponsiveBoxOptions_width */
         /** @docid_ignore dxResponsiveBoxOptions_height */
@@ -2581,8 +2618,6 @@ declare module DevExpress.ui {
         min?: number;
         /** @docid dxTrackBarOptions_max */
         max?: number;
-        /** @docid dxTrackBarOptions_value */
-        value?: number;
     }
     /** @docid dxTrackBar */
     export class dxTrackBar extends Editor {
@@ -2600,6 +2635,8 @@ declare module DevExpress.ui {
         showStatus?: boolean;
         /** @docid dxProgressBarOptions_onComplete */
         onComplete?: Function;
+        /** @docid dxProgressBarOptions_value */
+        value?: number;
     }
     /** @docid dxProgressBar */
     export class dxProgressBar extends dxTrackBar {
@@ -2608,15 +2645,13 @@ declare module DevExpress.ui {
         /** @docid_ignore dxProgressBarMethods_registerKeyHandler */
         /** @docid_ignore dxProgressBarMethods_focus */
     }
-    export interface dxSliderOptions extends dxTrackBarOptions {
+    export interface dxSliderBaseOptions extends dxTrackBarOptions {
         /** @docid_ignore dxSliderOptions_hoverStateEnabled */
         /** @docid_ignore dxSliderOptions_focusStateEnabled */
         /** @docid dxSliderOptions_activeStateEnabled */
         activeStateEnabled?: boolean;
         /** @docid dxSliderOptions_step */
         step?: number;
-        /** @docid dxSliderOptions_value */
-        value?: number;
         /** @docid dxSliderOptions_showRange */
         showRange?: boolean;
         /** @docid dxSliderOptions_keyStep */
@@ -2644,13 +2679,16 @@ declare module DevExpress.ui {
         /** @docid dxSliderOptions_name */
         name?: string;
     }
+    export interface dxSliderOptions extends dxSliderBaseOptions {
+        /** @docid dxSliderOptions_value */
+        value?: number;
+    }
     /** @docid dxSlider */
     export class dxSlider extends dxTrackBar {
         constructor(element: JQuery, options?: dxSliderOptions);
         constructor(element: Element, options?: dxSliderOptions);
     }
-    export interface dxRangeSliderOptions extends dxSliderOptions {
-        /** @docid_ignore dxRangeSliderOptions_value */
+    export interface dxRangeSliderOptions extends dxSliderBaseOptions {
         /** @docid_ignore dxRangeSliderOptions_onValueChanged */
         /** @docid_ignore dxRangeSliderOptions_name */
         /** @docid dxRangeSliderOptions_start */
@@ -2661,6 +2699,8 @@ declare module DevExpress.ui {
         startName?: string;
         /** @docid dxRangeSliderOptions_endName */
         endName?: string;
+        /** @docid dxRangeSliderOptions_value */
+        value?: Array<number>;
     }
     /** @docid dxRangeSlider */
     export class dxRangeSlider extends dxSlider {
@@ -3110,6 +3150,8 @@ declare module DevExpress.ui {
         /** @docid_ignore dxTileViewOptions_selectedIndex */
         /** @docid_ignore dxTileViewOptions_selectedItem */
         /** @docid_ignore dxTileViewOptions_selectedItems */
+        /** @docid_ignore dxTileViewOptions_selectedItemKeys */
+        /** @docid_ignore dxTileViewOptions_keyExpr */
         /** @docid_ignore dxTileViewOptions_onSelectionChanged */
         /** @docid_ignore dxTileViewOptions_hoverStateEnabled */
         /** @docid_ignore dxTileViewOptions_focusStateEnabled */
@@ -3191,6 +3233,8 @@ declare module DevExpress.ui {
     }
     export interface dxSlideOutOptions extends CollectionWidgetOptions {
         /** @docid_ignore dxSlideOutOptions_selectedItems */
+        /** @docid_ignore dxSlideOutOptions_selectedItemKeys */
+        /** @docid_ignore dxSlideOutOptions_keyExpr */
         /** @docid_ignore dxSlideOutOptions_focusStateEnabled */
         /** @docid_ignore dxSlideOutOptions_accessKey */
         /** @docid_ignore dxSlideOutOptions_tabIndex */
@@ -3232,6 +3276,8 @@ declare module DevExpress.ui {
     export interface dxPivotOptions extends CollectionWidgetOptions {
         /** @docid_ignore dxPivotOptions_noDataText */
         /** @docid_ignore dxPivotOptions_selectedItems */
+        /** @docid_ignore dxPivotOptions_selectedItemKeys */
+        /** @docid_ignore dxPivotOptions_keyExpr */
         /** @docid_ignore dxPivotOptions_focusStateEnabled */
         /** @docid_ignore dxPivotOptions_accessKey */
         /** @docid_ignore dxPivotOptions_tabIndex */
@@ -3257,6 +3303,8 @@ declare module DevExpress.ui {
     export interface dxPanoramaOptions extends CollectionWidgetOptions {
         /** @docid_ignore dxPanoramaOptions_noDataText */
         /** @docid_ignore dxPanoramaOptions_selectedItems */
+        /** @docid_ignore dxPanoramaOptions_selectedItemKeys */
+        /** @docid_ignore dxPanoramaOptions_keyExpr */
         /** @docid_ignore dxPanoramaOptions_focusStateEnabled */
         /** @docid_ignore dxPanoramaOptions_accessKey */
         /** @docid_ignore dxPanoramaOptions_tabIndex */
@@ -3328,6 +3376,8 @@ declare module DevExpress.ui {
         /** @docid_ignore dxActionSheetOptions_selectedIndex */
         /** @docid_ignore dxActionSheetOptions_selectedItem */
         /** @docid_ignore dxActionSheetOptions_selectedItems */
+        /** @docid_ignore dxActionSheetOptions_selectedItemKeys */
+        /** @docid_ignore dxActionSheetOptions_keyExpr */
         /** @docid_ignore dxActionSheetOptions_noDataText */
         /** @docid_ignore dxActionSheetOptions_onSelectionChanged */
         /** @docid_ignore dxActionSheetOptions_focusStateEnabled */
@@ -3877,6 +3927,7 @@ declare module DevExpress.ui {
         /** @docid_ignore dxTreeViewItemTemplate_parentId */
         /** @docid_ignore dxTreeViewItemTemplate_hasItems */
         /** @docid_ignore dxTreeViewOptions_selectedItems */
+        /** @docid_ignore dxTreeViewOptions_selectedItemKeys */
         /** @docid_ignore dxTreeViewOptions_selectedItem */
         /** @docid_ignore dxTreeViewOptions_selectedIndex */
         /** @docid dxTreeViewOptions_animationEnabled */
@@ -3978,6 +4029,7 @@ declare module DevExpress.ui {
         /** @docid_ignore dxMenuBaseOptions_onItemHold */
         /** @docid_ignore dxMenuBaseOptions_noDataText */
         /** @docid_ignore dxMenuBaseOptions_selectedIndex */
+        /** @docid_ignore dxMenuBaseOptions_selectedItemKeys */
         /** @docid_ignore dxMenuBaseOptions_keyExpr */
         /** @docid_ignore dxMenuBaseOptions_parentIdExpr */
         /** @docid_ignore dxMenuBaseOptions_expandedExpr */
@@ -4673,8 +4725,8 @@ declare module DevExpress.ui {
             maxFilterLengthInRequest?: number;
             /** @docid dxDataGridOptions_selection_selectAllMode */
             selectAllMode?: string;
-            /** @docid dxDataGridOptions_selection_async */
-            async?: boolean;
+            /** @docid dxDataGridOptions_selection_deferred */
+            deferred?: boolean;
         };
         /** @docid dxDataGridOptions_onDataErrorOccurred */
         onDataErrorOccurred?: (e: { error: Error }) => void;
@@ -4995,6 +5047,8 @@ declare module DevExpress.ui {
         getDataSource(): DevExpress.data.DataSource;
         /** @docid dxDataGridMethods_getScrollable */
         getScrollable(): dxScrollable;
+        /** @docid dxDataGridMethods_repaintRows */
+        repaintRows(rowIndexes: Array<number>): void;
     }
     export interface dxPivotGridOptions extends WidgetOptions {
         /** @docid_ignore dxPivotGridOptions_activeStateEnabled */
@@ -7922,6 +7976,8 @@ declare module DevExpress.viz.charts {
         getSeriesByName(seriesName: string): BaseSeries;
         /** @docid basechartmethods_getseriesbypos */
         getSeriesByPos(seriesIndex: number): BaseSeries;
+        /** @docid basechartmethods_getdatasource */
+        getDataSource(): DevExpress.data.DataSource;
         /** @docid basechartmethods_hideTooltip */
         hideTooltip(): void;
         showLoadingIndicator(): void;
@@ -8074,9 +8130,9 @@ declare module DevExpress.viz.charts {
             /** @docid dxchartoptions_crosshair_width */
             width?: number;
             /** @docid dxchartoptions_crosshair_horizontalline */
-            horizontalLine?: CrosshaierWithLabel;
+            horizontalLine?: CrosshairWithLabel;
             /** @docid dxchartoptions_crosshair_verticalline */
-            verticalLine?: CrosshaierWithLabel;
+            verticalLine?: CrosshairWithLabel;
             /** @docid dxchartoptions_crosshair_label */
             label?: {
                 /** @docid dxchartoptions_crosshair_label_backgroundcolor */
@@ -8145,7 +8201,7 @@ declare module DevExpress.viz.charts {
             position?: string;
         };
     }
-    interface CrosshaierWithLabel extends viz.core.DashedBorderWithOpacity {
+    interface CrosshairWithLabel extends viz.core.DashedBorderWithOpacity {
         /**
         * @docid dxchartoptions_crosshair_verticalline_label
         * @docid dxchartoptions_crosshair_horizontalline_label
@@ -8754,6 +8810,8 @@ declare module DevExpress.viz.rangeSelector {
             animationEnabled?: boolean;
             /** @docid dxrangeselectoroptions_behavior_callselectedrangechanged */
             callSelectedRangeChanged?: string;
+            /** @docid dxrangeselectoroptions_behavior_callvaluechanged */
+            callValueChanged?: string;
             /** @docid dxrangeselectoroptions_behavior_manualrangeselectionenabled */
             manualRangeSelectionEnabled?: boolean;
             /** @docid dxrangeselectoroptions_behavior_moveselectedrangebyclick */
@@ -8910,8 +8968,8 @@ declare module DevExpress.viz.rangeSelector {
             useTicksAutoArrangement?: boolean;
             /** @docid dxrangeselectoroptions_scale_valueType */
             valueType?: string;
-			/** @docid dxrangeselectoroptions_scale_categories */
-			categories?: Array<any>;
+            /** @docid dxrangeselectoroptions_scale_categories */
+            categories?: Array<any>;
         };
         /** @docid dxrangeselectoroptions_selectedrange */
         selectedRange?: {
@@ -8920,6 +8978,8 @@ declare module DevExpress.viz.rangeSelector {
             /** @docid dxrangeselectoroptions_selectedrange_endvalue */
             endValue?: any;
         };
+        /** @docid dxrangeselectoroptions_value */
+        value?: Array<any>;
         /** @docid dxrangeselectoroptions_selectedrangecolor */
         selectedRangeColor?: string;
         /** @docid dxrangeselectoroptions_indent */
@@ -8933,6 +8993,13 @@ declare module DevExpress.viz.rangeSelector {
         onSelectedRangeChanged?: (e: {
             startValue: any;
             endValue: any;
+            component: dxRangeSelector;
+            element: Element;
+        }) => void;
+        /** @docid dxrangeselectoroptions_onvaluechanged */
+        onValueChanged?: (e: {
+            value: Array<any>;
+            previousValue: Array<any>;
             component: dxRangeSelector;
             element: Element;
         }) => void;
@@ -9004,6 +9071,12 @@ declare module DevExpress.viz {
         getSelectedRange(): { startValue: any; endValue: any; };
         /** @docid dxrangeselectormethods_setSelectedRange */
         setSelectedRange(selectedRange: { startValue: any; endValue: any; }): void;
+        /** @docid dxrangeselectormethods_getValue */
+        getValue(): Array<any>;
+        /** @docid dxrangeselectormethods_setValue */
+        setValue(value: Array<any>): void;
+        /** @docid dxrangeselectormethods_getdatasource */
+        getDataSource(): DevExpress.data.DataSource;
     }
 }
 interface JQuery {
@@ -9026,6 +9099,8 @@ declare module DevExpress.viz.map {
         getElements(): Array<MapLayerElement>;
         /** @docid mapLayermethods_clearSelection */
         clearSelection(): void;
+        /** @docid mapLayermethods_getDataSource */
+        getDataSource(): DevExpress.data.DataSource;
     }
     /** @docid mapLayerElement */
     export interface MapLayerElement {
@@ -9540,6 +9615,8 @@ declare module DevExpress.viz {
     export class dxSparkline extends DevExpress.viz.sparklines.BaseSparkline {
         constructor(element: JQuery, options?: DevExpress.viz.sparklines.dxSparklineOptions);
         constructor(element: Element, options?: DevExpress.viz.sparklines.dxSparklineOptions);
+        /** @docid dxsparklinemethods_getdatasource */
+        getDataSource(): DevExpress.data.DataSource;
     }
 }
 interface JQuery {
@@ -9780,6 +9857,8 @@ declare module DevExpress.viz {
         resetDrillDown(): void;
         showLoadingIndicator(): void;
         hideLoadingIndicator(): void;
+        /** @docid dxtreemapmethods_getdatasource */
+        getDataSource(): DevExpress.data.DataSource;
     }
 }
 interface JQuery {

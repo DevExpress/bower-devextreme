@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.all.de.js)
-* Version: 16.2.1
-* Build date: Mon Nov 07 2016
+* Version: 16.2.3
+* Build date: Tue Dec 13 2016
 *
 * Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -11,13 +11,14 @@
 ! function(root, factory) {
     if ("function" === typeof define && define.amd) {
         define(function(require) {
-            factory(require("../message"))
+            factory(require("devextreme/localization"), require("devextreme/core/errors"))
         })
     } else {
-        factory(DevExpress.localization.message)
+        factory(DevExpress.localization, DevExpress.errors)
     }
-}(this, function(message) {
-    message.load({
+}(this, function(localization, errors) {
+    errors.log("W0013", "devextreme/dist/js/localization/dx.all.de.js", "16.2", "Use the 'devextreme/dist/js/localization/dx.messages.de.js' file instead.");
+    localization.loadMessages({
         de: {
             Yes: "Ja",
             No: "Nein",
@@ -46,21 +47,7 @@
             "validation-pattern-formatted": "{0} passt nicht zum Muster",
             "validation-email": "Die Email-Adresse ist ungültig",
             "validation-email-formatted": "{0} ist ungültig",
-            "validation-mask": "Der Wert ist ungültig"
-        }
-    })
-});
-! function(root, factory) {
-    if ("function" === typeof define && define.amd) {
-        define(function(require) {
-            factory(require("../message"))
-        })
-    } else {
-        factory(DevExpress.localization.message)
-    }
-}(this, function(message) {
-    message.load({
-        de: {
+            "validation-mask": "Der Wert ist ungültig",
             "dxLookup-searchPlaceholder": "Minimale Anzahl Zeichen: {0}",
             "dxList-pullingDownText": "Zum Aktualisieren nach unten ziehen",
             "dxList-pulledDownText": "Zum Aktualisieren loslassen",
@@ -94,30 +81,7 @@
             "dxSwitch-offText": "AUS",
             "dxForm-optionalMark": "optional",
             "dxForm-requiredMessage": "{0} ist ein Pflichtfeld",
-            "dxNumberBox-invalidValueMessage": "Der Wert muss eine Zahl sein"
-        }
-    })
-});
-! function(root, factory) {
-    if ("function" === typeof define && define.amd) {
-        define(function(require) {
-            factory(require("../message"))
-        })
-    } else {
-        factory(DevExpress.localization.message)
-    }
-}(this, function() {});
-! function(root, factory) {
-    if ("function" === typeof define && define.amd) {
-        define(function(require) {
-            factory(require("../message"))
-        })
-    } else {
-        factory(DevExpress.localization.message)
-    }
-}(this, function(message) {
-    message.load({
-        de: {
+            "dxNumberBox-invalidValueMessage": "Der Wert muss eine Zahl sein",
             "dxDataGrid-columnChooserTitle": "Spaltenauswahl",
             "dxDataGrid-columnChooserEmptyText": "Ziehen Sie Spalten hierhin, um sie zu verstecken",
             "dxDataGrid-groupContinuesMessage": "Weiter auf der nächsten Seite",

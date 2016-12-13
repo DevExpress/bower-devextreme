@@ -1,5 +1,6 @@
 "use strict";
 (function(root, factory) {
+    /* global define, DevExpress, jQuery */
     if (typeof define === 'function' && define.amd) {
         define(function(require, exports, module) {
             module.exports = factory(
@@ -37,7 +38,7 @@
         root.DevExpress.framework.html.WinSplitLayoutController = root.DevExpress.layouts.SplitLayout.WinSplitLayoutController;
         root.DevExpress.framework.html.Win8SplitLayoutController = root.DevExpress.layouts.SplitLayout.Win8SplitLayoutController;
     }
-}(this, function($, ko, Class, errors, layoutSets, DefaultLayoutController, EmptyLayoutControllerModule, SimpleLayoutControllerModule, fx) {
+}(window, function($, ko, Class, errors, layoutSets, DefaultLayoutController, EmptyLayoutControllerModule, SimpleLayoutControllerModule, fx) {
 
     var exports = {},
         APPBAR_TOUCH_AREA_HEIGHT = 50,

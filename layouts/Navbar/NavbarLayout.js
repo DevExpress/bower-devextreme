@@ -1,5 +1,6 @@
 "use strict";
 (function(root, factory) {
+    /* global define, DevExpress */
     if (typeof define === 'function' && define.amd) {
         define(function(require, exports, module) {
             module.exports = factory(
@@ -17,7 +18,7 @@
         );
         root.DevExpress.framework.html.NavBarController = root.DevExpress.layouts.NavbarLayout.NavBarController;
     }
-}(this, function(layoutSets, DefaultLayoutController) {
+}(window, function(layoutSets, DefaultLayoutController) {
 
     var exports = {},
         HAS_NAVBAR_CLASS = "has-navbar",

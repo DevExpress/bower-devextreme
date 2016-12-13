@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.all.ja.js)
-* Version: 16.2.1
-* Build date: Mon Nov 07 2016
+* Version: 16.2.3
+* Build date: Tue Dec 13 2016
 *
 * Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -11,13 +11,14 @@
 ! function(root, factory) {
     if ("function" === typeof define && define.amd) {
         define(function(require) {
-            factory(require("../message"))
+            factory(require("devextreme/localization"), require("devextreme/core/errors"))
         })
     } else {
-        factory(DevExpress.localization.message)
+        factory(DevExpress.localization, DevExpress.errors)
     }
-}(this, function(message) {
-    message.load({
+}(this, function(localization, errors) {
+    errors.log("W0013", "devextreme/dist/js/localization/dx.all.ja.js", "16.2", "Use the 'devextreme/dist/js/localization/dx.messages.ja.js' file instead.");
+    localization.loadMessages({
         ja: {
             Yes: "はい",
             No: "いいえ",
@@ -46,21 +47,7 @@
             "validation-pattern-formatted": "{0} がパターンと一致しません",
             "validation-email": "電子メール アドレスが無効です。",
             "validation-email-formatted": "{0} が無効です。",
-            "validation-mask": "値が無効です。"
-        }
-    })
-});
-! function(root, factory) {
-    if ("function" === typeof define && define.amd) {
-        define(function(require) {
-            factory(require("../message"))
-        })
-    } else {
-        factory(DevExpress.localization.message)
-    }
-}(this, function(message) {
-    message.load({
-        ja: {
+            "validation-mask": "値が無効です。",
             "dxLookup-searchPlaceholder": "最低文字数: {0}",
             "dxList-pullingDownText": "引っ張って更新…",
             "dxList-pulledDownText": "指を離して更新…",
@@ -94,30 +81,7 @@
             "dxSwitch-offText": "オフ",
             "dxForm-optionalMark": "任意",
             "dxForm-requiredMessage": "{0} は必須フィールドです",
-            "dxNumberBox-invalidValueMessage": "数値を指定してください。"
-        }
-    })
-});
-! function(root, factory) {
-    if ("function" === typeof define && define.amd) {
-        define(function(require) {
-            factory(require("../message"))
-        })
-    } else {
-        factory(DevExpress.localization.message)
-    }
-}(this, function() {});
-! function(root, factory) {
-    if ("function" === typeof define && define.amd) {
-        define(function(require) {
-            factory(require("../message"))
-        })
-    } else {
-        factory(DevExpress.localization.message)
-    }
-}(this, function(message) {
-    message.load({
-        ja: {
+            "dxNumberBox-invalidValueMessage": "数値を指定してください。",
             "dxDataGrid-columnChooserTitle": "列の選択",
             "dxDataGrid-columnChooserEmptyText": "隠したい列のヘッダーをここにドラッグしてください。",
             "dxDataGrid-groupContinuesMessage": "次ページに続く",

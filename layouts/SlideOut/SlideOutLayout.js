@@ -1,5 +1,6 @@
 "use strict";
 (function(root, factory) {
+    /* global define, DevExpress, jQuery */
     if (typeof define === 'function' && define.amd) {
         define(function(require, exports, module) {
             module.exports = factory(
@@ -25,7 +26,7 @@
         );
         root.DevExpress.framework.html.SlideOutController = root.DevExpress.layouts.SlideOutLayout.SlideOutController;
     }
-}(this, function($, layoutSets, DefaultLayoutController, fx, devices) {
+}(window, function($, layoutSets, DefaultLayoutController, fx, devices) {
 
     var exports = {};
 

@@ -1,5 +1,6 @@
 "use strict";
 (function(root, factory) {
+    /* global define, DevExpress, jQuery */
     if (typeof define === 'function' && define.amd) {
         define(function(require, exports, module) {
             module.exports = factory(
@@ -17,7 +18,7 @@
         );
         root.DevExpress.framework.html.EmptyLayoutController = root.DevExpress.layouts.EmptyLayout.EmptyLayoutController;
     }
-}(this, function($, layoutSets, DefaultLayoutController) {
+}(window, function($, layoutSets, DefaultLayoutController) {
 
     var exports = {};
 

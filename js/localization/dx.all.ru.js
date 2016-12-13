@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.all.ru.js)
-* Version: 16.2.1
-* Build date: Mon Nov 07 2016
+* Version: 16.2.3
+* Build date: Tue Dec 13 2016
 *
 * Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -11,13 +11,14 @@
 ! function(root, factory) {
     if ("function" === typeof define && define.amd) {
         define(function(require) {
-            factory(require("../message"))
+            factory(require("devextreme/localization"), require("devextreme/core/errors"))
         })
     } else {
-        factory(DevExpress.localization.message)
+        factory(DevExpress.localization, DevExpress.errors)
     }
-}(this, function(message) {
-    message.load({
+}(this, function(localization, errors) {
+    errors.log("W0013", "devextreme/dist/js/localization/dx.all.ru.js", "16.2", "Use the 'devextreme/dist/js/localization/dx.messages.ru.js' file instead.");
+    localization.loadMessages({
         ru: {
             Yes: "Да",
             No: "Нет",
@@ -46,21 +47,7 @@
             "validation-pattern-formatted": "Значение поля {0} не соответствует шаблону",
             "validation-email": "Недопустимое значение email",
             "validation-email-formatted": "Недопустимое значениe {0}",
-            "validation-mask": "Недопустимое значение"
-        }
-    })
-});
-! function(root, factory) {
-    if ("function" === typeof define && define.amd) {
-        define(function(require) {
-            factory(require("../message"))
-        })
-    } else {
-        factory(DevExpress.localization.message)
-    }
-}(this, function(message) {
-    message.load({
-        ru: {
+            "validation-mask": "Недопустимое значение",
             "dxLookup-searchPlaceholder": "Минимальное количество символов: {0}",
             "dxList-pullingDownText": "Потяните, чтобы обновить...",
             "dxList-pulledDownText": "Отпустите, чтобы обновить...",
@@ -94,30 +81,7 @@
             "dxSwitch-offText": "ВЫКЛ",
             "dxForm-optionalMark": "необязательный",
             "dxForm-requiredMessage": " Поле {0} должно быть заполнено",
-            "dxNumberBox-invalidValueMessage": "Значение должно быть числом"
-        }
-    })
-});
-! function(root, factory) {
-    if ("function" === typeof define && define.amd) {
-        define(function(require) {
-            factory(require("../message"))
-        })
-    } else {
-        factory(DevExpress.localization.message)
-    }
-}(this, function() {});
-! function(root, factory) {
-    if ("function" === typeof define && define.amd) {
-        define(function(require) {
-            factory(require("../message"))
-        })
-    } else {
-        factory(DevExpress.localization.message)
-    }
-}(this, function(message) {
-    message.load({
-        ru: {
+            "dxNumberBox-invalidValueMessage": "Значение должно быть числом",
             "dxDataGrid-columnChooserTitle": "Выбор столбцов",
             "dxDataGrid-columnChooserEmptyText": "Перетащите столбец сюда, чтобы скрыть его",
             "dxDataGrid-groupContinuesMessage": "Продолжение на следующей странице",

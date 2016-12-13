@@ -1,5 +1,6 @@
 "use strict";
 (function(root, factory) {
+    /* global define, DevExpress, jQuery */
     if (typeof define === 'function' && define.amd) {
         define(function(require, exports, module) {
             module.exports = factory(
@@ -22,7 +23,7 @@
         root.DevExpress.framework.html.OverlayLayoutControllerBase = root.DevExpress.layouts.PopupLayout.OverlayLayoutControllerBase;
         root.DevExpress.framework.html.PopupLayoutController = root.DevExpress.layouts.PopupLayout.PopupLayoutController;
     }
-}(this, function($, layoutSets, DefaultLayoutController, SimpleLayoutController) {
+}(window, function($, layoutSets, DefaultLayoutController, SimpleLayoutController) {
 
     var exports = {},
         abstract = DefaultLayoutController.abstract;

@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 16.2.1
-* Build date: Nov 7, 2016
+* Version: 16.2.3
+* Build date: Dec 13, 2016
 *
 * Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -105,7 +105,7 @@
   font-weight: normal;
   font-size: 14px;
   font-family: 'Helvetica Neue', 'Segoe UI', Helvetica, Verdana, sans-serif;
-  line-height: normal;
+  line-height: 1.35715;
 }
 .dx-datagrid-column-chooser input,
 .dx-datagrid-column-chooser textarea {
@@ -184,7 +184,7 @@
   position: relative;
 }
 .dx-pivotgrid-fields-container .dx-sort {
-  color: #7c7c7c;
+  color: #929292;
 }
 .dx-pivotgrid-fields-container .dx-sort-up {
   font: 14px/1 DXIcons;
@@ -299,7 +299,7 @@
   box-sizing: content-box;
 }
 .dx-pivotgrid .dx-pivotgrid-area td {
-  color: #7c7c7c;
+  color: #929292;
   padding: 7px 10px;
 }
 .dx-pivotgrid .dx-pivotgrid-fields-area-head td {
@@ -317,7 +317,7 @@
   white-space: nowrap;
   padding: 6px 0;
   border: 1px solid transparent;
-  color: #bfbfbf;
+  color: #d4d4d4;
 }
 .dx-pivotgrid .dx-group-connector {
   position: absolute;
@@ -696,7 +696,7 @@
   height: 100%;
 }
 .dx-scheduler-view-switcher.dx-tabs {
-  max-width: 60%;
+  max-width: 52%;
   min-width: 72px;
   width: auto;
   float: right;
@@ -1564,6 +1564,13 @@
   line-height: 75px;
   text-align: center;
   border-bottom: 2px solid rgba(77, 77, 77, 0.6);
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
 }
 .dx-scheduler-small .dx-scheduler-all-day-title {
   width: 50px;
@@ -1780,6 +1787,16 @@
   cursor: default;
   opacity: .6;
 }
+.dx-scheduler-work-space-week .dx-scheduler-appointment-reduced .dx-scheduler-appointment-content,
+.dx-scheduler-work-space-work-week .dx-scheduler-appointment-reduced .dx-scheduler-appointment-content,
+.dx-scheduler-work-space-day .dx-scheduler-appointment-reduced .dx-scheduler-appointment-content {
+  padding: 5px 20px 5px 7px;
+}
+.dx-scheduler-work-space-week .dx-scheduler-appointment-reduced-icon,
+.dx-scheduler-work-space-work-week .dx-scheduler-appointment-reduced-icon,
+.dx-scheduler-work-space-day .dx-scheduler-appointment-reduced-icon {
+  top: 9px;
+}
 .dx-scheduler-timeline .dx-scheduler-appointment,
 .dx-scheduler-work-space-month .dx-scheduler-appointment,
 .dx-scheduler-all-day-appointment {
@@ -1971,6 +1988,10 @@
   margin: 0;
 }
 .dx-scheduler-appointment-popup .dx-field-item {
+  padding-left: 20px;
+  padding-right: 20px;
+}
+.dx-scheduler-appointment-popup .dx-layout-manager-one-col .dx-field-item {
   padding-left: 20px;
   padding-right: 20px;
 }
@@ -2572,7 +2593,7 @@
   font-weight: normal;
   font-size: 14px;
   font-family: 'Helvetica Neue', 'Segoe UI', Helvetica, Verdana, sans-serif;
-  line-height: normal;
+  line-height: 1.35715;
 }
 .dx-theme-generic-typography input,
 .dx-theme-generic-typography textarea {
@@ -2619,8 +2640,7 @@
 }
 @font-face {
   font-family: 'DXIcons';
-  src: url(icons/dxicons.eot);
-  src: url(icons/dxicons.eot) format('embedded-opentype'), url(icons/dxicons.woff) format('woff'), url(icons/dxicons.ttf) format('truetype');
+  src: url(icons/dxicons.woff) format('woff'), url(icons/dxicons.ttf) format('truetype');
   font-weight: normal;
   font-style: normal;
 }
@@ -3399,7 +3419,7 @@
   font-weight: normal;
   font-size: 14px;
   font-family: 'Helvetica Neue', 'Segoe UI', Helvetica, Verdana, sans-serif;
-  line-height: normal;
+  line-height: 1.35715;
 }
 .dx-widget input,
 .dx-widget textarea {
@@ -4340,6 +4360,7 @@
   color: #dedede;
   font-size: 1em;
   border-radius: 4px;
+  min-height: 34px;
 }
 .dx-invalid.dx-texteditor {
   border-color: rgba(217, 83, 79, 0.4);
@@ -5121,6 +5142,9 @@
 .dx-dropdownlist-popup-wrapper .dx-empty-message:last-of-type {
   border-bottom: none;
 }
+.dx-textarea {
+  height: auto;
+}
 .dx-textarea .dx-icon-clear {
   top: 0;
   margin-top: 0;
@@ -5509,6 +5533,32 @@
   background-image: -ms-linear-gradient(top, rgba(42, 42, 42, 0) 0%, rgba(42, 42, 42, 0.8) 60%);
   background-image: -o-linear-gradient(top, rgba(42, 42, 42, 0) 0%, rgba(42, 42, 42, 0.8) 60%);
 }
+.dx-device-tablet .dx-dateview-rollers,
+.dx-device-phone .dx-dateview-rollers {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -moz-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-flow: row nowrap;
+  -moz-flex-flow: row nowrap;
+  -ms-flex-direction: row;
+  -ms-flex-wrap: nowrap;
+  -ms-flex-flow: row nowrap;
+  flex-flow: row nowrap;
+}
+.dx-device-tablet .dx-dateviewroller-month,
+.dx-device-phone .dx-dateviewroller-month {
+  min-width: 4em;
+}
+.dx-device-tablet .dx-dateview-item,
+.dx-device-phone .dx-dateview-item {
+  font-size: 1.1em;
+}
+.dx-device-tablet .dx-dateview-item-selected,
+.dx-device-phone .dx-dateview-item-selected {
+  font-size: 1.4em;
+}
 .dx-toolbar {
   background-color: #2a2a2a;
   color: #dedede;
@@ -5703,7 +5753,7 @@
   font-weight: normal;
   font-size: 14px;
   font-family: 'Helvetica Neue', 'Segoe UI', Helvetica, Verdana, sans-serif;
-  line-height: normal;
+  line-height: 1.35715;
 }
 .dx-overlay-wrapper input,
 .dx-overlay-wrapper textarea {
@@ -5949,8 +5999,11 @@
 .dx-popup-content .dx-button {
   margin: 0 10px;
 }
+.dx-popup-bottom {
+  background: transparent;
+}
 .dx-popup-bottom.dx-toolbar {
-  padding: 0 20px 20px;
+  padding: 20px;
   overflow: visible;
 }
 .dx-popup-bottom.dx-toolbar .dx-toolbar-before {
@@ -6434,9 +6487,6 @@
 .dx-lookup-popup-wrapper .dx-popup-title + .dx-popup-content {
   top: 49px;
 }
-.dx-lookup-popup-wrapper .dx-popup-bottom {
-  padding-top: 10px;
-}
 .dx-lookup-empty .dx-lookup-field {
   color: #787878;
 }
@@ -6732,8 +6782,8 @@
 .dx-selectbox-popup-wrapper .dx-list {
   background-color: #2a2a2a;
 }
-.dx-selectbox-popup-wrapper .dx-popup-bottom {
-  padding-top: 10px;
+.dx-tagbox:not(.dx-texteditor-empty).dx-tagbox-default-template.dx-tagbox-only-select .dx-tag-container {
+  padding-bottom: 4px;
 }
 .dx-tagbox:not(.dx-texteditor-empty) .dx-texteditor-input {
   padding-left: 0;
@@ -7290,6 +7340,9 @@
   padding-left: 10px;
   padding-right: 0;
 }
+.dx-datagrid {
+  line-height: inherit;
+}
 .dx-datagrid.dx-datagrid-borders > .dx-datagrid-headers,
 .dx-datagrid.dx-datagrid-borders > .dx-datagrid-rowsview,
 .dx-datagrid.dx-datagrid-borders > .dx-datagrid-total-footer {
@@ -7314,6 +7367,12 @@
 }
 .dx-datagrid .dx-menu .dx-menu-item .dx-menu-item-content .dx-icon {
   margin: 0px 3px;
+}
+.dx-datagrid .dx-menu-item-has-submenu.dx-state-hover {
+  background-color: transparent;
+}
+.dx-datagrid .dx-menu-item-has-submenu.dx-menu-item-expanded.dx-state-hover {
+  background-color: #2a2a2a;
 }
 .dx-datagrid .dx-menu-item-has-icon .dx-icon {
   color: #888888;
@@ -7436,7 +7495,7 @@
   background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAFCAQAAADbc8WkAAAAHElEQVQYV2NI+J/A8B8DJoAQbgmsEKwDC8QtAQC2WDWbJkSICQAAAABJRU5ErkJggg==);
 }
 .dx-datagrid .dx-row-alt > td {
-  background-color: #2f2f2f;
+  background-color: #343434;
 }
 .dx-datagrid .dx-row-alt.dx-row:not(.dx-row-removed) {
   border-bottom-color: transparent;
@@ -7492,6 +7551,7 @@
 .dx-datagrid-headers .dx-texteditor-input,
 .dx-datagrid-rowsview .dx-texteditor-input {
   padding: 7px;
+  min-height: 33px;
 }
 .dx-datagrid-headers .dx-dropdowneditor-button-visible.dx-show-clear-button .dx-texteditor-input,
 .dx-datagrid-rowsview .dx-dropdowneditor-button-visible.dx-show-clear-button .dx-texteditor-input {
@@ -8272,7 +8332,7 @@
   font-weight: normal;
   font-size: 14px;
   font-family: 'Helvetica Neue', 'Segoe UI', Helvetica, Verdana, sans-serif;
-  line-height: normal;
+  line-height: 1.35715;
 }
 .dx-menu-base input,
 .dx-menu-base textarea {
@@ -8868,7 +8928,7 @@
   font-weight: normal;
   font-size: 14px;
   font-family: 'Helvetica Neue', 'Segoe UI', Helvetica, Verdana, sans-serif;
-  line-height: normal;
+  line-height: 1.35715;
 }
 .dx-field input,
 .dx-field textarea {
