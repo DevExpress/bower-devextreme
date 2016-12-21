@@ -1,4 +1,4 @@
-DEVELOPER EXPRESS INC
+﻿DEVELOPER EXPRESS INC
 DevExtreme (R) Complete
 Copyright (C) 2011-2016 Developer Express Inc.
 
@@ -13,7 +13,7 @@ By purchasing, installing, copying, or otherwise using the SOFTWARE DEVELOPMENT 
 
 If you do not agree to any of the terms and conditions of this AGREEMENT or if you do not have the legal authority to bind the business and/or entity you are representing to any of the terms and conditions of this AGREEMENT, DO NOT INSTALL, COPY, USE, EVALUATE, OR REPLICATE IN ANY MANNER, ANY PART, FILE OR PORTION OF THE SOFTWARE DEVELOPMENT PRODUCT(S).
 
-All SOFTWARE DEVELOPMENT PRODUCT(S) is licensed, not sold. 
+All SOFTWARE DEVELOPMENT PRODUCT(S) is licensed, not sold.
 
 1. GRANT OF LICENSE.
 
@@ -31,7 +31,7 @@ DEVEXPRESS licenses the SOFTWARE DEVELOPMENT PRODUCT(S) on a per-developer basis
 
 If the SOFTWARE DEVELOPMENT PRODUCT(S) you have obtained is marked as "COMPLIMENTARY" or "FREE", you may install, and use the SOFTWARE DEVELOPMENT PRODUCT(S).
 
-DEVEXPRESS reserves the right to discontinue at its discretion and without advance notice, the availability of COMPLIMENTARY or FREE versions of the SOFTWARE DEVELOPMENT PRODUCT(S) or its constituent parts at any time. 
+DEVEXPRESS reserves the right to discontinue at its discretion and without advance notice, the availability of COMPLIMENTARY or FREE versions of the SOFTWARE DEVELOPMENT PRODUCT(S) or its constituent parts at any time.
 
 1.4 THIRTY (30) DAY EVALUATION (TRIAL) USE LICENSE.
 
@@ -40,6 +40,12 @@ If the SOFTWARE DEVELOPMENT PRODUCT(S) you have obtained is marked as a "TRIAL" 
 You MAY NOT CREATE applications or begin software projects using the SOFTWARE DEVELOPMENT PRODUCT(S) under the terms of the THIRTY (30) DAY EVALUATION (TRIAL) USE LICENSE.
 
 You MAY NOT REDISTRIBUTE files in the SOFTWARE DEVELOPMENT PRODUCT(S) distribution if using an evaluation or trial version of the SOFTWARE DEVELOPMENT PRODUCT(S).
+
+1.5 PRE-RELEASE SOFTWARE
+
+SOFTWARE DEVELOPMENT PRODUCT(S) marked as PRE-RELEASE (including but not limited to the designation of Alpha, Beta, Community Technology Preview "CTP", or Release Candidate "RC") may contain deficiencies and as such, should not be considered for use or integrated in any mission critical application.
+
+DEVEXPRESS may, at its sole discretion, discontinue availability of the PRE-RELEASE software, limit or modify PRE-RELEASE software functionality, or eliminate SUPPORT SERVICES for the PRE-RELEASE software at any time. For a complete list of PRE-RELEASE software, refer to the following webpage: https://www.devexpress.com/pre-release
 
 2. LIMITATIONS ON REVERSE ENGINEERING, DECOMPILATION, AND DISASSEMBLY.
 
@@ -99,7 +105,7 @@ http://jquery.com/
 
 Knockout JavaScript Library (Open Source - MIT License)
 Copyright (C) Knockoutjs.com
-http://knockoutjs.com/ 
+http://knockoutjs.com/
 http://opensource.org/licenses/mit-license.php
 
 Globalize JavaScript Library (Open Source - MIT License)
@@ -117,11 +123,11 @@ http://unicode.org/copyright.html
 
 AngularJS JavaScript Library (Open Source - MIT License)
 Copyright (C) Google, Inc.
-http://angularjs.org/ 
+http://angularjs.org/
 
 JSZip JavaScript Library (Open Source - MIT License)
 Copyright (C) Stuart Knightley, David Duponchel, Franz Buchinger, Antonio Afonso
-https://stuk.github.io/jszip/  
+https://stuk.github.io/jszip/
 
 The open source libraries included in the SOFTWARE DEVELOPMENT PRODUCT(S) are done so pursuant to each individual open source library license and subject to the disclaimers and limitations on liability set forth in each open source library license.
 
@@ -157,7 +163,7 @@ LICENSEE understands that the SOFTWARE DEVELOPMENT PRODUCT(S) may produce inaccu
 
 14. INDEMNIFICATION.
 
-You hereby agree to indemnify DEVEXPRESS and its officers, directors, employees, agents, and representatives from each and every demand, claim, loss, liability, or damage of any kind, including actual attorney's fees, whether in tort or contract, that it or any of them may incur by reason of, or arising out of, any claim which is made by any third party with respect to any breach or violation of this AGREEMENT by you or any claims based on the Applications and the SOFTWARE DEVELOPMENT PRODUCT(S) included herein.
+You hereby agree to indemnify DEVEXPRESS and its officers, directors, employees, agents, and representatives from each and every demand, claim, loss, liability, or damage of any kind, including actual attorney's fees, whether in tort or contract, that it or any of them may incur by reason of, or arising out of, any claim which is made by any third party with respect to any breach or violation of this AGREEMENT by you or any claims based on the Applications and the SOFTWARE DEVELOPMENT PRODUCT(S) included herein, including without limitation any claims asserted by your end user customers.
 
 15. U.S. GOVERNMENT RESTRICTED RIGHTS.
 
@@ -167,12 +173,13 @@ For the Department of Defense: The SOFTWARE DEVELOPMENT PRODUCT(S) is "Commercia
 
 For all agencies or departments: US GOVT rights in the SOFTWARE DEVELOPMENT PRODUCT(S) is defined in Clause 52.227-19(c)(2) of the FAR.
 
-The manufacturer of the SOFTWARE DEVELOPMENT PRODUCT(S) is:
-Developer Express, Inc., 505 N. Brand Blvd Suite 1600 Glendale, CA 91203. 
+The manufacturer of the SOFTWARE DEVELOPMENT PRODUCT(S) is: Developer Express, Inc., 505 N. Brand Blvd Suite 1600 Glendale, CA 91203.
 
 16. SUPPORT SERVICES.
 
-DEVEXPRESS may provide you with support services related to the SOFTWARE DEVELOPMENT PRODUCT(S) ("SUPPORT SERVICES"). Use of SUPPORT SERVICES is governed by DEVEXPRESS policies and programs described in the user manual, in "on line" documentation and/or other DEVEXPRESS provided materials. Any supplemental SOFTWARE DEVELOPMENT PRODUCT(S) provided to you as part of the SUPPORT SERVICES shall be considered part of the SOFTWARE DEVELOPMENT PRODUCT(S) and subject to the terms and conditions of this AGREEMENT. With respect to technical information you provide to DEVEXPRESS as part of the SUPPORT SERVICES, DEVEXPRESS may use such information for its business purposes, including for SOFTWARE DEVELOPMENT PRODUCT(S) support and development.
+DEVEXPRESS may provide you with support services related to the SOFTWARE DEVELOPMENT PRODUCT(S) ("SUPPORT SERVICES"). Use of SUPPORT SERVICES is governed by DEVEXPRESS policies and programs described in the user manual, in "on line" documentation and/or other DEVEXPRESS provided materials. DEVEXPRESS may restrict or otherwise discontinue SUPPORT SERVICES provided to you if Your use of SUPPORT SERVICES is deemed by DEVEXPRESS, in its sole and reasonable discretion, to be excessive and beyond the scope of fair use.
+
+Any supplemental SOFTWARE DEVELOPMENT PRODUCT(S) provided to you as part of the SUPPORT SERVICES shall be considered part of the SOFTWARE DEVELOPMENT PRODUCT(S) and subject to the terms and conditions of this AGREEMENT. With respect to technical information you provide to DEVEXPRESS as part of the SUPPORT SERVICES, DEVEXPRESS may use such information for its business purposes, including for SOFTWARE DEVELOPMENT PRODUCT(S) support and development.
 
 17. TERMINATION.
 
@@ -184,7 +191,31 @@ DEVEXPRESS delivers its software electronically and does not collect sales or us
 
 19. PERSONAL DATA.
 
-DEVEXPRESS may collect and store information to help identify usage and defects within its SOFTWARE DEVELOPMENT PRODUCT(S) and to verify LICENSEE’s compliance with the terms of this AGREEMENT. DEVEXPRESS does not lend, lease, sell, or share personally identifiable information it obtains from you. DEVEXPRESS does not disclose purchase information or licensing information to third parties. Refer to the DEVEXPRESS Privacy Statement at https://www.devexpress.com/Home/Legal.xml for additional information. 
+All Information DEVEXPRESS collects from You is stored and maintained on servers utilizing reasonable and appropriate data security safeguards. DEVEXPRESS does not lend, lease, sell, or market information it obtains from its customers or those who provide us personally identifiable information. DEVEXPRESS does not disclose purchase information or licensing information to third parties.
+
+DEVEXPRESS collects personally identifiable information whenever You purchase/license a DEVEXPRESS product or service. Information includes Name, Address, Phone Number, Email address, Payment Information, Product Purchases, Licenses Owned, Employee/Contact Details, etc. The information we collect allows DEVEXPRESS to communicate with You regarding upcoming product updates, new product releases, company news and other important business matters.
+
+DEVEXPRESS does not wish to receive, act to procure, nor desire to solicit, confidential or proprietary materials and information from You through the use of the SOFTWARE DEVELOPMENT PRODUCT(S) or SUPPORT SERVICES. Any and all materials, attachments, or information submitted by You as part of error submissions, or divulged during chats, online discussions, Support Center submissions, or made available to DEVEXPRESS in any manner will be deemed NOT to be confidential by DEVEXPRESS. You acknowledge that submissions to DEVEXPRESS will not be considered confidential or proprietary and that DEVEXPRESS will be under no obligation to keep such information confidential.
+
+Your election to use the SOFTWARE DEVELOPMENT PRODUCT(S) indicates your acceptance of the terms of this AGREEMENT. You are responsible for maintaining confidentiality of your username, password and other sensitive information. You are responsible for all activities that occur in your user account and in case of any unauthorized activity on your account, you agree to inform DEVEXPRESS immediately by any method listed on the DEVEXPRESS website's Contacts page. DEVEXPRESS is not responsible for any loss or damage to you or to any third party incurred as a result of any unauthorized access and/or use of your user account, or otherwise.
+
+DEVEXPRESS may disclose or report Confidential Information in limited circumstances where it believes in good faith that disclosure is required under the law. For example, DEVEXPRESS may be required to disclose Confidential Information to cooperate with regulators or law enforcement authorities, to comply with a legal process such as a court order, subpoena, search warrant, or a law enforcement request. Additionally, if the ownership of all or substantially all of our business changes or we otherwise transfer assets relating to our business or the SOFTWARE DEVELOPMENT PRODUCT(S) to a third party, such as by merger, acquisition, bankruptcy proceeding or otherwise, we may transfer or sell your personal information to the new owner. In such a case, unless permitted otherwise by applicable law, your information would remain subject to the promises made in the applicable privacy policy unless you agree differently.
+
+19.1 CUSTOMER EXPERIENCE PROGRAM
+
+When you optionally join the Customer Experience Program, your computer or device automatically transmits information to DEVEXPRESS about the usage of the SOFTWARE DEVELOPMENT PRODUCT(S). This information is used to address issues within DEVEXPRESS products and improve quality/usability.
+
+Opt in/Opt out
+
+The Customer Experience Program is strictly optional and you can opt in or opt out of the program at any time by executing the DEVEXPRESS installer and making the appropriate selection within the installation program.
+
+Privacy
+
+The Customer Experience Program does not transmit personally identifiable information such as your name, address or phone number.
+
+What we collect
+
+The Customer Experience Program only collects information related to DEVEXPRESS controls and libraries. This information includes usage of DEVEXPRESS controls at design time within Visual Studio and usage of DEVEXPRESS demos. DEVEXPRESS CodeRush collects project type and file type information when you edit code in Visual Studio. No information is collected from applications/demos you create.
 
 20. MISCELLANEOUS.
 
