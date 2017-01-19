@@ -102,8 +102,9 @@
             if (this._thresholdExceeded(originalEvent)) {
                 this._moveEvent = true;
                 this.root._$viewPort.off(POINTER_MOVE_EVENT_NAME + EVENTS_NAMESPACE);
-                if (this._isVerticalDirection(originalEvent.clientX, originalEvent.clientY))
+                if (this._isVerticalDirection(originalEvent.clientX, originalEvent.clientY)) {
                     this._toggleAppBarState(true);
+                }
             }
         },
 
@@ -136,8 +137,9 @@
         },
 
         _toggleAppBarState: function(state) {
-            if (!this.root._appBarHasCommands())
+            if (!this.root._appBarHasCommands()) {
                 return;
+            }
 
             this.root._$viewPort.find(".dx-app-bar").toggleClass("dx-app-bar-visible", !this._appBarBehavior || state);
         },

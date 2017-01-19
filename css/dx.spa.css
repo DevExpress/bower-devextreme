@@ -1,9 +1,9 @@
 /*!
 * DevExtreme
-* Version: 16.2.3
-* Build date: Dec 13, 2016
+* Version: 16.2.4
+* Build date: Jan 17, 2017
 *
-* Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
+* Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
 */
 html,
@@ -137,8 +137,8 @@ section {
 .dx-fast-hidden,
 .dx-inactive-view {
   position: absolute !important;
-  top: -9999px !important;
-  left: -9999px !important;
+  top: -99999px !important;
+  left: -99999px !important;
 }
 .dx-skip-animation,
 .dx-fast-hidden,

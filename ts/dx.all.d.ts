@@ -1,11 +1,473 @@
 /*!
 * DevExtreme (dx.all.d.ts)
-* Version: 16.2.3
-* Build date: Tue Dec 13 2016
+* Version: 16.2.4
+* Build date: Tue Jan 17 2017
 *
-* Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
+* Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
 */
+interface JQuery {
+    dxAccordion(): JQuery;
+    dxAccordion(options: "instance"): DevExpress.ui.dxAccordion;
+    dxAccordion(options: string): any;
+    dxAccordion(options: string, ...params: any[]): any;
+    dxAccordion(options: DevExpress.ui.dxAccordionOptions): JQuery;
+}
+interface JQuery {
+    dxActionSheet(): JQuery;
+    dxActionSheet(options: "instance"): DevExpress.ui.dxActionSheet;
+    dxActionSheet(options: string): any;
+    dxActionSheet(options: string, ...params: any[]): any;
+    dxActionSheet(options: DevExpress.ui.dxActionSheetOptions): JQuery;
+}
+interface JQuery {
+    dxAutocomplete(): JQuery;
+    dxAutocomplete(options: "instance"): DevExpress.ui.dxAutocomplete;
+    dxAutocomplete(options: string): any;
+    dxAutocomplete(options: string, ...params: any[]): any;
+    dxAutocomplete(options: DevExpress.ui.dxAutocompleteOptions): JQuery;
+}
+interface JQuery {
+    dxBox(): JQuery;
+    dxBox(options: "instance"): DevExpress.ui.dxBox;
+    dxBox(options: string): any;
+    dxBox(options: string, ...params: any[]): any;
+    dxBox(options: DevExpress.ui.dxBoxOptions): JQuery;
+}
+interface JQuery {
+    dxButton(): JQuery;
+    dxButton(options: "instance"): DevExpress.ui.dxButton;
+    dxButton(options: string): any;
+    dxButton(options: string, ...params: any[]): any;
+    dxButton(options: DevExpress.ui.dxButtonOptions): JQuery;
+}
+interface JQuery {
+    dxCalendar(): JQuery;
+    dxCalendar(options: "instance"): DevExpress.ui.dxCalendar;
+    dxCalendar(options: string): any;
+    dxCalendar(options: string, ...params: any[]): any;
+    dxCalendar(options: DevExpress.ui.dxCalendarOptions): JQuery;
+}
+interface JQuery {
+    dxCheckBox(): JQuery;
+    dxCheckBox(options: "instance"): DevExpress.ui.dxCheckBox;
+    dxCheckBox(options: string): any;
+    dxCheckBox(options: string, ...params: any[]): any;
+    dxCheckBox(options: DevExpress.ui.dxCheckBoxOptions): JQuery;
+}
+interface JQuery {
+    dxColorBox(): JQuery;
+    dxColorBox(options: "instance"): DevExpress.ui.dxColorBox;
+    dxColorBox(options: string): any;
+    dxColorBox(options: string, ...params: any[]): any;
+    dxColorBox(options: DevExpress.ui.dxColorBoxOptions): JQuery;
+}
+interface JQuery {
+    dxContextMenu(): JQuery;
+    dxContextMenu(options: "instance"): DevExpress.ui.dxContextMenu;
+    dxContextMenu(options: string): any;
+    dxContextMenu(options: string, ...params: any[]): any;
+    dxContextMenu(options: DevExpress.ui.dxContextMenuOptions): JQuery;
+}
+interface JQuery {
+    dxDataGrid(): JQuery;
+    dxDataGrid(options: "instance"): DevExpress.ui.dxDataGrid;
+    dxDataGrid(options: string): any;
+    dxDataGrid(options: string, ...params: any[]): any;
+    dxDataGrid(options: DevExpress.ui.dxDataGridOptions): JQuery;
+}
+interface JQuery {
+    dxDateBox(): JQuery;
+    dxDateBox(options: "instance"): DevExpress.ui.dxDateBox;
+    dxDateBox(options: string): any;
+    dxDateBox(options: string, ...params: any[]): any;
+    dxDateBox(options: DevExpress.ui.dxDateBoxOptions): JQuery;
+}
+interface JQuery {
+    dxDeferRendering(): JQuery;
+    dxDeferRendering(options: "instance"): DevExpress.ui.dxDeferRendering;
+    dxDeferRendering(options: string): any;
+    dxDeferRendering(options: string, ...params: any[]): any;
+    dxDeferRendering(options: DevExpress.ui.dxDeferRenderingOptions): JQuery;
+}
+interface JQuery {
+    dxFileUploader(): JQuery;
+    dxFileUploader(options: "instance"): DevExpress.ui.dxFileUploader;
+    dxFileUploader(options: string): any;
+    dxFileUploader(options: string, ...params: any[]): any;
+    dxFileUploader(options: DevExpress.ui.dxFileUploaderOptions): JQuery;
+}
+interface JQuery {
+    dxForm(): JQuery;
+    dxForm(options: "instance"): DevExpress.ui.dxForm;
+    dxForm(options: string): any;
+    dxForm(options: string, ...params: any[]): any;
+    dxForm(options: DevExpress.ui.dxFormOptions): JQuery;
+}
+interface JQuery {
+    dxGallery(): JQuery;
+    dxGallery(options: "instance"): DevExpress.ui.dxGallery;
+    dxGallery(options: string): any;
+    dxGallery(options: string, ...params: any[]): any;
+    dxGallery(options: DevExpress.ui.dxGalleryOptions): JQuery;
+}
+interface JQuery {
+    dxList(): JQuery;
+    dxList(options: "instance"): DevExpress.ui.dxList;
+    dxList(options: string): any;
+    dxList(options: string, ...params: any[]): any;
+    dxList(options: DevExpress.ui.dxListOptions): JQuery;
+}
+interface JQuery {
+    dxLoadIndicator(): JQuery;
+    dxLoadIndicator(options: "instance"): DevExpress.ui.dxLoadIndicator;
+    dxLoadIndicator(options: string): any;
+    dxLoadIndicator(options: string, ...params: any[]): any;
+    dxLoadIndicator(options: DevExpress.ui.dxLoadIndicatorOptions): JQuery;
+}
+interface JQuery {
+    dxLoadPanel(): JQuery;
+    dxLoadPanel(options: "instance"): DevExpress.ui.dxLoadPanel;
+    dxLoadPanel(options: string): any;
+    dxLoadPanel(options: string, ...params: any[]): any;
+    dxLoadPanel(options: DevExpress.ui.dxLoadPanelOptions): JQuery;
+}
+interface JQuery {
+    dxLookup(): JQuery;
+    dxLookup(options: "instance"): DevExpress.ui.dxLookup;
+    dxLookup(options: string): any;
+    dxLookup(options: string, ...params: any[]): any;
+    dxLookup(options: DevExpress.ui.dxLookupOptions): JQuery;
+}
+interface JQuery {
+    dxMap(): JQuery;
+    dxMap(options: "instance"): DevExpress.ui.dxMap;
+    dxMap(options: string): any;
+    dxMap(options: string, ...params: any[]): any;
+    dxMap(options: DevExpress.ui.dxMapOptions): JQuery;
+}
+interface JQuery {
+    dxMenu(): JQuery;
+    dxMenu(options: "instance"): DevExpress.ui.dxMenu;
+    dxMenu(options: string): any;
+    dxMenu(options: string, ...params: any[]): any;
+    dxMenu(options: DevExpress.ui.dxMenuOptions): JQuery;
+}
+interface JQuery {
+    dxMultiView(): JQuery;
+    dxMultiView(options: "instance"): DevExpress.ui.dxMultiView;
+    dxMultiView(options: string): any;
+    dxMultiView(options: string, ...params: any[]): any;
+    dxMultiView(options: DevExpress.ui.dxMultiViewOptions): JQuery;
+}
+interface JQuery {
+    dxNavBar(): JQuery;
+    dxNavBar(options: "instance"): DevExpress.ui.dxNavBar;
+    dxNavBar(options: string): any;
+    dxNavBar(options: string, ...params: any[]): any;
+    dxNavBar(options: DevExpress.ui.dxNavBarOptions): JQuery;
+}
+interface JQuery {
+    dxNumberBox(): JQuery;
+    dxNumberBox(options: "instance"): DevExpress.ui.dxNumberBox;
+    dxNumberBox(options: string): any;
+    dxNumberBox(options: string, ...params: any[]): any;
+    dxNumberBox(options: DevExpress.ui.dxNumberBoxOptions): JQuery;
+}
+interface JQuery {
+    dxPanorama(): JQuery;
+    dxPanorama(options: "instance"): DevExpress.ui.dxPanorama;
+    dxPanorama(options: string): any;
+    dxPanorama(options: string, ...params: any[]): any;
+    dxPanorama(options: DevExpress.ui.dxPanoramaOptions): JQuery;
+}
+interface JQuery {
+    dxPivot(): JQuery;
+    dxPivot(options: "instance"): DevExpress.ui.dxPivot;
+    dxPivot(options: string): any;
+    dxPivot(options: string, ...params: any[]): any;
+    dxPivot(options: DevExpress.ui.dxPivotOptions): JQuery;
+}
+interface JQuery {
+    dxPivotGrid(): JQuery;
+    dxPivotGrid(options: "instance"): DevExpress.ui.dxPivotGrid;
+    dxPivotGrid(options: string): any;
+    dxPivotGrid(options: string, ...params: any[]): any;
+    dxPivotGrid(options: DevExpress.ui.dxPivotGridOptions): JQuery;
+}
+interface JQuery {
+    dxPivotGridFieldChooser(): JQuery;
+    dxPivotGridFieldChooser(options: "instance"): DevExpress.ui.dxPivotGridFieldChooser;
+    dxPivotGridFieldChooser(options: string): any;
+    dxPivotGridFieldChooser(options: string, ...params: any[]): any;
+    dxPivotGridFieldChooser(options: DevExpress.ui.dxPivotGridFieldChooserOptions): JQuery;
+}
+interface JQuery {
+    dxPopover(): JQuery;
+    dxPopover(options: "instance"): DevExpress.ui.dxPopover;
+    dxPopover(options: string): any;
+    dxPopover(options: string, ...params: any[]): any;
+    dxPopover(options: DevExpress.ui.dxPopoverOptions): JQuery;
+}
+interface JQuery {
+    dxPopup(): JQuery;
+    dxPopup(options: "instance"): DevExpress.ui.dxPopup;
+    dxPopup(options: string): any;
+    dxPopup(options: string, ...params: any[]): any;
+    dxPopup(options: DevExpress.ui.dxPopupOptions): JQuery;
+}
+interface JQuery {
+    dxProgressBar(): JQuery;
+    dxProgressBar(options: "instance"): DevExpress.ui.dxProgressBar;
+    dxProgressBar(options: string): any;
+    dxProgressBar(options: string, ...params: any[]): any;
+    dxProgressBar(options: DevExpress.ui.dxProgressBarOptions): JQuery;
+}
+interface JQuery {
+    dxRadioGroup(): JQuery;
+    dxRadioGroup(options: "instance"): DevExpress.ui.dxRadioGroup;
+    dxRadioGroup(options: string): any;
+    dxRadioGroup(options: string, ...params: any[]): any;
+    dxRadioGroup(options: DevExpress.ui.dxRadioGroupOptions): JQuery;
+}
+interface JQuery {
+    dxRangeSlider(): JQuery;
+    dxRangeSlider(options: "instance"): DevExpress.ui.dxRangeSlider;
+    dxRangeSlider(options: string): any;
+    dxRangeSlider(options: string, ...params: any[]): any;
+    dxRangeSlider(options: DevExpress.ui.dxRangeSliderOptions): JQuery;
+}
+interface JQuery {
+    dxResizable(): JQuery;
+    dxResizable(options: "instance"): DevExpress.ui.dxResizable;
+    dxResizable(options: string): any;
+    dxResizable(options: string, ...params: any[]): any;
+    dxResizable(options: DevExpress.ui.dxResizableOptions): JQuery;
+}
+interface JQuery {
+    dxResponsiveBox(): JQuery;
+    dxResponsiveBox(options: "instance"): DevExpress.ui.dxResponsiveBox;
+    dxResponsiveBox(options: string): any;
+    dxResponsiveBox(options: string, ...params: any[]): any;
+    dxResponsiveBox(options: DevExpress.ui.dxResponsiveBoxOptions): JQuery;
+}
+interface JQuery {
+    dxScheduler(): JQuery;
+    dxScheduler(options: "instance"): DevExpress.ui.dxScheduler;
+    dxScheduler(options: string): any;
+    dxScheduler(options: string, ...params: any[]): any;
+    dxScheduler(options: DevExpress.ui.dxSchedulerOptions): JQuery;
+}
+interface JQuery {
+    dxScrollView(): JQuery;
+    dxScrollView(options: "instance"): DevExpress.ui.dxScrollView;
+    dxScrollView(options: string): any;
+    dxScrollView(options: string, ...params: any[]): any;
+    dxScrollView(options: DevExpress.ui.dxScrollViewOptions): JQuery;
+}
+interface JQuery {
+    dxSelectBox(): JQuery;
+    dxSelectBox(options: "instance"): DevExpress.ui.dxSelectBox;
+    dxSelectBox(options: string): any;
+    dxSelectBox(options: string, ...params: any[]): any;
+    dxSelectBox(options: DevExpress.ui.dxSelectBoxOptions): JQuery;
+}
+interface JQuery {
+    dxSlideOut(): JQuery;
+    dxSlideOut(options: "instance"): DevExpress.ui.dxSlideOut;
+    dxSlideOut(options: string): any;
+    dxSlideOut(options: string, ...params: any[]): any;
+    dxSlideOut(options: DevExpress.ui.dxSlideOutOptions): JQuery;
+}
+interface JQuery {
+    dxSlideOutView(): JQuery;
+    dxSlideOutView(options: "instance"): DevExpress.ui.dxSlideOutView;
+    dxSlideOutView(options: string): any;
+    dxSlideOutView(options: string, ...params: any[]): any;
+    dxSlideOutView(options: DevExpress.ui.dxSlideOutViewOptions): JQuery;
+}
+interface JQuery {
+    dxSlider(): JQuery;
+    dxSlider(options: "instance"): DevExpress.ui.dxSlider;
+    dxSlider(options: string): any;
+    dxSlider(options: string, ...params: any[]): any;
+    dxSlider(options: DevExpress.ui.dxSliderOptions): JQuery;
+}
+interface JQuery {
+    dxSwitch(): JQuery;
+    dxSwitch(options: "instance"): DevExpress.ui.dxSwitch;
+    dxSwitch(options: string): any;
+    dxSwitch(options: string, ...params: any[]): any;
+    dxSwitch(options: DevExpress.ui.dxSwitchOptions): JQuery;
+}
+interface JQuery {
+    dxTabPanel(): JQuery;
+    dxTabPanel(options: "instance"): DevExpress.ui.dxTabPanel;
+    dxTabPanel(options: string): any;
+    dxTabPanel(options: string, ...params: any[]): any;
+    dxTabPanel(options: DevExpress.ui.dxTabPanelOptions): JQuery;
+}
+interface JQuery {
+    dxTabs(): JQuery;
+    dxTabs(options: "instance"): DevExpress.ui.dxTabs;
+    dxTabs(options: string): any;
+    dxTabs(options: string, ...params: any[]): any;
+    dxTabs(options: DevExpress.ui.dxTabsOptions): JQuery;
+}
+interface JQuery {
+    dxTagBox(): JQuery;
+    dxTagBox(options: "instance"): DevExpress.ui.dxTagBox;
+    dxTagBox(options: string): any;
+    dxTagBox(options: string, ...params: any[]): any;
+    dxTagBox(options: DevExpress.ui.dxTagBoxOptions): JQuery;
+}
+interface JQuery {
+    dxTextArea(): JQuery;
+    dxTextArea(options: "instance"): DevExpress.ui.dxTextArea;
+    dxTextArea(options: string): any;
+    dxTextArea(options: string, ...params: any[]): any;
+    dxTextArea(options: DevExpress.ui.dxTextAreaOptions): JQuery;
+}
+interface JQuery {
+    dxTextBox(): JQuery;
+    dxTextBox(options: "instance"): DevExpress.ui.dxTextBox;
+    dxTextBox(options: string): any;
+    dxTextBox(options: string, ...params: any[]): any;
+    dxTextBox(options: DevExpress.ui.dxTextBoxOptions): JQuery;
+}
+interface JQuery {
+    dxTileView(): JQuery;
+    dxTileView(options: "instance"): DevExpress.ui.dxTileView;
+    dxTileView(options: string): any;
+    dxTileView(options: string, ...params: any[]): any;
+    dxTileView(options: DevExpress.ui.dxTileViewOptions): JQuery;
+}
+interface JQuery {
+    dxToast(): JQuery;
+    dxToast(options: "instance"): DevExpress.ui.dxToast;
+    dxToast(options: string): any;
+    dxToast(options: string, ...params: any[]): any;
+    dxToast(options: DevExpress.ui.dxToastOptions): JQuery;
+}
+interface JQuery {
+    dxToolbar(): JQuery;
+    dxToolbar(options: "instance"): DevExpress.ui.dxToolbar;
+    dxToolbar(options: string): any;
+    dxToolbar(options: string, ...params: any[]): any;
+    dxToolbar(options: DevExpress.ui.dxToolbarOptions): JQuery;
+}
+interface JQuery {
+    dxTooltip(): JQuery;
+    dxTooltip(options: "instance"): DevExpress.ui.dxTooltip;
+    dxTooltip(options: string): any;
+    dxTooltip(options: string, ...params: any[]): any;
+    dxTooltip(options: DevExpress.ui.dxTooltipOptions): JQuery;
+}
+interface JQuery {
+    dxTreeView(): JQuery;
+    dxTreeView(options: "instance"): DevExpress.ui.dxTreeView;
+    dxTreeView(options: string): any;
+    dxTreeView(options: string, ...params: any[]): any;
+    dxTreeView(options: DevExpress.ui.dxTreeViewOptions): JQuery;
+}
+interface JQuery {
+    dxValidationGroup(): JQuery;
+    dxValidationGroup(options: "instance"): DevExpress.ui.dxValidationGroup;
+    dxValidationGroup(options: string): any;
+    dxValidationGroup(options: string, ...params: any[]): any;
+    dxValidationGroup(options: DevExpress.ui.dxValidationGroupOptions): JQuery;
+}
+interface JQuery {
+    dxValidationSummary(): JQuery;
+    dxValidationSummary(options: "instance"): DevExpress.ui.dxValidationSummary;
+    dxValidationSummary(options: string): any;
+    dxValidationSummary(options: string, ...params: any[]): any;
+    dxValidationSummary(options: DevExpress.ui.dxValidationSummaryOptions): JQuery;
+}
+interface JQuery {
+    dxValidator(): JQuery;
+    dxValidator(options: "instance"): DevExpress.ui.dxValidator;
+    dxValidator(options: string): any;
+    dxValidator(options: string, ...params: any[]): any;
+    dxValidator(options: DevExpress.ui.dxValidatorOptions): JQuery;
+}
+interface JQuery {
+    dxBarGauge(): JQuery;
+    dxBarGauge(options: "instance"): DevExpress.viz.dxBarGauge;
+    dxBarGauge(options: string): any;
+    dxBarGauge(options: string, ...params: any[]): any;
+    dxBarGauge(options: DevExpress.viz.gauges.dxBarGaugeOptions): JQuery;
+}
+interface JQuery {
+    dxBullet(): JQuery;
+    dxBullet(options: "instance"): DevExpress.viz.dxBullet;
+    dxBullet(options: string): any;
+    dxBullet(options: string, ...params: any[]): any;
+    dxBullet(options: DevExpress.viz.sparklines.dxBulletOptions): JQuery;
+}
+interface JQuery {
+    dxChart(): JQuery;
+    dxChart(options: "instance"): DevExpress.viz.dxChart;
+    dxChart(options: string): any;
+    dxChart(options: string, ...params: any[]): any;
+    dxChart(options: DevExpress.viz.charts.dxChartOptions): JQuery;
+}
+interface JQuery {
+    dxCircularGauge(): JQuery;
+    dxCircularGauge(options: "instance"): DevExpress.viz.dxCircularGauge;
+    dxCircularGauge(options: string): any;
+    dxCircularGauge(options: string, ...params: any[]): any;
+    dxCircularGauge(options: DevExpress.viz.gauges.dxCircularGaugeOptions): JQuery;
+}
+interface JQuery {
+    dxLinearGauge(): JQuery;
+    dxLinearGauge(options: "instance"): DevExpress.viz.dxLinearGauge;
+    dxLinearGauge(options: string): any;
+    dxLinearGauge(options: string, ...params: any[]): any;
+    dxLinearGauge(options: DevExpress.viz.gauges.dxLinearGaugeOptions): JQuery;
+}
+interface JQuery {
+    dxPieChart(): JQuery;
+    dxPieChart(options: "instance"): DevExpress.viz.dxPieChart;
+    dxPieChart(options: string): any;
+    dxPieChart(options: string, ...params: any[]): any;
+    dxPieChart(options: DevExpress.viz.charts.dxPieChartOptions): JQuery;
+}
+interface JQuery {
+    dxPolarChart(): JQuery;
+    dxPolarChart(options: "instance"): DevExpress.viz.dxPolarChart;
+    dxPolarChart(options: string): any;
+    dxPolarChart(options: string, ...params: any[]): any;
+    dxPolarChart(options: DevExpress.viz.charts.dxPolarChartOptions): JQuery;
+}
+interface JQuery {
+    dxRangeSelector(): JQuery;
+    dxRangeSelector(options: "instance"): DevExpress.viz.dxRangeSelector;
+    dxRangeSelector(options: string): any;
+    dxRangeSelector(options: string, ...params: any[]): any;
+    dxRangeSelector(options: DevExpress.viz.rangeSelector.dxRangeSelectorOptions): JQuery;
+}
+interface JQuery {
+    dxSparkline(): JQuery;
+    dxSparkline(options: "instance"): DevExpress.viz.dxSparkline;
+    dxSparkline(options: string): any;
+    dxSparkline(options: string, ...params: any[]): any;
+    dxSparkline(options: DevExpress.viz.sparklines.dxSparklineOptions): JQuery;
+}
+interface JQuery {
+    dxTreeMap(): JQuery;
+    dxTreeMap(options: "instance"): DevExpress.viz.dxTreeMap;
+    dxTreeMap(options: string): any;
+    dxTreeMap(options: string, ...params: any[]): any;
+    dxTreeMap(options: DevExpress.viz.treeMap.dxTreeMapOptions): JQuery;
+}
+interface JQuery {
+    dxVectorMap(): JQuery;
+    dxVectorMap(options: "instance"): DevExpress.viz.dxVectorMap;
+    dxVectorMap(options: string): any;
+    dxVectorMap(options: string, ...params: any[]): any;
+    dxVectorMap(options: DevExpress.viz.map.dxVectorMapOptions): JQuery;
+}
 declare module DevExpress {
     /** @docid format */
     export interface Format {
@@ -1048,10 +1510,11 @@ declare module DevExpress.ui {
         /** @docid dxValidatorMethods_focus */
         focus(): void;
     }
+    export interface dxValidationGroupOptions extends DOMComponentOptions { }
     /** @docid dxValidationGroup */
     export class dxValidationGroup extends DOMComponent {
-        constructor(element: JQuery, options?: DOMComponentOptions);
-        constructor(element: Element, options?: DOMComponentOptions);
+        constructor(element: JQuery, options?: dxValidationGroupOptions);
+        constructor(element: Element, options?: dxValidationGroupOptions);
         /** @docid_ignore dxValidationGroupMethods_beginUpdate */
         /** @docid_ignore dxValidationGroupMethods_defaultOptions */
         /** @docid_ignore dxValidationGroupMethods_endUpdate */
@@ -1915,6 +2378,7 @@ declare module DevExpress.ui {
         /** @docid_ignore dxLookupOptions_onPaste*/
         /** @docid_ignore dxLookupOptions_readOnly*/
         /** @docid_ignore dxLookupOptions_pagingEnabled */
+        /** @docid_ignore dxLookupOptions_fieldEditEnabled */
         /** @docid_ignore dxLookupOptions_acceptCustomValue */
         /** @docid_ignore dxLookupOptions_spellcheck */
         /** @docid dxLookupOptions_applyValueMode */
@@ -2708,76 +3172,78 @@ declare module DevExpress.ui {
         constructor(element: Element, options?: dxRangeSliderOptions);
     }
     export interface dxFormItemLabel {
-        /** @docid dxFormSimpleItem_label_text */
+        /** @docid dxFormSimpleItemOptions_label_text */
         text?: string;
-        /** @docid dxFormSimpleItem_label_visible */
+        /** @docid dxFormSimpleItemOptions_label_visible */
         visible?: boolean;
-        /** @docid dxFormSimpleItem_label_showColon */
+        /** @docid dxFormSimpleItemOptions_label_showColon */
         showColon?: boolean;
-        /** @docid dxFormSimpleItem_label_location */
+        /** @docid dxFormSimpleItemOptions_label_location */
         location?: string;
-        /** @docid dxFormSimpleItem_label_alignment */
+        /** @docid dxFormSimpleItemOptions_label_alignment */
         alignment?: string;
     }
     export interface dxFormItem {
         /**
-         * @docid dxFormEmptyItem_itemType
-         * @docid dxFormGroupItem_itemType
-         * @docid dxFormTabbedItem_itemType
-         * @docid dxFormSimpleItem_itemType
+         * @docid dxFormEmptyItemOptions_itemType
+         * @docid dxFormGroupItemOptions_itemType
+         * @docid dxFormTabbedItemOptions_itemType
+         * @docid dxFormSimpleItemOptions_itemType
         */
         itemType?: string;
         /**
-         * @docid dxFormEmptyItem_visible
-         * @docid dxFormGroupItem_visible
-         * @docid dxFormTabbedItem_visible
-         * @docid dxFormSimpleItem_visible
+         * @docid dxFormEmptyItemOptions_visible
+         * @docid dxFormGroupItemOptions_visible
+         * @docid dxFormTabbedItemOptions_visible
+         * @docid dxFormSimpleItemOptions_visible
         */
         visible?: boolean;
         /**
-         * @docid dxFormEmptyItem_visibleIndex
-         * @docid dxFormGroupItem_visibleIndex
-         * @docid dxFormTabbedItem_visibleIndex
-         * @docid dxFormSimpleItem_visibleIndex
+         * @docid dxFormEmptyItemOptions_visibleIndex
+         * @docid dxFormGroupItemOptions_visibleIndex
+         * @docid dxFormTabbedItemOptions_visibleIndex
+         * @docid dxFormSimpleItemOptions_visibleIndex
         */
         visibleIndex?: number;
         /**
-         * @docid dxFormEmptyItem_cssClass
-         * @docid dxFormGroupItem_cssClass
-         * @docid dxFormTabbedItem_cssClass
-         * @docid dxFormSimpleItem_cssClass
+         * @docid dxFormEmptyItemOptions_cssClass
+         * @docid dxFormGroupItemOptions_cssClass
+         * @docid dxFormTabbedItemOptions_cssClass
+         * @docid dxFormSimpleItemOptions_cssClass
         */
         cssClass?: string;
         /**
-         * @docid dxFormEmptyItem_colSpan
-         * @docid dxFormSimpleItem_colSpan
-         * @docid dxFormGroupItem_colSpan
-         * @docid dxFormTabbedItem_colSpan
+         * @docid dxFormEmptyItemOptions_colSpan
+         * @docid dxFormSimpleItemOptions_colSpan
+         * @docid dxFormGroupItemOptions_colSpan
+         * @docid dxFormTabbedItemOptions_colSpan
          */
         colSpan?: number;
     }
+    /** @docid dxFormEmptyItem */
     export interface dxFormEmptyItem extends dxFormItem {
-        /** @docid dxFormEmptyItem_name */
+        /** @docid dxFormEmptyItemOptions_name */
         name?: string;
     }
+    /** @docid dxFormSimpleItem */
     export interface dxFormSimpleItem extends dxFormItem {
-        /** @docid dxFormSimpleItem_dataField */
+        /** @docid dxFormSimpleItemOptions_dataField */
         dataField?: string;
-        /** @docid dxFormSimpleItem_name */
+        /** @docid dxFormSimpleItemOptions_name */
         name?: string;
-        /** @docid dxFormSimpleItem_editorType */
+        /** @docid dxFormSimpleItemOptions_editorType */
         editorType?: string;
-        /** @docid dxFormSimpleItem_editorOptions */
+        /** @docid dxFormSimpleItemOptions_editorOptions */
         editorOptions?: Object;
-        /** @docid dxFormSimpleItem_template */
+        /** @docid dxFormSimpleItemOptions_template */
         template?: any;
-        /** @docid dxFormSimpleItem_helpText */
+        /** @docid dxFormSimpleItemOptions_helpText */
         helpText?: string;
-        /** @docid dxFormSimpleItem_isRequired */
+        /** @docid dxFormSimpleItemOptions_isRequired */
         isRequired?: boolean;
-        /** @docid dxFormSimpleItem_label */
+        /** @docid dxFormSimpleItemOptions_label */
         label?: dxFormItemLabel;
-        /** @docid dxFormSimpleItem_validationRules */
+        /** @docid dxFormSimpleItemOptions_validationRules */
         validationRules?: Array<any>;
     }
     /** @docid ColCountResponsible */
@@ -2791,46 +3257,48 @@ declare module DevExpress.ui {
         /** @docid ColCountResponsible_lg */
         lg?: number;
     }
+    /** @docid dxFormGroupItem */
     export interface dxFormGroupItem extends dxFormItem {
-        /** @docid dxFormGroupItem_caption */
+        /** @docid dxFormGroupItemOptions_caption */
         caption?: string;
-        /** @docid dxFormGroupItem_template */
+        /** @docid dxFormGroupItemOptions_template */
         template?: any;
-        /** @docid dxFormGroupItem_colCount */
+        /** @docid dxFormGroupItemOptions_colCount */
         colCount?: number;
-        /** @docid dxFormTabbedItem_tabs_colCountByScreen */
+        /** @docid dxFormTabbedItemOptions_tabs_colCountByScreen */
         colCountByScreen?: ColCountResponsible;
-        /** @docid dxFormGroupItem_alignItemLabels */
+        /** @docid dxFormGroupItemOptions_alignItemLabels */
         alignItemLabels?: boolean;
-        /** @docid dxFormGroupItem_items */
+        /** @docid dxFormGroupItemOptions_items */
         items?: Array<dxFormItem>;
     }
     export interface dxFormTab {
-        /** @docid dxFormTabbedItem_tabs_title */
+        /** @docid dxFormTabbedItemOptions_tabs_title */
         title?: string;
-        /** @docid dxFormTabbedItem_tabs_colCount */
+        /** @docid dxFormTabbedItemOptions_tabs_colCount */
         colCount?: number;
-        /** @docid dxFormGroupItem_colCountByScreen */
+        /** @docid dxFormGroupItemOptions_colCountByScreen */
         colCountByScreen?: ColCountResponsible;
-        /** @docid dxFormTabbedItem_tabs_alignItemLabels */
+        /** @docid dxFormTabbedItemOptions_tabs_alignItemLabels */
         alignItemLabels?: boolean;
-        /** @docid dxFormTabbedItem_tabs_items */
+        /** @docid dxFormTabbedItemOptions_tabs_items */
         items?: Array<dxFormItem>;
-        /** @docid dxFormTabbedItem_tabs_badge */
+        /** @docid dxFormTabbedItemOptions_tabs_badge */
         badge?: string;
-        /** @docid dxFormTabbedItem_tabs_disabled */
+        /** @docid dxFormTabbedItemOptions_tabs_disabled */
         disabled?: boolean;
-        /** @docid dxFormTabbedItem_tabs_icon */
+        /** @docid dxFormTabbedItemOptions_tabs_icon */
         icon?: string;
-        /** @docid dxFormTabbedItem_tabs_tabTemplate */
+        /** @docid dxFormTabbedItemOptions_tabs_tabTemplate */
         tabTemplate?: any;
-        /** @docid dxFormTabbedItem_tabs_template */
+        /** @docid dxFormTabbedItemOptions_tabs_template */
         template?: any;
     }
+    /** @docid dxFormTabbedItem */
     export interface dxFormTabbedItem extends dxFormItem {
-        /** @docid dxFormTabbedItem_tabPanelOptions */
+        /** @docid dxFormTabbedItemOptions_tabPanelOptions */
         tabPanelOptions?: Object;
-        /** @docid dxFormTabbedItem_tabs */
+        /** @docid dxFormTabbedItemOptions_tabs */
         tabs?: Array<dxFormTab>;
     }
     export interface dxFormOptions extends WidgetOptions {
@@ -2924,226 +3392,33 @@ declare module DevExpress.ui {
         constructor(element: Element, options?: dxDeferRenderingOptions);
     }
 }
+/* Private plugins. To be removed */
 interface JQuery {
-    dxProgressBar(): JQuery;
-    dxProgressBar(options: "instance"): DevExpress.ui.dxProgressBar;
-    dxProgressBar(options: string): any;
-    dxProgressBar(options: string, ...params: any[]): any;
-    dxProgressBar(options: DevExpress.ui.dxProgressBarOptions): JQuery;
-    dxSlider(): JQuery;
-    dxSlider(options: "instance"): DevExpress.ui.dxSlider;
-    dxSlider(options: string): any;
-    dxSlider(options: string, ...params: any[]): any;
-    dxSlider(options: DevExpress.ui.dxSliderOptions): JQuery;
-    dxRangeSlider(): JQuery;
-    dxRangeSlider(options: "instance"): DevExpress.ui.dxRangeSlider;
-    dxRangeSlider(options: string): any;
-    dxRangeSlider(options: string, ...params: any[]): any;
-    dxRangeSlider(options: DevExpress.ui.dxRangeSliderOptions): JQuery;
-    dxFileUploader(): JQuery;
-    dxFileUploader(options: "instance"): DevExpress.ui.dxFileUploader;
-    dxFileUploader(options: string): any;
-    dxFileUploader(options: string, ...params: any[]): any;
-    dxFileUploader(options: DevExpress.ui.dxFileUploaderOptions): JQuery;
-    dxValidator(): JQuery;
-    dxValidator(options: "instance"): DevExpress.ui.dxValidator;
-    dxValidator(options: string): any;
-    dxValidator(options: string, ...params: any[]): any;
-    dxValidator(options: DevExpress.ui.dxValidatorOptions): JQuery;
-    dxValidationGroup(): JQuery;
-    dxValidationGroup(options: "instance"): DevExpress.ui.dxValidationGroup;
-    dxValidationGroup(options: string): any;
-    dxValidationGroup(options: string, ...params: any[]): any;
-    dxValidationSummary(): JQuery;
-    dxValidationSummary(options: "instance"): DevExpress.ui.dxValidationSummary;
-    dxValidationSummary(options: string): any;
-    dxValidationSummary(options: string, ...params: any[]): any;
-    dxValidationSummary(options: DevExpress.ui.dxValidationSummaryOptions): JQuery;
-    dxTooltip(): JQuery;
-    dxTooltip(options: "instance"): DevExpress.ui.dxTooltip;
-    dxTooltip(options: string): any;
-    dxTooltip(options: string, ...params: any[]): any;
-    dxTooltip(options: DevExpress.ui.dxTooltipOptions): JQuery;
-    dxResizable(): JQuery;
-    dxResizable(options: "instance"): DevExpress.ui.dxResizable;
-    dxResizable(options: string): any;
-    dxResizable(options: string, ...params: any[]): any;
-    dxResizable(options: DevExpress.ui.dxResizableOptions): JQuery;
     dxDropDownList(): JQuery;
     dxDropDownList(options: "instance"): DevExpress.ui.dxDropDownList;
     dxDropDownList(options: string): any;
     dxDropDownList(options: string, ...params: any[]): any;
     dxDropDownList(options: DevExpress.ui.dxDropDownListOptions): JQuery;
-    dxToolbar(): JQuery;
-    dxToolbar(options: "instance"): DevExpress.ui.dxToolbar;
-    dxToolbar(options: string): any;
-    dxToolbar(options: string, ...params: any[]): any;
-    dxToolbar(options: DevExpress.ui.dxToolbarOptions): JQuery;
-    dxToast(): JQuery;
-    dxToast(options: "instance"): DevExpress.ui.dxToast;
-    dxToast(options: string): any;
-    dxToast(options: string, ...params: any[]): any;
-    dxToast(options: DevExpress.ui.dxToastOptions): JQuery;
     dxTextEditor(): JQuery;
     dxTextEditor(options: "instance"): DevExpress.ui.dxTextEditor;
     dxTextEditor(options: string): any;
     dxTextEditor(options: string, ...params: any[]): any;
     dxTextEditor(options: DevExpress.ui.dxTextEditorOptions): JQuery;
-    dxTextBox(): JQuery;
-    dxTextBox(options: "instance"): DevExpress.ui.dxTextBox;
-    dxTextBox(options: string): any;
-    dxTextBox(options: string, ...params: any[]): any;
-    dxTextBox(options: DevExpress.ui.dxTextBoxOptions): JQuery;
-    dxTextArea(): JQuery;
-    dxTextArea(options: "instance"): DevExpress.ui.dxTextArea;
-    dxTextArea(options: string): any;
-    dxTextArea(options: string, ...params: any[]): any;
-    dxTextArea(options: DevExpress.ui.dxTextAreaOptions): JQuery;
-    dxTabs(): JQuery;
-    dxTabs(options: "instance"): DevExpress.ui.dxTabs;
-    dxTabs(options: string): any;
-    dxTabs(options: string, ...params: any[]): any;
-    dxTabs(options: DevExpress.ui.dxTabsOptions): JQuery;
-    dxTabPanel(): JQuery;
-    dxTabPanel(options: "instance"): DevExpress.ui.dxTabPanel;
-    dxTabPanel(options: string): any;
-    dxTabPanel(options: string, ...params: any[]): any;
-    dxTabPanel(options: DevExpress.ui.dxTabPanelOptions): JQuery;
-    dxSelectBox(): JQuery;
-    dxSelectBox(options: "instance"): DevExpress.ui.dxSelectBox;
-    dxSelectBox(options: string): any;
-    dxSelectBox(options: string, ...params: any[]): any;
-    dxSelectBox(options: DevExpress.ui.dxSelectBoxOptions): JQuery;
-    dxTagBox(): JQuery;
-    dxTagBox(options: "instance"): DevExpress.ui.dxTagBox;
-    dxTagBox(options: string): any;
-    dxTagBox(options: string, ...params: any[]): any;
-    dxTagBox(options: DevExpress.ui.dxTagBoxOptions): JQuery;
-    dxScrollView(): JQuery;
-    dxScrollView(options: "instance"): DevExpress.ui.dxScrollView;
-    dxScrollView(options: string): any;
-    dxScrollView(options: string, ...params: any[]): any;
-    dxScrollView(options: DevExpress.ui.dxScrollViewOptions): JQuery;
     dxScrollable(): JQuery;
     dxScrollable(options: "instance"): DevExpress.ui.dxScrollable;
     dxScrollable(options: string): any;
     dxScrollable(options: string, ...params: any[]): any;
     dxScrollable(options: DevExpress.ui.dxScrollableOptions): JQuery;
-    dxRadioGroup(): JQuery;
-    dxRadioGroup(options: "instance"): DevExpress.ui.dxRadioGroup;
-    dxRadioGroup(options: string): any;
-    dxRadioGroup(options: string, ...params: any[]): any;
-    dxRadioGroup(options: DevExpress.ui.dxRadioGroupOptions): JQuery;
-    dxPopup(): JQuery;
-    dxPopup(options: "instance"): DevExpress.ui.dxPopup;
-    dxPopup(options: string): any;
-    dxPopup(options: string, ...params: any[]): any;
-    dxPopup(options: DevExpress.ui.dxPopupOptions): JQuery;
-    dxPopover(): JQuery;
-    dxPopover(options: "instance"): DevExpress.ui.dxPopover;
-    dxPopover(options: string): any;
-    dxPopover(options: string, ...params: any[]): any;
-    dxPopover(options: DevExpress.ui.dxPopoverOptions): JQuery;
     dxOverlay(): JQuery;
     dxOverlay(options: "instance"): DevExpress.ui.dxOverlay;
     dxOverlay(options: string): any;
     dxOverlay(options: string, ...params: any[]): any;
     dxOverlay(options: DevExpress.ui.dxOverlayOptions): JQuery;
-    dxNumberBox(): JQuery;
-    dxNumberBox(options: "instance"): DevExpress.ui.dxNumberBox;
-    dxNumberBox(options: string): any;
-    dxNumberBox(options: string, ...params: any[]): any;
-    dxNumberBox(options: DevExpress.ui.dxNumberBoxOptions): JQuery;
-    dxNavBar(): JQuery;
-    dxNavBar(options: "instance"): DevExpress.ui.dxNavBar;
-    dxNavBar(options: string): any;
-    dxNavBar(options: string, ...params: any[]): any;
-    dxNavBar(options: DevExpress.ui.dxNavBarOptions): JQuery;
-    dxMultiView(): JQuery;
-    dxMultiView(options: "instance"): DevExpress.ui.dxMultiView;
-    dxMultiView(options: string): any;
-    dxMultiView(options: string, ...params: any[]): any;
-    dxMultiView(options: DevExpress.ui.dxMultiViewOptions): JQuery;
-    dxMap(): JQuery;
-    dxMap(options: "instance"): DevExpress.ui.dxMap;
-    dxMap(options: string): any;
-    dxMap(options: string, ...params: any[]): any;
-    dxMap(options: DevExpress.ui.dxMapOptions): JQuery;
-    dxLookup(): JQuery;
-    dxLookup(options: "instance"): DevExpress.ui.dxLookup;
-    dxLookup(options: string): any;
-    dxLookup(options: string, ...params: any[]): any;
-    dxLookup(options: DevExpress.ui.dxLookupOptions): JQuery;
-    dxLoadPanel(): JQuery;
-    dxLoadPanel(options: "instance"): DevExpress.ui.dxLoadPanel;
-    dxLoadPanel(options: string): any;
-    dxLoadPanel(options: string, ...params: any[]): any;
-    dxLoadPanel(options: DevExpress.ui.dxLoadPanelOptions): JQuery;
-    dxLoadIndicator(): JQuery;
-    dxLoadIndicator(options: "instance"): DevExpress.ui.dxLoadIndicator;
-    dxLoadIndicator(options: string): any;
-    dxLoadIndicator(options: string, ...params: any[]): any;
-    dxLoadIndicator(options: DevExpress.ui.dxLoadIndicatorOptions): JQuery;
-    dxList(): JQuery;
-    dxList(options: "instance"): DevExpress.ui.dxList;
-    dxList(options: string): any;
-    dxList(options: string, ...params: any[]): any;
-    dxList(options: DevExpress.ui.dxListOptions): JQuery;
-    dxGallery(): JQuery;
-    dxGallery(options: "instance"): DevExpress.ui.dxGallery;
-    dxGallery(options: string): any;
-    dxGallery(options: string, ...params: any[]): any;
-    dxGallery(options: DevExpress.ui.dxGalleryOptions): JQuery;
     dxDropDownEditor(): JQuery;
     dxDropDownEditor(options: "instance"): DevExpress.ui.dxDropDownEditor;
     dxDropDownEditor(options: string): any;
     dxDropDownEditor(options: string, ...params: any[]): any;
     dxDropDownEditor(options: DevExpress.ui.dxDropDownEditorOptions): JQuery;
-    dxDateBox(): JQuery;
-    dxDateBox(options: "instance"): DevExpress.ui.dxDateBox;
-    dxDateBox(options: string): any;
-    dxDateBox(options: string, ...params: any[]): any;
-    dxDateBox(options: DevExpress.ui.dxDateBoxOptions): JQuery;
-    dxCheckBox(): JQuery;
-    dxCheckBox(options: "instance"): DevExpress.ui.dxCheckBox;
-    dxCheckBox(options: string): any;
-    dxCheckBox(options: string, ...params: any[]): any;
-    dxCheckBox(options: DevExpress.ui.dxCheckBoxOptions): JQuery;
-    dxBox(): JQuery;
-    dxBox(options: "instance"): DevExpress.ui.dxBox;
-    dxBox(options: string): any;
-    dxBox(options: string, ...params: any[]): any;
-    dxBox(options: DevExpress.ui.dxBoxOptions): JQuery;
-    dxButton(): JQuery;
-    dxButton(options: "instance"): DevExpress.ui.dxButton;
-    dxButton(options: string): any;
-    dxButton(options: string, ...params: any[]): any;
-    dxButton(options: DevExpress.ui.dxButtonOptions): JQuery;
-    dxCalendar(): JQuery;
-    dxCalendar(options: "instance"): DevExpress.ui.dxCalendar;
-    dxCalendar(options: string): any;
-    dxCalendar(options: string, ...params: any[]): any;
-    dxCalendar(options: DevExpress.ui.dxCalendarOptions): JQuery;
-    dxAccordion(): JQuery;
-    dxAccordion(options: "instance"): DevExpress.ui.dxAccordion;
-    dxAccordion(options: string): any;
-    dxAccordion(options: string, ...params: any[]): any;
-    dxAccordion(options: DevExpress.ui.dxAccordionOptions): JQuery;
-    dxResponsiveBox(): JQuery;
-    dxResponsiveBox(options: "instance"): DevExpress.ui.dxResponsiveBox;
-    dxResponsiveBox(options: string): any;
-    dxResponsiveBox(options: string, ...params: any[]): any;
-    dxResponsiveBox(options: DevExpress.ui.dxResponsiveBoxOptions): JQuery;
-    dxAutocomplete(): JQuery;
-    dxAutocomplete(options: "instance"): DevExpress.ui.dxAutocomplete;
-    dxAutocomplete(options: string): any;
-    dxAutocomplete(options: string, ...params: any[]): any;
-    dxAutocomplete(options: DevExpress.ui.dxAutocompleteOptions): JQuery;
-    dxForm(): JQuery;
-    dxForm(options: "instance"): DevExpress.ui.dxForm;
-    dxForm(options: string): any;
-    dxForm(options: string, ...params: any[]): any;
-    dxForm(options: DevExpress.ui.dxFormOptions): JQuery;
 }
 declare module DevExpress.ui {
     export interface dxTileViewOptions extends CollectionWidgetOptions {
@@ -3419,43 +3694,6 @@ declare module DevExpress.ui {
         toggle(showing: boolean): JQueryPromise<dxActionSheet>;
     }
 }
-interface JQuery {
-    dxTileView(): JQuery;
-    dxTileView(options: "instance"): DevExpress.ui.dxTileView;
-    dxTileView(options: string): any;
-    dxTileView(options: string, ...params: any[]): any;
-    dxTileView(options: DevExpress.ui.dxTileViewOptions): JQuery;
-    dxSwitch(): JQuery;
-    dxSwitch(options: "instance"): DevExpress.ui.dxSwitch;
-    dxSwitch(options: string): any;
-    dxSwitch(options: string, ...params: any[]): any;
-    dxSwitch(options: DevExpress.ui.dxSwitchOptions): JQuery;
-    dxSlideOut(): JQuery;
-    dxSlideOut(options: "instance"): DevExpress.ui.dxSlideOut;
-    dxSlideOut(options: string): any;
-    dxSlideOut(options: string, ...params: any[]): any;
-    dxSlideOut(options: DevExpress.ui.dxSlideOutOptions): JQuery;
-    dxPivot(): JQuery;
-    dxPivot(options: "instance"): DevExpress.ui.dxPivot;
-    dxPivot(options: string): any;
-    dxPivot(options: string, ...params: any[]): any;
-    dxPivot(options: DevExpress.ui.dxPivotOptions): JQuery;
-    dxPanorama(): JQuery;
-    dxPanorama(options: "instance"): DevExpress.ui.dxPanorama;
-    dxPanorama(options: string): any;
-    dxPanorama(options: string, ...params: any[]): any;
-    dxPanorama(options: DevExpress.ui.dxPanoramaOptions): JQuery;
-    dxActionSheet(): JQuery;
-    dxActionSheet(options: "instance"): DevExpress.ui.dxActionSheet;
-    dxActionSheet(options: string): any;
-    dxActionSheet(options: string, ...params: any[]): any;
-    dxActionSheet(options: DevExpress.ui.dxActionSheetOptions): JQuery;
-    dxDropDownMenu(): JQuery;
-    dxDropDownMenu(options: "instance"): DevExpress.ui.dxDropDownMenu;
-    dxDropDownMenu(options: string): any;
-    dxDropDownMenu(options: string, ...params: any[]): any;
-    dxDropDownMenu(options: DevExpress.ui.dxDropDownMenuOptions): JQuery;
-}
 declare module DevExpress.data {
     export interface XmlaStoreOptions {
         /** @docid XmlaStoreOptions_url */
@@ -3664,7 +3902,7 @@ declare module DevExpress.ui {
         /** @docid dxSchedulerOptions_views_type */
         type?: string;
         /** @docid dxSchedulerOptions_views_firstDayOfWeek */
-        firstDayOfWeek?: number;        
+        firstDayOfWeek?: number;
         /** @docid dxSchedulerOptions_views_groups */
         groups?: Array<string>;
         /** @docid dxSchedulerOptions_views_startDayHour */
@@ -3868,7 +4106,7 @@ declare module DevExpress.ui {
         showAppointmentTooltip(appointmentData: Object, target?: Element, currentAppointmentData?: Object): void;
         showAppointmentTooltip(appointmentData: Object, target?: string, currentAppointmentData?: Object): void;
         /** @docid dxSchedulerMethods_hideAppointmentTooltip */
-        hideAppointmentTooltip(): void;     
+        hideAppointmentTooltip(): void;
         /** @docid dxSchedulerMethods_getStartViewDate */
         getStartViewDate(): Date;
         /** @docid dxSchedulerMethods_getEndViewDate */
@@ -4231,7 +4469,7 @@ declare module DevExpress.ui {
         /** @docid dxDataGridOptions_columns_setCellValue */
         setCellValue?: (rowData: Object, value: any) => void;
         /** @docid dxDataGridOptions_columns_calculateFilterExpression */
-        calculateFilterExpression?: (filterValue: any, selectedFilterOperation: string, target: string) => Array<any>;
+        calculateFilterExpression?: (filterValue: any, selectedFilterOperation: string, target: string) => any;
         /** @docid dxDataGridOptions_columns_caption */
         caption?: string;
         /** @docid dxDataGridOptions_columns_cellTemplate */
@@ -5300,53 +5538,6 @@ declare module DevExpress.ui {
         /** @docid dxPivotGridFieldChooserMethods_getDataSource */
         getDataSource(): DevExpress.data.PivotGridDataSource;
     }
-}
-interface JQuery {
-    dxTreeView(): JQuery;
-    dxTreeView(options: "instance"): DevExpress.ui.dxTreeView;
-    dxTreeView(options: string): any;
-    dxTreeView(options: string, ...params: any[]): any;
-    dxTreeView(options: DevExpress.ui.dxTreeViewOptions): JQuery;
-    dxMenuBase(): JQuery;
-    dxMenuBase(options: "instance"): DevExpress.ui.dxMenuBase;
-    dxMenuBase(options: string): any;
-    dxMenuBase(options: string, ...params: any[]): any;
-    dxMenuBase(options: DevExpress.ui.dxMenuBaseOptions): JQuery;
-    dxMenu(): JQuery;
-    dxMenu(options: "instance"): DevExpress.ui.dxMenu;
-    dxMenu(options: string): any;
-    dxMenu(options: string, ...params: any[]): any;
-    dxMenu(options: DevExpress.ui.dxMenuOptions): JQuery;
-    dxContextMenu(): JQuery;
-    dxContextMenu(options: "instance"): DevExpress.ui.dxContextMenu;
-    dxContextMenu(options: string): any;
-    dxContextMenu(options: string, ...params: any[]): any;
-    dxContextMenu(options: DevExpress.ui.dxContextMenuOptions): JQuery;
-    dxColorBox(): JQuery;
-    dxColorBox(options: "instance"): DevExpress.ui.dxColorBox;
-    dxColorBox(options: string): any;
-    dxColorBox(options: string, ...params: any[]): any;
-    dxColorBox(options: DevExpress.ui.dxColorBoxOptions): JQuery;
-    dxDataGrid(): JQuery;
-    dxDataGrid(options: "instance"): DevExpress.ui.dxDataGrid;
-    dxDataGrid(options: string): any;
-    dxDataGrid(options: string, ...params: any[]): any;
-    dxDataGrid(options: DevExpress.ui.dxDataGridOptions): JQuery;
-    dxPivotGrid(): JQuery;
-    dxPivotGrid(options: "instance"): DevExpress.ui.dxPivotGrid;
-    dxPivotGrid(options: string): any;
-    dxPivotGrid(options: string, ...params: any[]): any;
-    dxPivotGrid(options: DevExpress.ui.dxPivotGridOptions): JQuery;
-    dxPivotGridFieldChooser(): JQuery;
-    dxPivotGridFieldChooser(options: "instance"): DevExpress.ui.dxPivotGridFieldChooser;
-    dxPivotGridFieldChooser(options: string): any;
-    dxPivotGridFieldChooser(options: string, ...params: any[]): any;
-    dxPivotGridFieldChooser(options: DevExpress.ui.dxPivotGridFieldChooserOptions): JQuery;
-    dxScheduler(): JQuery;
-    dxScheduler(options: "instance"): DevExpress.ui.dxScheduler;
-    dxScheduler(options: string): any;
-    dxScheduler(options: string, ...params: any[]): any;
-    dxScheduler(options: DevExpress.ui.dxSchedulerOptions): JQuery;
 }
 declare module DevExpress.framework {
     /** @docid_ignore dxCommandContainer */
@@ -7611,12 +7802,16 @@ declare module DevExpress.viz.charts {
     export interface ChartConstantLineLabel extends ChartCommonConstantLineLabel {
         /**
         * @docid dxchartoptions_argumentaxis_constantlinestyle_label_horizontalalignment
+        * @docid dxchartoptions_argumentaxis_constantlines_label_horizontalalignment
         * @docid dxchartoptions_valueaxis_constantlinestyle_label_horizontalalignment
+        * @docid dxchartoptions_valueaxis_constantlines_label_horizontalalignment
         */
         horizontalAlignment?: string;
         /**
         * @docid dxchartoptions_argumentaxis_constantlinestyle_label_verticalalignment
+        * @docid dxchartoptions_argumentaxis_constantlines_label_verticalalignment
         * @docid dxchartoptions_valueaxis_constantlinestyle_label_verticalalignment
+        * @docid dxchartoptions_valueaxis_constantlines_label_verticalalignment
         */
         verticalAlignment?: string;
         /**
@@ -8327,17 +8522,6 @@ declare module DevExpress.viz {
         constructor(element: Element, options?: DevExpress.viz.charts.dxPolarChartOptions);
     }
 }
-interface JQuery {
-    dxChart(options?: DevExpress.viz.charts.dxChartOptions): JQuery;
-    dxChart(methodName: string, ...params: any[]): any;
-    dxChart(methodName: "instance"): DevExpress.viz.dxChart;
-    dxPieChart(options?: DevExpress.viz.charts.dxPieChartOptions): JQuery;
-    dxPieChart(methodName: string, ...params: any[]): any;
-    dxPieChart(methodName: "instance"): DevExpress.viz.dxPieChart;
-    dxPolarChart(options?: DevExpress.viz.charts.dxPolarChartOptions): JQuery;
-    dxPolarChart(methodName: string, ...params: any[]): any;
-    dxPolarChart(methodName: "instance"): DevExpress.viz.dxPolarChart;
-}
 declare module DevExpress.viz.gauges {
     export interface BaseRangeContainer {
         /** @docid basegaugeoptions_rangeContainer_backgroundColor */
@@ -8774,17 +8958,6 @@ declare module DevExpress.viz {
         values(values: Array<number>): void;
     }
 }
-interface JQuery {
-    dxLinearGauge(options?: DevExpress.viz.gauges.dxLinearGaugeOptions): JQuery;
-    dxLinearGauge(methodName: string, ...params: any[]): any;
-    dxLinearGauge(methodName: "instance"): DevExpress.viz.dxLinearGauge;
-    dxCircularGauge(options?: DevExpress.viz.gauges.dxCircularGaugeOptions): JQuery;
-    dxCircularGauge(methodName: string, ...params: any[]): any;
-    dxCircularGauge(methodName: "instance"): DevExpress.viz.dxCircularGauge;
-    dxBarGauge(options?: DevExpress.viz.gauges.dxBarGaugeOptions): JQuery;
-    dxBarGauge(methodName: string, ...params: any[]): any;
-    dxBarGauge(methodName: "instance"): DevExpress.viz.dxBarGauge;
-}
 declare module DevExpress.viz.rangeSelector {
     export interface dxRangeSelectorOptions extends viz.core.BaseWidgetOptions, viz.core.MarginOptions, viz.core.RedrawOnResizeOptions, viz.core.TitleOptions, viz.core.LoadingIndicatorOptions, viz.core.ExportOptions {
         /** @docid_ignore dxrangeselectoroptions_tooltip */
@@ -9078,11 +9251,6 @@ declare module DevExpress.viz {
         /** @docid dxrangeselectormethods_getdatasource */
         getDataSource(): DevExpress.data.DataSource;
     }
-}
-interface JQuery {
-    dxRangeSelector(options?: DevExpress.viz.rangeSelector.dxRangeSelectorOptions): JQuery;
-    dxRangeSelector(methodName: string, ...params: any[]): any;
-    dxRangeSelector(methodName: "instance"): DevExpress.viz.dxRangeSelector;
 }
 declare module DevExpress.viz.map {
     /** @docid mapLayer */
@@ -9464,7 +9632,7 @@ declare module DevExpress.viz.map {
         add(name: string, projection: Object): void;
     }
 }
-declare module DevExpress.viz{
+declare module DevExpress.viz {
     /** @docid dxvectormap */
     export class dxVectorMap extends viz.core.BaseWidget implements viz.core.LoadingIndicatorMethods {
         constructor(element: JQuery, options?: DevExpress.viz.map.dxVectorMapOptions);
@@ -9502,11 +9670,6 @@ declare module DevExpress.viz{
         /** @docid dxvectormapmethods_zoomFactor#zoomFactor(zoomFactor) */
         zoomFactor(zoomFactor: number): void;
     }
-}
-interface JQuery {
-    dxVectorMap(options?: DevExpress.viz.map.dxVectorMapOptions): JQuery;
-    dxVectorMap(methodName: string, ...params: any[]): any;
-    dxVectorMap(methodName: "instance"): DevExpress.viz.dxVectorMap;
 }
 declare module DevExpress.viz.sparklines {
     export interface SparklineTooltip extends viz.core.Tooltip {
@@ -9618,14 +9781,6 @@ declare module DevExpress.viz {
         /** @docid dxsparklinemethods_getdatasource */
         getDataSource(): DevExpress.data.DataSource;
     }
-}
-interface JQuery {
-    dxBullet(options?: DevExpress.viz.sparklines.dxBulletOptions): JQuery;
-    dxBullet(methodName: string, ...params: any[]): any;
-    dxBullet(methodName: "instance"): DevExpress.viz.dxBullet;
-    dxSparkline(options?: DevExpress.viz.sparklines.dxSparklineOptions): JQuery;
-    dxSparkline(methodName: string, ...params: any[]): any;
-    dxSparkline(methodName: "instance"): DevExpress.viz.dxSparkline;
 }
 declare module DevExpress.viz.treeMap {
     export interface dxTreeMapOptions extends viz.core.BaseWidgetOptions, viz.core.RedrawOnResizeOptions, viz.core.TitleOptions, viz.core.LoadingIndicatorOptions, viz.core.ExportOptions {
@@ -9860,9 +10015,4 @@ declare module DevExpress.viz {
         /** @docid dxtreemapmethods_getdatasource */
         getDataSource(): DevExpress.data.DataSource;
     }
-}
-interface JQuery {
-    dxTreeMap(options?: DevExpress.viz.treeMap.dxTreeMapOptions): JQuery;
-    dxTreeMap(methodName: string, ...params: any[]): any;
-    dxTreeMap(methodName: "instance"): DevExpress.viz.dxTreeMap;
 }

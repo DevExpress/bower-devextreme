@@ -1,9 +1,9 @@
 /*!
 * DevExtreme
-* Version: 16.2.3
-* Build date: Dec 13, 2016
+* Version: 16.2.4
+* Build date: Jan 17, 2017
 *
-* Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
+* Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
 */
 .dx-colorview-palette-handle {
@@ -256,8 +256,8 @@
   background-color: rgba(221, 221, 221, 0.2);
 }
 .dx-pivotgrid .dx-column-header .dx-pivotgrid-fields-area {
-  margin: 0 -5px;
-  padding: 0 5px;
+  margin-left: -5px;
+  padding-left: 5px;
 }
 .dx-pivotgrid .dx-column-header .dx-pivotgrid-fields-area-head tr > td:first-child {
   padding-left: 0;
@@ -420,7 +420,10 @@
 .dx-pivotgrid .dx-pivotgrid-horizontal-headers:last-child {
   border-bottom: 0;
 }
-.dx-pivotgrid .dx-total {
+.dx-pivotgrid .dx-total,
+.dx-pivotgrid .dx-data-header,
+.dx-pivotgrid .dx-column-header,
+.dx-pivotgrid .dx-area-description-cell {
   background-color: rgba(221, 221, 221, 0.2);
 }
 .dx-pivotgrid .dx-grandtotal {
@@ -548,6 +551,12 @@
 .dx-rtl.dx-pivotgrid .dx-filter-header .dx-pivotgrid-toolbar .dx-pivotgrid-field-chooser-button {
   margin-right: 0;
   margin-left: 4px;
+}
+.dx-rtl.dx-pivotgrid .dx-column-header .dx-pivotgrid-fields-area {
+  margin-left: 0;
+  padding-left: 0;
+  margin-right: -5px;
+  padding-right: 5px;
 }
 .dx-rtl.dx-pivotgrid .dx-column-header .dx-pivotgrid-fields-area-head tr > td:first-child {
   padding-left: 2px;
@@ -1797,6 +1806,15 @@
 .dx-scheduler-work-space-day .dx-scheduler-appointment-reduced-icon {
   top: 9px;
 }
+.dx-scheduler-work-space-week .dx-scheduler-appointment-head .dx-scheduler-appointment-recurrence-icon,
+.dx-scheduler-work-space-work-week .dx-scheduler-appointment-head .dx-scheduler-appointment-recurrence-icon,
+.dx-scheduler-work-space-day .dx-scheduler-appointment-head .dx-scheduler-appointment-recurrence-icon {
+  top: 20px;
+  right: 5px;
+}
+.dx-scheduler-work-space-month .dx-scheduler-appointment-reduced .dx-scheduler-appointment-recurrence-icon {
+  right: 20px;
+}
 .dx-scheduler-timeline .dx-scheduler-appointment,
 .dx-scheduler-work-space-month .dx-scheduler-appointment,
 .dx-scheduler-all-day-appointment {
@@ -1904,9 +1922,6 @@
 .dx-scheduler-appointment-recurrence-icon.dx-icon-repeat {
   font-size: 18px;
 }
-.dx-scheduler-appointment-reduced .dx-scheduler-appointment-recurrence-icon {
-  right: 20px;
-}
 .dx-scheduler-appointment-recurrence .dx-scheduler-appointment-recurrence-icon {
   display: block;
 }
@@ -1926,9 +1941,6 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.dx-scheduler-appointment-empty .dx-scheduler-appointment-content {
-  display: none;
-}
 .dx-scheduler-work-space-grouped.dx-scheduler-work-space-month .dx-scheduler-appointment-content {
   font-size: 12px;
 }
@@ -1938,6 +1950,11 @@
   -ms-text-overflow: ellipsis;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+.dx-scheduler-appointment-empty .dx-scheduler-appointment-content-details,
+.dx-scheduler-appointment-empty .dx-scheduler-appointment-title,
+.dx-scheduler-appointment-empty .dx-scheduler-appointment-recurrence-icon {
+  display: none;
 }
 .dx-scheduler-appointment-content-details {
   font-size: 11px;
@@ -5833,6 +5850,7 @@
   min-height: 28px;
   border-bottom: 1px solid #ddd;
   background: transparent;
+  color: #333;
 }
 .dx-popup-title.dx-toolbar {
   padding: 6px 20px;
@@ -6001,6 +6019,7 @@
 }
 .dx-popup-bottom {
   background: transparent;
+  color: #333;
 }
 .dx-popup-bottom.dx-toolbar {
   padding: 20px;
@@ -8232,6 +8251,9 @@
 .dx-datagrid-table-fixed .dx-row.dx-group-row td {
   background-color: #f7f7f7;
 }
+.dx-pivotgrid {
+  background-color: #fff;
+}
 .dx-pivotgrid .dx-area-description-cell .dx-button-content {
   padding: 5px;
 }
@@ -8293,6 +8315,9 @@
 .dx-pivotgrid .dx-area-tree-view td.dx-white-space-column {
   width: 19px;
   min-width: 19px;
+}
+.dx-pivotgridfieldchooser {
+  background-color: #fff;
 }
 .dx-pivotgrid-fields-container .dx-position-indicator {
   background-color: gray;
