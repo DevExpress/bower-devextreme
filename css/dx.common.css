@@ -1,9 +1,9 @@
 /*! 
 * DevExtreme
-* Version: 16.1.9
-* Build date: Dec 19, 2016
+* Version: 16.1.10
+* Build date: Jan 26, 2017
 *
-* Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
+* Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
 */
 
@@ -4671,13 +4671,13 @@
   vertical-align: top;
   white-space: nowrap;
 }
+.dx-datagrid .dx-column-indicators.dx-visibility-hidden
+{
+  visibility: hidden;
+}
 .dx-datagrid .dx-column-indicators .dx-sort.dx-sort, .dx-datagrid .dx-column-indicators .dx-header-filter.dx-sort, .dx-datagrid .dx-column-indicators .dx-sort.dx-header-filter, .dx-datagrid .dx-column-indicators .dx-header-filter.dx-header-filter
 {
   display: inline-block;
-}
-.dx-datagrid .dx-column-indicators .dx-sort.dx-sort-none, .dx-datagrid .dx-column-indicators .dx-header-filter.dx-sort-none
-{
-  width: 14px;
 }
 .dx-datagrid .dx-column-indicators .dx-sort.dx-header-filter:after, .dx-datagrid .dx-column-indicators .dx-header-filter.dx-header-filter:after
 {
@@ -4846,6 +4846,22 @@ input.dx-hidden
 {
   display: none;
 }
+.dx-datagrid-content .dx-datagrid-table:not(.dx-datagrid-table-fixed) .dx-column-indicators
+{
+  float: none !important;
+}
+.dx-datagrid-content .dx-datagrid-table:not(.dx-datagrid-table-fixed) .dx-column-indicators>span
+{
+  width: 14px;
+}
+.dx-datagrid-content .dx-datagrid-table:not(.dx-datagrid-table-fixed) .dx-text-content-alignment-left
+{
+  margin-right: 3px;
+}
+.dx-datagrid-content .dx-datagrid-table:not(.dx-datagrid-table-fixed) .dx-text-content-alignment-right
+{
+  margin-left: 3px;
+}
 .dx-datagrid-content .dx-datagrid-table [class*="column"]+[class*="column"]:last-child
 {
   float: none;
@@ -4993,20 +5009,36 @@ input.dx-hidden
 .dx-datagrid-headers .dx-header-row>td>.dx-datagrid-text-content
 {
   white-space: normal;
-  display: inline-block;
   vertical-align: top;
 }
-.dx-datagrid-headers .dx-header-row.dx-column-lines>td>.dx-datagrid-text-content
+.dx-header-row .dx-text-content-alignment-left, .dx-header-row .dx-text-content-alignment-right
 {
-  display: block;
+  display: inline-block;
+  max-width: 100%;
 }
-.dx-header-row .dx-indicator-alignment-left
+.dx-header-row .dx-sort-indicator, .dx-header-row .dx-header-filter-indicator
+{
+  max-width: calc(100% - 17px);
+}
+.dx-header-row .dx-sort-indicator.dx-text-content-alignment-left, .dx-header-row .dx-header-filter-indicator.dx-text-content-alignment-left
+{
+  margin-right: 3px;
+}
+.dx-header-row .dx-sort-indicator.dx-text-content-alignment-right, .dx-header-row .dx-header-filter-indicator.dx-text-content-alignment-right
 {
   margin-left: 3px;
 }
-.dx-header-row .dx-indicator-alignment-right
+.dx-header-row .dx-sort-indicator.dx-text-content-alignment-left.dx-text-content-alignment-right, .dx-header-row .dx-header-filter-indicator.dx-text-content-alignment-left.dx-text-content-alignment-right
 {
-  margin-right: 3px;
+  max-width: calc(100% - 34px);
+}
+.dx-header-row .dx-sort-indicator.dx-header-filter-indicator
+{
+  max-width: calc(100% - 31px);
+}
+.dx-header-row .dx-sort-indicator.dx-header-filter-indicator.dx-text-content-alignment-left.dx-text-content-alignment-right
+{
+  max-width: calc(100% - 62px);
 }
 .dx-datagrid-filter-range-overlay .dx-texteditor
 {
@@ -5510,7 +5542,7 @@ input.dx-hidden
 {
   width: 100%;
 }
-.dx-pivotgrid.dx-overflow-hidden
+.dx-pivotgrid .dx-pivotgrid-container
 {
   overflow: hidden;
 }

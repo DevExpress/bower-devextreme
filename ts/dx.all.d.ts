@@ -1,9 +1,9 @@
 /*! 
 * DevExtreme
-* Version: 16.1.9
-* Build date: Dec 19, 2016
+* Version: 16.1.10
+* Build date: Jan 26, 2017
 *
-* Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
+* Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
 */
 
@@ -1076,7 +1076,7 @@ declare module DevExpress.ui {
         maskRules?: Object;
         /** A message displayed when the entered text does not match the specified pattern. */
         maskInvalidMessage?: string;
-        /** Specifies whether the value option holds only characters entered by a user or prompt characters as well. */
+        /** Specifies whether the value should contain mask characters or not. */
         useMaskedValue?: boolean;
     }
     /** A base class for text editing widgets. */
@@ -1444,7 +1444,7 @@ declare module DevExpress.ui {
         step?: number;
         /** The current number box value. */
         value?: number;
-        /** The "mode" attribute value of the actual HTML input element representing the widget. */
+        /** Specifies the value to be passed to the type attribute of the underlying `<input>` element. */
         mode?: string;
         /** Specifies the text of the message displayed if the specified value is not a number. */
         invalidValueMessage?: string;
@@ -1803,11 +1803,11 @@ declare module DevExpress.ui {
         scrollToItem(itemIndex: any): void;
         /** Returns how far the list content is scrolled from the top. */
         scrollTop(): number;
-        /** Selects the specified item from the list. */
+        /** Selects the specified item. */
         selectItem(itemElement: Element): void;
         /** Selects the specified item from the list. */
         selectItem(itemIndex: any): void;
-        /** Deselects the specified item from the list. */
+        /** Cancels the selection of the specified item. */
         unselectItem(itemElement: Element): void;
         /** Unselects the specified item from the list. */
         unselectItem(itemIndex: any): void;
@@ -1890,7 +1890,7 @@ declare module DevExpress.ui {
     }
     export interface dxDateBoxOptions extends dxTextEditorOptions {
         formatString?: any;
-        /** Specifies the date display format. Applies only if the pickerType option is 'native' */
+        /** Specifies the date display format. Ignored if the pickerType option is 'native' */
         displayFormat?: any;
         format?: string;
         /** A format used to display date/time information. */
@@ -2297,7 +2297,7 @@ declare module DevExpress.ui {
         icon?: string;
         /** The template to be used for rendering the tab. */
         tabTemplate?: any;
-        /** The template to be used for rendering the tab content. */
+        /** The template to be used for rendering the tab's content. */
         template?: any;
     }
     export interface dxFormTabbedItem extends dxFormItem {
@@ -2365,7 +2365,7 @@ declare module DevExpress.ui {
         itemOption(field: string, options: Object): void;
         /** Gets the value of the form item option. */
         itemOption(field: string): any;
-        /** Returns an editor instance associated with the specified formData field or name of the form item. */
+        /** Returns an editor instance associated with the specified formData field or name of a form item. */
         getEditor(field: string): Object;
         /** Updates the dimensions of the widget contents. */
         updateDimensions(): JQueryPromise<void>;
@@ -3293,7 +3293,7 @@ declare module DevExpress.ui {
         updateDimensions(): JQueryPromise<void>;
         /** Selects the specified item. */
         selectItem(itemElement: any): void;
-        /** Unselects the specified item. */
+        /** Cancels the selection of the specified item. */
         unselectItem(itemElement: any): void;
         /** Expands the specified item. */
         expandItem(itemElement: any): void;
@@ -3316,7 +3316,7 @@ declare module DevExpress.ui {
         };
         /** A Boolean value specifying whether or not the widget changes its state when interacting with a user. */
         activeStateEnabled?: boolean;
-        /** Specifies the name of the CSS class associated with the menu. */
+        /** Specifies the name of the CSS class to be applied to the root menu level and all submenus. */
         cssClass?: string;
         /** Holds an array of menu items. */
         items?: Array<any>;
@@ -3407,7 +3407,7 @@ declare module DevExpress.ui {
         position?: PositionOptions;
         /** Specifies the direction at which submenus are displayed. */
         submenuDirection?: string;
-        /** The target element associated with a popover. */
+        /** The target element associated with the context menu. */
         target?: any;
         /** A Boolean value specifying whether or not the widget is visible. */
         visible?: boolean;
@@ -3475,7 +3475,7 @@ declare module DevExpress.ui {
         /** Specifies a callback function to be invoked after the cell value is edited by an end-user and before the new value is saved to the data source. */
         setCellValue?: (rowData: Object, value: any) => void;
         /** Specifies a callback function that defines filters for customary calculated grid cells. */
-        calculateFilterExpression?: (filterValue: any, selectedFilterOperation: string, target: string) => Array<any>;
+        calculateFilterExpression?: (filterValue: any, selectedFilterOperation: string, target: string) => any;
         /** Specifies a caption for a column. */
         caption?: string;
         /** Specifies a custom template for grid column cells. */

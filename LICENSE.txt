@@ -1,6 +1,6 @@
 ﻿DEVELOPER EXPRESS INC
 DevExtreme (R) Complete
-Copyright (C) 2011-2016 Developer Express Inc.
+Copyright (C) 2011-2017 Developer Express Inc.
 
 END-USER LICENSE AGREEMENT
 FOR ALL SOFTWARE DEVELOPMENT PRODUCT(S) INCLUDED IN THIS DISTRIBUTION
@@ -118,7 +118,7 @@ http://rafael.xavier.blog.br
 https://github.com/rxaviers/cldrjs/blob/master/LICENSE-MIT
 
 CLDR - Unicode Common Locale Data Repository
-Copyright (C) 1991-2016 Unicode, Inc
+Copyright (C) 1991-2017 Unicode, Inc
 http://unicode.org/copyright.html
 
 AngularJS JavaScript Library (Open Source - MIT License)
