@@ -1,6 +1,5 @@
 "use strict";
 
-// jshint strict:implied
 (function(root, factory) {
     /* global DevExpress, define */
     if(typeof define === "function" && define.amd) {

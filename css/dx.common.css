@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 16.2.4
-* Build date: Jan 17, 2017
+* Version: 16.2.5
+* Build date: Feb 27, 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -53,12 +53,6 @@
   bottom: 0;
   opacity: 0;
   z-index: 2147483647;
-}
-.dx-deferrendering.dx-pending-rendering .dx-invisible-while-pending-rendering {
-  display: none !important;
-}
-.dx-deferrendering:not(.dx-pending-rendering) .dx-visible-while-pending-rendering {
-  display: none !important;
 }
 .dx-animating {
   pointer-events: none;
@@ -713,6 +707,7 @@
   cursor: default;
 }
 .dx-resizable {
+  display: block;
   position: relative;
 }
 .dx-resizable-handle {
@@ -930,6 +925,7 @@
   position: relative;
 }
 .dx-scrollable {
+  display: block;
   height: 100%;
   min-height: 0;
 }
@@ -3710,6 +3706,7 @@
   width: 100%;
   height: 100%;
   top: 0;
+  z-index: 100;
 }
 .dx-slideoutview-shield {
   position: absolute;
@@ -4153,7 +4150,7 @@
 .dx-datagrid.dx-datagrid-borders > .dx-datagrid-header-panel {
   border-bottom: 0;
 }
-.dx-datagrid.dx-datagrid-borders > .dx-datagrid-rowsview.dx-last-row-border .dx-data-row.dx-row-lines:nth-last-child(2) td {
+.dx-datagrid.dx-datagrid-borders > .dx-datagrid-rowsview.dx-last-row-border tbody:last-child > .dx-data-row:nth-last-child(2) > td {
   border-bottom-width: 0;
 }
 .dx-datagrid .dx-menu-horizontal {
@@ -4925,6 +4922,9 @@ input.dx-hidden {
 .dx-pivotgrid .dx-area-data-cell,
 .dx-pivotgrid .dx-area-column-cell {
   width: 100%;
+}
+.dx-pivotgrid .dx-area-data-cell {
+  position: relative;
 }
 .dx-pivotgrid .dx-pivotgrid-container {
   overflow: hidden;
@@ -5956,4 +5956,15 @@ input.dx-hidden {
 .dx-rtl .dx-form-group-with-caption .dx-form-group.dx-form-group-with-caption {
   padding-left: 0;
   padding-right: 20px;
+}
+.dx-deferrendering .dx-deferrendering-loadindicator-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+.dx-deferrendering.dx-pending-rendering .dx-invisible-while-pending-rendering {
+  display: none !important;
+}
+.dx-deferrendering:not(.dx-pending-rendering) .dx-visible-while-pending-rendering {
+  display: none !important;
 }
