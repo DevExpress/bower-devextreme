@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.all.d.ts)
-* Version: 16.2.5
-* Build date: Mon Feb 27 2017
+* Version: 16.2.6
+* Build date: Tue Mar 28 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -2311,6 +2311,8 @@ declare module DevExpress.ui {
         scrollToItem(itemIndex: any): void;
         /** Returns how far the list content is scrolled from the top. */
         scrollTop(): number;
+        selectAll(): void;
+        unselectAll(): void;
         /** Selects the specified item. */
         selectItem(itemElement: Element): void;
         /** Selects the specified item from the list. */
@@ -2411,6 +2413,7 @@ declare module DevExpress.ui {
         placeholder?: string;
         /** Specifies whether or not a user can pick out a date using the drop-down calendar. */
         useCalendar?: boolean;
+        dateSerializationFormat?: string;
         /** An object or a value, specifying the date and time currently selected using the date box. */
         value?: any;
         /** Specifies whether or not the widget uses the native HTML input element. */
@@ -2459,6 +2462,7 @@ declare module DevExpress.ui {
         currentDate?: Date;
         /** Specifies the first day of a week. */
         firstDayOfWeek?: number;
+        dateSerializationFormat?: string;
         /** An object or a value, specifying the date and time currently selected in the calendar. */
         value?: any;
         /** The latest date the widget allows to select. */
@@ -2634,7 +2638,7 @@ declare module DevExpress.ui {
         /** A handler for the valueChanged event. */
         onValueChanged?: Function;
     }
-    /** The FileUploader widget enables an end user to upload files to the server. An end user can select files in the file exlorer or drag and drop files to the FileUploader area on the page. */
+    /** The FileUploader widget enables an end user to upload files to the server. An end user can select files in the file explorer or drag and drop files to the FileUploader area on the page. */
     export class dxFileUploader extends Editor {
         constructor(element: JQuery, options?: dxFileUploaderOptions);
         constructor(element: Element, options?: dxFileUploaderOptions);
@@ -3214,7 +3218,7 @@ declare module DevExpress.data {
         customizeText?: (cellInfo: { value: any; valueText: string }) => string;
         /** Specifies a precision for formatted field values. */
         precision?: number;
-        /** Specifies how to sort the header items. */
+        /** Specifies how to sort header items. */
         sortingMethod?: (a: Object, b: Object) => number;
         /** Allows an end-user to change sorting options. */
         allowSorting?: boolean;
@@ -3374,12 +3378,13 @@ declare module DevExpress.ui {
         resourceCellTemplate?: any;
     }
     export interface dxSchedulerOptions extends WidgetOptions {
+        dateSerializationFormat?: string;
         /** Specifies a date displayed on the current scheduler view by default. */
         currentDate?: any;
         /** The earliest date the widget allows you to select. */
-        min?: Date;
+        min?: any;
         /** The latest date the widget allows you to select. */
-        max?: Date;
+        max?: any;
         /** Specifies the view used in the scheduler by default. */
         currentView?: string;
         /** A data source used to fetch data to be displayed by the widget. */
@@ -3774,7 +3779,7 @@ declare module DevExpress.ui {
         grouping?: boolean;
         /** Specifies whether or not paging by groups must be performed on the server side. */
         groupPaging?: boolean;
-        /** Specifies whether or not summaries calculation must be performed on the server side. */
+        /** Specifies whether or not summaries calculation must be performed on the server. */
         summary?: boolean;
     }
     export interface dxDataGridRow {
@@ -3811,6 +3816,7 @@ declare module DevExpress.ui {
         allowResizing?: boolean;
         /** Specifies whether grid records can be sorted by a specific column at runtime. Setting this option makes sense only when the sorting mode differs from none. */
         allowSorting?: boolean;
+        /** Specifies whether data from this column should be exported. */
         allowExporting?: boolean;
         /** Specifies whether groups appear expanded or not when records are grouped by a specific column. Setting this option makes sense only when grouping is allowed for this column. */
         autoExpandGroup?: boolean;
@@ -4231,6 +4237,7 @@ declare module DevExpress.ui {
         searchPanel?: {
             /** Specifies whether or not search strings in the located grid records should be highlighted. */
             highlightSearchText?: boolean;
+            highlightCaseSensitive?: boolean;
             /** Specifies text displayed by the search panel when no search string was typed. */
             placeholder?: string;
             /** Specifies whether the search panel is visible or not. */
@@ -4464,6 +4471,7 @@ declare module DevExpress.ui {
         };
         /** Specifies whether text that does not fit into a column should be wrapped. */
         wordWrapEnabled?: boolean;
+        dateSerializationFormat?: string;
     }
     /** The DataGrid is a widget that represents data from a local or remote source in the form of a grid. This widget offers such basic features as sorting, grouping, filtering, as well as more advanced capabilities, like state storing, export to Excel, master-detail interface, and many others. */
     export class dxDataGrid extends Widget implements DataHelperMixin {
@@ -4499,6 +4507,7 @@ declare module DevExpress.ui {
         hasEditData(): boolean;
         /** Clears all the filters of a specific type applied to grid records. */
         clearFilter(): void;
+        clearFilter(filterName: string): void;
         /** Deselects all grid records. */
         clearSelection(): void;
         /** Draws the cell being edited from the editing state. Use this method when the edit mode is batch. */
@@ -4590,15 +4599,15 @@ declare module DevExpress.ui {
         /** Searches grid records by a search string. */
         searchByText(text: string): void;
         /** Selects all rows. */
-        selectAll(): void;
+        selectAll(): JQueryPromise<any>;
         /** Deselects all rows. */
-        deselectAll(): void;
+        deselectAll(): JQueryPromise<any>;
         /** Selects specific grid records. */
-        selectRows(keys: Array<any>, preserve: boolean): void;
+        selectRows(keys: Array<any>, preserve: boolean): JQueryPromise<any>;
         /** Deselects specific grid records. */
-        deselectRows(keys: Array<any>): void;
+        deselectRows(keys: Array<any>): JQueryPromise<any>;
         /** Selects grid rows by indexes. */
-        selectRowsByIndexes(indexes: Array<any>): void;
+        selectRowsByIndexes(indexes: Array<any>): JQueryPromise<any>;
         /** Allows you to find out whether or not the row with a specified data object is selected. */
         isRowSelected(arg: any): boolean;
         /** Invokes the column chooser panel. */
@@ -5390,7 +5399,7 @@ declare module DevExpress.viz.core {
         }) => void;
         /** A handler for the exported event. */
         onExported?: (e: Object) => void;
-        /** Notifies the widget that it is embedded into an HTML page that uses a path modifying tag. */
+        /** Notifies the widget that it is embedded into an HTML page that uses a tag modifying the path. */
         pathModified?: boolean;
         /** Specifies whether or not the widget supports right-to-left representation. */
         rtlEnabled?: boolean;
@@ -5955,6 +5964,12 @@ declare module DevExpress.viz.charts {
     export interface PolarSeriesTemplate {
         /** Specifies a callback function that returns a series object with individual series settings. */
         customizeSeries?: (seriesName: string) => PolarSeriesConfig;
+        /** Specifies a data source field that represents the series name. */
+        nameField?: string;
+    }
+    export interface PieSeriesTemplate {
+        /** Specifies a callback function that returns a series object with individual series settings. */
+        customizeSeries?: (seriesName: string) => PieSeriesConfig;
         /** Specifies a data source field that represents the series name. */
         nameField?: string;
     }
@@ -6613,6 +6628,8 @@ declare module DevExpress.viz.charts {
         resolveLabelOverlapping?: string;
         /** An object defining the configuration options that are common for all series of the PieChart widget. */
         commonSeriesSettings?: CommonPieSeriesSettings;
+        /** Defines options for the series template. */
+        seriesTemplate?: PieSeriesTemplate;
         /** Specifies the type of the pie chart series. */
         type?: string;
     }

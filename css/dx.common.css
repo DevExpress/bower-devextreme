@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 16.2.5
-* Build date: Feb 27, 2017
+* Version: 16.2.6
+* Build date: Mar 28, 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -679,6 +679,9 @@
 .dx-rtl {
   direction: rtl;
   unicode-bidi: embed;
+}
+.dx-state-disabled {
+  pointer-events: none;
 }
 .dx-badge {
   padding: 0px 5px;
@@ -4641,6 +4644,9 @@ input.dx-hidden {
 .dx-datagrid-rowsview.dx-scrollable .dx-scrollable-content {
   z-index: 2;
 }
+.dx-datagrid-rowsview .dx-datagrid-content {
+  overflow-anchor: none;
+}
 .dx-datagrid-rowsview .dx-scrollable-scrollbar {
   z-index: 3;
 }
@@ -4919,15 +4925,15 @@ input.dx-hidden {
   width: 100%;
   position: relative;
 }
+.dx-pivotgrid.dx-overflow-hidden {
+  overflow: hidden;
+}
 .dx-pivotgrid .dx-area-data-cell,
 .dx-pivotgrid .dx-area-column-cell {
   width: 100%;
 }
 .dx-pivotgrid .dx-area-data-cell {
   position: relative;
-}
-.dx-pivotgrid .dx-pivotgrid-container {
-  overflow: hidden;
 }
 .dx-pivotgrid table,
 .dx-pivotgrid tbody,
@@ -5713,6 +5719,7 @@ input.dx-hidden {
   -ms-transform-origin: 50% 100%;
   -o-transform-origin: 50% 100%;
   transform-origin: 50% 100%;
+  -webkit-backface-visibility: hidden;
 }
 .dx-timeview-field .dx-numberbox {
   width: 70px;
