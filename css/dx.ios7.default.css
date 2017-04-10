@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 16.2.6
-* Build date: Mar 28, 2017
+* Version: 16.2.6 (build 17100)
+* Build date: Apr 10, 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -6114,19 +6114,23 @@
 .dx-hairlines .dx-selectbox-popup-wrapper .dx-list:not(.dx-list-select-decorator-enabled) .dx-list-item:not(:last-child):not(:only-child) {
   border-bottom-width: .5px;
 }
-.dx-tagbox:not(.dx-texteditor-empty) .dx-texteditor-input {
-  padding-left: 5px;
+.dx-tagbox:not(.dx-texteditor-empty).dx-show-clear-button .dx-icon-clear {
+  position: absolute;
+  top: 50%;
+  margin-top: -9px;
+  right: auto;
 }
-.dx-rtl .dx-tagbox:not(.dx-texteditor-empty) .dx-texteditor-input,
-.dx-rtl.dx-tagbox:not(.dx-texteditor-empty) .dx-texteditor-input {
-  padding-left: 6px;
-  padding-right: 5px;
+.dx-dropdowneditor-button-visible .dx-tag-container {
+  padding-right: 25px;
+}
+.dx-show-clear-button .dx-tag-container {
+  padding-right: 26px;
+}
+.dx-show-clear-button.dx-dropdowneditor-button-visible .dx-tag-container {
+  padding-right: 51px;
 }
 .dx-tag-container {
   background: #fff;
-}
-.dx-show-clear-button .dx-tag-container {
-  padding-right: 51px;
 }
 .dx-tagbox-single-line {
   border: 1px solid #ccc;
@@ -6156,7 +6160,6 @@
   padding: 4px 19px 4px 7px;
   color: #fff;
   font-size: 1em;
-  vertical-align: top;
   background-color: #007aff;
   -webkit-border-radius: 10px;
   -moz-border-radius: 10px;
@@ -6196,6 +6199,10 @@
 .dx-tagbox-popup-wrapper .dx-list-select-all:after {
   margin-left: 0;
 }
+.dx-rtl.dx-tagbox.dx-show-clear-button .dx-icon-clear {
+  left: auto;
+  right: auto;
+}
 .dx-rtl .dx-tag-content {
   padding-right: 7px;
   padding-left: 19px;
@@ -6208,8 +6215,25 @@
   right: 7px;
   left: auto;
 }
-.dx-rtl .dx-tag-container {
-  padding-left: 40px;
+.dx-rtl.dx-dropdowneditor-button-visible .dx-tag-container {
+  padding-right: 0;
+  padding-left: 25px;
+}
+.dx-rtl.dx-show-clear-button {
+  padding-left: 26px;
+}
+.dx-rtl.dx-show-clear-button .dx-tag-container {
+  padding-right: 0;
+  padding-left: 26px;
+}
+.dx-rtl.dx-show-clear-button.dx-dropdowneditor-button-visible .dx-tag-container {
+  padding-right: 0;
+  padding-left: 51px;
+}
+.dx-rtl.dx-show-clear-button .dx-texteditor-input,
+.dx-rtl.dx-dropdowneditor-button-visible .dx-texteditor-input,
+.dx-rtl.dx-show-clear-button.dx-dropdowneditor-button-visible .dx-texteditor-input {
+  padding-left: 0;
   padding-right: 0;
 }
 .dx-radiobutton-icon {

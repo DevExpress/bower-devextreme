@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.all.d.ts)
-* Version: 16.2.6
-* Build date: Tue Mar 28 2017
+* Version: 16.2.6 (build 17100)
+* Build date: Mon Apr 10 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -722,17 +722,19 @@ declare module DevExpress {
         off(eventName: string): Component;
         off(eventName: string, eventHandler: Function): Component;
     }
-    export interface DOMComponentOptions extends ComponentOptions {
+    export interface DOMComponentOptionsBase extends ComponentOptions {
         /** Specifies whether or not the current component supports a right-to-left representation. */
         rtlEnabled?: boolean;
-        /** Specifies the height of the widget. */
-        height?: any;
-        /** Specifies the width of the widget. */
-        width?: any;
         /** Specifies the attributes to be attached to the widget's root element. */
         elementAttr?: Object;
         /** A bag for holding any options that require two-way binding (Angular approach specific) */
         bindingOptions?: { [key: string]: any; };
+    }
+    export interface DOMComponentOptions extends DOMComponentOptionsBase {
+        /** Specifies the height of the widget. */
+        height?: any;
+        /** Specifies the width of the widget. */
+        width?: any;
     }
     /** A base class for all components. */
     export class DOMComponent extends Component {
@@ -2311,15 +2313,17 @@ declare module DevExpress.ui {
         scrollToItem(itemIndex: any): void;
         /** Returns how far the list content is scrolled from the top. */
         scrollTop(): number;
+        /** Selects all items. */
         selectAll(): void;
+        /** Clears selection of all items. */
         unselectAll(): void;
         /** Selects the specified item. */
         selectItem(itemElement: Element): void;
         /** Selects the specified item from the list. */
         selectItem(itemIndex: any): void;
-        /** Cancels the selection of the specified item. */
+        /** Clears selection of the specified item. */
         unselectItem(itemElement: Element): void;
-        /** Unselects the specified item from the list. */
+        /** Clears selection of the specified item from the list. */
         unselectItem(itemIndex: any): void;
         /** Updates the widget scrollbar according to widget content size. */
         updateDimensions(): JQueryPromise<void>;
@@ -2413,6 +2417,7 @@ declare module DevExpress.ui {
         placeholder?: string;
         /** Specifies whether or not a user can pick out a date using the drop-down calendar. */
         useCalendar?: boolean;
+        /** Specifies the serialization format for a date-time value. */
         dateSerializationFormat?: string;
         /** An object or a value, specifying the date and time currently selected using the date box. */
         value?: any;
@@ -2462,8 +2467,9 @@ declare module DevExpress.ui {
         currentDate?: Date;
         /** Specifies the first day of a week. */
         firstDayOfWeek?: number;
+        /** Specifies the serialization format for a date-time value. */
         dateSerializationFormat?: string;
-        /** An object or a value, specifying the date and time currently selected in the calendar. */
+        /** An object or a value specifying the date and time currently selected in the calendar. */
         value?: any;
         /** The latest date the widget allows to select. */
         max?: any;
@@ -3378,6 +3384,7 @@ declare module DevExpress.ui {
         resourceCellTemplate?: any;
     }
     export interface dxSchedulerOptions extends WidgetOptions {
+        /** Specifies the serialization format for date-time values. */
         dateSerializationFormat?: string;
         /** Specifies a date displayed on the current scheduler view by default. */
         currentDate?: any;
@@ -4237,6 +4244,7 @@ declare module DevExpress.ui {
         searchPanel?: {
             /** Specifies whether or not search strings in the located grid records should be highlighted. */
             highlightSearchText?: boolean;
+            /** Notifies the DataGrid whether search is case-sensitive to ensure proper highlightning of search results. Applies only if highlightSearchText is true. */
             highlightCaseSensitive?: boolean;
             /** Specifies text displayed by the search panel when no search string was typed. */
             placeholder?: string;
@@ -4471,6 +4479,7 @@ declare module DevExpress.ui {
         };
         /** Specifies whether text that does not fit into a column should be wrapped. */
         wordWrapEnabled?: boolean;
+        /** Specifies the serialization format for date-time values. */
         dateSerializationFormat?: string;
     }
     /** The DataGrid is a widget that represents data from a local or remote source in the form of a grid. This widget offers such basic features as sorting, grouping, filtering, as well as more advanced capabilities, like state storing, export to Excel, master-detail interface, and many others. */
@@ -4505,10 +4514,11 @@ declare module DevExpress.ui {
         cancelEditData(): void;
         /** Checks whether or not the grid contains unsaved changes. */
         hasEditData(): boolean;
-        /** Clears all the filters of a specific type applied to grid records. */
+        /** Clears all filters applied to grid rows. */
         clearFilter(): void;
+        /** Clears all filters of a specific type applied to grid rows. */
         clearFilter(filterName: string): void;
-        /** Deselects all grid records. */
+        /** Clears selection of all grid rows on all pages. */
         clearSelection(): void;
         /** Draws the cell being edited from the editing state. Use this method when the edit mode is batch. */
         closeEditCell(): void;
@@ -4600,11 +4610,11 @@ declare module DevExpress.ui {
         searchByText(text: string): void;
         /** Selects all rows. */
         selectAll(): JQueryPromise<any>;
-        /** Deselects all rows. */
+        /** Clears selection of all grid rows on the current page only or on all pages. */
         deselectAll(): JQueryPromise<any>;
-        /** Selects specific grid records. */
+        /** Selects specified grid rows. */
         selectRows(keys: Array<any>, preserve: boolean): JQueryPromise<any>;
-        /** Deselects specific grid records. */
+        /** Clears selection of specified grid rows. */
         deselectRows(keys: Array<any>): JQueryPromise<any>;
         /** Selects grid rows by indexes. */
         selectRowsByIndexes(indexes: Array<any>): JQueryPromise<any>;
@@ -5364,7 +5374,7 @@ declare module DevExpress.viz.core {
         /** Specifies whether or not the legend is visible on the map. */
         visible?: boolean;
     }
-    export interface BaseWidgetOptions extends DOMComponentOptions {
+    export interface BaseWidgetOptions extends DOMComponentOptionsBase {
         /** Specifies the size of the widget in pixels. */
         size?: Size;
         /** A handler for the drawn event. */
@@ -5411,26 +5421,12 @@ declare module DevExpress.viz.core {
         /** Returns the widget's SVG markup. */
         svg(): string;
         /** Exports the widget into a document with a specified name and format. */
-        exportTo(): void;
+        exportTo(fileName: string, format: string): void;
         /** Opens the browser's print window. */
         print(): void;
         /** Redraws the widget. */
         render(): void;
     }
-}
-declare module DevExpress.viz {
-    /** Applies a theme for the entire page with several DevExtreme visualization widgets. */
-    export function currentTheme(theme: string): void;
-    /** Applies a new theme (with the color scheme defined separately) for the entire page with several DevExtreme visualization widgets. */
-    export function currentTheme(platform: string, colorScheme: string): void;
-    /** Registers a new theme based on the existing one. */
-    export function registerTheme(customTheme: Object, baseTheme: string): void;
-    /** Applies a predefined or registered custom palette to all visualization widgets at once. */
-    export function currentPalette(paletteName: string): void;
-    /** Obtains the color sets of a predefined or registered palette. */
-    export function getPalette(paletteName: string): Object;
-    /** Registers a new palette. */
-    export function registerPalette(paletteName: string, palette: Object): void;
 }
 declare module DevExpress.viz.charts {
     /** This section describes the fields and methods that can be used in code to manipulate the Series object. */
@@ -5639,6 +5635,7 @@ declare module DevExpress.viz.charts {
         color?: string;
         /** Specifies the dash style of the series' line. */
         dashStyle?: string;
+        /** Specifies series elements to be highlighted when a user points to the series. */
         hoverMode?: string;
         hoverStyle?: {
             border?: viz.core.DashedBorder;

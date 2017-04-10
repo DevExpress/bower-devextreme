@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 16.2.6
-* Build date: Mar 28, 2017
+* Version: 16.2.6 (build 17100)
+* Build date: Apr 10, 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -3895,6 +3895,7 @@
 }
 .dx-scrollview-pull-down-image {
   background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAyCAQAAAD2dTOtAAAApElEQVRIx2OYxQCHvlggw38oZBgcCrFCihQ2YIFDViH1g+cMFjhkFVI/eP5jgUNWIfWDh2iFdbMuYUCsCmcS65lRhXRRqDXrwKzDYPgci8LDUFgKMilq1h+saREBt8xig1gai1fp9llsCDcm4FS2dxYnqmfS8ClD9XUmFq9wYk/hOWjKeHBnhVK4smMgZfjyTDVY2clZ/IQzVzWwuOPHyFz/iYQAhMbywidpE3YAAAAASUVORK5CYII=) 0 0 no-repeat;
+  background-size: 100%;
 }
 .dx-scrollable-native.dx-scrollable-native-android .dx-scrollview-pull-down {
   background-color: #2a2a2a;
@@ -6811,25 +6812,25 @@
 .dx-selectbox-popup-wrapper .dx-list {
   background-color: #2a2a2a;
 }
-.dx-tagbox:not(.dx-texteditor-empty).dx-tagbox-default-template.dx-tagbox-only-select .dx-tag-container {
-  padding-bottom: 4px;
-}
 .dx-tagbox:not(.dx-texteditor-empty) .dx-texteditor-input {
   padding-left: 0;
   margin-left: 5px;
 }
 .dx-rtl .dx-tagbox:not(.dx-texteditor-empty) .dx-texteditor-input,
 .dx-rtl.dx-tagbox:not(.dx-texteditor-empty) .dx-texteditor-input {
-  padding: 7px 9px 8px;
   padding-right: 0;
-  margin-right: 5px;
+  padding-left: 0;
+  margin-right: 0;
   margin-left: 0;
 }
-.dx-tag-container {
+.dx-dropdowneditor-button-visible .dx-tag-container {
   padding-right: 34px;
 }
 .dx-show-clear-button .dx-tag-container {
-  padding-right: 68px;
+  padding-right: 30px;
+}
+.dx-show-clear-button.dx-dropdowneditor-button-visible .dx-tag-container {
+  padding-right: 64px;
 }
 .dx-tagbox-single-line.dx-dropdowneditor-button-visible .dx-texteditor-container {
   width: calc(100% -  34px);
@@ -6844,7 +6845,6 @@
   background-color: #4c4c4c;
   border-radius: 2px;
   color: #dedede;
-  vertical-align: top;
 }
 .dx-tag-remove-button {
   width: 25px;
@@ -6904,9 +6904,17 @@
   right: auto;
   left: 5px;
 }
-.dx-rtl .dx-tag-container {
-  padding-left: 34px;
+.dx-rtl.dx-dropdowneditor-button-visible .dx-tag-container {
   padding-right: 0;
+  padding-left: 34px;
+}
+.dx-rtl.dx-show-clear-button .dx-tag-container {
+  padding-right: 0;
+  padding-left: 30px;
+}
+.dx-rtl.dx-show-clear-button.dx-dropdowneditor-button-visible .dx-tag-container {
+  padding-right: 0;
+  padding-left: 64px;
 }
 .dx-radiobutton-icon {
   width: 22px;

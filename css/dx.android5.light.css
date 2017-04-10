@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 16.2.6
-* Build date: Mar 28, 2017
+* Version: 16.2.6 (build 17100)
+* Build date: Apr 10, 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -6519,6 +6519,18 @@
 .dx-tagbox.dx-show-clear-button .dx-tag-container {
   padding-right: 34px;
 }
+.dx-tagbox.dx-show-clear-button .dx-icon-clear {
+  position: absolute;
+  top: 50%;
+  margin-top: -10px;
+  right: auto;
+}
+.dx-dropdowneditor-button-visible .dx-tag-container {
+  padding-right: 20px;
+}
+.dx-dropdowneditor-button-visible.dx-show-clear-button .dx-tag-container {
+  padding-right: 54px;
+}
 .dx-tag-container {
   padding: 0;
 }
@@ -6527,6 +6539,12 @@
 }
 .dx-tagbox-single-line .dx-texteditor-container:before {
   bottom: 8px;
+}
+.dx-tagbox-single-line.dx-dropdowneditor-button-visible .dx-tag-container {
+  padding-right: 20px;
+}
+.dx-tagbox-single-line.dx-dropdowneditor-button-visible.dx-show-clear-button .dx-tag-container {
+  padding-right: 54px;
 }
 .dx-tagbox-single-line.dx-dropdowneditor-button-visible .dx-tag-container {
   width: calc(100% -  20px);
@@ -6589,9 +6607,38 @@
   padding-right: 5px;
   padding-left: 20px;
 }
-.dx-rtl .dx-tagbox .dx-tag-container,
-.dx-rtl.dx-tagbox .dx-tag-container {
+.dx-rtl .dx-tagbox.dx-show-clear-button .dx-tag-container,
+.dx-rtl.dx-tagbox.dx-show-clear-button .dx-tag-container {
+  padding-right: 0;
   padding-left: 34px;
+}
+.dx-rtl .dx-tagbox.dx-show-clear-button .dx-icon-clear,
+.dx-rtl.dx-tagbox.dx-show-clear-button .dx-icon-clear {
+  left: auto;
+  right: auto;
+}
+.dx-rtl .dx-tagbox.dx-show-clear-button .dx-texteditor-input,
+.dx-rtl.dx-tagbox.dx-show-clear-button .dx-texteditor-input {
+  padding-left: 0;
+  padding-right: 0;
+}
+.dx-rtl .dx-tagbox.dx-dropdowneditor-button-visible .dx-tag-container,
+.dx-rtl.dx-tagbox.dx-dropdowneditor-button-visible .dx-tag-container {
+  padding-right: 0;
+  padding-left: 20px;
+}
+.dx-rtl .dx-tagbox.dx-dropdowneditor-button-visible.dx-show-clear-button .dx-tag-container,
+.dx-rtl.dx-tagbox.dx-dropdowneditor-button-visible.dx-show-clear-button .dx-tag-container {
+  padding-right: 0;
+  padding-left: 54px;
+}
+.dx-rtl .dx-tagbox.dx-show-clear-button .dx-texteditor-input,
+.dx-rtl.dx-tagbox.dx-show-clear-button .dx-texteditor-input,
+.dx-rtl .dx-tagbox.dx-dropdowneditor-button-visible .dx-texteditor-input,
+.dx-rtl.dx-tagbox.dx-dropdowneditor-button-visible .dx-texteditor-input,
+.dx-rtl .dx-tagbox.dx-show-clear-button.dx-dropdowneditor-button-visible .dx-texteditor-input,
+.dx-rtl.dx-tagbox.dx-show-clear-button.dx-dropdowneditor-button-visible .dx-texteditor-input {
+  padding-left: 0;
   padding-right: 0;
 }
 .dx-rtl .dx-tagbox .dx-tag-remove-button:before,

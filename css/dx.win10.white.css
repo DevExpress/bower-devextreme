@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 16.2.6
-* Build date: Mar 28, 2017
+* Version: 16.2.6 (build 17100)
+* Build date: Apr 10, 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -5744,11 +5744,14 @@
 .dx-tagbox .dx-texteditor-input {
   width: auto;
 }
-.dx-tag-container {
+.dx-dropdowneditor-button-visible .dx-tag-container {
   padding-right: 28px;
 }
 .dx-show-clear-button .dx-tag-container {
   padding-right: 28px;
+}
+.dx-show-clear-button.dx-dropdowneditor-button-visible .dx-tag-container {
+  padding-right: 56px;
 }
 .dx-tagbox-single-line.dx-state-active .dx-dropdowneditor-button {
   background-color: #cccccc;
@@ -5769,7 +5772,6 @@
   margin: 2px 0 0 2px;
   line-height: 16px;
   padding: 4px 24px 4px 6px;
-  vertical-align: top;
   background-color: #0078d7;
   color: #ffffff;
 }
@@ -5826,12 +5828,34 @@
 .dx-state-disabled.dx-tagbox .dx-tag-remove-button {
   display: none;
 }
+.dx-rtl .dx-tagbox.dx-dropdowneditor-button-visible .dx-tag-container,
+.dx-rtl.dx-tagbox.dx-dropdowneditor-button-visible .dx-tag-container {
+  padding-right: 0;
+  padding-left: 28px;
+}
+.dx-rtl .dx-tagbox.dx-show-clear-button .dx-tag-container,
+.dx-rtl.dx-tagbox.dx-show-clear-button .dx-tag-container {
+  padding-right: 0;
+  padding-left: 28px;
+}
+.dx-rtl .dx-tagbox.dx-show-clear-button.dx-dropdowneditor-button-visible .dx-tag-container,
+.dx-rtl.dx-tagbox.dx-show-clear-button.dx-dropdowneditor-button-visible .dx-tag-container {
+  padding-right: 0;
+  padding-left: 56px;
+}
+.dx-rtl .dx-tagbox.dx-show-clear-button .dx-texteditor-input,
+.dx-rtl.dx-tagbox.dx-show-clear-button .dx-texteditor-input,
+.dx-rtl .dx-tagbox.dx-dropdowneditor-button-visible .dx-texteditor-input,
+.dx-rtl.dx-tagbox.dx-dropdowneditor-button-visible .dx-texteditor-input {
+  padding-left: 0;
+  padding-right: 0;
+}
 .dx-rtl .dx-tagbox .dx-tag-content,
 .dx-rtl.dx-tagbox .dx-tag-content {
-  margin-left: 0;
-  margin-right: 2px;
   padding-right: 6px;
   padding-left: 24px;
+  margin-left: 0;
+  margin-right: 2px;
 }
 .dx-radiobutton-icon {
   height: 20px;
