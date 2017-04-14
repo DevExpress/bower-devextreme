@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.aspnet.mvc.js)
-* Version: 16.2.6 (build 17100)
-* Build date: Mon Apr 10 2017
+* Version: 16.2.6 (build 17104)
+* Build date: Fri Apr 14 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -13,7 +13,8 @@
             module.exports = factory(require("jquery"), require("./ui/set_template_engine"), require("./ui/widget/ui.template_base").renderedCallbacks, require("./core/guid"))
         })
     } else {
-        DevExpress.aspnet = factory(window.jQuery, DevExpress.ui.setTemplateEngine, DevExpress.ui.templateRendered, DevExpress.data.Guid)
+        var ui = DevExpress.ui;
+        DevExpress.aspnet = factory(window.jQuery, ui && ui.setTemplateEngine, ui && ui.templateRendered, DevExpress.data.Guid)
     }
 }(function($, setTemplateEngine, templateRendered, Guid) {
     var templateCompiler = createTemplateCompiler();
