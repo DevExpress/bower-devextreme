@@ -1,10 +1,10 @@
 /*!
 * DevExtreme (dx.messages.ru.js)
-* Version: 16.2.6 (build 17104)
-* Build date: Fri Apr 14 2017
+* Version: 17.1.2-beta
+* Build date: Mon Apr 17 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
-* EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
+* Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
 */
 "use strict";
 
@@ -122,6 +122,7 @@
             "dxDataGrid-editingSaveAllChanges": "Сохранить изменения",
             "dxDataGrid-editingCancelAllChanges": "Отменить изменения",
             "dxDataGrid-editingAddRow": "Добавить строку",
+            "dxTreeList-editingAddRowToNode": "Добавить",
             "dxDataGrid-summaryMin": "Мин: {0}",
             "dxDataGrid-summaryMinOtherColumn": "Мин по {1} : {0}",
             "dxDataGrid-summaryMax": "Макс: {0}",

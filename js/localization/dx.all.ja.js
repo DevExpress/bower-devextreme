@@ -1,10 +1,10 @@
 /*!
 * DevExtreme (dx.all.ja.js)
-* Version: 16.2.6 (build 17104)
-* Build date: Fri Apr 14 2017
+* Version: 17.1.2-beta
+* Build date: Mon Apr 17 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
-* EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
+* Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
 */
 "use strict";
 
@@ -123,6 +123,7 @@
             "dxDataGrid-editingSaveAllChanges": "変更を保存",
             "dxDataGrid-editingCancelAllChanges": "変更を破棄",
             "dxDataGrid-editingAddRow": "行を追加",
+            "dxTreeList-editingAddRowToNode": "!TODO!",
             "dxDataGrid-summaryMin": "Min: {0}",
             "dxDataGrid-summaryMinOtherColumn": "{1} の最小は {0}",
             "dxDataGrid-summaryMax": "Max: {0}",

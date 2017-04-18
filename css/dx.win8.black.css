@@ -1,10 +1,10 @@
 /*!
 * DevExtreme
-* Version: 16.2.6 (build 17104)
-* Build date: Apr 14, 2017
+* Version: 17.1.2-beta
+* Build date: Apr 17, 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
-* EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
+* Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
 */
 .dx-colorview-palette-handle {
   background: -webkit-gradient(transparent 5px,  rgba(0, 0, 0, 0.2) 6px,  #FFF 7px,  #FFF 12px,  rgba(0, 0, 0, 0.2) 13px);
@@ -651,6 +651,142 @@
 .dx-rtl.dx-pivotgrid .dx-pivotgrid-border .dx-area-row-cell,
 .dx-rtl.dx-pivotgrid .dx-pivotgrid-border .dx-data-header {
   border-left: none;
+}
+.dx-treelist {
+  color: #ffffff;
+  background-color: #000;
+}
+.dx-treelist .dx-sort-up {
+  font: 14px/1 DXIcons;
+}
+.dx-treelist .dx-sort-up:before {
+  content: "\f051";
+}
+.dx-treelist .dx-sort-down {
+  font: 14px/1 DXIcons;
+}
+.dx-treelist .dx-sort-down:before {
+  content: "\f052";
+}
+.dx-treelist .dx-header-filter {
+  position: relative;
+  color: #ffffff;
+  font: 14px/1 DXIcons;
+}
+.dx-treelist .dx-header-filter:before {
+  content: "\f050";
+}
+.dx-treelist .dx-header-filter-empty {
+  color: rgba(255, 255, 255, 0.5);
+}
+.dx-treelist.dx-filter-menu .dx-menu-item-content .dx-icon {
+  width: 14px;
+  height: 14px;
+  background-position: 0px 0px;
+  -webkit-background-size: 14px 14px;
+  -moz-background-size: 14px 14px;
+  background-size: 14px 14px;
+  padding: 0px;
+  font-size: 14px;
+  text-align: center;
+  line-height: 14px;
+}
+.dx-treelist .dx-treelist-content-fixed .dx-treelist-table .dx-col-fixed {
+  background-color: #000;
+}
+.dx-treelist .dx-treelist-rowsview .dx-data-row td.dx-pointer-events-none,
+.dx-treelist .dx-treelist-rowsview .dx-freespace-row td.dx-pointer-events-none,
+.dx-treelist .dx-treelist-headers .dx-row td.dx-pointer-events-none {
+  border-left: 2px solid #c7c7c7;
+  border-right: 2px solid #c7c7c7;
+}
+.dx-treelist .dx-treelist-rowsview .dx-data-row td.dx-pointer-events-none.dx-first-cell,
+.dx-treelist .dx-treelist-rowsview .dx-freespace-row td.dx-pointer-events-none.dx-first-cell,
+.dx-treelist .dx-treelist-headers .dx-row td.dx-pointer-events-none.dx-first-cell {
+  border-left: none;
+}
+.dx-treelist .dx-treelist-rowsview .dx-data-row td.dx-pointer-events-none.dx-last-cell,
+.dx-treelist .dx-treelist-rowsview .dx-freespace-row td.dx-pointer-events-none.dx-last-cell,
+.dx-treelist .dx-treelist-headers .dx-row td.dx-pointer-events-none.dx-last-cell {
+  border-right: none;
+}
+.dx-treelist .dx-treelist-rowsview .dx-treelist-edit-form {
+  background-color: #000;
+}
+.dx-treelist .dx-treelist-filter-row .dx-filter-range-content {
+  color: #ffffff;
+}
+.dx-treelist-form-buttons-container {
+  float: right;
+}
+.dx-treelist-form-buttons-container .dx-button {
+  margin-left: 10px;
+  margin-top: 10px;
+}
+.dx-treelist-column-chooser {
+  color: #ffffff;
+  font-size: 11pt;
+  font-weight: 300;
+  font-family: Segoe UI, Helvetica, Arial, sans-serif;
+  line-height: 1.3636;
+}
+.dx-treelist-column-chooser a {
+  text-decoration: underline;
+  color: #bb1000;
+}
+.dx-treelist-column-chooser img {
+  border-style: none;
+}
+.dx-treelist-export-menu .dx-menu-item .dx-icon-exportxlsx {
+  width: 16px;
+  height: 16px;
+  background-position: 0px 0px;
+  -webkit-background-size: 16px 16px;
+  -moz-background-size: 16px 16px;
+  background-size: 16px 16px;
+  padding: 0px;
+  font-size: 16px;
+  text-align: center;
+  line-height: 16px;
+}
+.dx-treelist-adaptive-more {
+  cursor: pointer;
+  font: 14px/1 DXIcons;
+  width: 21px;
+  height: 21px;
+  background-position: 0px 0px;
+  -webkit-background-size: 21px 21px;
+  -moz-background-size: 21px 21px;
+  background-size: 21px 21px;
+  padding: 0px;
+  font-size: 21px;
+  text-align: center;
+  line-height: 21px;
+}
+.dx-treelist-adaptive-more:before {
+  content: "\f06c";
+}
+.dx-rtl .dx-treelist .dx-treelist-rowsview .dx-data-row td.dx-pointer-events-none,
+.dx-rtl .dx-treelist .dx-treelist-rowsview .dx-freespace-row td.dx-pointer-events-none,
+.dx-rtl .dx-treelist .dx-treelist-headers .dx-row td.dx-pointer-events-none {
+  border-left: 2px solid #c7c7c7;
+}
+.dx-rtl .dx-treelist .dx-treelist-rowsview .dx-data-row td.dx-pointer-events-none.dx-first-cell,
+.dx-rtl .dx-treelist .dx-treelist-rowsview .dx-freespace-row td.dx-pointer-events-none.dx-first-cell,
+.dx-rtl .dx-treelist .dx-treelist-headers .dx-row td.dx-pointer-events-none.dx-first-cell {
+  border-right: none;
+}
+.dx-rtl .dx-treelist .dx-treelist-rowsview .dx-data-row td.dx-pointer-events-none.dx-last-cell,
+.dx-rtl .dx-treelist .dx-treelist-rowsview .dx-freespace-row td.dx-pointer-events-none.dx-last-cell,
+.dx-rtl .dx-treelist .dx-treelist-headers .dx-row td.dx-pointer-events-none.dx-last-cell {
+  border-left: none;
+}
+.dx-rtl .dx-treelist-form-buttons-container {
+  float: left;
+}
+.dx-rtl .dx-treelist-form-buttons-container .dx-button {
+  margin-left: 0;
+  margin-right: 10px;
 }
 .dx-validationsummary-item {
   color: #EA4444;
