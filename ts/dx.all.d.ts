@@ -1,10 +1,10 @@
 /*!
 * DevExtreme (dx.all.d.ts)
-* Version: 16.2.6 (build 17104)
-* Build date: Fri Apr 14 2017
+* Version: 16.2.6 (build 17111)
+* Build date: Fri Apr 21 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
-* EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
+* Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
 */
 interface JQuery {
     dxAccordion(): JQuery;
@@ -3869,7 +3869,7 @@ declare module DevExpress.ui {
         filterType?: string;
         /** Indicates whether the column takes part in horizontal grid scrolling or is anchored to a grid edge. */
         fixed?: boolean;
-        /** Specifies the order according to which grid columns must be concealed when the widget adapts to the screen or container size. */
+        /** Specifies the order in which grid columns conceal when the widget adapts to the screen or container size. */
         hidingPriority?: number;
         /** Specifies the grid edge to which the column is anchored. */
         fixedPosition?: string;
@@ -3961,7 +3961,7 @@ declare module DevExpress.ui {
         onRowUpdating?: (e: { oldData: Object; newData: Object; key: any; cancel: any }) => void;
         /** Enables a hint that appears when a user hovers the mouse pointer over a cell with truncated content. */
         cellHintEnabled?: boolean;
-        /** Specifies whether or not the widget should hide columns in order to adapt to the screen or container size. */
+        /** Specifies whether the widget should hide columns in order to adapt to the screen or container size. */
         columnHidingEnabled?: boolean;
         /** Specifies whether or not grid columns can be reordered by a user. */
         allowColumnReordering?: boolean;
@@ -4317,9 +4317,9 @@ declare module DevExpress.ui {
             /** Specifies the selection mode. */
             mode?: string;
             maxFilterLengthInRequest?: number;
-            /** Specifies the mode in which all the records are selected. */
+            /** Specifies the mode in which all the records are selected. Applies only if selection | allowSelectAll is true. */
             selectAllMode?: string;
-            /** Specifies whether or not deferred row selection is enabled. */
+            /** Makes selection deferred. */
             deferred?: boolean;
         };
         /** A handler for the dataErrorOccured event. */
@@ -4695,7 +4695,7 @@ declare module DevExpress.ui {
         allowExpandAll?: boolean;
         /** Specifies whether long text in header items should be wrapped. */
         wordWrapEnabled?: boolean;
-        /** Specifies whether to display the Total rows. */
+        /** Specifies whether to display the Total rows. Applies only if rowHeaderLayout is "standard". */
         showRowTotals?: boolean;
         /** Specifies whether to display the Grand Total row. */
         showRowGrandTotals?: boolean;
@@ -4705,7 +4705,7 @@ declare module DevExpress.ui {
         showColumnGrandTotals?: boolean;
         /** Specifies whether or not to hide rows and columns with no data. */
         hideEmptySummaryCells?: boolean;
-        /** Specifies where to show the total rows or columns. */
+        /** Specifies where to show the total rows or columns. Applies only if rowHeaderLayout is "standard". */
         showTotalsPrior?: string;
         /** Specifies the layout of items in the row header. */
         rowHeaderLayout?: string;
