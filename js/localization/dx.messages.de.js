@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.messages.de.js)
-* Version: 16.2.6 (build 17116)
-* Build date: Wed Apr 26 2017
+* Version: 16.2.6 (build 17123)
+* Build date: Wed May 03 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -164,6 +164,7 @@
             "dxPivotGrid-sortColumnBySummary": '"{0}" nach dieser Spalte sortieren',
             "dxPivotGrid-sortRowBySummary": '"{0}" nach dieser Zeile sortieren',
             "dxPivotGrid-removeAllSorting": "Sortierungen entfernen",
+            "dxPivotGrid-dataNotAvailable": "Entf.",
             "dxPivotGrid-rowFields": "Zeilenfelder",
             "dxPivotGrid-columnFields": "Spaltenfelder",
             "dxPivotGrid-dataFields": "Datenfelder",

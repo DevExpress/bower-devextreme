@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.messages.ja.js)
-* Version: 16.2.6 (build 17116)
-* Build date: Wed Apr 26 2017
+* Version: 16.2.6 (build 17123)
+* Build date: Wed May 03 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -164,6 +164,7 @@
             "dxPivotGrid-sortColumnBySummary": 'この列で "{0}" を並べ替え',
             "dxPivotGrid-sortRowBySummary": "この行で {0} を並べ替え",
             "dxPivotGrid-removeAllSorting": "すべての並べ替えを削除",
+            "dxPivotGrid-dataNotAvailable": "N/A",
             "dxPivotGrid-rowFields": "行のフィールド",
             "dxPivotGrid-columnFields": "列のフィールド",
             "dxPivotGrid-dataFields": "データ  フィールド",

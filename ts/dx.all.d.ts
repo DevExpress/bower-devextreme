@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.all.d.ts)
-* Version: 16.2.6 (build 17116)
-* Build date: Wed Apr 26 2017
+* Version: 16.2.6 (build 17123)
+* Build date: Wed May 03 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -3040,6 +3040,7 @@ declare module DevExpress.ui {
         swipeEnabled?: boolean;
         /** A template to be used for rendering widget content. */
         contentTemplate?: any;
+        selectedIndex?: number;
     }
     /** The SlideOut widget is a classic slide-out menu paired with a view. An end user opens the menu by swiping away the view. */
     export class dxSlideOut extends CollectionWidget {
@@ -4759,6 +4760,8 @@ declare module DevExpress.ui {
             removeAllSorting?: string;
             /** The string to display as an Export to Excel file context menu item. */
             exportToExcel?: string;
+            /** Specifies text displayed in a cell when its data is unavailable for some reason. */
+            dataNotAvailable?: string;
         };
         /** Specifies options configuring the load panel. */
         loadPanel?: {

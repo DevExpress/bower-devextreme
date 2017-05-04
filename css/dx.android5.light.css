@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 16.2.6 (build 17116)
-* Build date: Apr 26, 2017
+* Version: 16.2.6 (build 17123)
+* Build date: May 3, 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -7041,6 +7041,9 @@
 .dx-datagrid .dx-menu-items-container .dx-menu-item .dx-icon-context-menu-sort-none {
   min-width: 16px;
   height: 16px;
+}
+.dx-datagrid .dx-datagrid-group-panel {
+  font-size: 14px;
 }
 .dx-datagrid .dx-menu-base .dx-menu-item .dx-menu-item-content {
   padding: 8px 0px 0px 9px;

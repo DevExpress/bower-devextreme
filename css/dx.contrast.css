@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 16.2.6 (build 17116)
-* Build date: Apr 26, 2017
+* Version: 16.2.6 (build 17123)
+* Build date: May 3, 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -4028,7 +4028,8 @@
 }
 .dx-switch-container {
   overflow: hidden;
-  margin: 0 -4px 0 0;
+  margin: 0 -6px 0 0;
+  padding: 0 2px;
   height: 24px;
   border: 1px solid #fff;
   background: #000;
@@ -4046,8 +4047,7 @@
 .dx-switch-off {
   float: left;
   width: 50%;
-  padding-right: 18px;
-  padding-left: 2px;
+  padding-right: 16px;
   line-height: 22px;
   text-align: center;
   font-size: 9px;
@@ -4062,7 +4062,7 @@
   box-sizing: border-box;
 }
 .dx-switch-off {
-  margin-left: -2px;
+  padding-left: 2px;
   color: #fff;
 }
 .dx-switch-on {
@@ -4071,11 +4071,10 @@
 .dx-switch-handle {
   position: relative;
   float: left;
-  width: 16px;
+  width: 14px;
   height: 18px;
-  padding-right: 2px;
   margin-top: 2px;
-  margin-left: -16px;
+  margin-left: -14px;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
@@ -4100,25 +4099,22 @@
 .dx-rtl .dx-switch .dx-switch-off,
 .dx-switch.dx-rtl .dx-switch-off {
   float: right;
-  padding-left: 18px;
+  padding-left: 16px;
   padding-right: 2px;
 }
 .dx-rtl .dx-switch .dx-switch-off,
 .dx-switch.dx-rtl .dx-switch-off {
   margin-left: 0;
-  margin-right: -2px;
 }
 .dx-rtl .dx-switch .dx-switch-handle,
 .dx-switch.dx-rtl .dx-switch-handle {
   float: right;
-  padding-left: 2px;
-  padding-right: 0;
   margin-left: 0;
-  margin-right: -16px;
+  margin-right: -14px;
 }
 .dx-rtl .dx-switch .dx-switch-container,
 .dx-switch.dx-rtl .dx-switch-container {
-  margin: 0 0 0 -4px;
+  margin: 0 0 0 -6px;
 }
 .dx-tabs {
   border: 1px solid #fff;
@@ -7394,6 +7390,9 @@
 .dx-datagrid.dx-datagrid-borders > .dx-datagrid-headers,
 .dx-datagrid.dx-datagrid-borders > .dx-datagrid-rowsview {
   border-top: 1px solid #fff;
+}
+.dx-datagrid .dx-datagrid-group-panel {
+  font-size: 14px;
 }
 .dx-datagrid .dx-menu {
   background-color: transparent;

@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 16.2.6 (build 17116)
-* Build date: Apr 26, 2017
+* Version: 16.2.6 (build 17123)
+* Build date: May 3, 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -1503,17 +1503,9 @@
   height: 100%;
   vertical-align: middle;
 }
-.dx-switch-inner {
-  margin-left: -50px;
-}
 .dx-state-disabled.dx-switch,
 .dx-state-disabled .dx-switch {
   cursor: default;
-}
-.dx-rtl.dx-switch-inner,
-.dx-rtl .dx-switch-inner {
-  margin-right: -50px;
-  margin-left: 0px;
 }
 .dx-rtl.dx-switch-wrapper,
 .dx-rtl .dx-switch-wrapper {
@@ -4596,8 +4588,16 @@ input.dx-hidden {
 .dx-datagrid-group-panel {
   display: inline-block;
   white-space: nowrap;
+  width: 100%;
   -ms-touch-action: pinch-zoom;
   touch-action: pinch-zoom;
+}
+.dx-datagrid-group-panel .dx-group-panel-message {
+  overflow: hidden;
+  -o-text-overflow: ellipsis;
+  -ms-text-overflow: ellipsis;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .dx-datagrid-group-panel .dx-group-panel-item {
   display: inline-block;

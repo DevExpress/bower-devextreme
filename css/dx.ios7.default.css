@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 16.2.6 (build 17116)
-* Build date: Apr 26, 2017
+* Version: 16.2.6 (build 17123)
+* Build date: May 3, 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -6597,6 +6597,9 @@
 }
 .dx-datagrid .dx-menu-items-container .dx-menu-item .dx-icon-context-menu-sort-desc:before {
   content: "\f054";
+}
+.dx-datagrid .dx-datagrid-group-panel {
+  font-size: 1em;
 }
 .dx-datagrid .dx-menu .dx-menu-item.dx-state-focused,
 .dx-datagrid .dx-menu .dx-menu-item.dx-state-active {
