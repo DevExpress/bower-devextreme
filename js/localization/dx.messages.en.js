@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.messages.en.js)
-* Version: 17.1.2-beta
-* Build date: Mon Apr 17 2017
+* Version: 17.1.3
+* Build date: Wed May 17 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -122,7 +122,6 @@
             "dxDataGrid-editingSaveAllChanges": "Save changes",
             "dxDataGrid-editingCancelAllChanges": "Discard changes",
             "dxDataGrid-editingAddRow": "Add a row",
-            "dxTreeList-editingAddRowToNode": "Add",
             "dxDataGrid-summaryMin": "Min: {0}",
             "dxDataGrid-summaryMinOtherColumn": "Min of {1} is {0}",
             "dxDataGrid-summaryMax": "Max: {0}",
@@ -154,6 +153,8 @@
             "dxDataGrid-ariaSearchInGrid": "Search in data grid",
             "dxDataGrid-ariaSelectAll": "Select all",
             "dxDataGrid-ariaSelectRow": "Select row",
+            "dxTreeList-ariaTreeList": "Tree list",
+            "dxTreeList-editingAddRowToNode": "Add",
             "dxPager-infoText": "Page {0} of {1} ({2} items)",
             "dxPager-pagesCountText": "of",
             "dxPivotGrid-grandTotal": "Grand Total",
@@ -165,6 +166,7 @@
             "dxPivotGrid-sortColumnBySummary": 'Sort "{0}" by This Column',
             "dxPivotGrid-sortRowBySummary": 'Sort "{0}" by This Row',
             "dxPivotGrid-removeAllSorting": "Remove All Sorting",
+            "dxPivotGrid-dataNotAvailable": "N/A",
             "dxPivotGrid-rowFields": "Row Fields",
             "dxPivotGrid-columnFields": "Column Fields",
             "dxPivotGrid-dataFields": "Data Fields",

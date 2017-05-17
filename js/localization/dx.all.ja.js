@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.all.ja.js)
-* Version: 17.1.2-beta
-* Build date: Mon Apr 17 2017
+* Version: 17.1.3
+* Build date: Wed May 17 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -123,7 +123,6 @@
             "dxDataGrid-editingSaveAllChanges": "変更を保存",
             "dxDataGrid-editingCancelAllChanges": "変更を破棄",
             "dxDataGrid-editingAddRow": "行を追加",
-            "dxTreeList-editingAddRowToNode": "!TODO!",
             "dxDataGrid-summaryMin": "Min: {0}",
             "dxDataGrid-summaryMinOtherColumn": "{1} の最小は {0}",
             "dxDataGrid-summaryMax": "Max: {0}",
@@ -155,6 +154,8 @@
             "dxDataGrid-ariaSearchInGrid": "データ グリッド内で検索",
             "dxDataGrid-ariaSelectAll": "すべてを選択",
             "dxDataGrid-ariaSelectRow": "行の選択",
+            "dxTreeList-ariaTreeList": "ツリー リスト",
+            "dxTreeList-editingAddRowToNode": "追加",
             "dxPager-infoText": "ページ {0} / {1} ({2} アイテム)",
             "dxPager-pagesCountText": "/",
             "dxPivotGrid-grandTotal": "総計",
@@ -166,6 +167,7 @@
             "dxPivotGrid-sortColumnBySummary": 'この列で "{0}" を並べ替え',
             "dxPivotGrid-sortRowBySummary": "この行で {0} を並べ替え",
             "dxPivotGrid-removeAllSorting": "すべての並べ替えを削除",
+            "dxPivotGrid-dataNotAvailable": "N/A",
             "dxPivotGrid-rowFields": "行のフィールド",
             "dxPivotGrid-columnFields": "列のフィールド",
             "dxPivotGrid-dataFields": "データ  フィールド",

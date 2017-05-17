@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 17.1.2-beta
-* Build date: Apr 17, 2017
+* Version: 17.1.3
+* Build date: May 17, 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -650,34 +650,34 @@
 .dx-rtl.dx-pivotgrid .dx-pivotgrid-border .dx-data-header {
   border-left: none;
 }
-.dx-treelist {
+.dx-treelist-container {
   color: #dedede;
   background-color: #2a2a2a;
 }
-.dx-treelist .dx-sort-up {
+.dx-treelist-container .dx-sort-up {
   font: 14px/1 DXIcons;
 }
-.dx-treelist .dx-sort-up:before {
+.dx-treelist-container .dx-sort-up:before {
   content: "\f051";
 }
-.dx-treelist .dx-sort-down {
+.dx-treelist-container .dx-sort-down {
   font: 14px/1 DXIcons;
 }
-.dx-treelist .dx-sort-down:before {
+.dx-treelist-container .dx-sort-down:before {
   content: "\f052";
 }
-.dx-treelist .dx-header-filter {
+.dx-treelist-container .dx-header-filter {
   position: relative;
   color: #7c7c7c;
   font: 14px/1 DXIcons;
 }
-.dx-treelist .dx-header-filter:before {
+.dx-treelist-container .dx-header-filter:before {
   content: "\f050";
 }
-.dx-treelist .dx-header-filter-empty {
+.dx-treelist-container .dx-header-filter-empty {
   color: rgba(124, 124, 124, 0.5);
 }
-.dx-treelist.dx-filter-menu .dx-menu-item-content .dx-icon {
+.dx-treelist-container.dx-filter-menu .dx-menu-item-content .dx-icon {
   width: 14px;
   height: 14px;
   background-position: 0px 0px;
@@ -689,29 +689,29 @@
   text-align: center;
   line-height: 14px;
 }
-.dx-treelist .dx-treelist-content-fixed .dx-treelist-table .dx-col-fixed {
+.dx-treelist-container .dx-treelist-content-fixed .dx-treelist-table .dx-col-fixed {
   background-color: #2a2a2a;
 }
-.dx-treelist .dx-treelist-rowsview .dx-data-row td.dx-pointer-events-none,
-.dx-treelist .dx-treelist-rowsview .dx-freespace-row td.dx-pointer-events-none,
-.dx-treelist .dx-treelist-headers .dx-row td.dx-pointer-events-none {
+.dx-treelist-container .dx-treelist-rowsview .dx-data-row td.dx-pointer-events-none,
+.dx-treelist-container .dx-treelist-rowsview .dx-freespace-row td.dx-pointer-events-none,
+.dx-treelist-container .dx-treelist-headers .dx-row td.dx-pointer-events-none {
   border-left: 2px solid #4d4d4d;
   border-right: 2px solid #4d4d4d;
 }
-.dx-treelist .dx-treelist-rowsview .dx-data-row td.dx-pointer-events-none.dx-first-cell,
-.dx-treelist .dx-treelist-rowsview .dx-freespace-row td.dx-pointer-events-none.dx-first-cell,
-.dx-treelist .dx-treelist-headers .dx-row td.dx-pointer-events-none.dx-first-cell {
+.dx-treelist-container .dx-treelist-rowsview .dx-data-row td.dx-pointer-events-none.dx-first-cell,
+.dx-treelist-container .dx-treelist-rowsview .dx-freespace-row td.dx-pointer-events-none.dx-first-cell,
+.dx-treelist-container .dx-treelist-headers .dx-row td.dx-pointer-events-none.dx-first-cell {
   border-left: none;
 }
-.dx-treelist .dx-treelist-rowsview .dx-data-row td.dx-pointer-events-none.dx-last-cell,
-.dx-treelist .dx-treelist-rowsview .dx-freespace-row td.dx-pointer-events-none.dx-last-cell,
-.dx-treelist .dx-treelist-headers .dx-row td.dx-pointer-events-none.dx-last-cell {
+.dx-treelist-container .dx-treelist-rowsview .dx-data-row td.dx-pointer-events-none.dx-last-cell,
+.dx-treelist-container .dx-treelist-rowsview .dx-freespace-row td.dx-pointer-events-none.dx-last-cell,
+.dx-treelist-container .dx-treelist-headers .dx-row td.dx-pointer-events-none.dx-last-cell {
   border-right: none;
 }
-.dx-treelist .dx-treelist-rowsview .dx-treelist-edit-form {
+.dx-treelist-container .dx-treelist-rowsview .dx-treelist-edit-form {
   background-color: #2a2a2a;
 }
-.dx-treelist .dx-treelist-filter-row .dx-filter-range-content {
+.dx-treelist-container .dx-treelist-filter-row .dx-filter-range-content {
   color: #dedede;
 }
 .dx-treelist-form-buttons-container {
@@ -762,19 +762,19 @@
 .dx-treelist-adaptive-more:before {
   content: "\f06c";
 }
-.dx-rtl .dx-treelist .dx-treelist-rowsview .dx-data-row td.dx-pointer-events-none,
-.dx-rtl .dx-treelist .dx-treelist-rowsview .dx-freespace-row td.dx-pointer-events-none,
-.dx-rtl .dx-treelist .dx-treelist-headers .dx-row td.dx-pointer-events-none {
+.dx-rtl .dx-treelist-container .dx-treelist-rowsview .dx-data-row td.dx-pointer-events-none,
+.dx-rtl .dx-treelist-container .dx-treelist-rowsview .dx-freespace-row td.dx-pointer-events-none,
+.dx-rtl .dx-treelist-container .dx-treelist-headers .dx-row td.dx-pointer-events-none {
   border-left: 2px solid #4d4d4d;
 }
-.dx-rtl .dx-treelist .dx-treelist-rowsview .dx-data-row td.dx-pointer-events-none.dx-first-cell,
-.dx-rtl .dx-treelist .dx-treelist-rowsview .dx-freespace-row td.dx-pointer-events-none.dx-first-cell,
-.dx-rtl .dx-treelist .dx-treelist-headers .dx-row td.dx-pointer-events-none.dx-first-cell {
+.dx-rtl .dx-treelist-container .dx-treelist-rowsview .dx-data-row td.dx-pointer-events-none.dx-first-cell,
+.dx-rtl .dx-treelist-container .dx-treelist-rowsview .dx-freespace-row td.dx-pointer-events-none.dx-first-cell,
+.dx-rtl .dx-treelist-container .dx-treelist-headers .dx-row td.dx-pointer-events-none.dx-first-cell {
   border-right: none;
 }
-.dx-rtl .dx-treelist .dx-treelist-rowsview .dx-data-row td.dx-pointer-events-none.dx-last-cell,
-.dx-rtl .dx-treelist .dx-treelist-rowsview .dx-freespace-row td.dx-pointer-events-none.dx-last-cell,
-.dx-rtl .dx-treelist .dx-treelist-headers .dx-row td.dx-pointer-events-none.dx-last-cell {
+.dx-rtl .dx-treelist-container .dx-treelist-rowsview .dx-data-row td.dx-pointer-events-none.dx-last-cell,
+.dx-rtl .dx-treelist-container .dx-treelist-rowsview .dx-freespace-row td.dx-pointer-events-none.dx-last-cell,
+.dx-rtl .dx-treelist-container .dx-treelist-headers .dx-row td.dx-pointer-events-none.dx-last-cell {
   border-left: none;
 }
 .dx-rtl .dx-treelist-form-buttons-container {
@@ -4162,7 +4162,8 @@
 }
 .dx-switch-container {
   overflow: hidden;
-  margin: 0 -4px 0 0;
+  margin: 0 -6px 0 0;
+  padding: 0 2px;
   height: 24px;
   border: 1px solid #4d4d4d;
   background: #2a2a2a;
@@ -4180,8 +4181,7 @@
 .dx-switch-off {
   float: left;
   width: 50%;
-  padding-right: 18px;
-  padding-left: 2px;
+  padding-right: 16px;
   line-height: 22px;
   text-align: center;
   font-size: 9px;
@@ -4196,7 +4196,7 @@
   box-sizing: border-box;
 }
 .dx-switch-off {
-  margin-left: -2px;
+  padding-left: 2px;
   color: #787878;
 }
 .dx-switch-on {
@@ -4205,11 +4205,10 @@
 .dx-switch-handle {
   position: relative;
   float: left;
-  width: 16px;
+  width: 14px;
   height: 18px;
-  padding-right: 2px;
   margin-top: 2px;
-  margin-left: -16px;
+  margin-left: -14px;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
@@ -4234,25 +4233,22 @@
 .dx-rtl .dx-switch .dx-switch-off,
 .dx-switch.dx-rtl .dx-switch-off {
   float: right;
-  padding-left: 18px;
+  padding-left: 16px;
   padding-right: 2px;
 }
 .dx-rtl .dx-switch .dx-switch-off,
 .dx-switch.dx-rtl .dx-switch-off {
   margin-left: 0;
-  margin-right: -2px;
 }
 .dx-rtl .dx-switch .dx-switch-handle,
 .dx-switch.dx-rtl .dx-switch-handle {
   float: right;
-  padding-left: 2px;
-  padding-right: 0;
   margin-left: 0;
-  margin-right: -16px;
+  margin-right: -14px;
 }
 .dx-rtl .dx-switch .dx-switch-container,
 .dx-switch.dx-rtl .dx-switch-container {
-  margin: 0 0 0 -4px;
+  margin: 0 0 0 -6px;
 }
 .dx-tabs {
   border: 1px solid #4d4d4d;
@@ -9275,21 +9271,6 @@
 .dx-treelist-rowsview .dx-treelist-table:not(.dx-treelist-table-fixed) .dx-treelist-empty-space {
   width: 14px;
 }
-.dx-treelist-rowsview .dx-treelist-table:not(.dx-treelist-table-fixed) .dx-treelist-cell-expandable {
-  white-space: nowrap;
-}
-.dx-treelist-rowsview .dx-treelist-table:not(.dx-treelist-table-fixed) .dx-treelist-cell-expandable .dx-treelist-text-content {
-  display: inline-block;
-  white-space: normal;
-}
-.dx-treelist-rowsview .dx-treelist-icon-container {
-  display: inline-block;
-  white-space: nowrap;
-  vertical-align: top;
-}
-.dx-treelist-rowsview .dx-treelist-table-fixed .dx-treelist-icon-container {
-  float: left;
-}
 .dx-treelist-rowsview .dx-treelist-empty-space {
   position: relative;
   display: inline-block;
@@ -9350,39 +9331,69 @@
   margin-left: -6px;
   margin-top: -8px;
 }
+.dx-treelist-rowsview .dx-treelist-cell-expandable {
+  white-space: nowrap;
+}
+.dx-treelist-rowsview .dx-treelist-cell-expandable .dx-treelist-text-content {
+  white-space: normal;
+}
 .dx-treelist-rowsview.dx-treelist-nowrap .dx-treelist-table .dx-treelist-cell-expandable .dx-treelist-text-content {
   white-space: nowrap;
 }
-.dx-treelist-editor-cell .dx-select-checkbox {
-  padding-right: 7px;
-  padding-left: 14px;
+.dx-treelist-checkbox-size {
+  line-height: 0px;
 }
-.dx-treelist-cell-expandable .dx-select-checkbox {
-  float: left;
-  padding-right: 7px;
+.dx-treelist-cell-expandable .dx-checkbox,
+.dx-treelist-select-all .dx-checkbox {
+  position: absolute;
 }
 .dx-treelist-cell-expandable .dx-checkbox.dx-checkbox-checked .dx-checkbox-icon,
-.dx-treelist-editor-cell .dx-checkbox.dx-checkbox-checked .dx-checkbox-icon {
+.dx-treelist-select-all .dx-checkbox.dx-checkbox-checked .dx-checkbox-icon {
   font-size: 12px;
 }
-.dx-rtl .dx-treelist-rowsview .dx-treelist-icon-container {
+.dx-treelist-icon-container.dx-editor-inline-block {
+  position: relative;
+  padding-right: 23px;
+}
+.dx-treelist-icon-container.dx-editor-inline-block .dx-checkbox {
+  top: 50%;
+  margin-top: -8px;
+}
+.dx-treelist-select-all {
+  position: relative;
+}
+.dx-treelist-select-all .dx-checkbox {
+  left: 0px;
+  margin-top: 1px;
+  background-color: #2a2a2a;
+  padding-left: 21px;
+}
+.dx-treelist-headers .dx-header-row > .dx-treelist-select-all {
+  padding-left: 44px;
+}
+.dx-rtl .dx-treelist-rowsview .dx-treelist-expanded,
+.dx-rtl .dx-treelist-rowsview .dx-treelist-collapsed {
   -moz-transform: scaleX(-1);
   -o-transform: scaleX(-1);
   -webkit-transform: scaleX(-1);
   transform: scaleX(-1);
 }
 .dx-rtl .dx-treelist-rowsview .dx-treelist-table-fixed .dx-treelist-icon-container {
-  direction: ltr;
   float: right;
 }
-.dx-rtl .dx-treelist-editor-cell .dx-select-checkbox {
-  padding-left: 7px;
-  padding-right: 14px;
+.dx-rtl .dx-treelist-select-all .dx-checkbox {
+  left: 100%;
+  padding-right: 21px;
+  margin-left: -37px;
+  padding-left: 0px;
 }
-.dx-rtl .dx-treelist-cell-expandable .dx-select-checkbox {
-  float: right;
+.dx-rtl .dx-treelist-headers .dx-header-row > .dx-treelist-select-all {
+  padding-right: 44px;
   padding-left: 7px;
-  padding-right: 0;
+}
+.dx-rtl .dx-treelist-icon-container.dx-editor-inline-block {
+  padding-left: 23px;
+  padding-right: 0px;
 }
 .dx-menu-item {
   color: #dedede;

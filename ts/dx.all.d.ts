@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.all.d.ts)
-* Version: 17.1.2-beta
-* Build date: Mon Apr 17 2017
+* Version: 17.1.3
+* Build date: Wed May 17 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -713,23 +713,23 @@ declare module DevExpress {
     /** A base class for all components and widgets. */
     export class Component implements EventsMixin<Component> {
         constructor(options?: ComponentOptions)
-        /** Prevents the component from refreshing until the endUpdate() method is called. */
+        /** Prevents the widget from refreshing until the endUpdate() method is called. */
         beginUpdate(): void;
-        /** Enables the component to refresh after the beginUpdate() method call. */
+        /** Refreshes the widget after a call of the beginUpdate() method. */
         endUpdate(): void;
-        /** Returns an instance of this component class. */
+        /** Returns this widget's instance. Use it to access other methods of the widget. */
         instance(): Component;
-        /** Returns the configuration options of this component. */
+        /** Gets the widget's options. */
         option(): {
             [optionKey: string]: any;
         };
-        /** Sets one or more options of this component. */
+        /** Sets one or more options. */
         option(options: {
             [optionKey: string]: any;
         }): void;
-        /** Gets the value of the specified configuration option of this component. */
+        /** Gets a specific option value. */
         option(optionName: string): any;
-        /** Sets a value to the specified configuration option of this component. */
+        /** Assigns a new value to a specific option. */
         option(optionName: string, optionValue: any): void;
         on(eventName: string, eventHandler: Function): Component;
         on(events: { [eventName: string]: Function; }): Component;
@@ -737,7 +737,7 @@ declare module DevExpress {
         off(eventName: string, eventHandler: Function): Component;
     }
     export interface DOMComponentOptionsBase extends ComponentOptions {
-        /** Specifies whether or not the current component supports a right-to-left representation. */
+        /** Switches the widget to a right-to-left representation. */
         rtlEnabled?: boolean;
         /** Specifies the attributes to be attached to the widget's root element. */
         elementAttr?: Object;
@@ -754,7 +754,7 @@ declare module DevExpress {
     export class DOMComponent extends Component {
         constructor(element: JQuery, options?: DOMComponentOptions);
         constructor(element: HTMLElement, options?: DOMComponentOptions);
-        /** Returns the root HTML element of the widget. */
+        /** Gets the root element of the widget. */
         element(): JQuery;
         /** Specifies the device-dependent default configuration options for this component. */
         static defaultOptions(rule: {
@@ -1100,6 +1100,7 @@ declare module DevExpress {
             jsonp?: boolean;
             /** Specifies the type of the ODataStore key property. The following key types are supported out of the box: String, Int32, Int64, Boolean, Single, Decimal and Guid. */
             keyType?: any;
+            /** Specifies the types of data fields. Accepts the following types: "String", "Int32", "Int64", "Boolean", "Single", "Decimal" and "Guid". */
             fieldTypes?: Object;
             /** Specifies whether or not dates in a response are deserialized. */
             deserializeDates?: boolean;
@@ -1215,9 +1216,9 @@ declare module DevExpress {
             focusStateEnabled?: boolean;
             /** Specifies the shortcut key that sets focus on the widget. */
             accessKey?: string;
-            /** A Boolean value specifying whether or not the widget is visible. */
+            /** Specifies whether the widget is visible. */
             visible?: boolean;
-            /** Specifies the widget tab index. */
+            /** Specifies the number of the element when the Tab key is used for navigating. */
             tabIndex?: number;
             /** Specifies text for a hint that appears when a user pauses on the widget. */
             hint?: string;
@@ -1225,11 +1226,11 @@ declare module DevExpress {
         /** The base class for widgets. */
         export class Widget extends DOMComponent {
             constructor(options?: WidgetOptions);
-            /** Redraws the widget. */
+            /** Repaints the widget. Call it if you made modifications that changed the widget's state to invalid. */
             repaint(): void;
             /** Sets focus on the widget. */
             focus(): void;
-            /** Registers a handler when a specified key is pressed. */
+            /** Registers a handler to be executed when a user presses a specific key. */
             registerKeyHandler(key: string, handler: Function): void;
         }
         export interface CollectionWidgetOptions extends WidgetOptions {
@@ -1273,7 +1274,7 @@ declare module DevExpress {
             onItemReordered?: Function;
         }
         export interface DataHelperMixin {
-            /** Allows you to get the DataSource instance. */
+            /** Gets the DataSource instance. */
             getDataSource(): DevExpress.data.DataSource;
         }
         /** The base class for widgets containing an item collection. */
@@ -1371,6 +1372,8 @@ declare module DevExpress {
         export function registerTheme(customTheme: Object, baseTheme: string): void;
         /** Allows you to export widgets using their SVG markup. */
         export function exportFromMarkup(markup: string, options: Object): void;
+        /** Gets the SVG markup of specific widgets for their subsequent export. */
+        export function getMarkup(widgetInstances: Array<Object>): string;
         /** Applies a predefined or registered custom palette to all visualization widgets at once. */
         export function currentPalette(paletteName: string): void;
         /** Obtains the color sets of a predefined or registered palette. */
@@ -1676,11 +1679,11 @@ declare module DevExpress.ui {
         fieldTemplate?: any;
         /** The text that is provided as a hint in the select box editor. */
         placeholder?: string;
-        /** Specifies whether or not the widget allows an end-user to enter a custom value. */
+        /** Specifies whether the widget allows a user to enter a custom value. Requires the onCustomItemCreating handler implementation. */
         acceptCustomValue?: boolean;
         /** Specifies whether or not to display selection controls. */
         showSelectionControls?: boolean;
-        /** A handler for the customItemCreating event. */
+        /** A handler for the customItemCreating event. Executed when a user adds a custom item. Requires acceptCustomValue to be set to true. */
         onCustomItemCreating?: Function;
     }
     /** The SelectBox widget is an editor that allows an end user to select an item from a drop-down list. */
@@ -2411,6 +2414,7 @@ declare module DevExpress.ui {
         /** Specifies whether widget content is rendered when the widget is shown or when rendering the widget. */
         deferRendering?: boolean;
         activeStateEnabled?: boolean;
+        /** Specifies a custom template for the drop-down button. */
         dropDownButtonTemplate?: any;
     }
     /** A drop-down editor widget. */
@@ -2431,7 +2435,10 @@ declare module DevExpress.ui {
     export interface dxDropDownBoxOptions extends dxDropDownEditorOptions {
         /** Specifies a custom template for the drop-down content. */
         contentTemplate?: any;
+        /** Specifies whether the widget allows a user to enter a custom value. */
         acceptCustomValue?: boolean;
+        /** Configures the drop-down field which holds the content. */
+        dropDownOptions?: DevExpress.ui.dxPopupOptions;
     }
     /** The DropDownBox widget consists of a text field, which displays the current value, and a drop-down field, which can contain any UI element. */
     export class dxDropDownBox extends dxDropDownEditor {
@@ -3076,6 +3083,7 @@ declare module DevExpress.ui {
         swipeEnabled?: boolean;
         /** A template to be used for rendering widget content. */
         contentTemplate?: any;
+        selectedIndex?: number;
     }
     /** The SlideOut widget is a classic slide-out menu paired with a view. An end user opens the menu by swiping away the view. */
     export class dxSlideOut extends CollectionWidget {
@@ -3284,6 +3292,7 @@ declare module DevExpress.data {
         showTotals?: boolean;
         /** Specifies whether or not to display Grand Total values for the field. */
         showGrandTotals?: boolean;
+        /** Specifies whether or not to display summary values. Applies only to the fields whose area is "data". Inherits the value of showTotals by default. */
         showValues?: boolean;
     }
     export class SummaryCell {
@@ -3882,8 +3891,6 @@ declare module DevExpress.ui {
         allowSorting?: boolean;
         /** Specifies whether this column can be searched. Applies only if searchPanel | visible is true. */
         allowSearch?: boolean;
-        /** Specifies whether data from this column should be exported. */
-        allowExporting?: boolean;
         /** Calculates custom values for column cells. */
         calculateCellValue?: (rowData: Object) => string;
         /** Specifies a function to be invoked after the user has edited a cell value, but before it will be saved in the data source. */
@@ -3912,11 +3919,11 @@ declare module DevExpress.ui {
         encodeHtml?: boolean;
         /** In a boolean column, replaces all false items with a specified text. Applies only if showEditorAlways option is false. */
         falseText?: string;
-        /** Fixes the column. Applies only if columnFixing | enabled is true. */
+        /** Fixes the column. */
         fixed?: boolean;
-        /** Specifies the order according to which columns must be concealed when the widget adapts to the screen or container size. Applies only if columnHidingEnabled is true. */
+        /** Specifies the order according to which columns must be concealed when the widget adapts to the screen or container size. */
         hidingPriority?: number;
-        /** Specifies the widget's edge to which the column is fixed. Applies only if columnFixing | enabled and columns] | [fixed are true. */
+        /** Specifies the widget's edge to which the column is fixed. Applies only if columns] | [fixed is true. */
         fixedPosition?: string;
         /** Specifies a format for the values displayed in the column. */
         format?: any;
@@ -3955,13 +3962,13 @@ declare module DevExpress.ui {
         showInColumnChooser?: boolean;
         /** Specifies the identifier of the column. */
         name?: string;
-        /** Configures the form item produced by this column in the editing state. Only used if editing | mode is "form" or "popup". */
+        /** Configures the form item produced by this column in the editing state. Used only if editing | mode is "form" or "popup". */
         formItem?: DevExpress.ui.dxFormItem;
         /** Specifies the band column that owns the current column. Accepts the index of the band column in the columns array. */
         ownerBand?: number;
         /** Specifies whether the column bands other columns or not. */
         isBand?: boolean;
-        /** Specifies whether data can be filtered by this column. Applies only if filterRow | visible or headerFilter | visible is true. */
+        /** Specifies whether data can be filtered by this column. Applies only if filterRow | visible, headerFilter | visible or searchPanel | visible is true. */
         allowFiltering?: boolean;
         /** Specifies whether the header filter can be used to filter data by this column. Applies only if headerFilter | visible is true. By default, inherits the value of the allowFiltering option. */
         allowHeaderFiltering?: boolean;
@@ -3990,6 +3997,8 @@ declare module DevExpress.ui {
         allowGrouping?: boolean;
         /** Specifies whether groups appear expanded or not when records are grouped by a specific column. Setting this option makes sense only when grouping is allowed for this column. */
         autoExpandGroup?: boolean;
+        /** Specifies whether data from this column should be exported. */
+        allowExporting?: boolean;
         /** Specifies a custom template for the group cell of a grid column. */
         groupCellTemplate?: any;
         /** Specifies the index of a column when grid records are grouped by the values of this column. */
@@ -4004,18 +4013,19 @@ declare module DevExpress.ui {
         columns?: Array<dxDataGridColumn>;
     }
     export interface dxTreeListColumn extends GridBaseColumn {
+        /** Configures columns. */
         columns?: Array<dxTreeListColumn>;
     }
     export interface GridBaseScrolling {
-        /** Specifies whether or not a grid must preload pages adjacent to the current page when using virtual scrolling. */
+        /** Specifies whether the widget should load pages adjacent to the current page. Applies only if scrolling | mode is "virtual". */
         preloadEnabled?: boolean;
-        /** Specifies whether or not the widget uses native scrolling. */
+        /** Specifies whether the widget should use native or simulated scrolling. */
         useNative?: any;
-        /** Specifies the scrollbar display policy. */
+        /** Specifies when to show the scrollbar. */
         showScrollbar?: string;
-        /** Specifies whether or not the scrolling by content is enabled. */
+        /** Specifies whether a user can scroll the content with a swipe gesture. Applies only if native scrolling is disabled. */
         scrollByContent?: boolean;
-        /** Specifies whether or not the scrollbar thumb scrolling enabled. */
+        /** Specifies whether a user can scroll the content with the scrollbar. Applies only if native scrolling is disabled. */
         scrollByThumb?: boolean;
     }
     export interface dxDataGridScrolling extends GridBaseScrolling {
@@ -4023,6 +4033,7 @@ declare module DevExpress.ui {
         mode?: string;
     }
     export interface dxTreeListScrolling extends GridBaseScrolling {
+        /** Specifies the scrolling mode. */
         mode?: string;
     }
     export interface GridBaseEditing {
@@ -4034,9 +4045,9 @@ declare module DevExpress.ui {
         allowAdding?: boolean;
         /** Specifies whether a user can delete rows. */
         allowDeleting?: boolean;
-        /** Configures the form. Only used if editing | mode is "form" or "popup". */
+        /** Configures the form. Used only if editing | mode is "form" or "popup". */
         form?: DevExpress.ui.dxFormOptions;
-        /** Configures the popup. Only used if editing | mode is "popup". */
+        /** Configures the popup. Used only if editing | mode is "popup". */
         popup?: DevExpress.ui.dxPopupOptions;
     }
     export interface dxDataGridEditing extends GridBaseEditing {
@@ -4048,6 +4059,7 @@ declare module DevExpress.ui {
         texts?: dxDataGridEditingTexts;
     }
     export interface dxTreeListEditing extends GridBaseEditing {
+        /** Contains options that specify texts for editing-related UI elements. */
         texts?: dxTreeListEditingTexts;
     }
     export interface GridBaseEditingTexts {
@@ -4077,18 +4089,22 @@ declare module DevExpress.ui {
     export interface dxDataGridEditingTexts extends GridBaseEditingTexts {
     }
     export interface dxTreeListEditingTexts extends GridBaseEditingTexts {
+        /** Specifies text for the button that adds a new nested row. Applies if the editing | mode is "batch" or "cell". */
         addRowToNode?: string;
     }
     export interface GridBaseSelection {
-        /** Specifies whether the user can select all grid records at once. */
+        /** Specifies whether a user can select all rows at once. */
         allowSelectAll?: boolean;
         /** Specifies the selection mode. */
         mode?: string;
     }
     export interface dxDataGridSelection extends GridBaseSelection {
+        /** Specifies when to display checkboxes in rows. Applies only if selection | mode is "multiple". */
         showCheckBoxesMode?: string;
          maxFilterLengthInRequest?: number;
+        /** Specifies the mode in which all the records are selected. Applies only if selection | allowSelectAll is true. */
         selectAllMode?: string;
+         /** Makes selection deferred. */
         deferred?: boolean;
     }
     export interface dxTreeListSelection extends GridBaseSelection {
@@ -4187,8 +4203,11 @@ declare module DevExpress.ui {
         onRowPrepared?: (e: Object) => void;
         /** Specifies a custom template for grid rows. */
         rowTemplate?: any;
+        /** Configures runtime selection. */
         selection?: dxDataGridSelection;
+        /** Specifies filters for the rows that must be selected initially. Applies only if selection | deferred is true. */
         selectionFilter?: Object;
+        /** Configures scrolling. */
         scrolling?: dxDataGridScrolling;
         /** Specifies the operations that must be performed on the server side. */
         remoteOperations?: any;
@@ -4358,41 +4377,66 @@ declare module DevExpress.ui {
         };
     }
     export interface dxTreeListOptions extends GridBaseOptions {
+        /** Specifies which data field provides keys for nodes. */
         keyExpr?: any;
+        /** Specifies which data field provides parent keys. */
         parentIdExpr?: any;
+        /** Specifies which data field contains nested items. Set this option when your data has a hierarchical structure. */
         itemsExpr?: any;
+        /** Specifies which data field defines whether the node has children. */
         hasItemsExpr?: any;
+        /** Specifies the root node's identifier. Applies if dataStructure is 'plain'. */
         rootValue?: Object;
+        /** Notifies the widget of your data structure. */
         dataStructure?: string;
+        /** Specifies keys of the initially expanded rows. */
         expandedRowKeys?: Array<any>;
+        /** Specifies whether nodes appear expanded or collapsed after filtering is applied. */
         expandNodesOnFiltering?: boolean;
+        /** Specifies whether all rows are expanded initially. */
         autoExpandAll?: boolean;
+        /** Configures columns. */
         columns?: Array<dxTreeListColumn>;
+        /** A handler for the contextMenuPreparing event. Executed before a context menu is rendered. */
         onContextMenuPreparing?: (e: Object) => void;
+        /** A handler for the cellClick event. Executed after a user clicks a cell. */
         onCellClick?: any;
+        /** A handler for the cellHoverChanged event. Executed after the pointer enters or leaves a cell. */
         onCellHoverChanged?: (e: Object) => void;
+        /** A handler for the cellPrepared event. Executed after the widget creates a cell. */
         onCellPrepared?: (e: Object) => void;
+        /** A handler for the contentReady event. Executed when the widget's content is ready. */
         onContentReady?: Function;
+        /** Customizes columns after they are created. */
         customizeColumns?: (columns: Array<dxTreeListColumn>) => void;
+        /** A handler for the rowClick event. Executed when a user clicks a row. */
         onRowClick?: any;
+        /** A handler for the rowPrepared event. Executed after the widget creates a row. */
         onRowPrepared?: (e: Object) => void;
+        /** A handler for editingStart. Executed before a cell or row switches to the editing state. */
         onEditingStart?: (e: {
             data: Object;
             key: any;
             cancel: boolean;
             column: dxTreeListColumn
         }) => void;
+        /** A handler for the editorPrepared event. Executed after an editor is created. */
         onEditorPrepared?: (e: Object) => void;
+        /** A handler for the editorPreparing event. Executed before an editor is created. */
         onEditorPreparing?: (e: Object) => void;
+        /** Configures editing. */
         editing?: dxTreeListEditing;
+         /** Configures runtime selection. */
         selection?: dxTreeListSelection;
+        /** Configures scrolling. */
         scrolling?: dxTreeListScrolling;
+        /** A handler for the nodesInitialized event. Executed after all nodes in the widget are initialized. */
         onNodesInitialized?: (e: Object) => void;
         /** Specifies what operations are performed on the server. */
         remoteOperations?: any;
     }
     export interface GridBaseOptions extends WidgetOptions {
-        /** Specifies whether the outer borders of the grid are visible or not. */
+        /** Specifies whether the outer borders of the widget are visible. */
         showBorders?: boolean;
         /** Enables a hint that appears when a user hovers the mouse pointer over a cell with truncated content. */
         cellHintEnabled?: boolean;
@@ -4429,27 +4473,27 @@ declare module DevExpress.ui {
         };
         /** Specifies text shown when the widget does not display any data. */
         noDataText?: string;
-        /** Specifies whether or not grid rows must be shaded in a different way. */
+        /** Specifies whether rows should be shaded differently. */
         rowAlternationEnabled?: boolean;
         /** Specifies whether to enable two-way data binding. */
         twoWayBindingEnabled?: boolean;
         /** A handler for the dataErrorOccurred event. Executed when an error occurs in the data source. */
         onDataErrorOccurred?: (e: { error: Error }) => void;
-        /** Specifies whether column headers are visible or not. */
+        /** Specifies whether column headers are visible. */
         showColumnHeaders?: boolean;
-        /** Specifies whether or not vertical lines separating one grid column from another are visible. */
+        /** Specifies whether vertical lines that separate one column from another are visible. */
         showColumnLines?: boolean;
-        /** Specifies whether or not horizontal lines separating one grid row from another are visible. */
+        /** Specifies whether horizontal lines that separate one row from another are visible. */
         showRowLines?: boolean;
-        /** Specifies options of runtime sorting. */
+        /** Configures runtime sorting. */
         sorting?: {
             /** Specifies text for the context menu item that sets an ascending sort order in a column. */
             ascendingText?: string;
-            /** Specifies text for the context menu item that resets sorting settings for a column. */
+            /** Specifies text for the context menu item that clears sorting settings for a column. */
             clearText?: string;
             /** Specifies text for the context menu item that sets a descending sort order in a column. */
             descendingText?: string;
-            /** Specifies the runtime sorting mode. */
+            /** Specifies the sorting mode. */
             mode?: string;
         };
         /** Specifies whether text that does not fit into a column should be wrapped. */
@@ -4573,7 +4617,7 @@ declare module DevExpress.ui {
         onAdaptiveDetailRowPreparing?: (e: Object) => void;
         /** Indicates whether to show the error row. */
         errorRowEnabled?: boolean;
-        /** Specifies the keys of the records that must appear initially selected. */
+        /** Specifies the keys of rows that must be selected initially. Applies only if selection | deferred is false. */
         selectedRowKeys?: Array<any>;
         /** A handler for the selectionChanged event. Executed after a row has been selected or selection has been cleared. */
         onSelectionChanged?: (e: {
@@ -4584,16 +4628,17 @@ declare module DevExpress.ui {
         }) => void;
         /** A handler for the keyDown event. Executed when the widget is in focus and a key has been pressed down. */
         onKeyDown?: (e: Object) => void;
-        /** Specifies options of the search panel. */
+        /** Configures the search panel. */
         searchPanel?: {
-            /** Specifies whether or not search strings in the located grid records should be highlighted. */
+            /** Specifies whether found substrings should be highlighted. */
             highlightSearchText?: boolean;
+            /** Notifies the widget whether search is case-sensitive to ensure proper highlightning of search results. Applies only if highlightSearchText is true. */
             highlightCaseSensitive?: boolean;
-            /** Specifies text displayed by the search panel when no search string was typed. */
+            /** Specifies a placeholder for the search panel. */
             placeholder?: string;
             /** Specifies whether the search panel is visible or not. */
             visible?: boolean;
-            /** Specifies whether to search all columns or only visible ones. */
+            /** Specifies whether the widget should search against all columns or only visible ones. */
             searchVisibleColumnsOnly?: boolean;
             /** Specifies the width of the search panel in pixels. */
             width?: number;
@@ -4612,116 +4657,141 @@ declare module DevExpress.ui {
     class GridBase extends Widget implements DataHelperMixin {
         constructor(element: JQuery, options?: GridBaseOptions);
         constructor(element: Element, options?: GridBaseOptions);
-        /** Clears sorting settings of all grid columns at once. */
+        /** Clears sorting settings of all columns at once. */
         clearSorting(): void;
-        /** Allows you to obtain a cell by its row index and the data field of its column. */
+        /** Gets a cell by the row index and data field. */
         getCellElement(rowIndex: number, dataField: string): any;
-        /** Allows you to obtain a cell by its row index and the visible index of its column. */
+        /** Gets a cell by the row index and column index. */
         getCellElement(rowIndex: number, visibleColumnIndex: number): any;
-        /** Allows you to obtain a row element by its index. */
+        /** Gets the element of a row by its index. */
         getRowElement(rowIndex: number): any;
-        /** Allows you to obtain the row index by a data key. */
+        /** Gets the index of a row by its key. */
         getRowIndexByKey(key: any): number;
-        /** Allows you to obtain the data key by a row index. */
+        /** Gets the key of a row by its index. */
         getKeyByRowIndex(rowIndex: number): any;
-        /** Removes the column from the grid. */
+        /** Removes a specific column from the widget. */
         deleteColumn(id: any): void;
         /** Displays the load panel. */
         beginCustomLoading(messageText: string): void;
         /** Hides the load panel. */
         endCustomLoading(): void;
-        /** Returns the number of data columns in a grid. */
+        /** Returns the number of data columns in the widget including visible and hidden columns, but without command columns. */
         columnCount(): number;
-        /** Returns the value of a specific column option. */
+        /** Gets the value of a specific option set for a specific column. */
         columnOption(id: any, optionName: string): any;
-        /** Sets an option of a specific column. */
+        /** Assigns a new value to a single option of a specific column. */
         columnOption(id: any, optionName: string, optionValue: any): void;
-        /** Returns the options of a column by an identifier. */
+        /** Gets the options of a column using its identifier. */
         columnOption(id: any): Object;
-        /** Sets several options of a column at once. */
+        /** Assigns new values to several options of a specific column at once. */
         columnOption(id: any, options: Object): void;
-        /** Returns the key corresponding to the passed data object. */
+        /** Gets a data object's key. */
         keyOf(obj: Object): any;
         /** Allows you to obtain a data object by its key. */
         byKey(key: any): JQueryPromise<any>;
-        /** Refreshes grid data. */
+        /** Reloads data in the widget. */
         refresh(): JQueryPromise<any>;
-        /** Updates the grid to the size of its content. */
+        /** Updates the widget's content after resizing. */
         updateDimensions(): void;
         getDataSource(): DevExpress.data.DataSource;
-        /** Gets an instance of the scrollable part of the DataGrid widget. */
+        /** Gets the instance of the scrollable part of the widget. */
         getScrollable(): dxScrollable;
-        /** Redraws the specified rows. */
+        /** Repaints specific rows. */
         repaintRows(rowIndexes: Array<number>): void;
-        /** Adds a new data row to a grid. */
+        /** Adds a new data row. */
         addRow(): void;
-        /** Sets a specific cell into the editing state. */
+        /** Switches a specific cell into the editing state. The cell is found by the row index and column index. */
         editCell(rowIndex: number, visibleColumnIndex: number): void;
-        /** Sets a specific cell into the editing state. */
+        /** Switches a specific cell into the editing state. The cell is found by the row index and data field. */
         editCell(rowIndex: number, dataField: string): void;
-        /** Sets a specific row into the editing state. */
+        /** Switches a specific row into the editing state. */
         editRow(rowIndex: number): void;
-        /** Gets the cell value. */
+        /** Gets the value of a cell found by the row index and data field. */
         cellValue(rowIndex: number, dataField: string): any;
-        /** Gets the cell value. */
+        /** Gets the value of a cell found by the row index and column index. */
         cellValue(rowIndex: number, visibleColumnIndex: number): any;
-        /** Sets the cell value. */
+        /** Assigns a new value to a cell found by the row index and data field. */
         cellValue(rowIndex: number, dataField: string, value: any): void;
-        /** Sets the cell value. */
+        /** Assigns a new value to a cell found by the row index and column index. */
         cellValue(rowIndex: number, visibleColumnIndex: number, value: any): void;
-        /** Removes a specific row from a grid. */
+        /** Removes a specific row from the widget. */
         deleteRow(rowIndex: number): void;
-        /** Saves changes made in a grid. */
+        /** Saves changes that a user made to data. */
         saveEditData(): JQueryPromise<any>;
-        /** Recovers a row deleted in the batch edit mode. */
+        /** Recovers a row deleted in batch editing mode. */
         undeleteRow(rowIndex: number): void;
-        /** Discards changes made in a grid. */
+        /** Discards changes that a user made to data. */
         cancelEditData(): void;
-        /** Checks whether or not the grid contains unsaved changes. */
+        /** Checks whether the widget has unsaved changes. */
         hasEditData(): boolean;
-        /** Draws the cell being edited from the editing state. Use this method when the edit mode is batch. */
+        /** Switches the cell being edited back to the normal state. Takes effect only if editing | mode is batch. */
         closeEditCell(): void;
         /** Checks whether a specific adaptive detail row is expanded or collapsed. */
         isAdaptiveDetailRowExpanded(key: any): void;
-        /** Expands an adaptive detail row by the key of its parent data row. */
+        /** Expands an adaptive detail row found by the key of its parent data row. */
         expandAdaptiveDetailRow(key: any): void;
         /** Collapses the currently expanded adaptive detail row (if there is one). */
         collapseAdaptiveDetailRow(): void;
         /** Selects all rows. */
         selectAll(): JQueryPromise<any>;
-        /** Clears selection of all grid rows on the current page only or on all pages. */
+        /** Clears selection of all rows on all pages or on the currently rendered page only. */
         deselectAll(): JQueryPromise<any>;
-        /** Selects specified grid rows. */
+        /** Selects rows by keys. */
         selectRows(keys: Array<any>, preserve: boolean): JQueryPromise<any>;
-        /** Clears selection of specified grid rows. */
+        /** Clears selection of specific rows. */
         deselectRows(keys: Array<any>): JQueryPromise<any>;
-        /** Selects grid rows by indexes. */
+        /** Selects rows by indexes. */
         selectRowsByIndexes(indexes: Array<any>): JQueryPromise<any>;
-        /** Clears selection of all grid rows on all pages. */
+        /** Clears selection of all rows on all pages. */
         clearSelection(): void;
-        /** Gets the keys of currently selected grid records. */
+        /** Gets the keys of the currently selected rows. */
         getSelectedRowKeys(): any;
-        /** Gets the data objects of the currently selected grid records. */
-        getSelectedRowsData(): any;
         startSelectionWithCheckboxes(): boolean;
-        /** Allows you to find out whether or not the row with a specified data object is selected. */
+        /** Checks whether the row with a specific key is selected. Takes effect only if selection | deferred is false. */
         isRowSelected(arg: any): boolean;
-        /** Searches grid records by a search string. */
+        /** Seeks a search string in the columns whose allowFiltering option is true. */
         searchByText(text: string): void;
-        /** Focuses the specified cell element in the grid. */
+        /** Sets focus on a specific cell. */
         focus(element?: JQuery): void;
+        /** Clears all filters applied to widget rows. */
+        clearFilter(): void;
+        /** Clears all row filters of a specific type. */
+        clearFilter(filterName: string): void;
+        /** Applies a filter to the widget's data source. */
+        filter(filterExpr?: any): void;
+        /** Returns a filter expression applied to the widget's data source using the filter(filterExpr) method. */
+        filter(): any;
+        /** Returns the total filter that combines all the filters applied. */
+        getCombinedFilter(): any;
+        /** Returns the total filter that combines all the filters applied. */
+        getCombinedFilter(returnDataField?: boolean): any;
+        /** Hides the column chooser. */
+        hideColumnChooser(): void;
+        /** Shows the column chooser. */
+        showColumnChooser(): void;
     }
+    /** The TreeList is a widget that represents data from a local or remote source in the form of a multi-column tree view. This widget offers such features as sorting, filtering, editing, selection, etc. */
     export class dxTreeList extends GridBase {
         constructor(element: JQuery, options?: dxTreeListOptions);
         constructor(element: Element, options?: dxTreeListOptions);
+        /** Adds a new column to the widget. */
         addColumn(columnOptions: dxTreeListColumn): void;
+        /** Gets all visible columns. */
         getVisibleColumns(): Array<dxTreeListColumn>;
+        /** Gets all visible columns at a specific hierarchical level of column headers. Use it to access banded columns. */
         getVisibleColumns(headerLevel?: number): Array<dxTreeListColumn>;
+        /** Gets all visible rows. */
         getVisibleRows(): Array<dxTreeListRow>;
+        /** Gets the root node. */
         getRootNode(): dxTreeListNode;
+        /** Checks whether a row is expanded or collapsed. */
         isRowExpanded(key: any): boolean;
+        /** Expands a specific row. */
         expandRow(key: any): void;
+        /** Collapses a specific row. */
         collapseRow(key: any): void;
+        /** Gets data objects of currently selected rows. */
+        getSelectedRowsData(): Array<any>;
     }
     /** The DataGrid is a widget that represents data from a local or remote source in the form of a grid. This widget offers such basic features as sorting, grouping, filtering, as well as more advanced capabilities, like state storing, export to Excel, master-detail interface, and many others. */
     export class dxDataGrid extends GridBase {
@@ -4733,38 +4803,24 @@ declare module DevExpress.ui {
         state(): Object;
         /** Sets the grid state. */
         state(state: Object): void;
-        /** Adds a new column to a grid. */
+        /** Adds a new column to the widget. */
         addColumn(columnOptions: dxDataGridColumn): void;
-        /** Clears all filters applied to grid rows. */
-        clearFilter(): void;
-        /** Clears all filters of a specific type applied to grid rows. */
-        clearFilter(filterName: string): void;
         /** Collapses groups or master rows in a grid. */
         collapseAll(groupIndex?: number): void;
-        /** Gets an array of visible columns. */
+        /** Gets all visible columns. */
         getVisibleColumns(): Array<dxDataGridColumn>;
-        /** Gets an array of visible columns at a specific hierarchical level of column headers. */
+        /** Gets all visible columns at a specific hierarchical level of column headers. Use it to access banded columns. */
         getVisibleColumns(headerLevel?: number): Array<dxDataGridColumn>;
-        /** Gets an array of visible rows. */
+        /** Gets all visible rows. */
         getVisibleRows(): Array<dxDataGridRow>;
         /** Expands groups or master rows in a grid. */
         expandAll(groupIndex: number): void;
-        /** Allows you to find out whether a specific group or master row is expanded or collapsed. */
+        /** Checks whether a specific group or master row is expanded or collapsed. */
         isRowExpanded(key: any): boolean;
         /** Allows you to expand a specific group or master row by its key. */
         expandRow(key: any): void;
         /** Allows you to collapse a specific group or master row by its key. */
         collapseRow(key: any): void;
-        /** Applies a filter to the grid's data source. */
-        filter(filterExpr?: any): void;
-        /** Returns a filter expression applied to the grid's data source using the filter(filterExpr) method. */
-        filter(): any;
-        /** Returns a filter expression applied to the grid using all possible scenarios. */
-        getCombinedFilter(): any;
-        /** Returns a filter expression applied to the grid using all possible scenarios. */
-        getCombinedFilter(returnDataField?: boolean): any;
-        /** Hides the column chooser panel. */
-        hideColumnChooser(): void;
         /** Adds a new data row to a grid. */
         insertRow(): void;
         /** Switches a grid to a specified page. */
@@ -4777,8 +4833,6 @@ declare module DevExpress.ui {
         pageSize(): number;
         /** Removes a specific row from a grid. */
         removeRow(rowIndex: number): void;
-        /** Invokes the column chooser panel. */
-        showColumnChooser(): void;
         /** Returns how many pages the grid contains. */
         pageCount(): number;
         /** Returns the number of records currently held by a grid. */
@@ -4787,6 +4841,8 @@ declare module DevExpress.ui {
         getTotalSummaryValue(summaryItemName: string): any;
         /** Exports grid data to Excel. */
         exportToExcel(selectionOnly: boolean): void;
+        /** Gets data objects of currently selected rows. */
+        getSelectedRowsData(): any;
     }
     export interface dxPivotGridOptions extends WidgetOptions {
         onContentReady?: Function;
@@ -4838,7 +4894,7 @@ declare module DevExpress.ui {
         allowExpandAll?: boolean;
         /** Specifies whether long text in header items should be wrapped. */
         wordWrapEnabled?: boolean;
-        /** Specifies whether to display the Total rows. */
+        /** Specifies whether to display the Total rows. Applies only if rowHeaderLayout is "standard". */
         showRowTotals?: boolean;
         /** Specifies whether to display the Grand Total row. */
         showRowGrandTotals?: boolean;
@@ -4848,7 +4904,7 @@ declare module DevExpress.ui {
         showColumnGrandTotals?: boolean;
         /** Specifies whether or not to hide rows and columns with no data. */
         hideEmptySummaryCells?: boolean;
-        /** Specifies where to show the total rows or columns. */
+        /** Specifies where to show the total rows or columns. Applies only if rowHeaderLayout is "standard". */
         showTotalsPrior?: string;
         /** Specifies the layout of items in the row header. */
         rowHeaderLayout?: string;
@@ -4902,6 +4958,8 @@ declare module DevExpress.ui {
             removeAllSorting?: string;
             /** The string to display as an Export to Excel file context menu item. */
             exportToExcel?: string;
+            /** Specifies text displayed in a cell when its data is unavailable for some reason. */
+            dataNotAvailable?: string;
         };
         /** Specifies options configuring the load panel. */
         loadPanel?: {
@@ -6830,7 +6888,7 @@ declare module DevExpress.viz.gauges {
         width?: number;
     }
     export interface ScaleMajorTick extends ScaleTick {
-        /**     * Specifies whether or not to expand the current major tick interval if labels overlap each other.     * @deprecated Use the overlappingBehavior | useAutoArrangement option instead.     */
+        /**     * Specifies whether or not to expand the current major tick interval if labels overlap each other.     * @deprecated Use the overlappingBehavior option instead.     */
         useTicksAutoArrangement?: boolean;
     }
     export interface ScaleMinorTick extends ScaleTick {
@@ -6842,7 +6900,7 @@ declare module DevExpress.viz.gauges {
         useRangeColors?: boolean;
         /** Specifies a callback function that returns the text to be displayed in scale labels. */
         customizeText?: (scaleValue: { value: number; valueText: string }) => string;
-        /** Specifies the overlap resolving options to be applied to scale labels. */
+        /** Decides how to arrange scale labels when there is not enough space to keep all of them. */
         overlappingBehavior?: any;
         /** Specifies font options for the text displayed in the scale labels of the gauge. */
         font?: viz.core.Font;
@@ -7035,6 +7093,7 @@ declare module DevExpress.viz.gauges {
     export interface CircularScaleLabel extends BaseScaleLabel {
         /** Specifies the spacing between scale labels and ticks. */
         indentFromTick?: number;
+        /** Specifies which label to hide in case of overlapping. */
         hideFirstOrLast?: string;
         overlappingBehavior?: any;
     }
@@ -7227,6 +7286,7 @@ declare module DevExpress.viz.rangeSelector {
                 topIndent?: number;
                 /** Specifies whether or not the scale's labels are visible. */
                 visible?: boolean;
+                /** Decides how to arrange scale labels when there is not enough space to keep all of them. */
                 overlappingBehavior?: string;
             };
             /** Specifies the value to be raised to a power when generating ticks for a logarithmic scale. */
@@ -7295,7 +7355,7 @@ declare module DevExpress.viz.rangeSelector {
             };
             /** Specifies the type of the scale. */
             type?: string;
-            /** * Specifies whether or not to expand the current tick interval if labels overlap each other. * @deprecated  */
+            /** * Specifies whether or not to expand the current tick interval if labels overlap each other. * @deprecated Use the overlappingBehavior option instead. */
             useTicksAutoArrangement?: boolean;
             /** Specifies the type of values on the scale. */
             valueType?: string;
@@ -7935,9 +7995,9 @@ declare module DevExpress.viz.treeMap {
         colorField?: string;
         /** Specifies the name of the data source field that provides texts for tile and group labels. */
         labelField?: string;
-        /** Specifies the name of the data source field that provides IDs for items. Applies to flat data sources only. */
+        /** Specifies the name of the data source field that provides IDs for items. Applies to plain data sources only. */
         idField?: string;
-        /** Specifies the name of the data source field that provides parent IDs for items. Applies to flat data sources only. */
+        /** Specifies the name of the data source field that provides parent IDs for items. Applies to plain data sources only. */
         parentField?: string;
         /** Specifies the layout algorithm. */
         layoutAlgorithm?: any;

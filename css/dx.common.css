@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 17.1.2-beta
-* Build date: Apr 17, 2017
+* Version: 17.1.3
+* Build date: May 17, 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -1503,17 +1503,9 @@
   height: 100%;
   vertical-align: middle;
 }
-.dx-switch-inner {
-  margin-left: -50px;
-}
 .dx-state-disabled.dx-switch,
 .dx-state-disabled .dx-switch {
   cursor: default;
-}
-.dx-rtl.dx-switch-inner,
-.dx-rtl .dx-switch-inner {
-  margin-right: -50px;
-  margin-left: 0px;
 }
 .dx-rtl.dx-switch-wrapper,
 .dx-rtl .dx-switch-wrapper {
@@ -5762,6 +5754,21 @@ input.dx-hidden {
 .dx-rtl .dx-treelist-search-panel {
   margin: 0;
   margin-right: 15px;
+}
+.dx-treelist-rowsview .dx-treelist-table:not(.dx-treelist-table-fixed) .dx-treelist-cell-expandable {
+  white-space: nowrap;
+}
+.dx-treelist-rowsview .dx-treelist-table:not(.dx-treelist-table-fixed) .dx-treelist-cell-expandable .dx-treelist-text-content {
+  display: inline-block;
+  white-space: normal;
+}
+.dx-treelist-rowsview .dx-treelist-icon-container {
+  display: inline-block;
+  white-space: nowrap;
+  vertical-align: top;
+}
+.dx-treelist-rowsview .dx-treelist-table-fixed .dx-treelist-icon-container {
+  float: left;
 }
 .dx-menu-base {
   -webkit-user-select: none;

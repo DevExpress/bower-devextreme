@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 17.1.2-beta
-* Build date: Apr 17, 2017
+* Version: 17.1.3
+* Build date: May 17, 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -652,34 +652,34 @@
 .dx-rtl.dx-pivotgrid .dx-pivotgrid-border .dx-data-header {
   border-left: none;
 }
-.dx-treelist {
+.dx-treelist-container {
   color: #000;
   background-color: #ffffff;
 }
-.dx-treelist .dx-sort-up {
+.dx-treelist-container .dx-sort-up {
   font: 14px/1 DXIcons;
 }
-.dx-treelist .dx-sort-up:before {
+.dx-treelist-container .dx-sort-up:before {
   content: "\f051";
 }
-.dx-treelist .dx-sort-down {
+.dx-treelist-container .dx-sort-down {
   font: 14px/1 DXIcons;
 }
-.dx-treelist .dx-sort-down:before {
+.dx-treelist-container .dx-sort-down:before {
   content: "\f052";
 }
-.dx-treelist .dx-header-filter {
+.dx-treelist-container .dx-header-filter {
   position: relative;
   color: #000;
   font: 14px/1 DXIcons;
 }
-.dx-treelist .dx-header-filter:before {
+.dx-treelist-container .dx-header-filter:before {
   content: "\f050";
 }
-.dx-treelist .dx-header-filter-empty {
+.dx-treelist-container .dx-header-filter-empty {
   color: rgba(0, 0, 0, 0.5);
 }
-.dx-treelist.dx-filter-menu .dx-menu-item-content .dx-icon {
+.dx-treelist-container.dx-filter-menu .dx-menu-item-content .dx-icon {
   width: 14px;
   height: 14px;
   background-position: 0px 0px;
@@ -691,29 +691,29 @@
   text-align: center;
   line-height: 14px;
 }
-.dx-treelist .dx-treelist-content-fixed .dx-treelist-table .dx-col-fixed {
+.dx-treelist-container .dx-treelist-content-fixed .dx-treelist-table .dx-col-fixed {
   background-color: #ffffff;
 }
-.dx-treelist .dx-treelist-rowsview .dx-data-row td.dx-pointer-events-none,
-.dx-treelist .dx-treelist-rowsview .dx-freespace-row td.dx-pointer-events-none,
-.dx-treelist .dx-treelist-headers .dx-row td.dx-pointer-events-none {
+.dx-treelist-container .dx-treelist-rowsview .dx-data-row td.dx-pointer-events-none,
+.dx-treelist-container .dx-treelist-rowsview .dx-freespace-row td.dx-pointer-events-none,
+.dx-treelist-container .dx-treelist-headers .dx-row td.dx-pointer-events-none {
   border-left: 2px solid #c7c7c7;
   border-right: 2px solid #c7c7c7;
 }
-.dx-treelist .dx-treelist-rowsview .dx-data-row td.dx-pointer-events-none.dx-first-cell,
-.dx-treelist .dx-treelist-rowsview .dx-freespace-row td.dx-pointer-events-none.dx-first-cell,
-.dx-treelist .dx-treelist-headers .dx-row td.dx-pointer-events-none.dx-first-cell {
+.dx-treelist-container .dx-treelist-rowsview .dx-data-row td.dx-pointer-events-none.dx-first-cell,
+.dx-treelist-container .dx-treelist-rowsview .dx-freespace-row td.dx-pointer-events-none.dx-first-cell,
+.dx-treelist-container .dx-treelist-headers .dx-row td.dx-pointer-events-none.dx-first-cell {
   border-left: none;
 }
-.dx-treelist .dx-treelist-rowsview .dx-data-row td.dx-pointer-events-none.dx-last-cell,
-.dx-treelist .dx-treelist-rowsview .dx-freespace-row td.dx-pointer-events-none.dx-last-cell,
-.dx-treelist .dx-treelist-headers .dx-row td.dx-pointer-events-none.dx-last-cell {
+.dx-treelist-container .dx-treelist-rowsview .dx-data-row td.dx-pointer-events-none.dx-last-cell,
+.dx-treelist-container .dx-treelist-rowsview .dx-freespace-row td.dx-pointer-events-none.dx-last-cell,
+.dx-treelist-container .dx-treelist-headers .dx-row td.dx-pointer-events-none.dx-last-cell {
   border-right: none;
 }
-.dx-treelist .dx-treelist-rowsview .dx-treelist-edit-form {
+.dx-treelist-container .dx-treelist-rowsview .dx-treelist-edit-form {
   background-color: #ffffff;
 }
-.dx-treelist .dx-treelist-filter-row .dx-filter-range-content {
+.dx-treelist-container .dx-treelist-filter-row .dx-filter-range-content {
   color: #000;
 }
 .dx-treelist-form-buttons-container {
@@ -766,19 +766,19 @@
 .dx-treelist-adaptive-more:before {
   content: "\f06c";
 }
-.dx-rtl .dx-treelist .dx-treelist-rowsview .dx-data-row td.dx-pointer-events-none,
-.dx-rtl .dx-treelist .dx-treelist-rowsview .dx-freespace-row td.dx-pointer-events-none,
-.dx-rtl .dx-treelist .dx-treelist-headers .dx-row td.dx-pointer-events-none {
+.dx-rtl .dx-treelist-container .dx-treelist-rowsview .dx-data-row td.dx-pointer-events-none,
+.dx-rtl .dx-treelist-container .dx-treelist-rowsview .dx-freespace-row td.dx-pointer-events-none,
+.dx-rtl .dx-treelist-container .dx-treelist-headers .dx-row td.dx-pointer-events-none {
   border-left: 2px solid #c7c7c7;
 }
-.dx-rtl .dx-treelist .dx-treelist-rowsview .dx-data-row td.dx-pointer-events-none.dx-first-cell,
-.dx-rtl .dx-treelist .dx-treelist-rowsview .dx-freespace-row td.dx-pointer-events-none.dx-first-cell,
-.dx-rtl .dx-treelist .dx-treelist-headers .dx-row td.dx-pointer-events-none.dx-first-cell {
+.dx-rtl .dx-treelist-container .dx-treelist-rowsview .dx-data-row td.dx-pointer-events-none.dx-first-cell,
+.dx-rtl .dx-treelist-container .dx-treelist-rowsview .dx-freespace-row td.dx-pointer-events-none.dx-first-cell,
+.dx-rtl .dx-treelist-container .dx-treelist-headers .dx-row td.dx-pointer-events-none.dx-first-cell {
   border-right: none;
 }
-.dx-rtl .dx-treelist .dx-treelist-rowsview .dx-data-row td.dx-pointer-events-none.dx-last-cell,
-.dx-rtl .dx-treelist .dx-treelist-rowsview .dx-freespace-row td.dx-pointer-events-none.dx-last-cell,
-.dx-rtl .dx-treelist .dx-treelist-headers .dx-row td.dx-pointer-events-none.dx-last-cell {
+.dx-rtl .dx-treelist-container .dx-treelist-rowsview .dx-data-row td.dx-pointer-events-none.dx-last-cell,
+.dx-rtl .dx-treelist-container .dx-treelist-rowsview .dx-freespace-row td.dx-pointer-events-none.dx-last-cell,
+.dx-rtl .dx-treelist-container .dx-treelist-headers .dx-row td.dx-pointer-events-none.dx-last-cell {
   border-left: none;
 }
 .dx-rtl .dx-treelist-form-buttons-container {

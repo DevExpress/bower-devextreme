@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.messages.de.js)
-* Version: 17.1.2-beta
-* Build date: Mon Apr 17 2017
+* Version: 17.1.3
+* Build date: Wed May 17 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -122,7 +122,6 @@
             "dxDataGrid-editingSaveAllChanges": "Änderungen speichern",
             "dxDataGrid-editingCancelAllChanges": "Änderungen verwerfen",
             "dxDataGrid-editingAddRow": "Neue Zeile",
-            "dxTreeList-editingAddRowToNode": "!TODO!",
             "dxDataGrid-summaryMin": "Min: {0}",
             "dxDataGrid-summaryMinOtherColumn": "Minimum von {1} ist {0}",
             "dxDataGrid-summaryMax": "Max: {0}",
@@ -154,6 +153,8 @@
             "dxDataGrid-ariaSearchInGrid": "Suchen in der Datentabelle",
             "dxDataGrid-ariaSelectAll": "Alle auswählen",
             "dxDataGrid-ariaSelectRow": "Zeile auswählen",
+            "dxTreeList-ariaTreeList": "Strukturliste",
+            "dxTreeList-editingAddRowToNode": "Hinzufügen",
             "dxPager-infoText": "Seite {0} von {1} ({2} Elemente)",
             "dxPager-pagesCountText": "von",
             "dxPivotGrid-grandTotal": "Gesamt",
@@ -165,6 +166,7 @@
             "dxPivotGrid-sortColumnBySummary": '"{0}" nach dieser Spalte sortieren',
             "dxPivotGrid-sortRowBySummary": '"{0}" nach dieser Zeile sortieren',
             "dxPivotGrid-removeAllSorting": "Sortierungen entfernen",
+            "dxPivotGrid-dataNotAvailable": "Entf.",
             "dxPivotGrid-rowFields": "Zeilenfelder",
             "dxPivotGrid-columnFields": "Spaltenfelder",
             "dxPivotGrid-dataFields": "Datenfelder",

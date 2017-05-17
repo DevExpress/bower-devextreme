@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.all.ru.js)
-* Version: 17.1.2-beta
-* Build date: Mon Apr 17 2017
+* Version: 17.1.3
+* Build date: Wed May 17 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -123,7 +123,6 @@
             "dxDataGrid-editingSaveAllChanges": "Сохранить изменения",
             "dxDataGrid-editingCancelAllChanges": "Отменить изменения",
             "dxDataGrid-editingAddRow": "Добавить строку",
-            "dxTreeList-editingAddRowToNode": "Добавить",
             "dxDataGrid-summaryMin": "Мин: {0}",
             "dxDataGrid-summaryMinOtherColumn": "Мин по {1} : {0}",
             "dxDataGrid-summaryMax": "Макс: {0}",
@@ -155,6 +154,8 @@
             "dxDataGrid-ariaSearchInGrid": "Искать в таблице данных",
             "dxDataGrid-ariaSelectAll": "Выбрать всё",
             "dxDataGrid-ariaSelectRow": "Выбрать строку",
+            "dxTreeList-ariaTreeList": "Иерархическая таблица данных",
+            "dxTreeList-editingAddRowToNode": "Добавить",
             "dxPager-infoText": "Страница {0} из {1} (Всего элементов: {2})",
             "dxPager-pagesCountText": "из",
             "dxPivotGrid-grandTotal": "Итого",
@@ -166,6 +167,7 @@
             "dxPivotGrid-sortColumnBySummary": 'Сортировать "{0}" по этой колонке',
             "dxPivotGrid-sortRowBySummary": 'Сортировать "{0}" по этой строке',
             "dxPivotGrid-removeAllSorting": "Сбросить все сортировки",
+            "dxPivotGrid-dataNotAvailable": "Н/Д",
             "dxPivotGrid-rowFields": "Поля строк",
             "dxPivotGrid-columnFields": "Поля столбцов",
             "dxPivotGrid-dataFields": "Поля данных",
