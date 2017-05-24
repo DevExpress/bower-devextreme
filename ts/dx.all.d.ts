@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme
-* Version: 16.1.11
-* Build date: Feb 27, 2017
+* Version: 16.1.12
+* Build date: May 17, 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -2128,7 +2128,7 @@ declare module DevExpress.ui {
         /** A handler for the valueChanged event. */
         onValueChanged?: Function;
     }
-    /** The FileUploader widget enables an end user to upload files to the server. An end user can select files in the file exlorer or drag and drop files to the FileUploader area on the page. */
+    /** The FileUploader widget enables an end user to upload files to the server. An end user can select files in the file explorer or drag and drop files to the FileUploader area on the page. */
     export class dxFileUploader extends Editor {
         constructor(element: JQuery, options?: dxFileUploaderOptions);
         constructor(element: Element, options?: dxFileUploaderOptions);
