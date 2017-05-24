@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 16.2.6 (build 17123)
-* Build date: May 3, 2017
+* Version: 16.2.7
+* Build date: May 17, 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -6944,6 +6944,10 @@
 .dx-datagrid-header-panel .dx-toolbar-button:not(.dx-state-disabled) .dx-apply-button .dx-button-content {
   background-color: rgba(90, 200, 250, 0.5);
 }
+.dx-datagrid-header-panel .dx-toolbar-label {
+  font-size: inherit;
+  font-weight: normal;
+}
 .dx-datagrid-header-panel .dx-link {
   padding: 7px 0px 7px 10px;
 }
@@ -7003,6 +7007,7 @@
   color: #7f7f7f;
 }
 .dx-datagrid-group-panel {
+  vertical-align: middle;
   -ms-touch-action: pinch-zoom;
   touch-action: pinch-zoom;
 }
@@ -7011,15 +7016,16 @@
   padding: 7px;
   border-top: 1px solid transparent;
   border-bottom: 1px solid transparent;
+  text-align: left;
 }
 .dx-datagrid-group-panel .dx-group-panel-item {
   text-transform: uppercase;
   font-size: 0.9em;
-  font-weight: bold;
   background-color: #E5E5E5;
   color: #4D4D4D;
   border: 1px solid #C8C8C8;
   padding: 7px;
+  font-weight: bold;
 }
 .dx-datagrid-group-panel .dx-block-separator {
   padding: 7px;
@@ -7240,6 +7246,9 @@
 .dx-rtl .dx-datagrid-search-panel {
   margin-left: 0;
   margin-right: 20px;
+}
+.dx-rtl .dx-group-panel-message {
+  text-align: right;
 }
 .dx-datagrid-table-fixed .dx-row.dx-group-row {
   background-color: #fff;

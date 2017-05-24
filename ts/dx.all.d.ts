@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.all.d.ts)
-* Version: 16.2.6 (build 17123)
-* Build date: Wed May 03 2017
+* Version: 16.2.7
+* Build date: Wed May 17 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -1244,7 +1244,7 @@ declare module DevExpress {
             selectedItemKeys?: Array<any>;
             /** Specifies which data field provides keys for widget items. */
             keyExpr?: any;
-            /** A handler for the itemDeleting event. */
+            /** A handler for the itemDeleting event. Executed before an item is deleted from the data source. */
             onItemDeleting?: Function;
             /** A handler for the itemDeleted event. */
             onItemDeleted?: Function;
@@ -1940,6 +1940,7 @@ declare module DevExpress.ui {
         show(): JQueryPromise<void>;
         /** Toggles the visibility of the widget. */
         toggle(showing: boolean): JQueryPromise<void>;
+        /** An object that serves as a namespace for static methods that affect overlay widgets. */
         /** A static method that specifies the base z-index for all overlay widgets. */
         static baseZIndex(zIndex: number): void;
     }
@@ -3040,6 +3041,7 @@ declare module DevExpress.ui {
         swipeEnabled?: boolean;
         /** A template to be used for rendering widget content. */
         contentTemplate?: any;
+        /** The index number of the currently selected item. */
         selectedIndex?: number;
     }
     /** The SlideOut widget is a classic slide-out menu paired with a view. An end user opens the menu by swiping away the view. */

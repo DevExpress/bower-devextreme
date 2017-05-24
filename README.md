@@ -38,7 +38,7 @@ A vast collection of code samples illustrating the usage of DevExtreme widgets.
 
 ## License
 
-Familiarize yourself with a [Commercial License](http://js.devexpress.com/EULAs/DevExtremeComplete/).
+Read about DevExtreme licensing here: [https://js.devexpress.com/Licensing](https://js.devexpress.com/Licensing).
 
 ## Support
 
