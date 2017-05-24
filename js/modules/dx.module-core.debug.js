@@ -1,9 +1,9 @@
 /*! 
 * DevExtreme (Core Library)
-* Version: 15.2.13
-* Build date: Oct 7, 2016
+* Version: 15.2.16
+* Build date: May 17, 2017
 *
-* Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
+* Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
 */
 
@@ -4137,6 +4137,8 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                     var prepareOption = function(name, value) {
                             if ($.isPlainObject(value))
                                 $.each(value, function(valueName, valueItem) {
+                                    if (value === valueItem)
+                                        return;
                                     prepareOption(name + "." + valueName, valueItem)
                                 });
                             normailzeOptionValue(name, value)
@@ -4383,7 +4385,7 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
     });
     /*! Module core, file version.js */
     DevExpress.define("/version", [], function() {
-        return "15.2.13"
+        return "15.2.16"
     });
     /*! Module core, file errors.js */
     DevExpress.define("/errors", ["/utils/utils.error"], function(errorUtils) {
@@ -4420,7 +4422,8 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                 W0003: "{0} - '{1}' property is deprecated in {2}. {3}",
                 W0004: "Timeout for theme loading is over: {0}",
                 W0005: "'{0}' event is deprecated in {1}. {2}",
-                W0006: "Invalid recurrence rule: '{0}'"
+                W0006: "Invalid recurrence rule: '{0}'",
+                W0007: "'{0}' Globolize culture is not defined"
             })
     });
     /*! Module core, file eventsMixin.js */
@@ -7677,7 +7680,7 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
                         url = loadOptions.urlOverride;
                     else
                         url = this._url;
-                    if ("customQueryParams" in loadOptions) {
+                    if (loadOptions.customQueryParams) {
                         var params = escapeServiceOperationParams(loadOptions.customQueryParams, this.version());
                         if (this.version() === 4)
                             url = formatFunctionInvocationUrl(url, params);

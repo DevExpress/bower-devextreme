@@ -1,9 +1,9 @@
 /*! 
 * DevExtreme (Common Widgets)
-* Version: 15.2.13
-* Build date: Oct 7, 2016
+* Version: 15.2.16
+* Build date: May 17, 2017
 *
-* Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
+* Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
 */
 
@@ -6664,6 +6664,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                 _renderMask: function() {
                     this.element().removeClass(TEXTEDITOR_MASKED_CLASS);
                     this._maskRulesChain = null;
+                    this._detachMaskEventHandlers();
                     if (!this.option("mask"))
                         return;
                     this.element().addClass(TEXTEDITOR_MASKED_CLASS);
@@ -6673,8 +6674,11 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     this._changedValue = this._input().val()
                 },
                 _attachMaskEventHandlers: function() {
-                    this._input().off("." + MASK_EVENT_NAMESPACE).on(eventUtils.addNamespace("focus", MASK_EVENT_NAMESPACE), $.proxy(this._maskFocusHandler, this)).on(eventUtils.addNamespace("keydown", MASK_EVENT_NAMESPACE), $.proxy(this._maskKeyDownHandler, this)).on(eventUtils.addNamespace("keypress", MASK_EVENT_NAMESPACE), $.proxy(this._maskKeyPressHandler, this)).on(eventUtils.addNamespace("input", MASK_EVENT_NAMESPACE), $.proxy(this._maskInputHandler, this)).on(eventUtils.addNamespace("paste", MASK_EVENT_NAMESPACE), $.proxy(this._maskPasteHandler, this)).on(eventUtils.addNamespace("cut", MASK_EVENT_NAMESPACE), $.proxy(this._maskCutHandler, this)).on(eventUtils.addNamespace("drop", MASK_EVENT_NAMESPACE), $.proxy(this._maskDragHandler, this));
+                    this._input().on(eventUtils.addNamespace("focus", MASK_EVENT_NAMESPACE), $.proxy(this._maskFocusHandler, this)).on(eventUtils.addNamespace("keydown", MASK_EVENT_NAMESPACE), $.proxy(this._maskKeyDownHandler, this)).on(eventUtils.addNamespace("keypress", MASK_EVENT_NAMESPACE), $.proxy(this._maskKeyPressHandler, this)).on(eventUtils.addNamespace("input", MASK_EVENT_NAMESPACE), $.proxy(this._maskInputHandler, this)).on(eventUtils.addNamespace("paste", MASK_EVENT_NAMESPACE), $.proxy(this._maskPasteHandler, this)).on(eventUtils.addNamespace("cut", MASK_EVENT_NAMESPACE), $.proxy(this._maskCutHandler, this)).on(eventUtils.addNamespace("drop", MASK_EVENT_NAMESPACE), $.proxy(this._maskDragHandler, this));
                     this._attachChangeEventHandlers()
+                },
+                _detachMaskEventHandlers: function() {
+                    this._input().off("." + MASK_EVENT_NAMESPACE)
                 },
                 _attachChangeEventHandlers: function() {
                     if ($.inArray("change", this.option("valueChangeEvent").split(" ")) === -1)
@@ -7968,8 +7972,15 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                 _updatePopupWidth: function() {
                     this._setPopupOption("width", this.element().outerWidth() + this.option("popupWidthExtension"))
                 },
+                _needPopupRepaint: function() {
+                    var currentPageIndex = this._dataSource.pageIndex(),
+                        needRepaint = commonUtils.isDefined(this._pageIndex) && currentPageIndex <= this._pageIndex;
+                    this._pageIndex = currentPageIndex;
+                    return needRepaint
+                },
                 _updatePopupHeight: function() {
-                    this._popup.repaint();
+                    if (this._needPopupRepaint())
+                        this._popup.repaint();
                     this._list && this._list.updateDimensions()
                 },
                 _getMaxHeight: function() {
@@ -8409,6 +8420,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     this.callBase(e, value);
                     if (this._isValueIncomplete(inputValue))
                         return;
+                    if (commonUtils.isString(inputValue))
+                        inputValue = inputValue.replace(",", ".");
                     if (Number(inputValue) !== value)
                         $input.val(valueFormat(value))
                 },
@@ -8434,7 +8447,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     var inputValue = this._normalizeText(),
                         isValueValid = this._isValueValid(),
                         isValid = true,
-                        isNumber = /^[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?$/.test(inputValue);
+                        isNumber = /^([-+]?[0-9]*[.,]?[0-9]+([eE][-+]?[0-9]+)?)$/.test(inputValue);
                     if (isNaN(Number(value)))
                         isValid = false;
                     if (!value && isValueValid)
@@ -18442,7 +18455,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
         return DateView
     });
     /*! Module widgets-base, file ui.dateBox.js */
-    DevExpress.define("/ui/widgets/date/ui.dateBox", ["jquery", "/utils/utils.support", "/devices", "/ui/ui.errors", "/utils/utils.date", "/ui/widgets/date/ui.dateUtils", "/utils/utils.version", "/utils/utils.common", "/componentRegistrator", "/ui/widgets/ui.dropDownEditor", "/ui/uiNamespace"], function($, support, devices, errors, dateUtils, uiDateUtils, version, commonUtils, registerComponent, DropDownEditor, uiNamespace) {
+    DevExpress.define("/ui/widgets/date/ui.dateBox", ["jquery", "/utils/utils.support", "/devices", "/ui/ui.errors", "/utils/utils.date", "/ui/widgets/date/ui.dateUtils", "/utils/utils.version", "/utils/utils.common", "/componentRegistrator", "/ui/widgets/ui.dropDownEditor", "/utils/utils.formatHelper", "/ui/uiNamespace"], function($, support, devices, errors, dateUtils, uiDateUtils, version, commonUtils, registerComponent, DropDownEditor, formatHelper, uiNamespace) {
         var compareVersions = version.compare,
             DATEBOX_CLASS = "dx-datebox",
             DATEBOX_WRAPPER_CLASS = "dx-datebox-wrapper";
@@ -18729,8 +18742,14 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                         pattern = this._getPattern(patternKey);
                     if (mode !== "text")
                         this.option("text", uiDateUtils.toStandardDateFormat(value, mode, pattern));
-                    else
-                        this.option("text", Globalize.format(value, this.option("formatString")));
+                    else {
+                        var format = this.option("formatString");
+                        var text = Globalize.format(value, format);
+                        if (!text || !format || text !== format && text.length !== format.length)
+                            this.option("text", text);
+                        else
+                            this.option("text", formatHelper.format(value, format))
+                    }
                     this._strategy.renderValue();
                     this.callBase()
                 },
@@ -19025,6 +19044,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                                     else
                                         return true
                                 }
+                                else
+                                    this.dateBox._valueChangeEventHandler(e)
                             }, this)
                         }
                 },
@@ -20157,10 +20178,17 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                     this._refreshSelected();
                     this.callBase()
                 },
-                _refreshPopupVisibility: $.noop,
+                _refreshPopupVisibility: function() {
+                    if (this.option("opened"))
+                        this._updatePopupHeight()
+                },
                 _dimensionChanged: function() {
                     if (this.option("usePopover") && !this.option("popupWidth"))
-                        this.option("popupWidth", this.element().width())
+                        this.option("popupWidth", this.element().width());
+                    this.callBase()
+                },
+                _updatePopupDimensions: function() {
+                    this._updatePopupHeight()
                 },
                 _input: function() {
                     return this._$searchBox || this.callBase()
@@ -20717,10 +20745,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_BASE) {
                 },
                 _renderOpenedState: function() {
                     this.callBase();
-                    if (this.option("opened")) {
-                        this._updatePopupHeight();
+                    if (this.option("opened"))
                         this._scrollToSelectedItem()
-                    }
                 },
                 _updatePopupPosition: function() {
                     if (!this.option("_isAdaptablePopupPosition") || this.option("popupPosition") !== this.initialOption("popupPosition"))

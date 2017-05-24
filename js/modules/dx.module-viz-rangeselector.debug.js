@@ -1,9 +1,9 @@
 /*! 
 * DevExtreme (Range Selector)
-* Version: 15.2.13
-* Build date: Oct 7, 2016
+* Version: 15.2.16
+* Build date: May 17, 2017
 *
-* Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
+* Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
 */
 

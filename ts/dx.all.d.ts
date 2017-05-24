@@ -1,9 +1,9 @@
 /*! 
 * DevExtreme
-* Version: 15.2.13
-* Build date: Oct 7, 2016
+* Version: 15.2.16
+* Build date: May 17, 2017
 *
-* Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
+* Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
 */
 
@@ -68,9 +68,9 @@ declare module DevExpress {
     export function hideTopOverlay(): boolean;
     /** Specifies whether or not the entire application/site supports right-to-left representation. */
     export var rtlEnabled: boolean;
-    /** Registers a new component in the DevExpress.ui namespace as a jQuery plugin, Angular directive and Knockout binding. */
+    /** Registers a new component in the DevExpress.ui namespace as a jQuery plugin, AngularJS directive and Knockout binding. */
     export function registerComponent(name: string, componentClass: Object): void;
-    /** Registers a new component in the specified namespace as a jQuery plugin, Angular directive and Knockout binding. */
+    /** Registers a new component in the specified namespace as a jQuery plugin, AngularJS directive and Knockout binding. */
     export function registerComponent(name: string, namespace: Object, componentClass: Object): void;
     export function requestAnimationFrame(callback: Function): number;
     export function cancelAnimationFrame(requestID: number): void;
@@ -99,7 +99,7 @@ declare module DevExpress {
             staggerDelay?: number;
             /** A number specifying the time in milliseconds spent on animation. */
             duration?: number;
-            /** A string specifying the type of an easing function used for animation. */
+            /** A string specifying the easing function for animation. */
             easing?: string;
             /** Specifies the initial animation state. */
             from?: any;
@@ -463,7 +463,7 @@ declare module DevExpress {
             isLoading(): boolean;
             /** Returns the array of items currently operated by the DataSource. */
             items(): Array<any>;
-            /** Returns the key expression. */
+            /** Returns the key expression specified by the key configuration option of the underlying Store. */
             key(): any;
             /** Starts loading data. */
             load(): OperationPromise<Array<any>>;
@@ -867,7 +867,7 @@ declare module DevExpress.ui {
         /** Resets the value and validation result of the editor associated with the current dxValidator object. */
         reset(): void;
     }
-    /** The widget that is used in the Knockout and Angular approaches to combine the editors to be validated. */
+    /** The widget that is used in the Knockout and AngularJS approaches to combine the editors to be validated. */
     export class dxValidationGroup extends DOMComponent {
         constructor(element: JQuery);
         constructor(element: Element);
@@ -903,14 +903,14 @@ declare module DevExpress.ui {
         /** A handler for the resizeEnd event. */
         onResizeEnd?: Function;
     }
-    /** A widget that displays required content in a resizable element. */
+    /** The dxResizable widget enables its content to be resizable in the UI. */
     export class dxResizable extends DOMComponent {
         constructor(element: JQuery, options?: dxResizableOptions);
         constructor(element: Element, options?: dxResizableOptions);
     }
     export interface dxTooltipOptions extends dxPopoverOptions {
     }
-    /** A tooltip widget. */
+    /** The dxTooltip widget displays a tooltip for a specified element on the page. */
     export class dxTooltip extends dxPopover {
         constructor(element: JQuery, options?: dxTooltipOptions);
         constructor(element: Element, options?: dxTooltipOptions);
@@ -958,7 +958,7 @@ declare module DevExpress.ui {
         /** Informs the widget about its location in a view HTML markup. */
         renderAs?: string;
     }
-    /** A toolbar widget. */
+    /** The dxToolbar is a widget containing items that usually manage screen content. Those items can be plain text or widgets. */
     export class dxToolbar extends CollectionWidget {
         constructor(element: JQuery, options?: dxToolbarOptions);
         constructor(element: Element, options?: dxToolbarOptions);
@@ -986,7 +986,7 @@ declare module DevExpress.ui {
         /** A Boolean value specifying whether or not the toast is closed if a user clicks it. */
         closeOnClick?: boolean;
     }
-    /** The toast message widget. */
+    /** The dxToast is a widget that provides pop-up notifications. */
     export class dxToast extends dxOverlay {
         constructor(element: JQuery, options?: dxToastOptions);
         constructor(element: Element, options?: dxToastOptions);
@@ -1038,7 +1038,7 @@ declare module DevExpress.ui {
         maskRules?: Object;
         /** A message displayed when the entered text does not match the specified pattern. */
         maskInvalidMessage?: string;
-        /** Specifies whether the value option holds only characters entered by a user or prompt characters as well. */
+        /** Specifies whether the value should contain mask characters or not. */
         useMaskedValue?: boolean;
     }
     /** A base class for text editing widgets. */
@@ -1056,7 +1056,7 @@ declare module DevExpress.ui {
         /** The "mode" attribute value of the actual HTML input element representing the text box. */
         mode?: string;
     }
-    /** A single-line text box widget. */
+    /** The dxTextBox is a widget that enables a user to enter and edit a single line of text. */
     export class dxTextBox extends dxTextEditor {
         constructor(element: JQuery, options?: dxTextBoxOptions);
         constructor(element: Element, options?: dxTextBoxOptions);
@@ -1065,7 +1065,7 @@ declare module DevExpress.ui {
         /** Specifies whether or not the widget checks the inner text for spelling mistakes. */
         spellcheck?: boolean;
     }
-    /** A widget used to display and edit multi-line text. */
+    /** The dxTextArea is a widget that enables a user to enter and edit a multi-line text. */
     export class dxTextArea extends dxTextBox {
         constructor(element: JQuery, options?: dxTextAreaOptions);
         constructor(element: Element, options?: dxTextAreaOptions);
@@ -1080,7 +1080,7 @@ declare module DevExpress.ui {
         /** A Boolean value that specifies the availability of navigation buttons. */
         showNavButtons?: boolean;
     }
-    /** A tab strip used to switch between pages. */
+    /** The dxTabs is a tab strip used to switch between pages or views. This widget is included in the dxTabPanel widget, but you can use the dxTabs separately as well. */
     export class dxTabs extends CollectionWidget {
         constructor(element: JQuery, options?: dxTabsOptions);
         constructor(element: Element, options?: dxTabsOptions);
@@ -1101,7 +1101,7 @@ declare module DevExpress.ui {
         /** A Boolean value that specifies the availability of navigation buttons. */
         showNavButtons?: boolean;
     }
-    /** A widget used to display a view and to switch between several views by clicking the appropriate tabs. */
+    /** The dxTabPanel is a widget consisting of the dxTabs and dxMultiView widgets. It automatically synchronizes the selected tab with the currently displayed view and vice versa. */
     export class dxTabPanel extends dxMultiView {
         constructor(element: JQuery, options?: dxTabPanelOptions);
         constructor(element: Element, options?: dxTabPanelOptions);
@@ -1116,7 +1116,7 @@ declare module DevExpress.ui {
         /** Specifies whether or not the widget allows an end-user to enter a custom value. */
         fieldEditEnabled?: boolean;
     }
-    /** A widget that allows you to select an item in a dropdown list. */
+    /** The dxSelectBox widget is an editor that allows an end user to select an item from a drop-down list. */
     export class dxSelectBox extends dxDropDownList {
         constructor(element: JQuery, options?: dxSelectBoxOptions);
         constructor(element: Element, options?: dxSelectBoxOptions);
@@ -1127,7 +1127,7 @@ declare module DevExpress.ui {
         /** A read-only option that holds the last selected value. */
         value?: Object;
     }
-    /** A widget that allows you to select multiple items from a dropdown list. */
+    /** The dxTagBox widget is an editor that allows an end user to select multiple items from a drop-down list. */
     export class dxTagBox extends dxSelectBox {
         constructor(element: JQuery, options?: dxTagBoxOptions);
         constructor(element: Element, options?: dxTagBoxOptions);
@@ -1146,7 +1146,7 @@ declare module DevExpress.ui {
         /** Specifies the text shown in the pullDown panel displayed when the content is being refreshed. */
         refreshingText?: string;
     }
-    /** A widget used to display scrollable content. */
+    /** The dxScrollView is a widget that enables a user to scroll its content. */
     export class dxScrollView extends dxScrollable {
         constructor(element: JQuery, options?: dxScrollViewOptions);
         constructor(element: Element, options?: dxScrollViewOptions);
@@ -1221,7 +1221,7 @@ declare module DevExpress.ui {
         /** Specifies the radio group layout. */
         layout?: string;
     }
-    /** A widget that enables a user to select one item within a list of items represented by radio buttons. */
+    /** The dxRadioGroup is a widget that contains a set of radio buttons and allows an end user to make a single selection from the set. */
     export class dxRadioGroup extends CollectionWidget {
         constructor(element: JQuery, options?: dxRadioGroupOptions);
         constructor(element: Element, options?: dxRadioGroupOptions);
@@ -1266,7 +1266,7 @@ declare module DevExpress.ui {
         /** A handler for the titleRendered event. */
         onTitleRendered?: Function;
     }
-    /** A widget that displays required content in a popup window. */
+    /** The dxPopup widget is a pop-up window overlaying the current view. */
     export class dxPopup extends dxOverlay {
         constructor(element: JQuery, options?: dxPopupOptions);
         constructor(element: Element, options?: dxPopupOptions);
@@ -1291,7 +1291,7 @@ declare module DevExpress.ui {
         /** Specifies the width of the widget. */
         width?: any;
     }
-    /** A widget that displays the required content in a popup window. */
+    /** The dxPopover is a widget that shows notifications within a box with an arrow pointing to a specified UI element. */
     export class dxPopover extends dxPopup {
         constructor(element: JQuery, options?: dxPopoverOptions);
         constructor(element: Element, options?: dxPopoverOptions);
@@ -1386,7 +1386,7 @@ declare module DevExpress.ui {
         /** The "mode" attribute value of the actual HTML input element representing the widget. */
         mode?: string;
     }
-    /** A textbox widget that enables a user to enter numeric values. */
+    /** The dxNumberBox is a widget that displays a numeric value and allows a user to modify it by typing in a value, and incrementing or decrementing it using the keyboard or mouse. */
     export class dxNumberBox extends dxTextEditor {
         constructor(element: JQuery, options?: dxNumberBoxOptions);
         constructor(element: Element, options?: dxNumberBoxOptions);
@@ -1394,7 +1394,7 @@ declare module DevExpress.ui {
     export interface dxNavBarOptions extends dxTabsOptions {
         scrollingEnabled?: boolean;
     }
-    /** A widget that contains items used to navigate through application views. */
+    /** The dxNavBar is a widget that navigates the application views. */
     export class dxNavBar extends dxTabs {
         constructor(element: JQuery, options?: dxNavBarOptions);
         constructor(element: Element, options?: dxNavBarOptions);
@@ -1411,7 +1411,7 @@ declare module DevExpress.ui {
         /** Specifies whether widget content is rendered when the widget is shown or when rendering the widget. */
         deferRendering?: boolean;
     }
-    /** A widget used to display a view and to switch between several views. */
+    /** The dxMultiView is a widget that contains several views. An end user navigates through the views by swiping them in the horizontal direction. */
     export class dxMultiView extends CollectionWidget {
         constructor(element: JQuery, options?: dxMultiViewOptions);
         constructor(element: Element, options?: dxMultiViewOptions);
@@ -1465,7 +1465,7 @@ declare module DevExpress.ui {
         /** The zoom level of the map. */
         zoom?: number;
     }
-    /** An interactive map widget. */
+    /** The dxMap is an interactive widget that displays a geographic map with markers and routes. */
     export class dxMap extends Widget {
         constructor(element: JQuery, options?: dxMapOptions);
         constructor(element: Element, options?: dxMapOptions);
@@ -1562,7 +1562,7 @@ declare module DevExpress.ui {
         /** The template to be used for rendering the widget text field. */
         fieldTemplate?: any;
     }
-    /** A widget that allows a user to select predefined values from a lookup window. */
+    /** The dxLookup is a widget that allows an end user to search for an item in a collection shown in a drop-down menu. */
     export class dxLookup extends dxDropDownList {
         constructor(element: JQuery, options?: dxLookupOptions);
         constructor(element: Element, options?: dxLookupOptions);
@@ -1585,7 +1585,7 @@ declare module DevExpress.ui {
         /** The width of the widget. */
         width?: number;
     }
-    /** A widget used to indicate whether or not an element is loading. */
+    /** The dxLoadPanel is an overlay widget notifying the viewer that loading is in progress. */
     export class dxLoadPanel extends dxOverlay {
         constructor(element: JQuery, options?: dxLoadPanelOptions);
         constructor(element: Element, options?: dxLoadPanelOptions);
@@ -1594,7 +1594,7 @@ declare module DevExpress.ui {
         /** Specifies the path to an image used as the indicator. */
         indicatorSrc?: string;
     }
-    /** The widget used to indicate the loading process. */
+    /** The dxLoadIndicator is a UI element notifying the viewer that a process is in progress. */
     export class dxLoadIndicator extends Widget {
         constructor(element: JQuery, options?: dxLoadIndicatorOptions);
         constructor(element: Element, options?: dxLoadIndicatorOptions);
@@ -1678,7 +1678,7 @@ declare module DevExpress.ui {
         indicateLoading?: boolean;
         activeStateEnabled?: boolean;
     }
-    /** A list widget. */
+    /** The dxList is a widget that represents a collection of items in a scrollable list. */
     export class dxList extends CollectionWidget {
         constructor(element: JQuery, options?: dxListOptions);
         constructor(element: Element, options?: dxListOptions);
@@ -1714,7 +1714,7 @@ declare module DevExpress.ui {
         selectItem(itemElement: Element): void;
         /** Selects the specified item from the list. */
         selectItem(itemIndex: any): void;
-        /** Deselects the specified item from the list. */
+        /** Cancels the selection of the specified item. */
         unselectItem(itemElement: Element): void;
         /** Unselects the specified item from the list. */
         unselectItem(itemIndex: any): void;
@@ -1751,7 +1751,7 @@ declare module DevExpress.ui {
         /** Specifies the width of an area used to display a single image. */
         initialItemWidth?: number;
     }
-    /** An image gallery widget. */
+    /** The dxGallery is a widget that displays a collection of images in a carousel. The widget is supplied with various navigation controls that allow a user to switch between images. */
     export class dxGallery extends CollectionWidget {
         constructor(element: JQuery, options?: dxGalleryOptions);
         constructor(element: Element, options?: dxGalleryOptions);
@@ -1823,7 +1823,7 @@ declare module DevExpress.ui {
         maxZoomLevel?: string;
         /** Specifies the minimal zoom level of a calendar, which is used to pick the date. */
         minZoomLevel?: string;
-        /** Specifies the type of date/time picker. */
+        /** Specifies the type of the date/time picker. */
         pickerType?: string;
         /** Specifies the message displayed if the typed value is not a valid date or time. */
         invalidDateMessage?: string;
@@ -1834,7 +1834,7 @@ declare module DevExpress.ui {
         /** The text displayed on the Cancel button. */
         cancelButtonText?: string;
     }
-    /** A date box widget. */
+    /** The dxDateBox is a widget that displays date and time in a specified format, and enables a user to pick or type in the required date/time value. */
     export class dxDateBox extends dxDropDownEditor {
         constructor(element: JQuery, options?: dxDateBoxOptions);
         constructor(element: Element, options?: dxDateBoxOptions);
@@ -1846,7 +1846,7 @@ declare module DevExpress.ui {
         /** Specifies the text displayed by the check box. */
         text?: string;
     }
-    /** A check box widget. */
+    /** The dxCheckBox is a small box, which when selected by the end user, shows that a particular feature has been enabled or a specific option has been chosen. */
     export class dxCheckBox extends Editor {
         constructor(element: JQuery, options?: dxCheckBoxOptions);
         constructor(element: Element, options?: dxCheckBoxOptions);
@@ -1874,7 +1874,7 @@ declare module DevExpress.ui {
         /** The template to be used for rendering calendar cells. */
         cellTemplate?: any;
     }
-    /** A calendar widget. */
+    /** The dxCalendar is a widget that displays a calendar and allows an end user to select the required date within a specified date range. */
     export class dxCalendar extends Editor {
         constructor(element: JQuery, options?: dxCalendarOptions);
         constructor(element: Element, options?: dxCalendarOptions);
@@ -1896,7 +1896,7 @@ declare module DevExpress.ui {
         /** Specifies the name of the validation group to be accessed in the click event handler. */
         validationGroup?: string;
     }
-    /** A button widget. */
+    /** The dxButton widget is a simple button that performs specified commands when a user clicks it. */
     export class dxButton extends Widget {
         constructor(element: JQuery, options?: dxButtonOptions);
         constructor(element: Element, options?: dxButtonOptions);
@@ -1909,7 +1909,7 @@ declare module DevExpress.ui {
         /** Specifies how widget items are aligned cross-wise. */
         crossAlign?: string;
     }
-    /** A container widget used to arrange inner elements. */
+    /** The dxBox widget allows you to arrange various elements within it. Separate and adaptive, the dxBox widget acts as a building block for the layout. */
     export class dxBox extends CollectionWidget {
         constructor(element: JQuery, options?: dxBoxOptions);
         constructor(element: Element, options?: dxBoxOptions);
@@ -1924,7 +1924,7 @@ declare module DevExpress.ui {
         /** Specifies the screen factor with which all elements are located in a single column. */
         singleColumnScreen?: string;
     }
-    /** A widget used to build an adaptive markup that is dependent on screen resolution. */
+    /** The dxResponsiveBox widget allows you to create an application or a website with a layout adapted to different screen sizes. */
     export class dxResponsiveBox extends CollectionWidget {
         constructor(element: JQuery, options?: dxBoxOptions);
         constructor(element: Element, options?: dxBoxOptions);
@@ -1939,7 +1939,7 @@ declare module DevExpress.ui {
         /** Gets the currently selected item. */
         selectedItem?: Object;
     }
-    /** A textbox widget that supports autocompletion. */
+    /** The dxAutocomplete widget is a textbox that provides suggestions while a user types into it. */
     export class dxAutocomplete extends dxDropDownList {
         constructor(element: JQuery, options?: dxAutocompleteOptions);
         constructor(element: Element, options?: dxAutocompleteOptions);
@@ -1968,7 +1968,7 @@ declare module DevExpress.ui {
         /** Specifies whether widget content is rendered when the widget is shown or when rendering the widget. */
         deferRendering?: boolean;
     }
-    /** A widget that displays data source items on collapsible panels. */
+    /** The dxAccordion widget contains several panels displayed one under another. These panels can be collapsed or expanded by an end user, which makes this widget very useful for presenting information in a limited amount of space. */
     export class dxAccordion extends CollectionWidget {
         constructor(element: JQuery, options?: dxAccordionOptions);
         constructor(element: Element, options?: dxAccordionOptions);
@@ -2022,7 +2022,7 @@ declare module DevExpress.ui {
         /** A handler for the valueChanged event. */
         onValueChanged?: Function;
     }
-    /** A widget used to select and upload a file or multiple files. */
+    /** The dxFileUploader widget enables an end user to upload files to the server. An end user can select files in the file explorer or drag and drop files to the dxFileUploader area on the page. */
     export class dxFileUploader extends Editor {
         constructor(element: JQuery, options?: dxFileUploaderOptions);
         constructor(element: Element, options?: dxFileUploaderOptions);
@@ -2048,7 +2048,7 @@ declare module DevExpress.ui {
         /** A handler for the complete event. */
         onComplete?: Function;
     }
-    /** A widget used to indicate progress. */
+    /** The dxProgressBar is a widget that shows current progress. */
     export class dxProgressBar extends dxTrackBar {
         constructor(element: JQuery, options?: dxProgressBarOptions);
         constructor(element: Element, options?: dxProgressBarOptions);
@@ -2084,7 +2084,7 @@ declare module DevExpress.ui {
             format?: any;
         };
     }
-    /** A widget that allows a user to select a numeric value within a given range. */
+    /** The dxSlider is a widget that allows an end user to set a numeric value on a continuous range of possible values. */
     export class dxSlider extends dxTrackBar {
         constructor(element: JQuery, options?: dxSliderOptions);
         constructor(element: Element, options?: dxSliderOptions);
@@ -2095,7 +2095,7 @@ declare module DevExpress.ui {
         /** The right edge of the interval currently selected using the range slider. */
         end?: number;
     }
-    /** A widget that enables a user to select a range of numeric values. */
+    /** The dxRangeSlider is a widget that allows an end user to choose a range of numeric values. */
     export class dxRangeSlider extends dxSlider {
         constructor(element: JQuery, options?: dxRangeSliderOptions);
         constructor(element: Element, options?: dxRangeSliderOptions);
@@ -2227,7 +2227,7 @@ declare module DevExpress.ui {
         scrollingEnabled?: boolean;
         onContentReady?: Function;
     }
-    /** A form widget used to display and edit values of object fields. */
+    /** The dxForm widget represents fields of a data object as a collection of label-editor pairs. These pairs can be arranged in several groups, tabs and columns. */
     export class dxForm extends Widget {
         constructor(element: JQuery, options?: dxFormOptions);
         constructor(element: Element, options?: dxFormOptions);
@@ -2239,7 +2239,7 @@ declare module DevExpress.ui {
         itemOption(field: string, option: string, value: any): void;
         /** Updates the values of form item options. */
         itemOption(field: string, options: Object): void;
-        /** Returns an editor instance associated with the specified formData field or name of the form item. */
+        /** Returns an editor instance associated with the specified formData field or name of a form item. */
         getEditor(field: string): Object;
         /** Updates the dimensions of the widget contents. */
         updateDimensions(): JQueryPromise<void>;
@@ -2262,7 +2262,7 @@ declare module DevExpress.ui {
         /** Specifies a callback function that is called when widget content is shown and animation has completed. */
         onShown?: Function;
     }
-    /** A container for elements that must be rendered at a specified moment. */
+    /** The dxDeferRendering is a widget that waits for its content to be ready before rendering it. While the content is getting ready, the dxDeferRendering displays a loading indicator. */
     export class dxDeferRendering extends Widget {
         constructor(element: JQuery, options?: dxDeferRenderingOptions);
         constructor(element: Element, options?: dxDeferRenderingOptions);
@@ -2507,7 +2507,7 @@ declare module DevExpress.ui {
         /** A Boolean value specifying whether or not to display a scrollbar. */
         showScrollbar?: boolean;
     }
-    /** A widget displaying several blocks of data as tiles. */
+    /** The dxTileView widget contains a collection of tiles. Tiles can store much more information than ordinary buttons, that is why they are very popular in apps designed for touch devices. */
     export class dxTileView extends CollectionWidget {
         constructor(element: JQuery, options?: dxTileViewOptions);
         constructor(element: Element, options?: dxTileViewOptions);
@@ -2523,7 +2523,7 @@ declare module DevExpress.ui {
         /** A Boolean value specifying whether the current switch state is "On" or "Off". */
         value?: boolean;
     }
-    /** A switch widget. */
+    /** The dxSwitch is a widget that can be in two states: "On" and "Off". */
     export class dxSwitch extends Editor {
         constructor(element: JQuery, options?: dxSwitchOptions);
         constructor(element: Element, options?: dxSwitchOptions);
@@ -2540,7 +2540,7 @@ declare module DevExpress.ui {
         /** A template to be used for rendering widget content. */
         contentTemplate?: any;
     }
-    /** The widget that allows you to slide-out the current view to reveal a custom menu. */
+    /** The dxSlideOutView widget is a classic slide-out menu paired with a view. */
     export class dxSlideOutView extends Widget {
         constructor(element: JQuery, options?: dxSlideOutViewOptions);
         constructor(element: Element, options?: dxSlideOutViewOptions);
@@ -2577,7 +2577,7 @@ declare module DevExpress.ui {
         /** A template to be used for rendering widget content. */
         contentTemplate?: any;
     }
-    /** The widget that allows you to slide-out the current view to reveal an item list. */
+    /** The dxSlideOut widget is a classic slide-out menu paired with a view. An end user opens the menu by swiping away the view. */
     export class dxSlideOut extends CollectionWidget {
         constructor(element: JQuery, options?: dxSlideOutOptions);
         constructor(element: Element, options?: dxSlideOutOptions);
@@ -2598,7 +2598,7 @@ declare module DevExpress.ui {
         /** The template to be used for rendering an item title. */
         itemTitleTemplate?: any;
     }
-    /** A widget that is similar to a traditional tab control, but optimized for the phone with simplified end-user interaction. */
+    /** The dxPivot provides a quick way to manage multiple views. It includes a collection of views and a navigation header. An end user switches the views by swiping them or by clicking their titles on the navigation header. */
     export class dxPivot extends CollectionWidget {
         constructor(element: JQuery, options?: dxPivotOptions);
         constructor(element: Element, options?: dxPivotOptions);
@@ -2618,7 +2618,7 @@ declare module DevExpress.ui {
         /** Specifies the widget content title. */
         title?: string;
     }
-    /** A widget displaying the required content in a long horizontal canvas that extends beyond the frames of the screen. */
+    /** The dxPanorama widget is a full-screen widget that allows you to arrange items on a long horizontal canvas split into several views. Each view contains several items, and an end user navigates the views with the swipe gesture. The dxPanorama is often used as a navigation map on the first page of an application. */
     export class dxPanorama extends CollectionWidget {
         constructor(element: JQuery, options?: dxDropDownEditorOptions);
         constructor(element: Element, options?: dxDropDownEditorOptions);
@@ -2677,7 +2677,7 @@ declare module DevExpress.ui {
         /** A Boolean value specifying whether or not the dxActionSheet widget is visible. */
         visible?: boolean;
     }
-    /** A widget consisting of a set of choices related to a certain task. */
+    /** The dxActionSheet widget is a sheet containing a set of buttons located one under the other. These buttons usually represent several choices relating to a single task. */
     export class dxActionSheet extends CollectionWidget {
         constructor(element: JQuery, options?: dxActionSheetOptions);
         constructor(element: Element, options?: dxActionSheetOptions);
@@ -2823,7 +2823,7 @@ declare module DevExpress.data {
     export class SummaryCell {
         /** Gets the parent cell in a specified direction. */
         parent(direction: string): SummaryCell;
-        /** Gets all children cells in a specified direction. */
+        /** Gets all child cells in a specified direction. */
         children(direction: string): Array<SummaryCell>;
         /** Gets a partial Grand Total cell of a row or column. */
         grandTotal(direction: string): SummaryCell;
@@ -3033,7 +3033,7 @@ declare module DevExpress.ui {
         /** Specifies whether filtering is performed on the server or client side. */
         remoteFiltering?: boolean;
     }
-    /** A widget that displays scheduled data using different views and provides the capability to load, add and edit appointments. */
+    /** The dxScheduler is a widget that represents scheduled data and allows a user to manage and edit it. */
     export class dxScheduler extends Widget {
         constructor(element: JQuery, options?: dxSchedulerOptions);
         constructor(element: Element, options?: dxSchedulerOptions);
@@ -3059,7 +3059,7 @@ declare module DevExpress.ui {
         /** Specifies the size of a step by which a handle is moved using a keyboard shortcut. */
         keyStep?: number;
     }
-    /** A widget used to specify a color value. */
+    /** The dxColorBox is a widget that allows an end user to enter a color or pick it out from the drop-down editor. */
     export class dxColorBox extends dxDropDownEditor {
         constructor(element: JQuery, options?: dxColorBoxOptions);
         constructor(element: Element, options?: dxColorBoxOptions);
@@ -3130,7 +3130,7 @@ declare module DevExpress.ui {
         onItemRendered?: Function;
         onItemHold?: Function;
     }
-    /** A widget displaying specified data items as a tree. */
+    /** The dxTreeView widget is a tree-like representation of textual data. */
     export class dxTreeView extends HierarchicalCollectionWidget {
         constructor(element: JQuery, options?: dxTreeViewOptions);
         constructor(element: Element, options?: dxTreeViewOptions);
@@ -3138,7 +3138,7 @@ declare module DevExpress.ui {
         updateDimensions(): JQueryPromise<void>;
         /** Selects the specified item. */
         selectItem(itemElement: any): void;
-        /** Unselects the specified item. */
+        /** Cancels the selection of the specified item. */
         unselectItem(itemElement: any): void;
         /** Expands the specified item. */
         expandItem(itemElement: any): void;
@@ -3161,7 +3161,7 @@ declare module DevExpress.ui {
         };
         /** A Boolean value specifying whether or not the widget changes its state when interacting with a user. */
         activeStateEnabled?: boolean;
-        /** Specifies the name of the CSS class associated with the menu. */
+        /** Specifies the name of the CSS class to be applied to the root menu level and all submenus. */
         cssClass?: string;
         /** Holds an array of menu items. */
         items?: Array<any>;
@@ -3187,7 +3187,7 @@ declare module DevExpress.ui {
         constructor(element: Element, options?: dxMenuBaseOptions);
         /** Selects the specified item. */
         selectItem(itemElement: any): void;
-        /** Unselects the specified item. */
+        /** Cancels the selection of a specific item. */
         unselectItem(itemElement: any): void;
     }
     export interface dxMenuOptions extends dxMenuBaseOptions {
@@ -3218,7 +3218,7 @@ declare module DevExpress.ui {
         /** A handler for the submenuShown event. */
         onSubmenuShown?: Function;
     }
-    /** A menu widget. */
+    /** The dxMenu widget is a panel with clickable items. A click on an item opens a drop-down menu, which can contain several submenus. */
     export class dxMenu extends dxMenuBase {
         constructor(element: JQuery, options?: dxMenuOptions);
         constructor(element: Element, options?: dxMenuOptions);
@@ -3250,7 +3250,7 @@ declare module DevExpress.ui {
         /** A Boolean value specifying whether or not the widget is visible. */
         visible?: boolean;
     }
-    /** A context menu widget. */
+    /** The dxContextMenu widget displays a single- or multi-level context menu. An end user invokes this menu by a right click or a long press. */
     export class dxContextMenu extends dxMenuBase {
         constructor(element: JQuery, options?: dxContextMenuOptions);
         constructor(element: Element, options?: dxContextMenuOptions);
@@ -3911,7 +3911,7 @@ declare module DevExpress.ui {
         /** Specifies whether text that does not fit into a column should be wrapped. */
         wordWrapEnabled?: boolean;
     }
-    /** A data grid widget. */
+    /** The dxDataGrid is a widget that represents data from a local or remote source in the form of a grid. This widget offers such basic features as sorting, grouping, filtering, as well as more advanced capabilities, like state storing, export to Excel, master-detail interface, and many others. */
     export class dxDataGrid extends Widget {
         constructor(element: JQuery, options?: dxDataGridOptions);
         constructor(element: Element, options?: dxDataGridOptions);
@@ -4200,7 +4200,7 @@ declare module DevExpress.ui {
             type?: string;
         };
     }
-    /** A data summarization widget for multi-dimensional data analysis and data mining. */
+    /** The dxPivotGrid is a widget that allows you to display and analyze multi-dimensional data from a local storage or an OLAP cube. */
     export class dxPivotGrid extends Widget {
         constructor(element: JQuery, options?: dxPivotGridOptions);
         constructor(element: Element, options?: dxPivotGridOptions);
@@ -4291,7 +4291,7 @@ interface JQuery {
     dxScheduler(options: DevExpress.ui.dxSchedulerOptions): JQuery;
 }
 declare module DevExpress.framework {
-    /** An object used to store information on the views displayed in an application. */
+    /** An object that stores information about views displayed in the application. */
     export class ViewCache {
         viewRemoved: JQueryCallback;
         /** Removes all the viewInfo objects from the cache. */
@@ -4344,7 +4344,7 @@ declare module DevExpress.framework {
         /** A storage to which the state manager saves the application state. */
         storage?: Object;
     }
-    /** An object used to store the current application state. */
+    /** An object that stores the current application state. */
     export class StateManager {
         constructor(options?: StateManagerOptions);
         /** Adds an object that implements an interface of a state source to the state manager's collection of state sources. */
@@ -4398,7 +4398,7 @@ declare module DevExpress.framework {
             /** A custom router to be used in the application. */
             router?: Router;
         }
-        /** An object used to manage views, as well as control the application life cycle. */
+        /** An object that manages views and controls the application life cycle. */
         export class HtmlApplication implements EventsMixin<HtmlApplication> {
             constructor(options: HtmlApplicationOptions);
             afterViewSetup: JQueryCallback;
@@ -5908,7 +5908,7 @@ declare module DevExpress.viz.charts {
         maxBubbleSize?: number;
         /** Specifies the diameter of the smallest bubble measured in pixels. */
         minBubbleSize?: number;
-        /** Defines the dxChart widget's <a href="/Documentation/Guide/Data_Visualization/Charts/Chart_Elements?version=15_2#Panes">pane(s)</a>. */
+        /** Defines the dxChart widget's <a href="/Documentation/Guide/Data_Visualization/Charts/Chart_Elements#Panes">pane(s)</a>. */
         panes?: Array<Pane>;
         /** Swaps the axes round so that the value axis becomes horizontal and the argument axes becomes vertical. */
         rotated?: boolean;
@@ -5942,7 +5942,7 @@ declare module DevExpress.viz.charts {
             position?: string;
         };
     }
-    /** A widget used to embed charts into web applications. */
+    /** The dxChart is a widget that visualizes data from a local or remote storage using a great variety of series types along with different interactive elements, such as tooltips, crosshair pointer, legend, etc. */
     export class dxChart extends BaseChart {
         constructor(element: JQuery, options?: dxChartOptions);
         constructor(element: Element, options?: dxChartOptions);
@@ -5997,7 +5997,7 @@ declare module DevExpress.viz.charts {
         /** Specifies value axis options for the dxPolarChart widget. */
         valueAxis?: PolarValueAxis;
     }
-    /** A chart widget displaying data in a polar coordinate system. */
+    /** The dxPolarChart is a widget that visualizes data in a polar coordinate system. */
     export class dxPolarChart extends BaseChart {
         constructor(element: JQuery, options?: dxPolarChartOptions);
         constructor(element: Element, options?: dxPolarChartOptions);
@@ -6037,7 +6037,7 @@ declare module DevExpress.viz.charts {
         /** Specifies the type of the pie chart series. */
         type?: string;
     }
-    /** A circular chart widget for web applications. */
+    /** The dxPieChart is a widget that visualizes data as a circle divided into sectors that each represents a portion of the whole. */
     export class dxPieChart extends BaseChart {
         constructor(element: JQuery, options?: dxPieChartOptions);
         constructor(element: Element, options?: dxPieChartOptions);
@@ -6368,7 +6368,7 @@ declare module DevExpress.viz.gauges {
         rangeContainer?: LinearRangeContainer;
         scale?: LinearScale;
     }
-    /** A widget that represents a gauge with a linear scale. */
+    /** The dxLinearGauge is a widget that indicates values on a linear numeric scale. */
     export class dxLinearGauge extends dxBaseGauge {
         constructor(element: JQuery, options?: dxLinearGaugeOptions);
         constructor(element: Element, options?: dxLinearGaugeOptions);
@@ -6400,7 +6400,7 @@ declare module DevExpress.viz.gauges {
         rangeContainer?: CircularRangeContainer;
         scale?: CircularScale;
     }
-    /** A widget that represents a gauge with a circular scale. */
+    /** The dxCircularGauge is a widget that indicates values on a circular numeric scale. */
     export class dxCircularGauge extends dxBaseGauge {
         constructor(element: JQuery, options?: dxCircularGaugeOptions);
         constructor(element: Element, options?: dxCircularGaugeOptions);
@@ -6449,7 +6449,7 @@ declare module DevExpress.viz.gauges {
         /** Specifies the array of values to be indicated on a bar gauge. */
         values?: Array<number>;
     }
-    /** A circular bar widget. */
+    /** The dxBarGauge widget contains several circular bars that each indicates a single value. */
     export class dxBarGauge extends viz.core.BaseWidget {
         constructor(element: JQuery, options?: dxBarGaugeOptions);
         constructor(element: Element, options?: dxBarGaugeOptions);
@@ -6540,7 +6540,7 @@ declare module DevExpress.viz.rangeSelector {
             topIndent?: number;
             /** Specifies whether or not to filter the series points depending on their quantity. */
             useAggregation?: boolean;
-            /** Specifies options for the chart's value axis. */
+            /** Configures the chart value axis. */
             valueAxis?: {
                 /** Indicates whether or not the chart's value axis must be inverted. */
                 inverted?: boolean;
@@ -6751,7 +6751,7 @@ declare module DevExpress.viz.rangeSelector {
             visible?: boolean;
         };
     }
-    /** A widget that allows end users to select a range of values on a scale. */
+    /** The dxRangeSelector is a widget that allows a user to select a range of values on a scale. */
     export class dxRangeSelector extends viz.core.BaseWidget {
         constructor(element: JQuery, options?: dxRangeSelectorOptions);
         constructor(element: Element, options?: dxRangeSelectorOptions);
@@ -7339,7 +7339,7 @@ declare module DevExpress.viz.map {
             grouping?: string;
         }
     }
-    /** A vector map widget. */
+    /** The dxVectorMap is a widget that visualize geographical locations. This widget represents a geographical map that contains areas and markers. Areas embody continents and countries. Markers flag specific points on the map, for example, towns, cities or capitals. */
     export class dxVectorMap extends viz.core.BaseWidget {
         constructor(element: JQuery, options?: dxVectorMapOptions);
         constructor(element: Element, options?: dxVectorMapOptions);
@@ -7467,7 +7467,7 @@ declare module DevExpress.viz.sparklines {
         /** Specifies the primary value indicated by the bullet bar. */
         value?: number;
     }
-    /** A bullet graph widget. */
+    /** The dxBullet widget is useful when you need to compare a single measure to a target value. The widget comprises a horizontal bar indicating the measure and a vertical line indicating the target value. */
     export class dxBullet extends BaseSparkline {
         constructor(element: JQuery, options?: dxBulletOptions);
         constructor(element: Element, options?: dxBulletOptions);
@@ -7518,7 +7518,7 @@ declare module DevExpress.viz.sparklines {
         /** Specifies the maximum value of the sparkline's value axis. */
         maxValue?: number;
     }
-    /** A sparkline widget. */
+    /** The dxSparkline widget is a compact chart that contains only one series. Owing to their size, sparklines occupy very little space and can be easily collected in a table or embedded straight in text. */
     export class dxSparkline extends BaseSparkline {
         constructor(element: JQuery, options?: dxSparklineOptions);
         constructor(element: Element, options?: dxSparklineOptions);

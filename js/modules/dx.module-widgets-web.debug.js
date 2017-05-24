@@ -1,9 +1,9 @@
 /*! 
 * DevExtreme (Web Widgets)
-* Version: 15.2.13
-* Build date: Oct 7, 2016
+* Version: 15.2.16
+* Build date: May 17, 2017
 *
-* Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
+* Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
 */
 
@@ -4762,6 +4762,12 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                             }
                         return result
                     };
+                var equalSelectors = function(selector1, selector2) {
+                        if (commonUtils.isFunction(selector1) && commonUtils.isFunction(selector2))
+                            if (selector1.originalCallback && selector2.originalCallback)
+                                return selector1.originalCallback === selector2.originalCallback;
+                        return selector1 === selector2
+                    };
                 var equalSortParameters = dataGrid.equalSortParameters = function(sortParameters1, sortParameters2, ignoreIsExpanded) {
                         var i;
                         sortParameters1 = normalizeSortingInfo(sortParameters1);
@@ -4771,7 +4777,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                                 return false;
                             else
                                 for (i = 0; i < sortParameters1.length; i++)
-                                    if (sortParameters1[i].selector !== sortParameters2[i].selector || sortParameters1[i].desc !== sortParameters2[i].desc || sortParameters1[i].groupInterval !== sortParameters2[i].groupInterval || !ignoreIsExpanded && Boolean(sortParameters1[i].isExpanded) !== Boolean(sortParameters2[i].isExpanded))
+                                    if (!equalSelectors(sortParameters1[i].selector, sortParameters2[i].selector) || sortParameters1[i].desc !== sortParameters2[i].desc || sortParameters1[i].groupInterval !== sortParameters2[i].groupInterval || !ignoreIsExpanded && Boolean(sortParameters1[i].isExpanded) !== Boolean(sortParameters2[i].isExpanded))
                                         return false;
                             return true
                         }
@@ -5479,11 +5485,11 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                                 };
                                 $.each(["calculateSortValue", "calculateGroupValue", "calculateDisplayValue"], function(_, calculateCallbackName) {
                                     var calculateCallback = column[calculateCallbackName];
-                                    if (commonUtils.isFunction(calculateCallback) && !calculateCallback.isProxy) {
+                                    if (commonUtils.isFunction(calculateCallback) && !calculateCallback.originalCallback) {
                                         column[calculateCallbackName] = function(data) {
                                             return calculateCallback.call(column, data)
                                         };
-                                        column[calculateCallbackName].isProxy = true
+                                        column[calculateCallbackName].originalCallback = calculateCallback
                                     }
                                 });
                                 if (commonUtils.isString(column.calculateDisplayValue)) {
@@ -6715,8 +6721,11 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                             attr: {id: options.id}
                         }, options.editorOptions)
                 };
+            var checkEnterBug = function() {
+                    return browser.msie && parseInt(browser.version) <= 11 || devices.real().ios
+                };
             var getTextEditorConfig = function(options) {
-                    var isEnterBug = browser.msie && parseInt(browser.version) <= 11 || devices.real().ios,
+                    var isEnterBug = checkEnterBug(),
                         isValueChanged = false,
                         data = {},
                         sharedData = options.sharedData || data;
@@ -6761,6 +6770,12 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         value: options.value,
                         onValueChanged: function(args) {
                             options.setValue(args.value)
+                        },
+                        onKeyDown: function(e) {
+                            if (checkEnterBug() && e.jQueryEvent.keyCode === 13) {
+                                e.component.blur();
+                                e.component.focus()
+                            }
                         },
                         formatString: commonUtils.isString(options.format) && defaultDateTimeFormat[options.format.toLowerCase()] || options.format,
                         formatWidthCalculator: null,
@@ -12416,7 +12431,6 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         init: function(dataSource) {
                             var that = this;
                             that.callBase.apply(that, arguments);
-                            that._isLoading = true;
                             that._items = [];
                             that._isLoaded = true;
                             that._virtualScrollController = new VirtualScrollController(that.component, {
@@ -12831,6 +12845,15 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 return $("<div />").addClass(DATAGRID_CELL_CONTENT_CLASS).appendTo($cell)
             };
         dataGrid.ColumnHeadersView = dataGrid.ColumnsView.inherit({
+            _createTable: function() {
+                var $table = this.callBase.apply(this, arguments);
+                $table.on("mousedown selectstart", this.createAction(function(e) {
+                    var event = e.jQueryEvent;
+                    if (event.shiftKey)
+                        event.preventDefault()
+                }));
+                return $table
+            },
             _getDefaultTemplate: function(column) {
                 var that = this,
                     template,
@@ -14694,8 +14717,12 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                                     return this.callBase() || searchPanelOptions && searchPanelOptions.visible
                                 },
                                 optionChanged: function(args) {
-                                    if (args.name === "searchPanel") {
+                                    if (args.fullName === "searchPanel.text") {
                                         this._renderSearchPanel();
+                                        args.handled = true
+                                    }
+                                    else if (args.name === "searchPanel") {
+                                        this._invalidate();
                                         args.handled = true
                                     }
                                     else
@@ -14757,7 +14784,8 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         _updateCell: function($cell, parameters) {
                             var that = this,
                                 column = parameters.column,
-                                isEquals = column.dataType !== "string";
+                                dataType = column.lookup && column.lookup.dataType || column.dataType,
+                                isEquals = dataType !== "string";
                             if (allowSearch(column))
                                 that._highlightSearchText($cell, isEquals, column);
                             that.callBase($cell, parameters)
@@ -15180,8 +15208,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                     columnsCountBeforeGroups: columnsCountBeforeGroups
                 }, options));
                 that._renderFreeSpaceRow($table);
-                if (!that._hasHeight)
-                    that.updateFreeSpaceRowHeight($table)
+                that.updateFreeSpaceRowHeight($table)
             },
             _renderRow: function($table, options) {
                 var that = this,
@@ -25326,15 +25353,13 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
             DEFAULT_DISPLAY_EXPR = "text";
         var ResourceManager = Class.inherit({
                 _wrapDataSource: function(dataSource) {
-                    var store;
                     if (dataSource instanceof data.DataSource)
-                        store = dataSource.store();
+                        return dataSource;
                     else
-                        store = dataUtils.normalizeDataSourceOptions(dataSource).store;
-                    return new data.DataSource({
-                            store: store,
-                            pageSize: 0
-                        })
+                        return new data.DataSource({
+                                store: dataUtils.normalizeDataSourceOptions(dataSource).store,
+                                pageSize: 0
+                            })
                 },
                 _mapResourceData: function(resource, data) {
                     var valueGetter = dataUtils.compileGetter(resource.valueExpr || DEFAULT_VALUE_EXPR),
@@ -25392,7 +25417,6 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                         if (resource.field === field) {
                             var dataSource = that._wrapDataSource(resource.dataSource),
                                 valueExpr = resource.valueExpr || DEFAULT_VALUE_EXPR;
-                            dataSource.filter(valueExpr, value);
                             dataSource.load().done(function(data) {
                                 var filteredData = DevExpress.data.query(data).filter(valueExpr, value).toArray();
                                 result.resolve(filteredData[0])
@@ -31040,6 +31064,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
     (function($, DX) {
         var stringUtils = DX.require("/utils/utils.string"),
             commonUtils = DX.require("/utils/utils.common"),
+            errors = DevExpress.require("/ui/ui.errors"),
             defaultDateTimeFormat = DX.require("/utils/utils.formatHelper").defaultDateTimeFormat,
             Class = DX.require("/class"),
             exporter = DX.dxClientExporter,
@@ -31081,6 +31106,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
             MAX_DIGIT_WIDTH_IN_PIXELS = 7,
             CUSTOM_FORMAT_START_INDEX = 165;
         exporter.excelFormatConverter = {
+            _currentCulture: null,
             _applyPrecision: function(format, precision) {
                 var result,
                     i;
@@ -31092,8 +31118,19 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
                 }
                 return ""
             },
+            _getCulture: function() {
+                if (!this._currentCulture) {
+                    var selector = Globalize.cultureSelector;
+                    if (!Globalize.cultures[selector]) {
+                        errors.log("W0007", selector);
+                        selector = 'default'
+                    }
+                    this._currentCulture = Globalize.cultures[selector]
+                }
+                return this._currentCulture
+            },
             _getCurrencyFormat: function() {
-                var currency = Globalize.cultures[Globalize.cultureSelector].numberFormat.currency,
+                var currency = this._getCulture().numberFormat.currency,
                     i,
                     result,
                     symbol,
@@ -31119,7 +31156,7 @@ if (!window.DevExpress || !DevExpress.MOD_WIDGETS_WEB) {
             _convertDateFormat: function(format) {
                 if (!defaultDateTimeFormat[format.toLowerCase()] || $.inArray(format, UNSUPPORTED_DEFINED_DATE_FORMATS) !== -1)
                     format = DEFAULT_DATE_FORMAT;
-                var datePatterns = Globalize.cultures[Globalize.cultureSelector].calendar.patterns,
+                var datePatterns = this._getCulture().calendar.patterns,
                     pattern = defaultDateTimeFormat[format.toLowerCase()];
                 if (commonUtils.isDefined(datePatterns[pattern]))
                     pattern = datePatterns[pattern];

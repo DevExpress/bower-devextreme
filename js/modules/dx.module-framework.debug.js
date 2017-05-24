@@ -1,9 +1,9 @@
 /*! 
 * DevExtreme (Single Page App Framework)
-* Version: 15.2.13
-* Build date: Oct 7, 2016
+* Version: 15.2.16
+* Build date: May 17, 2017
 *
-* Copyright (c) 2012 - 2016 Developer Express Inc. ALL RIGHTS RESERVED
+* Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
 */
 
@@ -112,7 +112,7 @@ if (!window.DevExpress || !DevExpress.MOD_FRAMEWORK) {
                 return str.replace(/^[\/.]+|\/+$/g, "")
             },
             _escapeRe: function(str) {
-                return str.replace(/\W/g, "\\$1")
+                return str.replace(/[^-\w]/g, "\\$1")
             },
             _checkConstraint: function(param, constraint) {
                 param = String(param);
