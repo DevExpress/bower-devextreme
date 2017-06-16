@@ -1,7 +1,7 @@
 /*!
  * DevExtreme (dx.vectormaputils.debug.js)
- * Version: 17.1.3
- * Build date: Wed May 17 2017
+ * Version: 17.1.3 (build 17167)
+ * Build date: Fri Jun 16 2017
  *
  * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
  * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -541,6 +541,9 @@
     var DBF_FIELD_PARSERS = {
         C: function(stream, length) {
             var str = getAsciiString(stream, length);
+            try {
+                str = decodeURIComponent(escape(str))
+            } catch (e) {}
             return str.trim()
         },
         N: function(stream, length) {

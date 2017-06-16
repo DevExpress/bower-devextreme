@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 17.1.3
-* Build date: May 17, 2017
+* Version: 17.1.3 (build 17167)
+* Build date: Jun 16, 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -838,23 +838,23 @@
   flex-direction: column;
   height: auto;
 }
-.dx-box-flex .dx-box-item > .dx-scrollable .dx-scrollable-wrapper,
-.dx-box-flex .dx-box-item-content > .dx-scrollable .dx-scrollable-wrapper,
-.dx-box-flex .dx-box-item > .dx-treeview .dx-scrollable-wrapper,
-.dx-box-flex .dx-box-item-content > .dx-treeview .dx-scrollable-wrapper,
-.dx-box-flex .dx-box-item > .dx-treeview > .dx-scrollable .dx-scrollable-wrapper,
-.dx-box-flex .dx-box-item-content > .dx-treeview > .dx-scrollable .dx-scrollable-wrapper {
+.dx-box-flex .dx-box-item > .dx-scrollable > .dx-scrollable-wrapper,
+.dx-box-flex .dx-box-item-content > .dx-scrollable > .dx-scrollable-wrapper,
+.dx-box-flex .dx-box-item > .dx-treeview > .dx-scrollable-wrapper,
+.dx-box-flex .dx-box-item-content > .dx-treeview > .dx-scrollable-wrapper,
+.dx-box-flex .dx-box-item > .dx-treeview > .dx-scrollable > .dx-scrollable-wrapper,
+.dx-box-flex .dx-box-item-content > .dx-treeview > .dx-scrollable > .dx-scrollable-wrapper {
   display: flex;
   flex-grow: 1;
   flex-direction: column;
   height: auto;
 }
-.dx-box-flex .dx-box-item > .dx-scrollable .dx-scrollable-container,
-.dx-box-flex .dx-box-item-content > .dx-scrollable .dx-scrollable-container,
-.dx-box-flex .dx-box-item > .dx-treeview .dx-scrollable-container,
-.dx-box-flex .dx-box-item-content > .dx-treeview .dx-scrollable-container,
-.dx-box-flex .dx-box-item > .dx-treeview > .dx-scrollable .dx-scrollable-container,
-.dx-box-flex .dx-box-item-content > .dx-treeview > .dx-scrollable .dx-scrollable-container {
+.dx-box-flex .dx-box-item > .dx-scrollable > .dx-scrollable-wrapper > .dx-scrollable-container,
+.dx-box-flex .dx-box-item-content > .dx-scrollable > .dx-scrollable-wrapper > .dx-scrollable-container,
+.dx-box-flex .dx-box-item > .dx-treeview > .dx-scrollable-wrapper > .dx-scrollable-container,
+.dx-box-flex .dx-box-item-content > .dx-treeview > .dx-scrollable-wrapper > .dx-scrollable-container,
+.dx-box-flex .dx-box-item > .dx-treeview > .dx-scrollable > .dx-scrollable-wrapper > .dx-scrollable-container,
+.dx-box-flex .dx-box-item-content > .dx-treeview > .dx-scrollable > .dx-scrollable-wrapper > .dx-scrollable-container {
   height: auto;
 }
 .dx-button-disabled {
@@ -4095,12 +4095,6 @@
 .dx-datagrid-table {
   background-color: transparent;
 }
-.dx-datagrid {
-  position: relative;
-  cursor: default;
-  white-space: normal;
-  line-height: normal;
-}
 .dx-datagrid .dx-datagrid-content-fixed {
   position: absolute;
   top: 0;
@@ -4814,6 +4808,12 @@ input.dx-hidden {
   margin: 0;
   margin-right: 15px;
 }
+.dx-datagrid {
+  position: relative;
+  cursor: default;
+  white-space: normal;
+  line-height: normal;
+}
 .dx-hidden.dx-group-cell {
   display: table-cell !important;
   font-size: 0 !important;
@@ -4821,8 +4821,16 @@ input.dx-hidden {
 .dx-datagrid-group-panel {
   display: inline-block;
   white-space: nowrap;
+  width: 100%;
   -ms-touch-action: pinch-zoom;
   touch-action: pinch-zoom;
+}
+.dx-datagrid-group-panel .dx-group-panel-message {
+  overflow: hidden;
+  -o-text-overflow: ellipsis;
+  -ms-text-overflow: ellipsis;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .dx-datagrid-group-panel .dx-group-panel-item {
   display: inline-block;
@@ -4904,6 +4912,11 @@ input.dx-hidden {
 .dx-pivotgrid-fields-container.dx-drag .dx-column-indicators {
   float: none;
   display: inline-block;
+}
+.dx-pivotgrid-nodata {
+  position: absolute;
+  top: 50%;
+  left: 50%;
 }
 .dx-pivotgrid {
   cursor: default;
@@ -5035,12 +5048,6 @@ input.dx-hidden {
 }
 .dx-treelist-table {
   background-color: transparent;
-}
-.dx-treelist {
-  position: relative;
-  cursor: default;
-  white-space: normal;
-  line-height: normal;
 }
 .dx-treelist .dx-treelist-content-fixed {
   position: absolute;
@@ -5754,6 +5761,12 @@ input.dx-hidden {
 .dx-rtl .dx-treelist-search-panel {
   margin: 0;
   margin-right: 15px;
+}
+.dx-treelist-container {
+  position: relative;
+  cursor: default;
+  white-space: normal;
+  line-height: normal;
 }
 .dx-treelist-rowsview .dx-treelist-table:not(.dx-treelist-table-fixed) .dx-treelist-cell-expandable {
   white-space: nowrap;
