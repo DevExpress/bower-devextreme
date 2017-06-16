@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 16.2.7
-* Build date: May 17, 2017
+* Version: 16.2.7 (build 17167)
+* Build date: Jun 16, 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -8449,7 +8449,7 @@
   margin: 0 19px 0 3px;
 }
 .dx-menu .dx-menu-item-has-text .dx-menu-item-text {
-  padding: 0 5px;
+  padding: 0 5px 5px 5px;
 }
 .dx-menu .dx-menu-item-has-text.dx-menu-item-has-icon .dx-icon {
   margin: 0 3px;

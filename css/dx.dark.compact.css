@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 16.2.7
-* Build date: May 17, 2017
+* Version: 16.2.7 (build 17167)
+* Build date: Jun 16, 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -4655,7 +4655,7 @@
 }
 .dx-list-group-header {
   font-weight: bold;
-  padding: 20px 5px 5px 5px;
+  padding: 10px 5px 5px 5px;
   border-top: 0px solid #4d4d4d;
   border-bottom: 2px solid #4d4d4d;
   background: rgba(59, 59, 59, 0.05);
@@ -4921,7 +4921,7 @@
 }
 .dx-device-mobile .dx-list-group-header {
   font-weight: bold;
-  padding: 20px 15px 5px 15px;
+  padding: 10px 15px 5px 15px;
   border-top: 0px solid #4d4d4d;
   border-bottom: 2px solid #4d4d4d;
   background: rgba(59, 59, 59, 0.05);
@@ -8446,7 +8446,7 @@
   margin: 0 17px 0 1px;
 }
 .dx-menu .dx-menu-item-has-text .dx-menu-item-text {
-  padding: 0 3px;
+  padding: 0 3px 3px 3px;
 }
 .dx-menu .dx-menu-item-has-text.dx-menu-item-has-icon .dx-icon {
   margin: 0 1px;
