@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.all.d.ts)
-* Version: 16.2.7 (build 17167)
-* Build date: Fri Jun 16 2017
+* Version: 16.2.8
+* Build date: Wed Jun 28 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -1849,7 +1849,7 @@ declare module DevExpress.ui {
         constructor(element: Element, options?: dxPopupOptions);
     }
     export interface dxPopoverOptions extends dxPopupOptions {
-        /** An object defining the animation options of the widget. */
+        /** Configures widget visibility animations. This object contains two fields: show and hide. */
         animation?: {
             /** An object that defines the animation options used when the widget is being shown. */
             show?: fx.AnimationOptions;
@@ -1890,7 +1890,7 @@ declare module DevExpress.ui {
         show(target?: any): JQueryPromise<void>;
     }
     export interface dxOverlayOptions extends WidgetOptions {
-        /** An object defining the animation options of the widget. */
+        /** Configures widget visibility animations. This object contains two fields: show and hide. */
         animation?: {
             /** An object that defines the animation options used when the widget is being shown. */
             show?: fx.AnimationOptions;
@@ -2094,7 +2094,7 @@ declare module DevExpress.ui {
     }
     export interface dxLookupOptions extends dxDropDownListOptions {
         applyValueMode?: string;
-        /** An object that defines widget animation options. */
+        /** Configures widget visibility animations. This object contains two fields: show and hide. */
         animation?: {
             /** An object that defines the animation options used when the widget is being shown. */
             show?: fx.AnimationOptions;
@@ -2179,8 +2179,11 @@ declare module DevExpress.ui {
         constructor(element: Element, options?: dxLookupOptions);
     }
     export interface dxLoadPanelOptions extends dxOverlayOptions {
-        /** An object defining the animation options of the widget. */
-        animation?: fx.AnimationOptions;
+        /** Configures widget visibility animations. This object contains two fields: show and hide. */
+        animation?: {
+            show?: fx.AnimationOptions;
+            hide?: fx.AnimationOptions;
+        };
         /** The delay in milliseconds after which the load panel is displayed. */
         delay?: number;
         /** The height of the widget. */
@@ -3674,7 +3677,7 @@ declare module DevExpress.ui {
         unselectAll(): void;
     }
     export interface dxMenuBaseOptions extends HierarchicalCollectionWidgetOptions {
-        /** An object that defines the animation options of the widget. */
+        /** Configures widget visibility animations. This object contains two fields: show and hide. */
         animation?: {
             /** An object that defines the animation options used when the widget is being shown. */
             show?: fx.AnimationOptions;
