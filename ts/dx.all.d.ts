@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.all.d.ts)
-* Version: 17.1.3 (build 17167)
-* Build date: Fri Jun 16 2017
+* Version: 17.1.4
+* Build date: Tue Jun 27 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -1877,7 +1877,7 @@ declare module DevExpress.ui {
         constructor(element: Element, options?: dxPopupOptions);
     }
     export interface dxPopoverOptions extends dxPopupOptions {
-        /** An object defining the animation options of the widget. */
+        /** Configures widget visibility animations. This object contains two fields: show and hide. */
         animation?: {
             /** An object that defines the animation options used when the widget is being shown. */
             show?: fx.AnimationOptions;
@@ -1918,7 +1918,7 @@ declare module DevExpress.ui {
         show(target?: any): JQueryPromise<void>;
     }
     export interface dxOverlayOptions extends WidgetOptions {
-        /** An object defining the animation options of the widget. */
+        /** Configures widget visibility animations. This object contains two fields: show and hide. */
         animation?: {
             /** An object that defines the animation options used when the widget is being shown. */
             show?: fx.AnimationOptions;
@@ -2123,7 +2123,7 @@ declare module DevExpress.ui {
     }
     export interface dxLookupOptions extends dxDropDownListOptions {
         applyValueMode?: string;
-        /** An object that defines widget animation options. */
+        /** Configures widget visibility animations. This object contains two fields: show and hide. */
         animation?: {
             /** An object that defines the animation options used when the widget is being shown. */
             show?: fx.AnimationOptions;
@@ -2208,7 +2208,7 @@ declare module DevExpress.ui {
         constructor(element: Element, options?: dxLookupOptions);
     }
     export interface dxLoadPanelOptions extends dxOverlayOptions {
-        /** An object defining the animation options of the widget. */
+        /** Configures widget visibility animations. This object contains two fields: show and hide. */
         animation?: {
             show?: fx.AnimationOptions;
             hide?: fx.AnimationOptions;
@@ -2656,7 +2656,7 @@ declare module DevExpress.ui {
         updateDimensions(): JQueryPromise<dxAccordion>;
     }
     export interface dxFileUploaderOptions extends EditorOptions {
-        /** A read-only option that holds a File instance representing the selected file. */
+        /** Specifies a File instance representing the selected file. Read-only when uploadMode is "useForm". */
         value?: Array<File>;
         values?: Array<File>;
         buttonText?: string;
@@ -3725,7 +3725,7 @@ declare module DevExpress.ui {
         unselectAll(): void;
     }
     export interface dxMenuBaseOptions extends HierarchicalCollectionWidgetOptions {
-        /** An object that defines the animation options of the widget. */
+        /** Configures widget visibility animations. This object contains two fields: show and hide. */
         animation?: {
             /** An object that defines the animation options used when the widget is being shown. */
             show?: fx.AnimationOptions;
@@ -3971,7 +3971,7 @@ declare module DevExpress.ui {
         visible?: boolean;
         /** Specifies the position of the column regarding other columns in the resulting widget. */
         visibleIndex?: number;
-        /** Specifies the width of the column in pixels or percentages. */
+        /** Specifies the column's width in pixels or percentages. Ignored if less than minWidth. */
         width?: any;
         /** Specifies the minimum width of the column. */
         minWidth?: number;
@@ -4129,6 +4129,7 @@ declare module DevExpress.ui {
     export interface dxTreeListSelection extends GridBaseSelection {
     }
     export interface dxDataGridOptions extends GridBaseOptions {
+        keyExpr?: any;
         /** A handler for the contextMenuPreparing event. */
         onContextMenuPreparing?: (e: Object) => void;
         /** A handler for the cellClick event. */
@@ -4811,6 +4812,8 @@ declare module DevExpress.ui {
         collapseRow(key: any): void;
         /** Gets data objects of currently selected rows. */
         getSelectedRowsData(): Array<any>;
+        /** Gets a node by its key. */
+        getNodeByKey(key: any): dxTreeListNode;
     }
     /** The DataGrid is a widget that represents data from a local or remote source in the form of a grid. This widget offers such basic features as sorting, grouping, filtering, as well as more advanced capabilities, like state storing, export to Excel, master-detail interface, and many others. */
     export class dxDataGrid extends GridBase {
@@ -5669,6 +5672,8 @@ declare module DevExpress.viz.charts {
         selectPoint(point: BasePoint): void;
         /** Deselects the specified point. The point is displayed in an initial style. */
         deselectPoint(point: BasePoint): void;
+        hover(): void;
+        clearHover(): void;
         /** Returns an array of all points in the series. */
         getAllPoints(): Array<BasePoint>;
         /** Returns visible series points. */
@@ -5710,6 +5715,8 @@ declare module DevExpress.viz.charts {
         isSelected(): boolean;
         /** Selects the point. The point is displayed in a 'selected' style until another point is selected or the current point is deselected programmatically. */
         select(): void;
+        hover(): void;
+        clearHover(): void;
         /** Shows the tooltip of the point. */
         showTooltip(): void;
         /** Allows you to obtain the label(s) of the series point. */

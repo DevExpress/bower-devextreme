@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 17.1.3 (build 17167)
-* Build date: Jun 16, 2017
+* Version: 17.1.4
+* Build date: Jun 27, 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -4178,6 +4178,9 @@
 .dx-state-disabled .dx-checkbox .dx-checkbox-icon {
   opacity: 0.4;
 }
+.dx-state-disabled .dx-checkbox-text {
+  opacity: 0.4;
+}
 .dx-invalid .dx-checkbox-container .dx-checkbox-icon {
   border: 1px solid rgba(217, 83, 79, 0.4);
 }
@@ -7794,12 +7797,6 @@
 .dx-datagrid .dx-link {
   color: #1ca8dd;
 }
-.dx-datagrid .dx-checkbox-indeterminate .dx-checkbox-icon:before {
-  width: 6px;
-  height: 6px;
-  left: 4px;
-  top: 4px;
-}
 .dx-datagrid .dx-row-lines > td {
   border-bottom: 1px solid #4d4d4d;
 }
@@ -7927,6 +7924,12 @@
   height: 16px;
   width: 16px;
 }
+.dx-datagrid-checkbox-size.dx-checkbox-indeterminate .dx-checkbox-icon:before {
+  width: 6px;
+  height: 6px;
+  left: 4px;
+  top: 4px;
+}
 .dx-device-mobile .dx-datagrid-column-chooser-list .dx-empty-message,
 .dx-datagrid-column-chooser-list .dx-empty-message {
   color: #787878;
@@ -8024,14 +8027,14 @@
   touch-action: pinch-zoom;
   border-bottom: 1px solid #4d4d4d;
 }
+.dx-datagrid-headers .dx-datagrid-content {
+  margin-bottom: -1px;
+}
 .dx-datagrid-borders .dx-datagrid-headers .dx-datagrid-table {
   border-bottom-width: 1px;
 }
 .dx-datagrid-headers .dx-datagrid-table .dx-row > td {
   border-bottom: 1px solid #4d4d4d;
-}
-.dx-datagrid-headers .dx-datagrid-table .dx-row:last-child > td {
-  border-bottom-width: 0;
 }
 .dx-datagrid-filter-row .dx-menu .dx-overlay-content {
   color: #dedede;
@@ -8772,12 +8775,6 @@
 .dx-treelist .dx-link {
   color: #1ca8dd;
 }
-.dx-treelist .dx-checkbox-indeterminate .dx-checkbox-icon:before {
-  width: 6px;
-  height: 6px;
-  left: 4px;
-  top: 4px;
-}
 .dx-treelist .dx-row-lines > td {
   border-bottom: 1px solid #4d4d4d;
 }
@@ -8905,6 +8902,12 @@
   height: 16px;
   width: 16px;
 }
+.dx-treelist-checkbox-size.dx-checkbox-indeterminate .dx-checkbox-icon:before {
+  width: 6px;
+  height: 6px;
+  left: 4px;
+  top: 4px;
+}
 .dx-device-mobile .dx-treelist-column-chooser-list .dx-empty-message,
 .dx-treelist-column-chooser-list .dx-empty-message {
   color: #787878;
@@ -9002,14 +9005,14 @@
   touch-action: pinch-zoom;
   border-bottom: 1px solid #4d4d4d;
 }
+.dx-treelist-headers .dx-treelist-content {
+  margin-bottom: -1px;
+}
 .dx-treelist-borders .dx-treelist-headers .dx-treelist-table {
   border-bottom-width: 1px;
 }
 .dx-treelist-headers .dx-treelist-table .dx-row > td {
   border-bottom: 1px solid #4d4d4d;
-}
-.dx-treelist-headers .dx-treelist-table .dx-row:last-child > td {
-  border-bottom-width: 0;
 }
 .dx-treelist-filter-row .dx-menu .dx-overlay-content {
   color: #dedede;
