@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.all.d.ts)
-* Version: 17.1.4
-* Build date: Tue Jun 27 2017
+* Version: 17.1.4 (build 17202)
+* Build date: Fri Jul 21 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -745,9 +745,9 @@ declare module DevExpress {
         bindingOptions?: { [key: string]: any; };
     }
     export interface DOMComponentOptions extends DOMComponentOptionsBase {
-        /** Specifies the height of the widget. */
+        /** Specifies the height of the widget container. */
         height?: any;
-        /** Specifies the width of the widget. */
+        /** Specifies the width of the widget container. */
         width?: any;
     }
     /** A base class for all components. */
@@ -1183,7 +1183,6 @@ declare module DevExpress {
         export function query(array: Array<any>): Query;
         /** Creates a Query instance for accessing the remote service specified by a URL. */
         export function query(url: string, queryOptions: Object): Query;
-        /** This section describes the utility objects provided by the DevExtreme data layer. */
         export module utils {
             /** Compiles a getter function from the getter expression. */
             export function compileGetter(expr: any): Function;
@@ -1263,7 +1262,7 @@ declare module DevExpress {
             onItemHold?: Function;
             /** A handler for the itemRendered event. */
             onItemRendered?: Function;
-            /** A handler for the selectionChanged event. */
+            /** A handler for the selectionChanged event. Raised after an item is selected or unselected. */
             onSelectionChanged?: Function;
             /** The index of the currently selected widget item. */
             selectedIndex?: number;
@@ -1303,7 +1302,7 @@ declare module DevExpress {
             dataSource?: any;
             /** Specifies the name of the data source item field whose value is displayed by the widget. */
             displayExpr?: any;
-            /** Specifies the name of a data source item field whose value is held in the value configuration option. */
+            /** Specifies which data field provides the widget value. */
             valueExpr?: any;
             /** An array of items displayed by the widget. */
             items?: Array<any>;
@@ -1774,7 +1773,7 @@ declare module DevExpress.ui {
         useNative?: boolean;
         /** A Boolean value specifying whether to enable or disable the bounce-back effect. */
         bounceEnabled?: boolean;
-        /** A Boolean value specifying whether or not an end-user can scroll the widget content swiping it up or down. */
+        /** A Boolean value specifying whether or not an end-user can scroll the widget content swiping it up or down. Applies only if useNative is false */
         scrollByContent?: boolean;
         /** A Boolean value specifying whether or not an end-user can scroll the widget content using the scrollbar. */
         scrollByThumb?: boolean;
@@ -3459,7 +3458,7 @@ declare module DevExpress.ui {
         max?: any;
         /** Specifies the view used in the scheduler by default. */
         currentView?: string;
-        /** A data source used to fetch data to be displayed by the widget. */
+        /** Specifies the origin of data for the widget. */
         dataSource?: any;
         /** Specifies the first day of a week. */
         firstDayOfWeek?: number;
@@ -3911,7 +3910,7 @@ declare module DevExpress.ui {
         /** Specifies whether this column can be searched. Applies only if searchPanel | visible is true. Inherits the value of the allowFiltering option by default. */
         allowSearch?: boolean;
         /** Calculates custom values for column cells. */
-        calculateCellValue?: (rowData: Object) => string;
+        calculateCellValue?: (rowData: Object) => any;
         /** Specifies a function to be invoked after the user has edited a cell value, but before it will be saved in the data source. */
         setCellValue?: (rowData: Object, value: any) => void;
         /** Specifies a caption for the column. */
@@ -4129,6 +4128,7 @@ declare module DevExpress.ui {
     export interface dxTreeListSelection extends GridBaseSelection {
     }
     export interface dxDataGridOptions extends GridBaseOptions {
+        /** Specifies which data field provides keys for data items. Applies only if data is a simple array. */
         keyExpr?: any;
         /** A handler for the contextMenuPreparing event. */
         onContextMenuPreparing?: (e: Object) => void;
@@ -4718,8 +4718,6 @@ declare module DevExpress.ui {
         getScrollable(): dxScrollable;
         /** Repaints specific rows. */
         repaintRows(rowIndexes: Array<number>): void;
-        /** Adds a new data row. */
-        addRow(): void;
         /** Switches a specific cell into the editing state. The cell is found by the row index and column index. Takes effect only if the editing mode is 'batch' or 'cell'. */
         editCell(rowIndex: number, visibleColumnIndex: number): void;
         /** Switches a specific cell into the editing state. The cell is found by the row index and data field. Takes effect only if the editing mode is 'batch' or 'cell'. */
@@ -4814,6 +4812,10 @@ declare module DevExpress.ui {
         getSelectedRowsData(): Array<any>;
         /** Gets a node by its key. */
         getNodeByKey(key: any): dxTreeListNode;
+        /** Adds an empty data row to the highest hierarchical level. */
+        addRow(): void;
+        /** Adds an empty data row to a specified parent row. */
+        addRow(parentId: any): void;
     }
     /** The DataGrid is a widget that represents data from a local or remote source in the form of a grid. This widget offers such basic features as sorting, grouping, filtering, as well as more advanced capabilities, like state storing, export to Excel, master-detail interface, and many others. */
     export class dxDataGrid extends GridBase {
@@ -4865,6 +4867,8 @@ declare module DevExpress.ui {
         exportToExcel(selectionOnly: boolean): void;
         /** Gets data objects of currently selected rows. */
         getSelectedRowsData(): any;
+        /** Adds an empty data row. */
+        addRow(): void;
     }
     export interface dxPivotGridOptions extends WidgetOptions {
         onContentReady?: Function;
@@ -5622,6 +5626,7 @@ declare module DevExpress.viz.core {
         onExporting?: (e: {
             fileName: string;
             cancel: boolean;
+            format: string;
         }) => void;
         /** A handler for the fileSaving event. */
         onFileSaving?: (e: {
@@ -5643,6 +5648,8 @@ declare module DevExpress.viz.core {
     export class BaseWidget extends DOMComponent {
         /** Returns the widget's SVG markup. */
         svg(): string;
+        /** Gets the current size of the widget. */
+        getSize(): { width: number; height: number };
         /** Exports the widget into a document with a specified name and format. */
         exportTo(fileName: string, format: string): void;
         /** Opens the browser's print window. */
@@ -5672,7 +5679,9 @@ declare module DevExpress.viz.charts {
         selectPoint(point: BasePoint): void;
         /** Deselects the specified point. The point is displayed in an initial style. */
         deselectPoint(point: BasePoint): void;
+        /** Switches the series into the hover state, the same as when a user places the mouse pointer on it. */
         hover(): void;
+        /** Switches the series from the hover state back to normal. */
         clearHover(): void;
         /** Returns an array of all points in the series. */
         getAllPoints(): Array<BasePoint>;
@@ -5715,7 +5724,9 @@ declare module DevExpress.viz.charts {
         isSelected(): boolean;
         /** Selects the point. The point is displayed in a 'selected' style until another point is selected or the current point is deselected programmatically. */
         select(): void;
+        /** Switches the point into the hover state, the same as when a user places the mouse pointer on it. */
         hover(): void;
+        /** Switches the point from the hover state back to normal. */
         clearHover(): void;
         /** Shows the tooltip of the point. */
         showTooltip(): void;
@@ -5762,6 +5773,7 @@ declare module DevExpress.viz.charts {
         /** Shows the point label. */
         show(): void;
     }
+    /** This section describes fields and methods that you can use in code to manipulate the Series object. */
     export interface PieSeries extends BaseSeries {
         selectPoint(point: PiePoint): void;
         deselectPoint(point: PiePoint): void;
@@ -6080,7 +6092,7 @@ declare module DevExpress.viz.charts {
         point?: PolarCommonPointOptions;
     }
     export interface CommonPolarSeriesSettings extends CommonPolarSeriesConfig {
-        /** An object that specifies configuration options for all series of the <i>area</i> type in the chart. */
+        /** An object that specifies configuration options for all series of the area type in the chart. */
         area?: CommonPolarSeriesConfig;
         /** An object that specifies configuration options for all series of the _bar_ type in the chart. */
         bar?: CommonPolarSeriesConfig;
@@ -6595,8 +6607,6 @@ declare module DevExpress.viz.charts {
     export class BaseChart extends viz.core.BaseWidget implements viz.core.LoadingIndicatorMethods {
         /** Deselects the chart's selected series. The series is displayed in an initial style. */
         clearSelection(): void;
-        /** Gets the current size of the widget. */
-        getSize(): { width: number; height: number };
         /** Returns an array of all series in the chart. */
         getAllSeries(): Array<BaseSeries>;
         /** Gets a series within the chart's series collection by the specified name (see the name option). */
@@ -6847,7 +6857,7 @@ declare module DevExpress.viz.charts {
         innerRadius?: number;
         /** A handler for the legendClick event. */
         onLegendClick?: any;
-        /** Specifies how a chart must behave when series point labels overlap. */
+        /** Specifies how a chart must behave when point labels overlap. */
         resolveLabelOverlapping?: string;
         /** An object defining the configuration options that are common for all series of the PieChart widget. */
         commonSeriesSettings?: CommonPieSeriesSettings;

@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 17.1.4
-* Build date: Jun 27, 2017
+* Version: 17.1.4 (build 17202)
+* Build date: Jul 21, 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -381,8 +381,6 @@
 }
 .dx-pivotgrid .dx-virtual-mode table {
   position: absolute;
-  top: 0;
-  left: 0;
 }
 .dx-pivotgrid .dx-pivotgrid-area-data {
   position: relative;
@@ -4720,17 +4718,17 @@
   padding-right: 9px;
   padding-left: 34px;
 }
-.dx-dropdowneditor-button-visible.dx-invalid .dx-texteditor-input {
+.dx-invalid.dx-dropdowneditor-button-visible .dx-texteditor-input {
   padding-right: 60px;
 }
-.dx-dropdowneditor-button-visible.dx-invalid.dx-rtl .dx-texteditor-input {
+.dx-invalid.dx-dropdowneditor-button-visible.dx-rtl .dx-texteditor-input {
   padding: 7px 9px 8px;
   padding-left: 60px;
 }
-.dx-dropdowneditor-button-visible.dx-invalid.dx-show-clear-button .dx-texteditor-input {
+.dx-invalid.dx-dropdowneditor-button-visible.dx-show-clear-button .dx-texteditor-input {
   padding-right: 90px;
 }
-.dx-dropdowneditor-button-visible.dx-invalid.dx-show-clear-button.dx-rtl .dx-texteditor-input {
+.dx-invalid.dx-dropdowneditor-button-visible.dx-show-clear-button.dx-rtl .dx-texteditor-input {
   padding: 7px 9px 8px;
   padding-left: 90px;
 }
@@ -5649,6 +5647,24 @@
 .dx-datebox input[type="date"] {
   line-height: normal;
 }
+.dx-datebox.dx-auto-width.dx-dropdowneditor-button-visible .dx-texteditor-input,
+.dx-datebox:not(.dx-texteditor-empty).dx-auto-width.dx-dropdowneditor-button-visible .dx-texteditor-input {
+  padding-right: 60px;
+}
+.dx-datebox.dx-auto-width.dx-dropdowneditor-button-visible.dx-rtl .dx-texteditor-input,
+.dx-datebox:not(.dx-texteditor-empty).dx-auto-width.dx-dropdowneditor-button-visible.dx-rtl .dx-texteditor-input {
+  padding: 7px 9px 8px;
+  padding-left: 60px;
+}
+.dx-datebox.dx-auto-width.dx-dropdowneditor-button-visible.dx-show-clear-button .dx-texteditor-input,
+.dx-datebox:not(.dx-texteditor-empty).dx-auto-width.dx-dropdowneditor-button-visible.dx-show-clear-button .dx-texteditor-input {
+  padding-right: 90px;
+}
+.dx-datebox.dx-auto-width.dx-dropdowneditor-button-visible.dx-show-clear-button.dx-rtl .dx-texteditor-input,
+.dx-datebox:not(.dx-texteditor-empty).dx-auto-width.dx-dropdowneditor-button-visible.dx-show-clear-button.dx-rtl .dx-texteditor-input {
+  padding: 7px 9px 8px;
+  padding-left: 90px;
+}
 .dx-device-ios .dx-datebox.dx-texteditor-empty .dx-texteditor-input {
   min-height: 33px;
 }
@@ -5739,19 +5755,21 @@
   top: -71px;
   border-bottom: 1px solid #fff;
   background-repeat: no-repeat;
-  background-image: -webkit-linear-gradient(bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.8) 60%);
-  background-image: -moz-linear-gradient(bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.8) 60%);
-  background-image: -ms-linear-gradient(bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.8) 60%);
-  background-image: -o-linear-gradient(bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.8) 60%);
+  background-image: -webkit-linear-gradient(0deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.8) 60%);
+  background-image: -moz-linear-gradient(0deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.8) 60%);
+  background-image: -ms-linear-gradient(0deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.8) 60%);
+  background-image: -o-linear-gradient(0deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.8) 60%);
+  background-image: linear-gradient(0deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.8) 60%);
 }
 .dx-dateview-item-selected-frame:after {
   top: 40px;
   border-top: 1px solid #fff;
   background-repeat: no-repeat;
-  background-image: -webkit-linear-gradient(top, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.8) 60%);
-  background-image: -moz-linear-gradient(top, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.8) 60%);
-  background-image: -ms-linear-gradient(top, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.8) 60%);
-  background-image: -o-linear-gradient(top, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.8) 60%);
+  background-image: -webkit-linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.8) 60%);
+  background-image: -moz-linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.8) 60%);
+  background-image: -ms-linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.8) 60%);
+  background-image: -o-linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.8) 60%);
+  background-image: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.8) 60%);
 }
 .dx-device-tablet .dx-dateview-rollers,
 .dx-device-phone .dx-dateview-rollers {
@@ -5914,7 +5932,7 @@
 .dx-toolbar-menu-section {
   border-bottom: 1px solid #fff;
 }
-.dx-toolbar-menu-section .dx-toolbar-hidden-button .dx-list-item-content {
+.dx-toolbar-menu-section .dx-toolbar-hidden-button .dx-button-content {
   padding: 0;
 }
 .dx-toolbar-menu-section .dx-button-content {
@@ -6395,10 +6413,11 @@
   -o-animation: loader 2s linear infinite;
   animation: loader 2s linear infinite;
   background-repeat: no-repeat;
-  background-image: -webkit-linear-gradient(left, transparent 5%, #cf00d7, transparent 95%);
-  background-image: -moz-linear-gradient(left, transparent 5%, #cf00d7, transparent 95%);
-  background-image: -ms-linear-gradient(left, transparent 5%, #cf00d7, transparent 95%);
-  background-image: -o-linear-gradient(left, transparent 5%, #cf00d7, transparent 95%);
+  background-image: -webkit-linear-gradient(-90deg, transparent 5%, #cf00d7, transparent 95%);
+  background-image: -moz-linear-gradient(-90deg, transparent 5%, #cf00d7, transparent 95%);
+  background-image: -ms-linear-gradient(-90deg, transparent 5%, #cf00d7, transparent 95%);
+  background-image: -o-linear-gradient(-90deg, transparent 5%, #cf00d7, transparent 95%);
+  background-image: linear-gradient(-90deg, transparent 5%, #cf00d7, transparent 95%);
   background-repeat: repeat;
 }
 .dx-state-disabled .dx-progressbar-range {
@@ -6418,10 +6437,11 @@
   -o-animation: loader-rtl 2s linear infinite;
   animation: loader-rtl 2s linear infinite;
   background-repeat: no-repeat;
-  background-image: -webkit-linear-gradient(left, transparent 5%, #cf00d7, transparent 95%);
-  background-image: -moz-linear-gradient(left, transparent 5%, #cf00d7, transparent 95%);
-  background-image: -ms-linear-gradient(left, transparent 5%, #cf00d7, transparent 95%);
-  background-image: -o-linear-gradient(left, transparent 5%, #cf00d7, transparent 95%);
+  background-image: -webkit-linear-gradient(-90deg, transparent 5%, #cf00d7, transparent 95%);
+  background-image: -moz-linear-gradient(-90deg, transparent 5%, #cf00d7, transparent 95%);
+  background-image: -ms-linear-gradient(-90deg, transparent 5%, #cf00d7, transparent 95%);
+  background-image: -o-linear-gradient(-90deg, transparent 5%, #cf00d7, transparent 95%);
+  background-image: linear-gradient(-90deg, transparent 5%, #cf00d7, transparent 95%);
   background-repeat: repeat;
 }
 @-webkit-keyframes loader {
@@ -8395,7 +8415,7 @@
   color: #000000;
 }
 .dx-datagrid-revert-tooltip .dx-revert-button > .dx-button-content {
-  padding: 6px;
+  padding: 7px;
 }
 .dx-toolbar-menu-section .dx-datagrid-checkbox-size {
   width: 100%;
@@ -9376,7 +9396,7 @@
   color: #000000;
 }
 .dx-treelist-revert-tooltip .dx-revert-button > .dx-button-content {
-  padding: 6px;
+  padding: 7px;
 }
 .dx-toolbar-menu-section .dx-treelist-checkbox-size {
   width: 100%;
@@ -10341,7 +10361,12 @@
 .dx-tabpanel.dx-state-focused .dx-multiview-wrapper {
   border: 1px solid #cf00d7;
 }
-.dx-tabpanel.dx-state-focused .dx-tab:not(.dx-tab-selected):before {
+.dx-tabpanel.dx-state-focused .dx-tab-selected:after {
+  border-top: 1px solid #cf00d7;
+  border-right: 1px solid #cf00d7;
+  border-left: 1px solid #cf00d7;
+}
+.dx-tabpanel.dx-state-focused .dx-tabs-scrollable .dx-tab:not(.dx-tab-selected):before {
   content: "";
   pointer-events: none;
   position: absolute;
@@ -10353,11 +10378,6 @@
   height: 0;
   border-bottom: 1.5px solid #cf00d7;
   bottom: -1.4px;
-}
-.dx-tabpanel.dx-state-focused .dx-tab-selected:after {
-  border-top: 1px solid #cf00d7;
-  border-right: 1px solid #cf00d7;
-  border-left: 1px solid #cf00d7;
 }
 .dx-tabpanel.dx-state-focused .dx-tabs-scrollable .dx-tab-selected:after {
   border-bottom: 1.5px solid #000;

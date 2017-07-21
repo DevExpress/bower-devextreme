@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 17.1.4
-* Build date: Jun 27, 2017
+* Version: 17.1.4 (build 17202)
+* Build date: Jul 21, 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -382,8 +382,6 @@
 }
 .dx-pivotgrid .dx-virtual-mode table {
   position: absolute;
-  top: 0;
-  left: 0;
 }
 .dx-pivotgrid .dx-pivotgrid-area-data {
   position: relative;
@@ -4547,6 +4545,9 @@
 .dx-dropdowneditor-button-visible .dx-texteditor-input {
   padding-right: 25px;
 }
+.dx-dropdowneditor-button-visible.dx-show-clear-button .dx-texteditor-input {
+  padding-right: 51px;
+}
 .dx-dropdowneditor-button {
   width: 25px;
 }
@@ -4557,9 +4558,6 @@
   -webkit-border-bottom-right-radius: 0;
   -moz-border-bottom-right-radius: 0;
   border-bottom-right-radius: 0;
-}
-.dx-dropdowneditor-button-visible.dx-show-clear-button .dx-texteditor-input {
-  padding-right: 51px;
 }
 .dx-dropdowneditor-active .dx-dropdowneditor-icon,
 .dx-state-disabled .dx-dropdowneditor-icon {
@@ -4598,11 +4596,19 @@
 .dx-invalid.dx-dropdowneditor.dx-show-clear-button:not(.dx-texteditor-empty) .dx-texteditor-container:after {
   right: 59px;
 }
-.dx-invalid.dx-dropdowneditor .dx-texteditor-input {
+.dx-invalid.dx-dropdowneditor-button-visible .dx-texteditor-input {
   padding-right: 58px;
 }
-.dx-invalid.dx-show-clear-button.dx-dropdowneditor-button-visible .dx-texteditor-input {
+.dx-invalid.dx-dropdowneditor-button-visible.dx-rtl .dx-texteditor-input {
+  padding-left: 58px;
+  padding-right: 6px;
+}
+.dx-invalid.dx-dropdowneditor-button-visible.dx-show-clear-button .dx-texteditor-input {
   padding-right: 92px;
+}
+.dx-invalid.dx-dropdowneditor-button-visible.dx-show-clear-button.dx-rtl .dx-texteditor-input {
+  padding-left: 92px;
+  padding-right: 6px;
 }
 .dx-rtl.dx-dropdowneditor-button-visible .dx-texteditor-input,
 .dx-rtl .dx-dropdowneditor-button-visible .dx-texteditor-input {
@@ -4610,14 +4616,6 @@
 }
 .dx-rtl.dx-dropdowneditor-button-visible.dx-show-clear-button .dx-texteditor-input {
   padding-left: 51px;
-  padding-right: 6px;
-}
-.dx-rtl.dx-dropdowneditor-button-visible.dx-invalid .dx-texteditor-input {
-  padding-left: 58px;
-  padding-right: 6px;
-}
-.dx-rtl.dx-dropdowneditor-button-visible.dx-invalid.dx-show-clear-button .dx-texteditor-input {
-  padding-left: 92px;
   padding-right: 6px;
 }
 .dx-rtl.dx-dropdowneditor .dx-icon-clear {
@@ -5091,6 +5089,24 @@
 .dx-datebox.dx-dropdowneditor-field-clickable .dx-dropdowneditor-button {
   display: none;
 }
+.dx-datebox.dx-auto-width.dx-dropdowneditor-button-visible .dx-texteditor-input,
+.dx-datebox:not(.dx-texteditor-empty).dx-auto-width.dx-dropdowneditor-button-visible .dx-texteditor-input {
+  padding-right: 58px;
+}
+.dx-datebox.dx-auto-width.dx-dropdowneditor-button-visible.dx-rtl .dx-texteditor-input,
+.dx-datebox:not(.dx-texteditor-empty).dx-auto-width.dx-dropdowneditor-button-visible.dx-rtl .dx-texteditor-input {
+  padding-left: 58px;
+  padding-right: 6px;
+}
+.dx-datebox.dx-auto-width.dx-dropdowneditor-button-visible.dx-show-clear-button .dx-texteditor-input,
+.dx-datebox:not(.dx-texteditor-empty).dx-auto-width.dx-dropdowneditor-button-visible.dx-show-clear-button .dx-texteditor-input {
+  padding-right: 92px;
+}
+.dx-datebox.dx-auto-width.dx-dropdowneditor-button-visible.dx-show-clear-button.dx-rtl .dx-texteditor-input,
+.dx-datebox:not(.dx-texteditor-empty).dx-auto-width.dx-dropdowneditor-button-visible.dx-show-clear-button.dx-rtl .dx-texteditor-input {
+  padding-left: 92px;
+  padding-right: 6px;
+}
 .dx-datebox-wrapper-calendar .dx-overlay-content {
   -webkit-border-radius: 0.5em;
   -moz-border-radius: 0.5em;
@@ -5193,18 +5209,20 @@
 .dx-dateview-item-selected-frame:before {
   top: -74px;
   background-repeat: no-repeat;
-  background-image: -webkit-linear-gradient(bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 80%);
-  background-image: -moz-linear-gradient(bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 80%);
-  background-image: -ms-linear-gradient(bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 80%);
-  background-image: -o-linear-gradient(bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 80%);
+  background-image: -webkit-linear-gradient(0deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 80%);
+  background-image: -moz-linear-gradient(0deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 80%);
+  background-image: -ms-linear-gradient(0deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 80%);
+  background-image: -o-linear-gradient(0deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 80%);
+  background-image: linear-gradient(0deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 80%);
 }
 .dx-dateview-item-selected-frame:after {
   top: 34px;
   background-repeat: no-repeat;
-  background-image: -webkit-linear-gradient(top, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 80%);
-  background-image: -moz-linear-gradient(top, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 80%);
-  background-image: -ms-linear-gradient(top, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 80%);
-  background-image: -o-linear-gradient(top, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 80%);
+  background-image: -webkit-linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 80%);
+  background-image: -moz-linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 80%);
+  background-image: -ms-linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 80%);
+  background-image: -o-linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 80%);
+  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 80%);
 }
 .dx-device-phone .dx-dateview-rollers {
   flex-wrap: nowrap;
@@ -5257,7 +5275,7 @@
 .dx-toolbar-menu-section {
   border-bottom: 1px solid #ababab;
 }
-.dx-toolbar-menu-section .dx-toolbar-hidden-button .dx-list-item-content {
+.dx-toolbar-menu-section .dx-toolbar-hidden-button .dx-button-content {
   padding-top: 0px;
   padding-bottom: 0px;
 }
@@ -5507,10 +5525,11 @@
   -o-animation: loader 2s linear infinite;
   animation: loader 2s linear infinite;
   background-repeat: no-repeat;
-  background-image: -webkit-linear-gradient(left, transparent 5%, #74b9ff, transparent 95%);
-  background-image: -moz-linear-gradient(left, transparent 5%, #74b9ff, transparent 95%);
-  background-image: -ms-linear-gradient(left, transparent 5%, #74b9ff, transparent 95%);
-  background-image: -o-linear-gradient(left, transparent 5%, #74b9ff, transparent 95%);
+  background-image: -webkit-linear-gradient(-90deg, transparent 5%, #74b9ff, transparent 95%);
+  background-image: -moz-linear-gradient(-90deg, transparent 5%, #74b9ff, transparent 95%);
+  background-image: -ms-linear-gradient(-90deg, transparent 5%, #74b9ff, transparent 95%);
+  background-image: -o-linear-gradient(-90deg, transparent 5%, #74b9ff, transparent 95%);
+  background-image: linear-gradient(-90deg, transparent 5%, #74b9ff, transparent 95%);
   background-repeat: repeat;
 }
 .dx-state-disabled.dx-progressbar {
@@ -5525,10 +5544,11 @@
   -o-animation: none;
   animation: none;
   background-repeat: no-repeat;
-  background-image: -webkit-linear-gradient(left, transparent 5%, #b7b6bb, transparent 95%);
-  background-image: -moz-linear-gradient(left, transparent 5%, #b7b6bb, transparent 95%);
-  background-image: -ms-linear-gradient(left, transparent 5%, #b7b6bb, transparent 95%);
-  background-image: -o-linear-gradient(left, transparent 5%, #b7b6bb, transparent 95%);
+  background-image: -webkit-linear-gradient(-90deg, transparent 5%, #b7b6bb, transparent 95%);
+  background-image: -moz-linear-gradient(-90deg, transparent 5%, #b7b6bb, transparent 95%);
+  background-image: -ms-linear-gradient(-90deg, transparent 5%, #b7b6bb, transparent 95%);
+  background-image: -o-linear-gradient(-90deg, transparent 5%, #b7b6bb, transparent 95%);
+  background-image: linear-gradient(-90deg, transparent 5%, #b7b6bb, transparent 95%);
   background-repeat: repeat;
   background-color: #d8d8d8;
   background-position-x: 45%;
@@ -5540,10 +5560,11 @@
   -o-animation: loader-rtl 1s linear infinite;
   animation: loader-rtl 1s linear infinite;
   background-repeat: no-repeat;
-  background-image: -webkit-linear-gradient(left, transparent 5%, #74b9ff, transparent 95%);
-  background-image: -moz-linear-gradient(left, transparent 5%, #74b9ff, transparent 95%);
-  background-image: -ms-linear-gradient(left, transparent 5%, #74b9ff, transparent 95%);
-  background-image: -o-linear-gradient(left, transparent 5%, #74b9ff, transparent 95%);
+  background-image: -webkit-linear-gradient(-90deg, transparent 5%, #74b9ff, transparent 95%);
+  background-image: -moz-linear-gradient(-90deg, transparent 5%, #74b9ff, transparent 95%);
+  background-image: -ms-linear-gradient(-90deg, transparent 5%, #74b9ff, transparent 95%);
+  background-image: -o-linear-gradient(-90deg, transparent 5%, #74b9ff, transparent 95%);
+  background-image: linear-gradient(-90deg, transparent 5%, #74b9ff, transparent 95%);
   background-repeat: repeat;
 }
 @-webkit-keyframes loader {

@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.aspnet.mvc.js)
-* Version: 17.1.4
-* Build date: Tue Jun 27 2017
+* Version: 17.1.4 (build 17202)
+* Build date: Fri Jul 21 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -114,7 +114,8 @@
         renderComponent: function(name, options, id, validatorOptions) {
             id = id || "dx-" + new Guid;
             var render = function(_, container) {
-                var $component = $("#" + id, container)[name](options);
+                var selector = "#" + id.replace(/[^\w-]/g, "\\$&"),
+                    $component = $(selector, container)[name](options);
                 if ($.isPlainObject(validatorOptions)) {
                     $component.dxValidator(validatorOptions)
                 }
