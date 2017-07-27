@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.all.d.ts)
-* Version: 16.2.8
-* Build date: Wed Jun 28 2017
+* Version: 16.2.8 (build 17208)
+* Build date: Thu Jul 27 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -1161,7 +1161,6 @@ declare module DevExpress {
         export function query(array: Array<any>): Query;
         /** Creates a Query instance for accessing the remote service specified by a URL. */
         export function query(url: string, queryOptions: Object): Query;
-        /** This section describes the utility objects provided by the DevExtreme data layer. */
         export module utils {
             /** Compiles a getter function from the getter expression. */
             export function compileGetter(expr: any): Function;
@@ -1746,7 +1745,7 @@ declare module DevExpress.ui {
         useNative?: boolean;
         /** A Boolean value specifying whether to enable or disable the bounce-back effect. */
         bounceEnabled?: boolean;
-        /** A Boolean value specifying whether or not an end-user can scroll the widget content swiping it up or down. */
+        /** A Boolean value specifying whether or not an end-user can scroll the widget content swiping it up or down. Applies only if useNative is false */
         scrollByContent?: boolean;
         /** A Boolean value specifying whether or not an end-user can scroll the widget content using the scrollbar. */
         scrollByThumb?: boolean;
@@ -5418,6 +5417,7 @@ declare module DevExpress.viz.core {
         onExporting?: (e: {
             fileName: string;
             cancel: boolean;
+            format: string;
         }) => void;
         /** A handler for the fileSaving event. */
         onFileSaving?: (e: {
@@ -5473,9 +5473,9 @@ declare module DevExpress.viz.charts {
         /** Returns visible series points. */
         getVisiblePoints(): Array<BasePoint>;
         /** Returns the name of the series. */
-        name: string;
+        name: any;
         /** Returns the tag of the series. */
-        tag: string;
+        tag: any;
         /** Hides a series. */
         hide(): void;
         /** Provides information about the hover state of a series. */
@@ -5496,7 +5496,7 @@ declare module DevExpress.viz.charts {
         /** Returns the point's value that was set in the data source. */
         originalValue: any;
         /** Returns the tag of the point. */
-        tag: string;
+        tag: any;
         /** Deselects the point. */
         clearSelection(): void;
         /** Gets the color of a particular point. */
@@ -5973,19 +5973,19 @@ declare module DevExpress.viz.charts {
     }
     export interface SeriesTemplate {
         /** Specifies a callback function that returns a series object with individual series settings. */
-        customizeSeries?: (seriesName: string) => SeriesConfig;
+        customizeSeries?: (seriesName: any) => SeriesConfig;
         /** Specifies a data source field that represents the series name. */
         nameField?: string;
     }
     export interface PolarSeriesTemplate {
         /** Specifies a callback function that returns a series object with individual series settings. */
-        customizeSeries?: (seriesName: string) => PolarSeriesConfig;
+        customizeSeries?: (seriesName: any) => PolarSeriesConfig;
         /** Specifies a data source field that represents the series name. */
         nameField?: string;
     }
     export interface PieSeriesTemplate {
         /** Specifies a callback function that returns a series object with individual series settings. */
-        customizeSeries?: (seriesName: string) => PieSeriesConfig;
+        customizeSeries?: (seriesName: any) => PieSeriesConfig;
         /** Specifies a data source field that represents the series name. */
         nameField?: string;
     }
@@ -6386,7 +6386,7 @@ declare module DevExpress.viz.charts {
         /** Returns an array of all series in the chart. */
         getAllSeries(): Array<BaseSeries>;
         /** Gets a series within the chart's series collection by the specified name (see the name option). */
-        getSeriesByName(seriesName: string): BaseSeries;
+        getSeriesByName(seriesName: any): BaseSeries;
         /** Gets a series within the chart's series collection by its position number. */
         getSeriesByPos(seriesIndex: number): BaseSeries;
         /** Returns the DataSource instance. */
@@ -6404,9 +6404,9 @@ declare module DevExpress.viz.charts {
     }
     export interface AdvancedLegend extends core.BaseLegend {
         /** Specifies the text for a hint that appears when a user hovers the mouse pointer over a legend item. */
-        customizeHint?: (seriesInfo: { seriesName: string; seriesIndex: number; seriesColor: string; }) => string;
+        customizeHint?: (seriesInfo: { seriesName: any; seriesIndex: number; seriesColor: string; }) => string;
         /** <p>Specifies a callback function that returns the text to be displayed by legend items.</p> */
-        customizeText?: (seriesInfo: { seriesName: string; seriesIndex: number; seriesColor: string; }) => string;
+        customizeText?: (seriesInfo: { seriesName: any; seriesIndex: number; seriesColor: string; }) => string;
         /** Specifies what series elements to highlight when a corresponding item in the legend is hovered over. */
         hoverMode?: string;
     }
@@ -6608,9 +6608,9 @@ declare module DevExpress.viz.charts {
         /** Specifies what chart elements to highlight when a corresponding item in the legend is hovered over. */
         hoverMode?: string;
         /** Specifies the text for a hint that appears when a user hovers the mouse pointer over a legend item. */
-        customizeHint?: (pointInfo: { pointName: string; pointIndex: number; pointColor: string; }) => string;
+        customizeHint?: (pointInfo: { pointName: any; pointIndex: number; pointColor: string; }) => string;
         /** Specifies a callback function that returns the text to be displayed by a legend item. */
-        customizeText?: (pointInfo: { pointName: string; pointIndex: number; pointColor: string; }) => string;
+        customizeText?: (pointInfo: { pointName: any; pointIndex: number; pointColor: string; }) => string;
     }
     export interface dxPieChartOptions extends BaseChartOptions<PiePoint> {
         /** Specifies adaptive layout options. */

@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 16.2.8
-* Build date: Jun 28, 2017
+* Version: 16.2.8 (build 17208)
+* Build date: Jul 27, 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -2625,6 +2625,8 @@
 }
 .dx-popup-draggable .dx-popup-title {
   cursor: move;
+  -ms-touch-action: pinch-zoom;
+  touch-action: pinch-zoom;
 }
 .dx-overlay-content > .dx-template-wrapper.dx-popup-title {
   height: auto;
@@ -4239,6 +4241,8 @@
 .dx-datagrid-column-chooser .dx-overlay-content .dx-popup-content .dx-column-chooser-item.dx-datagrid-drag-action {
   opacity: 1;
   cursor: pointer;
+  -ms-touch-action: pinch-zoom;
+  touch-action: pinch-zoom;
 }
 .dx-datagrid-column-chooser.dx-datagrid-column-chooser-mode-drag .dx-treeview-node-container:first-child > .dx-treeview-node-is-leaf {
   padding: 0px;
@@ -5920,6 +5924,7 @@ input.dx-hidden {
 }
 .dx-field-item-help-text {
   font-style: italic;
+  white-space: normal;
 }
 .dx-field-item-label-location-left {
   padding-right: 10px;
