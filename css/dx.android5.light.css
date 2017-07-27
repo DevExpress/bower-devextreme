@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 17.1.4 (build 17202)
-* Build date: Jul 21, 2017
+* Version: 17.1.4 (build 17208)
+* Build date: Jul 27, 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -4756,9 +4756,6 @@
 .dx-list-group-collapsed .dx-list-group-header:before {
   margin-top: 12px;
 }
-.dx-list-item {
-  position: relative;
-}
 .dx-list-item .dx-icon {
   color: #646464;
 }
@@ -4772,17 +4769,10 @@
   -moz-background-size: 100%;
   background-size: 100%;
 }
-.dx-list-item.dx-state-active {
-  background-color: rgba(0, 0, 0, 0.06);
-}
-.dx-list-item .dx-inkripple {
-  overflow: hidden;
-}
-.dx-list-item .dx-inkripple-wave {
-  background-color: rgba(0, 0, 0, 0.06);
-}
 .dx-list-item.dx-state-focused,
-.dx-list-item.dx-state-hover {
+.dx-list-item.dx-state-hover,
+.dx-list-item.dx-state-active,
+.dx-list-item .dx-inkripple-wave {
   background-color: rgba(0, 0, 0, 0.06);
 }
 .dx-list-item-separator-hidden .dx-list-item {
@@ -4850,6 +4840,14 @@
 .dx-list-select-all-label {
   padding: 0 11px;
   vertical-align: middle;
+}
+.dx-list-select-all,
+.dx-list-item {
+  position: relative;
+}
+.dx-list-select-all .dx-inkripple,
+.dx-list-item .dx-inkripple {
+  overflow: hidden;
 }
 .dx-list-static-delete-button-container {
   width: 57px;
