@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.messages.ja.js)
-* Version: 17.2.0 (build 17189)
-* Build date: Sat Jul 08 2017
+* Version: 17.2.0 (build 17206)
+* Build date: Tue Jul 25 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -221,6 +221,9 @@
             "dxColorView-ariaBlue": "青",
             "dxColorView-ariaAlpha": "透明度",
             "dxColorView-ariaHex": "色コード",
+            "dxTagBox-selected": "{0} つ選択済み",
+            "dxTagBox-allSelected": "すべて選択済み ({0})",
+            "dxTagBox-moreSelected": "その他 {0} つ選択",
             "vizExport-printingButtonText": "印刷",
             "vizExport-titleMenuText": "エクスポート / 印刷",
             "vizExport-exportButtonText": "{0} ファイル"

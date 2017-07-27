@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.aspnet.mvc.js)
-* Version: 17.2.0 (build 17189)
-* Build date: Sat Jul 08 2017
+* Version: 17.2.0 (build 17206)
+* Build date: Tue Jul 25 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -10,13 +10,13 @@
 ! function(factory) {
     if ("function" === typeof define && define.amd) {
         define(function(require, exports, module) {
-            module.exports = factory(require("jquery"), require("./ui/set_template_engine"), require("./ui/widget/ui.template_base").renderedCallbacks, require("./core/guid"), require("./ui/validation_engine"))
+            module.exports = factory(require("jquery"), require("./ui/set_template_engine"), require("./ui/widget/ui.template_base").renderedCallbacks, require("./core/guid"), require("./ui/validation_engine"), require("./core/utils/iterator"))
         })
     } else {
         var ui = DevExpress.ui;
-        DevExpress.aspnet = factory(window.jQuery, ui && ui.setTemplateEngine, ui && ui.templateRendered, DevExpress.data.Guid, DevExpress.validationEngine)
+        DevExpress.aspnet = factory(window.jQuery, ui && ui.setTemplateEngine, ui && ui.templateRendered, DevExpress.data.Guid, DevExpress.validationEngine, DevExpress.utils.iterator)
     }
-}(function($, setTemplateEngine, templateRendered, Guid, validationEngine) {
+}(function($, setTemplateEngine, templateRendered, Guid, validationEngine, iteratorUtils) {
     var templateCompiler = createTemplateCompiler();
 
     function createTemplateCompiler() {
@@ -99,7 +99,7 @@
 
     function createValidationSummaryItemsFromValidators(validators, editorNames) {
         var items = [];
-        $.each(validators, function(_, validator) {
+        iteratorUtils.each(validators, function(_, validator) {
             var widget = validator.element().data("dx-validation-target");
             if (widget && $.inArray(widget.option("name"), editorNames) > -1) {
                 items.push({

@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.all.de.js)
-* Version: 17.2.0 (build 17189)
-* Build date: Sat Jul 08 2017
+* Version: 17.2.0 (build 17206)
+* Build date: Tue Jul 25 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -222,6 +222,9 @@
             "dxColorView-ariaBlue": "Blau",
             "dxColorView-ariaAlpha": "Transparenz",
             "dxColorView-ariaHex": "Farbwert",
+            "dxTagBox-selected": "{0} ausgewählt",
+            "dxTagBox-allSelected": "Alle ausgewählt ({0})",
+            "dxTagBox-moreSelected": "{0} weitere",
             "vizExport-printingButtonText": "Drucken",
             "vizExport-titleMenuText": "Export/Druck",
             "vizExport-exportButtonText": "{0}-Datei"

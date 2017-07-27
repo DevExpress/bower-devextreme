@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 17.2.0 (build 17189)
-* Build date: Jul 8, 2017
+* Version: 17.2.0 (build 17206)
+* Build date: Jul 25, 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -1807,6 +1807,7 @@
 .dx-searchbox .dx-icon-search {
   display: block;
   position: relative;
+  pointer-events: none;
 }
 .dx-searchbox .dx-icon-search:before {
   content: "";
@@ -2628,6 +2629,8 @@
 }
 .dx-popup-draggable .dx-popup-title {
   cursor: move;
+  -ms-touch-action: pinch-zoom;
+  touch-action: pinch-zoom;
 }
 .dx-overlay-content > .dx-template-wrapper.dx-popup-title {
   height: auto;
@@ -3925,10 +3928,11 @@
   width: 18px;
   height: 299px;
   background-repeat: no-repeat;
-  background-image: -webkit-linear-gradient(bottom, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%);
-  background-image: -moz-linear-gradient(bottom, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%);
-  background-image: -ms-linear-gradient(bottom, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%);
-  background-image: -o-linear-gradient(bottom, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%);
+  background-image: -webkit-linear-gradient(0deg, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%);
+  background-image: -moz-linear-gradient(0deg, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%);
+  background-image: -ms-linear-gradient(0deg, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%);
+  background-image: -o-linear-gradient(0deg, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%);
+  background-image: linear-gradient(0deg, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%);
 }
 .dx-colorview-color-preview-container-inner,
 .dx-colorview-alpha-channel-wrapper,
@@ -3949,17 +3953,19 @@
 }
 .dx-colorview-palette-gradient-white {
   background-repeat: no-repeat;
-  background-image: -webkit-linear-gradient(180deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1));
-  background-image: -moz-linear-gradient(180deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1));
-  background-image: -ms-linear-gradient(180deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1));
-  background-image: -o-linear-gradient(180deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1));
+  background-image: -webkit-linear-gradient(270deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1));
+  background-image: -moz-linear-gradient(270deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1));
+  background-image: -ms-linear-gradient(270deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1));
+  background-image: -o-linear-gradient(270deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1));
+  background-image: linear-gradient(270deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1));
 }
 .dx-colorview-palette-gradient-black {
   background-repeat: no-repeat;
-  background-image: -webkit-linear-gradient(-90deg, rgba(0, 0, 0, 0), rgba(0, 0, 0, 1));
-  background-image: -moz-linear-gradient(-90deg, rgba(0, 0, 0, 0), rgba(0, 0, 0, 1));
-  background-image: -ms-linear-gradient(-90deg, rgba(0, 0, 0, 0), rgba(0, 0, 0, 1));
-  background-image: -o-linear-gradient(-90deg, rgba(0, 0, 0, 0), rgba(0, 0, 0, 1));
+  background-image: -webkit-linear-gradient(180deg, rgba(0, 0, 0, 0), rgba(0, 0, 0, 1));
+  background-image: -moz-linear-gradient(180deg, rgba(0, 0, 0, 0), rgba(0, 0, 0, 1));
+  background-image: -ms-linear-gradient(180deg, rgba(0, 0, 0, 0), rgba(0, 0, 0, 1));
+  background-image: -o-linear-gradient(180deg, rgba(0, 0, 0, 0), rgba(0, 0, 0, 1));
+  background-image: linear-gradient(180deg, rgba(0, 0, 0, 0), rgba(0, 0, 0, 1));
 }
 .dx-colorview-palette {
   position: relative;
@@ -4236,6 +4242,8 @@
 .dx-datagrid-column-chooser .dx-overlay-content .dx-popup-content .dx-column-chooser-item.dx-datagrid-drag-action {
   opacity: 1;
   cursor: pointer;
+  -ms-touch-action: pinch-zoom;
+  touch-action: pinch-zoom;
 }
 .dx-datagrid-column-chooser.dx-datagrid-column-chooser-mode-drag .dx-treeview-node-container:first-child > .dx-treeview-node-is-leaf {
   padding: 0px;
@@ -5190,6 +5198,8 @@ input.dx-hidden {
 .dx-treelist-column-chooser .dx-overlay-content .dx-popup-content .dx-column-chooser-item.dx-treelist-drag-action {
   opacity: 1;
   cursor: pointer;
+  -ms-touch-action: pinch-zoom;
+  touch-action: pinch-zoom;
 }
 .dx-treelist-column-chooser.dx-treelist-column-chooser-mode-drag .dx-treeview-node-container:first-child > .dx-treeview-node-is-leaf {
   padding: 0px;
@@ -6676,6 +6686,7 @@ input.dx-hidden {
 }
 .dx-field-item-help-text {
   font-style: italic;
+  white-space: normal;
 }
 .dx-field-item-label-location-left {
   padding-right: 10px;

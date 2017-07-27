@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.all.d.ts)
-* Version: 17.2.0 (build 17189)
-* Build date: Sat Jul 08 2017
+* Version: 17.2.0 (build 17206)
+* Build date: Tue Jul 25 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -1183,7 +1183,6 @@ declare module DevExpress {
         export function query(array: Array<any>): Query;
         /** Creates a Query instance for accessing the remote service specified by a URL. */
         export function query(url: string, queryOptions: Object): Query;
-        /** This section describes the utility objects provided by the DevExtreme data layer. */
         export module utils {
             /** Compiles a getter function from the getter expression. */
             export function compileGetter(expr: any): Function;
@@ -1716,6 +1715,11 @@ declare module DevExpress.ui {
         selectAllMode?: string;
         /** A handler for the selectAllValueChanged event. */
         onSelectAllValueChanged?: Function;
+        /** A handler for the multiTagPreparing event. Executed before the multi-tag is rendered. */
+        onMultiTagPreparing?: Function;
+        maxDisplayedTags?: number;
+        /** Specifies whether the multi-tag is shown without ordinary tags. */
+        showMultiTagOnly?: boolean;
         /** A Boolean value specifying whether or not the widget is multiline. */
         multiline?: boolean;
         /** A handler for the selectionChanged event. */
@@ -1774,7 +1778,7 @@ declare module DevExpress.ui {
         useNative?: boolean;
         /** A Boolean value specifying whether to enable or disable the bounce-back effect. */
         bounceEnabled?: boolean;
-        /** A Boolean value specifying whether or not an end-user can scroll the widget content swiping it up or down. */
+        /** A Boolean value specifying whether or not an end-user can scroll the widget content swiping it up or down. Applies only if useNative is false */
         scrollByContent?: boolean;
         /** A Boolean value specifying whether or not an end-user can scroll the widget content using the scrollbar. */
         scrollByThumb?: boolean;
@@ -2455,6 +2459,7 @@ declare module DevExpress.ui {
         acceptCustomValue?: boolean;
         /** Configures the drop-down field which holds the content. */
         dropDownOptions?: DevExpress.ui.dxPopupOptions;
+        fieldTemplate?: any;
         /** Specifies after which DOM events the widget updates the value. */
         valueChangeEvent?: string;
     }
@@ -3460,7 +3465,7 @@ declare module DevExpress.ui {
         max?: any;
         /** Specifies the view used in the scheduler by default. */
         currentView?: string;
-        /** A data source used to fetch data to be displayed by the widget. */
+        /** Specifies the origin of data for the widget. */
         dataSource?: any;
         /** Specifies the first day of a week. */
         firstDayOfWeek?: number;
@@ -4720,8 +4725,6 @@ declare module DevExpress.ui {
         getScrollable(): dxScrollable;
         /** Repaints specific rows. */
         repaintRows(rowIndexes: Array<number>): void;
-        /** Adds a new data row. */
-        addRow(): void;
         /** Switches a specific cell into the editing state. The cell is found by the row index and column index. Takes effect only if the editing mode is 'batch' or 'cell'. */
         editCell(rowIndex: number, visibleColumnIndex: number): void;
         /** Switches a specific cell into the editing state. The cell is found by the row index and data field. Takes effect only if the editing mode is 'batch' or 'cell'. */
@@ -4816,6 +4819,10 @@ declare module DevExpress.ui {
         getSelectedRowsData(): Array<any>;
         /** Gets a node by its key. */
         getNodeByKey(key: any): dxTreeListNode;
+        /** Adds an empty data row to the highest hierarchical level. */
+        addRow(): void;
+        /** Adds an empty data row to a specified parent row. */
+        addRow(parentId: any): void;
     }
     /** The DataGrid is a widget that represents data from a local or remote source in the form of a grid. This widget offers such basic features as sorting, grouping, filtering, as well as more advanced capabilities, like state storing, export to Excel, master-detail interface, and many others. */
     export class dxDataGrid extends GridBase {
@@ -4867,6 +4874,8 @@ declare module DevExpress.ui {
         exportToExcel(selectionOnly: boolean): void;
         /** Gets data objects of currently selected rows. */
         getSelectedRowsData(): any;
+        /** Adds an empty data row. */
+        addRow(): void;
     }
     export interface dxPivotGridOptions extends WidgetOptions {
         onContentReady?: Function;
@@ -5624,6 +5633,7 @@ declare module DevExpress.viz.core {
         onExporting?: (e: {
             fileName: string;
             cancel: boolean;
+            format: string;
         }) => void;
         /** A handler for the fileSaving event. */
         onFileSaving?: (e: {
@@ -5645,6 +5655,8 @@ declare module DevExpress.viz.core {
     export class BaseWidget extends DOMComponent {
         /** Returns the widget's SVG markup. */
         svg(): string;
+        /** Gets the current size of the widget. */
+        getSize(): { width: number; height: number };
         /** Exports the widget into a document with a specified name and format. */
         exportTo(fileName: string, format: string): void;
         /** Opens the browser's print window. */
@@ -6602,8 +6614,6 @@ declare module DevExpress.viz.charts {
     export class BaseChart extends viz.core.BaseWidget implements viz.core.LoadingIndicatorMethods {
         /** Deselects the chart's selected series. The series is displayed in an initial style. */
         clearSelection(): void;
-        /** Gets the current size of the widget. */
-        getSize(): { width: number; height: number };
         /** Returns an array of all series in the chart. */
         getAllSeries(): Array<BaseSeries>;
         /** Gets a series within the chart's series collection by the specified name (see the name option). */
@@ -6854,7 +6864,7 @@ declare module DevExpress.viz.charts {
         innerRadius?: number;
         /** A handler for the legendClick event. */
         onLegendClick?: any;
-        /** Specifies how a chart must behave when series point labels overlap. */
+        /** Specifies how a chart must behave when point labels overlap. */
         resolveLabelOverlapping?: string;
         /** An object defining the configuration options that are common for all series of the PieChart widget. */
         commonSeriesSettings?: CommonPieSeriesSettings;

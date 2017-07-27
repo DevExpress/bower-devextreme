@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 17.2.0 (build 17189)
-* Build date: Jul 8, 2017
+* Version: 17.2.0 (build 17206)
+* Build date: Jul 25, 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -4718,17 +4718,17 @@
   padding-right: 5px;
   padding-left: 24px;
 }
-.dx-dropdowneditor-button-visible.dx-invalid .dx-texteditor-input {
+.dx-invalid.dx-dropdowneditor-button-visible .dx-texteditor-input {
   padding-right: 44px;
 }
-.dx-dropdowneditor-button-visible.dx-invalid.dx-rtl .dx-texteditor-input {
+.dx-invalid.dx-dropdowneditor-button-visible.dx-rtl .dx-texteditor-input {
   padding: 4px 5px 4px;
   padding-left: 44px;
 }
-.dx-dropdowneditor-button-visible.dx-invalid.dx-show-clear-button .dx-texteditor-input {
+.dx-invalid.dx-dropdowneditor-button-visible.dx-show-clear-button .dx-texteditor-input {
   padding-right: 66px;
 }
-.dx-dropdowneditor-button-visible.dx-invalid.dx-show-clear-button.dx-rtl .dx-texteditor-input {
+.dx-invalid.dx-dropdowneditor-button-visible.dx-show-clear-button.dx-rtl .dx-texteditor-input {
   padding: 4px 5px 4px;
   padding-left: 66px;
 }
@@ -5647,6 +5647,24 @@
 .dx-datebox input[type="date"] {
   line-height: normal;
 }
+.dx-datebox.dx-auto-width.dx-dropdowneditor-button-visible .dx-texteditor-input,
+.dx-datebox:not(.dx-texteditor-empty).dx-auto-width.dx-dropdowneditor-button-visible .dx-texteditor-input {
+  padding-right: 44px;
+}
+.dx-datebox.dx-auto-width.dx-dropdowneditor-button-visible.dx-rtl .dx-texteditor-input,
+.dx-datebox:not(.dx-texteditor-empty).dx-auto-width.dx-dropdowneditor-button-visible.dx-rtl .dx-texteditor-input {
+  padding: 4px 5px 4px;
+  padding-left: 44px;
+}
+.dx-datebox.dx-auto-width.dx-dropdowneditor-button-visible.dx-show-clear-button .dx-texteditor-input,
+.dx-datebox:not(.dx-texteditor-empty).dx-auto-width.dx-dropdowneditor-button-visible.dx-show-clear-button .dx-texteditor-input {
+  padding-right: 66px;
+}
+.dx-datebox.dx-auto-width.dx-dropdowneditor-button-visible.dx-show-clear-button.dx-rtl .dx-texteditor-input,
+.dx-datebox:not(.dx-texteditor-empty).dx-auto-width.dx-dropdowneditor-button-visible.dx-show-clear-button.dx-rtl .dx-texteditor-input {
+  padding: 4px 5px 4px;
+  padding-left: 66px;
+}
 .dx-device-ios .dx-datebox.dx-texteditor-empty .dx-texteditor-input {
   min-height: 23px;
 }
@@ -5737,19 +5755,21 @@
   top: -59px;
   border-bottom: 1px solid #4d4d4d;
   background-repeat: no-repeat;
-  background-image: -webkit-linear-gradient(bottom, rgba(42, 42, 42, 0) 0%, rgba(42, 42, 42, 0.8) 60%);
-  background-image: -moz-linear-gradient(bottom, rgba(42, 42, 42, 0) 0%, rgba(42, 42, 42, 0.8) 60%);
-  background-image: -ms-linear-gradient(bottom, rgba(42, 42, 42, 0) 0%, rgba(42, 42, 42, 0.8) 60%);
-  background-image: -o-linear-gradient(bottom, rgba(42, 42, 42, 0) 0%, rgba(42, 42, 42, 0.8) 60%);
+  background-image: -webkit-linear-gradient(0deg, rgba(42, 42, 42, 0) 0%, rgba(42, 42, 42, 0.8) 60%);
+  background-image: -moz-linear-gradient(0deg, rgba(42, 42, 42, 0) 0%, rgba(42, 42, 42, 0.8) 60%);
+  background-image: -ms-linear-gradient(0deg, rgba(42, 42, 42, 0) 0%, rgba(42, 42, 42, 0.8) 60%);
+  background-image: -o-linear-gradient(0deg, rgba(42, 42, 42, 0) 0%, rgba(42, 42, 42, 0.8) 60%);
+  background-image: linear-gradient(0deg, rgba(42, 42, 42, 0) 0%, rgba(42, 42, 42, 0.8) 60%);
 }
 .dx-dateview-item-selected-frame:after {
   top: 34px;
   border-top: 1px solid #4d4d4d;
   background-repeat: no-repeat;
-  background-image: -webkit-linear-gradient(top, rgba(42, 42, 42, 0) 0%, rgba(42, 42, 42, 0.8) 60%);
-  background-image: -moz-linear-gradient(top, rgba(42, 42, 42, 0) 0%, rgba(42, 42, 42, 0.8) 60%);
-  background-image: -ms-linear-gradient(top, rgba(42, 42, 42, 0) 0%, rgba(42, 42, 42, 0.8) 60%);
-  background-image: -o-linear-gradient(top, rgba(42, 42, 42, 0) 0%, rgba(42, 42, 42, 0.8) 60%);
+  background-image: -webkit-linear-gradient(180deg, rgba(42, 42, 42, 0) 0%, rgba(42, 42, 42, 0.8) 60%);
+  background-image: -moz-linear-gradient(180deg, rgba(42, 42, 42, 0) 0%, rgba(42, 42, 42, 0.8) 60%);
+  background-image: -ms-linear-gradient(180deg, rgba(42, 42, 42, 0) 0%, rgba(42, 42, 42, 0.8) 60%);
+  background-image: -o-linear-gradient(180deg, rgba(42, 42, 42, 0) 0%, rgba(42, 42, 42, 0.8) 60%);
+  background-image: linear-gradient(180deg, rgba(42, 42, 42, 0) 0%, rgba(42, 42, 42, 0.8) 60%);
 }
 .dx-device-tablet .dx-dateview-rollers,
 .dx-device-phone .dx-dateview-rollers {
@@ -6393,10 +6413,11 @@
   -o-animation: loader 2s linear infinite;
   animation: loader 2s linear infinite;
   background-repeat: no-repeat;
-  background-image: -webkit-linear-gradient(left, transparent 5%, #1ca8dd, transparent 95%);
-  background-image: -moz-linear-gradient(left, transparent 5%, #1ca8dd, transparent 95%);
-  background-image: -ms-linear-gradient(left, transparent 5%, #1ca8dd, transparent 95%);
-  background-image: -o-linear-gradient(left, transparent 5%, #1ca8dd, transparent 95%);
+  background-image: -webkit-linear-gradient(-90deg, transparent 5%, #1ca8dd, transparent 95%);
+  background-image: -moz-linear-gradient(-90deg, transparent 5%, #1ca8dd, transparent 95%);
+  background-image: -ms-linear-gradient(-90deg, transparent 5%, #1ca8dd, transparent 95%);
+  background-image: -o-linear-gradient(-90deg, transparent 5%, #1ca8dd, transparent 95%);
+  background-image: linear-gradient(-90deg, transparent 5%, #1ca8dd, transparent 95%);
   background-repeat: repeat;
 }
 .dx-state-disabled .dx-progressbar-range {
@@ -6416,10 +6437,11 @@
   -o-animation: loader-rtl 2s linear infinite;
   animation: loader-rtl 2s linear infinite;
   background-repeat: no-repeat;
-  background-image: -webkit-linear-gradient(left, transparent 5%, #1ca8dd, transparent 95%);
-  background-image: -moz-linear-gradient(left, transparent 5%, #1ca8dd, transparent 95%);
-  background-image: -ms-linear-gradient(left, transparent 5%, #1ca8dd, transparent 95%);
-  background-image: -o-linear-gradient(left, transparent 5%, #1ca8dd, transparent 95%);
+  background-image: -webkit-linear-gradient(-90deg, transparent 5%, #1ca8dd, transparent 95%);
+  background-image: -moz-linear-gradient(-90deg, transparent 5%, #1ca8dd, transparent 95%);
+  background-image: -ms-linear-gradient(-90deg, transparent 5%, #1ca8dd, transparent 95%);
+  background-image: -o-linear-gradient(-90deg, transparent 5%, #1ca8dd, transparent 95%);
+  background-image: linear-gradient(-90deg, transparent 5%, #1ca8dd, transparent 95%);
   background-repeat: repeat;
 }
 @-webkit-keyframes loader {
@@ -10333,7 +10355,12 @@
 .dx-tabpanel.dx-state-focused .dx-multiview-wrapper {
   border: 1px solid #1ca8dd;
 }
-.dx-tabpanel.dx-state-focused .dx-tab:not(.dx-tab-selected):before {
+.dx-tabpanel.dx-state-focused .dx-tab-selected:after {
+  border-top: 1px solid #1ca8dd;
+  border-right: 1px solid #1ca8dd;
+  border-left: 1px solid #1ca8dd;
+}
+.dx-tabpanel.dx-state-focused .dx-tabs-scrollable .dx-tab:not(.dx-tab-selected):before {
   content: "";
   pointer-events: none;
   position: absolute;
@@ -10345,11 +10372,6 @@
   height: 0;
   border-bottom: 1.5px solid #1ca8dd;
   bottom: -1.4px;
-}
-.dx-tabpanel.dx-state-focused .dx-tab-selected:after {
-  border-top: 1px solid #1ca8dd;
-  border-right: 1px solid #1ca8dd;
-  border-left: 1px solid #1ca8dd;
 }
 .dx-tabpanel.dx-state-focused .dx-tabs-scrollable .dx-tab-selected:after {
   border-bottom: 1.5px solid #323232;
