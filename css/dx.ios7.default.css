@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 17.1.4 (build 17208)
-* Build date: Jul 27, 2017
+* Version: 17.2.0 (build 17189)
+* Build date: Jul 8, 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -4366,10 +4366,6 @@
   width: auto;
   border: none;
 }
-.dx-searchbox .dx-texteditor-container .dx-icon-search {
-  width: 0px;
-  height: 0px;
-}
 .dx-searchbox .dx-placeholder {
   width: 100%;
   -webkit-transform: translate(50%, 0);
@@ -4385,7 +4381,6 @@
 .dx-searchbox .dx-placeholder:before {
   overflow: visible;
   display: none;
-  vertical-align: baseline;
   background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAADlUlEQVR42u2bIXAiQRBFqUJEIBAIBAIREXECgUAgEIgTJyJOREQgTkScQEQgEBEnIqgKAnEiAhGBiIiIiIhArFgRERGBiEAiTkQgEIhNT1VvVdfc7LKw07OzmxW/Kib09OueoWe6KXieV/jKKuQAcgDxPuDmZrJLVVAd1AY18e9yhP+LJNsAFEFd0DXIBX2AvACtQE+gAaiRdgAiqiPQvxCHd2kB6u+bHYkCgAVUQLegrcKhDegFdAe6IhLZcQ96DQAhsmaI2WQvADB+rkhxkQF/QR3QUQQHRLR/IpCNIiPa1gEAoyXQVLGf+xGdDjssxxKILZ4RdgDAiDmS82OdpzqeJ0+SjUnQljAGACP/JkW9q9FxWX3pbLlLDADSd6T9eRKxDoij76A1sTtKCsCYLGIp9usehVBctaVMODUKAIz8IMbXfuQNAhA6k74ma0YA4Km+JMbPDiiFdYlm4cwUgAE1euBdQJfkYHRYAaDBFanqagkDKGDR5AN44Abwi37Xx7gN6hYtoY85AcyJobpFAHpkXX9YAGBl5xtxYr4H6FaJ1AYLLgB0rw0sAyD0SNZX5QAwIgaaFgLo08KIAwAlfGQhgC5Z3yUHgIVf9mp4E+RQnQC45QDgFxyupQAKBMCUA4BfAM1TAOCRMwPmXzUDlpafATVuAP6T1NZSAC0CYMgBYEIMfLMQwO+wK7oOALTevrAQwEzXhSjIKfo9+2AZgCLpQC05b4Nv5G2+YhEA+kQ34QRwSQxdWQSA9gxanACqpEsjCqOSBQCaxPlXE2+C9CFyZAEAV34e5wZQJQ3QrepqnNAV2DXZF7iQmiLlBAA0yHbc4lYw2hmiB49DzwMDzp+Qy5knd4tNARCDEO8qCAacp72A5yS7w3IkXrBg4nz1WUlt8rU8NGF6PkCG8IGTIro7QNcBYzf/QUhiQqSmmO9x/FZVzBL3XNpq3i4IicwIYZQmioU52FEq7/m+N1Q4vsZMWIdBSHpKrIVngWqBLkLq4+2ygwMPPTzJpyHRnpEWeJsTgq45wVPF7NC+2uC0WCNgSIIFgu5J0TpG91kx9hY0E3iP26YSYVJEOwTuWeFjvL72JHWxzD5kXEYrBBPD0hwzQ9ogpBGAVghpBaANQpoBaIGQdgCxIaQeAK7hYAiZABAHQmYAHAohUwAiQBB3j2KmAYRAWMlzzpkFoICgdD7TAAiE9yDnMw/A/7FH/tPZHEAOIFCfbCDU6WjIrzYAAAAASUVORK5CYII=);
   background-position: 0 8px;
   margin-left: 4px;
@@ -4476,7 +4471,6 @@
 .dx-rtl.dx-searchbox .dx-placeholder:before {
   overflow: visible;
   display: none;
-  vertical-align: baseline;
   background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAADlUlEQVR42u2bIXAiQRBFqUJEIBAIBAIREXECgUAgEIgTJyJOREQgTkScQEQgEBEnIqgKAnEiAhGBiIiIiIhArFgRERGBiEAiTkQgEIhNT1VvVdfc7LKw07OzmxW/Kib09OueoWe6KXieV/jKKuQAcgDxPuDmZrJLVVAd1AY18e9yhP+LJNsAFEFd0DXIBX2AvACtQE+gAaiRdgAiqiPQvxCHd2kB6u+bHYkCgAVUQLegrcKhDegFdAe6IhLZcQ96DQAhsmaI2WQvADB+rkhxkQF/QR3QUQQHRLR/IpCNIiPa1gEAoyXQVLGf+xGdDjssxxKILZ4RdgDAiDmS82OdpzqeJ0+SjUnQljAGACP/JkW9q9FxWX3pbLlLDADSd6T9eRKxDoij76A1sTtKCsCYLGIp9usehVBctaVMODUKAIz8IMbXfuQNAhA6k74ma0YA4Km+JMbPDiiFdYlm4cwUgAE1euBdQJfkYHRYAaDBFanqagkDKGDR5AN44Abwi37Xx7gN6hYtoY85AcyJobpFAHpkXX9YAGBl5xtxYr4H6FaJ1AYLLgB0rw0sAyD0SNZX5QAwIgaaFgLo08KIAwAlfGQhgC5Z3yUHgIVf9mp4E+RQnQC45QDgFxyupQAKBMCUA4BfAM1TAOCRMwPmXzUDlpafATVuAP6T1NZSAC0CYMgBYEIMfLMQwO+wK7oOALTevrAQwEzXhSjIKfo9+2AZgCLpQC05b4Nv5G2+YhEA+kQ34QRwSQxdWQSA9gxanACqpEsjCqOSBQCaxPlXE2+C9CFyZAEAV34e5wZQJQ3QrepqnNAV2DXZF7iQmiLlBAA0yHbc4lYw2hmiB49DzwMDzp+Qy5knd4tNARCDEO8qCAacp72A5yS7w3IkXrBg4nz1WUlt8rU8NGF6PkCG8IGTIro7QNcBYzf/QUhiQqSmmO9x/FZVzBL3XNpq3i4IicwIYZQmioU52FEq7/m+N1Q4vsZMWIdBSHpKrIVngWqBLkLq4+2ygwMPPTzJpyHRnpEWeJsTgq45wVPF7NC+2uC0WCNgSIIFgu5J0TpG91kx9hY0E3iP26YSYVJEOwTuWeFjvL72JHWxzD5kXEYrBBPD0hwzQ9ogpBGAVghpBaANQpoBaIGQdgCxIaQeAK7hYAiZABAHQmYAHAohUwAiQBB3j2KmAYRAWMlzzpkFoICgdD7TAAiE9yDnMw/A/7FH/tPZHEAOIFCfbCDU6WjIrzYAAAAASUVORK5CYII=);
   background-position: 0 8px;
   margin-left: 4px;
@@ -4551,9 +4545,6 @@
 .dx-dropdowneditor-button-visible .dx-texteditor-input {
   padding-right: 25px;
 }
-.dx-dropdowneditor-button-visible.dx-show-clear-button .dx-texteditor-input {
-  padding-right: 51px;
-}
 .dx-dropdowneditor-button {
   width: 25px;
 }
@@ -4564,6 +4555,9 @@
   -webkit-border-bottom-right-radius: 0;
   -moz-border-bottom-right-radius: 0;
   border-bottom-right-radius: 0;
+}
+.dx-dropdowneditor-button-visible.dx-show-clear-button .dx-texteditor-input {
+  padding-right: 51px;
 }
 .dx-dropdowneditor-active .dx-dropdowneditor-icon,
 .dx-state-disabled .dx-dropdowneditor-icon {
@@ -4602,19 +4596,11 @@
 .dx-invalid.dx-dropdowneditor.dx-show-clear-button:not(.dx-texteditor-empty) .dx-texteditor-container:after {
   right: 59px;
 }
-.dx-invalid.dx-dropdowneditor-button-visible .dx-texteditor-input {
+.dx-invalid.dx-dropdowneditor .dx-texteditor-input {
   padding-right: 58px;
 }
-.dx-invalid.dx-dropdowneditor-button-visible.dx-rtl .dx-texteditor-input {
-  padding-left: 58px;
-  padding-right: 6px;
-}
-.dx-invalid.dx-dropdowneditor-button-visible.dx-show-clear-button .dx-texteditor-input {
+.dx-invalid.dx-show-clear-button.dx-dropdowneditor-button-visible .dx-texteditor-input {
   padding-right: 92px;
-}
-.dx-invalid.dx-dropdowneditor-button-visible.dx-show-clear-button.dx-rtl .dx-texteditor-input {
-  padding-left: 92px;
-  padding-right: 6px;
 }
 .dx-rtl.dx-dropdowneditor-button-visible .dx-texteditor-input,
 .dx-rtl .dx-dropdowneditor-button-visible .dx-texteditor-input {
@@ -4622,6 +4608,14 @@
 }
 .dx-rtl.dx-dropdowneditor-button-visible.dx-show-clear-button .dx-texteditor-input {
   padding-left: 51px;
+  padding-right: 6px;
+}
+.dx-rtl.dx-dropdowneditor-button-visible.dx-invalid .dx-texteditor-input {
+  padding-left: 58px;
+  padding-right: 6px;
+}
+.dx-rtl.dx-dropdowneditor-button-visible.dx-invalid.dx-show-clear-button .dx-texteditor-input {
+  padding-left: 92px;
   padding-right: 6px;
 }
 .dx-rtl.dx-dropdowneditor .dx-icon-clear {
@@ -5095,24 +5089,6 @@
 .dx-datebox.dx-dropdowneditor-field-clickable .dx-dropdowneditor-button {
   display: none;
 }
-.dx-datebox.dx-auto-width.dx-dropdowneditor-button-visible .dx-texteditor-input,
-.dx-datebox:not(.dx-texteditor-empty).dx-auto-width.dx-dropdowneditor-button-visible .dx-texteditor-input {
-  padding-right: 58px;
-}
-.dx-datebox.dx-auto-width.dx-dropdowneditor-button-visible.dx-rtl .dx-texteditor-input,
-.dx-datebox:not(.dx-texteditor-empty).dx-auto-width.dx-dropdowneditor-button-visible.dx-rtl .dx-texteditor-input {
-  padding-left: 58px;
-  padding-right: 6px;
-}
-.dx-datebox.dx-auto-width.dx-dropdowneditor-button-visible.dx-show-clear-button .dx-texteditor-input,
-.dx-datebox:not(.dx-texteditor-empty).dx-auto-width.dx-dropdowneditor-button-visible.dx-show-clear-button .dx-texteditor-input {
-  padding-right: 92px;
-}
-.dx-datebox.dx-auto-width.dx-dropdowneditor-button-visible.dx-show-clear-button.dx-rtl .dx-texteditor-input,
-.dx-datebox:not(.dx-texteditor-empty).dx-auto-width.dx-dropdowneditor-button-visible.dx-show-clear-button.dx-rtl .dx-texteditor-input {
-  padding-left: 92px;
-  padding-right: 6px;
-}
 .dx-datebox-wrapper-calendar .dx-overlay-content {
   -webkit-border-radius: 0.5em;
   -moz-border-radius: 0.5em;
@@ -5215,20 +5191,18 @@
 .dx-dateview-item-selected-frame:before {
   top: -74px;
   background-repeat: no-repeat;
-  background-image: -webkit-linear-gradient(0deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 80%);
-  background-image: -moz-linear-gradient(0deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 80%);
-  background-image: -ms-linear-gradient(0deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 80%);
-  background-image: -o-linear-gradient(0deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 80%);
-  background-image: linear-gradient(0deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 80%);
+  background-image: -webkit-linear-gradient(bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 80%);
+  background-image: -moz-linear-gradient(bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 80%);
+  background-image: -ms-linear-gradient(bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 80%);
+  background-image: -o-linear-gradient(bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 80%);
 }
 .dx-dateview-item-selected-frame:after {
   top: 34px;
   background-repeat: no-repeat;
-  background-image: -webkit-linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 80%);
-  background-image: -moz-linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 80%);
-  background-image: -ms-linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 80%);
-  background-image: -o-linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 80%);
-  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 80%);
+  background-image: -webkit-linear-gradient(top, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 80%);
+  background-image: -moz-linear-gradient(top, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 80%);
+  background-image: -ms-linear-gradient(top, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 80%);
+  background-image: -o-linear-gradient(top, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 80%);
 }
 .dx-device-phone .dx-dateview-rollers {
   flex-wrap: nowrap;
@@ -5531,11 +5505,10 @@
   -o-animation: loader 2s linear infinite;
   animation: loader 2s linear infinite;
   background-repeat: no-repeat;
-  background-image: -webkit-linear-gradient(-90deg, transparent 5%, #74b9ff, transparent 95%);
-  background-image: -moz-linear-gradient(-90deg, transparent 5%, #74b9ff, transparent 95%);
-  background-image: -ms-linear-gradient(-90deg, transparent 5%, #74b9ff, transparent 95%);
-  background-image: -o-linear-gradient(-90deg, transparent 5%, #74b9ff, transparent 95%);
-  background-image: linear-gradient(-90deg, transparent 5%, #74b9ff, transparent 95%);
+  background-image: -webkit-linear-gradient(left, transparent 5%, #74b9ff, transparent 95%);
+  background-image: -moz-linear-gradient(left, transparent 5%, #74b9ff, transparent 95%);
+  background-image: -ms-linear-gradient(left, transparent 5%, #74b9ff, transparent 95%);
+  background-image: -o-linear-gradient(left, transparent 5%, #74b9ff, transparent 95%);
   background-repeat: repeat;
 }
 .dx-state-disabled.dx-progressbar {
@@ -5550,11 +5523,10 @@
   -o-animation: none;
   animation: none;
   background-repeat: no-repeat;
-  background-image: -webkit-linear-gradient(-90deg, transparent 5%, #b7b6bb, transparent 95%);
-  background-image: -moz-linear-gradient(-90deg, transparent 5%, #b7b6bb, transparent 95%);
-  background-image: -ms-linear-gradient(-90deg, transparent 5%, #b7b6bb, transparent 95%);
-  background-image: -o-linear-gradient(-90deg, transparent 5%, #b7b6bb, transparent 95%);
-  background-image: linear-gradient(-90deg, transparent 5%, #b7b6bb, transparent 95%);
+  background-image: -webkit-linear-gradient(left, transparent 5%, #b7b6bb, transparent 95%);
+  background-image: -moz-linear-gradient(left, transparent 5%, #b7b6bb, transparent 95%);
+  background-image: -ms-linear-gradient(left, transparent 5%, #b7b6bb, transparent 95%);
+  background-image: -o-linear-gradient(left, transparent 5%, #b7b6bb, transparent 95%);
   background-repeat: repeat;
   background-color: #d8d8d8;
   background-position-x: 45%;
@@ -5566,11 +5538,10 @@
   -o-animation: loader-rtl 1s linear infinite;
   animation: loader-rtl 1s linear infinite;
   background-repeat: no-repeat;
-  background-image: -webkit-linear-gradient(-90deg, transparent 5%, #74b9ff, transparent 95%);
-  background-image: -moz-linear-gradient(-90deg, transparent 5%, #74b9ff, transparent 95%);
-  background-image: -ms-linear-gradient(-90deg, transparent 5%, #74b9ff, transparent 95%);
-  background-image: -o-linear-gradient(-90deg, transparent 5%, #74b9ff, transparent 95%);
-  background-image: linear-gradient(-90deg, transparent 5%, #74b9ff, transparent 95%);
+  background-image: -webkit-linear-gradient(left, transparent 5%, #74b9ff, transparent 95%);
+  background-image: -moz-linear-gradient(left, transparent 5%, #74b9ff, transparent 95%);
+  background-image: -ms-linear-gradient(left, transparent 5%, #74b9ff, transparent 95%);
+  background-image: -o-linear-gradient(left, transparent 5%, #74b9ff, transparent 95%);
   background-repeat: repeat;
 }
 @-webkit-keyframes loader {

@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 17.1.4 (build 17208)
-* Build date: Jul 27, 2017
+* Version: 17.2.0 (build 17189)
+* Build date: Jul 8, 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -4656,16 +4656,8 @@
 .dx-invalid.dx-dropdowneditor-button-visible .dx-texteditor-input {
   padding-right: 50px;
 }
-.dx-invalid.dx-dropdowneditor-button-visible.dx-show-clear-button .dx-texteditor-input {
+.dx-invalid.dx-show-clear-button.dx-dropdowneditor-button-visible .dx-texteditor-input {
   padding-right: 94px;
-}
-.dx-invalid.dx-dropdowneditor-button-visible.dx-rtl .dx-texteditor-input {
-  padding-left: 50px;
-  padding-right: 0;
-}
-.dx-invalid.dx-dropdowneditor-button-visible.dx-rtl.dx-show-clear-button .dx-texteditor-input {
-  padding-left: 94px;
-  padding-right: 0;
 }
 .dx-dropdowneditor-button {
   width: 30px;
@@ -4709,6 +4701,16 @@
 }
 .dx-invalid.dx-dropdowneditor.dx-show-clear-button:not(.dx-texteditor-empty) .dx-texteditor-container:after {
   right: 67px;
+}
+.dx-rtl .dx-dropdowneditor.dx-dropdowneditor-button-visible.dx-invaild .dx-texteditor-input,
+.dx-rtl.dx-dropdowneditor.dx-dropdowneditor-button-visible.dx-invaild .dx-texteditor-input {
+  padding-left: 50px;
+  padding-right: 0;
+}
+.dx-rtl .dx-dropdowneditor.dx-dropdowneditor-button-visible.dx-invalid.dx-show-clear-button .dx-texteditor-input,
+.dx-rtl.dx-dropdowneditor.dx-dropdowneditor-button-visible.dx-invalid.dx-show-clear-button .dx-texteditor-input {
+  padding-left: 94px;
+  padding-right: 0;
 }
 .dx-rtl .dx-dropdowneditor.dx-dropdowneditor-button-visible.dx-show-clear-button .dx-texteditor-input,
 .dx-rtl.dx-dropdowneditor.dx-dropdowneditor-button-visible.dx-show-clear-button .dx-texteditor-input {
@@ -4756,6 +4758,9 @@
 .dx-list-group-collapsed .dx-list-group-header:before {
   margin-top: 12px;
 }
+.dx-list-item {
+  position: relative;
+}
 .dx-list-item .dx-icon {
   color: #646464;
 }
@@ -4769,10 +4774,17 @@
   -moz-background-size: 100%;
   background-size: 100%;
 }
-.dx-list-item.dx-state-focused,
-.dx-list-item.dx-state-hover,
-.dx-list-item.dx-state-active,
+.dx-list-item.dx-state-active {
+  background-color: rgba(0, 0, 0, 0.06);
+}
+.dx-list-item .dx-inkripple {
+  overflow: hidden;
+}
 .dx-list-item .dx-inkripple-wave {
+  background-color: rgba(0, 0, 0, 0.06);
+}
+.dx-list-item.dx-state-focused,
+.dx-list-item.dx-state-hover {
   background-color: rgba(0, 0, 0, 0.06);
 }
 .dx-list-item-separator-hidden .dx-list-item {
@@ -4840,14 +4852,6 @@
 .dx-list-select-all-label {
   padding: 0 11px;
   vertical-align: middle;
-}
-.dx-list-select-all,
-.dx-list-item {
-  position: relative;
-}
-.dx-list-select-all .dx-inkripple,
-.dx-list-item .dx-inkripple {
-  overflow: hidden;
 }
 .dx-list-static-delete-button-container {
   width: 57px;
@@ -5084,24 +5088,6 @@
 .dx-datebox .dx-texteditor-input::-webkit-calendar-picker-indicator {
   display: none;
 }
-.dx-datebox.dx-auto-width.dx-dropdowneditor-button-visible .dx-texteditor-input,
-.dx-datebox:not(.dx-texteditor-empty).dx-auto-width.dx-dropdowneditor-button-visible .dx-texteditor-input {
-  padding-right: 50px;
-}
-.dx-datebox.dx-auto-width.dx-dropdowneditor-button-visible.dx-show-clear-button .dx-texteditor-input,
-.dx-datebox:not(.dx-texteditor-empty).dx-auto-width.dx-dropdowneditor-button-visible.dx-show-clear-button .dx-texteditor-input {
-  padding-right: 94px;
-}
-.dx-datebox.dx-auto-width.dx-dropdowneditor-button-visible.dx-rtl .dx-texteditor-input,
-.dx-datebox:not(.dx-texteditor-empty).dx-auto-width.dx-dropdowneditor-button-visible.dx-rtl .dx-texteditor-input {
-  padding-left: 50px;
-  padding-right: 0;
-}
-.dx-datebox.dx-auto-width.dx-dropdowneditor-button-visible.dx-rtl.dx-show-clear-button .dx-texteditor-input,
-.dx-datebox:not(.dx-texteditor-empty).dx-auto-width.dx-dropdowneditor-button-visible.dx-rtl.dx-show-clear-button .dx-texteditor-input {
-  padding-left: 94px;
-  padding-right: 0;
-}
 .dx-datebox-wrapper-calendar .dx-popup-content {
   padding: 0;
 }
@@ -5201,20 +5187,18 @@
 .dx-dateview-item-selected-frame:before {
   top: -73px;
   background-repeat: no-repeat;
-  background-image: -webkit-linear-gradient(0deg, rgba(243, 243, 243, 0) 0%, #FAFAFA 60%);
-  background-image: -moz-linear-gradient(0deg, rgba(243, 243, 243, 0) 0%, #FAFAFA 60%);
-  background-image: -ms-linear-gradient(0deg, rgba(243, 243, 243, 0) 0%, #FAFAFA 60%);
-  background-image: -o-linear-gradient(0deg, rgba(243, 243, 243, 0) 0%, #FAFAFA 60%);
-  background-image: linear-gradient(0deg, rgba(243, 243, 243, 0) 0%, #FAFAFA 60%);
+  background-image: -webkit-linear-gradient(bottom, rgba(243, 243, 243, 0) 0%, #FAFAFA 60%);
+  background-image: -moz-linear-gradient(bottom, rgba(243, 243, 243, 0) 0%, #FAFAFA 60%);
+  background-image: -ms-linear-gradient(bottom, rgba(243, 243, 243, 0) 0%, #FAFAFA 60%);
+  background-image: -o-linear-gradient(bottom, rgba(243, 243, 243, 0) 0%, #FAFAFA 60%);
 }
 .dx-dateview-item-selected-frame:after {
   top: 36px;
   background-repeat: no-repeat;
-  background-image: -webkit-linear-gradient(180deg, rgba(243, 243, 243, 0) 0%, #FAFAFA 60%);
-  background-image: -moz-linear-gradient(180deg, rgba(243, 243, 243, 0) 0%, #FAFAFA 60%);
-  background-image: -ms-linear-gradient(180deg, rgba(243, 243, 243, 0) 0%, #FAFAFA 60%);
-  background-image: -o-linear-gradient(180deg, rgba(243, 243, 243, 0) 0%, #FAFAFA 60%);
-  background-image: linear-gradient(180deg, rgba(243, 243, 243, 0) 0%, #FAFAFA 60%);
+  background-image: -webkit-linear-gradient(top, rgba(243, 243, 243, 0) 0%, #FAFAFA 60%);
+  background-image: -moz-linear-gradient(top, rgba(243, 243, 243, 0) 0%, #FAFAFA 60%);
+  background-image: -ms-linear-gradient(top, rgba(243, 243, 243, 0) 0%, #FAFAFA 60%);
+  background-image: -o-linear-gradient(top, rgba(243, 243, 243, 0) 0%, #FAFAFA 60%);
 }
 .dx-dateview-item-selected-border {
   display: block;
