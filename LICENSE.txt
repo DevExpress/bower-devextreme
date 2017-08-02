@@ -173,7 +173,7 @@ For the Department of Defense: The SOFTWARE DEVELOPMENT PRODUCT(S) is "Commercia
 
 For all agencies or departments: US GOVT rights in the SOFTWARE DEVELOPMENT PRODUCT(S) is defined in Clause 52.227-19(c)(2) of the FAR.
 
-The manufacturer of the SOFTWARE DEVELOPMENT PRODUCT(S) is: Developer Express, Inc., 505 N. Brand Blvd Suite 1600 Glendale, CA 91203.
+The manufacturer of the SOFTWARE DEVELOPMENT PRODUCT(S) is: Developer Express, Inc., 505 N. Brand Blvd Suite 1450 Glendale, CA 91203.
 
 16. SUPPORT SERVICES.
 
@@ -225,6 +225,6 @@ This AGREEMENT may only be modified in writing signed by you and an authorized o
 
 DEVEXPRESS reserves all rights not specifically granted in this AGREEMENT.
 
-Should you have any questions concerning this AGREEMENT, contact us directly in the United States at +1 (818) 844 3383, or write: Developer Express Inc. Legal department / 505 N. Brand Blvd Suite 1600, Glendale CA 91203.
+Should you have any questions concerning this AGREEMENT, contact us directly in the United States at +1 (818) 844 3383, or write: Developer Express Inc. Legal department / 505 N. Brand Blvd Suite 1450, Glendale CA 91203.
 
 All trademarks and registered trademarks are property of their respective owners.

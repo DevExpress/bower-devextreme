@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme
-* Version: 16.1.12
-* Build date: May 17, 2017
+* Version: 16.1.13
+* Build date: Jul 28, 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -5066,6 +5066,7 @@ declare module DevExpress.viz.core {
         onExporting?: (e: {
             fileName: string;
             cancel: boolean;
+            format: string;
         }) => void;
         /** A handler for the fileSaving event. */
         onFileSaving?: (e: {
