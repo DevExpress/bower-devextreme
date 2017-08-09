@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.all.d.ts)
-* Version: 17.2.0 (build 17206)
-* Build date: Tue Jul 25 2017
+* Version: 17.2.0 (build 17217)
+* Build date: Sat Aug 05 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -1308,11 +1308,11 @@ declare module DevExpress {
             items?: Array<any>;
             /** The template to be used for rendering items. */
             itemTemplate?: any;
-            /** The currently selected value in the widget. */
+            /** Specifies the currently selected value. */
             value?: any;
         }
         export interface EditorOptions extends WidgetOptions {
-            /** The currently specified value. */
+            /** Specifies the currently selected value. */
             value?: any;
             /** The value to be assigned to the `name` attribute of the underlying HTML element. */
             name?: string;
@@ -1717,6 +1717,7 @@ declare module DevExpress.ui {
         onSelectAllValueChanged?: Function;
         /** A handler for the multiTagPreparing event. Executed before the multi-tag is rendered. */
         onMultiTagPreparing?: Function;
+        /** Specifies the limit on displayed tags. On exceeding it, the widget replaces all tags with a single multi-tag that displays the number of selected items. */
         maxDisplayedTags?: number;
         /** Specifies whether the multi-tag is shown without ordinary tags. */
         showMultiTagOnly?: boolean;
@@ -2418,7 +2419,7 @@ declare module DevExpress.ui {
         prevItem(animation: boolean): JQueryPromise<any>;
     }
     export interface dxDropDownEditorOptions extends dxTextBoxOptions {
-        /** Specifies the current value displayed by the widget. */
+        /** Specifies the currently selected value. */
         value?: any;
         /** A handler for the closed event. */
         onClosed?: Function;
@@ -2491,6 +2492,7 @@ declare module DevExpress.ui {
         useNative?: boolean;
         /** Specifies the interval between neighboring values in the popup list in minutes. */
         interval?: number;
+        disabledDates?: any;
         /** Specifies the maximum zoom level of a calendar, which is used to pick the date. */
         maxZoomLevel?: string;
         /** Specifies the minimal zoom level of a calendar, which is used to pick the date. */
@@ -2551,6 +2553,7 @@ declare module DevExpress.ui {
         minZoomLevel?: string;
         /** The template to be used for rendering calendar cells. */
         cellTemplate?: any;
+        disabledDates?: any;
         name?: string;
     }
     /** The Calendar is a widget that displays a calendar and allows an end user to select the required date within a specified date range. */
@@ -2912,7 +2915,7 @@ declare module DevExpress.ui {
         screenByWidth?: (width: number) => string;
         /** Specifies the location of a label against the editor. */
         labelLocation?: string;
-        /** Specifies whether or not all editors on the form are read-only. */
+        /** Specifies whether all editors on the form are read-only. Applies only to non-templated items. */
         readOnly?: boolean;
         /** A handler for the fieldDataChanged event. */
         onFieldDataChanged?: (e: Object) => void;
@@ -3429,6 +3432,8 @@ declare module DevExpress.ui {
         /** The name of the view. */
         type?: string;
         name?: string;
+        intervalCount?: number;
+        startDate?: any;
         /** The first day of a week. */
         firstDayOfWeek?: number;
         /** The resource kinds by which appointments are grouped. */
@@ -4133,6 +4138,7 @@ declare module DevExpress.ui {
         deferred?: boolean;
     }
     export interface dxTreeListSelection extends GridBaseSelection {
+        recursive?: boolean;
     }
     export interface dxDataGridOptions extends GridBaseOptions {
         /** Specifies which data field provides keys for data items. Applies only if data is a simple array. */
@@ -4769,8 +4775,6 @@ declare module DevExpress.ui {
         selectRowsByIndexes(indexes: Array<any>): JQueryPromise<any>;
         /** Clears selection of all rows on all pages. */
         clearSelection(): void;
-        /** Gets the keys of the currently selected rows. */
-        getSelectedRowKeys(): any;
         startSelectionWithCheckboxes(): boolean;
         /** Checks whether the row with a specific key is selected. Takes effect only if selection | deferred is false. */
         isRowSelected(arg: any): boolean;
@@ -4815,6 +4819,8 @@ declare module DevExpress.ui {
         expandRow(key: any): void;
         /** Collapses a specific row. */
         collapseRow(key: any): void;
+        getSelectedRowKeys(): Array<any>;
+        getSelectedRowKeys(leavesOnly: boolean): Array<any>;
         /** Gets data objects of currently selected rows. */
         getSelectedRowsData(): Array<any>;
         /** Gets a node by its key. */
@@ -4823,6 +4829,9 @@ declare module DevExpress.ui {
         addRow(): void;
         /** Adds an empty data row to a specified parent row. */
         addRow(parentId: any): void;
+        loadDescendants(): JQueryPromise<void>;
+        loadDescendants(keys: any): JQueryPromise<void>;
+        loadDescendants(keys: any, childrenOnly: boolean): JQueryPromise<void>;
     }
     /** The DataGrid is a widget that represents data from a local or remote source in the form of a grid. This widget offers such basic features as sorting, grouping, filtering, as well as more advanced capabilities, like state storing, export to Excel, master-detail interface, and many others. */
     export class dxDataGrid extends GridBase {
@@ -4874,6 +4883,7 @@ declare module DevExpress.ui {
         exportToExcel(selectionOnly: boolean): void;
         /** Gets data objects of currently selected rows. */
         getSelectedRowsData(): any;
+        getSelectedRowKeys(): any;
         /** Adds an empty data row. */
         addRow(): void;
     }
@@ -5695,9 +5705,9 @@ declare module DevExpress.viz.charts {
         /** Returns visible series points. */
         getVisiblePoints(): Array<BasePoint>;
         /** Returns the name of the series. */
-        name: string;
+        name: any;
         /** Returns the tag of the series. */
-        tag: string;
+        tag: any;
         /** Hides a series. */
         hide(): void;
         /** Provides information about the hover state of a series. */
@@ -5718,7 +5728,7 @@ declare module DevExpress.viz.charts {
         /** Returns the point's value that was set in the data source. */
         originalValue: any;
         /** Returns the tag of the point. */
-        tag: string;
+        tag: any;
         /** Deselects the point. */
         clearSelection(): void;
         /** Gets the color of a particular point. */
@@ -6200,19 +6210,19 @@ declare module DevExpress.viz.charts {
     }
     export interface SeriesTemplate {
         /** Specifies a callback function that returns a series object with individual series settings. */
-        customizeSeries?: (seriesName: string) => SeriesConfig;
+        customizeSeries?: (seriesName: any) => SeriesConfig;
         /** Specifies a data source field that represents the series name. */
         nameField?: string;
     }
     export interface PolarSeriesTemplate {
         /** Specifies a callback function that returns a series object with individual series settings. */
-        customizeSeries?: (seriesName: string) => PolarSeriesConfig;
+        customizeSeries?: (seriesName: any) => PolarSeriesConfig;
         /** Specifies a data source field that represents the series name. */
         nameField?: string;
     }
     export interface PieSeriesTemplate {
         /** Specifies a callback function that returns a series object with individual series settings. */
-        customizeSeries?: (seriesName: string) => PieSeriesConfig;
+        customizeSeries?: (seriesName: any) => PieSeriesConfig;
         /** Specifies a data source field that represents the series name. */
         nameField?: string;
     }
@@ -6617,7 +6627,7 @@ declare module DevExpress.viz.charts {
         /** Returns an array of all series in the chart. */
         getAllSeries(): Array<BaseSeries>;
         /** Gets a series within the chart's series collection by the specified name (see the name option). */
-        getSeriesByName(seriesName: string): BaseSeries;
+        getSeriesByName(seriesName: any): BaseSeries;
         /** Gets a series within the chart's series collection by its position number. */
         getSeriesByPos(seriesIndex: number): BaseSeries;
         /** Returns the DataSource instance. */
@@ -6635,9 +6645,9 @@ declare module DevExpress.viz.charts {
     }
     export interface AdvancedLegend extends core.BaseLegend {
         /** Specifies the text for a hint that appears when a user hovers the mouse pointer over a legend item. */
-        customizeHint?: (seriesInfo: { seriesName: string; seriesIndex: number; seriesColor: string; }) => string;
+        customizeHint?: (seriesInfo: { seriesName: any; seriesIndex: number; seriesColor: string; }) => string;
         /** <p>Specifies a callback function that returns the text to be displayed by legend items.</p> */
-        customizeText?: (seriesInfo: { seriesName: string; seriesIndex: number; seriesColor: string; }) => string;
+        customizeText?: (seriesInfo: { seriesName: any; seriesIndex: number; seriesColor: string; }) => string;
         /** Specifies what series elements to highlight when a corresponding item in the legend is hovered over. */
         hoverMode?: string;
     }
@@ -6839,9 +6849,9 @@ declare module DevExpress.viz.charts {
         /** Specifies what chart elements to highlight when a corresponding item in the legend is hovered over. */
         hoverMode?: string;
         /** Specifies the text for a hint that appears when a user hovers the mouse pointer over a legend item. */
-        customizeHint?: (pointInfo: { pointName: string; pointIndex: number; pointColor: string; }) => string;
+        customizeHint?: (pointInfo: { pointName: any; pointIndex: number; pointColor: string; }) => string;
         /** Specifies a callback function that returns the text to be displayed by a legend item. */
-        customizeText?: (pointInfo: { pointName: string; pointIndex: number; pointColor: string; }) => string;
+        customizeText?: (pointInfo: { pointName: any; pointIndex: number; pointColor: string; }) => string;
     }
     export interface dxPieChartOptions extends BaseChartOptions<PiePoint> {
         /** Specifies adaptive layout options. */

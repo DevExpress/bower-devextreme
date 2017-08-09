@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 17.2.0 (build 17206)
-* Build date: Jul 25, 2017
+* Version: 17.2.0 (build 17217)
+* Build date: Aug 5, 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -1141,15 +1141,16 @@
   border-left: 1px solid rgba(221, 221, 221, 0.6);
   border-top: 1px solid rgba(221, 221, 221, 0.6);
 }
-.dx-scheduler-work-space-day .dx-scheduler-all-day-table-cell {
+.dx-scheduler-work-space-day:not(.dx-scheduler-work-space-count) .dx-scheduler-all-day-table-cell {
   border-top: none;
   border-left: none;
 }
 .dx-scheduler-work-space-week .dx-scheduler-all-day-title,
-.dx-scheduler-work-space-work-week .dx-scheduler-all-day-title {
+.dx-scheduler-work-space-work-week .dx-scheduler-all-day-title,
+.dx-scheduler-work-space-day.dx-scheduler-work-space-count .dx-scheduler-all-day-title {
   border-top: 1px solid rgba(221, 221, 221, 0.6);
 }
-.dx-scheduler-work-space-month .dx-scrollable .dx-scrollable-content {
+.dx-scheduler-work-space-month:not(.dx-scheduler-work-space-count) .dx-scrollable .dx-scrollable-content {
   height: 100%;
 }
 .dx-scheduler-work-space-month .dx-scheduler-all-day-title {
@@ -1215,6 +1216,13 @@
 }
 .dx-scheduler-work-space-month .dx-scheduler-fixed-appointments {
   left: 0;
+}
+.dx-scheduler-work-space-month.dx-scheduler-work-space-count .dx-scheduler-date-table-cell {
+  height: 75px;
+}
+.dx-scheduler-work-space-month.dx-scheduler-work-space-count .dx-scheduler-date-table-first-of-month {
+  color: #337ab7;
+  font-weight: bold;
 }
 .dx-scheduler-work-space-month .dx-scheduler-all-day-panel,
 .dx-scheduler-timeline .dx-scheduler-all-day-panel,
@@ -1466,6 +1474,36 @@
 .dx-rtl .dx-scheduler-work-space-day .dx-scheduler-date-table-cell:nth-child(1n),
 .dx-rtl .dx-scheduler-work-space-day .dx-scheduler-all-day-table-cell:nth-child(1n) {
   border-left: none;
+}
+.dx-scheduler-work-space-count.dx-scheduler-work-space-week .dx-scheduler-header-panel-cell:nth-child(7n),
+.dx-scheduler-work-space-count.dx-scheduler-work-space-week .dx-scheduler-date-table-cell:nth-child(7n),
+.dx-scheduler-work-space-count.dx-scheduler-work-space-week .dx-scheduler-all-day-table-cell:nth-child(7n) {
+  border-right: 1px solid #c4c4c4;
+}
+.dx-rtl .dx-scheduler-work-space-count.dx-scheduler-work-space-week .dx-scheduler-header-panel-cell:nth-child(7n),
+.dx-rtl .dx-scheduler-work-space-count.dx-scheduler-work-space-week .dx-scheduler-date-table-cell:nth-child(7n),
+.dx-rtl .dx-scheduler-work-space-count.dx-scheduler-work-space-week .dx-scheduler-all-day-table-cell:nth-child(7n) {
+  border-left: 1px solid #c4c4c4;
+}
+.dx-scheduler-work-space-count.dx-scheduler-work-space-work-week .dx-scheduler-header-panel-cell:nth-child(5n),
+.dx-scheduler-work-space-count.dx-scheduler-work-space-work-week .dx-scheduler-date-table-cell:nth-child(5n),
+.dx-scheduler-work-space-count.dx-scheduler-work-space-work-week .dx-scheduler-all-day-table-cell:nth-child(5n) {
+  border-right: 1px solid #c4c4c4;
+}
+.dx-rtl .dx-scheduler-work-space-count.dx-scheduler-work-space-work-week .dx-scheduler-header-panel-cell:nth-child(5n),
+.dx-rtl .dx-scheduler-work-space-count.dx-scheduler-work-space-work-week .dx-scheduler-date-table-cell:nth-child(5n),
+.dx-rtl .dx-scheduler-work-space-count.dx-scheduler-work-space-work-week .dx-scheduler-all-day-table-cell:nth-child(5n) {
+  border-left: 1px solid #c4c4c4;
+}
+.dx-scheduler-work-space-count.dx-scheduler-work-space-day .dx-scheduler-header-panel-cell:nth-child(1n),
+.dx-scheduler-work-space-count.dx-scheduler-work-space-day .dx-scheduler-date-table-cell:nth-child(1n),
+.dx-scheduler-work-space-count.dx-scheduler-work-space-day .dx-scheduler-all-day-table-cell:nth-child(1n) {
+  border-right: 1px solid #c4c4c4;
+}
+.dx-rtl .dx-scheduler-work-space-count.dx-scheduler-work-space-day .dx-scheduler-header-panel-cell:nth-child(1n),
+.dx-rtl .dx-scheduler-work-space-count.dx-scheduler-work-space-day .dx-scheduler-date-table-cell:nth-child(1n),
+.dx-rtl .dx-scheduler-work-space-count.dx-scheduler-work-space-day .dx-scheduler-all-day-table-cell:nth-child(1n) {
+  border-left: 1px solid #c4c4c4;
 }
 .dx-scheduler-header-panel {
   border-collapse: collapse;
@@ -7912,9 +7950,6 @@
 .dx-editor-cell .dx-numberbox-spin-button {
   background-color: transparent;
 }
-.dx-editor-cell .dx-checkbox.dx-checkbox-checked .dx-checkbox-icon {
-  font-size: 12px;
-}
 .dx-editor-cell .dx-texteditor {
   background: #fff;
 }
@@ -7939,6 +7974,9 @@
 }
 .dx-datagrid-checkbox-size {
   line-height: normal;
+}
+.dx-datagrid-checkbox-size.dx-checkbox-checked .dx-checkbox-icon {
+  font-size: 12px;
 }
 .dx-datagrid-checkbox-size .dx-checkbox-icon {
   height: 16px;
@@ -8890,9 +8928,6 @@
 .dx-editor-cell .dx-numberbox-spin-button {
   background-color: transparent;
 }
-.dx-editor-cell .dx-checkbox.dx-checkbox-checked .dx-checkbox-icon {
-  font-size: 12px;
-}
 .dx-editor-cell .dx-texteditor {
   background: #fff;
 }
@@ -8917,6 +8952,9 @@
 }
 .dx-treelist-checkbox-size {
   line-height: normal;
+}
+.dx-treelist-checkbox-size.dx-checkbox-checked .dx-checkbox-icon {
+  font-size: 12px;
 }
 .dx-treelist-checkbox-size .dx-checkbox-icon {
   height: 16px;
@@ -9512,10 +9550,6 @@
 .dx-treelist-select-all .dx-checkbox {
   position: absolute;
 }
-.dx-treelist-cell-expandable .dx-checkbox.dx-checkbox-checked .dx-checkbox-icon,
-.dx-treelist-select-all .dx-checkbox.dx-checkbox-checked .dx-checkbox-icon {
-  font-size: 12px;
-}
 .dx-treelist-icon-container.dx-editor-inline-block {
   position: relative;
   padding-right: 23px;
@@ -9971,7 +10005,7 @@
   border-radius: 4px;
 }
 .dx-calendar-cell.dx-calendar-today {
-  text-shadow: 0 1px 0 #333;
+  font-weight: bold;
 }
 .dx-calendar-cell.dx-state-hover {
   -webkit-box-shadow: inset 0px -1px 0px 1000px #f5f5f5;
@@ -10014,7 +10048,6 @@
   -webkit-box-shadow: inset 0px 0px 0px 1000px #337ab7;
   -moz-box-shadow: inset 0px 0px 0px 1000px #337ab7;
   box-shadow: inset 0px 0px 0px 1000px #337ab7;
-  text-shadow: 0 1px 0 #fff;
   font-weight: normal;
 }
 .dx-calendar-cell.dx-calendar-selected-date.dx-calendar-contoured-date,
@@ -10700,11 +10733,38 @@
   padding-bottom: 125px;
   margin-bottom: -125px;
 }
-.dx-scheduler-work-space-day .dx-scheduler-header-panel .dx-scheduler-group-row:not(:first-child) {
-  border-bottom: none;
-}
 .dx-scheduler-work-space-day:not(.dx-scheduler-work-space-grouped) .dx-scheduler-all-day-title {
   top: 57px;
+}
+.dx-scheduler-work-space-day.dx-scheduler-work-space-count .dx-scheduler-header-panel {
+  margin-top: 10px;
+}
+.dx-scheduler-work-space-day.dx-scheduler-work-space-count[dx-group-row-count='1'] .dx-scheduler-all-day-title {
+  top: 136px;
+}
+.dx-scheduler-work-space-day.dx-scheduler-work-space-count[dx-group-row-count='1'] .dx-scheduler-all-day-title:before {
+  top: -81px;
+  height: 80px;
+}
+.dx-scheduler-work-space-day.dx-scheduler-work-space-count[dx-group-row-count='2'] .dx-scheduler-all-day-title {
+  top: 166px;
+}
+.dx-scheduler-work-space-day.dx-scheduler-work-space-count[dx-group-row-count='2'] .dx-scheduler-all-day-title:before {
+  top: -111px;
+  height: 110px;
+}
+.dx-scheduler-work-space-day.dx-scheduler-work-space-count[dx-group-row-count='3'] .dx-scheduler-all-day-title {
+  top: 196px;
+}
+.dx-scheduler-work-space-day.dx-scheduler-work-space-count[dx-group-row-count='3'] .dx-scheduler-all-day-title:before {
+  top: -141px;
+  height: 140px;
+}
+.dx-scheduler-work-space-day.dx-scheduler-work-space-count .dx-scheduler-all-day-title {
+  top: 106px;
+}
+.dx-scheduler-work-space-day .dx-scheduler-header-panel .dx-scheduler-group-row:not(:first-child) {
+  border-bottom: none;
 }
 .dx-scheduler-work-space-month .dx-scrollable.dx-scheduler-date-table-scrollable,
 .dx-scheduler-work-space-month .dx-scrollable.dx-scheduler-sidebar-scrollable {
@@ -10728,6 +10788,10 @@
 }
 .dx-scheduler-work-space-month .dx-scheduler-appointment-content {
   font-size: 13px;
+}
+.dx-scheduler-work-space-month .dx-scheduler-date-table-first-of-month {
+  border-left: 1px solid #aaaaaa;
+  border-top: 1px solid #aaaaaa;
 }
 .dx-scheduler-appointment-tooltip .dx-button-content {
   font-size: 12.30769231px;

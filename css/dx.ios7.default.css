@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 17.2.0 (build 17206)
-* Build date: Jul 25, 2017
+* Version: 17.2.0 (build 17217)
+* Build date: Aug 5, 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -1143,15 +1143,16 @@
   border-left: 1px solid rgba(200, 200, 200, 0.6);
   border-top: 1px solid rgba(200, 200, 200, 0.6);
 }
-.dx-scheduler-work-space-day .dx-scheduler-all-day-table-cell {
+.dx-scheduler-work-space-day:not(.dx-scheduler-work-space-count) .dx-scheduler-all-day-table-cell {
   border-top: none;
   border-left: none;
 }
 .dx-scheduler-work-space-week .dx-scheduler-all-day-title,
-.dx-scheduler-work-space-work-week .dx-scheduler-all-day-title {
+.dx-scheduler-work-space-work-week .dx-scheduler-all-day-title,
+.dx-scheduler-work-space-day.dx-scheduler-work-space-count .dx-scheduler-all-day-title {
   border-top: 1px solid rgba(200, 200, 200, 0.6);
 }
-.dx-scheduler-work-space-month .dx-scrollable .dx-scrollable-content {
+.dx-scheduler-work-space-month:not(.dx-scheduler-work-space-count) .dx-scrollable .dx-scrollable-content {
   height: 100%;
 }
 .dx-scheduler-work-space-month .dx-scheduler-all-day-title {
@@ -1217,6 +1218,13 @@
 }
 .dx-scheduler-work-space-month .dx-scheduler-fixed-appointments {
   left: 0;
+}
+.dx-scheduler-work-space-month.dx-scheduler-work-space-count .dx-scheduler-date-table-cell {
+  height: 75px;
+}
+.dx-scheduler-work-space-month.dx-scheduler-work-space-count .dx-scheduler-date-table-first-of-month {
+  color: #65bccd;
+  font-weight: bold;
 }
 .dx-scheduler-work-space-month .dx-scheduler-all-day-panel,
 .dx-scheduler-timeline .dx-scheduler-all-day-panel,
@@ -1468,6 +1476,36 @@
 .dx-rtl .dx-scheduler-work-space-day .dx-scheduler-date-table-cell:nth-child(1n),
 .dx-rtl .dx-scheduler-work-space-day .dx-scheduler-all-day-table-cell:nth-child(1n) {
   border-left: none;
+}
+.dx-scheduler-work-space-count.dx-scheduler-work-space-week .dx-scheduler-header-panel-cell:nth-child(7n),
+.dx-scheduler-work-space-count.dx-scheduler-work-space-week .dx-scheduler-date-table-cell:nth-child(7n),
+.dx-scheduler-work-space-count.dx-scheduler-work-space-week .dx-scheduler-all-day-table-cell:nth-child(7n) {
+  border-right: 1px solid #aeaeae;
+}
+.dx-rtl .dx-scheduler-work-space-count.dx-scheduler-work-space-week .dx-scheduler-header-panel-cell:nth-child(7n),
+.dx-rtl .dx-scheduler-work-space-count.dx-scheduler-work-space-week .dx-scheduler-date-table-cell:nth-child(7n),
+.dx-rtl .dx-scheduler-work-space-count.dx-scheduler-work-space-week .dx-scheduler-all-day-table-cell:nth-child(7n) {
+  border-left: 1px solid #aeaeae;
+}
+.dx-scheduler-work-space-count.dx-scheduler-work-space-work-week .dx-scheduler-header-panel-cell:nth-child(5n),
+.dx-scheduler-work-space-count.dx-scheduler-work-space-work-week .dx-scheduler-date-table-cell:nth-child(5n),
+.dx-scheduler-work-space-count.dx-scheduler-work-space-work-week .dx-scheduler-all-day-table-cell:nth-child(5n) {
+  border-right: 1px solid #aeaeae;
+}
+.dx-rtl .dx-scheduler-work-space-count.dx-scheduler-work-space-work-week .dx-scheduler-header-panel-cell:nth-child(5n),
+.dx-rtl .dx-scheduler-work-space-count.dx-scheduler-work-space-work-week .dx-scheduler-date-table-cell:nth-child(5n),
+.dx-rtl .dx-scheduler-work-space-count.dx-scheduler-work-space-work-week .dx-scheduler-all-day-table-cell:nth-child(5n) {
+  border-left: 1px solid #aeaeae;
+}
+.dx-scheduler-work-space-count.dx-scheduler-work-space-day .dx-scheduler-header-panel-cell:nth-child(1n),
+.dx-scheduler-work-space-count.dx-scheduler-work-space-day .dx-scheduler-date-table-cell:nth-child(1n),
+.dx-scheduler-work-space-count.dx-scheduler-work-space-day .dx-scheduler-all-day-table-cell:nth-child(1n) {
+  border-right: 1px solid #aeaeae;
+}
+.dx-rtl .dx-scheduler-work-space-count.dx-scheduler-work-space-day .dx-scheduler-header-panel-cell:nth-child(1n),
+.dx-rtl .dx-scheduler-work-space-count.dx-scheduler-work-space-day .dx-scheduler-date-table-cell:nth-child(1n),
+.dx-rtl .dx-scheduler-work-space-count.dx-scheduler-work-space-day .dx-scheduler-all-day-table-cell:nth-child(1n) {
+  border-left: 1px solid #aeaeae;
 }
 .dx-scheduler-header-panel {
   border-collapse: collapse;
