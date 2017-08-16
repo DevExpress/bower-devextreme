@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.all.d.ts)
-* Version: 16.2.8 (build 17208)
-* Build date: Thu Jul 27 2017
+* Version: 16.2.9
+* Build date: Mon Aug 14 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -2860,7 +2860,7 @@ declare module DevExpress.ui {
         screenByWidth?: (width: number) => string;
         /** Specifies the location of a label against the editor. */
         labelLocation?: string;
-        /** Specifies whether or not all editors on the form are read-only. */
+        /** Specifies whether all editors on the form are read-only. Applies only to non-templated items. */
         readOnly?: boolean;
         /** A handler for the fieldDataChanged event. */
         onFieldDataChanged?: (e: Object) => void;
