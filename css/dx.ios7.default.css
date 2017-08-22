@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 17.2.0 (build 17217)
-* Build date: Aug 5, 2017
+* Version: 17.2.0 (build 17231)
+* Build date: Aug 19, 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -5810,11 +5810,6 @@
   padding: 4px 17px 4px 0;
   color: #8e8e93;
 }
-.dx-rtl .dx-lookup-field,
-.dx-rtl.dx-lookup-field {
-  padding-right: 0;
-  padding-left: 17px;
-}
 .dx-lookup-arrow {
   font: 14px/1 DXIcons;
   font-size: 16px;
@@ -5863,9 +5858,6 @@
 .dx-lookup-popup-wrapper .dx-popup-content {
   padding: 0;
 }
-.dx-lookup-popup-wrapper .dx-rtl .dx-list-item:before {
-  float: left;
-}
 .dx-lookup-popup-wrapper .dx-lookup-invalid .dx-list {
   top: 40px;
 }
@@ -5882,15 +5874,6 @@
   margin-right: 20px;
   line-height: 20px;
   float: right;
-}
-.dx-rtl .dx-lookup-popup-wrapper .dx-list-item-selected .dx-list-item-content:before,
-.dx-rtl.dx-lookup-popup-wrapper .dx-list-item-selected .dx-list-item-content:before {
-  float: left;
-  margin-left: 20px;
-}
-.dx-rtl .dx-lookup-popup-wrapper .dx-list-item-selected .dx-list-item-content {
-  padding-right: 15px;
-  padding-left: 20px;
 }
 .dx-lookup-popup-wrapper .dx-list {
   padding-bottom: 8px;
@@ -5939,10 +5922,25 @@
   text-align: center;
   line-height: 19px;
 }
+.dx-rtl .dx-lookup-field {
+  padding-right: 0;
+  padding-left: 17px;
+}
 .dx-rtl .dx-invalid.dx-lookup .dx-lookup-field:after,
 .dx-rtl.dx-invalid.dx-lookup .dx-lookup-field:after {
   left: 26px;
   right: auto;
+}
+.dx-lookup-popup-wrapper > .dx-rtl .dx-list-item:before {
+  float: left;
+}
+.dx-lookup-popup-wrapper > .dx-rtl .dx-list-item.dx-list-item-selected .dx-list-item-content:before {
+  float: left;
+  margin-left: 20px;
+}
+.dx-lookup-popup-wrapper > .dx-rtl .dx-list-item .dx-list-item-content {
+  padding-right: 15px;
+  padding-left: 20px;
 }
 .dx-actionsheet-without-title .dx-actionsheet-container {
   -webkit-border-radius: 6px 6px 6px 6px;
@@ -9318,6 +9316,9 @@
 }
 .dx-timeview-minutearrow {
   background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAABBCAQAAABcbc0qAAAAIElEQVQoU2Ng8GR4BoSeDEDiPxA+YwBTIDjKGGUQzQAAYUgBPFDJCN4AAAAASUVORK5CYII=);
+}
+.dx-timeview-format12 {
+  width: 60px;
 }
 .dx-scheduler-header {
   height: 50px;

@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.all.d.ts)
-* Version: 17.2.0 (build 17217)
-* Build date: Sat Aug 05 2017
+* Version: 17.2.0 (build 17231)
+* Build date: Sat Aug 19 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -745,9 +745,9 @@ declare module DevExpress {
         bindingOptions?: { [key: string]: any; };
     }
     export interface DOMComponentOptions extends DOMComponentOptionsBase {
-        /** Specifies the height of the widget container. */
+        /** Specifies the widget's height. */
         height?: any;
-        /** Specifies the width of the widget container. */
+        /** Specifies the widget's width. */
         width?: any;
     }
     /** A base class for all components. */
@@ -1889,7 +1889,7 @@ declare module DevExpress.ui {
             /** An object that defines the animation options used when the widget is being hidden. */
             hide?: fx.AnimationOptions;
         };
-        /** Specifies the height of the widget. */
+        /** Specifies the widget's height. */
         height?: any;
         /** An object defining widget positioning options. */
         position?: PositionOptions;
@@ -1898,7 +1898,7 @@ declare module DevExpress.ui {
         showTitle?: boolean;
         /** The target element associated with a popover. */
         target?: any;
-        /** Specifies the width of the widget. */
+        /** Specifies the widget's width. */
         width?: any;
         /** Specifies options for displaying the widget. */
         showEvent?: {
@@ -2077,7 +2077,7 @@ declare module DevExpress.ui {
         onClick?: any;
         /** Specifies whether or not map widget controls are available. */
         controls?: boolean;
-        /** Specifies the height of the widget. */
+        /** Specifies the widget's height. */
         height?: any;
         /** A key used to authenticate the application within the required map provider. */
         key?: {
@@ -2108,7 +2108,7 @@ declare module DevExpress.ui {
         routes?: Array<dxMapRoute>;
         /** The type of a map to display. */
         type?: string;
-        /** Specifies the width of the widget. */
+        /** Specifies the widget's width. */
         width?: any;
         /** The zoom level of the map. */
         zoom?: number;
@@ -2230,7 +2230,7 @@ declare module DevExpress.ui {
         showIndicator?: boolean;
         /** A Boolean value specifying whether or not to show the pane behind the load indicator. */
         showPane?: boolean;
-        /** The width of the widget. */
+        /** Specifies the widget's width. */
         width?: number;
         /** Specifies whether or not the widget can be focused. */
         focusStateEnabled?: boolean;
@@ -2460,6 +2460,7 @@ declare module DevExpress.ui {
         acceptCustomValue?: boolean;
         /** Configures the drop-down field which holds the content. */
         dropDownOptions?: DevExpress.ui.dxPopupOptions;
+        /** The template to be used for rendering the widget's text field. */
         fieldTemplate?: any;
         /** Specifies after which DOM events the widget updates the value. */
         valueChangeEvent?: string;
@@ -2492,6 +2493,7 @@ declare module DevExpress.ui {
         useNative?: boolean;
         /** Specifies the interval between neighboring values in the popup list in minutes. */
         interval?: number;
+        /** Specifies dates to be disabled. Applies only if pickerType is "calendar". */
         disabledDates?: any;
         /** Specifies the maximum zoom level of a calendar, which is used to pick the date. */
         maxZoomLevel?: string;
@@ -2553,6 +2555,7 @@ declare module DevExpress.ui {
         minZoomLevel?: string;
         /** The template to be used for rendering calendar cells. */
         cellTemplate?: any;
+        /** Specifies dates to be disabled. */
         disabledDates?: any;
         name?: string;
     }
@@ -2635,7 +2638,7 @@ declare module DevExpress.ui {
     export interface dxAccordionOptions extends CollectionWidgetOptions {
         /** A number specifying the time in milliseconds spent on the animation of the expanding or collapsing of a panel. */
         animationDuration?: number;
-        /** Specifies the height of the widget. */
+        /** Specifies the widget's height. */
         height?: any;
         /** Specifies whether all items can be collapsed or whether at least one item must always be expanded. */
         collapsible?: boolean;
@@ -3032,7 +3035,7 @@ declare module DevExpress.ui {
         baseItemWidth?: number;
         /** Specifies whether tiles are placed horizontally or vertically. */
         direction?: string;
-        /** Specifies the height of the widget. */
+        /** Specifies the widget's height. */
         height?: any;
         /** Specifies the distance in pixels between adjacent tiles. */
         itemMargin?: number;
@@ -3431,8 +3434,11 @@ declare module DevExpress.ui {
     export interface dxSchedulerViewOptions {
         /** The name of the view. */
         type?: string;
+        /** A custom name for the view. This name goes to the view switcher. */
         name?: string;
+        /** Multiplies the default view interval. Applies to all view types except "agenda". */
         intervalCount?: number;
+        /** Specifies the date from which to start counting the view interval. Applies to all view types except "agenda". */
         startDate?: any;
         /** The first day of a week. */
         firstDayOfWeek?: number;
@@ -3468,7 +3474,7 @@ declare module DevExpress.ui {
         min?: any;
         /** The latest date the widget allows you to select. */
         max?: any;
-        /** Specifies the view used in the scheduler by default. */
+        /** Specifies the currently displayed view. Accepts the view's name or type. */
         currentView?: string;
         /** Specifies the origin of data for the widget. */
         dataSource?: any;
@@ -3598,9 +3604,9 @@ declare module DevExpress.ui {
         constructor(element: Element, options?: dxSchedulerOptions);
         /** Add the appointment defined by the object passed as a parameter to the data associated with the widget. */
         addAppointment(appointment: Object): void;
-        /** Updates the appointment specified by the first method parameter by the appointment object specified by the second method parameter in the the data associated with the widget. */
+        /** Updates the appointment specified by the first method parameter by the appointment object specified by the second method parameter in the data associated with the widget. */
         updateAppointment(target: Object, appointment: Object): void;
-        /** Deletes the appointment defined by the parameter from the the data associated with the widget. */
+        /** Deletes the appointment defined by the parameter from the data associated with the widget. */
         deleteAppointment(appointment: Object): void;
         /** Scrolls the scheduler work space to the specified time of the specified day. */
         scrollToTime(hours: number, minutes: number, date: Date): void;
@@ -4138,6 +4144,7 @@ declare module DevExpress.ui {
         deferred?: boolean;
     }
     export interface dxTreeListSelection extends GridBaseSelection {
+        /** Specifies whether selection is recursive. */
         recursive?: boolean;
     }
     export interface dxDataGridOptions extends GridBaseOptions {
@@ -4819,7 +4826,9 @@ declare module DevExpress.ui {
         expandRow(key: any): void;
         /** Collapses a specific row. */
         collapseRow(key: any): void;
+        /** Gets the currently selected rows' keys. */
         getSelectedRowKeys(): Array<any>;
+        /** Gets the currently selected row keys. */
         getSelectedRowKeys(leavesOnly: boolean): Array<any>;
         /** Gets data objects of currently selected rows. */
         getSelectedRowsData(): Array<any>;
@@ -4829,8 +4838,11 @@ declare module DevExpress.ui {
         addRow(): void;
         /** Adds an empty data row to a specified parent row. */
         addRow(parentId: any): void;
+        /** Loads all root node descendants (all data items). Takes effect only if data has the plain structure and  remoteOperations | filtering is true. */
         loadDescendants(): JQueryPromise<void>;
+        /** Loads a specific node's descendants. Takes effect only if data has the plain structure and  remoteOperations | filtering is true. */
         loadDescendants(keys: any): JQueryPromise<void>;
+        /** Loads all or only direct descendants of specific nodes. Takes effect only if data has the plain structure and  remoteOperations | filtering is true. */
         loadDescendants(keys: any, childrenOnly: boolean): JQueryPromise<void>;
     }
     /** The DataGrid is a widget that represents data from a local or remote source in the form of a grid. This widget offers such basic features as sorting, grouping, filtering, as well as more advanced capabilities, like state storing, export to Excel, master-detail interface, and many others. */
@@ -4883,6 +4895,7 @@ declare module DevExpress.ui {
         exportToExcel(selectionOnly: boolean): void;
         /** Gets data objects of currently selected rows. */
         getSelectedRowsData(): any;
+        /** Gets the currently selected rows' keys. */
         getSelectedRowKeys(): any;
         /** Adds an empty data row. */
         addRow(): void;
@@ -5407,50 +5420,33 @@ declare module DevExpress.framework {
 }
 declare module DevExpress.viz.core {
     export interface Border {
-        /** Sets a border color for a selected series. */
         color?: string;
-        /** Sets border visibility for a selected series. */
         visible?: boolean;
-        /** Sets a border width for a selected series. */
         width?: number;
     }
     export interface DashedBorder extends Border {
-        /** Specifies a dash style for the border of a selected series point. */
         dashStyle?: string;
     }
     export interface DashedBorderWithOpacity extends DashedBorder {
-        /** Specifies how transparent the vertical crosshair line should be. */
         opacity?: number;
     }
     export interface Font {
-        /** Colors the text displayed by the group labels. */
         color?: string;
-        /** Specifies the font family of the text displayed by the group labels. */
         family?: string;
-        /** Specifies how transparent the text displayed by the group labels should be. */
         opacity?: number;
-        /** Specifies the size of the text displayed by the group labels. */
         size?: any;
-        /** Specifies the font weight of the text displayed by the group labels. */
         weight?: number;
     }
     export interface Hatching {
         direction?: string;
-        /** Specifies the opacity of hatching lines. */
         opacity?: number;
-        /** Specifies the distance between hatching lines in pixels. */
         step?: number;
-        /** Specifies the width of hatching lines in pixels. */
         width?: number;
     }
     export interface Margins {
-        /** Specifies the legend's bottom margin in pixels. */
         bottom?: number;
-        /** Specifies the legend's left margin in pixels. */
         left?: number;
-        /** Specifies the legend's right margin in pixels. */
         right?: number;
-        /** Specifies the legend's bottom margin in pixels. */
         top?: number;
     }
     export interface MarginOptions {
@@ -5531,7 +5527,6 @@ declare module DevExpress.viz.core {
         zIndex?: number;
         /** Specifies the container to draw tooltips inside of it. */
         container?: any;
-        /** Allows you to change tooltip appearance. */
         customizeTooltip?: (arg: Object) => { color?: string; text?: string };
         enabled?: boolean;
         /** Specifies the font of the text displayed by a tooltip. */
@@ -5579,43 +5574,25 @@ declare module DevExpress.viz.core {
         text?: string;
     }
     export interface LegendBorder extends viz.core.DashedBorderWithOpacity {
-        /** Specifies a radius for the corners of the legend border. */
         cornerRadius?: number;
     }
     export interface BaseLegend {
-        /** Specifies the color of the legend's background. */
         backgroundColor?: string;
-        /** Specifies legend border settings. */
         border?: viz.core.LegendBorder;
-        /** Specifies how many columns must be taken to arrange legend items. */
         columnCount?: number;
-        /** Specifies the spacing between a pair of neighboring legend columns in pixels. */
         columnItemSpacing?: number;
-        /** Specifies font options for legend items. */
         font?: viz.core.Font;
-        /** Specifies the legend's position on the map. */
         horizontalAlignment?: string;
-        /** Specifies the alignment of legend items. */
         itemsAlignment?: string;
-        /** Specifies the position of text relative to the item marker. */
         itemTextPosition?: string;
-        /** Specifies the distance between the legend and the container borders in pixels. */
         margin?: viz.core.Margins;
-        /** Specifies the size of item markers in the legend in pixels. */
         markerSize?: number;
-        /** Specifies whether to arrange legend items horizontally or vertically. */
         orientation?: string;
-        /** Specifies the spacing between the legend left/right border and legend items in pixels. */
         paddingLeftRight?: number;
-        /** Specifies the spacing between the legend top/bottom border and legend items in pixels. */
         paddingTopBottom?: number;
-        /** Specifies how many rows must be taken to arrange legend items. */
         rowCount?: number;
-        /** Specifies the spacing between a pair of neighboring legend rows in pixels. */
         rowItemSpacing?: number;
-        /** Specifies the legend's position on the map. */
         verticalAlignment?: string;
-        /** Specifies whether or not the legend is visible on the map. */
         visible?: boolean;
     }
     export interface BaseWidgetOptions extends DOMComponentOptionsBase {
