@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 17.1.5
-* Build date: Aug 1, 2017
+* Version: 17.1.5 (build 17235)
+* Build date: Aug 23, 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -9977,7 +9977,7 @@
   border-radius: 4px;
 }
 .dx-calendar-cell.dx-calendar-today {
-  text-shadow: 0 1px 0 #fff;
+  font-weight: bold;
 }
 .dx-calendar-cell.dx-state-hover {
   -webkit-box-shadow: inset 0px -1px 0px 1000px #cf00d7;
@@ -10020,7 +10020,6 @@
   -webkit-box-shadow: inset 0px 0px 0px 1000px #ffffff;
   -moz-box-shadow: inset 0px 0px 0px 1000px #ffffff;
   box-shadow: inset 0px 0px 0px 1000px #ffffff;
-  text-shadow: 0 1px 0 #000000;
   font-weight: normal;
 }
 .dx-calendar-cell.dx-calendar-selected-date.dx-calendar-contoured-date,

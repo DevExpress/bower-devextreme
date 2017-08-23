@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.all.d.ts)
-* Version: 17.1.5
-* Build date: Tue Aug 01 2017
+* Version: 17.1.5 (build 17235)
+* Build date: Wed Aug 23 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -745,9 +745,9 @@ declare module DevExpress {
         bindingOptions?: { [key: string]: any; };
     }
     export interface DOMComponentOptions extends DOMComponentOptionsBase {
-        /** Specifies the height of the widget container. */
+        /** Specifies the widget's height. */
         height?: any;
-        /** Specifies the width of the widget container. */
+        /** Specifies the widget's width. */
         width?: any;
     }
     /** A base class for all components. */
@@ -1883,7 +1883,7 @@ declare module DevExpress.ui {
             /** An object that defines the animation options used when the widget is being hidden. */
             hide?: fx.AnimationOptions;
         };
-        /** Specifies the height of the widget. */
+        /** Specifies the widget's height. */
         height?: any;
         /** An object defining widget positioning options. */
         position?: PositionOptions;
@@ -1892,7 +1892,7 @@ declare module DevExpress.ui {
         showTitle?: boolean;
         /** The target element associated with a popover. */
         target?: any;
-        /** Specifies the width of the widget. */
+        /** Specifies the widget's width. */
         width?: any;
         /** Specifies options for displaying the widget. */
         showEvent?: {
@@ -2071,7 +2071,7 @@ declare module DevExpress.ui {
         onClick?: any;
         /** Specifies whether or not map widget controls are available. */
         controls?: boolean;
-        /** Specifies the height of the widget. */
+        /** Specifies the widget's height. */
         height?: any;
         /** A key used to authenticate the application within the required map provider. */
         key?: {
@@ -2102,7 +2102,7 @@ declare module DevExpress.ui {
         routes?: Array<dxMapRoute>;
         /** The type of a map to display. */
         type?: string;
-        /** Specifies the width of the widget. */
+        /** Specifies the widget's width. */
         width?: any;
         /** The zoom level of the map. */
         zoom?: number;
@@ -2224,7 +2224,7 @@ declare module DevExpress.ui {
         showIndicator?: boolean;
         /** A Boolean value specifying whether or not to show the pane behind the load indicator. */
         showPane?: boolean;
-        /** The width of the widget. */
+        /** Specifies the widget's width. */
         width?: number;
         /** Specifies whether or not the widget can be focused. */
         focusStateEnabled?: boolean;
@@ -2626,7 +2626,7 @@ declare module DevExpress.ui {
     export interface dxAccordionOptions extends CollectionWidgetOptions {
         /** A number specifying the time in milliseconds spent on the animation of the expanding or collapsing of a panel. */
         animationDuration?: number;
-        /** Specifies the height of the widget. */
+        /** Specifies the widget's height. */
         height?: any;
         /** Specifies whether all items can be collapsed or whether at least one item must always be expanded. */
         collapsible?: boolean;
@@ -2906,7 +2906,7 @@ declare module DevExpress.ui {
         screenByWidth?: (width: number) => string;
         /** Specifies the location of a label against the editor. */
         labelLocation?: string;
-        /** Specifies whether or not all editors on the form are read-only. */
+        /** Specifies whether all editors on the form are read-only. Applies only to non-templated items. */
         readOnly?: boolean;
         /** A handler for the fieldDataChanged event. */
         onFieldDataChanged?: (e: Object) => void;
@@ -3023,7 +3023,7 @@ declare module DevExpress.ui {
         baseItemWidth?: number;
         /** Specifies whether tiles are placed horizontally or vertically. */
         direction?: string;
-        /** Specifies the height of the widget. */
+        /** Specifies the widget's height. */
         height?: any;
         /** Specifies the distance in pixels between adjacent tiles. */
         itemMargin?: number;
@@ -3586,9 +3586,9 @@ declare module DevExpress.ui {
         constructor(element: Element, options?: dxSchedulerOptions);
         /** Add the appointment defined by the object passed as a parameter to the data associated with the widget. */
         addAppointment(appointment: Object): void;
-        /** Updates the appointment specified by the first method parameter by the appointment object specified by the second method parameter in the the data associated with the widget. */
+        /** Updates the appointment specified by the first method parameter by the appointment object specified by the second method parameter in the data associated with the widget. */
         updateAppointment(target: Object, appointment: Object): void;
-        /** Deletes the appointment defined by the parameter from the the data associated with the widget. */
+        /** Deletes the appointment defined by the parameter from the data associated with the widget. */
         deleteAppointment(appointment: Object): void;
         /** Scrolls the scheduler work space to the specified time of the specified day. */
         scrollToTime(hours: number, minutes: number, date: Date): void;
@@ -4039,7 +4039,7 @@ declare module DevExpress.ui {
         preloadEnabled?: boolean;
         /** Specifies whether the widget should use native or simulated scrolling. */
         useNative?: any;
-        /** Specifies when to show the scrollbar. */
+        /** Specifies when to show the scrollbar. Applies only if useNative is false. */
         showScrollbar?: string;
         /** Specifies whether a user can scroll the content with a swipe gesture. Applies only if native scrolling is disabled. */
         scrollByContent?: boolean;
@@ -4234,7 +4234,7 @@ declare module DevExpress.ui {
         /** Allows you to sort groups according to the values of group summary items. */
         sortByGroupSummaryInfo?: Array<{
             /** Specifies the group summary item whose values must be used to sort groups. */
-            summaryItem?: string;
+            summaryItem?: any;
             /** Specifies the identifier of the column that must be used in grouping so that sorting by group summary item values be applied. */
             groupColumn?: string;
             /** Specifies the sort order of group summary item values. */
@@ -4762,8 +4762,6 @@ declare module DevExpress.ui {
         selectRowsByIndexes(indexes: Array<any>): JQueryPromise<any>;
         /** Clears selection of all rows on all pages. */
         clearSelection(): void;
-        /** Gets the keys of the currently selected rows. */
-        getSelectedRowKeys(): any;
         startSelectionWithCheckboxes(): boolean;
         /** Checks whether the row with a specific key is selected. Takes effect only if selection | deferred is false. */
         isRowSelected(arg: any): boolean;
@@ -4810,6 +4808,8 @@ declare module DevExpress.ui {
         collapseRow(key: any): void;
         /** Gets data objects of currently selected rows. */
         getSelectedRowsData(): Array<any>;
+        /** Gets the keys of the currently selected rows. */
+        getSelectedRowKeys(): Array<any>;
         /** Gets a node by its key. */
         getNodeByKey(key: any): dxTreeListNode;
         /** Adds an empty data row to the highest hierarchical level. */
@@ -4867,6 +4867,8 @@ declare module DevExpress.ui {
         exportToExcel(selectionOnly: boolean): void;
         /** Gets data objects of currently selected rows. */
         getSelectedRowsData(): any;
+        /** Gets the keys of the currently selected rows. */
+        getSelectedRowKeys(): any;
         /** Adds an empty data row. */
         addRow(): void;
     }
@@ -5515,7 +5517,13 @@ declare module DevExpress.viz.core {
         /** Specifies the container to draw tooltips inside of it. */
         container?: any;
         /** Allows you to change tooltip appearance. */
-        customizeTooltip?: (arg: Object) => { color?: string; text?: string };
+        customizeTooltip?: (arg: Object) => {
+            color?: string;
+            text?: string;
+            html?: string;
+            fontColor?: string;
+            borderColor?: string;
+        };
         enabled?: boolean;
         /** Specifies the font of the text displayed by a tooltip. */
         font?: Font;
