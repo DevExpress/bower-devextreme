@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.all.d.ts)
-* Version: 17.1.6
-* Build date: Tue Sep 05 2017
+* Version: 17.1.6 (build 17251)
+* Build date: Fri Sep 08 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -3709,21 +3709,29 @@ declare module DevExpress.ui {
         constructor(element: Element, options?: dxTreeViewOptions);
         /** Updates the tree view scrollbars according to the current size of the widget content. */
         updateDimensions(): JQueryPromise<void>;
-        /** Selects the specified item. */
+        /** Selects an item found using an HTML element. */
         selectItem(itemElement: Node): void;
+        /** Selects an item found using a data object. */
         selectItem(itemData: Object): void;
+        /** Selects an item found using a key. */
         selectItem(key: any): void;
-        /** Cancels the selection of the specified item. */
+        /** Clears the selection of an item found using an HTML element. */
         unselectItem(itemElement: Node): void;
+        /** Clears the selection of an item found using a data object. */
         unselectItem(itemData: Object): void;
+        /** Clears the selection of an item found using a key. */
         unselectItem(key: any): void;
-        /** Expands the specified item. */
+        /** Expands an item found using an HTML element. */
         expandItem(itemElement: Node): void;
+        /** Expands an item found using a data object. */
         expandItem(itemData: Object): void;
+        /** Expands an item found using a key. */
         expandItem(key: any): void;
-        /** Collapses the specified item. */
+        /** Collapses an item found using an HTML element. */
         collapseItem(itemElement: Node): void;
+        /** Collapses an item found using a key. */
         collapseItem(itemData: Object): void;
+        /** Collapses an item found using a key. */
         collapseItem(key: any): void;
         /** Returns all nodes of the tree view. */
         getNodes(): Array<Object>;
@@ -3932,6 +3940,7 @@ declare module DevExpress.ui {
         calculateDisplayValue?: any;
         /** Calculates custom values to be used in sorting. */
         calculateSortValue?: any;
+        /** Specifies a custom comparison function for sorting. */
         sortingMethod?: (value1: any, value2: any) => number;
         /** Customizes the text displayed in column cells. */
         customizeText?: (cellInfo: { value: any; valueText: string; target: string; groupInterval: any }) => string;
