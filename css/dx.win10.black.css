@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 17.1.6 (build 17251)
-* Build date: Sep 8, 2017
+* Version: 17.1.6 (build 17257)
+* Build date: Sep 14, 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -8676,7 +8676,7 @@
 .dx-layout-manager .dx-field-item:not(.dx-first-row) {
   padding-top: 15px;
 }
-.dx-layout-manager.dx-layout-manager-one-col .dx-box-item:not(:first-child) .dx-field-item {
+.dx-layout-manager.dx-layout-manager-one-col .dx-box-item:not(:first-child) .dx-single-column-item-content > .dx-field-item {
   padding-top: 15px;
 }
 .dx-field-item-label-text {

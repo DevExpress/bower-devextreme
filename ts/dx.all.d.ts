@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.all.d.ts)
-* Version: 17.1.6 (build 17251)
-* Build date: Fri Sep 08 2017
+* Version: 17.1.6 (build 17257)
+* Build date: Thu Sep 14 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -886,7 +886,7 @@ declare module DevExpress {
             createQuery(): Query;
         }
         interface Promise {
-            then(doneFn?: Function, failFn?: Function, progressFn?: Function): Promise;
+            then(doneFn?: any, failFn?: any, progressFn?: any): Promise;
         }
         export interface CustomStoreOptions extends StoreOptions {
             /** Specifies whether or not the store combines the search expression with the filter expression. */
@@ -3940,7 +3940,7 @@ declare module DevExpress.ui {
         calculateDisplayValue?: any;
         /** Calculates custom values to be used in sorting. */
         calculateSortValue?: any;
-        /** Specifies a custom comparison function for sorting. */
+        /** Specifies a custom comparison function for sorting. Applies only when sorting is performed on the client. */
         sortingMethod?: (value1: any, value2: any) => number;
         /** Customizes the text displayed in column cells. */
         customizeText?: (cellInfo: { value: any; valueText: string; target: string; groupInterval: any }) => string;
