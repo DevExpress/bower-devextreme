@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.all.d.ts)
-* Version: 16.2.9
-* Build date: Mon Aug 14 2017
+* Version: 16.2.9 (build 17264)
+* Build date: Thu Sep 21 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -1161,6 +1161,7 @@ declare module DevExpress {
         export function query(array: Array<any>): Query;
         /** Creates a Query instance for accessing the remote service specified by a URL. */
         export function query(url: string, queryOptions: Object): Query;
+        /** This section describes the utility objects provided by the DevExtreme data layer. */
         export module utils {
             /** Compiles a getter function from the getter expression. */
             export function compileGetter(expr: any): Function;
@@ -3238,7 +3239,7 @@ declare module DevExpress.data {
         format?: any;
         /** Specifies a callback function that returns the text to be displayed in the cells of a field. */
         customizeText?: (cellInfo: { value: any; valueText: string }) => string;
-        /**           * Specifies a precision for formatted field values.           * @deprecated Use the format | precision option instead.           */
+        /**       * Specifies a precision for formatted field values.       * @deprecated Use the format | precision option instead.       */
         precision?: number;
         /** Specifies how to sort header items. */
         sortingMethod?: (a: Object, b: Object) => number;
@@ -3457,7 +3458,7 @@ declare module DevExpress.ui {
         resources?: Array<{
             /** Indicates whether or not several resources of this kind can be assigned to an appointment. */
             allowMultiple?: boolean;
-            /**          * Indicates whether or not resources of this kind have priority in the color identification of the appointments that have resources of different kinds assigned.          * @deprecated Use the useColorAsDefault option instead.          */
+            /**      * Indicates whether or not resources of this kind have priority in the color identification of the appointments that have resources of different kinds assigned.      * @deprecated Use the useColorAsDefault option instead.      */
             mainColor?: boolean;
             /** Indicates whether or not resources of this kind have priority in the color identification of the appointments that have resources of different kinds assigned. */
             useColorAsDefault?: boolean;
@@ -3467,7 +3468,7 @@ declare module DevExpress.ui {
             displayExpr?: any;
             /** Specifies the resource object field that is used as a value of the Resource editor in the Appointment popup window. */
             valueExpr?: any;
-            /**         * The name of the appointment object field that specifies a resource of this kind.         * @deprecated Use the fieldExpr option instead.         */
+            /**     * The name of the appointment object field that specifies a resource of this kind.     * @deprecated Use the fieldExpr option instead.     */
             field?: string;
             /** The name of the appointment object field that specifies a resource of this kind. */
             fieldExpr?: string;
@@ -3601,7 +3602,7 @@ declare module DevExpress.ui {
         dataStructure?: string;
         /** Specifies whether or not a user can expand all tree view items by the "*" hot key. */
         expandAllEnabled?: boolean;
-        /**        * Specifies whether or not a check box is displayed at each tree view item.        * @deprecated Use the showCheckBoxesMode options instead.        */
+        /**    * Specifies whether or not a check box is displayed at each tree view item.    * @deprecated Use the showCheckBoxesMode options instead.    */
         showCheckBoxes?: boolean;
         /** Specifies the current check boxes display mode. */
         showCheckBoxesMode?: string;
@@ -3611,7 +3612,7 @@ declare module DevExpress.ui {
         selectNodesRecursive?: boolean;
         /** Specifies whether or not all parent nodes of an initially expanded node are displayed expanded. */
         expandNodesRecursive?: boolean;
-        /**       * Specifies whether the "Select All" check box is displayed over the tree view.       * @deprecated Use the showCheckBoxesMode options instead.       */
+        /**   * Specifies whether the "Select All" check box is displayed over the tree view.   * @deprecated Use the showCheckBoxesMode options instead.   */
         selectAllEnabled?: boolean;
         /** Specifies whether or not an item becomes selected if a user clicks it. */
         selectByClick?: boolean;
@@ -3660,14 +3661,30 @@ declare module DevExpress.ui {
         constructor(element: Element, options?: dxTreeViewOptions);
         /** Updates the tree view scrollbars according to the current size of the widget content. */
         updateDimensions(): JQueryPromise<void>;
-        /** Selects the specified item. */
-        selectItem(itemElement: any): void;
-        /** Cancels the selection of the specified item. */
-        unselectItem(itemElement: any): void;
-        /** Expands the specified item. */
-        expandItem(itemElement: any): void;
-        /** Collapses the specified item. */
-        collapseItem(itemElement: any): void;
+        /** Selects an item found using an HTML element. */
+        selectItem(itemElement: Node): void;
+        /** Selects an item found using a data object. */
+        selectItem(itemData: Object): void;
+        /** Selects an item found using a key. */
+        selectItem(key: any): void;
+        /** Clears the selection of an item found using an HTML element. */
+        unselectItem(itemElement: Node): void;
+        /** Clears the selection of an item found using a data object. */
+        unselectItem(itemData: Object): void;
+        /** Clears the selection of an item found using a key. */
+        unselectItem(key: any): void;
+        /** Expands an item found using an HTML element. */
+        expandItem(itemElement: Node): void;
+        /** Expands an item found using a data object. */
+        expandItem(itemData: Object): void;
+        /** Expands an item found using a key. */
+        expandItem(key: any): void;
+        /** Collapses an item found using an HTML element. */
+        collapseItem(itemElement: Node): void;
+        /** Collapses an item found using a key. */
+        collapseItem(itemData: Object): void;
+        /** Collapses an item found using a key. */
+        collapseItem(key: any): void;
         /** Returns all nodes of the tree view. */
         getNodes(): Array<Object>;
         /** Selects all widget items. */
@@ -3689,7 +3706,7 @@ declare module DevExpress.ui {
         cssClass?: string;
         /** Holds an array of menu items. */
         items?: Array<any>;
-        /**      * Specifies whether or not an item becomes selected if an end-user clicks it.      * @deprecated Use the selectByClick option instead.      */
+        /**  * Specifies whether or not an item becomes selected if an end-user clicks it.  * @deprecated Use the selectByClick option instead.  */
         selectionByClick?: boolean;
         /** Specifies whether or not an item becomes selected if a user clicks it. */
         selectByClick?: boolean;
@@ -3737,7 +3754,7 @@ declare module DevExpress.ui {
         submenuDirection?: string;
         /** A handler for the submenuHidden event. */
         onSubmenuHidden?: Function;
-        /** Specifies whether or not adaptive widget rendering is enabled on a small screen. */
+        /** Specifies whether adaptive widget rendering is enabled on small screens. Applies only if the orientation is "horizontal". */
         adaptivityEnabled?: boolean;
         /** A handler for the submenuHiding event. */
         onSubmenuHiding?: Function;
@@ -3915,7 +3932,7 @@ declare module DevExpress.ui {
             /** Specifies how header filter values should be combined into groups. */
             groupInterval?: any;
         };
-        /**     * Specifies a precision for formatted values displayed in a column.     * @deprecated Use the format | precision option instead.     */
+        /** * Specifies a precision for formatted values displayed in a column. * @deprecated Use the format | precision option instead. */
         precision?: number;
         /** Specifies the default filter operation of a column. */
         selectedFilterOperation?: string;
@@ -4092,10 +4109,7 @@ declare module DevExpress.ui {
                 confirmDeleteMessage?: string;
                 /** Specifies text to be displayed in the title of a confirmation window. Setting this option makes sense only when the edit mode is "row". */
                 confirmDeleteTitle?: string;
-                /** Specifies text for a hint that appears when a user hovers the mouse pointer over the "Cancel changes" button. Setting this option makes sense only when the mode option is set to cell and the validation capabilities are enabled.
-#####See Also#####
-- Validation Engine
-- Validation Engine - MVVM Approach */
+                /** Specifies text for a hint that appears when a user hovers the mouse pointer over the "Cancel changes" button. Setting this option makes sense only when the mode option is set to cell and the validation capabilities are enabled.#####See Also#####- Validation Engine- Validation Engine - MVVM Approach */
                 validationCancelChanges?: string;
                 /** Specifies text for a button that deletes a row from a grid. Setting this option makes sense only when the allowDeleting option is set to true. */
                 deleteRow?: string;
@@ -4249,7 +4263,7 @@ declare module DevExpress.ui {
             preloadEnabled?: boolean;
             /** Specifies whether or not the widget uses native scrolling. */
             useNative?: any;
-            /** Specifies the scrollbar display policy. */
+            /** Specifies the scrollbar display policy. Applies only if useNative is false. */
             showScrollbar?: string;
             /** Specifies whether or not the scrolling by content is enabled. */
             scrollByContent?: boolean;
@@ -4278,7 +4292,7 @@ declare module DevExpress.ui {
         /** Allows you to sort groups according to the values of group summary items. */
         sortByGroupSummaryInfo?: Array<{
             /** Specifies the group summary item whose values must be used to sort groups. */
-            summaryItem?: string;
+            summaryItem?: any;
             /** Specifies the identifier of the column that must be used in grouping so that sorting by group summary item values be applied. */
             groupColumn?: string;
             /** Specifies the sort order of group summary item values. */
@@ -4328,7 +4342,7 @@ declare module DevExpress.ui {
         selection?: {
             /** Specifies the checkbox row display policy in the multiple mode. */
             showCheckBoxesMode?: string;
-            /** Specifies whether the user can select all grid records at once. */
+            /** Specifies whether a user can select all rows at once. */
             allowSelectAll?: boolean;
             /** Specifies the selection mode. */
             mode?: string;
@@ -5197,15 +5211,10 @@ declare module DevExpress.viz.core {
         opacity?: number;
     }
     export interface Font {
-        /** Colors the text displayed by the group labels. */
         color?: string;
-        /** Specifies the font family of the text displayed by the group labels. */
         family?: string;
-        /** Specifies how transparent the text displayed by the group labels should be. */
         opacity?: number;
-        /** Specifies the size of the text displayed by the group labels. */
         size?: any;
-        /** Specifies the font weight of the text displayed by the group labels. */
         weight?: number;
     }
     export interface Hatching {
@@ -6781,6 +6790,7 @@ declare module DevExpress.viz.gauges {
         text?: {
             /** Specifies a callback function that returns the text to be displayed in an indicator. */
             customizeText?: (indicatedValue: { value: number; valueText: string }) => string;
+            /** Specifies font options for the text displayed by the indicator. */
             font?: viz.core.Font;
             /** Specifies a format for the text displayed in an indicator. */
             format?: any;
@@ -6816,7 +6826,7 @@ declare module DevExpress.viz.gauges {
         animation?: viz.core.Animation;
         /**    * Specifies a subtitle for the widget.    * @deprecated Use the title | subtitle option instead.    */
         subtitle?: {
-            /**   * Specifies font options for the subtitle.   * @deprecated Use the title | subtitle | font option instead.   */
+            /**   * Use the title | subtitle | font option instead.   * @deprecated    */
             font?: viz.core.Font;
             /**  * Specifies a text for the subtitle.  * @deprecated Use the title | subtitle | text option instead.  */
             text?: string;
@@ -7438,7 +7448,7 @@ declare module DevExpress.viz.map {
             dataField?: string;
             /**                                               * Enables area labels.                                               * @deprecated Use the layers | label | enabled option instead.                                               */
             enabled?: boolean;
-            /**                                              * Specifies font options for area labels.                                              * @deprecated Use the layers | label | font option instead.                                              */
+            /**                                              * Use the layers | label | font option instead.                                              * @deprecated                                               */
             font?: viz.core.Font;
         };
         /**                                             * Specifies the name of the palette or a custom range of colors to be used for coloring a map.                                             * @deprecated Use the layers | palette option instead.                                             */
@@ -7479,7 +7489,7 @@ declare module DevExpress.viz.map {
         label?: {
             /**                            * Enables marker labels.                            * @deprecated Use the layers | label | enabled option instead.                            */
             enabled?: boolean;
-            /**                           * Specifies font options for marker labels.                           * @deprecated Use the layers | label | font option instead.                           */
+            /**                           * Use the layers | label | font option instead.                           * @deprecated                            */
             font?: viz.core.Font;
         };
         /**                          * Specifies the pixel-measured diameter of the marker that represents the biggest value. Setting this option makes sense only if you use markers of the bubble type.                          * @deprecated Use the layers | maxSize option instead.                          */
