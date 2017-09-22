@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.all.d.ts)
-* Version: 17.1.6 (build 17257)
-* Build date: Thu Sep 14 2017
+* Version: 17.1.6 (build 17265)
+* Build date: Fri Sep 22 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -4136,7 +4136,7 @@ declare module DevExpress.ui {
         mode?: string;
     }
     export interface dxDataGridSelection extends GridBaseSelection {
-        /** Specifies when to display checkboxes in rows. Applies only if selection.mode is "multiple". */
+        /** Specifies when to display check boxes in rows. Applies only if selection.mode is "multiple". */
         showCheckBoxesMode?: string;
          maxFilterLengthInRequest?: number;
         /** Specifies the mode in which all the records are selected. Applies only if selection.allowSelectAll is true. */
@@ -5427,15 +5427,15 @@ declare module DevExpress.viz.core {
         opacity?: number;
     }
     export interface Font {
-        /** Colors the text displayed by the group labels. */
+        /** Specifies a font color. */
         color?: string;
-        /** Specifies the font family of the text displayed by the group labels. */
+        /** Specifies a font family. */
         family?: string;
-        /** Specifies how transparent the text displayed by the group labels should be. */
+        /** Specifies a font opacity. */
         opacity?: number;
-        /** Specifies the size of the text displayed by the group labels. */
+        /** Specifies a font size. */
         size?: any;
-        /** Specifies the font weight of the text displayed by the group labels. */
+        /** Specifies a font weight. */
         weight?: number;
     }
     export interface Hatching {
@@ -5536,7 +5536,7 @@ declare module DevExpress.viz.core {
         /** Specifies the container to draw tooltips inside of it. */
         container?: any;
         /** Allows you to change tooltip appearance. */
-        customizeTooltip?: (arg: Object) => {
+        customizeTooltip?: (arg: any) => {
             color?: string;
             text?: string;
             html?: string;
@@ -5663,7 +5663,7 @@ declare module DevExpress.viz.core {
             cancel: boolean;
         }) => void;
         /** A handler for the exported event. */
-        onExported?: (e: Object) => void;
+        onExported?: (e: any) => void;
         /** Notifies the widget that it is embedded into an HTML page that uses a tag modifying the path. */
         pathModified?: boolean;
         /** Specifies whether or not the widget supports right-to-left representation. */
@@ -6583,9 +6583,9 @@ declare module DevExpress.viz.charts {
         /** Specifies animation options. */
         animation?: ChartAnimation;
         /** Customizes the appearance of an individual point label. */
-        customizeLabel?: (pointInfo: Object) => Object;
+        customizeLabel?: (pointInfo: any) => Object;
         /** Customizes the appearance of an individual series point. */
-        customizePoint?: (pointInfo: Object) => Object;
+        customizePoint?: (pointInfo: any) => Object;
         /** Specifies the origin of data for the widget. */
         dataSource?: any;
         /** Specifies options of the legend. */
@@ -7029,6 +7029,7 @@ declare module DevExpress.viz.gauges {
         text?: {
             /** Specifies a callback function that returns the text to be displayed in an indicator. */
             customizeText?: (indicatedValue: { value: number; valueText: string }) => string;
+            /** Specifies font options for the text displayed by the indicator. */
             font?: viz.core.Font;
             /** Specifies a format for the text displayed in an indicator. */
             format?: any;
@@ -7064,7 +7065,7 @@ declare module DevExpress.viz.gauges {
         animation?: viz.core.Animation;
         /**    * Specifies a subtitle for the widget.    * @deprecated Use the title.subtitle option instead.    */
         subtitle?: {
-            /**   * Specifies font options for the subtitle.   * @deprecated Use the title.subtitle.font option instead.   */
+            /**   * Use the title.subtitle.font option instead.   * @deprecated    */
             font?: viz.core.Font;
             /**  * Specifies a text for the subtitle.  * @deprecated Use the title.subtitle.text option instead.  */
             text?: string;
@@ -7692,7 +7693,7 @@ declare module DevExpress.viz.map {
             dataField?: string;
             /**                                               * Enables area labels.                                               * @deprecated Use the layers.label.enabled option instead.                                               */
             enabled?: boolean;
-            /**                                              * Specifies font options for area labels.                                              * @deprecated Use the layers.label.font option instead.                                              */
+            /**                                              * Use the layers.label.font option instead.                                              * @deprecated                                               */
             font?: viz.core.Font;
         };
         /**                                             * Specifies the name of the palette or a custom range of colors to be used for coloring a map.                                             * @deprecated Use the layers.palette option instead.                                             */
@@ -7733,7 +7734,7 @@ declare module DevExpress.viz.map {
         label?: {
             /**                            * Enables marker labels.                            * @deprecated Use the layers.label.enabled option instead.                            */
             enabled?: boolean;
-            /**                           * Specifies font options for marker labels.                           * @deprecated Use the layers.label.font option instead.                           */
+            /**                           * Use the layers.label.font option instead.                           * @deprecated                            */
             font?: viz.core.Font;
         };
         /**                          * Specifies the pixel-measured diameter of the marker that represents the biggest value. Setting this option makes sense only if you use markers of the bubble type.                          * @deprecated Use the layers.maxSize option instead.                          */
