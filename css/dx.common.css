@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 17.2.0 (build 17248)
-* Build date: Sep 5, 2017
+* Version: 17.2.0 (build 17262)
+* Build date: Sep 19, 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -1883,6 +1883,9 @@
 .dx-list {
   margin: 0;
   min-height: 3em;
+}
+.dx-list .dx-scrollview-content:focus {
+  outline: 0px;
 }
 .dx-empty-collection .dx-list-select-all {
   display: none;
@@ -6090,6 +6093,9 @@ input.dx-hidden {
 .dx-treeview :focus {
   outline: none;
 }
+.dx-treeview .dx-scrollable:focus {
+  outline: none;
+}
 .dx-treeview .dx-checkbox + .dx-treeview-node-container,
 .dx-treeview .dx-treeview-node-container:first-child {
   margin: 0;
@@ -6592,14 +6598,14 @@ input.dx-hidden {
 .dx-layout-manager .dx-field-empty-item {
   width: 100%;
 }
-.dx-layout-manager.dx-layout-manager-one-col .dx-field-item {
+.dx-layout-manager.dx-layout-manager-one-col .dx-single-column-item-content > .dx-field-item {
   padding-left: 0;
   padding-right: 0;
 }
-.dx-layout-manager.dx-layout-manager-one-col .dx-form-group .dx-first-row.dx-col-0.dx-field-item {
+.dx-layout-manager.dx-layout-manager-one-col .dx-form-group .dx-single-column-item-content > .dx-first-row.dx-col-0.dx-field-item {
   padding-top: 0px;
 }
-.dx-layout-manager.dx-layout-manager-one-col .dx-box-item:not(:first-child) .dx-field-item {
+.dx-layout-manager.dx-layout-manager-one-col .dx-box-item:not(:first-child) .dx-single-column-item-content > .dx-field-item {
   padding-top: 10px;
 }
 .dx-layout-manager .dx-label-h-align.dx-flex-layout {
@@ -6717,7 +6723,7 @@ input.dx-hidden {
   padding-left: 0;
   padding-right: 10px;
 }
-.dx-rtl .dx-layout-manager-one-col .dx-field-item {
+.dx-rtl .dx-layout-manager-one-col .dx-single-column-item-content > .dx-field-item {
   padding-right: 0;
   padding-left: 0;
 }

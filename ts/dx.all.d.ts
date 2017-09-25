@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.all.d.ts)
-* Version: 17.2.0 (build 17248)
-* Build date: Tue Sep 05 2017
+* Version: 17.2.0 (build 17262)
+* Build date: Tue Sep 19 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -434,6 +434,13 @@ interface JQuery {
     dxCircularGauge(options: DevExpress.viz.gauges.dxCircularGaugeOptions): JQuery;
 }
 interface JQuery {
+    dxFunnel(): JQuery;
+    dxFunnel(options: "instance"): DevExpress.viz.dxFunnel;
+    dxFunnel(options: string): any;
+    dxFunnel(options: string, ...params: any[]): any;
+    dxFunnel(options: DevExpress.viz.funnel.dxFunnelOptions): JQuery;
+}
+interface JQuery {
     dxLinearGauge(): JQuery;
     dxLinearGauge(options: "instance"): DevExpress.viz.dxLinearGauge;
     dxLinearGauge(options: string): any;
@@ -756,6 +763,7 @@ declare module DevExpress {
         constructor(element: HTMLElement, options?: DOMComponentOptions);
         /** Gets the root element of the widget. */
         element(): JQuery;
+        dispose(): void;
         /** Specifies the device-dependent default configuration options for this component. */
         static defaultOptions(rule: {
             device?: any;
@@ -886,7 +894,7 @@ declare module DevExpress {
             createQuery(): Query;
         }
         interface Promise {
-            then(doneFn?: Function, failFn?: Function, progressFn?: Function): Promise;
+            then(doneFn?: any, failFn?: any, progressFn?: any): Promise;
         }
         export interface CustomStoreOptions extends StoreOptions {
             /** Specifies whether or not the store combines the search expression with the filter expression. */
@@ -1312,6 +1320,13 @@ declare module DevExpress {
             /** Specifies the currently selected value. */
             value?: any;
         }
+        export interface SearchBoxMixinOptions {
+            searchEnabled?: boolean;
+            searchValue?: string;
+            searchExpr?: any;
+            searchMode?: string;
+            searchEditorOptions?: DevExpress.ui.dxTextBoxOptions;
+        }
         export interface EditorOptions extends WidgetOptions {
             /** Specifies the currently selected value. */
             value?: any;
@@ -1610,6 +1625,7 @@ declare module DevExpress.ui {
         maskInvalidMessage?: string;
         /** Specifies whether the value should contain mask characters or not. */
         useMaskedValue?: boolean;
+        /** Specifies when the widget shows the mask. Applies only if useMaskedValue is true. */
         showMaskMode?: string;
         name?: string;
     }
@@ -2257,7 +2273,7 @@ declare module DevExpress.ui {
         /** Holds on a function called when the item is clicked. */
         action?: (itemElement: Element, itemData: any) => void;
     }
-    export interface dxListOptions extends CollectionWidgetOptions {
+    export interface dxListOptions extends CollectionWidgetOptions, SearchBoxMixinOptions {
         /** A Boolean value specifying whether or not to display a grouped list. */
         grouped?: boolean;
         /** The template to be used for rendering item groups.Specifies a custom template for a group caption. */
@@ -3298,7 +3314,7 @@ declare module DevExpress.data {
         format?: any;
         /** Specifies a callback function that returns the text to be displayed in the cells of a field. */
         customizeText?: (cellInfo: { value: any; valueText: string }) => string;
-        /**           * Specifies a precision for formatted field values.           * @deprecated Use the format.precision option instead.           */
+        /**         * Specifies a precision for formatted field values.         * @deprecated Use the format.precision option instead.         */
         precision?: number;
         /** Specifies how to sort header items. */
         sortingMethod?: (a: Object, b: Object) => number;
@@ -3438,6 +3454,7 @@ declare module DevExpress.ui {
         type?: string;
         /** A custom name for the view. This name goes to the view switcher. */
         name?: string;
+        /** Specifies the limit of full-sized appointments displayed per cell. In the "day", "week" and "workweek" views, this option applies only to all-day appointments. */
         maxAppointmentsPerCell?: any;
         /** Multiplies the default view interval. Applies to all view types except "agenda". */
         intervalCount?: number;
@@ -3526,7 +3543,7 @@ declare module DevExpress.ui {
         resources?: Array<{
             /** Indicates whether or not several resources of this kind can be assigned to an appointment. */
             allowMultiple?: boolean;
-            /**          * Indicates whether or not resources of this kind have priority in the color identification of the appointments that have resources of different kinds assigned.          * @deprecated Use the useColorAsDefault option instead.          */
+            /**        * Indicates whether or not resources of this kind have priority in the color identification of the appointments that have resources of different kinds assigned.        * @deprecated Use the useColorAsDefault option instead.        */
             mainColor?: boolean;
             /** Specifies whether appointments are colored like this resource kind. */
             useColorAsDefault?: boolean;
@@ -3536,7 +3553,7 @@ declare module DevExpress.ui {
             displayExpr?: any;
             /** Specifies the resource object field that is used as a value of the Resource editor in the Appointment popup window. */
             valueExpr?: any;
-            /**         * The name of the appointment object field that specifies a resource of this kind.         * @deprecated Use the fieldExpr option instead.         */
+            /**       * The name of the appointment object field that specifies a resource of this kind.       * @deprecated Use the fieldExpr option instead.       */
             field?: string;
             /** The name of the appointment object field that specifies a resource of this kind. */
             fieldExpr?: string;
@@ -3663,54 +3680,31 @@ declare module DevExpress.ui {
     }
     export class HierarchicalCollectionWidget extends CollectionWidget {
     }
-    export interface dxTreeViewOptions extends HierarchicalCollectionWidgetOptions {
-        /** Specifies whether or not to animate item collapsing and expanding. */
+    export interface dxTreeViewOptions extends HierarchicalCollectionWidgetOptions, SearchBoxMixinOptions {
         animationEnabled?: boolean;
-        /** Specifies whether a nested or plain array is used as a data source. */
         dataStructure?: string;
-        /** Specifies whether or not a user can expand all tree view items by the "*" hot key. */
         expandAllEnabled?: boolean;
-        /**        * Specifies whether or not a check box is displayed at each tree view item.        * @deprecated Use the showCheckBoxesMode options instead.        */
         showCheckBoxes?: boolean;
-        /** Specifies the current check boxes display mode. */
         showCheckBoxesMode?: string;
-        /** Specifies the name of the data source item field whose value defines whether or not the corresponding widget item is displayed expanded. */
         expandedExpr?: any;
-        /** Specifies whether or not to select nodes recursively. */
         selectNodesRecursive?: boolean;
-        /** Specifies whether or not all parent nodes of an initially expanded node are displayed expanded. */
         expandNodesRecursive?: boolean;
-        /**       * Specifies whether the "Select All" check box is displayed over the tree view.       * @deprecated Use the showCheckBoxesMode options instead.       */
         selectAllEnabled?: boolean;
-        /** Specifies whether or not an item becomes selected if a user clicks it. */
         selectByClick?: boolean;
-        /** Specifies item selection mode. */
         selectionMode?: string;
-        /** Specifies the text displayed at the "Select All" check box. */
         selectAllText?: string;
-        /** Specifies the name of the data source item field whose value defines whether or not the corresponding node includes child nodes. */
         hasItemsExpr?: any;
-        /** Specifies the name of the data source item field for holding the parent key of the corresponding node. */
         parentIdExpr?: any;
-        /** Specifies if the virtual mode is enabled. */
         virtualModeEnabled?: boolean;
-        /** Specifies the parent ID value of the root item. */
         rootValue?: Object;
-        /** Specifies the current value used to filter tree view items. */
-        searchValue?: string;
-        /** A string value specifying available scrolling directions. */
         scrollDirection?: string;
-        /** A handler for the itemSelectionChanged event. */
         onItemSelectionChanged?: Function;
-        /** A handler for the itemExpanded event. */
         onItemExpanded?: Function;
-        /** A handler for the itemCollapsed event. */
         onItemCollapsed?: Function;
         onItemClick?: Function;
         onItemContextMenu?: Function;
         onItemRendered?: Function;
         onItemHold?: Function;
-        /** Allows you to load nodes manually. */
         createChildren?: Function;
     }
     export interface dxTreeViewNode {
@@ -3727,29 +3721,21 @@ declare module DevExpress.ui {
     export class dxTreeView extends HierarchicalCollectionWidget {
         constructor(element: JQuery, options?: dxTreeViewOptions);
         constructor(element: Element, options?: dxTreeViewOptions);
-        /** Updates the tree view scrollbars according to the current size of the widget content. */
         updateDimensions(): JQueryPromise<void>;
-        /** Selects the specified item. */
         selectItem(itemElement: Node): void;
         selectItem(itemData: Object): void;
         selectItem(key: any): void;
-        /** Cancels the selection of the specified item. */
         unselectItem(itemElement: Node): void;
         unselectItem(itemData: Object): void;
         unselectItem(key: any): void;
-        /** Expands the specified item. */
         expandItem(itemElement: Node): void;
         expandItem(itemData: Object): void;
         expandItem(key: any): void;
-        /** Collapses the specified item. */
         collapseItem(itemElement: Node): void;
         collapseItem(itemData: Object): void;
         collapseItem(key: any): void;
-        /** Returns all nodes of the tree view. */
         getNodes(): Array<Object>;
-        /** Selects all widget items. */
         selectAll(): void;
-        /** Unselects all widget items. */
         unselectAll(): void;
     }
     export interface dxMenuBaseOptions extends HierarchicalCollectionWidgetOptions {
@@ -3952,6 +3938,7 @@ declare module DevExpress.ui {
         calculateDisplayValue?: any;
         /** Calculates custom values to be used in sorting. */
         calculateSortValue?: any;
+        /** Specifies a custom comparison function for sorting. Applies only when sorting is performed on the client. */
         sortingMethod?: (value1: any, value2: any) => number;
         /** Customizes the text displayed in column cells. */
         customizeText?: (cellInfo: { value: any; valueText: string; target: string; groupInterval: any }) => string;
@@ -4147,7 +4134,7 @@ declare module DevExpress.ui {
         mode?: string;
     }
     export interface dxDataGridSelection extends GridBaseSelection {
-        /** Specifies when to display checkboxes in rows. Applies only if selection.mode is "multiple". */
+        /** Specifies when to display check boxes in rows. Applies only if selection.mode is "multiple". */
         showCheckBoxesMode?: string;
          maxFilterLengthInRequest?: number;
         /** Specifies the mode in which all the records are selected. Applies only if selection.allowSelectAll is true. */
@@ -4800,6 +4787,7 @@ declare module DevExpress.ui {
         /** Seeks a search string in the columns whose allowSearch option is true. */
         searchByText(text: string): void;
         /** Sets focus on a specific cell. */
+        focus(element?: Element): void;
         focus(element?: JQuery): void;
         /** Clears all filters applied to widget rows. */
         clearFilter(): void;
@@ -5432,8 +5420,11 @@ declare module DevExpress.framework {
 }
 declare module DevExpress.viz.core {
     export interface Border {
+        /** Colors the selected funnel item's border. */
         color?: string;
+        /** Shows the selected funnel item's border. */
         visible?: boolean;
+        /** Thickens the selected funnel item's border. */
         width?: number;
     }
     export interface DashedBorder extends Border {
@@ -5457,9 +5448,13 @@ declare module DevExpress.viz.core {
         weight?: number;
     }
     export interface Hatching {
+        /** Specifies hatching line direction. */
         direction?: string;
+        /** Specifies hatching line transparency. */
         opacity?: number;
+        /** Specifies the distance between two side-by-side hatching lines in pixels. */
         step?: number;
+        /** Specifies hatching line width in pixels. */
         width?: number;
     }
     export interface Margins {
@@ -5540,16 +5535,17 @@ declare module DevExpress.viz.core {
         backgroundColor?: string;
     }
     export interface Tooltip {
-        /** Specifies the length of the tooltip's arrow in pixels. */
+        /** Specifies the length of a tooltip's arrow in pixels. */
         arrowLength?: number;
-        /** Specifies the appearance of the tooltip's border. */
+        /** Configures a tooltip's border. */
         border?: DashedBorderWithOpacity;
-        /** Specifies the color of tooltips. */
+        /** Colors all tooltips. */
         color?: string;
-        /** Specifies the z-index of tooltips. */
+        /** Specifies a tooltip's z-index. */
         zIndex?: number;
-        /** Specifies the container to draw tooltips inside of it. */
+        /** Specifies the container in which to draw tooltips. The default container is the HTML DOM `<body>` element. */
         container?: any;
+        /** Customizes a specific tooltip's appearance. */
         customizeTooltip?: (arg: Object) => {
             color?: string;
             text?: string;
@@ -5558,29 +5554,29 @@ declare module DevExpress.viz.core {
             borderColor?: string;
         };
         enabled?: boolean;
-        /** Specifies the font of the text displayed by a tooltip. */
+        /** Specifies tooltips' font options. */
         font?: Font;
-        /** Specifies the format of the value displayed by a tooltip. */
+        /** Specifies the format of the value a tooltip displays. */
         format?: any;
-        /** Specifies the opacity of tooltips. */
+        /** Specifies tooltips' transparency. */
         opacity?: number;
-        /** Generates space on the left and the right of the text displayed by a tooltip. */
+        /** Generates an empty space, measured in pixels, between a tooltip's left/right border and its text. */
         paddingLeftRight?: number;
-        /** Generates space above and below the text displayed by a tooltip. */
+        /** Generates an empty space, measured in pixels, between a tooltip's top/bottom border and its text. */
         paddingTopBottom?: number;
         /** * Specifies the precision of formatted values in a tooltip. * @deprecated Use the tooltip.format.precision option instead. */
         precision?: number;
-        /** Specifies the appearance of the tooltip's shadow. */
+        /** Configures a tooltip's shadow. */
         shadow?: {
-            /** Specifies the blur distance of the tooltip's shadow. */
+            /** Specifies the blur distance of a tooltip's shadow. The larger the value, the blurrier the shadow's edge. */
             blur?: number;
-            /** Specifies the color of the tooltip's shadow. */
+            /** Colors a tooltip's shadow. */
             color?: string;
-            /** Specifies the horizontal offset of the tooltip's shadow relative to the tooltip itself measured in pixels. */
+            /** Specifies the horizontal offset of a tooltip's shadow relative to the tooltip itself. Measured in pixels. */
             offsetX?: number;
-            /** Specifies the vertical offset of the tooltip's shadow relative to the tooltip itself measured in pixels. */
+            /** Specifies the vertical offset of a tooltip's shadow relative to the tooltip itself. Measured in pixels. */
             offsetY?: number;
-            /** Specifies the opacity of the tooltip's shadow. */
+            /** Specifies the transparency of a tooltip's shadow. */
             opacity?: number;
         };
     }
@@ -7257,6 +7253,154 @@ declare module DevExpress.viz {
         values(): Array<number>;
         /** Updates the values displayed by a gauge. */
         values(values: Array<number>): void;
+    }
+}
+declare module DevExpress.viz.funnel {
+    export interface Legend extends viz.core.BaseLegend {
+        /** Specifies the hint that appears when a user hovers the mouse pointer over a legend item. */
+        customizeHint?: (itemInfo: { item: funnelItem; text: string; }) => string;
+        /** Customizes the text displayed by legend items. */
+        customizeText?: (itemInfo: { item: funnelItem; text: string; }) => string;
+    }
+    export interface funnelItem {
+        data: Object;
+        argument: any;
+        id: number;
+        percent: number;
+        value: number;
+        select(state: boolean): void;
+        hover(state: boolean): void;
+        getColor(): string;
+        isHovered(): boolean;
+        isSelected(): boolean;
+        showTooltip(): void;
+    }
+    export interface dxFunnelOptions extends viz.core.BaseWidgetOptions, viz.core.RedrawOnResizeOptions, viz.core.TitleOptions, viz.core.LoadingIndicatorOptions, viz.core.ExportOptions {
+        /** Specifies adaptive layout options. */
+        adaptiveLayout?: {
+            /** Specifies the widget's width small enough for the layout to begin adapting. */
+            width?: number;
+            /** Specifies the widget's height small enough for the layout to begin adapting. */
+            height?: number;
+            /** Specifies whether item labels should be kept when the layout is adapting. */
+            keepLabels?: boolean;
+        };
+        dataSource?: any;
+        /** Specifies which data source field provides values for funnel items. The value defines a funnel item's area. */
+        valueField?: string;
+        /** Specifies which data source field provides colors for funnel items. If this field is absent, the palette provides the colors. */
+        colorField?: string;
+        /** Specifies whether funnel items change their style when a user pauses on them. */
+        hoverEnabled?: boolean;
+        /** Specifies which data source field provides arguments for funnel items. The argument identifies a funnel item and represents it on the legend. */
+        argumentField?: string;
+        /** Specifies whether a single or multiple funnel items can be in the selected state at a time. Assigning "none" disables the selection feature. */
+        selectionMode?: string;
+        /** Sets the palette to be used for colorizing funnel items. */
+        palette?: any;
+        /** Specifies the algorithm for building the funnel. */
+        algorithm?: string;
+        /** Specifies the ratio between the height of the neck and that of the whole funnel. Accepts values from 0 to 1. Applies only if the algorithm is "dynamicHeight". */
+        neckHeight?: number;
+        /** Specifies the ratio between the width of the neck and that of the whole funnel. Accepts values from 0 to 1. Applies only if the algorithm is "dynamicHeight". */
+        neckWidth?: number;
+        /** Turns the funnel upside down. */
+        inverted?: boolean;
+        /** Specifies whether to sort funnel items. */
+        sortData?: boolean;
+        item?: {
+            /** Configures a funnel item's border. */
+            border?: viz.core.Border;
+            /** Configures a funnel item's appearance when a user presses the item or hovers the mouse pointer over it. */
+            hoverStyle?: {
+                /** Configures a funnel item's border appearance when a user presses the item or hovers the mouse pointer over it. */
+                border?: viz.core.Border;
+                /** Applies hatching to a funnel item when a user presses the item or hovers the mouse pointer over it. */
+                hatching?: viz.core.Hatching;
+            };
+            /** Configures a funnel item's appearance when a user selects it. */
+            selectionStyle?: {
+                /** Configures a funnel item's border appearance when a user selects this item. */
+                border?: viz.core.Border;
+                /** Applies hatching to a selected funnel item. */
+                hatching?: viz.core.Hatching;
+            };
+        };
+        /** Configures funnel item labels. */
+        label?: {
+            /** Specifies labels' font options. */
+            font?: viz.core.Font;
+            /** Specifies whether to display labels inside or outside funnel items or arrange them in columns. */
+            position?: string;
+            /** Moves labels from their initial positions. */
+            horizontalOffset?: number;
+            /** Specifies labels' position in relation to the funnel items. */
+            horizontalAlignment?: string;
+            /** Configures label connectors. */
+            connector?: {
+                /** Colors label connectors. */
+                color?: string;
+                /** Shows label connectors. */
+                visible?: boolean;
+                /** Specifies the label connector width in pixels. */
+                width?: number;
+                /** Specifies the transparency of label connectors. */
+                opacity?: number;
+            };
+            /** Colors the labels' background. Inherits the funnel item's color by default. */
+            backgroundColor?: string;
+            /** Configures the label borders. */
+            border?: viz.core.DashedBorder;
+            /** Controls the labels' visibility. */
+            visible?: boolean;
+            /** Specifies whether to show labels for items with zero value. */
+            showForZeroValues?: boolean;
+            /** Customizes labels' text. */
+            customizeText?: (itemInfo: {
+                item: funnelItem;
+                valueText: string;
+                value: number;
+                percent: number;
+                percentText: string;
+            }) => string;
+            /** Formats the item value before displaying it in the label. */
+            format?: any;
+        };
+        /** Configures the legend. */
+        legend?: Legend;
+        /** A handler for the itemClick event. Executed when a user clicks a funnel item. */
+        onItemClick?: any;
+        /** A handler for the legendClick event. Executed when a user clicks a legend item. */
+        onLegendClick?: any;
+        /** A handler for the hoverChanged event. Executed after a funnel item's hover state is changed in the UI or programmatically. */
+        onHoverChanged?: (e: {
+            component: dxFunnel;
+            element: Element;
+            node: funnelItem;
+        }) => void;
+        /** A handler for the selectionChanged event. Executed after a funnel item's selection state is changed in the UI or programmatically. */
+        onSelectionChanged?: (e: {
+            component: dxFunnel;
+            element: Element;
+            node: funnelItem;
+        }) => void;
+        tooltip?: viz.core.Tooltip;
+    }
+}
+declare module DevExpress.viz {
+    export class dxFunnel extends viz.core.BaseWidget implements viz.core.LoadingIndicatorMethods {
+        constructor(element: JQuery, options?: DevExpress.viz.funnel.dxFunnelOptions);
+        constructor(element: Element, options?: DevExpress.viz.funnel.dxFunnelOptions);
+        /** Cancels the selection of all funnel items. */
+        clearSelection(): void;
+        /** Provides access to all funnel items. */
+        getAllItems(): Array<DevExpress.viz.funnel.funnelItem>;
+        /** Hides all widget tooltips. */
+        hideTooltip(): void;
+        /** Provides access to the DataSource instance. */
+        getDataSource(): DevExpress.data.DataSource;
+        showLoadingIndicator(): void;
+        hideLoadingIndicator(): void;
     }
 }
 declare module DevExpress.viz.rangeSelector {

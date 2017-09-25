@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 17.2.0 (build 17248)
-* Build date: Sep 5, 2017
+* Version: 17.2.0 (build 17262)
+* Build date: Sep 19, 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -1064,10 +1064,15 @@
 .dx-scheduler-date-table-other-month {
   opacity: 0.5;
 }
-.dx-scheduler-work-space-day .dx-scheduler-date-table-row:nth-child(odd) .dx-scheduler-date-table-cell,
-.dx-scheduler-work-space-week .dx-scheduler-date-table-row:nth-child(odd) .dx-scheduler-date-table-cell,
-.dx-scheduler-work-space-work-week .dx-scheduler-date-table-row:nth-child(odd) .dx-scheduler-date-table-cell {
+.dx-scheduler-work-space-day.dx-scheduler-work-space-odd-cells .dx-scheduler-date-table-row:nth-child(odd) .dx-scheduler-date-table-cell,
+.dx-scheduler-work-space-week.dx-scheduler-work-space-odd-cells .dx-scheduler-date-table-row:nth-child(odd) .dx-scheduler-date-table-cell,
+.dx-scheduler-work-space-work-week.dx-scheduler-work-space-odd-cells .dx-scheduler-date-table-row:nth-child(odd) .dx-scheduler-date-table-cell {
   border-top: 1px solid #868686;
+}
+.dx-scheduler-work-space-day.dx-scheduler-work-space-odd-cells .dx-scheduler-date-table-row:first-child .dx-scheduler-date-table-cell,
+.dx-scheduler-work-space-week.dx-scheduler-work-space-odd-cells .dx-scheduler-date-table-row:first-child .dx-scheduler-date-table-cell,
+.dx-scheduler-work-space-work-week.dx-scheduler-work-space-odd-cells .dx-scheduler-date-table-row:first-child .dx-scheduler-date-table-cell {
+  border-top: none;
 }
 .dx-scheduler-work-space-day .dx-scrollable.dx-scheduler-date-table-scrollable,
 .dx-scheduler-work-space-day .dx-scrollable.dx-scheduler-sidebar-scrollable {
@@ -4780,6 +4785,9 @@
 .dx-list .dx-scrollview-content {
   overflow: hidden;
 }
+.dx-list.dx-list-with-search .dx-scrollable-wrapper {
+  height: calc(100% -  48px);
+}
 .dx-list-group-header {
   padding: 1em 16px;
   font-weight: 400;
@@ -4881,7 +4889,7 @@
   float: left;
 }
 .dx-list-select-all-label {
-  padding: 0 11px;
+  padding: 0 16px;
   vertical-align: middle;
 }
 .dx-list-select-all,
@@ -9433,6 +9441,9 @@
 }
 .dx-treeview-node-loadindicator > .dx-loadindicator-wrapper {
   font-size: 20px;
+}
+.dx-treeview.dx-treeview-with-search > .dx-scrollable {
+  height: calc(100% -  48px);
 }
 .dx-treeview.dx-treeview-border-visible {
   border: 1px solid rgba(0, 0, 0, 0.12);
