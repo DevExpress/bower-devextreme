@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.all.d.ts)
-* Version: 17.1.6 (build 17265)
-* Build date: Fri Sep 22 2017
+* Version: 17.1.7
+* Build date: Fri Sep 29 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -1686,7 +1686,7 @@ declare module DevExpress.ui {
     export interface dxSelectBoxOptions extends dxDropDownListOptions {
         /** Specifies DOM event names that update a widget's value. */
         valueChangeEvent?: string;
-        /** The template to be used for rendering the widget text field. */
+        /** The template to be used for rendering the widget text field. Must contain the TextBox widget. */
         fieldTemplate?: any;
         /** The text that is provided as a hint in the select box editor. */
         placeholder?: string;
@@ -6283,7 +6283,7 @@ declare module DevExpress.viz.charts {
         alignment?: string;
         /** Decides how to arrange axis labels when there is not enough space to keep all of them. */
         overlappingBehavior?: any;
-        /** Allows you to rotate or stagger axis labels. */
+        /** Allows you to rotate or stagger axis labels. Applies to the horizontal axis only. */
         displayMode?: string;
         /** Specifies the rotation angle of axis labels. Applies only if displayMode or overlappingBehavior is "rotate". */
         rotationAngle?: number;
