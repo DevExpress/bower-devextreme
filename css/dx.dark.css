@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 17.1.7
-* Build date: Sep 29, 2017
+* Version: 17.1.7 (build 17284)
+* Build date: Oct 11, 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -1335,6 +1335,11 @@
 .dx-scheduler-timeline.dx-scheduler-work-space-grouped .dx-scheduler-date-table-row .dx-scheduler-date-table-cell:first-child,
 .dx-scheduler-timeline.dx-scheduler-work-space-grouped .dx-scheduler-header-row .dx-scheduler-header-panel-cell:first-child {
   border-left: none;
+}
+.dx-rtl .dx-scheduler-timeline.dx-scheduler-work-space-grouped .dx-scheduler-date-table-row .dx-scheduler-date-table-cell:first-child,
+.dx-rtl .dx-scheduler-timeline.dx-scheduler-work-space-grouped .dx-scheduler-header-row .dx-scheduler-header-panel-cell:first-child {
+  border-right: none;
+  border-left: 1px solid rgba(77, 77, 77, 0.6);
 }
 .dx-scheduler-timeline.dx-scheduler-work-space-grouped .dx-scheduler-group-row:before {
   display: none;
@@ -2681,12 +2686,12 @@
 .dx-rtl .dx-scheduler-work-space-month .dx-scheduler-date-table-cell:first-child {
   border-right: none;
 }
-.dx-rtl .dx-scheduler-date-table {
+.dx-rtl .dx-scheduler-work-space:not(.dx-scheduler-timeline):not(.dx-scheduler-work-space-month) .dx-scheduler-date-table {
   float: right;
   margin-left: 0;
   margin-right: -100px;
 }
-.dx-scheduler-small .dx-rtl .dx-scheduler-date-table {
+.dx-scheduler-small .dx-rtl .dx-scheduler-work-space:not(.dx-scheduler-timeline):not(.dx-scheduler-work-space-month) .dx-scheduler-date-table {
   margin-right: -50px;
 }
 .dx-rtl .dx-scheduler-appointment-tooltip {

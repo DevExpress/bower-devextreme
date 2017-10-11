@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 17.1.7
-* Build date: Sep 29, 2017
+* Version: 17.1.7 (build 17284)
+* Build date: Oct 11, 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -2469,7 +2469,8 @@
 .dx-toolbar-menu-section:empty {
   display: none;
 }
-.dx-dropdownmenu-popup-wrapper .dx-toolbar-menu-custom > .dx-list-item-content {
+.dx-dropdownmenu-popup-wrapper .dx-toolbar-menu-custom > .dx-list-item-content,
+.dx-toolbar-menu-section .dx-toolbar-hidden-button > .dx-list-item-content {
   padding: 0;
 }
 .dx-toolbar-menu-section.dx-toolbar-menu-last-section {
@@ -2481,6 +2482,7 @@
   margin: 0;
   width: 100%;
   text-align: left;
+  padding: 10px;
 }
 .dx-toolbar-menu-section .dx-toolbar-hidden-button .dx-button .dx-button-text {
   line-height: normal;
@@ -2962,8 +2964,8 @@
   -o-user-select: none;
   user-select: none;
   -webkit-touch-callout: none;
-  -ms-touch-action: pinch-zoom;
-  touch-action: pinch-zoom;
+  -ms-touch-action: pinch-zoom pan-y;
+  touch-action: pinch-zoom pan-y;
 }
 .dx-gallery-wrapper {
   position: relative;

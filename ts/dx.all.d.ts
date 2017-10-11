@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.all.d.ts)
-* Version: 17.1.7
-* Build date: Fri Sep 29 2017
+* Version: 17.1.7 (build 17284)
+* Build date: Wed Oct 11 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -3271,9 +3271,9 @@ declare module DevExpress.data {
         sortBySummaryField?: string;
         /** The array of field names that specify a path to column/row whose summary field is used for sorting of this field's header items. */
         sortBySummaryPath?: Array<any>;
-        /** The filter values for the current field. */
+        /** Specifies by which values the field is filtered. */
         filterValues?: Array<any>;
-        /** The filter type for the current field. */
+        /** Specifies whether a user changes the current filter by including (selecting) or excluding (clearing the selection) values. Applies only if allowFiltering is true. */
         filterType?: string;
         /** Indicates whether all header items of the field's header level are expanded. */
         expanded?: boolean;
@@ -3483,7 +3483,7 @@ declare module DevExpress.ui {
         startDayHour?: number;
         /** Specifies an end hour in the scheduler view's time interval. */
         endDayHour?: number;
-        /** Specifies whether or not the "All-day" panel is visible. */
+        /** Specifies the "All-day" panel's visibility. Setting this option to false hides the panel along with the all-day appointments. */
         showAllDayPanel?: boolean;
         /** Specifies cell duration in minutes. */
         cellDuration?: number;
@@ -4815,7 +4815,7 @@ declare module DevExpress.ui {
         getVisibleColumns(): Array<dxTreeListColumn>;
         /** Gets all visible columns at a specific hierarchical level of column headers. Use it to access banded columns. */
         getVisibleColumns(headerLevel?: number): Array<dxTreeListColumn>;
-        /** Gets all visible rows. */
+        /** Gets currently rendered rows. */
         getVisibleRows(): Array<dxTreeListRow>;
         /** Gets the root node. */
         getRootNode(): dxTreeListNode;
@@ -4854,7 +4854,7 @@ declare module DevExpress.ui {
         getVisibleColumns(): Array<dxDataGridColumn>;
         /** Gets all visible columns at a specific hierarchical level of column headers. Use it to access banded columns. */
         getVisibleColumns(headerLevel?: number): Array<dxDataGridColumn>;
-        /** Gets all visible rows. */
+        /** Gets currently rendered rows. */
         getVisibleRows(): Array<dxDataGridRow>;
         /** Expands groups or master rows in a grid. */
         expandAll(groupIndex: number): void;
