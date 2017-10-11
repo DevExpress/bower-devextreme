@@ -1,7 +1,7 @@
 /*!
  * DevExtreme (dx.vectormaputils.node.js)
- * Version: 16.2.10
- * Build date: Fri Sep 29 2017
+ * Version: 16.2.10 (build 17284)
+ * Build date: Wed Oct 11 2017
  *
  * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
  * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
