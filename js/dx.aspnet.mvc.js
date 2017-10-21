@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.aspnet.mvc.js)
-* Version: 17.2.0 (build 17262)
-* Build date: Tue Sep 19 2017
+* Version: 17.2.0 (build 17291)
+* Build date: Wed Oct 18 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -100,7 +100,7 @@
     function createValidationSummaryItemsFromValidators(validators, editorNames) {
         var items = [];
         iteratorUtils.each(validators, function(_, validator) {
-            var widget = validator.element().data("dx-validation-target");
+            var widget = validator.$element().data("dx-validation-target");
             if (widget && $.inArray(widget.option("name"), editorNames) > -1) {
                 items.push({
                     text: widget.option("validationError.message"),

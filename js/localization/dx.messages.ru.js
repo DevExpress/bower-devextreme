@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.messages.ru.js)
-* Version: 17.2.0 (build 17262)
-* Build date: Tue Sep 19 2017
+* Version: 17.2.0 (build 17291)
+* Build date: Wed Oct 18 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -214,6 +214,7 @@
             "dxScheduler-confirmRecurrenceEditOccurrence": "Только это событие",
             "dxScheduler-confirmRecurrenceDeleteOccurrence": "Только это событие",
             "dxScheduler-noTimezoneTitle": "Часовой пояс не выбран",
+            "dxScheduler-moreAppointments": "и еще {0}",
             "dxCalendar-todayButtonText": "Сегодня",
             "dxCalendar-ariaWidgetName": "Календарь",
             "dxColorView-ariaRed": "Красный",
@@ -226,7 +227,26 @@
             "dxTagBox-moreSelected": "и еще {0}",
             "vizExport-printingButtonText": "Печать",
             "vizExport-titleMenuText": "Экспорт/Печать",
-            "vizExport-exportButtonText": "{0} файл"
+            "vizExport-exportButtonText": "{0} файл",
+            "dxFilterBuilder-and": "И",
+            "dxFilterBuilder-or": "Или",
+            "dxFilterBuilder-notAnd": "Не И",
+            "dxFilterBuilder-notOr": "Не Или",
+            "dxFilterBuilder-addCondition": "Добавить условие",
+            "dxFilterBuilder-addGroup": "Добавить группу",
+            "dxFilterBuilder-enterValueText": "<введите значение>",
+            "dxFilterBuilder-filterOperationEquals": "Равно",
+            "dxFilterBuilder-filterOperationNotEquals": "Не равно",
+            "dxFilterBuilder-filterOperationLess": "Меньше",
+            "dxFilterBuilder-filterOperationLessOrEquals": "Меньше или равно",
+            "dxFilterBuilder-filterOperationGreater": "Больше",
+            "dxFilterBuilder-filterOperationGreaterOrEquals": "Больше или равно",
+            "dxFilterBuilder-filterOperationStartsWith": "Начинается с",
+            "dxFilterBuilder-filterOperationContains": "Содержит",
+            "dxFilterBuilder-filterOperationNotContains": "Не содержит",
+            "dxFilterBuilder-filterOperationEndsWith": "Заканчивается на",
+            "dxFilterBuilder-filterOperationIsBlank": "Пустой",
+            "dxFilterBuilder-filterOperationIsNotBlank": "Не пустой"
         }
     })
 });

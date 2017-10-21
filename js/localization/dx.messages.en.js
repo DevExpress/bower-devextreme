@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.messages.en.js)
-* Version: 17.2.0 (build 17262)
-* Build date: Tue Sep 19 2017
+* Version: 17.2.0 (build 17291)
+* Build date: Wed Oct 18 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -214,6 +214,7 @@
             "dxScheduler-confirmRecurrenceEditOccurrence": "Edit appointment",
             "dxScheduler-confirmRecurrenceDeleteOccurrence": "Delete appointment",
             "dxScheduler-noTimezoneTitle": "No timezone",
+            "dxScheduler-moreAppointments": "{0} more",
             "dxCalendar-todayButtonText": "Today",
             "dxCalendar-ariaWidgetName": "Calendar",
             "dxColorView-ariaRed": "Red",
@@ -226,7 +227,26 @@
             "dxTagBox-moreSelected": "{0} more",
             "vizExport-printingButtonText": "Print",
             "vizExport-titleMenuText": "Exporting/Printing",
-            "vizExport-exportButtonText": "{0} file"
+            "vizExport-exportButtonText": "{0} file",
+            "dxFilterBuilder-and": "And",
+            "dxFilterBuilder-or": "Or",
+            "dxFilterBuilder-notAnd": "Not And",
+            "dxFilterBuilder-notOr": "Not Or",
+            "dxFilterBuilder-addCondition": "Add Condition",
+            "dxFilterBuilder-addGroup": "Add Group",
+            "dxFilterBuilder-enterValueText": "<enter a value>",
+            "dxFilterBuilder-filterOperationEquals": "Equals",
+            "dxFilterBuilder-filterOperationNotEquals": "Does not equal",
+            "dxFilterBuilder-filterOperationLess": "Less than",
+            "dxFilterBuilder-filterOperationLessOrEquals": "Less than or equal to",
+            "dxFilterBuilder-filterOperationGreater": "Greater than",
+            "dxFilterBuilder-filterOperationGreaterOrEquals": "Greater than or equal to",
+            "dxFilterBuilder-filterOperationStartsWith": "Starts with",
+            "dxFilterBuilder-filterOperationContains": "Contains",
+            "dxFilterBuilder-filterOperationNotContains": "Does not contain",
+            "dxFilterBuilder-filterOperationEndsWith": "Ends with",
+            "dxFilterBuilder-filterOperationIsBlank": "Is blank",
+            "dxFilterBuilder-filterOperationIsNotBlank": "Is not blank"
         }
     })
 });

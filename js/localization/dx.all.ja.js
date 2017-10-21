@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.all.ja.js)
-* Version: 17.2.0 (build 17262)
-* Build date: Tue Sep 19 2017
+* Version: 17.2.0 (build 17291)
+* Build date: Wed Oct 18 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -215,6 +215,7 @@
             "dxScheduler-confirmRecurrenceEditOccurrence": "予定を編集",
             "dxScheduler-confirmRecurrenceDeleteOccurrence": "予定を削除",
             "dxScheduler-noTimezoneTitle": "時間帯なし",
+            "dxScheduler-moreAppointments": "その他 {0} つ選択",
             "dxCalendar-todayButtonText": "今日",
             "dxCalendar-ariaWidgetName": "カレンダー",
             "dxColorView-ariaRed": "赤",
@@ -227,7 +228,26 @@
             "dxTagBox-moreSelected": "その他 {0} つ選択",
             "vizExport-printingButtonText": "印刷",
             "vizExport-titleMenuText": "エクスポート / 印刷",
-            "vizExport-exportButtonText": "{0} ファイル"
+            "vizExport-exportButtonText": "{0} ファイル",
+            "dxFilterBuilder-and": "!TODO!",
+            "dxFilterBuilder-or": "!TODO!",
+            "dxFilterBuilder-notAnd": "!TODO!",
+            "dxFilterBuilder-notOr": "!TODO!",
+            "dxFilterBuilder-addCondition": "!TODO!",
+            "dxFilterBuilder-addGroup": "!TODO!",
+            "dxFilterBuilder-enterValueText": "!TODO!",
+            "dxFilterBuilder-filterOperationEquals": "指定の値に等しい",
+            "dxFilterBuilder-filterOperationNotEquals": "指定の値に等しくない",
+            "dxFilterBuilder-filterOperationLess": "指定の値より小さい",
+            "dxFilterBuilder-filterOperationLessOrEquals": "指定の値以下",
+            "dxFilterBuilder-filterOperationGreater": "指定の値より大きい",
+            "dxFilterBuilder-filterOperationGreaterOrEquals": "指定の値以上",
+            "dxFilterBuilder-filterOperationStartsWith": "指定の値で始まる",
+            "dxFilterBuilder-filterOperationContains": "指定の値を含む",
+            "dxFilterBuilder-filterOperationNotContains": "指定の値を含まない",
+            "dxFilterBuilder-filterOperationEndsWith": "指定の値で終わる",
+            "dxFilterBuilder-filterOperationIsBlank": "!TODO!",
+            "dxFilterBuilder-filterOperationIsNotBlank": "!TODO!"
         }
     })
 });
