@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.aspnet.mvc.js)
-* Version: 17.1.7 (build 17291)
-* Build date: Wed Oct 18 2017
+* Version: 17.1.7 (build 17299)
+* Build date: Thu Oct 26 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/

@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.all.d.ts)
-* Version: 17.1.7 (build 17291)
-* Build date: Wed Oct 18 2017
+* Version: 17.1.7 (build 17299)
+* Build date: Thu Oct 26 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -485,7 +485,7 @@ interface JQuery {
 declare module DevExpress {
     /** Formats values. */
     export interface Format {
-        /** Specifies a predefined format. */
+        /** Specifies a predefined format. Does not apply if you have specified the formatter function. */
         type?: String;
         /** Specifies the currency code for the 'currency' format. */
         currency?: String;
@@ -606,7 +606,7 @@ declare module DevExpress {
             direction?: string;
         }
         /** Animates the specified element. */
-        export function animate(element: HTMLElement, config: AnimationOptions): Object;
+        export function animate(element: HTMLElement, config: AnimationOptions): JQueryPromise<void>;
         /** Returns a value indicating whether the specified element is being animated. */
         export function isAnimating(element: HTMLElement): boolean;
         /** Stops the animation. */
@@ -1485,7 +1485,7 @@ declare module DevExpress.ui {
     export interface dxDropDownListOptions extends dxDropDownEditorOptions, DataExpressionMixinOptions {
         /** Returns the value currently displayed by the widget. */
         displayValue?: string;
-        /** The minimum number of characters that must be entered into the text box to begin a search. */
+        /** The minimum number of characters that must be entered into the text box to begin a search. Applies only if searchEnabled is true. */
         minSearchLength?: number;
         /** Specifies whether or not the widget displays unfiltered values until a user types a number of characters exceeding the minSearchLength option value. */
         showDataBeforeSearch?: boolean;
@@ -2478,7 +2478,7 @@ declare module DevExpress.ui {
         placeholder?: string;
         /**  * Specifies whether or not a user can pick out a date using the drop-down calendar.  * @deprecated Use the pickerType option instead.  */
         useCalendar?: boolean;
-        /** Specifies the serialization format for a date-time value. */
+        /** Specifies the date-time value serialization format. Use it only if you do not specify the value at design time. */
         dateSerializationFormat?: string;
         /** An object or a value specifying the date and time currently selected using the date box. */
         value?: any;
@@ -2528,7 +2528,7 @@ declare module DevExpress.ui {
         currentDate?: Date;
         /** Specifies the first day of a week. */
         firstDayOfWeek?: number;
-        /** Specifies the serialization format for a date-time value. */
+        /** Specifies the date-time value serialization format. Use it only if you do not specify the value at design time. */
         dateSerializationFormat?: string;
         /** An object or a value specifying the date and time currently selected in the calendar. */
         value?: any;
@@ -3273,7 +3273,7 @@ declare module DevExpress.data {
         sortBySummaryPath?: Array<any>;
         /** Specifies by which values the field is filtered. */
         filterValues?: Array<any>;
-        /** Specifies whether a user changes the current filter by including (selecting) or excluding (clearing the selection) values. Applies only if allowFiltering is true. */
+        /** Specifies whether a user can change the current filter by including (selecting) or excluding (clearing the selection) values. Applies only if allowFiltering is true. */
         filterType?: string;
         /** Indicates whether all header items of the field's header level are expanded. */
         expanded?: boolean;
@@ -3293,7 +3293,7 @@ declare module DevExpress.data {
         allowSorting?: boolean;
         /** Allows an end-user to sort columns by summary values. */
         allowSortingBySummary?: boolean;
-        /** Allows an end-user to change filtering options. */
+        /** Allows a user to filter fields by selecting or deselecting values in the popup menu. */
         allowFiltering?: boolean;
         /** Allows an end-user to expand/collapse all header items within a header level. */
         allowExpandAll?: boolean;
@@ -3449,7 +3449,7 @@ declare module DevExpress.ui {
         resourceCellTemplate?: any;
     }
     export interface dxSchedulerOptions extends WidgetOptions {
-        /** Specifies the serialization format for date-time values. */
+        /** Specifies the date-time values' serialization format. Use it only if you do not specify the dataSource at design time. */
         dateSerializationFormat?: string;
         /** Specifies a date displayed on the current scheduler view by default. */
         currentDate?: any;
@@ -4537,7 +4537,7 @@ declare module DevExpress.ui {
         };
         /** Specifies whether text that does not fit into a column should be wrapped. */
         wordWrapEnabled?: boolean;
-        /** Specifies the serialization format for date-time values. */
+        /** Specifies date-time values' serialization format. Use it only if you do not specify the dataSource at design time. */
         dateSerializationFormat?: string;
         /** A handler for the initNewRow event. Executed before a new row is added to the widget. */
         onInitNewRow?: (e: { data: Object }) => void;
@@ -4822,9 +4822,9 @@ declare module DevExpress.ui {
         /** Checks whether a row is expanded or collapsed. */
         isRowExpanded(key: any): boolean;
         /** Expands a specific row. */
-        expandRow(key: any): void;
+        expandRow(key: any): JQueryPromise<void>;
         /** Collapses a specific row. */
-        collapseRow(key: any): void;
+        collapseRow(key: any): JQueryPromise<void>;
         /** Gets data objects of currently selected rows. */
         getSelectedRowsData(): Array<any>;
         /** Gets the keys of the currently selected rows. */
@@ -4861,9 +4861,9 @@ declare module DevExpress.ui {
         /** Checks whether a specific group or master row is expanded or collapsed. */
         isRowExpanded(key: any): boolean;
         /** Allows you to expand a specific group or master row by its key. */
-        expandRow(key: any): void;
+        expandRow(key: any): JQueryPromise<void>;
         /** Allows you to collapse a specific group or master row by its key. */
-        collapseRow(key: any): void;
+        collapseRow(key: any): JQueryPromise<void>;
         /**  * Adds a new data row to a grid.  * @deprecated Use the addRow() method instead.  */
         insertRow(): void;
         /** Switches a grid to a specified page. */
@@ -4907,7 +4907,7 @@ declare module DevExpress.ui {
         allowSorting?: boolean;
         /** Allows an end-user to sort columns by summary values. */
         allowSortingBySummary?: boolean;
-        /** Allows an end-user to change filtering options. */
+        /** Allows a user to filter fields by selecting or deselecting values in the popup menu. */
         allowFiltering?: boolean;
         /** Specifies the area to which data field headers must belong. */
         dataFieldArea?: string;
@@ -5686,7 +5686,7 @@ declare module DevExpress.viz.core {
     }
 }
 declare module DevExpress.viz.charts {
-    /** This section describes the fields and methods that can be used in code to manipulate the Series object. */
+    /** This section describes the Series object, which represents a series. */
     export interface BaseSeries {
         /** Provides information about the state of the series object. */
         fullState: number;
@@ -5729,7 +5729,7 @@ declare module DevExpress.viz.charts {
         /** Makes a particular series visible. */
         show(): void;
     }
-    /** This section describes the methods that can be used in code to manipulate the Point object. */
+    /** This section describes the Point object, which represents a series point. */
     export interface BasePoint {
         /** Provides information about the state of the point object. */
         fullState: number;
@@ -5762,7 +5762,7 @@ declare module DevExpress.viz.charts {
         /** Returns the series object to which the point belongs. */
         series: BaseSeries;
     }
-    /** This section describes the fields and methods that can be used in code to manipulate the Series object. */
+    /** This section describes the Series object, which represents a series. */
     export interface ChartSeries extends BaseSeries {
         /** Returns the name of the series pane. */
         pane: string;
@@ -5773,7 +5773,7 @@ declare module DevExpress.viz.charts {
         getAllPoints(): Array<ChartPoint>;
         getVisiblePoints(): Array<ChartPoint>;
     }
-    /** This section describes the methods that can be used in code to manipulate the Point object. */
+    /** This section describes the Point object, which represents a series point. */
     export interface ChartPoint extends BasePoint {
         /** Contains the close value of the point. This field is useful for points belonging to a series of the candle stick or stock type only. */
         originalCloseValue: any;
@@ -5791,7 +5791,7 @@ declare module DevExpress.viz.charts {
         getBoundingRect(): { x: number; y: number; width: number; height: number; };
         series: ChartSeries;
     }
-    /** This section describes the methods that can be used in code to manipulate the Label object. */
+    /** This section describes the Label object, which represents a point label. */
     export interface Label {
         /** Gets the parameters of the label's minimum bounding rectangle (MBR). */
         getBoundingRect(): { x: number; y: number; width: number; height: number; };
@@ -5800,14 +5800,14 @@ declare module DevExpress.viz.charts {
         /** Shows the point label. */
         show(): void;
     }
-    /** This section describes fields and methods that you can use in code to manipulate the Series object. */
+    /** This section describes the Series object, which represents a series. */
     export interface PieSeries extends BaseSeries {
         selectPoint(point: PiePoint): void;
         deselectPoint(point: PiePoint): void;
         getAllPoints(): Array<PiePoint>;
         getVisiblePoints(): Array<PiePoint>;
     }
-    /** This section describes the methods that can be used in code to manipulate the Point object. */
+    /** This section describes the Point object, which represents a series point. */
     export interface PiePoint extends BasePoint {
         /** Gets the percentage value of the specific point. */
         percent: any;
@@ -5819,7 +5819,7 @@ declare module DevExpress.viz.charts {
         hide(): void;
         series: PieSeries;
     }
-    /** This section describes the fields and methods that can be used in code to manipulate the Series object. */
+    /** This section describes the Series object, which represents a series. */
     export interface PolarSeries extends BaseSeries {
         /** Returns the name of the value axis of the series. */
         axis: string;
@@ -5828,7 +5828,7 @@ declare module DevExpress.viz.charts {
         getAllPoints(): Array<PolarPoint>;
         getVisiblePoints(): Array<PolarPoint>;
     }
-    /** This section describes the methods that can be used in code to manipulate the Point object. */
+    /** This section describes the Point object, which represents a series point. */
     export interface PolarPoint extends BasePoint {
         series: PolarSeries;
     }
@@ -7535,7 +7535,7 @@ declare module DevExpress.viz {
     }
 }
 declare module DevExpress.viz.map {
-    /** This section describes the fields and methods that can be used in code to manipulate the Layer object. */
+    /** This section describes the Layer object, which represents a vector map layer. */
     export interface MapLayer {
         /** The name of the layer. */
         name: string;
@@ -7552,7 +7552,7 @@ declare module DevExpress.viz.map {
         /** Returns the DataSource instance. */
         getDataSource(): DevExpress.data.DataSource;
     }
-    /** This section describes the fields and methods that can be used in code to manipulate the Layer Element object. */
+    /** This section describes the Layer Element object, which represents a vector map layer element. */
     export interface MapLayerElement {
         /** The parent layer of the layer element. */
         layer: MapLayer;
@@ -8214,7 +8214,7 @@ declare module DevExpress.viz.treeMap {
             node: TreeMapNode
         }) => void;
     }
-    /** This section describes fields and methods that can be used in code to manipulate a Node object. */
+    /** This section describes the Node object, which represents a treemap node. */
     export interface TreeMapNode {
         /** The level that the current node occupies in the hierarchy of nodes. */
         level: number;
