@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 17.2.0 (build 17291)
-* Build date: Oct 18, 2017
+* Version: 17.2.2-pre-beta
+* Build date: Nov 1, 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -951,7 +951,7 @@
   display: none;
 }
 .dx-scheduler-header-panel-cell.dx-scheduler-header-panel-current-time-cell {
-  color: #65bccd;
+  color: #007aff;
 }
 .dx-scheduler-header-panel-cell.dx-scheduler-header-panel-current-time-cell:before {
   position: absolute;
@@ -960,7 +960,7 @@
   width: 100%;
   height: 2px;
   content: '';
-  background-color: #9fd5e0;
+  background-color: #007aff;
 }
 .dx-scheduler-date-time-shader-all-day {
   margin-left: 100px;
@@ -970,7 +970,7 @@
   pointer-events: none;
 }
 .dx-scheduler-date-time-indicator {
-  background-color: #9fd5e0;
+  background-color: #007aff;
   position: absolute;
   pointer-events: none;
   -webkit-box-shadow: 0 1px 0 0px rgba(255, 255, 255, 0.1);
@@ -979,10 +979,10 @@
 }
 .dx-scheduler-date-time-indicator:before {
   font-size: 30px;
-  color: #9fd5e0;
+  color: #007aff;
   position: absolute;
   z-index: 1000;
-  margin-top: -15px;
+  margin-top: -14px;
   margin-left: -12px;
   text-shadow: rgba(255, 255, 255, 0.1) 1px 0px 0px;
 }
@@ -1051,7 +1051,7 @@
 .dx-scheduler-work-space-week.dx-rtl .dx-scheduler-date-time-indicator:before,
 .dx-scheduler-work-space-work-week.dx-rtl .dx-scheduler-date-time-indicator:before,
 .dx-scheduler-work-space-day.dx-rtl .dx-scheduler-date-time-indicator:before {
-  margin-right: -12px;
+  margin-right: 12px;
 }
 .dx-scheduler-work-space-week.dx-rtl .dx-scheduler-date-time-shader-top:before,
 .dx-scheduler-work-space-work-week.dx-rtl .dx-scheduler-date-time-shader-top:before,
@@ -1070,7 +1070,7 @@
   content: "\f001";
 }
 .dx-scheduler-timeline .dx-scheduler-date-time-indicator:before {
-  margin-left: -15px;
+  margin-left: -14px;
   margin-top: -12px;
 }
 .dx-scheduler-timeline .dx-scheduler-date-time-shader {
@@ -1086,7 +1086,7 @@
   pointer-events: none;
 }
 .dx-scheduler-timeline .dx-scheduler-header-panel-cell.dx-scheduler-header-panel-current-time-cell {
-  border-bottom: 2px solid #9fd5e0;
+  border-bottom: 2px solid #007aff;
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
   box-shadow: none;
@@ -1186,6 +1186,7 @@
 }
 .dx-scheduler-date-table-cell {
   border-top: 1px solid rgba(200, 200, 200, 0.6);
+  height: 50px;
 }
 .dx-scheduler-date-table-cell > div {
   pointer-events: none;
@@ -1595,6 +1596,7 @@
 .dx-scheduler-work-space.dx-scheduler-timeline-week.dx-scheduler-work-space-grouped .dx-scheduler-sidebar-scrollable:before,
 .dx-scheduler-work-space.dx-scheduler-timeline-work-week.dx-scheduler-work-space-grouped .dx-scheduler-sidebar-scrollable:before {
   height: 91px;
+  margin-top: -91px;
 }
 .dx-scheduler-work-space.dx-scheduler-timeline-week .dx-scrollable.dx-scheduler-date-table-scrollable,
 .dx-scheduler-work-space.dx-scheduler-timeline-work-week .dx-scrollable.dx-scheduler-date-table-scrollable {
@@ -1627,14 +1629,14 @@
 .dx-rtl .dx-scheduler-work-space-work-week .dx-scheduler-all-day-table-cell:nth-child(5n) {
   border-left: none;
 }
-.dx-scheduler-work-space-day:not(.dx-scheduler-work-space-count) .dx-scheduler-header-panel-cell:nth-child(1n),
-.dx-scheduler-work-space-day:not(.dx-scheduler-work-space-count) .dx-scheduler-date-table-cell:nth-child(1n),
-.dx-scheduler-work-space-day:not(.dx-scheduler-work-space-count) .dx-scheduler-all-day-table-cell:nth-child(1n) {
+.dx-scheduler-work-space-day:not(.dx-scheduler-work-space-count):not(.dx-scheduler-work-space-grouped) .dx-scheduler-header-panel-cell:nth-child(1n),
+.dx-scheduler-work-space-day:not(.dx-scheduler-work-space-count):not(.dx-scheduler-work-space-grouped) .dx-scheduler-date-table-cell:nth-child(1n),
+.dx-scheduler-work-space-day:not(.dx-scheduler-work-space-count):not(.dx-scheduler-work-space-grouped) .dx-scheduler-all-day-table-cell:nth-child(1n) {
   border-right: none;
 }
-.dx-rtl .dx-scheduler-work-space-day:not(.dx-scheduler-work-space-count) .dx-scheduler-header-panel-cell:nth-child(1n),
-.dx-rtl .dx-scheduler-work-space-day:not(.dx-scheduler-work-space-count) .dx-scheduler-date-table-cell:nth-child(1n),
-.dx-rtl .dx-scheduler-work-space-day:not(.dx-scheduler-work-space-count) .dx-scheduler-all-day-table-cell:nth-child(1n) {
+.dx-rtl .dx-scheduler-work-space-day:not(.dx-scheduler-work-space-count):not(.dx-scheduler-work-space-grouped) .dx-scheduler-header-panel-cell:nth-child(1n),
+.dx-rtl .dx-scheduler-work-space-day:not(.dx-scheduler-work-space-count):not(.dx-scheduler-work-space-grouped) .dx-scheduler-date-table-cell:nth-child(1n),
+.dx-rtl .dx-scheduler-work-space-day:not(.dx-scheduler-work-space-count):not(.dx-scheduler-work-space-grouped) .dx-scheduler-all-day-table-cell:nth-child(1n) {
   border-left: none;
 }
 .dx-scheduler-work-space-count.dx-scheduler-work-space-week .dx-scheduler-header-panel-cell:nth-child(7n),
@@ -1796,9 +1798,6 @@
 }
 .dx-scheduler-work-space-both-scrollbar .dx-scheduler-date-table .dx-scheduler-date-table-row:before {
   display: none;
-}
-.dx-scheduler-work-space-both-scrollbar .dx-scheduler-date-table-cell {
-  height: 50px;
 }
 .dx-scheduler-work-space-both-scrollbar .dx-scheduler-sidebar-scrollable {
   float: left;
@@ -2008,50 +2007,45 @@
   float: left;
   width: 100px;
   border-collapse: collapse;
-  margin-top: -50px;
   font-size: 20px;
 }
 .dx-scheduler-small .dx-scheduler-time-panel {
   width: 50px;
   font-size: 14px;
 }
-.dx-scheduler-time-panel tbody:after {
-  content: '';
-  height: 50px;
-  display: table-cell;
-}
-.dx-scheduler-time-panel-odd-row-count .dx-scheduler-time-panel-row:last-child .dx-scheduler-time-panel-cell {
-  border-bottom: none;
-}
-.dx-scheduler-time-panel-odd-row-count tbody:after {
-  content: none;
-}
 .dx-scheduler-time-panel-cell {
   color: #aeaeae;
-  border-bottom: 1px solid rgba(200, 200, 200, 0.6);
   position: relative;
   width: 100%;
-  text-align: center;
-  height: 100px;
-  padding-left: 10px;
+  text-align: right;
+  vertical-align: top;
+  height: 50px;
+  padding-right: 20px;
+  border-bottom: 1px solid transparent;
+}
+.dx-scheduler-time-panel-cell > div {
+  margin-top: -13px;
 }
 .dx-scheduler-small .dx-scheduler-time-panel-cell {
   padding-left: 0;
 }
-.dx-scheduler-time-panel-row:first-child .dx-scheduler-time-panel-cell {
-  padding-top: 35px;
+.dx-scheduler-time-panel-row:first-child .dx-scheduler-time-panel-cell > div {
+  margin-top: 0px;
 }
 .dx-scheduler-time-panel-cell:after {
   position: absolute;
   bottom: -1px;
-  width: 50%;
+  width: 10%;
   height: 1px;
   content: '';
-  left: 0;
-  background-color: white;
+  right: 0;
+  background-color: rgba(200, 200, 200, 0.6);
+}
+.dx-scheduler-time-panel-row:nth-child(2n) .dx-scheduler-time-panel-cell:after {
+  background-color: #aeaeae;
 }
 .dx-scheduler-time-panel-cell.dx-scheduler-time-panel-current-time-cell {
-  color: #65bccd;
+  color: #007aff;
 }
 .dx-scheduler-time-panel-cell.dx-scheduler-time-panel-current-time-cell:before {
   position: absolute;
@@ -2060,7 +2054,10 @@
   width: 2px;
   height: inherit;
   content: '';
-  background-color: #9fd5e0;
+  background-color: #007aff;
+}
+.dx-scheduler-time-panel-odd-row-count .dx-scheduler-time-panel-row:nth-child(2n) .dx-scheduler-time-panel-cell:after {
+  background-color: rgba(200, 200, 200, 0.6);
 }
 .dx-scheduler-date-table {
   width: 100%;
@@ -2678,11 +2675,7 @@
 .dx-scheduler-agenda .dx-scheduler-time-panel-cell {
   vertical-align: top;
 }
-.dx-scheduler-agenda .dx-scheduler-time-panel-cell .dx-scheduler-agenda-date,
-.dx-scheduler-agenda .dx-scheduler-time-panel-cell .dx-scheduler-agenda-week-day {
-  display: block;
-}
-.dx-scheduler-agenda .dx-scheduler-time-panel tbody:after {
+.dx-scheduler-agenda .dx-scheduler-time-panel-cell:after {
   display: none;
 }
 .dx-scheduler-agenda .dx-scheduler-group-table {
@@ -2897,8 +2890,9 @@
   float: right;
 }
 .dx-rtl .dx-scheduler-time-panel-cell {
-  padding-left: 0;
-  padding-right: 10px;
+  text-align: left;
+  padding-left: 20px;
+  padding-right: 0;
 }
 .dx-rtl .dx-scheduler-time-panel-cell:after {
   right: 0;
@@ -3729,6 +3723,18 @@
 }
 .dx-icon-greaterorequal:before {
   content: "\f049";
+}
+.dx-icon-isblank {
+  font: 14px/1 DXIcons;
+}
+.dx-icon-isblank:before {
+  content: "\f075";
+}
+.dx-icon-isnotblank {
+  font: 14px/1 DXIcons;
+}
+.dx-icon-isnotblank:before {
+  content: "\f076";
 }
 .dx-icon-sortup {
   font: 14px/1 DXIcons;

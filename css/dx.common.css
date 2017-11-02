@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 17.2.0 (build 17291)
-* Build date: Oct 18, 2017
+* Version: 17.2.2-pre-beta
+* Build date: Nov 1, 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -6783,6 +6783,10 @@ input.dx-hidden {
   margin-left: 5px;
   margin-right: 0;
 }
+.dx-filterbuilder.dx-rtl .dx-filterbuilder-group .dx-filterbuilder-group-content .dx-filterbuilder-group-content {
+  padding-left: 0;
+  padding-right: 26px;
+}
 .dx-filterbuilder .dx-filterbuilder-text,
 .dx-filterbuilder .dx-filterbuilder-action-icon {
   margin-left: 0;
@@ -6822,10 +6826,9 @@ input.dx-hidden {
 }
 .dx-filterbuilder .dx-filterbuilder-group .dx-filterbuilder-group-item .dx-filterbuilder-action.dx-filterbuilder-action-icon {
   padding: 5px 8px;
-  font-weight: bold;
 }
 .dx-filterbuilder .dx-filterbuilder-group .dx-filterbuilder-group-content .dx-filterbuilder-group-content {
-  padding: 0 26px;
+  padding-left: 26px;
 }
 .dx-filterbuilder-fields {
   white-space: nowrap;
