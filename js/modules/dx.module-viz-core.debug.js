@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Visualization Core Library)
-* Version: 15.2.16
-* Build date: May 17, 2017
+* Version: 15.2.17
+* Build date: Nov 3, 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -6779,12 +6779,13 @@ if (!window.DevExpress || !DevExpress.MOD_VIZ_CORE) {
                     }
             }();
         var removeExtraAttrs = rendererNS.removeExtraAttrs = function(html) {
-                var findTagAttrs = /(?:<[a-z0-9])+(?:[\s\S]*?>)/gi,
-                    findStyleAttrWithValue = /(\S*\s*)=\s*(["'])(?:(?!\2).)*\2\s?/gi;
-                return html.replace(findTagAttrs, function(allTagAttrs) {
-                        return allTagAttrs.replace(findStyleAttrWithValue, function(currentAttr, attrName) {
-                                return attrName.toLowerCase() === "style" ? currentAttr : ""
-                            })
+                var findTagAttrs = /(?:(<[a-z0-9]+\s*))([\s\S]*?)(>|\/>)/gi,
+                    findStyleAndClassAttrs = /(style)\s*=\s*(["'])(?:(?!\2).)*\2\s?/gi;
+                return html.replace(findTagAttrs, function(allTagAttrs, p1, p2, p3) {
+                        p2 = (p2 && p2.match(findStyleAndClassAttrs) || []).map(function(str) {
+                            return str
+                        }).join(" ");
+                        return p1 + p2 + p3
                     })
             };
         function isObjectArgument(value) {
