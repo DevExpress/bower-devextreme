@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.all.ru.js)
-* Version: 17.2.2-pre-beta
-* Build date: Wed Nov 01 2017
+* Version: 17.2.3
+* Build date: Wed Nov 15 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -246,8 +246,8 @@
             "dxFilterBuilder-filterOperationContains": "Содержит",
             "dxFilterBuilder-filterOperationNotContains": "Не содержит",
             "dxFilterBuilder-filterOperationEndsWith": "Заканчивается на",
-            "dxFilterBuilder-filterOperationIsBlank": "Пустой",
-            "dxFilterBuilder-filterOperationIsNotBlank": "Не пустой"
+            "dxFilterBuilder-filterOperationIsBlank": "Пусто",
+            "dxFilterBuilder-filterOperationIsNotBlank": "Не пусто"
         }
     })
 });

@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.all.de.js)
-* Version: 17.2.2-pre-beta
-* Build date: Wed Nov 01 2017
+* Version: 17.2.3
+* Build date: Wed Nov 15 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -229,13 +229,13 @@
             "vizExport-printingButtonText": "Drucken",
             "vizExport-titleMenuText": "Export/Druck",
             "vizExport-exportButtonText": "{0}-Datei",
-            "dxFilterBuilder-and": "!TODO!",
-            "dxFilterBuilder-or": "!TODO!",
-            "dxFilterBuilder-notAnd": "!TODO!",
-            "dxFilterBuilder-notOr": "!TODO!",
-            "dxFilterBuilder-addCondition": "!TODO!",
-            "dxFilterBuilder-addGroup": "!TODO!",
-            "dxFilterBuilder-enterValueText": "!TODO!",
+            "dxFilterBuilder-and": "Und",
+            "dxFilterBuilder-or": "Oder",
+            "dxFilterBuilder-notAnd": "Nicht Und",
+            "dxFilterBuilder-notOr": "Nicht Oder",
+            "dxFilterBuilder-addCondition": "Bedingung hinzufügen",
+            "dxFilterBuilder-addGroup": "Gruppe hinzufügen",
+            "dxFilterBuilder-enterValueText": "<Wert eingeben>",
             "dxFilterBuilder-filterOperationEquals": "Ist gleich",
             "dxFilterBuilder-filterOperationNotEquals": "Ist nicht gleich",
             "dxFilterBuilder-filterOperationLess": "Kleiner als",
@@ -246,8 +246,8 @@
             "dxFilterBuilder-filterOperationContains": "Enthält",
             "dxFilterBuilder-filterOperationNotContains": "Enthält nicht",
             "dxFilterBuilder-filterOperationEndsWith": "Endet mit",
-            "dxFilterBuilder-filterOperationIsBlank": "!TODO!",
-            "dxFilterBuilder-filterOperationIsNotBlank": "!TODO!"
+            "dxFilterBuilder-filterOperationIsBlank": "Ist leer",
+            "dxFilterBuilder-filterOperationIsNotBlank": "Ist nicht leer"
         }
     })
 });

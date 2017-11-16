@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.all.ja.js)
-* Version: 17.2.2-pre-beta
-* Build date: Wed Nov 01 2017
+* Version: 17.2.3
+* Build date: Wed Nov 15 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -229,13 +229,13 @@
             "vizExport-printingButtonText": "印刷",
             "vizExport-titleMenuText": "エクスポート / 印刷",
             "vizExport-exportButtonText": "{0} ファイル",
-            "dxFilterBuilder-and": "!TODO!",
-            "dxFilterBuilder-or": "!TODO!",
-            "dxFilterBuilder-notAnd": "!TODO!",
-            "dxFilterBuilder-notOr": "!TODO!",
-            "dxFilterBuilder-addCondition": "!TODO!",
-            "dxFilterBuilder-addGroup": "!TODO!",
-            "dxFilterBuilder-enterValueText": "!TODO!",
+            "dxFilterBuilder-and": "And",
+            "dxFilterBuilder-or": "Or",
+            "dxFilterBuilder-notAnd": "Not And",
+            "dxFilterBuilder-notOr": "Not Or",
+            "dxFilterBuilder-addCondition": "条件の追加",
+            "dxFilterBuilder-addGroup": "グループの追加",
+            "dxFilterBuilder-enterValueText": "値を入力",
             "dxFilterBuilder-filterOperationEquals": "指定の値に等しい",
             "dxFilterBuilder-filterOperationNotEquals": "指定の値に等しくない",
             "dxFilterBuilder-filterOperationLess": "指定の値より小さい",
@@ -246,8 +246,8 @@
             "dxFilterBuilder-filterOperationContains": "指定の値を含む",
             "dxFilterBuilder-filterOperationNotContains": "指定の値を含まない",
             "dxFilterBuilder-filterOperationEndsWith": "指定の値で終わる",
-            "dxFilterBuilder-filterOperationIsBlank": "!TODO!",
-            "dxFilterBuilder-filterOperationIsNotBlank": "!TODO!"
+            "dxFilterBuilder-filterOperationIsBlank": "空白である",
+            "dxFilterBuilder-filterOperationIsNotBlank": "空白ではない"
         }
     })
 });
