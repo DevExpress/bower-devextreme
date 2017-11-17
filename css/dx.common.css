@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 17.1.8
-* Build date: Nov 7, 2017
+* Version: 17.1.8 (build 17321)
+* Build date: Nov 17, 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -4670,6 +4670,9 @@ input.dx-hidden {
   position: absolute;
   top: 50%;
   left: 50%;
+  width: 100%;
+  text-align: center;
+  transform: translate(-50%, -50%);
 }
 .dx-datagrid-bottom-load-panel {
   text-align: center;
@@ -4880,6 +4883,9 @@ input.dx-hidden {
   border-left-color: transparent;
   border-right-color: transparent;
 }
+.dx-datagrid-rowsview .dx-adaptive-detail-row .dx-field-item-content:focus {
+  outline: none;
+}
 .dx-datagrid-group-opened,
 .dx-datagrid-group-closed {
   cursor: pointer;
@@ -4930,6 +4936,9 @@ input.dx-hidden {
   position: absolute;
   top: 50%;
   left: 50%;
+  width: 100%;
+  text-align: center;
+  transform: translate(-50%, -50%);
 }
 .dx-pivotgrid {
   cursor: default;
@@ -5626,6 +5635,9 @@ input.dx-hidden {
   position: absolute;
   top: 50%;
   left: 50%;
+  width: 100%;
+  text-align: center;
+  transform: translate(-50%, -50%);
 }
 .dx-treelist-bottom-load-panel {
   text-align: center;

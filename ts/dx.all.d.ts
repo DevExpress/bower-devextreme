@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.all.d.ts)
-* Version: 17.1.8
-* Build date: Tue Nov 07 2017
+* Version: 17.1.8 (build 17321)
+* Build date: Fri Nov 17 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -932,7 +932,7 @@ declare module DevExpress {
             postProcess?: (data: any[]) => any[];
             /** Specifies a value by which the required items are searched. */
             searchExpr?: any;
-            /** Specifies the comparison operation used to search for the required items. */
+            /** Specifies the comparison operation used to search for the required items. One of "=", "<>", ">", ">=", "<", "<=", "startswith", "endswith", "contains", "notcontains". */
             searchOperation?: string;
             /** Specifies the value to which the search expression is compared. */
             searchValue?: any;
@@ -1810,7 +1810,7 @@ declare module DevExpress.ui {
         /** Returns the width of the scrollable content in pixels. */
         scrollWidth(): number;
         /** Updates the dimensions of the scrollable contents. */
-        update(): void;
+        update(): JQueryPromise<void>;
     }
     export interface dxRadioGroupOptions extends EditorOptions, DataExpressionMixinOptions {
         activeStateEnabled?: boolean;
@@ -1899,14 +1899,14 @@ declare module DevExpress.ui {
         showEvent?: {
         /** Specifies the event names on which the widget is shown. */
             name?: String;
-            /** The time span after which the widget is shown. */
+            /** The delay in milliseconds after which the widget is displayed. */
             delay?: Number;
         };
         /** Specifies options of popover hiding. */
         hideEvent?: {
         /** Specifies the event names on which the widget is hidden. */
             name?: String;
-            /** The time span after which the popover is hidden. */
+            /** The delay in milliseconds after which the widget is hidden. */
             delay?: Number;
         };
     }
@@ -3821,7 +3821,7 @@ declare module DevExpress.ui {
         showEvent?: {
             /** Specifies the event names on which the widget is shown. */
             name?: String;
-            /** The time span after which the widget is shown. */
+            /** The delay in milliseconds after which the widget is displayed. */
             delay?: Number;
         };
         /** A Boolean value specifying whether or not the widget is closed if a user clicks outside of the context menu. */
@@ -4150,13 +4150,13 @@ declare module DevExpress.ui {
         /** Specifies which data field provides keys for data items. Applies only if data is a simple array. */
         keyExpr?: any;
         /** A handler for the contextMenuPreparing event. */
-        onContextMenuPreparing?: (e: Object) => void;
+        onContextMenuPreparing?: (e: any) => void;
         /** A handler for the cellClick event. */
         onCellClick?: any;
         /** A handler for the cellHoverChanged event. */
-        onCellHoverChanged?: (e: Object) => void;
+        onCellHoverChanged?: (e: any) => void;
         /** A handler for the cellPrepared event. */
-        onCellPrepared?: (e: Object) => void;
+        onCellPrepared?: (e: any) => void;
         /** An array of grid columns. */
         columns?: Array<dxDataGridColumn>;
         onContentReady?: Function;
@@ -4166,15 +4166,15 @@ declare module DevExpress.ui {
         customizeExportData?: (columns: Array<dxDataGridColumn>, rows: Array<dxDataGridRow>) => void;
         /** A handler for the editingStart event. */
         onEditingStart?: (e: {
-            data: Object;
+            data: any;
             key: any;
             cancel: boolean;
             column: dxDataGridColumn
         }) => void;
         /** A handler for the editorPrepared event. */
-        onEditorPrepared?: (e: Object) => void;
+        onEditorPrepared?: (e: any) => void;
         /** A handler for the editorPreparing event. */
-        onEditorPreparing?: (e: Object) => void;
+        onEditorPreparing?: (e: any) => void;
         /** Configures editing. */
         editing?: dxDataGridEditing;
         /** Specifies grouping settings and the behavior of grouped grid records. */
@@ -4239,7 +4239,7 @@ declare module DevExpress.ui {
         /** A handler for the rowClick event. */
         onRowClick?: any;
         /** A handler for the rowPrepared event. */
-        onRowPrepared?: (e: Object) => void;
+        onRowPrepared?: (e: any) => void;
         /** Specifies a custom template for grid rows. */
         rowTemplate?: any;
         /** Configures runtime selection. */
@@ -4308,7 +4308,7 @@ declare module DevExpress.ui {
             cancel: boolean;
         }) => void;
         /** A handler for the exported event. */
-        onExported?: (e: Object) => void;
+        onExported?: (e: any) => void;
         /** Specifies options of state storing. */
         stateStoring?: {
             /** Specifies a callback function that performs specific actions on state loading. */
@@ -4437,13 +4437,13 @@ declare module DevExpress.ui {
         /** Configures columns. */
         columns?: Array<dxTreeListColumn>;
         /** A handler for the contextMenuPreparing event. Executed before a context menu is rendered. */
-        onContextMenuPreparing?: (e: Object) => void;
+        onContextMenuPreparing?: (e: any) => void;
         /** A handler for the cellClick event. Executed after a user clicks a cell. */
         onCellClick?: any;
         /** A handler for the cellHoverChanged event. Executed after the pointer enters or leaves a cell. */
-        onCellHoverChanged?: (e: Object) => void;
+        onCellHoverChanged?: (e: any) => void;
         /** A handler for the cellPrepared event. Executed after the widget creates a cell. */
-        onCellPrepared?: (e: Object) => void;
+        onCellPrepared?: (e: any) => void;
         /** A handler for the contentReady event. Executed when the widget's content is ready. */
         onContentReady?: Function;
         /** Customizes columns after they are created. */
@@ -4451,18 +4451,18 @@ declare module DevExpress.ui {
         /** A handler for the rowClick event. Executed when a user clicks a row. */
         onRowClick?: any;
         /** A handler for the rowPrepared event. Executed after the widget creates a row. */
-        onRowPrepared?: (e: Object) => void;
+        onRowPrepared?: (e: any) => void;
         /** A handler for editingStart. Executed before a cell or row switches to the editing state. */
         onEditingStart?: (e: {
-            data: Object;
+            data: any;
             key: any;
             cancel: boolean;
             column: dxTreeListColumn
         }) => void;
         /** A handler for the editorPrepared event. Executed after an editor is created. */
-        onEditorPrepared?: (e: Object) => void;
+        onEditorPrepared?: (e: any) => void;
         /** A handler for the editorPreparing event. Executed before an editor is created. */
-        onEditorPreparing?: (e: Object) => void;
+        onEditorPreparing?: (e: any) => void;
         /** Configures editing. */
         editing?: dxTreeListEditing;
          /** Configures runtime selection. */
@@ -4470,7 +4470,7 @@ declare module DevExpress.ui {
         /** Configures scrolling. */
         scrolling?: dxTreeListScrolling;
         /** A handler for the nodesInitialized event. Executed after all nodes in the widget are initialized. */
-        onNodesInitialized?: (e: Object) => void;
+        onNodesInitialized?: (e: any) => void;
         /** Specifies what operations are performed on the server. */
         remoteOperations?: any;
     }
@@ -4540,23 +4540,23 @@ declare module DevExpress.ui {
         /** Specifies date-time values' serialization format. Use it only if you do not specify the dataSource at design time. */
         dateSerializationFormat?: string;
         /** A handler for the initNewRow event. Executed before a new row is added to the widget. */
-        onInitNewRow?: (e: { data: Object }) => void;
+        onInitNewRow?: (e: { data: any }) => void;
         /** A handler for the rowInserted event. Executed after a new row has been inserted into the data source. */
-        onRowInserted?: (e: { data: Object; key: any }) => void;
+        onRowInserted?: (e: { data: any; key: any }) => void;
         /** A handler for the rowInserting event. Executed before a new row is inserted into the data source. */
-        onRowInserting?: (e: { data: Object; cancel: any }) => void;
+        onRowInserting?: (e: { data: any; cancel: any }) => void;
         /** A handler for the rowRemoved event. Executed after a row has been removed from the data source. */
-        onRowRemoved?: (e: { data: Object; key: any }) => void;
+        onRowRemoved?: (e: { data: any; key: any }) => void;
         /** A handler for the rowRemoving event. Executed before a row is removed from the data source. */
-        onRowRemoving?: (e: { data: Object; key: any; cancel: any }) => void;
+        onRowRemoving?: (e: { data: any; key: any; cancel: any }) => void;
         /** A handler for the rowUpdated event. Executed after a row has been updated in the data source. */
-        onRowUpdated?: (e: { data: Object; key: any }) => void;
+        onRowUpdated?: (e: { data: any; key: any }) => void;
         /** A handler for the rowUpdating event. Executed before a row is updated in the data source. */
-        onRowUpdating?: (e: { oldData: Object; newData: Object; key: any; cancel: any }) => void;
+        onRowUpdating?: (e: { oldData: any; newData: any; key: any; cancel: any }) => void;
         /** A handler for the rowValidating event. Executed after cells in a row are validated against validation rules. */
-        onRowValidating?: (e: Object) => void;
+        onRowValidating?: (e: any) => void;
         /** A handler for the toolbarPreparing event. Executed before the toolbar is created. */
-        onToolbarPreparing?: (e: Object) => void;
+        onToolbarPreparing?: (e: any) => void;
         /** Configures the column chooser. */
         columnChooser?: {
             /** Specifies text displayed by the column chooser when it is empty. */
@@ -4653,7 +4653,7 @@ declare module DevExpress.ui {
         /** Specifies whether the widget should hide columns to adapt to the screen or container size. Ignored if allowColumnResizing is true and columnResizingMode is "widget". */
         columnHidingEnabled?: boolean;
         /** A handler for the adaptiveDetailRowPreparing event. Executed before an adaptive detail row is rendered. */
-        onAdaptiveDetailRowPreparing?: (e: Object) => void;
+        onAdaptiveDetailRowPreparing?: (e: any) => void;
         /** Indicates whether to show the error row. */
         errorRowEnabled?: boolean;
         /** Specifies the keys of rows that must be selected initially. Applies only if selection.deferred is false. */
@@ -4666,7 +4666,7 @@ declare module DevExpress.ui {
             selectedRowsData: Array<any>;
         }) => void;
         /** A handler for the keyDown event. Executed when the widget is in focus and a key has been pressed down. */
-        onKeyDown?: (e: Object) => void;
+        onKeyDown?: (e: any) => void;
         /** Configures the search panel. */
         searchPanel?: {
             /** Specifies whether found substrings should be highlighted. */
@@ -4685,13 +4685,13 @@ declare module DevExpress.ui {
             text?: string;
         };
         /** A handler for the rowExpanding event. Executed before a row is expanded. */
-        onRowExpanding?: (e: Object) => void;
+        onRowExpanding?: (e: any) => void;
         /** A handler for the rowExpanded event. Executed after a row is expanded. */
-        onRowExpanded?: (e: Object) => void;
+        onRowExpanded?: (e: any) => void;
         /** A handler for the rowCollapsing event. Executed before a row is collapsed. */
-        onRowCollapsing?: (e: Object) => void;
+        onRowCollapsing?: (e: any) => void;
         /** A handler for the rowCollapsed event. Executed after a row is collapsed. */
-        onRowCollapsed?: (e: Object) => void;
+        onRowCollapsed?: (e: any) => void;
     }
     class GridBase extends Widget implements DataHelperMixin {
         constructor(element: JQuery, options?: GridBaseOptions);
@@ -5030,7 +5030,7 @@ declare module DevExpress.ui {
         /** A handler for the cellPrepared event. */
         onCellPrepared?: (e: any) => void;
         /** A handler for the contextMenuPreparing event. */
-        onContextMenuPreparing?: (e: Object) => void;
+        onContextMenuPreparing?: (e: any) => void;
         /** Configures client-side export. */
         export?: {
             /** Enables client-side export. */
@@ -5053,7 +5053,7 @@ declare module DevExpress.ui {
             cancel: boolean;
         }) => void;
         /** A handler for the exported event. */
-        onExported?: (e: Object) => void;
+        onExported?: (e: any) => void;
         /** A configuration object specifying options related to state storing. */
         stateStoring?: {
             /** Specifies a callback function that performs specific actions on state loading. */
@@ -5102,7 +5102,7 @@ declare module DevExpress.ui {
         dataSource?: DevExpress.data.PivotGridDataSource;
         onContentReady?: Function;
         /** A handler for the contextMenuPreparing event. */
-        onContextMenuPreparing?: (e: Object) => void;
+        onContextMenuPreparing?: (e: any) => void;
         /** Strings that can be changed or localized in the PivotGridFieldChooser widget. */
         texts?: {
             /** The string to display instead of Row Fields. */
@@ -7374,7 +7374,7 @@ declare module DevExpress.viz.rangeSelector {
                 textLeftIndent?: number;
                 /** Specifies the space between the marker's label and the top edge of the marker's separator. */
                 textTopIndent?: number;
-                /** Specified the indent between the marker and the scale lables. */
+                /** Specified the indent between the marker and the scale labels. */
                 topIndent?: number;
                 /** Indicates whether scale markers are visible. */
                 visible?: boolean;
@@ -7904,7 +7904,7 @@ declare module DevExpress.viz.map {
     }
 }
 declare module DevExpress.viz {
-    /** The VectorMap is a widget that visualize geographical locations. This widget represents a geographical map that contains areas and markers. Areas embody continents and countries. Markers flag specific points on the map, for example, towns, cities or capitals. */
+    /** The VectorMap is a widget that visualizes geographical locations. This widget represents a geographical map that contains areas and markers. Areas embody continents and countries. Markers flag specific points on the map, for example, towns, cities or capitals. */
     export class dxVectorMap extends viz.core.BaseWidget implements viz.core.LoadingIndicatorMethods {
         constructor(element: JQuery, options?: DevExpress.viz.map.dxVectorMapOptions);
         constructor(element: Element, options?: DevExpress.viz.map.dxVectorMapOptions);
