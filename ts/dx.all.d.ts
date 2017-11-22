@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.all.d.ts)
-* Version: 17.1.8 (build 17321)
-* Build date: Fri Nov 17 2017
+* Version: 17.1.8 (build 17326)
+* Build date: Wed Nov 22 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -1215,6 +1215,8 @@ declare module DevExpress {
     /** An object that serves as a namespace for DevExtreme UI widgets as well as for methods implementing UI logic in DevExtreme sites/applications. */
     export module ui {
         export interface WidgetOptions extends DOMComponentOptions {
+            /** A handler for the contentReady event. Executed when the widget's content is ready. This handler may be executed multiple times during the widget's lifetime depending on the number of times its content changes. */
+            onContentReady?: Function;
             /** Specifies whether or not the widget changes its state when interacting with a user. */
             activeStateEnabled?: boolean;
             /** Specifies whether the widget responds to user interaction. */
@@ -1254,7 +1256,6 @@ declare module DevExpress {
             loopItemFocus?: boolean;
             /** The text or HTML markup displayed by the widget if the item collection is empty. */
             noDataText?: string;
-            onContentReady?: any;
             /** A handler for the itemClick event. */
             onItemClick?: any;
             /** A handler for the itemContextMenu event. */
@@ -1509,7 +1510,6 @@ declare module DevExpress.ui {
         onSelectionChanged?: Function;
         /** A handler for the itemClick event. */
         onItemClick?: Function;
-        onContentReady?: Function;
         /** Specifies whether data items should be grouped. */
         grouped?: boolean;
         /** Specifies a custom template for group captions. */
@@ -1959,7 +1959,6 @@ declare module DevExpress.ui {
         onShowing?: Function;
         /** A handler for the shown event. */
         onShown?: Function;
-        onContentReady?: Function;
         /** A Boolean value specifying whether or not the widget is visible. */
         visible?: boolean;
         /** The widget width in pixels. */
@@ -2251,7 +2250,7 @@ declare module DevExpress.ui {
         action?: (itemElement: Element, itemData: any) => void;
     }
     export interface dxListOptions extends CollectionWidgetOptions {
-        /** A Boolean value specifying whether or not to display a grouped list. */
+        /** Specifies whether data items should be grouped. */
         grouped?: boolean;
         /** The template to be used for rendering item groups.Specifies a custom template for a group caption. */
         groupTemplate?: any;
@@ -2500,7 +2499,6 @@ declare module DevExpress.ui {
         applyButtonText?: string;
         /** Specifies whether or not adaptive widget rendering is enabled on a small screen. */
         adaptivityEnabled?: boolean;
-        onContentReady?: Function;
         /** The text displayed on the Cancel button. */
         cancelButtonText?: string;
     }
@@ -2941,7 +2939,6 @@ declare module DevExpress.ui {
         scrollingEnabled?: boolean;
         /** Gives a name to the internal validation group. */
         validationGroup?: string;
-        onContentReady?: Function;
     }
     /** The Form widget represents fields of a data object as a collection of label-editor pairs. These pairs can be arranged in several groups, tabs and columns. */
     export class dxForm extends Widget {
@@ -3547,8 +3544,6 @@ declare module DevExpress.ui {
         onCellClick?: any;
         /** A handler for the appointmentFormCreated event. */
         onAppointmentFormCreated?: Function;
-        /** A handler for the contentReady event. */
-        onContentReady?: Function;
         horizontalScrollingEnabled?: boolean;
         /** Specifies whether or not an end-user can scroll the view in both directions at the same time. */
         crossScrollingEnabled?: boolean;
@@ -4159,7 +4154,6 @@ declare module DevExpress.ui {
         onCellPrepared?: (e: any) => void;
         /** An array of grid columns. */
         columns?: Array<dxDataGridColumn>;
-        onContentReady?: Function;
         /** Specifies a function that customizes grid columns after they are created. */
         customizeColumns?: (columns: Array<dxDataGridColumn>) => void;
         /** Customizes grid columns and data before exporting. */
@@ -4444,8 +4438,6 @@ declare module DevExpress.ui {
         onCellHoverChanged?: (e: any) => void;
         /** A handler for the cellPrepared event. Executed after the widget creates a cell. */
         onCellPrepared?: (e: any) => void;
-        /** A handler for the contentReady event. Executed when the widget's content is ready. */
-        onContentReady?: Function;
         /** Customizes columns after they are created. */
         customizeColumns?: (columns: Array<dxTreeListColumn>) => void;
         /** A handler for the rowClick event. Executed when a user clicks a row. */
@@ -4892,7 +4884,6 @@ declare module DevExpress.ui {
         addRow(): void;
     }
     export interface dxPivotGridOptions extends WidgetOptions {
-        onContentReady?: Function;
         /** Specifies a data source for the pivot grid. */
         dataSource?: any;
         useNativeScrolling?: any;
@@ -5100,7 +5091,6 @@ declare module DevExpress.ui {
         layout?: number;
         /** The data source of a PivotGrid widget. */
         dataSource?: DevExpress.data.PivotGridDataSource;
-        onContentReady?: Function;
         /** A handler for the contextMenuPreparing event. */
         onContextMenuPreparing?: (e: any) => void;
         /** Strings that can be changed or localized in the PivotGridFieldChooser widget. */
