@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 17.2.3 (build 17321)
-* Build date: Nov 17, 2017
+* Version: 17.2.3 (build 17326)
+* Build date: Nov 22, 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -4617,14 +4617,14 @@ input.dx-hidden {
   position: relative;
   overflow: hidden;
 }
-.dx-datagrid-rowsview.dx-scrollable .dx-scrollable-content {
+.dx-datagrid-rowsview.dx-fixed-columns.dx-scrollable .dx-scrollable-content {
   z-index: 2;
+}
+.dx-datagrid-rowsview.dx-fixed-columns .dx-scrollable-scrollbar {
+  z-index: 3;
 }
 .dx-datagrid-rowsview .dx-datagrid-content {
   overflow-anchor: none;
-}
-.dx-datagrid-rowsview .dx-scrollable-scrollbar {
-  z-index: 3;
 }
 .dx-datagrid-rowsview:focus {
   outline: 0;
@@ -4685,6 +4685,9 @@ input.dx-hidden {
   position: absolute;
   top: 50%;
   left: 50%;
+  width: 100%;
+  text-align: center;
+  transform: translate(-50%, -50%);
 }
 .dx-datagrid-bottom-load-panel {
   text-align: center;
@@ -4895,6 +4898,9 @@ input.dx-hidden {
   border-left-color: transparent;
   border-right-color: transparent;
 }
+.dx-datagrid-rowsview .dx-adaptive-detail-row .dx-field-item-content:focus {
+  outline: none;
+}
 .dx-datagrid-group-opened,
 .dx-datagrid-group-closed {
   cursor: pointer;
@@ -4945,6 +4951,9 @@ input.dx-hidden {
   position: absolute;
   top: 50%;
   left: 50%;
+  width: 100%;
+  text-align: center;
+  transform: translate(-50%, -50%);
 }
 .dx-pivotgrid {
   cursor: default;
@@ -5579,14 +5588,14 @@ input.dx-hidden {
   position: relative;
   overflow: hidden;
 }
-.dx-treelist-rowsview.dx-scrollable .dx-scrollable-content {
+.dx-treelist-rowsview.dx-fixed-columns.dx-scrollable .dx-scrollable-content {
   z-index: 2;
+}
+.dx-treelist-rowsview.dx-fixed-columns .dx-scrollable-scrollbar {
+  z-index: 3;
 }
 .dx-treelist-rowsview .dx-treelist-content {
   overflow-anchor: none;
-}
-.dx-treelist-rowsview .dx-scrollable-scrollbar {
-  z-index: 3;
 }
 .dx-treelist-rowsview:focus {
   outline: 0;
@@ -5647,6 +5656,9 @@ input.dx-hidden {
   position: absolute;
   top: 50%;
   left: 50%;
+  width: 100%;
+  text-align: center;
+  transform: translate(-50%, -50%);
 }
 .dx-treelist-bottom-load-panel {
   text-align: center;

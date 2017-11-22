@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 17.2.3 (build 17321)
-* Build date: Nov 17, 2017
+* Version: 17.2.3 (build 17326)
+* Build date: Nov 22, 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -988,6 +988,9 @@
   margin-left: -12px;
   text-shadow: rgba(255, 255, 255, 0.1) 1px 0px 0px;
 }
+.dx-scheduler-date-time-shader {
+  pointer-events: none;
+}
 .dx-scheduler-work-space-week .dx-scheduler-date-time-indicator,
 .dx-scheduler-work-space-work-week .dx-scheduler-date-time-indicator,
 .dx-scheduler-work-space-day .dx-scheduler-date-time-indicator {
@@ -1018,7 +1021,6 @@
   position: absolute;
   margin-left: 100px;
   background-color: rgba(23, 23, 23, 0.1);
-  pointer-events: none;
 }
 .dx-scheduler-work-space-week.dx-scheduler-work-space-both-scrollbar .dx-scheduler-date-time-shader,
 .dx-scheduler-work-space-work-week.dx-scheduler-work-space-both-scrollbar .dx-scheduler-date-time-shader,
@@ -1085,7 +1087,6 @@
   left: 0;
   position: absolute;
   background-color: rgba(23, 23, 23, 0.1);
-  pointer-events: none;
 }
 .dx-scheduler-timeline .dx-scheduler-header-panel-cell.dx-scheduler-header-panel-current-time-cell {
   border-bottom: 2px solid #00b8ff;
@@ -1312,7 +1313,7 @@
 .dx-scheduler-work-space-day.dx-scheduler-work-space-overlapping .dx-scheduler-all-day-appointment .dx-scheduler-appointment-content {
   padding: 0px 7px;
 }
-.dx-scheduler-work-space-month:not(.dx-scheduler-work-space-count) .dx-scrollable .dx-scrollable-content {
+.dx-scheduler-scrollable-fixed-content {
   height: 100%;
 }
 .dx-scheduler-work-space-month .dx-scheduler-all-day-title {
@@ -1447,6 +1448,7 @@
 .dx-scheduler-timeline .dx-scheduler-sidebar-scrollable .dx-scrollable-content,
 .dx-scheduler-timeline .dx-scheduler-group-table {
   height: 100%;
+  min-height: 100px;
 }
 .dx-scheduler-timeline.dx-scheduler-work-space-both-scrollbar .dx-scheduler-date-table-scrollable .dx-scrollable-content,
 .dx-scheduler-timeline.dx-scheduler-work-space-both-scrollbar .dx-scheduler-sidebar-scrollable .dx-scrollable-content,
