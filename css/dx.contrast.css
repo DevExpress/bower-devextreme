@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 17.1.8 (build 17326)
-* Build date: Nov 22, 2017
+* Version: 17.1.8 (build 17338)
+* Build date: Dec 4, 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -7919,6 +7919,9 @@
 .dx-editor-cell .dx-numberbox-spin-button {
   background-color: transparent;
 }
+.dx-editor-cell .dx-icon-clear {
+  left: 0px;
+}
 .dx-editor-cell .dx-checkbox.dx-checkbox-checked .dx-checkbox-icon {
   font-size: 12px;
 }
@@ -8899,6 +8902,9 @@
 }
 .dx-editor-cell .dx-numberbox-spin-button {
   background-color: transparent;
+}
+.dx-editor-cell .dx-icon-clear {
+  left: 0px;
 }
 .dx-editor-cell .dx-checkbox.dx-checkbox-checked .dx-checkbox-icon {
   font-size: 12px;

@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 17.1.8 (build 17326)
-* Build date: Nov 22, 2017
+* Version: 17.1.8 (build 17338)
+* Build date: Dec 4, 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -7384,6 +7384,9 @@
   border-left: 1px solid #CBCBCB;
   border-right: 1px solid #CBCBCB;
 }
+.dx-datagrid .dx-editor-cell .dx-numberbox .dx-icon-clear {
+  left: 0px;
+}
 .dx-datagrid .dx-editor-cell .dx-texteditor .dx-texteditor-container {
   border-bottom-width: 0px;
 }
@@ -7807,6 +7810,40 @@
 .dx-datagrid-rowsview .dx-master-detail-row:not(.dx-datagrid-edit-form) .dx-master-detail-cell {
   background-color: #FAFAFA;
 }
+.dx-datagrid-headers .dx-dropdowneditor-button-visible .dx-texteditor-container:after,
+.dx-datagrid-rowsview .dx-dropdowneditor-button-visible .dx-texteditor-container:after {
+  right: 27px;
+}
+.dx-datagrid-headers .dx-dropdowneditor-button-visible.dx-show-clear-button:not(.dx-texteditor-empty) .dx-texteditor-container:after,
+.dx-datagrid-rowsview .dx-dropdowneditor-button-visible.dx-show-clear-button:not(.dx-texteditor-empty) .dx-texteditor-container:after {
+  right: 54px;
+}
+.dx-datagrid-headers .dx-dropdowneditor-button-visible.dx-show-clear-button .dx-texteditor-input,
+.dx-datagrid-rowsview .dx-dropdowneditor-button-visible.dx-show-clear-button .dx-texteditor-input {
+  padding-right: 57px;
+}
+.dx-datagrid-headers .dx-dropdowneditor-button-visible.dx-show-clear-button.dx-invalid .dx-texteditor-input,
+.dx-datagrid-rowsview .dx-dropdowneditor-button-visible.dx-show-clear-button.dx-invalid .dx-texteditor-input {
+  padding-right: 77px;
+}
+.dx-datagrid-headers .dx-dropdowneditor-button-visible.dx-show-clear-button.dx-invalid.dx-rtl .dx-texteditor-input,
+.dx-datagrid-rowsview .dx-dropdowneditor-button-visible.dx-show-clear-button.dx-invalid.dx-rtl .dx-texteditor-input {
+  padding: 7px;
+  padding-left: 77px;
+}
+.dx-datagrid-headers .dx-dropdowneditor-button-visible.dx-invalid .dx-texteditor-input,
+.dx-datagrid-rowsview .dx-dropdowneditor-button-visible.dx-invalid .dx-texteditor-input {
+  padding-right: 50px;
+}
+.dx-datagrid-headers .dx-dropdowneditor-button-visible.dx-invalid.dx-rtl .dx-texteditor-input,
+.dx-datagrid-rowsview .dx-dropdowneditor-button-visible.dx-invalid.dx-rtl .dx-texteditor-input {
+  padding: 7px;
+  padding-left: 50px;
+}
+.dx-datagrid-headers .dx-dropdowneditor-button-visible .dx-texteditor-input,
+.dx-datagrid-rowsview .dx-dropdowneditor-button-visible .dx-texteditor-input {
+  padding-right: 30px;
+}
 .dx-datagrid-search-text {
   background-color: #b8e0ee;
 }
@@ -8165,6 +8202,9 @@
 .dx-treelist .dx-column-lines > td {
   border-left: 1px solid #CBCBCB;
   border-right: 1px solid #CBCBCB;
+}
+.dx-treelist .dx-editor-cell .dx-numberbox .dx-icon-clear {
+  left: 0px;
 }
 .dx-treelist .dx-editor-cell .dx-texteditor .dx-texteditor-container {
   border-bottom-width: 0px;
@@ -8588,6 +8628,40 @@
 .dx-treelist-rowsview .dx-master-detail-row:not(.dx-treelist-edit-form) > .dx-treelist-group-space,
 .dx-treelist-rowsview .dx-master-detail-row:not(.dx-treelist-edit-form) .dx-master-detail-cell {
   background-color: #FAFAFA;
+}
+.dx-treelist-headers .dx-dropdowneditor-button-visible .dx-texteditor-container:after,
+.dx-treelist-rowsview .dx-dropdowneditor-button-visible .dx-texteditor-container:after {
+  right: 27px;
+}
+.dx-treelist-headers .dx-dropdowneditor-button-visible.dx-show-clear-button:not(.dx-texteditor-empty) .dx-texteditor-container:after,
+.dx-treelist-rowsview .dx-dropdowneditor-button-visible.dx-show-clear-button:not(.dx-texteditor-empty) .dx-texteditor-container:after {
+  right: 54px;
+}
+.dx-treelist-headers .dx-dropdowneditor-button-visible.dx-show-clear-button .dx-texteditor-input,
+.dx-treelist-rowsview .dx-dropdowneditor-button-visible.dx-show-clear-button .dx-texteditor-input {
+  padding-right: 57px;
+}
+.dx-treelist-headers .dx-dropdowneditor-button-visible.dx-show-clear-button.dx-invalid .dx-texteditor-input,
+.dx-treelist-rowsview .dx-dropdowneditor-button-visible.dx-show-clear-button.dx-invalid .dx-texteditor-input {
+  padding-right: 77px;
+}
+.dx-treelist-headers .dx-dropdowneditor-button-visible.dx-show-clear-button.dx-invalid.dx-rtl .dx-texteditor-input,
+.dx-treelist-rowsview .dx-dropdowneditor-button-visible.dx-show-clear-button.dx-invalid.dx-rtl .dx-texteditor-input {
+  padding: 7px;
+  padding-left: 77px;
+}
+.dx-treelist-headers .dx-dropdowneditor-button-visible.dx-invalid .dx-texteditor-input,
+.dx-treelist-rowsview .dx-dropdowneditor-button-visible.dx-invalid .dx-texteditor-input {
+  padding-right: 50px;
+}
+.dx-treelist-headers .dx-dropdowneditor-button-visible.dx-invalid.dx-rtl .dx-texteditor-input,
+.dx-treelist-rowsview .dx-dropdowneditor-button-visible.dx-invalid.dx-rtl .dx-texteditor-input {
+  padding: 7px;
+  padding-left: 50px;
+}
+.dx-treelist-headers .dx-dropdowneditor-button-visible .dx-texteditor-input,
+.dx-treelist-rowsview .dx-dropdowneditor-button-visible .dx-texteditor-input {
+  padding-right: 30px;
 }
 .dx-treelist-search-text {
   background-color: #b8e0ee;
