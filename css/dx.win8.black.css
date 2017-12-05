@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 17.2.3 (build 17327)
-* Build date: Nov 23, 2017
+* Version: 17.2.3 (build 17339)
+* Build date: Dec 5, 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -957,7 +957,7 @@
 }
 .dx-scheduler-header-panel-cell.dx-scheduler-header-panel-current-time-cell:before {
   position: absolute;
-  bottom: 0;
+  top: 37px;
   right: 0;
   width: 100%;
   height: 2px;
@@ -1223,6 +1223,11 @@
 .dx-scheduler-work-space-work-week.dx-scheduler-work-space-odd-cells .dx-scheduler-date-table-row:first-child .dx-scheduler-date-table-cell {
   border-top: none;
 }
+.dx-scheduler-work-space-day.dx-scheduler-work-space-odd-cells .dx-scheduler-time-panel-row:nth-child(2n) .dx-scheduler-time-panel-cell:after,
+.dx-scheduler-work-space-week.dx-scheduler-work-space-odd-cells .dx-scheduler-time-panel-row:nth-child(2n) .dx-scheduler-time-panel-cell:after,
+.dx-scheduler-work-space-work-week.dx-scheduler-work-space-odd-cells .dx-scheduler-time-panel-row:nth-child(2n) .dx-scheduler-time-panel-cell:after {
+  background-color: rgba(255, 255, 255, 0.8);
+}
 .dx-scheduler-work-space-day .dx-scrollable.dx-scheduler-date-table-scrollable,
 .dx-scheduler-work-space-day .dx-scrollable.dx-scheduler-sidebar-scrollable {
   padding-bottom: 0;
@@ -1409,7 +1414,6 @@
   width: 200px;
 }
 .dx-scheduler-timeline .dx-scheduler-date-table-cell {
-  height: auto;
   border-right: none;
 }
 .dx-scheduler-timeline .dx-scheduler-group-table {
@@ -2045,9 +2049,6 @@
   right: 0;
   background-color: rgba(255, 255, 255, 0.3);
 }
-.dx-scheduler-time-panel-row:nth-child(2n) .dx-scheduler-time-panel-cell:after {
-  background-color: rgba(255, 255, 255, 0.8);
-}
 .dx-scheduler-time-panel-cell.dx-scheduler-time-panel-current-time-cell {
   color: #00b8ff;
 }
@@ -2060,8 +2061,8 @@
   content: '';
   background-color: #00b8ff;
 }
-.dx-scheduler-time-panel-odd-row-count .dx-scheduler-time-panel-row:nth-child(2n) .dx-scheduler-time-panel-cell:after {
-  background-color: rgba(255, 255, 255, 0.3);
+.dx-scheduler-time-panel-row:last-child .dx-scheduler-time-panel-cell:after {
+  display: none;
 }
 .dx-scheduler-date-table {
   width: 100%;
@@ -2552,24 +2553,16 @@
   color: #000;
 }
 .dx-scheduler-dropdown-appointments.dx-button,
-.dx-scheduler-dropdown-appointments.dx-button.dx-state-hover,
 .dx-scheduler-dropdown-appointments.dx-button.dx-state-active,
 .dx-scheduler-dropdown-appointments.dx-button.dx-state-focused {
   background-color: #65bccd;
+  color: #000;
   border: none;
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
   box-shadow: none;
 }
-.dx-scheduler-dropdown-appointments.dx-button .dx-scheduler-dropdown-appointments-content,
-.dx-scheduler-dropdown-appointments.dx-button.dx-state-hover .dx-scheduler-dropdown-appointments-content,
-.dx-scheduler-dropdown-appointments.dx-button.dx-state-active .dx-scheduler-dropdown-appointments-content,
-.dx-scheduler-dropdown-appointments.dx-button.dx-state-focused .dx-scheduler-dropdown-appointments-content {
-  color: #000;
-  opacity: .99;
-}
 .dx-scheduler-dropdown-appointments.dx-button .dx-button-content,
-.dx-scheduler-dropdown-appointments.dx-button.dx-state-hover .dx-button-content,
 .dx-scheduler-dropdown-appointments.dx-button.dx-state-active .dx-button-content,
 .dx-scheduler-dropdown-appointments.dx-button.dx-state-focused .dx-button-content {
   line-height: inherit;
@@ -2584,6 +2577,10 @@
   bottom: 0;
   background-color: rgba(0, 0, 0, 0.3);
   opacity: .98;
+}
+.dx-scheduler-dropdown-appointments.dx-button.dx-state-hover .dx-scheduler-dropdown-appointments-content {
+  color: #000;
+  opacity: .99;
 }
 .dx-scheduler-dropdown-appointment {
   border-left: 5px solid #65bccd;

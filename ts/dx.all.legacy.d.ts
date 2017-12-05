@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.all.legacy.d.ts)
-* Version: 17.2.3 (build 17327)
-* Build date: Thu Nov 23 2017
+* Version: 17.2.3 (build 17339)
+* Build date: Tue Dec 05 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -6109,8 +6109,14 @@ declare module DevExpress.viz.charts {
         getBoundingRect(): { x: number; y: number; width: number; height: number; };
         /** Hides the point label. */
         hide(): void;
+        /** Hides the point label. If called with "true", holds the label invisible until show() is called. */
+        hide(holdInvisible: boolean): void;
         /** Shows the point label. */
         show(): void;
+        /** Shows the point label. If called with "true", holds the label visible until hide() is called. */
+        show(holdVisible: boolean): void;
+        /** Provides information about the visibility state of a label. */
+        isVisible(): boolean;
     }
     /** This section describes the Series object, which represents a series. */
     export interface PieSeries extends BaseSeries {

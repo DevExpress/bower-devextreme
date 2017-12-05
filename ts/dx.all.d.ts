@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.all.d.ts)
-* Version: 17.2.3 (build 17327)
-* Build date: Thu Nov 23 2017
+* Version: 17.2.3 (build 17339)
+* Build date: Tue Dec 05 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -664,11 +664,11 @@ declare module DevExpress {
     export interface globalConfig {
         /** A decimal separator. Applies only if you do not use the Globalize or Intl library. */
         decimalSeparator?: string;
-        /** Specifies the default currency the widgets use. */
+        /** The default currency. Accepts a 3-letter code specified by ISO 4217. */
         defaultCurrency?: string;
         /** Specifies whether dates are parsed and serialized according to the ISO 8601 standard in all browsers. */
         forceIsoDateParsing?: boolean;
-        /** Specifies whether the widgets support a right-to-left representation. */
+        /** Specifies whether the widgets support a right-to-left representation. Available for individual widgets as well. */
         rtlEnabled?: boolean;
         /** The decimal separator that is used when submitting a value to the server. */
         serverDecimalSeparator?: string;
@@ -677,7 +677,7 @@ declare module DevExpress {
     }
     /** Gets the current global configuration object. */
     export function config(): globalConfig;
-    /** Sets the global configuration object. */
+    /** Configures your application before its launch. */
     export function config(config: globalConfig): void;
     /** The device object defines the device on which the application is running. */
     export interface Device {
@@ -910,7 +910,7 @@ declare module DevExpress.data {
         /** Indicates whether the total count of data objects is needed. */
         requireTotalCount?: boolean;
         /** A data field or expression whose value is compared to the search value. */
-        searchExpr?: Function | Array<Function>;
+        searchExpr?: string | Function | Array<string | Function>;
         /** A comparison operation. Can have one of the following values: "=", "<>", ">", ">=", "<", "<=", "startswith", "endswith", "contains", "notcontains", "isblank" and "isnotblank". */
         searchOperation?: string;
         /** The current search value. */
@@ -980,7 +980,7 @@ declare module DevExpress.data {
         /** Specifies whether or not the DataSource instance requests the total count of items available in the storage. */
         requireTotalCount?: boolean;
         /** Specifies a value by which the required items are searched. */
-        searchExpr?: Function | Array<Function>;
+        searchExpr?: string | Function | Array<string | Function>;
         /** Specifies the comparison operation used to search for the required items. One of "=", "<>", ">", ">=", "<", "<=", "startswith", "endswith", "contains", "notcontains". */
         searchOperation?: string;
         /** Specifies the value to which the search expression is compared. */
@@ -996,6 +996,7 @@ declare module DevExpress.data {
     export class DataSource {
         constructor(url: string);
         constructor(data: Array<any>);
+        constructor(store: Store);
         constructor(options: CustomStoreOptions | DataSourceOptions);
         /** Cancels the load operation associated with the specified identifier. */
         cancel(): boolean;
@@ -1050,9 +1051,9 @@ declare module DevExpress.data {
         /** Sets the requireTotalCount option value. */
         requireTotalCount(value: boolean): void;
         /** Returns the searchExpr option value. */
-        searchExpr(): Function & Array<Function>;
+        searchExpr(): string & Function & Array<string | Function>;
         /** Sets the searchExpr option value. */
-        searchExpr(expr: Function | Array<Function>): void;
+        searchExpr(expr: string | Function | Array<string | Function>): void;
         /** Returns the currently specified search operation. */
         searchOperation(): string;
         /** Sets the current search operation. */
@@ -1229,9 +1230,9 @@ declare module DevExpress.data {
         /** Collapses all header items of a field. */
         collapseAll(id: number | string): void;
         /** Collapses a specified header item. */
-        collapseHeaderItem(area: string, path: string): void;
+        collapseHeaderItem(area: string, path: Array<string | number | Date>): void;
         /** Provides access to a list of records (facts) that were used to calculate a specific summary. */
-        createDrillDownDataSource(options: { columnPath?: Array<string | number | Date>, rowPath?: Array<string | number | Date>, dataIndex?: number, maxRowCount?: number, customColumns?: Array<string | number | Date> }): DataSource;
+        createDrillDownDataSource(options: { columnPath?: Array<string | number | Date>, rowPath?: Array<string | number | Date>, dataIndex?: number, maxRowCount?: number, customColumns?: Array<string> }): DataSource;
         /** Disposes of all resources associated with this PivotGridDataSource. */
         dispose(): void;
         /** Expands all header items of a field. */
@@ -1321,7 +1322,7 @@ declare module DevExpress.data {
         customizeText?: ((cellInfo: { value?: string | number | Date, valueText?: string }) => string);
         /** Name of the data source field containing data for the pivot grid field. */
         dataField?: string;
-        /** Specifies a type of field values. */
+        /** Casts field values to a specific data type. */
         dataType?: string;
         /** The name of the folder in which the field is located. */
         displayFolder?: string;
@@ -1973,7 +1974,7 @@ declare module DevExpress.ui {
         scrolling?: GridBaseScrolling;
         /** Configures the search panel. */
         searchPanel?: { visible?: boolean, width?: number, placeholder?: string, highlightSearchText?: boolean, highlightCaseSensitive?: boolean, text?: string, searchVisibleColumnsOnly?: boolean };
-        /** Specifies the keys of rows that must be selected initially. Applies only if selection.deferred is false. */
+        /** Specifies the keys of rows that must be selected initially. */
         selectedRowKeys?: Array<any>;
         /** Overridden. */
         selection?: GridBaseSelection;
@@ -2250,7 +2251,7 @@ declare module DevExpress.ui {
         hideColumnChooser(): void;
         /** Checks whether a specific adaptive detail row is expanded or collapsed. */
         isAdaptiveDetailRowExpanded(key: any): void;
-        /** Checks whether the row with a specific key is selected. Takes effect only if selection.deferred is false. */
+        /** Checks whether the row with a specific key is selected. */
         isRowSelected(key: any): boolean;
         /** Gets a data object's key. */
         keyOf(obj: any): any;
@@ -2425,7 +2426,7 @@ declare module DevExpress.ui {
         isRowExpanded(key: any): boolean;
         /** Checks whether the row that represents a specific data object is selected. Takes effect only if selection.deferred is true. */
         isRowSelected(data: any): boolean;
-        /** Checks whether the row with a specific key is selected. Takes effect only if selection.deferred is false. */
+        /** Checks whether the row with a specific key is selected. */
         isRowSelected(key: any): boolean;
         /** Returns how many pages the grid contains. */
         pageCount(): number;
@@ -2534,6 +2535,8 @@ declare module DevExpress.ui {
     export class dxDropDownBox extends dxDropDownEditor {
         constructor(element: Element, options?: dxDropDownBoxOptions)
         constructor(element: JQuery, options?: dxDropDownBoxOptions)
+        /** Gets the DataSource instance. */
+        getDataSource(): DevExpress.data.DataSource;
     }
     export interface dxDropDownMenuOptions extends WidgetOptions {
         /** Specifies whether or not the widget changes its state when interacting with a user. */
@@ -3011,7 +3014,7 @@ declare module DevExpress.ui {
         pullRefreshEnabled?: boolean;
         /** Specifies the text displayed in the pullDown panel while the widget is being refreshed. */
         refreshingText?: string;
-        /** A Boolean value specifying whether or not the search bar is visible. */
+        /** Specifies whether to allow searching. */
         searchEnabled?: boolean;
         /** The text that is provided as a hint in the lookup's search bar. */
         searchPlaceholder?: string;
@@ -3528,6 +3531,8 @@ declare module DevExpress.ui {
     export class dxRadioGroup extends Editor {
         constructor(element: Element, options?: dxRadioGroupOptions)
         constructor(element: JQuery, options?: dxRadioGroupOptions)
+        /** Gets the DataSource instance. */
+        getDataSource(): DevExpress.data.DataSource;
     }
     export interface dxRangeSliderOptions extends dxSliderBaseOptions {
         /** The right edge of the interval currently selected using the range slider. */
@@ -3762,7 +3767,7 @@ declare module DevExpress.ui {
         /** The template to be used for rendering the widget text field. Must contain the TextBox widget. */
         fieldTemplate?: template;
         /** A handler for the customItemCreating event. Executed when a user adds a custom item. Requires acceptCustomValue to be set to true. */
-        onCustomItemCreating?: ((e: { component?: DOMComponent, element?: DevExpress.core.dxElement, model?: any, text?: string }) => any | Promise<any> | JQueryPromise<any>);
+        onCustomItemCreating?: ((e: { component?: DOMComponent, element?: DevExpress.core.dxElement, model?: any, text?: string, customItem?: string | any | Promise<any> | JQueryPromise<any> }) => string | any | Promise<any> | JQueryPromise<any>);
         /** The text that is provided as a hint in the select box editor. */
         placeholder?: string;
         /** Specifies whether or not to display selection controls. */
@@ -4613,10 +4618,10 @@ declare module DevExpress.ui {
         onValueChanged?: ((e: { component?: DOMComponent, element?: DevExpress.core.dxElement, model?: any, value?: any, previousValue?: any, jQueryEvent?: JQueryEventObject, event?: event }) => any);
         /** @deprecated Use the DataSource paging opportunities instead. */
         pagingEnabled?: boolean;
-        /** Specifies whether or not the widget supports searching. */
+        /** Specifies whether to allow searching. */
         searchEnabled?: boolean;
         /** Specifies the name of a data source item field or an expression whose value is compared to the search criterion. */
-        searchExpr?: Function | Array<Function>;
+        searchExpr?: string | Function | Array<string | Function>;
         /** Specifies the binary operation used to filter data. */
         searchMode?: string;
         /** Specifies the time delay, in milliseconds, after the last character has been typed in, before a search is executed. */
@@ -4625,7 +4630,7 @@ declare module DevExpress.ui {
         selectedItem?: any;
         /** Specifies whether or not the widget displays unfiltered values until a user types a number of characters exceeding the minSearchLength option value. */
         showDataBeforeSearch?: boolean;
-        /** Specifies the currently selected value. */
+        /** Specifies the currently selected value. May be an object if dataSource contains objects and valueExpr is not set. */
         value?: any;
         /** Specifies DOM event names that update a widget's value. */
         valueChangeEvent?: string;
@@ -4634,6 +4639,8 @@ declare module DevExpress.ui {
     export class dxDropDownList extends dxDropDownEditor {
         constructor(element: Element, options?: dxDropDownListOptions)
         constructor(element: JQuery, options?: dxDropDownListOptions)
+        /** Gets the DataSource instance. */
+        getDataSource(): DevExpress.data.DataSource;
     }
     export interface EditorOptions extends WidgetOptions {
         /** Specifies whether the editor's value is valid. */
@@ -4642,7 +4649,7 @@ declare module DevExpress.ui {
         onValueChanged?: ((e: { component?: DOMComponent, element?: DevExpress.core.dxElement, model?: any, value?: any, previousValue?: any, jQueryEvent?: JQueryEventObject, event?: event }) => any);
         /** A Boolean value specifying whether or not the widget is read-only. */
         readOnly?: boolean;
-        /** Holds the object that defines the error that occurred during validation. */
+        /** Specifies information on the validation error when using a custom validation engine. Should be changed at runtime along with the isValid option. */
         validationError?: any;
         /** Specifies how the message about the validation rules that are not satisfied by this editor's value is displayed. */
         validationMessageMode?: string;
@@ -4665,9 +4672,9 @@ declare module DevExpress.ui {
         items?: Array<any>;
         /** Specifies a custom template for an item. */
         itemTemplate?: template;
-        /** Specifies the currently selected value. */
+        /** Specifies the currently selected value. May be an object if dataSource contains objects and valueExpr is not set. */
         value?: any;
-        /** Specifies which data field provides the widget value. */
+        /** Specifies which data field provides the widget's value. When this option is not set, the value is the entire data object. */
         valueExpr?: string | Function;
     }
     export class DataExpressionMixin {
@@ -4847,7 +4854,7 @@ declare module DevExpress.ui {
         focusStateEnabled?: boolean;
         /** Specifies whether the widget changes its state when a user pauses on it. */
         hoverStateEnabled?: boolean;
-        /** Specifies the name of the data source item field that contains an array of nested items. */
+        /** Specifies which data field contains nested items. */
         itemsExpr?: string | Function;
         /** Specifies which data field provides keys for TreeView items. */
         keyExpr?: string | Function;
@@ -5165,10 +5172,10 @@ declare module DevExpress.ui {
     export interface SearchBoxMixinOptions {
         /** Configures the search panel. */
         searchEditorOptions?: dxTextBoxOptions;
-        /** Specifies whether searching is enabled. */
+        /** Specifies whether the search panel is visible. */
         searchEnabled?: boolean;
         /** Specifies a data object's field name or an expression whose value is compared to the search string. */
-        searchExpr?: Function | Array<Function>;
+        searchExpr?: string | Function | Array<string | Function>;
         /** Specifies whether the widget finds entries that contain your search string or entries that only start with it. */
         searchMode?: string;
         /** Specifies the current search string. */
@@ -5218,7 +5225,7 @@ declare module DevExpress.ui {
         /** Repaints the widget. Call it if you made modifications that changed the widget's state to invalid. */
         repaint(): void;
     }
-    /** A template notation used to specify a template for widget elements (item, title, content, etc.). */
+    /** A template notation used to specify templates for widget elements. */
     export type template = string | Function | Element | JQuery; 
     /** Formats values. */
     export type format = string | ((value: number | Date) => string) | { type?: string, precision?: number, currency?: string, formatter?: ((value: number | Date) => string), parser?: ((value: string) => number | Date) }; 
@@ -5424,9 +5431,9 @@ declare module DevExpress.viz {
         constructor(element: JQuery, options?: DevExpress.viz.charts.dxPieChartOptions)
         /** @deprecated Use the getAllSeries() method instead. */
         getSeries(): pieChartSeriesObject;
-        /** Gets a series within the chart's series collection by the specified name (see the name option). */
+        /** Gets a series within the chart's series array by the specified name. */
         getSeriesByName(seriesName: any): chartSeriesObject;
-        /** Gets a series within the chart's series collection by its position number. */
+        /** Gets a series within the chart's series array by index. */
         getSeriesByPos(seriesIndex: number): chartSeriesObject;
     }
     /** The PolarChart is a widget that visualizes data in a polar coordinate system. */
@@ -5444,9 +5451,9 @@ declare module DevExpress.viz {
         getAllSeries(): Array<baseSeriesObject>;
         /** Returns the DataSource instance. */
         getDataSource(): DevExpress.data.DataSource;
-        /** Gets a series within the chart's series collection by the specified name (see the name option). */
+        /** Gets a series within the chart's series array by the specified name. */
         getSeriesByName(seriesName: any): chartSeriesObject;
-        /** Gets a series within the chart's series collection by its position number. */
+        /** Gets a series within the chart's series array by index. */
         getSeriesByPos(seriesIndex: number): chartSeriesObject;
         /** Hides all widget tooltips. */
         hideTooltip(): void;
@@ -6384,7 +6391,7 @@ declare module DevExpress.viz {
         getPointsByArg(pointArg: number | string | Date): Array<basePointObject>;
         /** Returns visible series points. */
         getVisiblePoints(): Array<basePointObject>;
-        /** Hides a series. */
+        /** Hides a series at runtime. */
         hide(): void;
         /** Switches the series into the hover state, the same as when a user places the mouse pointer on it. */
         hover(): void;
@@ -6394,7 +6401,7 @@ declare module DevExpress.viz {
         isSelected(): boolean;
         /** Provides information about the visibility state of a series. */
         isVisible(): boolean;
-        /** Selects the series. The series is displayed in a 'selected' style until another series is selected or the current series is deselected programmatically. */
+        /** Selects the series. */
         select(): void;
         /** Selects the specified point. The point is displayed in a 'selected' style. */
         selectPoint(point: basePointObject): void;
@@ -6440,8 +6447,11 @@ declare module DevExpress.viz {
         getBoundingRect(): any;
         /** Hides the point label. */
         hide(): void;
+        hide(holdInvisible: boolean): void;
+        isVisible(): boolean;
         /** Shows the point label. */
         show(): void;
+        show(holdVisible: boolean): void;
     }
     /** This section describes the Series object, which represents a series. */
     export class chartSeriesObject extends baseSeriesObject {
@@ -7567,7 +7577,7 @@ declare module DevExpress.viz.charts {
         /** Forces the widget to treat negative values as zeroes. Applies to stacked-like series only. */
         negativesAsZeroes?: boolean;
         /** A handler for the argumentAxisClick event. */
-        onArgumentAxisClick?: ((e: { component?: DOMComponent, element?: DevExpress.core.dxElement, model?: any, jQueryEvent?: JQueryEventObject, event?: event, target?: any, argument?: Date | number | string }) => any) | string;
+        onArgumentAxisClick?: ((e: { component?: DOMComponent, element?: DevExpress.core.dxElement, model?: any, jQueryEvent?: JQueryEventObject, event?: event, argument?: Date | number | string }) => any) | string;
         /** A handler for the legendClick event. */
         onLegendClick?: ((e: { component?: DOMComponent, element?: DevExpress.core.dxElement, model?: any, jQueryEvent?: JQueryEventObject, event?: event, target?: polarChartSeriesObject }) => any) | string;
         /** A handler for the seriesClick event. */
@@ -7885,7 +7895,7 @@ declare module DevExpress.viz.charts {
         customizeLabel?: ((pointInfo: any) => dxChartSeriesTypesCommonSeriesLabel);
         /** Customizes the appearance of an individual series point. */
         customizePoint?: ((pointInfo: any) => dxChartSeriesTypesCommonSeriesPoint);
-        /** Specifies the origin of data for the widget. */
+        /** Specifies the widget's data origin. */
         dataSource?: Array<any> | DevExpress.data.DataSource | DevExpress.data.DataSourceOptions | string;
         /** Specifies options of the legend. */
         legend?: BaseChartLegend;
