@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 17.2.3 (build 17339)
-* Build date: Dec 5, 2017
+* Version: 17.2.4
+* Build date: Dec 11, 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -1383,7 +1383,7 @@
 }
 .dx-scheduler-work-space-month.dx-scheduler-work-space-count .dx-scheduler-date-table-first-of-month {
   color: #3debd3;
-  background-color: rgba(203, 218, 242, 0.15);
+  background-color: rgba(44, 201, 180, 0.15);
   font-weight: bold;
 }
 .dx-scheduler-work-space-month .dx-scheduler-all-day-panel,
@@ -2102,7 +2102,7 @@
 }
 .dx-scheduler-all-day-table-cell.dx-scheduler-focused-cell,
 .dx-scheduler-date-table-cell.dx-scheduler-focused-cell {
-  box-shadow: inset 0 0 0 1px #cbdaf2;
+  box-shadow: inset 0 0 0 1px #2cc9b4;
 }
 .dx-scheduler-date-table-droppable-cell {
   background-color: #3c4a62;
@@ -2123,8 +2123,8 @@
   -o-user-select: none;
   user-select: none;
   -webkit-touch-callout: none;
-  background-color: #cbdaf2;
-  color: #2a2a2a;
+  background-color: #2cc9b4;
+  color: #fff;
   -webkit-box-shadow: inset 0px 2px 0px 0px rgba(0, 0, 0, 0.3);
   -moz-box-shadow: inset 0px 2px 0px 0px rgba(0, 0, 0, 0.3);
   box-shadow: inset 0px 2px 0px 0px rgba(0, 0, 0, 0.3);
@@ -2545,20 +2545,22 @@
   float: right;
 }
 .dx-scheduler-dropdown-appointments {
-  background-color: #cbdaf2;
-  color: #2a2a2a;
+  background-color: #2cc9b4;
+  color: #fff;
 }
 .dx-scheduler-dropdown-appointments.dx-button,
+.dx-scheduler-dropdown-appointments.dx-button.dx-state-hover,
 .dx-scheduler-dropdown-appointments.dx-button.dx-state-active,
 .dx-scheduler-dropdown-appointments.dx-button.dx-state-focused {
-  background-color: #cbdaf2;
-  color: #2a2a2a;
+  background-color: #2cc9b4;
+  color: #fff;
   border: none;
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
   box-shadow: none;
 }
 .dx-scheduler-dropdown-appointments.dx-button .dx-button-content,
+.dx-scheduler-dropdown-appointments.dx-button.dx-state-hover .dx-button-content,
 .dx-scheduler-dropdown-appointments.dx-button.dx-state-active .dx-button-content,
 .dx-scheduler-dropdown-appointments.dx-button.dx-state-focused .dx-button-content {
   line-height: inherit;
@@ -2575,11 +2577,11 @@
   opacity: .98;
 }
 .dx-scheduler-dropdown-appointments.dx-button.dx-state-hover .dx-scheduler-dropdown-appointments-content {
-  color: #000000;
+  color: #fff;
   opacity: .99;
 }
 .dx-scheduler-dropdown-appointment {
-  border-left: 5px solid #cbdaf2;
+  border-left: 5px solid #2cc9b4;
 }
 .dx-scheduler-agenda .dx-scheduler-date-table-scrollable {
   margin-top: 10px;
@@ -2928,7 +2930,7 @@
 }
 .dx-rtl .dx-scheduler-dropdown-appointment {
   border-left: none;
-  border-right: 3px solid #cbdaf2;
+  border-right: 3px solid #2cc9b4;
 }
 .dx-rtl.dx-scheduler-work-space-both-scrollbar .dx-scheduler-all-day-title {
   border-left: 1px solid rgba(89, 105, 128, 0.6);
@@ -3161,6 +3163,46 @@
 }
 .dx-theme-marker {
   font-family: "dx.generic.darkmoon";
+}
+.dx-theme-accent-as-text-color {
+  color: #3debd3;
+}
+.dx-theme-accent-as-background-color {
+  background-color: #3debd3;
+  fill: #3debd3;
+}
+.dx-theme-accent-as-border-color {
+  border-color: #3debd3;
+}
+.dx-theme-text-color {
+  color: #fff;
+}
+.dx-theme-text-color-as-background-color {
+  background-color: #fff;
+  fill: #fff;
+}
+.dx-theme-text-color-as-border-color {
+  border-color: #fff;
+}
+.dx-theme-background-color {
+  background-color: #465672;
+  fill: #465672;
+}
+.dx-theme-background-color-as-text-color {
+  color: #465672;
+}
+.dx-theme-background-color-as-border-color {
+  border-color: #465672;
+}
+.dx-theme-border-color {
+  border-color: #596980;
+}
+.dx-theme-border-color-as-text-color {
+  color: #596980;
+}
+.dx-theme-border-color-as-background-color {
+  background-color: #596980;
+  fill: #596980;
 }
 @font-face {
   font-family: 'DXIcons';
@@ -6326,7 +6368,7 @@
   border: 1px solid #596980;
 }
 .dx-toast-content {
-  color: #2a2a2a;
+  color: #fff;
   font-size: 14px;
   font-weight: 600;
   line-height: 32px;
@@ -8236,6 +8278,9 @@
 .dx-editor-cell .dx-numberbox-spin-button {
   background-color: transparent;
 }
+.dx-editor-cell .dx-icon-clear {
+  left: 0px;
+}
 .dx-editor-cell .dx-texteditor {
   background: #465672;
 }
@@ -9217,6 +9262,9 @@
 .dx-editor-cell .dx-numberbox-spin-button {
   background-color: transparent;
 }
+.dx-editor-cell .dx-icon-clear {
+  left: 0px;
+}
 .dx-editor-cell .dx-texteditor {
   background: #465672;
 }
@@ -9824,7 +9872,7 @@
   margin-top: -8px;
 }
 .dx-treelist-rowsview .dx-selection .dx-treelist-empty-space {
-  color: #fff;
+  color: #465672;
 }
 .dx-treelist-rowsview .dx-treelist-cell-expandable {
   white-space: nowrap;
@@ -11371,7 +11419,7 @@
   border-right: 2px solid transparent;
 }
 .dx-scheduler-appointment.dx-state-focused {
-  color: #2a2a2a;
+  color: #fff;
 }
 .dx-scheduler-dropdown-appointment {
   border-bottom: 1px solid rgba(89, 105, 128, 0.6);

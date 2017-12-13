@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 17.2.3 (build 17339)
-* Build date: Dec 5, 2017
+* Version: 17.2.4
+* Build date: Dec 11, 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -2553,6 +2553,7 @@
   color: #FFF;
 }
 .dx-scheduler-dropdown-appointments.dx-button,
+.dx-scheduler-dropdown-appointments.dx-button.dx-state-hover,
 .dx-scheduler-dropdown-appointments.dx-button.dx-state-active,
 .dx-scheduler-dropdown-appointments.dx-button.dx-state-focused {
   background-color: #65bccd;
@@ -2563,6 +2564,7 @@
   box-shadow: none;
 }
 .dx-scheduler-dropdown-appointments.dx-button .dx-button-content,
+.dx-scheduler-dropdown-appointments.dx-button.dx-state-hover .dx-button-content,
 .dx-scheduler-dropdown-appointments.dx-button.dx-state-active .dx-button-content,
 .dx-scheduler-dropdown-appointments.dx-button.dx-state-focused .dx-button-content {
   line-height: inherit;
@@ -5349,7 +5351,7 @@
   left: 59px;
   right: auto;
 }
-.dx-numberbox-spin .dx-show-clear-button .dx-texteditor-input {
+.dx-numberbox-spin.dx-show-clear-button .dx-texteditor-input {
   padding-right: 59px;
 }
 .dx-numberbox-spin-touch-friendly.dx-invalid .dx-texteditor-input {
@@ -5380,7 +5382,7 @@
   left: 84px;
   right: auto;
 }
-.dx-numberbox-spin-touch-friendly .dx-show-clear-button .dx-texteditor-input {
+.dx-numberbox-spin-touch-friendly.dx-show-clear-button .dx-texteditor-input {
   padding-right: 84px;
 }
 .dx-state-active.dx-numberbox-spin-button {
@@ -7695,6 +7697,9 @@
   border-left: 1px solid #CBCBCB;
   border-right: 1px solid #CBCBCB;
 }
+.dx-datagrid .dx-editor-cell .dx-numberbox .dx-icon-clear {
+  left: 0px;
+}
 .dx-datagrid .dx-editor-cell .dx-texteditor .dx-texteditor-container {
   border-bottom-width: 0px;
 }
@@ -8121,6 +8126,40 @@
 .dx-datagrid-rowsview .dx-master-detail-row:not(.dx-datagrid-edit-form) .dx-master-detail-cell {
   background-color: #FAFAFA;
 }
+.dx-datagrid-headers .dx-dropdowneditor-button-visible .dx-texteditor-container:after,
+.dx-datagrid-rowsview .dx-dropdowneditor-button-visible .dx-texteditor-container:after {
+  right: 27px;
+}
+.dx-datagrid-headers .dx-dropdowneditor-button-visible.dx-show-clear-button:not(.dx-texteditor-empty) .dx-texteditor-container:after,
+.dx-datagrid-rowsview .dx-dropdowneditor-button-visible.dx-show-clear-button:not(.dx-texteditor-empty) .dx-texteditor-container:after {
+  right: 54px;
+}
+.dx-datagrid-headers .dx-dropdowneditor-button-visible.dx-show-clear-button .dx-texteditor-input,
+.dx-datagrid-rowsview .dx-dropdowneditor-button-visible.dx-show-clear-button .dx-texteditor-input {
+  padding-right: 57px;
+}
+.dx-datagrid-headers .dx-dropdowneditor-button-visible.dx-show-clear-button.dx-invalid .dx-texteditor-input,
+.dx-datagrid-rowsview .dx-dropdowneditor-button-visible.dx-show-clear-button.dx-invalid .dx-texteditor-input {
+  padding-right: 77px;
+}
+.dx-datagrid-headers .dx-dropdowneditor-button-visible.dx-show-clear-button.dx-invalid.dx-rtl .dx-texteditor-input,
+.dx-datagrid-rowsview .dx-dropdowneditor-button-visible.dx-show-clear-button.dx-invalid.dx-rtl .dx-texteditor-input {
+  padding: 7px;
+  padding-left: 77px;
+}
+.dx-datagrid-headers .dx-dropdowneditor-button-visible.dx-invalid .dx-texteditor-input,
+.dx-datagrid-rowsview .dx-dropdowneditor-button-visible.dx-invalid .dx-texteditor-input {
+  padding-right: 50px;
+}
+.dx-datagrid-headers .dx-dropdowneditor-button-visible.dx-invalid.dx-rtl .dx-texteditor-input,
+.dx-datagrid-rowsview .dx-dropdowneditor-button-visible.dx-invalid.dx-rtl .dx-texteditor-input {
+  padding: 7px;
+  padding-left: 50px;
+}
+.dx-datagrid-headers .dx-dropdowneditor-button-visible .dx-texteditor-input,
+.dx-datagrid-rowsview .dx-dropdowneditor-button-visible .dx-texteditor-input {
+  padding-right: 30px;
+}
 .dx-datagrid-search-text {
   background-color: #b8e0ee;
 }
@@ -8479,6 +8518,9 @@
 .dx-treelist .dx-column-lines > td {
   border-left: 1px solid #CBCBCB;
   border-right: 1px solid #CBCBCB;
+}
+.dx-treelist .dx-editor-cell .dx-numberbox .dx-icon-clear {
+  left: 0px;
 }
 .dx-treelist .dx-editor-cell .dx-texteditor .dx-texteditor-container {
   border-bottom-width: 0px;
@@ -8905,6 +8947,40 @@
 .dx-treelist-rowsview .dx-master-detail-row:not(.dx-treelist-edit-form) > .dx-treelist-group-space,
 .dx-treelist-rowsview .dx-master-detail-row:not(.dx-treelist-edit-form) .dx-master-detail-cell {
   background-color: #FAFAFA;
+}
+.dx-treelist-headers .dx-dropdowneditor-button-visible .dx-texteditor-container:after,
+.dx-treelist-rowsview .dx-dropdowneditor-button-visible .dx-texteditor-container:after {
+  right: 27px;
+}
+.dx-treelist-headers .dx-dropdowneditor-button-visible.dx-show-clear-button:not(.dx-texteditor-empty) .dx-texteditor-container:after,
+.dx-treelist-rowsview .dx-dropdowneditor-button-visible.dx-show-clear-button:not(.dx-texteditor-empty) .dx-texteditor-container:after {
+  right: 54px;
+}
+.dx-treelist-headers .dx-dropdowneditor-button-visible.dx-show-clear-button .dx-texteditor-input,
+.dx-treelist-rowsview .dx-dropdowneditor-button-visible.dx-show-clear-button .dx-texteditor-input {
+  padding-right: 57px;
+}
+.dx-treelist-headers .dx-dropdowneditor-button-visible.dx-show-clear-button.dx-invalid .dx-texteditor-input,
+.dx-treelist-rowsview .dx-dropdowneditor-button-visible.dx-show-clear-button.dx-invalid .dx-texteditor-input {
+  padding-right: 77px;
+}
+.dx-treelist-headers .dx-dropdowneditor-button-visible.dx-show-clear-button.dx-invalid.dx-rtl .dx-texteditor-input,
+.dx-treelist-rowsview .dx-dropdowneditor-button-visible.dx-show-clear-button.dx-invalid.dx-rtl .dx-texteditor-input {
+  padding: 7px;
+  padding-left: 77px;
+}
+.dx-treelist-headers .dx-dropdowneditor-button-visible.dx-invalid .dx-texteditor-input,
+.dx-treelist-rowsview .dx-dropdowneditor-button-visible.dx-invalid .dx-texteditor-input {
+  padding-right: 50px;
+}
+.dx-treelist-headers .dx-dropdowneditor-button-visible.dx-invalid.dx-rtl .dx-texteditor-input,
+.dx-treelist-rowsview .dx-dropdowneditor-button-visible.dx-invalid.dx-rtl .dx-texteditor-input {
+  padding: 7px;
+  padding-left: 50px;
+}
+.dx-treelist-headers .dx-dropdowneditor-button-visible .dx-texteditor-input,
+.dx-treelist-rowsview .dx-dropdowneditor-button-visible .dx-texteditor-input {
+  padding-right: 30px;
 }
 .dx-treelist-search-text {
   background-color: #b8e0ee;

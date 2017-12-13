@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 17.2.3 (build 17339)
-* Build date: Dec 5, 2017
+* Version: 17.2.4
+* Build date: Dec 11, 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -2549,6 +2549,7 @@
   color: #fff;
 }
 .dx-scheduler-dropdown-appointments.dx-button,
+.dx-scheduler-dropdown-appointments.dx-button.dx-state-hover,
 .dx-scheduler-dropdown-appointments.dx-button.dx-state-active,
 .dx-scheduler-dropdown-appointments.dx-button.dx-state-focused {
   background-color: #573199;
@@ -2559,6 +2560,7 @@
   box-shadow: none;
 }
 .dx-scheduler-dropdown-appointments.dx-button .dx-button-content,
+.dx-scheduler-dropdown-appointments.dx-button.dx-state-hover .dx-button-content,
 .dx-scheduler-dropdown-appointments.dx-button.dx-state-active .dx-button-content,
 .dx-scheduler-dropdown-appointments.dx-button.dx-state-focused .dx-button-content {
   line-height: inherit;
@@ -3161,6 +3163,46 @@
 }
 .dx-theme-marker {
   font-family: "dx.generic.darkviolet.compact";
+}
+.dx-theme-accent-as-text-color {
+  color: #9c63ff;
+}
+.dx-theme-accent-as-background-color {
+  background-color: #9c63ff;
+  fill: #9c63ff;
+}
+.dx-theme-accent-as-border-color {
+  border-color: #9c63ff;
+}
+.dx-theme-text-color {
+  color: #f5f6f7;
+}
+.dx-theme-text-color-as-background-color {
+  background-color: #f5f6f7;
+  fill: #f5f6f7;
+}
+.dx-theme-text-color-as-border-color {
+  border-color: #f5f6f7;
+}
+.dx-theme-background-color {
+  background-color: #17171f;
+  fill: #17171f;
+}
+.dx-theme-background-color-as-text-color {
+  color: #17171f;
+}
+.dx-theme-background-color-as-border-color {
+  border-color: #17171f;
+}
+.dx-theme-border-color {
+  border-color: #343840;
+}
+.dx-theme-border-color-as-text-color {
+  color: #343840;
+}
+.dx-theme-border-color-as-background-color {
+  background-color: #343840;
+  fill: #343840;
 }
 @font-face {
   font-family: 'DXIcons';
@@ -6326,7 +6368,7 @@
   border: 1px solid #343840;
 }
 .dx-toast-content {
-  color: #2a2a2a;
+  color: #fff;
   font-size: 12px;
   font-weight: 600;
   line-height: 25px;
@@ -8236,6 +8278,9 @@
 .dx-editor-cell .dx-numberbox-spin-button {
   background-color: transparent;
 }
+.dx-editor-cell .dx-icon-clear {
+  left: 0px;
+}
 .dx-editor-cell .dx-texteditor {
   background: #17171f;
 }
@@ -9216,6 +9261,9 @@
 }
 .dx-editor-cell .dx-numberbox-spin-button {
   background-color: transparent;
+}
+.dx-editor-cell .dx-icon-clear {
+  left: 0px;
 }
 .dx-editor-cell .dx-texteditor {
   background: #17171f;

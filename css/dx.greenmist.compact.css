@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 17.2.3 (build 17339)
-* Build date: Dec 5, 2017
+* Version: 17.2.4
+* Build date: Dec 11, 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -2549,6 +2549,7 @@
   color: #fff;
 }
 .dx-scheduler-dropdown-appointments.dx-button,
+.dx-scheduler-dropdown-appointments.dx-button.dx-state-hover,
 .dx-scheduler-dropdown-appointments.dx-button.dx-state-active,
 .dx-scheduler-dropdown-appointments.dx-button.dx-state-focused {
   background-color: #3cbab2;
@@ -2559,6 +2560,7 @@
   box-shadow: none;
 }
 .dx-scheduler-dropdown-appointments.dx-button .dx-button-content,
+.dx-scheduler-dropdown-appointments.dx-button.dx-state-hover .dx-button-content,
 .dx-scheduler-dropdown-appointments.dx-button.dx-state-active .dx-button-content,
 .dx-scheduler-dropdown-appointments.dx-button.dx-state-focused .dx-button-content {
   line-height: inherit;
@@ -3161,6 +3163,46 @@
 }
 .dx-theme-marker {
   font-family: "dx.generic.greenmist.compact";
+}
+.dx-theme-accent-as-text-color {
+  color: #3cbab2;
+}
+.dx-theme-accent-as-background-color {
+  background-color: #3cbab2;
+  fill: #3cbab2;
+}
+.dx-theme-accent-as-border-color {
+  border-color: #3cbab2;
+}
+.dx-theme-text-color {
+  color: #28484f;
+}
+.dx-theme-text-color-as-background-color {
+  background-color: #28484f;
+  fill: #28484f;
+}
+.dx-theme-text-color-as-border-color {
+  border-color: #28484f;
+}
+.dx-theme-background-color {
+  background-color: #f5f5f5;
+  fill: #f5f5f5;
+}
+.dx-theme-background-color-as-text-color {
+  color: #f5f5f5;
+}
+.dx-theme-background-color-as-border-color {
+  border-color: #f5f5f5;
+}
+.dx-theme-border-color {
+  border-color: #dedede;
+}
+.dx-theme-border-color-as-text-color {
+  color: #dedede;
+}
+.dx-theme-border-color-as-background-color {
+  background-color: #dedede;
+  fill: #dedede;
 }
 @font-face {
   font-family: 'DXIcons';
@@ -8236,6 +8278,9 @@
 .dx-editor-cell .dx-numberbox-spin-button {
   background-color: transparent;
 }
+.dx-editor-cell .dx-icon-clear {
+  left: 0px;
+}
 .dx-editor-cell .dx-texteditor {
   background: #f5f5f5;
 }
@@ -9216,6 +9261,9 @@
 }
 .dx-editor-cell .dx-numberbox-spin-button {
   background-color: transparent;
+}
+.dx-editor-cell .dx-icon-clear {
+  left: 0px;
 }
 .dx-editor-cell .dx-texteditor {
   background: #f5f5f5;
