@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 17.1.8 (build 17338)
-* Build date: Dec 4, 2017
+* Version: 17.1.9
+* Build date: Dec 18, 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -7809,12 +7809,6 @@
 .dx-datagrid .dx-menu .dx-menu-item .dx-menu-item-content .dx-icon {
   margin: 0px 3px;
 }
-.dx-datagrid .dx-menu-item-has-submenu.dx-state-hover {
-  background-color: transparent;
-}
-.dx-datagrid .dx-menu-item-has-submenu.dx-menu-item-expanded.dx-state-hover {
-  background-color: #2a2a2a;
-}
 .dx-datagrid .dx-row-alt > td {
   background-color: #343434;
 }
@@ -8080,6 +8074,12 @@
 }
 .dx-datagrid-filter-row .dx-menu-item.dx-state-focused.dx-menu-item-expanded:after {
   border-color: transparent;
+}
+.dx-datagrid-filter-row .dx-menu-item-has-submenu.dx-state-hover {
+  background-color: transparent;
+}
+.dx-datagrid-filter-row .dx-menu-item-has-submenu.dx-menu-item-expanded.dx-state-hover {
+  background-color: #2a2a2a;
 }
 .dx-datagrid-filter-row .dx-highlight-outline::after {
   border-color: rgba(92, 184, 92, 0.5);
@@ -8790,12 +8790,6 @@
 .dx-treelist .dx-menu .dx-menu-item .dx-menu-item-content .dx-icon {
   margin: 0px 3px;
 }
-.dx-treelist .dx-menu-item-has-submenu.dx-state-hover {
-  background-color: transparent;
-}
-.dx-treelist .dx-menu-item-has-submenu.dx-menu-item-expanded.dx-state-hover {
-  background-color: #2a2a2a;
-}
 .dx-treelist .dx-row-alt > td {
   background-color: #343434;
 }
@@ -9061,6 +9055,12 @@
 }
 .dx-treelist-filter-row .dx-menu-item.dx-state-focused.dx-menu-item-expanded:after {
   border-color: transparent;
+}
+.dx-treelist-filter-row .dx-menu-item-has-submenu.dx-state-hover {
+  background-color: transparent;
+}
+.dx-treelist-filter-row .dx-menu-item-has-submenu.dx-menu-item-expanded.dx-state-hover {
+  background-color: #2a2a2a;
 }
 .dx-treelist-filter-row .dx-highlight-outline::after {
   border-color: rgba(92, 184, 92, 0.5);
