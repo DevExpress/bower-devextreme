@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.all.legacy.d.ts)
-* Version: 17.2.4
-* Build date: Mon Dec 11 2017
+* Version: 17.2.4 (build 17356)
+* Build date: Fri Dec 22 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -2682,6 +2682,8 @@ declare module DevExpress.ui {
         direction?: string;
         /** Specifies how widget items are aligned cross-wise. */
         crossAlign?: string;
+        /** Specifies the layout strategy. */
+        layoutStrategy?: string;
     }
     /** The Box widget allows you to arrange various elements within it. Separate and adaptive, the Box widget acts as a building block for the layout. */
     export class dxBox extends CollectionWidget {
@@ -2697,6 +2699,8 @@ declare module DevExpress.ui {
         screenByWidth?: (width: number) => string;
         /** Decides on which screens all layout elements should be arranged in a single column. */
         singleColumnScreen?: string;
+        /** Specifies the layout strategy. */
+        layoutStrategy?: string;
     }
     /** The ResponsiveBox widget allows you to create an application or a website with a layout adapted to different screen sizes. */
     export class dxResponsiveBox extends CollectionWidget {
@@ -7467,6 +7471,7 @@ declare module DevExpress.viz.gauges {
         arrowLength?: number;
         /** Sets the array of colors to be used for coloring subvalue indicators. */
         palette?: any;
+        beginAdaptingAtRadius?: number;
         /** Specifies the distance between the needle and the center of a gauge for the indicator of a needle-like type. */
         indentFromCenter?: number;
         /** Specifies the second color for the indicator of the twoColorNeedle type. */
