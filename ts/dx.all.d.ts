@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.all.d.ts)
-* Version: 17.1.9
-* Build date: Mon Dec 18 2017
+* Version: 17.1.9 (build 17362)
+* Build date: Thu Dec 28 2017
 *
 * Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -631,6 +631,7 @@ declare module DevExpress {
     export class AnimationPresetCollection {
         /** Resets all the changes made in the animation repository. */
         resetToDefaults(): void;
+        clear(): void;
         /** Deletes the specified animation or clears all the animation repository, if an animation name is not passed. */
         clear(name: string): void;
         /** Adds the specified animation preset to the animation repository by the specified name. */
@@ -638,7 +639,7 @@ declare module DevExpress {
         /** Applies the changes made in the animation repository. */
         applyChanges(): void;
         /** Returns the configuration of the animation found in the animation repository by the specified name for the current device. */
-        getPreset(name: string): void;
+        getPreset(name: string): any;
         /** Registers predefined animations in the animation repository. */
         registerDefaultPresets(): void;
     }
@@ -2805,6 +2806,7 @@ declare module DevExpress.ui {
     export class dxRangeSlider extends dxSlider {
         constructor(element: JQuery, options?: dxRangeSliderOptions);
         constructor(element: Element, options?: dxRangeSliderOptions);
+        reset(): void;
     }
     export interface dxFormItemLabel {
         /** Specifies the label text. */
