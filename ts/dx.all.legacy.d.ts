@@ -1,9 +1,9 @@
 /*!
 * DevExtreme (dx.all.legacy.d.ts)
-* Version: 17.2.4 (build 17362)
-* Build date: Thu Dec 28 2017
+* Version: 17.2.4 (build 18012)
+* Build date: Fri Jan 12 2018
 *
-* Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
+* Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
 */
 interface JQuery {
@@ -1377,6 +1377,8 @@ declare module DevExpress {
             searchMode?: string;
             /** Configures the search panel. */
             searchEditorOptions?: DevExpress.ui.dxTextBoxOptions;
+            /** Specifies the time delay, in milliseconds, after the last character has been typed in, before a search is executed. */
+            searchTimeout?: number;
         }
         export interface EditorOptions extends WidgetOptions {
             /** Specifies the currently selected value. */

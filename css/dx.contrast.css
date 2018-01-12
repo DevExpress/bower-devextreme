@@ -1,9 +1,9 @@
 /*!
 * DevExtreme
-* Version: 17.2.4 (build 17362)
-* Build date: Dec 28, 2017
+* Version: 17.2.4 (build 18012)
+* Build date: Jan 12, 2018
 *
-* Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
+* Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
 */
 .dx-colorview-palette-handle {
@@ -216,6 +216,8 @@
 }
 .dx-pivotgrid-fields-container .dx-sort {
   color: #fff;
+  font-size: 14px;
+  width: 14px;
 }
 .dx-pivotgrid-fields-container .dx-sort-up {
   font: 14px/1 DXIcons;
@@ -232,6 +234,8 @@
 .dx-pivotgrid-fields-container .dx-header-filter {
   color: #3806ff;
   font: 14px/1 DXIcons;
+  font-size: 14px;
+  width: 14px;
 }
 .dx-pivotgrid-fields-container .dx-header-filter:before {
   content: "\f050";
@@ -963,7 +967,7 @@
 .dx-scheduler-date-time-shader-all-day {
   margin-left: 100px;
   width: 100%;
-  background-color: #fff;
+  background-color: rgba(56, 6, 255, 0.6);
   position: absolute;
   pointer-events: none;
 }
@@ -1016,7 +1020,7 @@
   left: inherit;
   position: absolute;
   margin-left: 100px;
-  background-color: #fff;
+  background-color: rgba(56, 6, 255, 0.6);
 }
 .dx-scheduler-work-space-week.dx-scheduler-work-space-both-scrollbar .dx-scheduler-date-time-shader,
 .dx-scheduler-work-space-work-week.dx-scheduler-work-space-both-scrollbar .dx-scheduler-date-time-shader,
@@ -1082,7 +1086,7 @@
   content: "";
   left: 0;
   position: absolute;
-  background-color: #fff;
+  background-color: rgba(56, 6, 255, 0.6);
 }
 .dx-scheduler-timeline .dx-scheduler-header-panel-cell.dx-scheduler-header-panel-current-time-cell {
   border-bottom: 2px solid #cf00d7;
@@ -10963,6 +10967,10 @@
 }
 .dx-scheduler-header-panel-cell {
   height: 40px;
+}
+.dx-scheduler-header-panel-cell.dx-scheduler-header-panel-current-time-cell:before {
+  top: 37px;
+  height: 2px;
 }
 .dx-scheduler-work-space .dx-scrollable.dx-scheduler-date-table-scrollable,
 .dx-scheduler-work-space .dx-scrollable.dx-scheduler-sidebar-scrollable {

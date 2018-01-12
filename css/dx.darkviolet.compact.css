@@ -1,9 +1,9 @@
 /*!
 * DevExtreme
-* Version: 17.2.4 (build 17362)
-* Build date: Dec 28, 2017
+* Version: 17.2.4 (build 18012)
+* Build date: Jan 12, 2018
 *
-* Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
+* Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
 */
 .dx-colorview-palette-handle {
@@ -216,6 +216,8 @@
 }
 .dx-pivotgrid-fields-container .dx-sort {
   color: #a0aab3;
+  font-size: 14px;
+  width: 14px;
 }
 .dx-pivotgrid-fields-container .dx-sort-up {
   font: 14px/1 DXIcons;
@@ -232,6 +234,8 @@
 .dx-pivotgrid-fields-container .dx-header-filter {
   color: #8894a0;
   font: 14px/1 DXIcons;
+  font-size: 14px;
+  width: 14px;
 }
 .dx-pivotgrid-fields-container .dx-header-filter:before {
   content: "\f050";
@@ -10959,6 +10963,10 @@
 }
 .dx-scheduler-header-panel-cell {
   height: 31px;
+}
+.dx-scheduler-header-panel-cell.dx-scheduler-header-panel-current-time-cell:before {
+  top: 28px;
+  height: 2px;
 }
 .dx-scheduler-work-space .dx-scrollable.dx-scheduler-date-table-scrollable,
 .dx-scheduler-work-space .dx-scrollable.dx-scheduler-sidebar-scrollable {
