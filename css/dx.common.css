@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 17.2.5 (build 18033)
-* Build date: Feb 2, 2018
+* Version: 17.2.5 (build 18038)
+* Build date: Feb 7, 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -6699,12 +6699,7 @@ input.dx-hidden {
 .dx-layout-manager .dx-label-h-align.dx-flex-layout .dx-field-item-content-wrapper {
   flex-shrink: 1;
   flex-grow: 1;
-  flex-basis: 0;
-  -webkit-box-flex: 1;
-  -webkit-flex: 1 1 0;
-  -moz-flex: 1 1 0;
-  -ms-flex: 1 1 0;
-  flex: 1 1 0;
+  flex-basis: auto;
   display: block;
 }
 .dx-layout-manager .dx-label-h-align.dx-flex-layout:not(.dx-field-item-label-align) {
