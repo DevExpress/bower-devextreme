@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 17.2.5 (build 18038)
-* Build date: Feb 7, 2018
+* Version: 17.2.5 (build 18044)
+* Build date: Feb 13, 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -6105,8 +6105,8 @@ input.dx-hidden {
   overflow: hidden;
   width: 100%;
   height: 100%;
-  -ms-touch-action: pinch-zoom;
-  touch-action: pinch-zoom;
+  -ms-touch-action: pinch-zoom pan-y;
+  touch-action: pinch-zoom pan-y;
 }
 .dx-multiview-item-container {
   position: relative;
