@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.all.de.js)
-* Version: 17.1.9 (build 18031)
-* Build date: Wed Jan 31 2018
+* Version: 17.1.10
+* Build date: Tue Feb 27 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
