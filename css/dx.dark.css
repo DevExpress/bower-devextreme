@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 17.2.5 (build 18044)
-* Build date: Feb 13, 2018
+* Version: 17.2.6
+* Build date: Feb 27, 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -3174,45 +3174,45 @@
 .dx-theme-marker {
   font-family: "dx.generic.dark";
 }
-.dx-theme-accent-as-text-color {
+.dx-viewport.dx-theme-generic .dx-theme-accent-as-text-color {
   color: #1ca8dd;
 }
-.dx-theme-accent-as-background-color {
+.dx-viewport.dx-theme-generic .dx-theme-text-color {
+  color: #dedede;
+}
+.dx-viewport.dx-theme-generic .dx-theme-background-color-as-text-color {
+  color: #2a2a2a;
+}
+.dx-viewport.dx-theme-generic .dx-theme-border-color-as-text-color {
+  color: #4d4d4d;
+}
+.dx-viewport.dx-theme-generic .dx-theme-accent-as-background-color {
   background-color: #1ca8dd;
   fill: #1ca8dd;
 }
-.dx-theme-accent-as-border-color {
-  border-color: #1ca8dd;
-}
-.dx-theme-text-color {
-  color: #dedede;
-}
-.dx-theme-text-color-as-background-color {
+.dx-viewport.dx-theme-generic .dx-theme-text-color-as-background-color {
   background-color: #dedede;
   fill: #dedede;
 }
-.dx-theme-text-color-as-border-color {
-  border-color: #dedede;
-}
-.dx-theme-background-color {
+.dx-viewport.dx-theme-generic .dx-theme-background-color {
   background-color: #2a2a2a;
   fill: #2a2a2a;
 }
-.dx-theme-background-color-as-text-color {
-  color: #2a2a2a;
-}
-.dx-theme-background-color-as-border-color {
-  border-color: #2a2a2a;
-}
-.dx-theme-border-color {
-  border-color: #4d4d4d;
-}
-.dx-theme-border-color-as-text-color {
-  color: #4d4d4d;
-}
-.dx-theme-border-color-as-background-color {
+.dx-viewport.dx-theme-generic .dx-theme-border-color-as-background-color {
   background-color: #4d4d4d;
   fill: #4d4d4d;
+}
+.dx-viewport.dx-theme-generic .dx-theme-accent-as-border-color {
+  border-color: #1ca8dd;
+}
+.dx-viewport.dx-theme-generic .dx-theme-text-color-as-border-color {
+  border-color: #dedede;
+}
+.dx-viewport.dx-theme-generic .dx-theme-background-color-as-border-color {
+  border-color: #2a2a2a;
+}
+.dx-viewport.dx-theme-generic .dx-theme-border-color {
+  border-color: #4d4d4d;
 }
 @font-face {
   font-family: 'DXIcons';
