@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 18.1.0 (build 18052)
-* Build date: Feb 21, 2018
+* Version: 18.1.0 (build 18064)
+* Build date: Mar 5, 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -7324,8 +7324,8 @@
   padding: 7px;
 }
 .dx-datagrid-content .dx-datagrid-table .dx-row .dx-command-edit {
-  width: 100px;
-  min-width: 100px;
+  width: 115px;
+  min-width: 115px;
 }
 .dx-datagrid-filter-range-overlay .dx-overlay-content {
   border: 1px solid #C8C8C8;
@@ -7475,15 +7475,15 @@
 .dx-data-row.dx-state-hover:not(.dx-selection):not(.dx-row-inserted):not(.dx-row-removed):not(.dx-edit-row) > td.dx-pointer-events-none {
   background-color: transparent;
 }
+.dx-header-row {
+  text-transform: uppercase;
+  font-size: 0.9em;
+  font-weight: bold;
+}
 .dx-datagrid-headers {
   color: #4D4D4D;
   -ms-touch-action: pinch-zoom;
   touch-action: pinch-zoom;
-}
-.dx-datagrid-headers .dx-header-row {
-  text-transform: uppercase;
-  font-size: 0.9em;
-  font-weight: bold;
 }
 .dx-datagrid-headers .dx-datagrid-table .dx-row.dx-header-row > td {
   background-color: #E5E5E5;
@@ -8078,8 +8078,8 @@
   padding: 7px;
 }
 .dx-treelist-content .dx-treelist-table .dx-row .dx-command-edit {
-  width: 100px;
-  min-width: 100px;
+  width: 115px;
+  min-width: 115px;
 }
 .dx-treelist-filter-range-overlay .dx-overlay-content {
   border: 1px solid #C8C8C8;
@@ -8229,15 +8229,15 @@
 .dx-data-row.dx-state-hover:not(.dx-selection):not(.dx-row-inserted):not(.dx-row-removed):not(.dx-edit-row) > td.dx-pointer-events-none {
   background-color: transparent;
 }
+.dx-header-row {
+  text-transform: uppercase;
+  font-size: 0.9em;
+  font-weight: bold;
+}
 .dx-treelist-headers {
   color: #4D4D4D;
   -ms-touch-action: pinch-zoom;
   touch-action: pinch-zoom;
-}
-.dx-treelist-headers .dx-header-row {
-  text-transform: uppercase;
-  font-size: 0.9em;
-  font-weight: bold;
 }
 .dx-treelist-headers .dx-treelist-table .dx-row.dx-header-row > td {
   background-color: #E5E5E5;
@@ -8502,13 +8502,11 @@
   margin-left: 0;
   margin-right: 20px;
 }
-.dx-treelist-rowsview .dx-treelist-table:not(.dx-treelist-table-fixed) .dx-treelist-empty-space {
-  width: 14px;
-}
 .dx-treelist-rowsview .dx-treelist-empty-space {
   font: 14px/1 DXIcons;
   position: relative;
   display: inline-block;
+  width: 14px;
   margin-right: 11px;
 }
 .dx-treelist-rowsview .dx-treelist-empty-space:before {

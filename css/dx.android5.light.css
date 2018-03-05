@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 18.1.0 (build 18052)
-* Build date: Feb 21, 2018
+* Version: 18.1.0 (build 18064)
+* Build date: Mar 5, 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -9084,13 +9084,11 @@
 .dx-rtl .dx-treelist .dx-menu .dx-menu-item .dx-menu-item-content .dx-icon {
   margin: 0px;
 }
-.dx-treelist-rowsview .dx-treelist-table:not(.dx-treelist-table-fixed) .dx-treelist-empty-space {
-  width: 14px;
-}
 .dx-treelist-rowsview .dx-treelist-empty-space {
   font: 14px/1 DXIcons;
   position: relative;
   display: inline-block;
+  width: 14px;
   margin-right: 3px;
 }
 .dx-treelist-rowsview .dx-treelist-empty-space:before {
@@ -10515,6 +10513,7 @@
 .dx-scheduler-dropdown-appointments.dx-button.dx-state-hover,
 .dx-scheduler-dropdown-appointments.dx-button.dx-state-active {
   min-height: 10px;
+  min-width: inherit;
 }
 .dx-scheduler-dropdown-appointments.dx-button .dx-button-content,
 .dx-scheduler-dropdown-appointments.dx-button.dx-state-hover .dx-button-content,

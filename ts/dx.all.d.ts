@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.all.d.ts)
-* Version: 18.1.0 (build 18052)
-* Build date: Wed Feb 21 2018
+* Version: 18.1.0 (build 18064)
+* Build date: Mon Mar 05 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -809,6 +809,7 @@ declare module DevExpress {
         static getMarkup(widgetInstances: Array<DOMComponent>): string;
         /** Gets the color sets of a predefined or registered palette. */
         static getPalette(paletteName: string): any;
+        static getTheme(theme: string): any;
         /** The method to be called every time the active entry in the browser history is modified without reloading the current page. */
         static refreshPaths(): void;
         /** Refreshes the current theme and palette in all data visualization widgets on the page. */
@@ -4740,6 +4741,7 @@ declare module DevExpress.ui {
         items?: Array<dxFormSimpleItem | dxFormGroupItem | dxFormTabbedItem | dxFormEmptyItem>;
         /** Specifies the type of the current item. */
         itemType?: string;
+        name?: string;
         /** A template to be used for rendering a group item. */
         template?: template | ((data: { component?: dxForm, formData?: any }, itemElement: DevExpress.core.dxElement) => string | Element | JQuery);
         /** Specifies whether or not the current form item is visible. */
@@ -4755,6 +4757,7 @@ declare module DevExpress.ui {
         cssClass?: string;
         /** Specifies the type of the current item. */
         itemType?: string;
+        name?: string;
         /** Holds a configuration object for the TabPanel widget used to display the current form item. */
         tabPanelOptions?: dxTabPanelOptions;
         /** An array of tab configuration objects. */
@@ -5337,7 +5340,7 @@ declare module DevExpress.ui {
         /** Creates a confirm dialog that contains "Yes" and "No" buttons. */
         static confirm(message: string, title: string): Promise<boolean> & JQueryPromise<boolean>;
         /** Creates a custom dialog. */
-        static custom(options: { title?: string, message?: string, buttons?: Array<any> }): any;
+        static custom(options: { title?: string, message?: string, buttons?: Array<any>, showTitle?: boolean }): any;
     }
     /** An object that serves as a namespace for the methods that work with DevExtreme CSS Themes. */
     export class themes {
@@ -7522,11 +7525,11 @@ declare module DevExpress.viz.charts {
     }
     /** Configures the value axis. */
     export interface dxChartValueAxis extends dxChartCommonAxisSettings {
-        /** Enables auto-calculated scale breaks. Applies only if the axis' type is "continuous" or "logarithmic". Does not apply to a multi-axis chart. */
+        /** Enables auto-calculated scale breaks. Applies only if the axis' type is "continuous" or "logarithmic". */
         autoBreaksEnabled?: boolean;
         /** Specifies the minimum distance between two neighboring major ticks in pixels. Applies only to the axes of the "continuous" and "logarithmic" types. */
         axisDivisionFactor?: number;
-        /** Declares a custom scale break collection. Applies only if the axis' type is "continuous" or "logarithmic". Does not apply to a multi-axis chart. */
+        /** Declares a custom scale break collection. Applies only if the axis' type is "continuous" or "logarithmic". */
         breaks?: Array<ScaleBreak>;
         /** Specifies the order of categories on an axis of the "discrete" type. */
         categories?: Array<number | string | Date>;

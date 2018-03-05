@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 18.1.0 (build 18052)
-* Build date: Feb 21, 2018
+* Version: 18.1.0 (build 18064)
+* Build date: Mar 5, 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -3174,45 +3174,45 @@
 .dx-theme-marker {
   font-family: "dx.generic.carmine";
 }
-.dx-theme-accent-as-text-color {
+.dx-viewport.dx-theme-generic .dx-theme-accent-as-text-color {
   color: #f05b41;
 }
-.dx-theme-accent-as-background-color {
+.dx-viewport.dx-theme-generic .dx-theme-text-color {
+  color: #333;
+}
+.dx-viewport.dx-theme-generic .dx-theme-background-color-as-text-color {
+  color: #fff;
+}
+.dx-viewport.dx-theme-generic .dx-theme-border-color-as-text-color {
+  color: #dee1e3;
+}
+.dx-viewport.dx-theme-generic .dx-theme-accent-as-background-color {
   background-color: #f05b41;
   fill: #f05b41;
 }
-.dx-theme-accent-as-border-color {
-  border-color: #f05b41;
-}
-.dx-theme-text-color {
-  color: #333;
-}
-.dx-theme-text-color-as-background-color {
+.dx-viewport.dx-theme-generic .dx-theme-text-color-as-background-color {
   background-color: #333;
   fill: #333;
 }
-.dx-theme-text-color-as-border-color {
-  border-color: #333;
-}
-.dx-theme-background-color {
+.dx-viewport.dx-theme-generic .dx-theme-background-color {
   background-color: #fff;
   fill: #fff;
 }
-.dx-theme-background-color-as-text-color {
-  color: #fff;
-}
-.dx-theme-background-color-as-border-color {
-  border-color: #fff;
-}
-.dx-theme-border-color {
-  border-color: #dee1e3;
-}
-.dx-theme-border-color-as-text-color {
-  color: #dee1e3;
-}
-.dx-theme-border-color-as-background-color {
+.dx-viewport.dx-theme-generic .dx-theme-border-color-as-background-color {
   background-color: #dee1e3;
   fill: #dee1e3;
+}
+.dx-viewport.dx-theme-generic .dx-theme-accent-as-border-color {
+  border-color: #f05b41;
+}
+.dx-viewport.dx-theme-generic .dx-theme-text-color-as-border-color {
+  border-color: #333;
+}
+.dx-viewport.dx-theme-generic .dx-theme-background-color-as-border-color {
+  border-color: #fff;
+}
+.dx-viewport.dx-theme-generic .dx-theme-border-color {
+  border-color: #dee1e3;
 }
 @font-face {
   font-family: 'DXIcons';
@@ -9818,13 +9818,11 @@
 .dx-rtl .dx-treelist-rowsview.dx-scrollable-scrollbars-alwaysvisible.dx-scrollable-both .dx-scrollable-content {
   padding-left: 0;
 }
-.dx-treelist-rowsview .dx-treelist-table:not(.dx-treelist-table-fixed) .dx-treelist-empty-space {
-  width: 14px;
-}
 .dx-treelist-rowsview .dx-treelist-empty-space {
   position: relative;
   display: inline-block;
   color: #627789;
+  width: 14px;
   font: 14px/1 DXIcons;
 }
 .dx-treelist-rowsview .dx-treelist-empty-space:before {
@@ -11763,6 +11761,9 @@
 .dx-filterbuilder .dx-filterbuilder-text,
 .dx-filterbuilder .dx-filterbuilder-item-value-text {
   border-radius: 5px;
+}
+.dx-filterbuilder .dx-filterbuilder-range-separator {
+  color: #333;
 }
 .dx-filterbuilder-overlay .dx-treeview-item {
   padding: 5px 15px;

@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 18.1.0 (build 18052)
-* Build date: Feb 21, 2018
+* Version: 18.1.0 (build 18064)
+* Build date: Mar 5, 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -7063,13 +7063,13 @@
 .dx-datagrid-header-text {
   font-size: 12pt;
 }
+.dx-datagrid-header-row {
+  font-size: 12pt;
+}
 .dx-datagrid-headers {
   color: #fff;
   -ms-touch-action: pinch-zoom;
   touch-action: pinch-zoom;
-}
-.dx-datagrid-headers .dx-datagrid-table .dx-row:first-child {
-  font-size: 12pt;
 }
 .dx-datagrid-headers .dx-datagrid-table .dx-row > td {
   border-bottom: 1px solid #999999;
@@ -7781,13 +7781,13 @@
 .dx-treelist-header-text {
   font-size: 12pt;
 }
+.dx-treelist-header-row {
+  font-size: 12pt;
+}
 .dx-treelist-headers {
   color: #fff;
   -ms-touch-action: pinch-zoom;
   touch-action: pinch-zoom;
-}
-.dx-treelist-headers .dx-treelist-table .dx-row:first-child {
-  font-size: 12pt;
 }
 .dx-treelist-headers .dx-treelist-table .dx-row > td {
   border-bottom: 1px solid #999999;
@@ -8042,13 +8042,11 @@
 .dx-rtl .dx-treelist-search-panel {
   margin-bottom: 10px;
 }
-.dx-treelist-rowsview .dx-treelist-table:not(.dx-treelist-table-fixed) .dx-treelist-empty-space {
-  width: 14px;
-}
 .dx-treelist-rowsview .dx-treelist-empty-space {
   font: 14px/1 DXIcons;
   position: relative;
   display: inline-block;
+  width: 14px;
   margin-right: 3px;
 }
 .dx-treelist-rowsview .dx-treelist-empty-space:before {

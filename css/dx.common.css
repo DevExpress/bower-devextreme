@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 18.1.0 (build 18052)
-* Build date: Feb 21, 2018
+* Version: 18.1.0 (build 18064)
+* Build date: Mar 5, 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -3024,6 +3024,9 @@
 .dx-gallery-loop .dx-gallery-item-loop {
   display: block;
 }
+.dx-gallery-item-invisible {
+  visibility: hidden;
+}
 .dx-gallery-nav-button-prev,
 .dx-gallery-nav-button-next {
   position: absolute;
@@ -4430,7 +4433,6 @@ input.dx-hidden {
 .dx-datagrid-content .dx-datagrid-table .dx-row .dx-command-edit {
   width: 100px;
   min-width: 100px;
-  max-width: 100px;
 }
 .dx-datagrid-content .dx-datagrid-table .dx-row .dx-command-expand {
   padding: 0;
@@ -5120,6 +5122,10 @@ input.dx-hidden {
 .dx-pivotgrid-action {
   cursor: pointer;
 }
+.dx-pivotgrid-drag-action {
+  -ms-touch-action: pinch-zoom;
+  touch-action: pinch-zoom;
+}
 .dx-treelist-checkbox-size {
   vertical-align: middle;
 }
@@ -5434,7 +5440,6 @@ input.dx-hidden {
 .dx-treelist-content .dx-treelist-table .dx-row .dx-command-edit {
   width: 100px;
   min-width: 100px;
-  max-width: 100px;
 }
 .dx-treelist-content .dx-treelist-table .dx-row .dx-command-expand {
   padding: 0;
@@ -5892,12 +5897,18 @@ input.dx-hidden {
   white-space: normal;
   line-height: normal;
 }
-.dx-treelist-rowsview .dx-treelist-table:not(.dx-treelist-table-fixed) .dx-treelist-cell-expandable {
+.dx-treelist-rowsview .dx-treelist-table:not(.dx-treelist-table-fixed) .dx-treelist-cell-expandable,
+.dx-treelist-rowsview .dx-treelist-best-fit.dx-treelist-cell-expandable {
   white-space: nowrap;
 }
-.dx-treelist-rowsview .dx-treelist-table:not(.dx-treelist-table-fixed) .dx-treelist-cell-expandable .dx-treelist-text-content {
-  display: inline-block;
+.dx-treelist-rowsview .dx-treelist-table:not(.dx-treelist-table-fixed) .dx-treelist-cell-expandable .dx-treelist-text-content,
+.dx-treelist-rowsview .dx-treelist-best-fit.dx-treelist-cell-expandable .dx-treelist-text-content {
+  display: inline;
   white-space: normal;
+}
+.dx-treelist-rowsview .dx-treelist-table:not(.dx-treelist-table-fixed) .dx-treelist-cell-expandable .dx-treelist-icon-container,
+.dx-treelist-rowsview .dx-treelist-best-fit.dx-treelist-cell-expandable .dx-treelist-icon-container {
+  float: none;
 }
 .dx-treelist-rowsview .dx-treelist-icon-container {
   display: inline-block;
