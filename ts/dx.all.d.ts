@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.all.d.ts)
-* Version: 17.2.6
-* Build date: Tue Feb 27 2018
+* Version: 17.2.6 (build 18066)
+* Build date: Wed Mar 07 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -5306,7 +5306,7 @@ declare module DevExpress.ui {
         /** Creates a confirm dialog that contains "Yes" and "No" buttons. */
         static confirm(message: string, title: string): Promise<boolean> & JQueryPromise<boolean>;
         /** Creates a custom dialog. */
-        static custom(options: { title?: string, message?: string, buttons?: Array<any> }): any;
+        static custom(options: { title?: string, message?: string, buttons?: Array<any>, showTitle?: boolean }): any;
     }
     /** An object that serves as a namespace for the methods that work with DevExtreme CSS Themes. */
     export class themes {
