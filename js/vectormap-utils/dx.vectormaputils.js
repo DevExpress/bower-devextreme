@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.vectormaputils.js)
-* Version: 17.2.6 (build 18066)
-* Build date: Wed Mar 07 2018
+* Version: 17.2.6 (build 18075)
+* Build date: Fri Mar 16 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/

@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 17.2.6 (build 18066)
-* Build date: Mar 7, 2018
+* Version: 17.2.6 (build 18075)
+* Build date: Mar 16, 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -5175,7 +5175,7 @@
   border: none;
 }
 .dx-list.dx-list-with-search .dx-scrollable-wrapper {
-  height: calc(100% -  26px);
+  height: calc(100% -  29px);
 }
 .dx-list .dx-empty-message {
   text-align: left;
@@ -5442,7 +5442,7 @@
   border: none;
 }
 .dx-device-mobile .dx-list.dx-list-with-search .dx-scrollable-wrapper {
-  height: calc(100% -  26px);
+  height: calc(100% -  29px);
 }
 .dx-device-mobile .dx-list .dx-empty-message {
   text-align: left;
