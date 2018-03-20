@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 18.1.0 (build 18064)
-* Build date: Mar 5, 2018
+* Version: 18.1.0 (build 18079)
+* Build date: Mar 20, 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -6711,6 +6711,9 @@
 .dx-colorbox-overlay .dx-popup-content {
   padding: 12px;
 }
+.dx-header-row {
+  font-size: 12pt;
+}
 .dx-datagrid-checkbox-size.dx-focused .dx-checkbox-icon {
   border-color: transparent;
 }
@@ -7061,9 +7064,6 @@
   background-color: transparent;
 }
 .dx-datagrid-header-text {
-  font-size: 12pt;
-}
-.dx-datagrid-header-row {
   font-size: 12pt;
 }
 .dx-datagrid-headers {
@@ -7779,9 +7779,6 @@
   background-color: transparent;
 }
 .dx-treelist-header-text {
-  font-size: 12pt;
-}
-.dx-treelist-header-row {
   font-size: 12pt;
 }
 .dx-treelist-headers {

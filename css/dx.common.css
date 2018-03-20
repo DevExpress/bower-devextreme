@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 18.1.0 (build 18064)
-* Build date: Mar 5, 2018
+* Version: 18.1.0 (build 18079)
+* Build date: Mar 20, 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -1535,6 +1535,9 @@
   text-align: center;
   table-layout: fixed;
   position: relative;
+}
+.dx-tabs.dx-overflow-hidden {
+  overflow: hidden;
 }
 .dx-tabs-wrapper {
   display: table-row;
@@ -4670,6 +4673,9 @@ input.dx-hidden {
 .dx-datagrid-rowsview .dx-datagrid-content {
   overflow-anchor: none;
 }
+.dx-datagrid-rowsview .dx-datagrid-content:not(.dx-datagrid-content-fixed) {
+  min-height: 100%;
+}
 .dx-datagrid-rowsview:focus {
   outline: 0;
 }
@@ -4767,8 +4773,8 @@ input.dx-hidden {
   word-break: normal;
 }
 .dx-command-adaptive {
-  width: 21px;
-  min-width: 21px;
+  width: 36px;
+  min-width: 36px;
 }
 .dx-datagrid-revert-tooltip.dx-popover-wrapper .dx-overlay-content {
   border: none;
@@ -5677,6 +5683,9 @@ input.dx-hidden {
 .dx-treelist-rowsview .dx-treelist-content {
   overflow-anchor: none;
 }
+.dx-treelist-rowsview .dx-treelist-content:not(.dx-treelist-content-fixed) {
+  min-height: 100%;
+}
 .dx-treelist-rowsview:focus {
   outline: 0;
 }
@@ -5774,8 +5783,8 @@ input.dx-hidden {
   word-break: normal;
 }
 .dx-command-adaptive {
-  width: 21px;
-  min-width: 21px;
+  width: 36px;
+  min-width: 36px;
 }
 .dx-treelist-revert-tooltip.dx-popover-wrapper .dx-overlay-content {
   border: none;
