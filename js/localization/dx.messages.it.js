@@ -1,6 +1,6 @@
 /*!
 * DevExtreme (dx.messages.it.js)
-* Version: 17.2.6 (build 18075)
+* Version: 17.2.7
 * Build date: Fri Mar 16 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
