@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.messages.zh.js)
-* Version: 18.1.0 (build 18079)
-* Build date: Tue Mar 20 2018
+* Version: 18.1.0 (build 18093)
+* Build date: Tue Apr 03 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -153,6 +153,10 @@
             "dxDataGrid-ariaSearchInGrid": "在数据网格中搜索",
             "dxDataGrid-ariaSelectAll": "全选",
             "dxDataGrid-ariaSelectRow": "选择行",
+            "dxDataGrid-filterBuilderPopupTitle": "!TODO",
+            "dxDataGrid-filterPanelCreateFilter": "!TODO",
+            "dxDataGrid-filterPanelClearFilter": "!TODO",
+            "dxDataGrid-filterPanelFilterEnabledHint": "!TODO",
             "dxTreeList-ariaTreeList": "树列表",
             "dxTreeList-editingAddRowToNode": "添加",
             "dxPager-infoText": "第{0}页,共{1}页 ({2} 项目)",
@@ -246,7 +250,9 @@
             "dxFilterBuilder-filterOperationNotContains": "不包含",
             "dxFilterBuilder-filterOperationEndsWith": "结束于",
             "dxFilterBuilder-filterOperationIsBlank": "空",
-            "dxFilterBuilder-filterOperationIsNotBlank": "不为空"
+            "dxFilterBuilder-filterOperationIsNotBlank": "不为空",
+            "dxFilterBuilder-filterOperationAnyOf": "!TODO",
+            "dxFilterBuilder-filterOperationNoneOf": "!TODO"
         }
     })
 });

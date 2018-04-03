@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.messages.fi.js)
-* Version: 18.1.0 (build 18079)
-* Build date: Tue Mar 20 2018
+* Version: 18.1.0 (build 18093)
+* Build date: Tue Apr 03 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -153,6 +153,10 @@
             "dxDataGrid-ariaSearchInGrid": "Hae tietoriviltä",
             "dxDataGrid-ariaSelectAll": "Valitse kaikki",
             "dxDataGrid-ariaSelectRow": "Valitse rivi",
+            "dxDataGrid-filterBuilderPopupTitle": "!TODO",
+            "dxDataGrid-filterPanelCreateFilter": "!TODO",
+            "dxDataGrid-filterPanelClearFilter": "!TODO",
+            "dxDataGrid-filterPanelFilterEnabledHint": "!TODO",
             "dxTreeList-ariaTreeList": "Puu",
             "dxTreeList-editingAddRowToNode": "Lisää",
             "dxPager-infoText": "Sivu {0}/{1} ({2} kohdetta)",
@@ -246,7 +250,9 @@
             "dxFilterBuilder-filterOperationNotContains": "Ei sisällä",
             "dxFilterBuilder-filterOperationEndsWith": "Loppuu merkillä",
             "dxFilterBuilder-filterOperationIsBlank": "On tyhjä",
-            "dxFilterBuilder-filterOperationIsNotBlank": "Ei ole tyhjä"
+            "dxFilterBuilder-filterOperationIsNotBlank": "Ei ole tyhjä",
+            "dxFilterBuilder-filterOperationAnyOf": "!TODO",
+            "dxFilterBuilder-filterOperationNoneOf": "!TODO"
         }
     })
 });

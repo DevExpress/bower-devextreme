@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.messages.it.js)
-* Version: 18.1.0 (build 18079)
-* Build date: Tue Mar 20 2018
+* Version: 18.1.0 (build 18093)
+* Build date: Tue Apr 03 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -153,6 +153,10 @@
             "dxDataGrid-ariaSearchInGrid": "Cerca nella griglia",
             "dxDataGrid-ariaSelectAll": "Seleziona tutti",
             "dxDataGrid-ariaSelectRow": "Seleziona riga",
+            "dxDataGrid-filterBuilderPopupTitle": "!TODO",
+            "dxDataGrid-filterPanelCreateFilter": "!TODO",
+            "dxDataGrid-filterPanelClearFilter": "!TODO",
+            "dxDataGrid-filterPanelFilterEnabledHint": "!TODO",
             "dxTreeList-ariaTreeList": "Albero",
             "dxTreeList-editingAddRowToNode": "Aggiungi",
             "dxPager-infoText": "Pagina {0} di {1} ({2} elementi)",
@@ -246,7 +250,9 @@
             "dxFilterBuilder-filterOperationNotContains": "Non contiene",
             "dxFilterBuilder-filterOperationEndsWith": "Termina con",
             "dxFilterBuilder-filterOperationIsBlank": "E' vuoto",
-            "dxFilterBuilder-filterOperationIsNotBlank": "Non è vuoto"
+            "dxFilterBuilder-filterOperationIsNotBlank": "Non è vuoto",
+            "dxFilterBuilder-filterOperationAnyOf": "!TODO",
+            "dxFilterBuilder-filterOperationNoneOf": "!TODO"
         }
     })
 });

@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.messages.cs.js)
-* Version: 18.1.0 (build 18079)
-* Build date: Tue Mar 20 2018
+* Version: 18.1.0 (build 18093)
+* Build date: Tue Apr 03 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -153,6 +153,10 @@
             "dxDataGrid-ariaSearchInGrid": "Hledat v datové mřížce",
             "dxDataGrid-ariaSelectAll": "Vybrat vše",
             "dxDataGrid-ariaSelectRow": "Vybrat řádek",
+            "dxDataGrid-filterBuilderPopupTitle": "!TODO",
+            "dxDataGrid-filterPanelCreateFilter": "!TODO",
+            "dxDataGrid-filterPanelClearFilter": "!TODO",
+            "dxDataGrid-filterPanelFilterEnabledHint": "!TODO",
             "dxTreeList-ariaTreeList": "Tree list",
             "dxTreeList-editingAddRowToNode": "Přidat",
             "dxPager-infoText": "Strana {0} ze {1} ({2} položek)",
@@ -246,7 +250,9 @@
             "dxFilterBuilder-filterOperationNotContains": "Neobsahuje",
             "dxFilterBuilder-filterOperationEndsWith": "Končí na",
             "dxFilterBuilder-filterOperationIsBlank": "Je prázdné",
-            "dxFilterBuilder-filterOperationIsNotBlank": "Není prázdné"
+            "dxFilterBuilder-filterOperationIsNotBlank": "Není prázdné",
+            "dxFilterBuilder-filterOperationAnyOf": "!TODO",
+            "dxFilterBuilder-filterOperationNoneOf": "!TODO"
         }
     })
 });

@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.messages.ja.js)
-* Version: 18.1.0 (build 18079)
-* Build date: Tue Mar 20 2018
+* Version: 18.1.0 (build 18093)
+* Build date: Tue Apr 03 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -153,6 +153,10 @@
             "dxDataGrid-ariaSearchInGrid": "データ グリッド内で検索",
             "dxDataGrid-ariaSelectAll": "すべてを選択",
             "dxDataGrid-ariaSelectRow": "行の選択",
+            "dxDataGrid-filterBuilderPopupTitle": "!TODO",
+            "dxDataGrid-filterPanelCreateFilter": "!TODO",
+            "dxDataGrid-filterPanelClearFilter": "!TODO",
+            "dxDataGrid-filterPanelFilterEnabledHint": "!TODO",
             "dxTreeList-ariaTreeList": "ツリー リスト",
             "dxTreeList-editingAddRowToNode": "追加",
             "dxPager-infoText": "ページ {0} / {1} ({2} アイテム)",
@@ -246,7 +250,9 @@
             "dxFilterBuilder-filterOperationNotContains": "指定の値を含まない",
             "dxFilterBuilder-filterOperationEndsWith": "指定の値で終わる",
             "dxFilterBuilder-filterOperationIsBlank": "空白である",
-            "dxFilterBuilder-filterOperationIsNotBlank": "空白ではない"
+            "dxFilterBuilder-filterOperationIsNotBlank": "空白ではない",
+            "dxFilterBuilder-filterOperationAnyOf": "!TODO",
+            "dxFilterBuilder-filterOperationNoneOf": "!TODO"
         }
     })
 });

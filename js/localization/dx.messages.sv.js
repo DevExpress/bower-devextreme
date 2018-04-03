@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.messages.sv.js)
-* Version: 18.1.0 (build 18079)
-* Build date: Tue Mar 20 2018
+* Version: 18.1.0 (build 18093)
+* Build date: Tue Apr 03 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -153,6 +153,10 @@
             "dxDataGrid-ariaSearchInGrid": "Sök i datarutnätet",
             "dxDataGrid-ariaSelectAll": "Välj allt",
             "dxDataGrid-ariaSelectRow": "Välj rad",
+            "dxDataGrid-filterBuilderPopupTitle": "!TODO",
+            "dxDataGrid-filterPanelCreateFilter": "!TODO",
+            "dxDataGrid-filterPanelClearFilter": "!TODO",
+            "dxDataGrid-filterPanelFilterEnabledHint": "!TODO",
             "dxTreeList-ariaTreeList": "Trädlista",
             "dxTreeList-editingAddRowToNode": "Lägg till",
             "dxPager-infoText": "Sida {0} av {1} ({2} uppgifter)",
@@ -246,7 +250,9 @@
             "dxFilterBuilder-filterOperationNotContains": "Innehåller inte",
             "dxFilterBuilder-filterOperationEndsWith": "Slutar med",
             "dxFilterBuilder-filterOperationIsBlank": "Är tom",
-            "dxFilterBuilder-filterOperationIsNotBlank": "Är inte tom"
+            "dxFilterBuilder-filterOperationIsNotBlank": "Är inte tom",
+            "dxFilterBuilder-filterOperationAnyOf": "!TODO",
+            "dxFilterBuilder-filterOperationNoneOf": "!TODO"
         }
     })
 });
