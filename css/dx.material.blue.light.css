@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 18.1.0 (build 18093)
-* Build date: Apr 3, 2018
+* Version: 18.1.0 (build 18094)
+* Build date: Apr 4, 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -13313,22 +13313,17 @@
   float: right;
   width: 23%;
 }
-.dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline-day .dx-scheduler-sidebar-scrollable,
-.dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline-week .dx-scheduler-sidebar-scrollable {
+.dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline .dx-scheduler-sidebar-scrollable {
   display: none;
 }
-.dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline-day .dx-scheduler-header-scrollable,
-.dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline-week .dx-scheduler-header-scrollable,
-.dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline-day .dx-scheduler-date-table-scrollable,
-.dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline-week .dx-scheduler-date-table-scrollable {
+.dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline .dx-scheduler-header-scrollable,
+.dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline .dx-scheduler-date-table-scrollable {
   margin-left: 0 !important;
 }
-.dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline-day .dx-scheduler-group-header-content,
-.dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline-week .dx-scheduler-group-header-content {
+.dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline .dx-scheduler-group-header-content {
   height: 40px;
 }
-.dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline-day .dx-scheduler-header-panel,
-.dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline-week .dx-scheduler-header-panel {
+.dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline .dx-scheduler-header-panel {
   display: -webkit-box;
   display: -webkit-flex;
   display: -moz-flex;
@@ -13341,10 +13336,8 @@
   -ms-flex-flow: row nowrap;
   flex-flow: row nowrap;
 }
-.dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline-day .dx-scheduler-header-row,
-.dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline-week .dx-scheduler-header-row,
-.dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline-day .dx-scheduler-group-row,
-.dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline-week .dx-scheduler-group-row {
+.dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline .dx-scheduler-header-row,
+.dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline .dx-scheduler-group-row {
   display: -webkit-box;
   display: -webkit-flex;
   display: -moz-flex;
@@ -13357,8 +13350,7 @@
   -ms-flex-flow: row nowrap;
   flex-flow: row nowrap;
 }
-.dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline-day.dx-scheduler-work-space-grouped .dx-scheduler-group-header,
-.dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline-week.dx-scheduler-work-space-grouped .dx-scheduler-group-header {
+.dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline.dx-scheduler-work-space-grouped .dx-scheduler-group-header {
   flex-grow: 1;
   flex-basis: 0;
   border-left: 1px solid #c7c7c7;
@@ -13374,12 +13366,10 @@
   -ms-flex-flow: row nowrap;
   flex-flow: row nowrap;
 }
-.dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline-day .dx-scheduler-header-row .dx-scheduler-header-panel-cell,
-.dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline-week .dx-scheduler-header-row .dx-scheduler-header-panel-cell {
+.dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline .dx-scheduler-header-row .dx-scheduler-header-panel-cell {
   border-right: none;
 }
-.dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline-day .dx-scheduler-date-table-scrollable,
-.dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline-week .dx-scheduler-date-table-scrollable {
+.dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline .dx-scheduler-date-table-scrollable {
   padding-bottom: 90px !important;
   margin-bottom: -90px !important;
 }
