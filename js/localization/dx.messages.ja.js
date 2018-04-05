@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.messages.ja.js)
-* Version: 17.2.7
-* Build date: Fri Mar 16 2018
+* Version: 17.2.7 (build 18095)
+* Build date: Thu Apr 05 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
