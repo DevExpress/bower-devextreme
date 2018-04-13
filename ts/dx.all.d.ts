@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.all.d.ts)
-* Version: 17.1.10 (build 18075)
-* Build date: Fri Mar 16 2018
+* Version: 17.1.10 (build 18103)
+* Build date: Fri Apr 13 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -4316,6 +4316,8 @@ declare module DevExpress.ui {
             proxyUrl?: string;
             /** Allows an end user to export selected rows only. */
             allowExportSelectedData?: boolean;
+			/** Specifies whether Excel should display warnings if there are errors in the exported document. */
+            ignoreExcelErrors?: boolean;
             /** Contains options that specify texts for the export-related commands and hints. */
             texts?: {
                 /** Specifies the hint of the Export button when the allowExportSelectedData option is true. */
@@ -5082,6 +5084,8 @@ declare module DevExpress.ui {
             fileName?: string;
             /** Specifies the URL of the server-side proxy that streams the resulting file to the end user to enable export in IE9 and Safari browsers. */
             proxyUrl?: string;
+			/** Specifies whether Excel should display warnings if there are errors in the exported document. */
+            ignoreExcelErrors?: boolean;
         };
         /** A handler for the exporting event. */
         onExporting?: (e: {
