@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 18.1.0 (build 18094)
-* Build date: Apr 4, 2018
+* Version: 18.1.0 (build 18103)
+* Build date: Apr 13, 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -4437,6 +4437,13 @@ input.dx-hidden {
   width: 100px;
   min-width: 100px;
 }
+.dx-datagrid-content .dx-datagrid-table .dx-row .dx-command-edit.dx-command-edit-with-icons {
+  width: 80px;
+  min-width: 80px;
+}
+.dx-datagrid-content .dx-datagrid-table .dx-row .dx-command-edit.dx-command-edit-with-icons .dx-link {
+  text-decoration: none;
+}
 .dx-datagrid-content .dx-datagrid-table .dx-row .dx-command-expand {
   padding: 0;
   width: 30px;
@@ -4892,6 +4899,36 @@ input.dx-hidden {
   margin: 0;
   margin-right: 15px;
 }
+.dx-datagrid-filter-panel,
+.dx-datagrid-filter-panel-left {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: row;
+  min-width: 0;
+}
+.dx-datagrid-filter-panel {
+  padding: 10px;
+}
+.dx-datagrid-filter-panel .dx-datagrid-filter-panel-text {
+  overflow: hidden;
+  -o-text-overflow: ellipsis;
+  -ms-text-overflow: ellipsis;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.dx-datagrid-filter-panel .dx-datagrid-filter-panel-text:hover,
+.dx-datagrid-filter-panel .dx-datagrid-filter-panel-clear-filter:hover {
+  text-decoration: underline;
+  cursor: pointer;
+}
+.dx-datagrid-filter-panel .dx-datagrid-filter-panel-checkbox {
+  padding-right: 10px;
+}
+.dx-datagrid-filter-panel .dx-icon-filter {
+  margin: auto;
+  padding-right: 7px;
+  cursor: pointer;
+}
 .dx-datagrid {
   position: relative;
   cursor: default;
@@ -4984,36 +5021,6 @@ input.dx-hidden {
 .dx-rtl .dx-datagrid-group-panel .dx-sort {
   margin-left: 0;
   margin-right: 6px;
-}
-.dx-datagrid-filter-panel,
-.dx-datagrid-filter-panel-left {
-  display: flex;
-  justify-content: space-between;
-  flex-direction: row;
-  min-width: 0;
-}
-.dx-datagrid-filter-panel {
-  padding: 10px;
-}
-.dx-datagrid-filter-panel .dx-datagrid-filter-panel-text {
-  overflow: hidden;
-  -o-text-overflow: ellipsis;
-  -ms-text-overflow: ellipsis;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.dx-datagrid-filter-panel .dx-datagrid-filter-panel-text:hover,
-.dx-datagrid-filter-panel .dx-datagrid-filter-panel-clear-filter:hover {
-  text-decoration: underline;
-  cursor: pointer;
-}
-.dx-datagrid-filter-panel .dx-datagrid-filter-panel-checkbox {
-  padding-right: 10px;
-}
-.dx-datagrid-filter-panel .dx-icon-filter {
-  margin: auto;
-  padding-right: 7px;
-  cursor: pointer;
 }
 .dx-pivotgrid-fields-container .dx-sort,
 .dx-pivotgrid-fields-container .dx-header-filter {
@@ -5148,11 +5155,23 @@ input.dx-hidden {
   position: relative;
 }
 .dx-pivotgridfieldchooser .dx-pivotgridfieldchooser-container {
+  display: flex;
+  flex-direction: row;
+  height: 100%;
   overflow: hidden;
+}
+.dx-pivotgridfieldchooser .dx-pivotgridfieldchooser-container.dx-layout-2 {
+  flex-direction: column;
+}
+.dx-pivotgridfieldchooser .dx-layout-2 .dx-fields-container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
 }
 .dx-pivotgridfieldchooser .dx-col {
   width: 50%;
-  float: left;
+  display: flex;
+  flex-direction: column;
 }
 .dx-pivotgridfieldchooser .dx-area-caption {
   vertical-align: middle;
@@ -5478,6 +5497,13 @@ input.dx-hidden {
 .dx-treelist-content .dx-treelist-table .dx-row .dx-command-edit {
   width: 100px;
   min-width: 100px;
+}
+.dx-treelist-content .dx-treelist-table .dx-row .dx-command-edit.dx-command-edit-with-icons {
+  width: 80px;
+  min-width: 80px;
+}
+.dx-treelist-content .dx-treelist-table .dx-row .dx-command-edit.dx-command-edit-with-icons .dx-link {
+  text-decoration: none;
 }
 .dx-treelist-content .dx-treelist-table .dx-row .dx-command-expand {
   padding: 0;
@@ -5933,6 +5959,36 @@ input.dx-hidden {
 .dx-rtl .dx-treelist-search-panel {
   margin: 0;
   margin-right: 15px;
+}
+.dx-treelist-filter-panel,
+.dx-treelist-filter-panel-left {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: row;
+  min-width: 0;
+}
+.dx-treelist-filter-panel {
+  padding: 10px;
+}
+.dx-treelist-filter-panel .dx-treelist-filter-panel-text {
+  overflow: hidden;
+  -o-text-overflow: ellipsis;
+  -ms-text-overflow: ellipsis;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.dx-treelist-filter-panel .dx-treelist-filter-panel-text:hover,
+.dx-treelist-filter-panel .dx-treelist-filter-panel-clear-filter:hover {
+  text-decoration: underline;
+  cursor: pointer;
+}
+.dx-treelist-filter-panel .dx-treelist-filter-panel-checkbox {
+  padding-right: 10px;
+}
+.dx-treelist-filter-panel .dx-icon-filter {
+  margin: auto;
+  padding-right: 7px;
+  cursor: pointer;
 }
 .dx-treelist-container {
   position: relative;

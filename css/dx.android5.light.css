@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 18.1.0 (build 18094)
-* Build date: Apr 4, 2018
+* Version: 18.1.0 (build 18103)
+* Build date: Apr 13, 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -110,6 +110,20 @@
 .dx-datagrid .dx-datagrid-rowsview .dx-datagrid-edit-form {
   background-color: white;
 }
+.dx-datagrid .dx-datagrid-rowsview .dx-virtual-row > td {
+  position: relative;
+}
+.dx-datagrid .dx-datagrid-rowsview .dx-virtual-row > td:before {
+  display: block;
+  position: absolute;
+  left: 7px;
+  right: 7px;
+  top: 0;
+  bottom: 0;
+  content: '';
+  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAACqCAYAAABbAOqQAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA39pVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNi1jMTQyIDc5LjE2MDkyNCwgMjAxNy8wNy8xMy0wMTowNjozOSAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDpjYWQ2ODE5MS00ZDMxLWRjNGYtOTU0NC1jNjJkMTIxMjY2M2IiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6MjY1RUVFQzAzRDYzMTFFODlFNThCOUJBQjU4Q0EzRDgiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6MjY1RUVFQkYzRDYzMTFFODlFNThCOUJBQjU4Q0EzRDgiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIChXaW5kb3dzKSI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOjVlMjM1Y2U0LTc5ZWUtNGI0NC05ZjlkLTk2NTZmZGFjNjhhNCIgc3RSZWY6ZG9jdW1lbnRJRD0iYWRvYmU6ZG9jaWQ6cGhvdG9zaG9wOjk1OTQ2MjBiLTUyMTQtYTM0Yy04Nzc5LTEwMmEyMTY4MTlhOSIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PvLbJKYAAADrSURBVHja7N3BDYBACABBsQn7L48q0BoMD5SZxAZuc74gF1V1MMfpCARBEEEQRBAEEQRBdovnuxxDq3RD/LIQRBAEQRBBEEQQBBEEQQQBAAAAAAAAABhi8gZVbgxi6kQQBBEEQQRBEEEQRBAEQRBBAAAAAAAAAAAabX2Daux2lqkTQRBEEAQRBEEEQRBBEARBBAEAAAAAAAAAaLR1g2osUyeCIIggCCIIggiCIIIgCIIIAgAAAAAAAADQ6KsbVPnXIKZOBEEQQRBEEAQRBEEEQRAEEYRXoqqcghuCIIIgiCAIIgiCCMIUtwADALYCCr92l++TAAAAAElFTkSuQmCC);
+  background-repeat: no-repeat repeat;
+}
 .dx-datagrid .dx-datagrid-filter-row .dx-filter-range-content {
   color: rgba(0, 0, 0, 0.87);
 }
@@ -197,6 +211,12 @@
 .dx-rtl .dx-datagrid .dx-datagrid-rowsview .dx-freespace-row td.dx-pointer-events-none.dx-last-cell,
 .dx-rtl .dx-datagrid .dx-datagrid-headers .dx-row td.dx-pointer-events-none.dx-last-cell {
   border-left: none;
+}
+.dx-rtl .dx-datagrid .dx-datagrid-rowsview .dx-virtual-row > td:before {
+  -moz-transform: scaleX(-1);
+  -o-transform: scaleX(-1);
+  -webkit-transform: scaleX(-1);
+  transform: scaleX(-1);
 }
 .dx-rtl .dx-datagrid-form-buttons-container {
   float: left;
@@ -462,6 +482,9 @@
 .dx-pivotgrid .dx-pivotgrid-horizontal-headers tr:first-child td {
   border-top: 0px;
 }
+.dx-pivotgrid .dx-expand-icon-container {
+  width: 14px;
+}
 .dx-pivotgrid .dx-pivotgrid-horizontal-headers:last-child {
   border-bottom: 0;
 }
@@ -497,6 +520,7 @@
 .dx-pivotgrid .dx-icon-sorted {
   display: inline-block;
   margin-left: 5px;
+  width: 14px;
 }
 .dx-pivotgrid .dx-menu-item .dx-icon {
   width: 16px;
@@ -543,14 +567,31 @@
 }
 .dx-pivotgridfieldchooser .dx-area {
   padding: 5px;
+  display: flex;
+  height: 33.33%;
+  flex-direction: column;
+}
+.dx-pivotgridfieldchooser .dx-layout-2 .dx-fields-container {
+  height: 66%;
+}
+.dx-pivotgridfieldchooser .dx-layout-2 .dx-fields-container .dx-area {
+  height: 50%;
+}
+.dx-pivotgridfieldchooser .dx-area.dx-all-fields {
+  flex-grow: 1;
 }
 .dx-pivotgridfieldchooser .dx-area .dx-area-fields {
   margin-top: 3px;
   border: 1px solid #CCCCCC;
+  height: 100%;
+}
+.dx-pivotgridfieldchooser .dx-area-fields-header .dx-area-caption {
+  align-self: center;
 }
 .dx-pivotgridfieldchooser .dx-area-fields[group] {
   padding: 5px;
   background-color: #F7F7F7;
+  display: flex;
 }
 .dx-pivotgridfieldchooser .dx-area-fields.dx-drag-target {
   border-color: #606060;
@@ -678,7 +719,7 @@
   margin-right: 5px;
 }
 .dx-rtl.dx-pivotgrid .dx-pivotgridfieldchooser-container .dx-col {
-  float: right;
+  display: flex;
 }
 .dx-rtl.dx-pivotgrid .dx-pivotgrid-border .dx-area-description-cell,
 .dx-rtl.dx-pivotgrid .dx-pivotgrid-border .dx-data-header,
@@ -708,8 +749,14 @@
   border-bottom: 1px solid #CBCBCB;
 }
 .dx-treelist-borders > .dx-treelist-pager,
-.dx-treelist-borders > .dx-treelist-headers {
+.dx-treelist-borders > .dx-treelist-headers,
+.dx-treelist-borders > .dx-treelist-filter-panel {
   border-top: 1px solid #CBCBCB;
+}
+.dx-treelist-borders > .dx-treelist-filter-panel {
+  border-top-width: 0;
+  border-left: 1px solid #CBCBCB;
+  border-right: 1px solid #CBCBCB;
 }
 .dx-treelist-container {
   color: rgba(0, 0, 0, 0.87);
@@ -772,6 +819,20 @@
 .dx-treelist-container .dx-treelist-rowsview .dx-treelist-edit-form {
   background-color: white;
 }
+.dx-treelist-container .dx-treelist-rowsview .dx-virtual-row > td {
+  position: relative;
+}
+.dx-treelist-container .dx-treelist-rowsview .dx-virtual-row > td:before {
+  display: block;
+  position: absolute;
+  left: 7px;
+  right: 7px;
+  top: 0;
+  bottom: 0;
+  content: '';
+  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAACqCAYAAABbAOqQAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA39pVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNi1jMTQyIDc5LjE2MDkyNCwgMjAxNy8wNy8xMy0wMTowNjozOSAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDpjYWQ2ODE5MS00ZDMxLWRjNGYtOTU0NC1jNjJkMTIxMjY2M2IiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6MjY1RUVFQzAzRDYzMTFFODlFNThCOUJBQjU4Q0EzRDgiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6MjY1RUVFQkYzRDYzMTFFODlFNThCOUJBQjU4Q0EzRDgiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIChXaW5kb3dzKSI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOjVlMjM1Y2U0LTc5ZWUtNGI0NC05ZjlkLTk2NTZmZGFjNjhhNCIgc3RSZWY6ZG9jdW1lbnRJRD0iYWRvYmU6ZG9jaWQ6cGhvdG9zaG9wOjk1OTQ2MjBiLTUyMTQtYTM0Yy04Nzc5LTEwMmEyMTY4MTlhOSIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PvLbJKYAAADrSURBVHja7N3BDYBACABBsQn7L48q0BoMD5SZxAZuc74gF1V1MMfpCARBEEEQRBAEEQRBdovnuxxDq3RD/LIQRBAEQRBBEEQQBBEEQQQBAAAAAAAAABhi8gZVbgxi6kQQBBEEQQRBEEEQRBAEQRBBAAAAAAAAAAAabX2Daux2lqkTQRBEEAQRBEEEQRBBEARBBAEAAAAAAAAAaLR1g2osUyeCIIggCCIIggiCIIIgCIIIAgAAAAAAAADQ6KsbVPnXIKZOBEEQQRBEEAQRBEEEQRAEEYRXoqqcghuCIIIgiCAIIgiCCMIUtwADALYCCr92l++TAAAAAElFTkSuQmCC);
+  background-repeat: no-repeat repeat;
+}
 .dx-treelist-container .dx-treelist-filter-row .dx-filter-range-content {
   color: rgba(0, 0, 0, 0.87);
 }
@@ -783,6 +844,10 @@
   background-color: #f28f8f;
   white-space: normal;
   word-wrap: break-word;
+}
+.dx-treelist-filter-panel {
+  color: rgba(0, 0, 0, 0.87);
+  border-top: 1px solid #CBCBCB;
 }
 .dx-treelist-form-buttons-container {
   float: right;
@@ -855,6 +920,12 @@
 .dx-rtl .dx-treelist-container .dx-treelist-rowsview .dx-freespace-row td.dx-pointer-events-none.dx-last-cell,
 .dx-rtl .dx-treelist-container .dx-treelist-headers .dx-row td.dx-pointer-events-none.dx-last-cell {
   border-left: none;
+}
+.dx-rtl .dx-treelist-container .dx-treelist-rowsview .dx-virtual-row > td:before {
+  -moz-transform: scaleX(-1);
+  -o-transform: scaleX(-1);
+  -webkit-transform: scaleX(-1);
+  transform: scaleX(-1);
 }
 .dx-rtl .dx-treelist-form-buttons-container {
   float: left;
@@ -5597,6 +5668,19 @@
   padding: 7px;
   padding-right: 35px;
 }
+.dx-datagrid .dx-datagrid-content .dx-datagrid-table .dx-row .dx-command-edit-with-icons .dx-link {
+  width: 18px;
+  height: 18px;
+  background-position: 0px 0px;
+  -webkit-background-size: 18px 18px;
+  -moz-background-size: 18px 18px;
+  background-size: 18px 18px;
+  padding: 0px;
+  font-size: 18px;
+  text-align: center;
+  line-height: 18px;
+  margin: 0 3px;
+}
 .dx-datagrid-edit-popup .dx-error-message {
   padding: 7px;
 }
@@ -6419,6 +6503,19 @@
 .dx-treelist .dx-error-row .dx-error-message {
   padding: 7px;
   padding-right: 35px;
+}
+.dx-treelist .dx-treelist-content .dx-treelist-table .dx-row .dx-command-edit-with-icons .dx-link {
+  width: 18px;
+  height: 18px;
+  background-position: 0px 0px;
+  -webkit-background-size: 18px 18px;
+  -moz-background-size: 18px 18px;
+  background-size: 18px 18px;
+  padding: 0px;
+  font-size: 18px;
+  text-align: center;
+  line-height: 18px;
+  margin: 0 3px;
 }
 .dx-treelist-edit-popup .dx-error-message {
   padding: 7px;
