@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.all.d.ts)
-* Version: 18.1.0 (build 18103)
-* Build date: Fri Apr 13 2018
+* Version: 18.1.2-pre-beta
+* Build date: Wed Apr 18 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -4505,7 +4505,6 @@ declare module DevExpress.ui {
         calculateGroupValue?: string | ((rowData: any) => any);
         /** An array of grid columns. */
         columns?: Array<dxDataGridColumn>;
-        command?: string | 'adaptive' | 'edit' | 'expand' | 'select';
         /** Specifies a custom template for group cells. */
         groupCellTemplate?: template | ((cellElement: DevExpress.core.dxElement, cellInfo: any) => any);
         /** Specifies the index of a column when grid records are grouped by the values of this column. */
@@ -4920,7 +4919,6 @@ declare module DevExpress.ui {
     export interface dxTreeListColumn extends GridBaseColumn {
         /** Configures columns. */
         columns?: Array<dxTreeListColumn>;
-        command?: string | 'adaptive' | 'edit';
     }
     /** This section describes the properties of a grid row. An object containing these properties comes to certain event-handling functions. */
     export interface dxDataGridRowObject {
