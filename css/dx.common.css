@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 17.2.7 (build 18103)
-* Build date: Apr 13, 2018
+* Version: 17.2.7 (build 18117)
+* Build date: Apr 27, 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -2219,6 +2219,9 @@
 }
 .dx-textarea .dx-placeholder {
   height: auto;
+}
+.dx-textarea .dx-placeholder:before {
+  white-space: normal;
 }
 .dx-numberbox {
   position: relative;
@@ -4562,6 +4565,14 @@ input.dx-hidden {
   margin-left: -2px;
   margin-top: -2px;
   height: 100%;
+  overflow: visible;
+}
+.dx-datagrid-filter-row .dx-menu .dx-menu-horizontal {
+  height: 100%;
+}
+.dx-datagrid-filter-row .dx-menu .dx-menu-horizontal .dx-menu-item-text,
+.dx-datagrid-filter-row .dx-menu .dx-menu-horizontal .dx-menu-item-popout {
+  display: none;
 }
 .dx-datagrid-filter-row .dx-menu-item.dx-state-focused:after {
   position: absolute;
@@ -4593,16 +4604,6 @@ input.dx-hidden {
 }
 .dx-datagrid-filter-row .dx-menu-item-highlight {
   font-weight: normal;
-}
-.dx-datagrid-filter-row .dx-menu {
-  overflow: visible;
-}
-.dx-datagrid-filter-row .dx-menu .dx-menu-horizontal {
-  height: 100%;
-}
-.dx-datagrid-filter-row .dx-menu .dx-menu-horizontal .dx-menu-item-text,
-.dx-datagrid-filter-row .dx-menu .dx-menu-horizontal .dx-menu-item-popout {
-  display: none;
 }
 .dx-datagrid-scroll-container {
   overflow: hidden;
@@ -5549,6 +5550,14 @@ input.dx-hidden {
   margin-left: -2px;
   margin-top: -2px;
   height: 100%;
+  overflow: visible;
+}
+.dx-treelist-filter-row .dx-menu .dx-menu-horizontal {
+  height: 100%;
+}
+.dx-treelist-filter-row .dx-menu .dx-menu-horizontal .dx-menu-item-text,
+.dx-treelist-filter-row .dx-menu .dx-menu-horizontal .dx-menu-item-popout {
+  display: none;
 }
 .dx-treelist-filter-row .dx-menu-item.dx-state-focused:after {
   position: absolute;
@@ -5580,16 +5589,6 @@ input.dx-hidden {
 }
 .dx-treelist-filter-row .dx-menu-item-highlight {
   font-weight: normal;
-}
-.dx-treelist-filter-row .dx-menu {
-  overflow: visible;
-}
-.dx-treelist-filter-row .dx-menu .dx-menu-horizontal {
-  height: 100%;
-}
-.dx-treelist-filter-row .dx-menu .dx-menu-horizontal .dx-menu-item-text,
-.dx-treelist-filter-row .dx-menu .dx-menu-horizontal .dx-menu-item-popout {
-  display: none;
 }
 .dx-treelist-scroll-container {
   overflow: hidden;

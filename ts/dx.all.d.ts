@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.all.d.ts)
-* Version: 17.2.7 (build 18103)
-* Build date: Fri Apr 13 2018
+* Version: 17.2.7 (build 18117)
+* Build date: Fri Apr 27 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -1302,7 +1302,7 @@ declare module DevExpress.data {
     /** Creates a Query instance for accessing a remote service by its URL. */
     export function query(url: string, queryOptions: any): Query;
     /** Encodes a string or an array of bytes to base64 encoding. */
-    export function base64encode(input: string | Array<number>): string;
+    export function base64_encode(input: string | Array<number>): string;
     /** An array of pivot grid fields. */
     export interface PivotGridDataSourceField {
         /** Specifies whether to allow the predefined summary post-processing functions ('absoluteVariation' and 'percentVariation') and runningTotal to take values of different groups into account. */

@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 17.2.7 (build 18103)
-* Build date: Apr 13, 2018
+* Version: 17.2.7 (build 18117)
+* Build date: Apr 27, 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -7681,20 +7681,6 @@
 .dx-datagrid-container .dx-icon-filter-operation-between:before {
   content: "\f06a";
 }
-.dx-datagrid .dx-menu-base .dx-menu-item .dx-menu-item-content {
-  padding: 8px 0px 0px 9px;
-}
-.dx-datagrid .dx-menu-base .dx-menu-item .dx-menu-item-content .dx-icon {
-  margin-right: 9px;
-  min-width: 16px;
-  height: 16px;
-}
-.dx-datagrid .dx-editor-with-menu .dx-filter-menu .dx-menu-item-content {
-  padding-top: 3px;
-}
-.dx-datagrid .dx-editor-with-menu .dx-filter-menu .dx-menu-item-content .dx-icon-filter-operation-default {
-  margin-top: 1px;
-}
 .dx-datagrid .dx-row-alt > td {
   background-color: #E5E5E5;
 }
@@ -7882,6 +7868,20 @@
 }
 .dx-datagrid-headers .dx-datagrid-drop-highlight.dx-row > td {
   background-color: #d9f5f9;
+}
+.dx-datagrid-filter-row .dx-menu-base .dx-menu-item .dx-menu-item-content {
+  padding: 8px 0px 0px 9px;
+}
+.dx-datagrid-filter-row .dx-menu-base .dx-menu-item .dx-menu-item-content .dx-icon {
+  margin-right: 9px;
+  min-width: 16px;
+  height: 16px;
+}
+.dx-datagrid-filter-row .dx-editor-with-menu .dx-filter-menu .dx-menu-item-content {
+  padding-top: 3px;
+}
+.dx-datagrid-filter-row .dx-editor-with-menu .dx-filter-menu .dx-menu-item-content .dx-icon-filter-operation-default {
+  margin-top: 1px;
 }
 .dx-datagrid-filter-row .dx-menu .dx-overlay-content {
   color: rgba(0, 0, 0, 0.87);
@@ -8250,10 +8250,10 @@
 .dx-rtl .dx-datagrid-rowsview .dx-selection.dx-row:hover > td:not(.dx-focused).dx-datagrid-group-space {
   border-left-color: #d9f5f9;
 }
-.dx-rtl .dx-datagrid .dx-menu .dx-menu-item .dx-menu-item-content {
+.dx-rtl .dx-datagrid-filter-row .dx-menu .dx-menu-item .dx-menu-item-content {
   padding: 8px 9px 6px 10px;
 }
-.dx-rtl .dx-datagrid .dx-menu .dx-menu-item .dx-menu-item-content .dx-icon {
+.dx-rtl .dx-datagrid-filter-row .dx-menu .dx-menu-item .dx-menu-item-content .dx-icon {
   margin: 0px;
 }
 .dx-datagrid-group-panel {
@@ -8504,20 +8504,6 @@
 .dx-treelist-container .dx-icon-filter-operation-between:before {
   content: "\f06a";
 }
-.dx-treelist .dx-menu-base .dx-menu-item .dx-menu-item-content {
-  padding: 8px 0px 0px 9px;
-}
-.dx-treelist .dx-menu-base .dx-menu-item .dx-menu-item-content .dx-icon {
-  margin-right: 9px;
-  min-width: 16px;
-  height: 16px;
-}
-.dx-treelist .dx-editor-with-menu .dx-filter-menu .dx-menu-item-content {
-  padding-top: 3px;
-}
-.dx-treelist .dx-editor-with-menu .dx-filter-menu .dx-menu-item-content .dx-icon-filter-operation-default {
-  margin-top: 1px;
-}
 .dx-treelist .dx-row-alt > td {
   background-color: #E5E5E5;
 }
@@ -8705,6 +8691,20 @@
 }
 .dx-treelist-headers .dx-treelist-drop-highlight.dx-row > td {
   background-color: #d9f5f9;
+}
+.dx-treelist-filter-row .dx-menu-base .dx-menu-item .dx-menu-item-content {
+  padding: 8px 0px 0px 9px;
+}
+.dx-treelist-filter-row .dx-menu-base .dx-menu-item .dx-menu-item-content .dx-icon {
+  margin-right: 9px;
+  min-width: 16px;
+  height: 16px;
+}
+.dx-treelist-filter-row .dx-editor-with-menu .dx-filter-menu .dx-menu-item-content {
+  padding-top: 3px;
+}
+.dx-treelist-filter-row .dx-editor-with-menu .dx-filter-menu .dx-menu-item-content .dx-icon-filter-operation-default {
+  margin-top: 1px;
 }
 .dx-treelist-filter-row .dx-menu .dx-overlay-content {
   color: rgba(0, 0, 0, 0.87);
@@ -9073,10 +9073,10 @@
 .dx-rtl .dx-treelist-rowsview .dx-selection.dx-row:hover > td:not(.dx-focused).dx-treelist-group-space {
   border-left-color: #d9f5f9;
 }
-.dx-rtl .dx-treelist .dx-menu .dx-menu-item .dx-menu-item-content {
+.dx-rtl .dx-treelist-filter-row .dx-menu .dx-menu-item .dx-menu-item-content {
   padding: 8px 9px 6px 10px;
 }
-.dx-rtl .dx-treelist .dx-menu .dx-menu-item .dx-menu-item-content .dx-icon {
+.dx-rtl .dx-treelist-filter-row .dx-menu .dx-menu-item .dx-menu-item-content .dx-icon {
   margin: 0px;
 }
 .dx-treelist-rowsview .dx-treelist-table:not(.dx-treelist-table-fixed) .dx-treelist-empty-space {
