@@ -1,9 +1,9 @@
 /*! 
 * DevExtreme
-* Version: 16.1.14
-* Build date: Nov 3, 2017
+* Version: 16.1.15
+* Build date: May 3, 2018
 *
-* Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
+* Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
 */
 
