@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.all.d.ts)
-* Version: 18.1.2-pre-beta
-* Build date: Wed Apr 18 2018
+* Version: 18.1.3
+* Build date: Tue May 15 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -541,12 +541,16 @@ declare module DevExpress {
     export type event = dxEvent | JQueryEventObject; 
     /** An object that serves as a namespace for the methods that are used to localize an application. */
     export class localization {
-        /** Loads DevExtreme messages. */
+        static formatDate(value: Date, format: DevExpress.ui.format): string;
+        static formatMessage(key: string, value: string | Array<string>): string;
+        static formatNumber(value: number, format: DevExpress.ui.format): string;
         static loadMessages(messages: any): void;
         /** Gets the current locale identifier. */
         static locale(): string;
         /** Sets the current locale identifier. */
         static locale(locale: string): void;
+        static parseDate(text: string, format: DevExpress.ui.format): Date;
+        static parseNumber(text: string, format: DevExpress.ui.format): number;
     }
     /** Defines animation options. */
     export interface animationConfig {
@@ -1177,7 +1181,7 @@ declare module DevExpress.data {
         /** Specifies the type of the key property or properties. */
         keyType?: 'String' | 'Int32' | 'Int64' | 'Guid' | 'Boolean' | 'Single' | 'Decimal' | any;
         /** A handler for the loading event. */
-        onLoading?: any;
+        onLoading?: ((loadOptions: LoadOptions) => any);
         /** Specifies the URL of the OData entity to access. */
         url?: string;
         /** Specifies the version of the OData protocol used to interact with the data service. */
@@ -1296,7 +1300,7 @@ declare module DevExpress.data {
     /** Creates a Query instance for accessing a remote service by its URL. */
     export function query(url: string, queryOptions: any): Query;
     /** Encodes a string or an array of bytes to base64 encoding. */
-    export function base64encode(input: string | Array<number>): string;
+    export function base64_encode(input: string | Array<number>): string;
     /** An array of pivot grid fields. */
     export interface PivotGridDataSourceField {
         /** Specifies whether to allow the predefined summary post-processing functions ('absoluteVariation' and 'percentVariation') and runningTotal to take values of different groups into account. */
@@ -2273,7 +2277,7 @@ declare module DevExpress.ui {
         /** Specifies filters for the rows that must be selected initially. Applies only if selection.deferred is true. */
         selectionFilter?: string | Array<any> | Function;
         /** Allows you to sort groups according to the values of group summary items. */
-        sortByGroupSummaryInfo?: Array<{ summaryItem?: string | number, groupColumn?: string, sortOrder?: undefined | 'asc' | 'desc' }>;
+        sortByGroupSummaryInfo?: Array<{ summaryItem?: string | number, groupColumn?: string, sortOrder?: 'asc' | 'desc' }>;
         /** Specifies the options of the grid summary. */
         summary?: { groupItems?: Array<{ name?: string, column?: string, summaryType?: 'avg' | 'count' | 'custom' | 'max' | 'min' | 'sum', valueFormat?: format, precision?: number, displayFormat?: string, customizeText?: ((itemInfo: { value?: string | number | Date, valueText?: string }) => string), showInGroupFooter?: boolean, alignByColumn?: boolean, showInColumn?: string, skipEmptyValues?: boolean }>, totalItems?: Array<{ name?: string, column?: string, showInColumn?: string, summaryType?: 'avg' | 'count' | 'custom' | 'max' | 'min' | 'sum', valueFormat?: format, precision?: number, displayFormat?: string, customizeText?: ((itemInfo: { value?: string | number | Date, valueText?: string }) => string), alignment?: 'center' | 'left' | 'right', cssClass?: string, skipEmptyValues?: boolean }>, calculateCustomSummary?: ((options: { component?: dxDataGrid, name?: string, summaryProcess?: string, value?: any, totalValue?: any }) => any), skipEmptyValues?: boolean, texts?: { sum?: string, sumOtherColumn?: string, min?: string, minOtherColumn?: string, max?: string, maxOtherColumn?: string, avg?: string, avgOtherColumn?: string, count?: string } };
     }
@@ -2811,22 +2815,26 @@ declare module DevExpress.ui {
         delay?: number;
         /** Specifies whether or not the widget can be focused. */
         focusStateEnabled?: boolean;
-        /** Specified the widget's height. */
-        height?: number;
+        /** Specifies the widget's height in pixels. */
+        height?: number | string | (() => number | string);
         /** A URL pointing to an image to be used as a load indicator. */
         indicatorSrc?: string;
+        /** Specifies the maximum height the widget can reach while resizing. */
+        maxHeight?: number | string | (() => number | string);
+        /** Specifies the maximum width the widget can reach while resizing. */
+        maxWidth?: number | string | (() => number | string);
         /** The text displayed in the load panel. */
         message?: string;
         /** Positions the widget. */
         position?: 'bottom' | 'center' | 'left' | 'left bottom' | 'left top' | 'right' | 'right bottom' | 'right top' | 'top' | positionConfig | Function;
         /** Specifies the shading color. */
-        shadingColor?: any;
+        shadingColor?: string;
         /** A Boolean value specifying whether or not to show a load indicator. */
         showIndicator?: boolean;
         /** A Boolean value specifying whether or not to show the pane behind the load indicator. */
         showPane?: boolean;
-        /** Specifies the widget's width. */
-        width?: number;
+        /** Specifies the widget's width in pixels. */
+        width?: number | string | (() => number | string);
     }
     /** Configures widget visibility animations. This object contains two fields: show and hide. */
     export interface dxLoadPanelAnimation extends dxOverlayAnimation {
@@ -2933,7 +2941,7 @@ declare module DevExpress.ui {
         /** Specifies whether the widget can be focused using keyboard navigation. */
         focusStateEnabled?: boolean;
         /** Specifies the widget's height. */
-        height?: any;
+        height?: number | string | (() => number | string);
         /** A key used to authenticate the application within the required map provider. */
         key?: string | { bing?: string, google?: string, googleStatic?: string };
         /** A URL pointing to the custom icon to be used for map markers. */
@@ -2959,7 +2967,7 @@ declare module DevExpress.ui {
         /** The type of a map to display. */
         type?: 'hybrid' | 'roadmap' | 'satellite';
         /** Specifies the widget's width. */
-        width?: any;
+        width?: number | string | (() => number | string);
         /** The zoom level of the map. */
         zoom?: number;
     }
@@ -3033,7 +3041,7 @@ declare module DevExpress.ui {
     }
     export interface dxNavBarOptions extends dxTabsOptions {
         /** Specifies whether or not an end-user can scroll tabs by swiping. */
-        scrollByContent?: any;
+        scrollByContent?: boolean;
     }
     /** The NavBar is a widget that navigates the application views. */
     export class dxNavBar extends dxTabs {
@@ -3252,8 +3260,9 @@ declare module DevExpress.ui {
         updateDimensions(): void;
     }
     export interface dxPivotGridFieldChooserOptions extends WidgetOptions {
-        /** Specifies whether searching is enabled in the field chooser. */
+        /** Specifies whether the field chooser allows searching in the "All Fields" section. */
         allowSearch?: boolean;
+        /** Specifies when to apply changes made in the widget to the PivotGrid. */
         applyChangesMode?: 'instantly' | 'onDemand';
         /** The data source of a PivotGrid widget. */
         dataSource?: DevExpress.data.PivotGridDataSource;
@@ -3265,6 +3274,7 @@ declare module DevExpress.ui {
         layout?: 0 | 1 | 2;
         /** A handler for the contextMenuPreparing event. */
         onContextMenuPreparing?: ((e: { component?: DOMComponent, element?: DevExpress.core.dxElement, model?: any, items?: Array<any>, area?: string, field?: DevExpress.data.PivotGridDataSourceField, jQueryEvent?: JQueryEventObject, event?: event }) => any);
+        /** The widget's state. */
         state?: any;
         /** Strings that can be changed or localized in the PivotGridFieldChooser widget. */
         texts?: { columnFields?: string, rowFields?: string, dataFields?: string, filterFields?: string, allFields?: string };
@@ -3273,7 +3283,9 @@ declare module DevExpress.ui {
     export class dxPivotGridFieldChooser extends Widget {
         constructor(element: Element, options?: dxPivotGridFieldChooserOptions)
         constructor(element: JQuery, options?: dxPivotGridFieldChooserOptions)
+        /** Applies changes made in the widget to the PivotGrid. Takes effect only if applyChangesMode is "onDemand". */
         applyChanges(): void;
+        /** Cancels changes made in the widget without applying them to the PivotGrid. Takes effect only if applyChangesMode is "onDemand". */
         cancelChanges(): void;
         /** Gets the PivotGridDataSource instance. */
         getDataSource(): DevExpress.data.PivotGridDataSource;
@@ -3284,7 +3296,7 @@ declare module DevExpress.ui {
         /** Configures widget visibility animations. This object contains two fields: show and hide. */
         animation?: dxPopoverAnimation;
         /** A Boolean value specifying whether or not the widget is closed if a user clicks outside of the popover window and outside the target element. */
-        closeOnOutsideClick?: any;
+        closeOnOutsideClick?: boolean | ((event: event) => boolean);
         /** Specifies the widget's height. */
         height?: number | string | (() => number | string);
         /** Specifies options of popover hiding. */
@@ -3320,7 +3332,7 @@ declare module DevExpress.ui {
     }
     export interface dxPopupOptions extends dxOverlayOptions {
         /** Configures widget visibility animations. This object contains two fields: show and hide. */
-        animation?: any;
+        animation?: dxPopupAnimation;
         /** Specifies the container in which to place the widget. */
         container?: string | Element | JQuery;
         /** Specifies whether or not to allow a user to drag the popup window. */
@@ -3330,7 +3342,7 @@ declare module DevExpress.ui {
         /** A Boolean value specifying whether or not to display the widget in full-screen mode. */
         fullScreen?: boolean;
         /** Specifies the widget's height in pixels. */
-        height?: any;
+        height?: number | string | (() => number | string);
         /** A handler for the resize event. */
         onResize?: ((e: { component?: DOMComponent, element?: DevExpress.core.dxElement, model?: any }) => any);
         /** A handler for the resizeEnd event. */
@@ -3354,14 +3366,14 @@ declare module DevExpress.ui {
         /** Specifies items displayed on the top or bottom toolbar of the popup window. */
         toolbarItems?: Array<dxPopupToolbarItem>;
         /** Specifies the widget's width in pixels. */
-        width?: any;
+        width?: number | string | (() => number | string);
     }
     /** Configures widget visibility animations. This object contains two fields: show and hide. */
     export interface dxPopupAnimation extends dxOverlayAnimation {
         /** An object that defines the animation options used when the widget is being hidden. */
-        hide?: any;
+        hide?: animationConfig;
         /** An object that defines the animation options used when the widget is being shown. */
-        show?: any;
+        show?: animationConfig;
     }
     /** Specifies items displayed on the top or bottom toolbar of the popup window. */
     export interface dxPopupToolbarItem {
@@ -3450,7 +3462,7 @@ declare module DevExpress.ui {
         /** Specifies which borders of the widget element are used as a handle. */
         handles?: 'top' | 'bottom' | 'right' | 'left' | 'all';
         /** Specifies the widget's height. */
-        height?: any;
+        height?: number | string | (() => number | string);
         /** Specifies the upper height boundary for resizing. */
         maxHeight?: number;
         /** Specifies the upper width boundary for resizing. */
@@ -3466,7 +3478,7 @@ declare module DevExpress.ui {
         /** A handler for the resizeStart event. */
         onResizeStart?: ((e: { component?: DOMComponent, element?: DevExpress.core.dxElement, model?: any, jQueryEvent?: JQueryEventObject, event?: event, width?: number, height?: number }) => any);
         /** Specifies the widget's width. */
-        width?: any;
+        width?: number | string | (() => number | string);
     }
     /** The Resizable widget enables its content to be resizable in the UI. */
     export class dxResizable extends DOMComponent {
@@ -3477,7 +3489,7 @@ declare module DevExpress.ui {
         /** Specifies the collection of columns for the grid used to position layout elements. */
         cols?: Array<{ baseSize?: number | 'auto', shrink?: number, ratio?: number, screen?: string }>;
         /** Specifies the widget's height. */
-        height?: any;
+        height?: number | string | (() => number | string);
         /** Specifies the collection of rows for the grid used to position layout elements. */
         rows?: Array<{ baseSize?: number | 'auto', shrink?: number, ratio?: number, screen?: string }>;
         /** Specifies the function returning the size qualifier depending on the screen's width. */
@@ -3485,7 +3497,7 @@ declare module DevExpress.ui {
         /** Specifies on which screens all layout elements should be arranged in a single column. Accepts a single or several size qualifiers separated by a space. */
         singleColumnScreen?: string;
         /** Specifies the widget's width. */
-        width?: any;
+        width?: number | string | (() => number | string);
     }
     /** The ResponsiveBox widget allows you to create an application or a website with a layout adapted to different screen sizes. */
     export class dxResponsiveBox extends CollectionWidget {
@@ -3586,6 +3598,7 @@ declare module DevExpress.ui {
         resourceCellTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery);
         /** Specifies an array of resources available in the scheduler. */
         resources?: Array<{ fieldExpr?: string, colorExpr?: string, label?: string, allowMultiple?: boolean, useColorAsDefault?: boolean, valueExpr?: string | Function, displayExpr?: string | Function, dataSource?: string | Array<any> | DevExpress.data.DataSource | DevExpress.data.DataSourceOptions }>;
+        /** Currently selected cells' data. */
         selectedCellData?: Array<any>;
         /** Specifies whether to apply shading to cover the timetable up to the current time. */
         shadeUntilCurrentTime?: boolean;
@@ -3947,19 +3960,19 @@ declare module DevExpress.ui {
         /** A Boolean value specifying whether or not the toast is closed if a user clicks it. */
         closeOnClick?: boolean;
         /** Specifies whether to close the widget if a user clicks outside it. */
-        closeOnOutsideClick?: any;
+        closeOnOutsideClick?: boolean | ((event: event) => boolean);
         /** A Boolean value specifying whether or not the toast is closed if a user swipes it out of the screen boundaries. */
         closeOnSwipe?: boolean;
         /** The time span in milliseconds during which the Toast widget is visible. */
         displayTime?: number;
         /** Specifies the widget's height in pixels. */
-        height?: any;
+        height?: number | string | (() => number | string);
         /** Specifies the maximum width the widget can reach while resizing. */
-        maxWidth?: any;
+        maxWidth?: number | string | (() => number | string);
         /** The Toast message text. */
         message?: string;
         /** Specifies the minimum width the widget can reach while resizing. */
-        minWidth?: any;
+        minWidth?: number | string | (() => number | string);
         /** Positions the widget. */
         position?: positionConfig | string;
         /** A Boolean value specifying whether or not the main screen is inactive while the widget is active. */
@@ -3967,7 +3980,7 @@ declare module DevExpress.ui {
         /** Specifies the Toast widget type. */
         type?: 'custom' | 'error' | 'info' | 'success' | 'warning';
         /** Specifies the widget's width in pixels. */
-        width?: any;
+        width?: number | string | (() => number | string);
     }
     /** Configures widget visibility animations. This object contains two fields: show and hide. */
     export interface dxToastAnimation extends dxOverlayAnimation {
@@ -4662,7 +4675,7 @@ declare module DevExpress.ui {
         /** Specifies the false value text. Applies only if dataType is "boolean". */
         falseText?: string;
         /** Specifies a set of available filter operations. */
-        filterOperations?: Array<'=' | '<>' | '<' | '<=' | '>' | '>=' | 'contains' | 'endswith' | 'isblank' | 'isnotblank' | 'notcontains' | 'startswith' | 'between' | '=' | '<>' | '<' | '<=' | '>' | '>=' | 'contains' | 'endswith' | 'isblank' | 'isnotblank' | 'notcontains' | 'startswith' | 'between'>;
+        filterOperations?: Array<'=' | '<>' | '<' | '<=' | '>' | '>=' | 'contains' | 'endswith' | 'isblank' | 'isnotblank' | 'notcontains' | 'startswith' | 'between' | string>;
         /** Formats a value before it is displayed. */
         format?: format;
         /** Configures the lookup field. */
@@ -5159,7 +5172,7 @@ declare module DevExpress.ui {
         /** Specifies whether or not the widget changes its state when interacting with a user. */
         activeStateEnabled?: boolean;
         /** Specifies whether the widget can be focused using keyboard navigation. */
-        focusStateEnabled?: any;
+        focusStateEnabled?: boolean;
         /** Specifies whether the widget changes its state when a user pauses on it. */
         hoverStateEnabled?: boolean;
         /** Specifies the step by which a handle moves when a user presses Page Up or Page Down. */
@@ -5356,7 +5369,7 @@ declare module DevExpress.ui {
     /** A template notation used to specify templates for widget elements. */
     export type template = string | Function | Element | JQuery; 
     /** Formats values. */
-    export type format = string | ((value: number | Date) => string) | { type?: 'billions' | 'currency' | 'day' | 'decimal' | 'exponential' | 'fixedPoint' | 'largeNumber' | 'longDate' | 'longTime' | 'millions' | 'millisecond' | 'month' | 'monthAndDay' | 'monthAndYear' | 'percent' | 'quarter' | 'quarterAndYear' | 'shortDate' | 'shortTime' | 'thousands' | 'trillions' | 'year' | 'dayOfWeek' | 'hour' | 'longDateLongTime' | 'minute' | 'second' | 'shortDateShortTime', precision?: number, currency?: string, formatter?: ((value: number | Date) => string), parser?: ((value: string) => number | Date) }; 
+    export type format = 'billions' | 'currency' | 'day' | 'decimal' | 'exponential' | 'fixedPoint' | 'largeNumber' | 'longDate' | 'longTime' | 'millions' | 'millisecond' | 'month' | 'monthAndDay' | 'monthAndYear' | 'percent' | 'quarter' | 'quarterAndYear' | 'shortDate' | 'shortTime' | 'thousands' | 'trillions' | 'year' | 'dayOfWeek' | 'hour' | 'longDateLongTime' | 'minute' | 'second' | 'shortDateShortTime' | string | ((value: number | Date) => string) | { type?: 'billions' | 'currency' | 'day' | 'decimal' | 'exponential' | 'fixedPoint' | 'largeNumber' | 'longDate' | 'longTime' | 'millions' | 'millisecond' | 'month' | 'monthAndDay' | 'monthAndYear' | 'percent' | 'quarter' | 'quarterAndYear' | 'shortDate' | 'shortTime' | 'thousands' | 'trillions' | 'year' | 'dayOfWeek' | 'hour' | 'longDateLongTime' | 'minute' | 'second' | 'shortDateShortTime', precision?: number, currency?: string, formatter?: ((value: number | Date) => string), parser?: ((value: string) => number | Date) }; 
     /** An object that serves as a namespace for methods displaying a message in an application/site. */
     export class dialog {
         /** Creates an alert dialog message containing a single "OK" button. */
@@ -5403,7 +5416,7 @@ declare module DevExpress.viz {
         /** Specifies the widget's size in pixels. */
         size?: BaseWidgetSize;
         /** Sets the name of the theme the widget uses. */
-        theme?: 'generic.light' | 'generic.dark' | 'generic.contrast' | 'generic.carmine' | 'generic.darkmoon' | 'generic.softblue' | 'generic.darkviolet' | 'generic.greenmist' | 'android5.light' | 'ios7.default';
+        theme?: 'android5.light' | 'generic.dark' | 'generic.light' | 'generic.contrast' | 'ios7.default' | 'win10.black' | 'win10.white' | 'win8.black' | 'win8.white' | 'generic.carmine' | 'generic.darkmoon' | 'generic.darkviolet' | 'generic.greenmist' | 'generic.softblue' | 'material.blue.light' | 'material.lime.light' | 'material.orange.light' | 'material.purple.light' | 'material.teal.light';
         /** Configures the widget's title. */
         title?: BaseWidgetTitle | string;
         /** Configures tooltips - small pop-up rectangles that display information about a data-visualizing widget element being pressed or hovered over with the mouse pointer. */
@@ -5419,6 +5432,7 @@ declare module DevExpress.viz {
         fileName?: string;
         /** Specifies a set of formats available for exporting into. */
         formats?: Array<string>;
+        margin?: number;
         /** Enables the printing feature in the widget. Applies only if the export.enabled option is true. */
         printingEnabled?: boolean;
         /** Specifies the URL of the server-side proxy that streams the resulting file to the end user to enable exporting in the Safari browser. */
@@ -5892,7 +5906,7 @@ declare module DevExpress.viz {
     interface dxChartSeriesTypesCommonSeriesLabel {
         /** Aligns point labels in relation to their points. */
         alignment?: 'center' | 'left' | 'right';
-        /** Formats the point argument before it will be displayed in the point label. */
+        /** Formats the point argument before it is displayed in the point label. To format the point value, use the format option. */
         argumentFormat?: DevExpress.ui.format;
         /** @deprecated Use the series.label.argumentFormat.precision instead. */
         argumentPrecision?: number;
@@ -6703,15 +6717,15 @@ declare module DevExpress.viz {
         clearSelection(): void;
         /** Deselects the specified point. The point is displayed in an initial style. */
         deselectPoint(point: basePointObject): void;
-        /** Returns an array of all points in the series. */
+        /** Gets all points in the series. */
         getAllPoints(): Array<basePointObject>;
         /** Gets the color of a particular series. */
         getColor(): string;
-        /** Gets a point from the series point collection based on the specified point position. */
+        /** Gets a series point with the specified index. */
         getPointByPos(positionIndex: number): basePointObject;
-        /** Gets points from the series point collection based on the specified argument. */
+        /** Gets a series point with the specified argument value. */
         getPointsByArg(pointArg: number | string | Date): Array<basePointObject>;
-        /** Returns visible series points. */
+        /** Gets visible series points. */
         getVisiblePoints(): Array<basePointObject>;
         /** Hides a series at runtime. */
         hide(): void;
@@ -6732,6 +6746,7 @@ declare module DevExpress.viz {
     }
     /** This section describes the Point object, which represents a series point. */
     export class basePointObject {
+        /** Contains the data object that the series point represents. */
         data: any;
         /** Provides information about the state of the point object. */
         fullState: number;
@@ -7110,7 +7125,7 @@ declare module DevExpress.viz {
     }
     /** An object defining the label configuration options. */
     export interface dxPolarChartSeriesTypesCommonPolarChartSeriesLabel {
-        /** Specifies a format for arguments displayed by point labels. */
+        /** Formats the point argument before it is displayed in the point label. To format the point value, use the format option. */
         argumentFormat?: DevExpress.ui.format;
         /** @deprecated Use the series.label.argumentFormat.precision instead. */
         argumentPrecision?: number;
@@ -7613,7 +7628,7 @@ declare module DevExpress.viz.charts {
         /** Adds a pixel-measured empty space between an axis and its labels. */
         indentFromAxis?: number;
         /** Decides how to arrange axis labels when there is not enough space to keep all of them. */
-        overlappingBehavior?: 'stagger' | 'rotate' | 'hide' | 'none' | { mode?: 'stagger' | 'rotate' | 'hide' | 'none', rotationAngle?: number, staggeringSpacing?: number };
+        overlappingBehavior?: 'stagger' | 'rotate' | 'hide' | 'none' | 'ignore' | 'enlargeTickInterval' | { mode?: 'stagger' | 'rotate' | 'hide' | 'none' | 'ignore' | 'enlargeTickInterval', rotationAngle?: number, staggeringSpacing?: number };
         /** Specifies the rotation angle of axis labels. Applies only if displayMode or overlappingBehavior is "rotate". */
         rotationAngle?: number;
         /** Adds a pixel-measured empty space between two staggered rows of axis labels. Applies only if displayMode or overlappingBehavior is "stagger". */
@@ -8100,7 +8115,7 @@ declare module DevExpress.viz.charts {
         /** Specifies the spacing between an axis and its labels in pixels. */
         indentFromAxis?: number;
         /** Decides how to arrange axis labels when there is not enough space to keep all of them. */
-        overlappingBehavior?: 'hide' | 'none';
+        overlappingBehavior?: 'hide' | 'none' | 'ignore' | 'enlargeTickInterval';
         /** Indicates whether or not axis labels are visible. */
         visible?: boolean;
     }
@@ -8330,7 +8345,7 @@ declare module DevExpress.viz.charts {
     }
     /** Configures tooltips. */
     interface BaseChartTooltip extends BaseWidgetTooltip {
-        /** Specifies a format for arguments of the chart's series points. */
+        /** Formats the point argument before it is displayed in the tooltip. To format the point value, use the format option. */
         argumentFormat?: DevExpress.ui.format;
         /** @deprecated Use the tooltip.argumentFormat.precision option instead. */
         argumentPrecision?: number;
@@ -8412,7 +8427,7 @@ declare module DevExpress.viz.gauges {
         /** Specifies a set of subvalues to be designated by the subvalue indicators. */
         subvalues?: Array<number>;
         /** Configures the widget's title. */
-        title?: any;
+        title?: BaseGaugeTitle | string;
         /** Configures tooltips. */
         tooltip?: BaseGaugeTooltip;
         /** Specifies the main value on a gauge. */
@@ -8644,7 +8659,7 @@ declare module DevExpress.viz.gauges {
         /** @deprecated Use the title.subtitle option instead. */
         subtitle?: any | string;
         /** Configures the widget's title. */
-        title?: any;
+        title?: dxBarGaugeTitle | string;
         /** Configures tooltips. */
         tooltip?: dxBarGaugeTooltip;
         /** Specifies the array of values to be indicated on a bar gauge. */

@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.messages.ru.js)
-* Version: 18.1.2-pre-beta
-* Build date: Wed Apr 18 2018
+* Version: 18.1.3
+* Build date: Tue May 15 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -251,6 +251,7 @@
             "dxFilterBuilder-filterOperationEndsWith": "Заканчивается на",
             "dxFilterBuilder-filterOperationIsBlank": "Пусто",
             "dxFilterBuilder-filterOperationIsNotBlank": "Не пусто",
+            "dxFilterBuilder-filterOperationBetween": "В диапазоне",
             "dxFilterBuilder-filterOperationAnyOf": "Любой из",
             "dxFilterBuilder-filterOperationNoneOf": "Ни один из"
         }

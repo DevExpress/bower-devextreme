@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.messages.zh.js)
-* Version: 18.1.2-pre-beta
-* Build date: Wed Apr 18 2018
+* Version: 18.1.3
+* Build date: Tue May 15 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -153,10 +153,10 @@
             "dxDataGrid-ariaSearchInGrid": "在数据网格中搜索",
             "dxDataGrid-ariaSelectAll": "全选",
             "dxDataGrid-ariaSelectRow": "选择行",
-            "dxDataGrid-filterBuilderPopupTitle": "!TODO",
-            "dxDataGrid-filterPanelCreateFilter": "!TODO",
-            "dxDataGrid-filterPanelClearFilter": "!TODO",
-            "dxDataGrid-filterPanelFilterEnabledHint": "!TODO",
+            "dxDataGrid-filterBuilderPopupTitle": "过滤器生成器",
+            "dxDataGrid-filterPanelCreateFilter": "创建过滤器",
+            "dxDataGrid-filterPanelClearFilter": "清空",
+            "dxDataGrid-filterPanelFilterEnabledHint": "启用该过滤器",
             "dxTreeList-ariaTreeList": "树列表",
             "dxTreeList-editingAddRowToNode": "添加",
             "dxPager-infoText": "第{0}页,共{1}页 ({2} 项目)",
@@ -251,8 +251,9 @@
             "dxFilterBuilder-filterOperationEndsWith": "结束于",
             "dxFilterBuilder-filterOperationIsBlank": "空",
             "dxFilterBuilder-filterOperationIsNotBlank": "不为空",
-            "dxFilterBuilder-filterOperationAnyOf": "!TODO",
-            "dxFilterBuilder-filterOperationNoneOf": "!TODO"
+            "dxFilterBuilder-filterOperationBetween": "之间",
+            "dxFilterBuilder-filterOperationAnyOf": "任何一个",
+            "dxFilterBuilder-filterOperationNoneOf": "任何一个都不"
         }
     })
 });

@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.messages.en.js)
-* Version: 18.1.2-pre-beta
-* Build date: Wed Apr 18 2018
+* Version: 18.1.3
+* Build date: Tue May 15 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -241,18 +241,19 @@
             "dxFilterBuilder-enterValueText": "<enter a value>",
             "dxFilterBuilder-filterOperationEquals": "Equals",
             "dxFilterBuilder-filterOperationNotEquals": "Does not equal",
-            "dxFilterBuilder-filterOperationLess": "Less than",
-            "dxFilterBuilder-filterOperationLessOrEquals": "Less than or equal to",
-            "dxFilterBuilder-filterOperationGreater": "Greater than",
-            "dxFilterBuilder-filterOperationGreaterOrEquals": "Greater than or equal to",
+            "dxFilterBuilder-filterOperationLess": "Is less than",
+            "dxFilterBuilder-filterOperationLessOrEquals": "Is less than or equal to",
+            "dxFilterBuilder-filterOperationGreater": "Is greater than",
+            "dxFilterBuilder-filterOperationGreaterOrEquals": "Is greater than or equal to",
             "dxFilterBuilder-filterOperationStartsWith": "Starts with",
             "dxFilterBuilder-filterOperationContains": "Contains",
             "dxFilterBuilder-filterOperationNotContains": "Does not contain",
             "dxFilterBuilder-filterOperationEndsWith": "Ends with",
             "dxFilterBuilder-filterOperationIsBlank": "Is blank",
             "dxFilterBuilder-filterOperationIsNotBlank": "Is not blank",
-            "dxFilterBuilder-filterOperationAnyOf": "Any of",
-            "dxFilterBuilder-filterOperationNoneOf": "None of"
+            "dxFilterBuilder-filterOperationBetween": "Is between",
+            "dxFilterBuilder-filterOperationAnyOf": "Is any of",
+            "dxFilterBuilder-filterOperationNoneOf": "Is none of"
         }
     })
 });

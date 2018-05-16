@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.messages.de.js)
-* Version: 18.1.2-pre-beta
-* Build date: Wed Apr 18 2018
+* Version: 18.1.3
+* Build date: Tue May 15 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -153,10 +153,10 @@
             "dxDataGrid-ariaSearchInGrid": "Suchen in der Datentabelle",
             "dxDataGrid-ariaSelectAll": "Alle auswählen",
             "dxDataGrid-ariaSelectRow": "Zeile auswählen",
-            "dxDataGrid-filterBuilderPopupTitle": "!TODO",
-            "dxDataGrid-filterPanelCreateFilter": "!TODO",
-            "dxDataGrid-filterPanelClearFilter": "!TODO",
-            "dxDataGrid-filterPanelFilterEnabledHint": "!TODO",
+            "dxDataGrid-filterBuilderPopupTitle": "Filter-Generator",
+            "dxDataGrid-filterPanelCreateFilter": "Filter erzeugen",
+            "dxDataGrid-filterPanelClearFilter": "Zurücksetzen",
+            "dxDataGrid-filterPanelFilterEnabledHint": "Filter aktivieren",
             "dxTreeList-ariaTreeList": "Strukturliste",
             "dxTreeList-editingAddRowToNode": "Hinzufügen",
             "dxPager-infoText": "Seite {0} von {1} ({2} Elemente)",
@@ -251,8 +251,9 @@
             "dxFilterBuilder-filterOperationEndsWith": "Endet mit",
             "dxFilterBuilder-filterOperationIsBlank": "Ist leer",
             "dxFilterBuilder-filterOperationIsNotBlank": "Ist nicht leer",
-            "dxFilterBuilder-filterOperationAnyOf": "!TODO",
-            "dxFilterBuilder-filterOperationNoneOf": "!TODO"
+            "dxFilterBuilder-filterOperationBetween": "Zwischen",
+            "dxFilterBuilder-filterOperationAnyOf": "Ist enthalten in",
+            "dxFilterBuilder-filterOperationNoneOf": "Ist nicht enthalten in"
         }
     })
 });
