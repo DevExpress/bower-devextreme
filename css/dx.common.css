@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 17.1.11
-* Build date: May 3, 2018
+* Version: 17.1.11 (build 18143)
+* Build date: May 23, 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -657,6 +657,8 @@
   -webkit-touch-callout: none;
   padding: 0;
   outline: 0;
+  -webkit-print-color-adjust: exact;
+  color-adjust: exact;
 }
 .dx-widget,
 .dx-widget:before,
@@ -4060,7 +4062,7 @@
   left: 13px;
   border: 1px solid;
 }
-.dx-colorbox-input-container .dx-colorbox-input {
+.dx-colorbox-input-container .dx-colorbox-input.dx-texteditor-input {
   -webkit-appearance: none;
   padding-left: 40px;
 }
