@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 17.2.8 (build 18143)
-* Build date: May 23, 2018
+* Version: 17.2.8 (build 18150)
+* Build date: May 30, 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -1766,6 +1766,7 @@
   width: 34px;
   position: relative;
   cursor: pointer;
+  text-align: justify;
 }
 .dx-clear-button-area .dx-icon-clear {
   position: absolute;
