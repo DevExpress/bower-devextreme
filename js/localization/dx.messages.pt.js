@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.messages.pt.js)
-* Version: 17.2.8 (build 18150)
-* Build date: Wed May 30 2018
+* Version: 17.2.8 (build 18151)
+* Build date: Thu May 31 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
