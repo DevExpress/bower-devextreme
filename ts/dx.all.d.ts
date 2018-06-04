@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.all.d.ts)
-* Version: 18.1.3
-* Build date: Tue May 15 2018
+* Version: 18.1.3 (build 18155)
+* Build date: Mon Jun 04 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -16,7 +16,13 @@ interface JQueryCallback {
 interface JQueryEventObject {
     cancel?: boolean;
 }
+interface PromiseLike<T> {
+}
 interface Promise<T> {
+    then<TResult1 = T, TResult2 = never>(
+        onfulfilled?: ((value: T, extraParameters: T) => TResult1 | PromiseLike<TResult1>) | undefined | null,
+        onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null
+    ): Promise<TResult1 | TResult2>;
 }
 /* #EndGlobalDeclaration */
 interface JQuery {
@@ -541,15 +547,21 @@ declare module DevExpress {
     export type event = dxEvent | JQueryEventObject; 
     /** An object that serves as a namespace for the methods that are used to localize an application. */
     export class localization {
+        /** Converts a Date object to a string using the specified format. */
         static formatDate(value: Date, format: DevExpress.ui.format): string;
+        /** Substitutes the provided value(s) for placeholders in a message that the key specifies. */
         static formatMessage(key: string, value: string | Array<string>): string;
+        /** Converts a numeric value to a string using the specified format. */
         static formatNumber(value: number, format: DevExpress.ui.format): string;
+        /** Loads localized messages. */
         static loadMessages(messages: any): void;
         /** Gets the current locale identifier. */
         static locale(): string;
         /** Sets the current locale identifier. */
         static locale(locale: string): void;
+        /** Parses a string into a Date object. */
         static parseDate(text: string, format: DevExpress.ui.format): Date;
+        /** Parses a string into a numeric value. */
         static parseNumber(text: string, format: DevExpress.ui.format): number;
     }
     /** Defines animation options. */
@@ -803,7 +815,7 @@ declare module DevExpress {
         /** Changes the current theme for all data visualization widgets on the page. */
         static currentTheme(theme: string): void;
         /** Allows you to export widgets using their SVG markup. */
-        static exportFromMarkup(markup: string, options: { fileName?: string, format?: string, backgroundColor?: string, proxyUrl?: string, width?: number, height?: number, onExporting?: Function, onExported?: Function, onFileSaving?: Function }): void;
+        static exportFromMarkup(markup: string, options: { fileName?: string, format?: string, backgroundColor?: string, proxyUrl?: string, width?: number, height?: number, onExporting?: Function, onExported?: Function, onFileSaving?: Function, margin?: number }): void;
         /** Gets the SVG markup of specific widgets for their subsequent export. */
         static getMarkup(widgetInstances: Array<DOMComponent>): string;
         /** Gets the color sets of a predefined or registered palette. */
@@ -2863,7 +2875,7 @@ declare module DevExpress.ui {
         clearButtonText?: string;
         /** Specifies whether to close the drop-down menu if a user clicks outside it. */
         closeOnOutsideClick?: boolean | (() => boolean);
-        /** Specifies a custom template for the input field. Must contain the TextBox widget. */
+        /** Specifies a custom template for the input field. */
         fieldTemplate?: template | ((selectedItem: any, fieldElement: DevExpress.core.dxElement) => string | Element | JQuery);
         /** Specifies whether the widget can be focused using keyboard navigation. */
         focusStateEnabled?: boolean;
@@ -2932,9 +2944,9 @@ declare module DevExpress.ui {
         constructor(element: JQuery, options?: dxLookupOptions)
     }
     export interface dxMapOptions extends WidgetOptions {
-        /** Specifies whether or not the widget automatically adjusts center and zoom option values when adding a new marker or route, or when creating a widget if it initially contains markers or routes. */
+        /** Specifies whether the widget automatically adjusts center and zoom option values when adding a new marker or route, or if a new widget contains markers or routes by default. */
         autoAdjust?: boolean;
-        /** An object, a string, or an array specifying the location displayed at the center of the widget. */
+        /** An object, a string, or an array specifying which part of the map is displayed at the widget's center using coordinates. The widget can change this value if autoAdjust is enabled. */
         center?: any | string | Array<number>;
         /** Specifies whether or not map widget controls are available. */
         controls?: boolean;
@@ -2968,7 +2980,7 @@ declare module DevExpress.ui {
         type?: 'hybrid' | 'roadmap' | 'satellite';
         /** Specifies the widget's width. */
         width?: number | string | (() => number | string);
-        /** The zoom level of the map. */
+        /** The map's zoom level. The widget can change this value if autoAdjust is enabled. */
         zoom?: number;
     }
     /** The Map is an interactive widget that displays a geographic map with markers and routes. */
@@ -3066,7 +3078,7 @@ declare module DevExpress.ui {
         mode?: 'number' | 'text' | 'tel';
         /** Specifies whether to show the buttons that change the value by a step. */
         showSpinButtons?: boolean;
-        /** Specifies by which value the widget value changes when a spin button is clicked. */
+        /** Specifies how much the widget's value changes when using the spin buttons, Up/Down arrow keys, or mouse wheel. */
         step?: number;
         /** Specifies whether to use touch friendly spin buttons. Applies only if showSpinButtons is true. */
         useLargeSpinButtons?: boolean;
@@ -3152,7 +3164,7 @@ declare module DevExpress.ui {
         /** Specifies the widget content title. */
         title?: string;
     }
-    /** @deprecated */
+    /** @deprecated note] The Panorama widget is deprecated since v18.1. We recommend using the [TabPanel or MultiView widget instead. */
     export class dxPanorama extends CollectionWidget {
         constructor(element: Element, options?: dxPanoramaOptions)
         constructor(element: JQuery, options?: dxPanoramaOptions)
@@ -3172,7 +3184,7 @@ declare module DevExpress.ui {
         /** A Boolean value specifying whether or not to allow users to switch between items by swiping. */
         swipeEnabled?: boolean;
     }
-    /** @deprecated */
+    /** @deprecated note] The Pivot widget is deprecated since v18.1. We recommend using the [TabPanel widget instead. */
     export class dxPivot extends CollectionWidget {
         constructor(element: Element, options?: dxPivotOptions)
         constructor(element: JQuery, options?: dxPivotOptions)
@@ -5432,6 +5444,7 @@ declare module DevExpress.viz {
         fileName?: string;
         /** Specifies a set of formats available for exporting into. */
         formats?: Array<string>;
+        /** Adds an empty space around the exported widget; measured in pixels. */
         margin?: number;
         /** Enables the printing feature in the widget. Applies only if the export.enabled option is true. */
         printingEnabled?: boolean;

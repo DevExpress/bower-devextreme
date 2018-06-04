@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 18.1.3
-* Build date: May 15, 2018
+* Version: 18.1.3 (build 18155)
+* Build date: Jun 4, 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -49,6 +49,7 @@
   border-top-width: 0;
   border-left: 1px solid #e0e0e0;
   border-right: 1px solid #e0e0e0;
+  border-bottom: 1px solid #e0e0e0;
 }
 .dx-datagrid {
   color: rgba(0, 0, 0, 0.87);
@@ -2145,25 +2146,11 @@
   line-height: 24px;
 }
 .dx-button-has-icon:not(.dx-button-has-text) {
-  -webkit-border-radius: 0;
-  -moz-border-radius: 0;
-  -ms-border-radius: 0;
-  -o-border-radius: 0;
-  border-radius: 0;
   background-color: transparent;
   color: rgba(0, 0, 0, 0.87);
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
   box-shadow: none;
-}
-.dx-button-has-icon:not(.dx-button-has-text).dx-state-hover,
-.dx-button-has-icon:not(.dx-button-has-text).dx-state-focused,
-.dx-button-has-icon:not(.dx-button-has-text).dx-state-active {
-  -webkit-border-radius: 2px;
-  -moz-border-radius: 2px;
-  -ms-border-radius: 2px;
-  -o-border-radius: 2px;
-  border-radius: 2px;
 }
 .dx-button-has-icon:not(.dx-button-has-text).dx-button-has-icon:not(.dx-button-has-text) {
   -webkit-border-radius: 50%;
@@ -2207,35 +2194,6 @@
 }
 .dx-button-has-icon:not(.dx-button-has-text) .dx-inkripple-wave {
   background-color: rgba(0, 0, 0, 0.2);
-}
-.dx-button-back {
-  min-width: 36px;
-}
-.dx-button-back .dx-button-content {
-  padding: 6px;
-}
-.dx-button-back .dx-icon {
-  color: rgba(0, 0, 0, 0.54);
-  width: 24px;
-  height: 24px;
-  background-position: 0px 0px;
-  -webkit-background-size: 24px 24px;
-  -moz-background-size: 24px 24px;
-  background-size: 24px 24px;
-  padding: 0px;
-  font-size: 24px;
-  text-align: center;
-  line-height: 24px;
-  margin-right: 0;
-  margin-left: 0;
-}
-.dx-rtl .dx-button-back .dx-icon,
-.dx-rtl.dx-button-back .dx-icon {
-  margin-left: 0;
-  margin-right: 0;
-}
-.dx-button-back .dx-button-text {
-  display: none;
 }
 .dx-button {
   height: 36px;
@@ -2438,26 +2396,94 @@
 .dx-button.dx-button-success .dx-inkripple-wave {
   background-color: rgba(255, 255, 255, 0.2);
 }
-.dx-button-flat {
-  -webkit-border-radius: 0;
-  -moz-border-radius: 0;
-  -ms-border-radius: 0;
-  -o-border-radius: 0;
-  border-radius: 0;
+.dx-button.dx-button-back {
   background-color: transparent;
   color: rgba(0, 0, 0, 0.87);
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
   box-shadow: none;
+  -webkit-border-radius: 50%;
+  -moz-border-radius: 50%;
+  -ms-border-radius: 50%;
+  -o-border-radius: 50%;
+  border-radius: 50%;
+  min-width: 36px;
 }
-.dx-button-flat.dx-state-hover,
-.dx-button-flat.dx-state-focused,
-.dx-button-flat.dx-state-active {
-  -webkit-border-radius: 2px;
-  -moz-border-radius: 2px;
-  -ms-border-radius: 2px;
-  -o-border-radius: 2px;
-  border-radius: 2px;
+.dx-button.dx-button-back.dx-button-has-icon:not(.dx-button-has-text) {
+  -webkit-border-radius: 50%;
+  -moz-border-radius: 50%;
+  -ms-border-radius: 50%;
+  -o-border-radius: 50%;
+  border-radius: 50%;
+}
+.dx-button.dx-button-back .dx-icon {
+  color: rgba(0, 0, 0, 0.87);
+}
+.dx-button.dx-button-back.dx-state-hover {
+  background-color: rgba(0, 0, 0, 0.08);
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+}
+.dx-button.dx-button-back.dx-state-focused {
+  background-color: rgba(0, 0, 0, 0.15);
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+}
+.dx-button.dx-button-back.dx-state-active {
+  background-color: rgba(0, 0, 0, 0.2);
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+}
+.dx-button.dx-button-back.dx-state-disabled {
+  background: transparent;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+}
+.dx-button.dx-button-back.dx-state-disabled .dx-icon {
+  opacity: 0.6;
+}
+.dx-button.dx-button-back.dx-state-disabled .dx-button-text {
+  color: rgba(0, 0, 0, 0.35);
+}
+.dx-button.dx-button-back .dx-inkripple-wave {
+  background-color: rgba(0, 0, 0, 0.2);
+}
+.dx-button.dx-button-back .dx-button-content {
+  padding: 6px;
+}
+.dx-button.dx-button-back .dx-icon {
+  color: rgba(0, 0, 0, 0.54);
+  width: 24px;
+  height: 24px;
+  background-position: 0px 0px;
+  -webkit-background-size: 24px 24px;
+  -moz-background-size: 24px 24px;
+  background-size: 24px 24px;
+  padding: 0px;
+  font-size: 24px;
+  text-align: center;
+  line-height: 24px;
+  margin-right: 0;
+  margin-left: 0;
+}
+.dx-rtl .dx-button.dx-button-back .dx-icon,
+.dx-rtl.dx-button.dx-button-back .dx-icon {
+  margin-left: 0;
+  margin-right: 0;
+}
+.dx-button.dx-button-back .dx-button-text {
+  display: none;
+}
+.dx-button-flat {
+  background-color: transparent;
+  color: rgba(0, 0, 0, 0.87);
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
 }
 .dx-button-flat.dx-button-has-icon:not(.dx-button-has-text) {
   -webkit-border-radius: 50%;
@@ -2503,25 +2529,11 @@
   background-color: rgba(0, 0, 0, 0.2);
 }
 .dx-button-flat.dx-button-default {
-  -webkit-border-radius: 0;
-  -moz-border-radius: 0;
-  -ms-border-radius: 0;
-  -o-border-radius: 0;
-  border-radius: 0;
   background-color: transparent;
   color: #009688;
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
   box-shadow: none;
-}
-.dx-button-flat.dx-button-default.dx-state-hover,
-.dx-button-flat.dx-button-default.dx-state-focused,
-.dx-button-flat.dx-button-default.dx-state-active {
-  -webkit-border-radius: 2px;
-  -moz-border-radius: 2px;
-  -ms-border-radius: 2px;
-  -o-border-radius: 2px;
-  border-radius: 2px;
 }
 .dx-button-flat.dx-button-default.dx-button-has-icon:not(.dx-button-has-text) {
   -webkit-border-radius: 50%;
@@ -2567,25 +2579,11 @@
   background-color: rgba(0, 150, 136, 0.2);
 }
 .dx-button-flat.dx-button-danger {
-  -webkit-border-radius: 0;
-  -moz-border-radius: 0;
-  -ms-border-radius: 0;
-  -o-border-radius: 0;
-  border-radius: 0;
   background-color: transparent;
   color: #F44336;
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
   box-shadow: none;
-}
-.dx-button-flat.dx-button-danger.dx-state-hover,
-.dx-button-flat.dx-button-danger.dx-state-focused,
-.dx-button-flat.dx-button-danger.dx-state-active {
-  -webkit-border-radius: 2px;
-  -moz-border-radius: 2px;
-  -ms-border-radius: 2px;
-  -o-border-radius: 2px;
-  border-radius: 2px;
 }
 .dx-button-flat.dx-button-danger.dx-button-has-icon:not(.dx-button-has-text) {
   -webkit-border-radius: 50%;
@@ -2631,25 +2629,11 @@
   background-color: rgba(244, 67, 54, 0.2);
 }
 .dx-button-flat.dx-button-success {
-  -webkit-border-radius: 0;
-  -moz-border-radius: 0;
-  -ms-border-radius: 0;
-  -o-border-radius: 0;
-  border-radius: 0;
   background-color: transparent;
   color: #8BC34A;
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
   box-shadow: none;
-}
-.dx-button-flat.dx-button-success.dx-state-hover,
-.dx-button-flat.dx-button-success.dx-state-focused,
-.dx-button-flat.dx-button-success.dx-state-active {
-  -webkit-border-radius: 2px;
-  -moz-border-radius: 2px;
-  -ms-border-radius: 2px;
-  -o-border-radius: 2px;
-  border-radius: 2px;
 }
 .dx-button-flat.dx-button-success.dx-button-has-icon:not(.dx-button-has-text) {
   -webkit-border-radius: 50%;
@@ -3115,9 +3099,9 @@
 }
 .dx-switch.dx-state-active .dx-switch-handle:before,
 .dx-switch.dx-state-focused .dx-switch-handle:before {
-  -webkit-box-shadow: 0 0 0 15px rgba(0, 0, 0, 0.1);
-  -moz-box-shadow: 0 0 0 15px rgba(0, 0, 0, 0.1);
-  box-shadow: 0 0 0 15px rgba(0, 0, 0, 0.1);
+  -webkit-box-shadow: 0 0 0 10px rgba(0, 0, 0, 0.1);
+  -moz-box-shadow: 0 0 0 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0 0 10px rgba(0, 0, 0, 0.1);
   -webkit-border-radius: 50%;
   -moz-border-radius: 50%;
   -ms-border-radius: 50%;
@@ -3126,9 +3110,9 @@
 }
 .dx-switch-on-value.dx-state-readonly.dx-state-focused .dx-switch-handle:before,
 .dx-switch.dx-state-readonly.dx-state-focused .dx-switch-handle:before {
-  -webkit-box-shadow: 0 0 0 15px rgba(0, 0, 0, 0.1);
-  -moz-box-shadow: 0 0 0 15px rgba(0, 0, 0, 0.1);
-  box-shadow: 0 0 0 15px rgba(0, 0, 0, 0.1);
+  -webkit-box-shadow: 0 0 0 10px rgba(0, 0, 0, 0.1);
+  -moz-box-shadow: 0 0 0 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0 0 10px rgba(0, 0, 0, 0.1);
   -webkit-border-radius: 50%;
   -moz-border-radius: 50%;
   -ms-border-radius: 50%;
@@ -3154,13 +3138,13 @@
   margin: 3px 0;
 }
 .dx-switch-inner {
-  width: 100%;
+  width: 200%;
   height: 100%;
 }
 .dx-switch-on,
 .dx-switch-off {
+  flex-shrink: 0;
   float: left;
-  margin-left: -10px;
   padding: 4px 0;
   width: 50%;
   height: 20px;
@@ -3170,7 +3154,6 @@
 }
 .dx-switch-on {
   background: transparent;
-  width: 100%;
 }
 .dx-switch-off {
   display: none;
@@ -3178,9 +3161,10 @@
   background-color: transparent;
 }
 .dx-switch-handle {
+  flex-basis: 20px;
+  flex-shrink: 0;
   position: relative;
   float: left;
-  margin-left: -10px;
   width: 20px;
   height: 20px;
   background-color: #fafafa;
@@ -3217,9 +3201,9 @@
 }
 .dx-switch-on-value.dx-state-active .dx-switch-handle:before,
 .dx-switch-on-value.dx-state-focused .dx-switch-handle:before {
-  -webkit-box-shadow: 0 0 0 15px rgba(0, 150, 136, 0.1);
-  -moz-box-shadow: 0 0 0 15px rgba(0, 150, 136, 0.1);
-  box-shadow: 0 0 0 15px rgba(0, 150, 136, 0.1);
+  -webkit-box-shadow: 0 0 0 10px rgba(0, 150, 136, 0.1);
+  -moz-box-shadow: 0 0 0 10px rgba(0, 150, 136, 0.1);
+  box-shadow: 0 0 0 10px rgba(0, 150, 136, 0.1);
   -webkit-border-radius: 50%;
   -moz-border-radius: 50%;
   -ms-border-radius: 50%;
@@ -3242,7 +3226,7 @@
 .dx-switch.dx-rtl .dx-switch-handle {
   float: right;
   margin-left: 0;
-  margin-right: -10px;
+  margin-right: -20px;
 }
 .dx-rtl .dx-switch .dx-switch-container,
 .dx-switch.dx-rtl .dx-switch-container {
@@ -4118,25 +4102,11 @@
   background-color: #fff;
 }
 .dx-button.dx-list-switchable-delete-button {
-  -webkit-border-radius: 0;
-  -moz-border-radius: 0;
-  -ms-border-radius: 0;
-  -o-border-radius: 0;
-  border-radius: 0;
   background-color: transparent;
   color: #F44336;
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
   box-shadow: none;
-}
-.dx-button.dx-list-switchable-delete-button.dx-state-hover,
-.dx-button.dx-list-switchable-delete-button.dx-state-focused,
-.dx-button.dx-list-switchable-delete-button.dx-state-active {
-  -webkit-border-radius: 2px;
-  -moz-border-radius: 2px;
-  -ms-border-radius: 2px;
-  -o-border-radius: 2px;
-  border-radius: 2px;
 }
 .dx-button.dx-list-switchable-delete-button.dx-button-has-icon:not(.dx-button-has-text) {
   -webkit-border-radius: 50%;
@@ -4552,25 +4522,11 @@
   background-color: #fff;
 }
 .dx-device-mobile .dx-button.dx-list-switchable-delete-button {
-  -webkit-border-radius: 0;
-  -moz-border-radius: 0;
-  -ms-border-radius: 0;
-  -o-border-radius: 0;
-  border-radius: 0;
   background-color: transparent;
   color: #F44336;
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
   box-shadow: none;
-}
-.dx-device-mobile .dx-button.dx-list-switchable-delete-button.dx-state-hover,
-.dx-device-mobile .dx-button.dx-list-switchable-delete-button.dx-state-focused,
-.dx-device-mobile .dx-button.dx-list-switchable-delete-button.dx-state-active {
-  -webkit-border-radius: 2px;
-  -moz-border-radius: 2px;
-  -ms-border-radius: 2px;
-  -o-border-radius: 2px;
-  border-radius: 2px;
 }
 .dx-device-mobile .dx-button.dx-list-switchable-delete-button.dx-button-has-icon:not(.dx-button-has-text) {
   -webkit-border-radius: 50%;
@@ -5261,82 +5217,13 @@
 .dx-toolbar.dx-state-disabled {
   opacity: 1;
 }
-.dx-toolbar .dx-toolbar-item-content > .dx-button,
-.dx-toolbar .dx-toolbar-button > .dx-button {
-  -webkit-border-radius: 0;
-  -moz-border-radius: 0;
-  -ms-border-radius: 0;
-  -o-border-radius: 0;
-  border-radius: 0;
-  background-color: transparent;
-  color: rgba(0, 0, 0, 0.54);
-  -webkit-box-shadow: none;
-  -moz-box-shadow: none;
-  box-shadow: none;
-}
-.dx-toolbar .dx-toolbar-item-content > .dx-button.dx-state-hover,
-.dx-toolbar .dx-toolbar-button > .dx-button.dx-state-hover,
-.dx-toolbar .dx-toolbar-item-content > .dx-button.dx-state-focused,
-.dx-toolbar .dx-toolbar-button > .dx-button.dx-state-focused,
-.dx-toolbar .dx-toolbar-item-content > .dx-button.dx-state-active,
-.dx-toolbar .dx-toolbar-button > .dx-button.dx-state-active {
-  -webkit-border-radius: 2px;
-  -moz-border-radius: 2px;
-  -ms-border-radius: 2px;
-  -o-border-radius: 2px;
-  border-radius: 2px;
-}
-.dx-toolbar .dx-toolbar-item-content > .dx-button.dx-button-has-icon:not(.dx-button-has-text),
-.dx-toolbar .dx-toolbar-button > .dx-button.dx-button-has-icon:not(.dx-button-has-text) {
-  -webkit-border-radius: 50%;
-  -moz-border-radius: 50%;
-  -ms-border-radius: 50%;
-  -o-border-radius: 50%;
-  border-radius: 50%;
-}
-.dx-toolbar .dx-toolbar-item-content > .dx-button .dx-icon,
-.dx-toolbar .dx-toolbar-button > .dx-button .dx-icon {
+.dx-toolbar .dx-toolbar-item-content > .dx-button.dx-button-normal,
+.dx-toolbar .dx-toolbar-button > .dx-button.dx-button-normal {
   color: rgba(0, 0, 0, 0.54);
 }
-.dx-toolbar .dx-toolbar-item-content > .dx-button.dx-state-hover,
-.dx-toolbar .dx-toolbar-button > .dx-button.dx-state-hover {
-  background-color: rgba(0, 0, 0, 0.08);
-  -webkit-box-shadow: none;
-  -moz-box-shadow: none;
-  box-shadow: none;
-}
-.dx-toolbar .dx-toolbar-item-content > .dx-button.dx-state-focused,
-.dx-toolbar .dx-toolbar-button > .dx-button.dx-state-focused {
-  background-color: rgba(0, 0, 0, 0.15);
-  -webkit-box-shadow: none;
-  -moz-box-shadow: none;
-  box-shadow: none;
-}
-.dx-toolbar .dx-toolbar-item-content > .dx-button.dx-state-active,
-.dx-toolbar .dx-toolbar-button > .dx-button.dx-state-active {
-  background-color: rgba(0, 0, 0, 0.2);
-  -webkit-box-shadow: none;
-  -moz-box-shadow: none;
-  box-shadow: none;
-}
-.dx-toolbar .dx-toolbar-item-content > .dx-button.dx-state-disabled,
-.dx-toolbar .dx-toolbar-button > .dx-button.dx-state-disabled {
-  background: transparent;
-  -webkit-box-shadow: none;
-  -moz-box-shadow: none;
-  box-shadow: none;
-}
-.dx-toolbar .dx-toolbar-item-content > .dx-button.dx-state-disabled .dx-icon,
-.dx-toolbar .dx-toolbar-button > .dx-button.dx-state-disabled .dx-icon {
-  opacity: 0.6;
-}
-.dx-toolbar .dx-toolbar-item-content > .dx-button.dx-state-disabled .dx-button-text,
-.dx-toolbar .dx-toolbar-button > .dx-button.dx-state-disabled .dx-button-text {
-  color: rgba(0, 0, 0, 0.35);
-}
-.dx-toolbar .dx-toolbar-item-content > .dx-button .dx-inkripple-wave,
-.dx-toolbar .dx-toolbar-button > .dx-button .dx-inkripple-wave {
-  background-color: rgba(0, 0, 0, 0.2);
+.dx-toolbar .dx-toolbar-item-content > .dx-button.dx-button-normal .dx-icon,
+.dx-toolbar .dx-toolbar-button > .dx-button.dx-button-normal .dx-icon {
+  color: rgba(0, 0, 0, 0.54);
 }
 .dx-toolbar-after .dx-toolbar-item {
   padding: 0 0 0 5px;
@@ -5595,25 +5482,11 @@
   overflow: visible;
 }
 .dx-popup-bottom.dx-toolbar .dx-button {
-  -webkit-border-radius: 0;
-  -moz-border-radius: 0;
-  -ms-border-radius: 0;
-  -o-border-radius: 0;
-  border-radius: 0;
   background-color: transparent;
   color: #009688;
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
   box-shadow: none;
-}
-.dx-popup-bottom.dx-toolbar .dx-button.dx-state-hover,
-.dx-popup-bottom.dx-toolbar .dx-button.dx-state-focused,
-.dx-popup-bottom.dx-toolbar .dx-button.dx-state-active {
-  -webkit-border-radius: 2px;
-  -moz-border-radius: 2px;
-  -ms-border-radius: 2px;
-  -o-border-radius: 2px;
-  border-radius: 2px;
 }
 .dx-popup-bottom.dx-toolbar .dx-button.dx-button-has-icon:not(.dx-button-has-text) {
   -webkit-border-radius: 50%;
@@ -6975,6 +6848,7 @@
   top: 45px;
 }
 .dx-accordion {
+  background-color: #fff;
   color: rgba(0, 0, 0, 0.87);
   margin: 3px 3px 5px 3px;
 }
@@ -7553,7 +7427,7 @@
 }
 .dx-datagrid .dx-column-indicators,
 .dx-datagrid-container .dx-column-indicators {
-  height: 24px;
+  height: 16px;
 }
 .dx-datagrid .dx-column-indicators > div,
 .dx-datagrid-container .dx-column-indicators > div {
@@ -7570,7 +7444,7 @@
 }
 .dx-datagrid .dx-placeholder:before,
 .dx-datagrid-container .dx-placeholder:before {
-  font-size: 13px;
+  font-size: 14px;
 }
 .dx-datagrid {
   line-height: inherit;
@@ -7593,7 +7467,7 @@
 }
 .dx-datagrid .dx-error-row .dx-closebutton {
   float: right;
-  margin: 14px;
+  margin: 16px;
   font: 14px/1 DXIcons;
   width: 14px;
   height: 14px;
@@ -7610,20 +7484,20 @@
   content: "\f00a";
 }
 .dx-datagrid .dx-error-row .dx-error-message {
-  padding: 12px;
+  padding: 14px;
   padding-right: 35px;
 }
 .dx-datagrid .dx-row > td {
-  padding-top: 12px;
-  padding-bottom: 12px;
-  font-size: 13px;
+  padding-top: 14px;
+  padding-bottom: 14px;
+  font-size: 14px;
+  line-height: 20px;
 }
 .dx-datagrid .dx-datagrid-content .dx-datagrid-table .dx-row > td,
 .dx-datagrid .dx-datagrid-content .dx-datagrid-table .dx-row > td.dx-cell-modified:not(.dx-field-item-content),
 .dx-datagrid .dx-datagrid-content .dx-datagrid-table .dx-row > td.dx-datagrid-invalid:not(.dx-field-item-content) {
   padding-right: 14px;
   padding-left: 14px;
-  line-height: 24px;
   vertical-align: middle;
 }
 .dx-datagrid .dx-datagrid-content .dx-datagrid-table .dx-row > td:first-of-type,
@@ -7689,11 +7563,11 @@
   background-position-y: 49px;
 }
 .dx-datagrid-edit-popup .dx-error-message {
-  padding: 12px 14px;
+  padding: 14px 14px;
 }
 .dx-datagrid-headers .dx-texteditor-input,
 .dx-datagrid-rowsview .dx-texteditor-input {
-  min-height: 24px;
+  min-height: 16px;
 }
 .dx-datagrid-headers .dx-lookup,
 .dx-datagrid-rowsview .dx-lookup {
@@ -7702,8 +7576,8 @@
 .dx-datagrid-headers .dx-lookup-field,
 .dx-datagrid-rowsview .dx-lookup-field {
   padding-left: 14px;
-  padding-top: 12px;
-  padding-bottom: 12px;
+  padding-top: 14px;
+  padding-bottom: 14px;
 }
 .dx-datagrid-headers .dx-dropdowneditor-button-visible.dx-show-clear-button .dx-texteditor-input,
 .dx-datagrid-rowsview .dx-dropdowneditor-button-visible.dx-show-clear-button .dx-texteditor-input {
@@ -7762,7 +7636,7 @@
 }
 .dx-editor-cell .dx-texteditor .dx-texteditor-input {
   background: rgba(255, 255, 255, 0);
-  font-size: 13px;
+  font-size: 14px;
   height: 48px;
   line-height: 48px;
 }
@@ -7783,8 +7657,8 @@
   border-radius: 0;
 }
 .dx-editor-cell.dx-editor-inline-block .dx-highlight-outline::before {
-  padding-top: 12px;
-  padding-bottom: 12px;
+  padding-top: 14px;
+  padding-bottom: 14px;
 }
 .dx-device-mobile .dx-datagrid-column-chooser-list .dx-empty-message,
 .dx-datagrid-column-chooser-list .dx-empty-message {
@@ -7819,8 +7693,8 @@
   color: rgba(0, 0, 0, 0.54);
   font-weight: 500;
   font-size: 12px;
-  padding: 12px;
-  line-height: 24px;
+  padding: 14px;
+  line-height: 16px;
   -webkit-box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.1), 0px 1px 3px rgba(0, 0, 0, 0.2);
   -moz-box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.1), 0px 1px 3px rgba(0, 0, 0, 0.2);
   box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.1), 0px 1px 3px rgba(0, 0, 0, 0.2);
@@ -7831,9 +7705,9 @@
   box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.1), 0px 1px 3px rgba(0, 0, 0, 0.2);
   color: rgba(0, 0, 0, 0.54);
   font-weight: 500;
-  padding: 12px;
+  padding: 20px;
   background-color: #fff;
-  line-height: 24px;
+  line-height: 16px;
   font-size: 12px;
 }
 .dx-datagrid-columns-separator {
@@ -7889,9 +7763,9 @@
 }
 .dx-datagrid-headers .dx-datagrid-table .dx-row > td {
   border-bottom: 1px solid #e0e0e0;
-  padding-top: 16px;
-  padding-bottom: 16px;
-  line-height: 24px;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  line-height: 16px;
   font-weight: 500;
   font-size: 12px;
 }
@@ -7938,7 +7812,7 @@
   background-color: rgba(139, 195, 74, 0.32);
 }
 .dx-datagrid-filter-row td .dx-editor-container .dx-filter-range-content {
-  padding: 12px 0 12px 32px;
+  padding: 14px 0 14px 32px;
 }
 .dx-datagrid .dx-datagrid-table .dx-datagrid-filter-row > td {
   padding-top: 0;
@@ -7956,11 +7830,11 @@
   padding: 0 10px;
 }
 .dx-datagrid-filter-range-overlay .dx-overlay-content .dx-texteditor .dx-texteditor-input {
-  font-size: 13px;
+  font-size: 14px;
   height: 49px;
 }
 .dx-highlight-outline {
-  padding: 12px 0 12px 0;
+  padding: 14px 0 14px 0;
   overflow: hidden;
   text-overflow: ellipsis;
 }
@@ -8200,7 +8074,7 @@
   padding-right: 14px;
   line-height: 40px;
   height: 40px;
-  font-size: 13px;
+  font-size: 14px;
 }
 .dx-datagrid-rowsview .dx-adaptive-detail-row .dx-field-item-content.dx-focused {
   padding: 0;
@@ -8209,7 +8083,7 @@
   padding-left: 14px;
   padding-right: 14px;
   background: rgba(255, 255, 255, 0);
-  font-size: 13px;
+  font-size: 14px;
   height: 40px;
   line-height: 40px;
 }
@@ -8415,25 +8289,11 @@
   border-bottom: 1px solid #e0e0e0;
 }
 .dx-datagrid-form-buttons-container .dx-button {
-  -webkit-border-radius: 0;
-  -moz-border-radius: 0;
-  -ms-border-radius: 0;
-  -o-border-radius: 0;
-  border-radius: 0;
   background-color: transparent;
   color: #009688;
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
   box-shadow: none;
-}
-.dx-datagrid-form-buttons-container .dx-button.dx-state-hover,
-.dx-datagrid-form-buttons-container .dx-button.dx-state-focused,
-.dx-datagrid-form-buttons-container .dx-button.dx-state-active {
-  -webkit-border-radius: 2px;
-  -moz-border-radius: 2px;
-  -ms-border-radius: 2px;
-  -o-border-radius: 2px;
-  border-radius: 2px;
 }
 .dx-datagrid-form-buttons-container .dx-button.dx-button-has-icon:not(.dx-button-has-text) {
   -webkit-border-radius: 50%;
@@ -8488,7 +8348,7 @@
 .dx-datagrid-filter-panel .dx-datagrid-filter-panel-text,
 .dx-datagrid-filter-panel .dx-datagrid-filter-panel-clear-filter {
   color: #009688;
-  font-size: 13px;
+  font-size: 14px;
   line-height: 18px;
 }
 .dx-datagrid-filter-panel .dx-icon-filter {
@@ -8514,10 +8374,10 @@
   color: rgba(0, 0, 0, 0.54);
   font-weight: 500;
   font-size: 12px;
-  line-height: 24px;
+  line-height: 16px;
   background: #e7e7e7;
   border-radius: 16px;
-  padding: 4px 10px;
+  padding: 8px 10px;
 }
 .dx-datagrid-group-panel .dx-block-separator {
   margin-right: 10px;
@@ -9070,7 +8930,7 @@
 }
 .dx-treelist .dx-column-indicators,
 .dx-treelist-container .dx-column-indicators {
-  height: 24px;
+  height: 16px;
 }
 .dx-treelist .dx-column-indicators > div,
 .dx-treelist-container .dx-column-indicators > div {
@@ -9087,7 +8947,7 @@
 }
 .dx-treelist .dx-placeholder:before,
 .dx-treelist-container .dx-placeholder:before {
-  font-size: 13px;
+  font-size: 14px;
 }
 .dx-treelist {
   line-height: inherit;
@@ -9110,7 +8970,7 @@
 }
 .dx-treelist .dx-error-row .dx-closebutton {
   float: right;
-  margin: 14px;
+  margin: 16px;
   font: 14px/1 DXIcons;
   width: 14px;
   height: 14px;
@@ -9127,20 +8987,20 @@
   content: "\f00a";
 }
 .dx-treelist .dx-error-row .dx-error-message {
-  padding: 12px;
+  padding: 14px;
   padding-right: 35px;
 }
 .dx-treelist .dx-row > td {
-  padding-top: 12px;
-  padding-bottom: 12px;
-  font-size: 13px;
+  padding-top: 14px;
+  padding-bottom: 14px;
+  font-size: 14px;
+  line-height: 20px;
 }
 .dx-treelist .dx-treelist-content .dx-treelist-table .dx-row > td,
 .dx-treelist .dx-treelist-content .dx-treelist-table .dx-row > td.dx-cell-modified:not(.dx-field-item-content),
 .dx-treelist .dx-treelist-content .dx-treelist-table .dx-row > td.dx-treelist-invalid:not(.dx-field-item-content) {
   padding-right: 14px;
   padding-left: 14px;
-  line-height: 24px;
   vertical-align: middle;
 }
 .dx-treelist .dx-treelist-content .dx-treelist-table .dx-row > td:first-of-type,
@@ -9206,11 +9066,11 @@
   background-position-y: 49px;
 }
 .dx-treelist-edit-popup .dx-error-message {
-  padding: 12px 14px;
+  padding: 14px 14px;
 }
 .dx-treelist-headers .dx-texteditor-input,
 .dx-treelist-rowsview .dx-texteditor-input {
-  min-height: 24px;
+  min-height: 16px;
 }
 .dx-treelist-headers .dx-lookup,
 .dx-treelist-rowsview .dx-lookup {
@@ -9219,8 +9079,8 @@
 .dx-treelist-headers .dx-lookup-field,
 .dx-treelist-rowsview .dx-lookup-field {
   padding-left: 14px;
-  padding-top: 12px;
-  padding-bottom: 12px;
+  padding-top: 14px;
+  padding-bottom: 14px;
 }
 .dx-treelist-headers .dx-dropdowneditor-button-visible.dx-show-clear-button .dx-texteditor-input,
 .dx-treelist-rowsview .dx-dropdowneditor-button-visible.dx-show-clear-button .dx-texteditor-input {
@@ -9279,7 +9139,7 @@
 }
 .dx-editor-cell .dx-texteditor .dx-texteditor-input {
   background: rgba(255, 255, 255, 0);
-  font-size: 13px;
+  font-size: 14px;
   height: 48px;
   line-height: 48px;
 }
@@ -9300,8 +9160,8 @@
   border-radius: 0;
 }
 .dx-editor-cell.dx-editor-inline-block .dx-highlight-outline::before {
-  padding-top: 12px;
-  padding-bottom: 12px;
+  padding-top: 14px;
+  padding-bottom: 14px;
 }
 .dx-device-mobile .dx-treelist-column-chooser-list .dx-empty-message,
 .dx-treelist-column-chooser-list .dx-empty-message {
@@ -9336,8 +9196,8 @@
   color: rgba(0, 0, 0, 0.54);
   font-weight: 500;
   font-size: 12px;
-  padding: 12px;
-  line-height: 24px;
+  padding: 14px;
+  line-height: 16px;
   -webkit-box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.1), 0px 1px 3px rgba(0, 0, 0, 0.2);
   -moz-box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.1), 0px 1px 3px rgba(0, 0, 0, 0.2);
   box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.1), 0px 1px 3px rgba(0, 0, 0, 0.2);
@@ -9348,9 +9208,9 @@
   box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.1), 0px 1px 3px rgba(0, 0, 0, 0.2);
   color: rgba(0, 0, 0, 0.54);
   font-weight: 500;
-  padding: 12px;
+  padding: 20px;
   background-color: #fff;
-  line-height: 24px;
+  line-height: 16px;
   font-size: 12px;
 }
 .dx-treelist-columns-separator {
@@ -9406,9 +9266,9 @@
 }
 .dx-treelist-headers .dx-treelist-table .dx-row > td {
   border-bottom: 1px solid #e0e0e0;
-  padding-top: 16px;
-  padding-bottom: 16px;
-  line-height: 24px;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  line-height: 16px;
   font-weight: 500;
   font-size: 12px;
 }
@@ -9455,7 +9315,7 @@
   background-color: rgba(139, 195, 74, 0.32);
 }
 .dx-treelist-filter-row td .dx-editor-container .dx-filter-range-content {
-  padding: 12px 0 12px 32px;
+  padding: 14px 0 14px 32px;
 }
 .dx-treelist .dx-treelist-table .dx-treelist-filter-row > td {
   padding-top: 0;
@@ -9473,11 +9333,11 @@
   padding: 0 10px;
 }
 .dx-treelist-filter-range-overlay .dx-overlay-content .dx-texteditor .dx-texteditor-input {
-  font-size: 13px;
+  font-size: 14px;
   height: 49px;
 }
 .dx-highlight-outline {
-  padding: 12px 0 12px 0;
+  padding: 14px 0 14px 0;
   overflow: hidden;
   text-overflow: ellipsis;
 }
@@ -9717,7 +9577,7 @@
   padding-right: 14px;
   line-height: 40px;
   height: 40px;
-  font-size: 13px;
+  font-size: 14px;
 }
 .dx-treelist-rowsview .dx-adaptive-detail-row .dx-field-item-content.dx-focused {
   padding: 0;
@@ -9726,7 +9586,7 @@
   padding-left: 14px;
   padding-right: 14px;
   background: rgba(255, 255, 255, 0);
-  font-size: 13px;
+  font-size: 14px;
   height: 40px;
   line-height: 40px;
 }
@@ -9932,25 +9792,11 @@
   border-bottom: 1px solid #e0e0e0;
 }
 .dx-treelist-form-buttons-container .dx-button {
-  -webkit-border-radius: 0;
-  -moz-border-radius: 0;
-  -ms-border-radius: 0;
-  -o-border-radius: 0;
-  border-radius: 0;
   background-color: transparent;
   color: #009688;
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
   box-shadow: none;
-}
-.dx-treelist-form-buttons-container .dx-button.dx-state-hover,
-.dx-treelist-form-buttons-container .dx-button.dx-state-focused,
-.dx-treelist-form-buttons-container .dx-button.dx-state-active {
-  -webkit-border-radius: 2px;
-  -moz-border-radius: 2px;
-  -ms-border-radius: 2px;
-  -o-border-radius: 2px;
-  border-radius: 2px;
 }
 .dx-treelist-form-buttons-container .dx-button.dx-button-has-icon:not(.dx-button-has-text) {
   -webkit-border-radius: 50%;
@@ -10005,7 +9851,7 @@
 .dx-treelist-filter-panel .dx-treelist-filter-panel-text,
 .dx-treelist-filter-panel .dx-treelist-filter-panel-clear-filter {
   color: #009688;
-  font-size: 13px;
+  font-size: 14px;
   line-height: 18px;
 }
 .dx-treelist-filter-panel .dx-icon-filter {
@@ -10016,6 +9862,7 @@
 }
 .dx-treelist-rowsview .dx-treelist-empty-space {
   position: relative;
+  top: -2px;
   display: inline-block;
   color: rgba(98, 98, 98, 0.54);
   font: 14px/1 DXIcons;
@@ -10100,7 +9947,7 @@
   position: absolute;
 }
 .dx-treelist-icon-container {
-  max-height: 24px;
+  max-height: 20px;
 }
 .dx-treelist-icon-container.dx-editor-inline-block {
   position: relative;
@@ -11105,6 +10952,14 @@
   width: 100%;
   height: 100%;
 }
+.dx-scheduler-view-switcher.dx-tabs.dx-tabs-expanded .dx-tab-selected:before {
+  position: absolute;
+  bottom: -2px;
+  width: 100%;
+  height: 2px;
+  content: '';
+  right: 0;
+}
 .dx-scheduler-view-switcher.dx-tabs {
   max-width: 52%;
   min-width: 72px;
@@ -11121,14 +10976,6 @@
 }
 .dx-scheduler-view-switcher.dx-tabs .dx-tab {
   width: 100px;
-}
-.dx-scheduler-view-switcher.dx-tabs .dx-tab.dx-tab-selected:before {
-  position: absolute;
-  bottom: -2px;
-  width: 100%;
-  height: 2px;
-  content: '';
-  right: 0;
 }
 .dx-scheduler-view-switcher.dx-tabs .dx-tab.dx-state-focused:after {
   border-bottom: none;
@@ -11261,7 +11108,7 @@
 .dx-scheduler-work-space-week.dx-rtl .dx-scheduler-date-time-indicator:before,
 .dx-scheduler-work-space-work-week.dx-rtl .dx-scheduler-date-time-indicator:before,
 .dx-scheduler-work-space-day.dx-rtl .dx-scheduler-date-time-indicator:before {
-  margin-right: 12px;
+  margin-right: -12px;
 }
 .dx-scheduler-work-space-week.dx-rtl .dx-scheduler-date-time-shader-top:before,
 .dx-scheduler-work-space-work-week.dx-rtl .dx-scheduler-date-time-shader-top:before,
@@ -11436,7 +11283,7 @@
 .dx-scheduler-work-space:not(.dx-scheduler-work-space-all-day).dx-scheduler-work-space:not(.dx-scheduler-work-space-month).dx-scheduler-work-space:not(.dx-scheduler-timeline) .dx-scheduler-header-panel {
   border-bottom: 2px solid #e0e0e0;
 }
-.dx-scheduler-work-space.dx-scheduler-work-space-month .dx-scheduler-header-panel {
+.dx-scheduler-work-space.dx-scheduler-work-space-month.dx-scheduler-work-space:not(.dx-scheduler-work-space-vertical-grouped) .dx-scheduler-header-panel {
   border-bottom: 1px solid #e0e0e0;
 }
 .dx-scheduler-date-table-scrollable .dx-scrollable-content {
@@ -11617,9 +11464,6 @@
   font-size: 16px;
   color: rgba(0, 0, 0, 0.54);
 }
-.dx-scheduler-work-space-month .dx-scheduler-date-table-cell.dx-state-focused {
-  background-position: 10% 10%;
-}
 .dx-scheduler-work-space-month .dx-scheduler-date-table-cell > div {
   padding-right: 6px;
 }
@@ -11656,6 +11500,9 @@
 .dx-scheduler-timeline .dx-scheduler-appointment-reduced .dx-scheduler-appointment-recurrence-icon {
   right: 20px;
 }
+.dx-scheduler-timeline .dx-scheduler-fixed-appointments {
+  left: 0;
+}
 .dx-scheduler-timeline .dx-scheduler-header-row:before,
 .dx-scheduler-timeline .dx-scheduler-date-table .dx-scheduler-date-table-row:before {
   content: none;
@@ -11672,34 +11519,78 @@
 .dx-scheduler-timeline .dx-scheduler-date-table-cell {
   border-right: none;
 }
+.dx-scheduler-timeline .dx-scheduler-work-space-vertical-group-table {
+  display: none;
+}
 .dx-scheduler-timeline .dx-scheduler-group-table {
   border-spacing: 0;
   border-collapse: separate;
   border-top: 1px solid #e0e0e0;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -moz-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-flow: column nowrap;
+  -moz-flex-flow: column nowrap;
+  -ms-flex-direction: column;
+  -ms-flex-wrap: nowrap;
+  -ms-flex-flow: column nowrap;
+  flex-flow: column nowrap;
+}
+.dx-scheduler-timeline .dx-scheduler-group-table tbody {
+  height: 100%;
+}
+.dx-scheduler-timeline .dx-scheduler-group-row {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -moz-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-flow: row nowrap;
+  -moz-flex-flow: row nowrap;
+  -ms-flex-direction: row;
+  -ms-flex-wrap: nowrap;
+  -ms-flex-flow: row nowrap;
+  flex-flow: row nowrap;
 }
 .dx-scheduler-timeline[dx-group-column-count='2'] .dx-scheduler-group-header:last-child,
 .dx-scheduler-timeline[dx-group-column-count='3'] .dx-scheduler-group-header:last-child {
   font-weight: normal;
   text-align: left;
 }
-.dx-scheduler-timeline .dx-scheduler-fixed-appointments {
-  left: 0;
+.dx-scheduler-timeline[dx-group-column-count='2'] .dx-scheduler-group-header:only-child,
+.dx-scheduler-timeline[dx-group-column-count='3'] .dx-scheduler-group-header:only-child {
+  position: relative;
+  left: 80px;
+  width: 80px;
 }
 .dx-scheduler-timeline .dx-scheduler-group-header {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -moz-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-flow: row nowrap;
+  -moz-flex-flow: row nowrap;
+  -ms-flex-direction: row;
+  -ms-flex-wrap: nowrap;
+  -ms-flex-flow: row nowrap;
+  flex-flow: row nowrap;
   padding: 0 10px 0 5px;
   height: auto;
+  width: 100%;
 }
-.dx-scheduler-timeline .dx-scheduler-group-header .dx-scheduler-group-header-content {
-  overflow: hidden;
+.dx-scheduler-timeline .dx-scheduler-group-header[rowspan='2'] .dx-scheduler-group-header-content div,
+.dx-scheduler-timeline .dx-scheduler-group-header[rowspan='3'] .dx-scheduler-group-header-content div {
+  margin-top: 200%;
 }
-.dx-scheduler-timeline .dx-scheduler-group-header .dx-scheduler-group-header-content div {
-  position: relative;
-  top: 50%;
-  -webkit-transform: translate(0, -50%);
-  -moz-transform: translate(0, -50%);
-  -ms-transform: translate(0, -50%);
-  -o-transform: translate(0, -50%);
-  transform: translate(0, -50%);
+.dx-scheduler-timeline .dx-scheduler-group-header-content {
+  overflow: visible;
+  margin: auto;
+  flex-grow: 1;
+}
+.dx-scheduler-timeline .dx-scheduler-group-header-content div {
   white-space: normal;
   line-height: normal;
 }
@@ -11852,18 +11743,6 @@
 .dx-scheduler-work-space.dx-scheduler-timeline-work-week .dx-scheduler-header-scrollable {
   height: 91px;
 }
-.dx-scheduler-work-space.dx-scheduler-timeline-week.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-day .dx-scheduler-header-scrollable,
-.dx-scheduler-work-space.dx-scheduler-timeline-work-week.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-day .dx-scheduler-header-scrollable {
-  height: 10px;
-}
-.dx-scheduler-work-space.dx-scheduler-timeline-week.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-week .dx-scheduler-header-scrollable,
-.dx-scheduler-work-space.dx-scheduler-timeline-work-week.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-week .dx-scheduler-header-scrollable,
-.dx-scheduler-work-space.dx-scheduler-timeline-week.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-work-week .dx-scheduler-header-scrollable,
-.dx-scheduler-work-space.dx-scheduler-timeline-work-week.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-work-week .dx-scheduler-header-scrollable,
-.dx-scheduler-work-space.dx-scheduler-timeline-week.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-month .dx-scheduler-header-scrollable,
-.dx-scheduler-work-space.dx-scheduler-timeline-work-week.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-month .dx-scheduler-header-scrollable {
-  height: 50px;
-}
 .dx-scheduler-work-space.dx-scheduler-timeline-week.dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline .dx-scheduler-header-scrollable,
 .dx-scheduler-work-space.dx-scheduler-timeline-work-week.dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline .dx-scheduler-header-scrollable {
   height: auto;
@@ -11937,6 +11816,7 @@
 .dx-rtl .dx-scheduler-work-space-count.dx-scheduler-work-space-work-week .dx-scheduler-header-panel-cell:nth-child(5n),
 .dx-rtl .dx-scheduler-work-space-count.dx-scheduler-work-space-work-week .dx-scheduler-date-table-cell:nth-child(5n),
 .dx-rtl .dx-scheduler-work-space-count.dx-scheduler-work-space-work-week .dx-scheduler-all-day-table-cell:nth-child(5n) {
+  border-right: 1px solid #e0e0e0;
   border-left: 1px solid #e0e0e0;
 }
 .dx-scheduler-work-space-count.dx-scheduler-work-space-day .dx-scheduler-header-panel-cell:nth-child(1n),
@@ -11980,14 +11860,6 @@
 .dx-scheduler-work-space-grouped:not(.dx-scheduler-timeline):not(.dx-scheduler-agenda):not(.dx-scheduler-work-space-month):not(.dx-scheduler-work-space-all-day):not(.dx-scheduler-work-space-vertical-grouped) .dx-scheduler-header-scrollable {
   height: 51px;
 }
-.dx-scheduler-work-space-grouped:not(.dx-scheduler-timeline):not(.dx-scheduler-agenda):not(.dx-scheduler-work-space-month):not(.dx-scheduler-work-space-all-day):not(.dx-scheduler-work-space-vertical-grouped).dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-day .dx-scheduler-header-scrollable {
-  height: 10px;
-}
-.dx-scheduler-work-space-grouped:not(.dx-scheduler-timeline):not(.dx-scheduler-agenda):not(.dx-scheduler-work-space-month):not(.dx-scheduler-work-space-all-day):not(.dx-scheduler-work-space-vertical-grouped).dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-week .dx-scheduler-header-scrollable,
-.dx-scheduler-work-space-grouped:not(.dx-scheduler-timeline):not(.dx-scheduler-agenda):not(.dx-scheduler-work-space-month):not(.dx-scheduler-work-space-all-day):not(.dx-scheduler-work-space-vertical-grouped).dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-work-week .dx-scheduler-header-scrollable,
-.dx-scheduler-work-space-grouped:not(.dx-scheduler-timeline):not(.dx-scheduler-agenda):not(.dx-scheduler-work-space-month):not(.dx-scheduler-work-space-all-day):not(.dx-scheduler-work-space-vertical-grouped).dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-month .dx-scheduler-header-scrollable {
-  height: 50px;
-}
 .dx-scheduler-work-space-grouped:not(.dx-scheduler-timeline):not(.dx-scheduler-agenda):not(.dx-scheduler-work-space-month):not(.dx-scheduler-work-space-all-day):not(.dx-scheduler-work-space-vertical-grouped).dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline .dx-scheduler-header-scrollable {
   height: auto;
 }
@@ -12022,14 +11894,6 @@
 }
 .dx-scheduler-work-space-grouped:not(.dx-scheduler-timeline):not(.dx-scheduler-agenda):not(.dx-scheduler-work-space-month):not(.dx-scheduler-work-space-all-day):not(.dx-scheduler-work-space-vertical-grouped).dx-scheduler-work-space-day .dx-scheduler-header-scrollable {
   height: 11px;
-}
-.dx-scheduler-work-space-grouped:not(.dx-scheduler-timeline):not(.dx-scheduler-agenda):not(.dx-scheduler-work-space-month):not(.dx-scheduler-work-space-all-day):not(.dx-scheduler-work-space-vertical-grouped).dx-scheduler-work-space-day.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-day .dx-scheduler-header-scrollable {
-  height: 10px;
-}
-.dx-scheduler-work-space-grouped:not(.dx-scheduler-timeline):not(.dx-scheduler-agenda):not(.dx-scheduler-work-space-month):not(.dx-scheduler-work-space-all-day):not(.dx-scheduler-work-space-vertical-grouped).dx-scheduler-work-space-day.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-week .dx-scheduler-header-scrollable,
-.dx-scheduler-work-space-grouped:not(.dx-scheduler-timeline):not(.dx-scheduler-agenda):not(.dx-scheduler-work-space-month):not(.dx-scheduler-work-space-all-day):not(.dx-scheduler-work-space-vertical-grouped).dx-scheduler-work-space-day.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-work-week .dx-scheduler-header-scrollable,
-.dx-scheduler-work-space-grouped:not(.dx-scheduler-timeline):not(.dx-scheduler-agenda):not(.dx-scheduler-work-space-month):not(.dx-scheduler-work-space-all-day):not(.dx-scheduler-work-space-vertical-grouped).dx-scheduler-work-space-day.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-month .dx-scheduler-header-scrollable {
-  height: 50px;
 }
 .dx-scheduler-work-space-grouped:not(.dx-scheduler-timeline):not(.dx-scheduler-agenda):not(.dx-scheduler-work-space-month):not(.dx-scheduler-work-space-all-day):not(.dx-scheduler-work-space-vertical-grouped).dx-scheduler-work-space-day.dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline .dx-scheduler-header-scrollable {
   height: auto;
@@ -12125,14 +11989,6 @@
 .dx-scheduler-work-space-both-scrollbar .dx-scheduler-header-scrollable {
   height: 51px;
 }
-.dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-day .dx-scheduler-header-scrollable {
-  height: 10px;
-}
-.dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-week .dx-scheduler-header-scrollable,
-.dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-work-week .dx-scheduler-header-scrollable,
-.dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-month .dx-scheduler-header-scrollable {
-  height: 50px;
-}
 .dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline .dx-scheduler-header-scrollable {
   height: auto;
 }
@@ -12147,14 +12003,6 @@
 }
 .dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space-day .dx-scheduler-header-scrollable {
   height: 1px;
-}
-.dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space-day.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-day .dx-scheduler-header-scrollable {
-  height: 10px;
-}
-.dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space-day.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-week .dx-scheduler-header-scrollable,
-.dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space-day.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-work-week .dx-scheduler-header-scrollable,
-.dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space-day.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-month .dx-scheduler-header-scrollable {
-  height: 50px;
 }
 .dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space-day.dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline .dx-scheduler-header-scrollable {
   height: auto;
@@ -12187,14 +12035,6 @@
 .dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space-all-day .dx-scheduler-header-scrollable {
   height: 126px;
 }
-.dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space-all-day.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-day .dx-scheduler-header-scrollable {
-  height: 10px;
-}
-.dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space-all-day.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-week .dx-scheduler-header-scrollable,
-.dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space-all-day.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-work-week .dx-scheduler-header-scrollable,
-.dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space-all-day.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-month .dx-scheduler-header-scrollable {
-  height: 50px;
-}
 .dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space-all-day.dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline .dx-scheduler-header-scrollable {
   height: auto;
 }
@@ -12209,14 +12049,6 @@
 }
 .dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space-all-day.dx-scheduler-work-space-all-day-collapsed .dx-scheduler-header-scrollable {
   height: 76px;
-}
-.dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space-all-day.dx-scheduler-work-space-all-day-collapsed.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-day .dx-scheduler-header-scrollable {
-  height: 10px;
-}
-.dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space-all-day.dx-scheduler-work-space-all-day-collapsed.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-week .dx-scheduler-header-scrollable,
-.dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space-all-day.dx-scheduler-work-space-all-day-collapsed.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-work-week .dx-scheduler-header-scrollable,
-.dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space-all-day.dx-scheduler-work-space-all-day-collapsed.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-month .dx-scheduler-header-scrollable {
-  height: 50px;
 }
 .dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space-all-day.dx-scheduler-work-space-all-day-collapsed.dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline .dx-scheduler-header-scrollable {
   height: auto;
@@ -12233,14 +12065,6 @@
 .dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space-all-day.dx-scheduler-work-space-day .dx-scheduler-header-scrollable {
   height: 86px;
 }
-.dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space-all-day.dx-scheduler-work-space-day.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-day .dx-scheduler-header-scrollable {
-  height: 10px;
-}
-.dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space-all-day.dx-scheduler-work-space-day.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-week .dx-scheduler-header-scrollable,
-.dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space-all-day.dx-scheduler-work-space-day.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-work-week .dx-scheduler-header-scrollable,
-.dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space-all-day.dx-scheduler-work-space-day.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-month .dx-scheduler-header-scrollable {
-  height: 50px;
-}
 .dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space-all-day.dx-scheduler-work-space-day.dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline .dx-scheduler-header-scrollable {
   height: auto;
 }
@@ -12255,14 +12079,6 @@
 }
 .dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space-all-day.dx-scheduler-work-space-day.dx-scheduler-work-space-all-day-collapsed .dx-scheduler-header-scrollable {
   height: 36px;
-}
-.dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space-all-day.dx-scheduler-work-space-day.dx-scheduler-work-space-all-day-collapsed.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-day .dx-scheduler-header-scrollable {
-  height: 10px;
-}
-.dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space-all-day.dx-scheduler-work-space-day.dx-scheduler-work-space-all-day-collapsed.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-week .dx-scheduler-header-scrollable,
-.dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space-all-day.dx-scheduler-work-space-day.dx-scheduler-work-space-all-day-collapsed.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-work-week .dx-scheduler-header-scrollable,
-.dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space-all-day.dx-scheduler-work-space-day.dx-scheduler-work-space-all-day-collapsed.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-month .dx-scheduler-header-scrollable {
-  height: 50px;
 }
 .dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space-all-day.dx-scheduler-work-space-day.dx-scheduler-work-space-all-day-collapsed.dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline .dx-scheduler-header-scrollable {
   height: auto;
@@ -12287,14 +12103,6 @@
 }
 .dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space-month .dx-scheduler-header-scrollable {
   height: 51px;
-}
-.dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space-month.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-day .dx-scheduler-header-scrollable {
-  height: 10px;
-}
-.dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space-month.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-week .dx-scheduler-header-scrollable,
-.dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space-month.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-work-week .dx-scheduler-header-scrollable,
-.dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space-month.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-month .dx-scheduler-header-scrollable {
-  height: 50px;
 }
 .dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space-month.dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline .dx-scheduler-header-scrollable {
   height: auto;
@@ -12802,13 +12610,10 @@
   position: relative;
   padding-left: 0;
   padding-right: 0;
+  margin-top: 20px;
 }
 .dx-scheduler-appointment-popup .dx-scheduler-recurrence-rule-item .dx-field-item-label {
   vertical-align: top;
-}
-.dx-scheduler-appointment-popup .dx-scheduler-recurrence-rule-item .dx-field-item-label.dx-field-item-label-location-left,
-.dx-scheduler-appointment-popup .dx-scheduler-recurrence-rule-item .dx-field-item-label.dx-field-item-label-location-top {
-  padding-left: 20px;
 }
 .dx-scheduler-appointment-popup .dx-scheduler-recurrence-rule-item .dx-field-item-label.dx-field-item-label-location-right {
   padding-right: 20px;
@@ -12840,9 +12645,6 @@
 }
 .dx-scheduler-appointment-popup .dx-scheduler-recurrence-rule-item.dx-label-v-align:before {
   top: 70px;
-}
-.dx-scheduler-appointment-popup .dx-scheduler-recurrence-rule-item.dx-label-v-align .dx-recurrence-editor {
-  padding-left: 20px;
 }
 .dx-scheduler-appointment-popup .dx-scheduler-recurrence-rule-item .dx-field-item-content-location-left .dx-recurrence-editor {
   padding-left: 20px;
@@ -13316,7 +13118,7 @@
 .dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline .dx-scheduler-header-scrollable {
   height: auto;
 }
-.dx-scheduler-work-space-vertical-grouped[dx-group-column-count='1'] .dx-scheduler-work-space-horizontal-group-table {
+.dx-scheduler-work-space-vertical-grouped[dx-group-column-count='1'] .dx-scheduler-work-space-vertical-group-table {
   width: 65px;
 }
 .dx-scheduler-work-space-vertical-grouped[dx-group-column-count='1'] .dx-scheduler-date-table {
@@ -13349,6 +13151,17 @@
 .dx-scheduler-work-space-vertical-grouped[dx-group-column-count='1'].dx-scheduler-work-space-both-scrollbar .dx-scheduler-header-scrollable.dx-scrollable {
   margin: 0 0 0 131px;
 }
+.dx-scheduler-work-space-vertical-grouped[dx-group-column-count='1'].dx-scheduler-work-space-both-scrollbar.dx-rtl .dx-scheduler-date-table-scrollable {
+  margin-left: 0;
+  margin-right: 131px;
+}
+.dx-scheduler-work-space-vertical-grouped[dx-group-column-count='1'].dx-scheduler-work-space-both-scrollbar.dx-rtl .dx-scheduler-header-scrollable.dx-scrollable {
+  margin: 0 131px 0 0;
+}
+.dx-scheduler-work-space-vertical-grouped[dx-group-column-count='1'].dx-scheduler-work-space-both-scrollbar.dx-rtl .dx-scheduler-fixed-appointments {
+  left: 0;
+  right: 131px;
+}
 .dx-scheduler-work-space-vertical-grouped[dx-group-column-count='1'].dx-scheduler-work-space-month .dx-scheduler-sidebar-scrollable {
   width: 65px;
 }
@@ -13376,7 +13189,7 @@
 .dx-scheduler-work-space-vertical-grouped[dx-group-column-count='1'].dx-scheduler-work-space-month .dx-scheduler-header-row:before {
   width: 65px;
 }
-.dx-scheduler-work-space-vertical-grouped[dx-group-column-count='2'] .dx-scheduler-work-space-horizontal-group-table {
+.dx-scheduler-work-space-vertical-grouped[dx-group-column-count='2'] .dx-scheduler-work-space-vertical-group-table {
   width: 97.5px;
 }
 .dx-scheduler-work-space-vertical-grouped[dx-group-column-count='2'] .dx-scheduler-date-table {
@@ -13409,6 +13222,17 @@
 .dx-scheduler-work-space-vertical-grouped[dx-group-column-count='2'].dx-scheduler-work-space-both-scrollbar .dx-scheduler-header-scrollable.dx-scrollable {
   margin: 0 0 0 163.5px;
 }
+.dx-scheduler-work-space-vertical-grouped[dx-group-column-count='2'].dx-scheduler-work-space-both-scrollbar.dx-rtl .dx-scheduler-date-table-scrollable {
+  margin-left: 0;
+  margin-right: 163.5px;
+}
+.dx-scheduler-work-space-vertical-grouped[dx-group-column-count='2'].dx-scheduler-work-space-both-scrollbar.dx-rtl .dx-scheduler-header-scrollable.dx-scrollable {
+  margin: 0 163.5px 0 0;
+}
+.dx-scheduler-work-space-vertical-grouped[dx-group-column-count='2'].dx-scheduler-work-space-both-scrollbar.dx-rtl .dx-scheduler-fixed-appointments {
+  left: 0;
+  right: 163.5px;
+}
 .dx-scheduler-work-space-vertical-grouped[dx-group-column-count='2'].dx-scheduler-work-space-month .dx-scheduler-sidebar-scrollable {
   width: 97.5px;
 }
@@ -13436,7 +13260,7 @@
 .dx-scheduler-work-space-vertical-grouped[dx-group-column-count='2'].dx-scheduler-work-space-month .dx-scheduler-header-row:before {
   width: 97.5px;
 }
-.dx-scheduler-work-space-vertical-grouped[dx-group-column-count='3'] .dx-scheduler-work-space-horizontal-group-table {
+.dx-scheduler-work-space-vertical-grouped[dx-group-column-count='3'] .dx-scheduler-work-space-vertical-group-table {
   width: 130px;
 }
 .dx-scheduler-work-space-vertical-grouped[dx-group-column-count='3'] .dx-scheduler-date-table {
@@ -13469,6 +13293,17 @@
 .dx-scheduler-work-space-vertical-grouped[dx-group-column-count='3'].dx-scheduler-work-space-both-scrollbar .dx-scheduler-header-scrollable.dx-scrollable {
   margin: 0 0 0 196px;
 }
+.dx-scheduler-work-space-vertical-grouped[dx-group-column-count='3'].dx-scheduler-work-space-both-scrollbar.dx-rtl .dx-scheduler-date-table-scrollable {
+  margin-left: 0;
+  margin-right: 196px;
+}
+.dx-scheduler-work-space-vertical-grouped[dx-group-column-count='3'].dx-scheduler-work-space-both-scrollbar.dx-rtl .dx-scheduler-header-scrollable.dx-scrollable {
+  margin: 0 196px 0 0;
+}
+.dx-scheduler-work-space-vertical-grouped[dx-group-column-count='3'].dx-scheduler-work-space-both-scrollbar.dx-rtl .dx-scheduler-fixed-appointments {
+  left: 0;
+  right: 196px;
+}
 .dx-scheduler-work-space-vertical-grouped[dx-group-column-count='3'].dx-scheduler-work-space-month .dx-scheduler-sidebar-scrollable {
   width: 130px;
 }
@@ -13496,29 +13331,91 @@
 .dx-scheduler-work-space-vertical-grouped[dx-group-column-count='3'].dx-scheduler-work-space-month .dx-scheduler-header-row:before {
   width: 130px;
 }
-.dx-scheduler-work-space-vertical-grouped .dx-scheduler-work-space-horizontal-group-table {
+.dx-scheduler-work-space-vertical-grouped .dx-scheduler-work-space-vertical-group-table {
   float: left;
   height: 100%;
   min-height: 100px;
   border-right: 1px solid #e0e0e0;
   border-top: 1px solid #e0e0e0;
   border-collapse: collapse;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -moz-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-flow: column nowrap;
+  -moz-flex-flow: column nowrap;
+  -ms-flex-direction: column;
+  -ms-flex-wrap: nowrap;
+  -ms-flex-flow: column nowrap;
+  flex-flow: column nowrap;
+}
+.dx-scheduler-work-space-vertical-grouped .dx-scheduler-work-space-vertical-group-table tbody {
+  height: 100%;
+}
+.dx-scheduler-work-space-vertical-grouped .dx-scheduler-group-row {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -moz-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-flow: row nowrap;
+  -moz-flex-flow: row nowrap;
+  -ms-flex-direction: row;
+  -ms-flex-wrap: nowrap;
+  -ms-flex-flow: row nowrap;
+  flex-flow: row nowrap;
+}
+.dx-scheduler-work-space-vertical-grouped .dx-scheduler-group-row:before {
+  display: none;
+}
+.dx-scheduler-work-space-vertical-grouped[dx-group-column-count='2'] .dx-scheduler-group-header:last-child,
+.dx-scheduler-work-space-vertical-grouped[dx-group-column-count='3'] .dx-scheduler-group-header:last-child {
+  font-weight: normal;
+  text-align: left;
+}
+.dx-scheduler-work-space-vertical-grouped[dx-group-column-count='2'] .dx-scheduler-group-header:only-child,
+.dx-scheduler-work-space-vertical-grouped[dx-group-column-count='3'] .dx-scheduler-group-header:only-child {
+  position: relative;
+  left: 75px;
+  width: 75px;
 }
 .dx-scheduler-work-space-vertical-grouped .dx-scheduler-group-header {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -moz-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-flow: row nowrap;
+  -moz-flex-flow: row nowrap;
+  -ms-flex-direction: row;
+  -ms-flex-wrap: nowrap;
+  -ms-flex-flow: row nowrap;
+  flex-flow: row nowrap;
   height: auto;
   text-align: center;
   border-bottom: 2px solid #e0e0e0;
   padding: 0;
+  overflow: hidden;
+  width: 100%;
+  border-right: none;
 }
-.dx-scheduler-work-space-vertical-grouped .dx-scheduler-group-header .dx-scheduler-group-header-content {
+.dx-scheduler-work-space-vertical-grouped .dx-scheduler-group-header[rowspan='2'],
+.dx-scheduler-work-space-vertical-grouped .dx-scheduler-group-header[rowspan='3'] {
+  border-bottom: none;
+}
+.dx-scheduler-work-space-vertical-grouped .dx-scheduler-group-header[rowspan='2'] .dx-scheduler-group-header-content div,
+.dx-scheduler-work-space-vertical-grouped .dx-scheduler-group-header[rowspan='3'] .dx-scheduler-group-header-content div {
+  margin-top: 200%;
+}
+.dx-scheduler-work-space-vertical-grouped .dx-scheduler-group-header-content {
   padding-top: 16px;
+  overflow: visible;
+  flex-grow: 1;
 }
-.dx-scheduler-work-space-vertical-grouped .dx-scheduler-group-header .dx-scheduler-group-header-content div {
+.dx-scheduler-work-space-vertical-grouped .dx-scheduler-group-header-content div {
   white-space: normal;
   line-height: normal;
-}
-.dx-scheduler-work-space-vertical-grouped .dx-scheduler-header-panel {
-  border-bottom: 1px solid #e0e0e0;
 }
 .dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-day .dx-scheduler-all-day-title,
 .dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-week .dx-scheduler-all-day-title,
@@ -13573,14 +13470,6 @@
 .dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-month .dx-scheduler-header-scrollable {
   height: 51px;
 }
-.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-month.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-day .dx-scheduler-header-scrollable {
-  height: 10px;
-}
-.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-month.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-week .dx-scheduler-header-scrollable,
-.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-month.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-work-week .dx-scheduler-header-scrollable,
-.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-month.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-month .dx-scheduler-header-scrollable {
-  height: 50px;
-}
 .dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-month.dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline .dx-scheduler-header-scrollable {
   height: auto;
 }
@@ -13594,15 +13483,15 @@
 .dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-month .dx-scheduler-fixed-appointments {
   left: 66px;
 }
-.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-month .dx-scheduler-first-group-cell {
-  border-top: 2px solid #e0e0e0;
-}
 .dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-month .dx-scheduler-group-header {
-  border-top: 2px solid #e0e0e0;
+  box-shadow: 0 -2px 0 #e0e0e0;
   border-bottom: none;
 }
 .dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-month .dx-scheduler-date-table-cell {
   height: 75px;
+}
+.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-month.dx-scheduler-work-space-both-scrollbar .dx-scheduler-header-panel {
+  border-bottom: none;
 }
 .dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-both-scrollbar .dx-scheduler-date-table {
   margin-left: 0;
@@ -13627,11 +13516,15 @@
   padding-bottom: 50px;
   margin-bottom: -50px;
 }
+.dx-scheduler-work-space-vertical-grouped:not(.dx-scheduler-work-space-day):not(.dx-scheduler-work-space-both-scrollbar) .dx-scheduler-sidebar-scrollable {
+  padding-bottom: 50px;
+  margin-bottom: -50px;
+}
 .dx-scheduler-work-space-vertical-grouped .dx-scheduler-work-space-day .dx-scheduler-date-table-scrollable {
   padding-bottom: 0;
   margin-bottom: 0;
 }
-.dx-rtl .dx-scheduler-work-space-horizontal-group-table {
+.dx-rtl .dx-scheduler-work-space-vertical-group-table {
   border-right: none;
   border-left: 1px solid #e0e0e0;
 }
@@ -13664,7 +13557,7 @@
 .dx-rtl .dx-scheduler-all-day-panel table {
   margin-left: 0;
 }
-.dx-rtl .dx-scheduler-work-space-horizontal-group-table,
+.dx-rtl .dx-scheduler-work-space-vertical-group-table,
 .dx-rtl .dx-scheduler-time-panel {
   float: right;
 }
@@ -13781,7 +13674,6 @@
 .dx-rtl .dx-scheduler-recurrence-rule-item .dx-field-item-label.dx-field-item-label-location-left,
 .dx-rtl .dx-scheduler-recurrence-rule-item .dx-field-item-label.dx-field-item-label-location-top {
   padding-left: 10px;
-  padding-right: 20px;
 }
 .dx-rtl .dx-scheduler-recurrence-rule-item .dx-field-item-label.dx-field-item-label-location-right {
   padding-left: 20px;
@@ -14484,14 +14376,17 @@
   color: rgba(0, 0, 0, 0.87);
   text-align: left;
   border-bottom: 1px solid #e0e0e0;
+}
+.dx-scheduler-group-table .dx-scheduler-group-row .dx-scheduler-group-header .dx-scheduler-group-header-content,
+.dx-scheduler-header-panel .dx-scheduler-group-row .dx-scheduler-group-header .dx-scheduler-group-header-content {
   padding-left: 14px;
 }
-.dx-scheduler-work-space-month .dx-scheduler-group-table .dx-scheduler-group-row .dx-scheduler-group-header,
-.dx-scheduler-work-space-month .dx-scheduler-header-panel .dx-scheduler-group-row .dx-scheduler-group-header,
-.dx-scheduler-timeline .dx-scheduler-group-table .dx-scheduler-group-row .dx-scheduler-group-header,
-.dx-scheduler-timeline .dx-scheduler-header-panel .dx-scheduler-group-row .dx-scheduler-group-header,
-.dx-scheduler-agenda .dx-scheduler-group-table .dx-scheduler-group-row .dx-scheduler-group-header,
-.dx-scheduler-agenda .dx-scheduler-header-panel .dx-scheduler-group-row .dx-scheduler-group-header {
+.dx-scheduler-work-space-month .dx-scheduler-group-table .dx-scheduler-group-row .dx-scheduler-group-header .dx-scheduler-group-header-content,
+.dx-scheduler-work-space-month .dx-scheduler-header-panel .dx-scheduler-group-row .dx-scheduler-group-header .dx-scheduler-group-header-content,
+.dx-scheduler-timeline .dx-scheduler-group-table .dx-scheduler-group-row .dx-scheduler-group-header .dx-scheduler-group-header-content,
+.dx-scheduler-timeline .dx-scheduler-header-panel .dx-scheduler-group-row .dx-scheduler-group-header .dx-scheduler-group-header-content,
+.dx-scheduler-agenda .dx-scheduler-group-table .dx-scheduler-group-row .dx-scheduler-group-header .dx-scheduler-group-header-content,
+.dx-scheduler-agenda .dx-scheduler-header-panel .dx-scheduler-group-row .dx-scheduler-group-header .dx-scheduler-group-header-content {
   padding-left: 8px;
 }
 .dx-scheduler-timeline .dx-scheduler-group-table .dx-scheduler-group-row .dx-scheduler-group-header,
@@ -14572,6 +14467,12 @@
 .dx-scheduler-appointment-popup .dx-fieldset {
   margin: 0 15px 15px 10px;
 }
+.dx-scheduler-appointment-popup .dx-form {
+  padding: 0 10px 0 10px;
+}
+.dx-scheduler-appointment-popup .dx-form .dx-layout-manager {
+  padding: 0 10px 0 10px;
+}
 .dx-scheduler-appointment-popup .dx-popup-title {
   background-color: #fff;
   border-bottom: none;
@@ -14603,6 +14504,9 @@
 .dx-scheduler-appointment-popup .dx-scheduler-recurrence-rule-item:before {
   background-color: #fff;
 }
+.dx-scheduler-appointment-popup .dx-scheduler-recurrence-rule-item.dx-label-v-align:before {
+  top: 84px;
+}
 .dx-scheduler-appointment-popup .dx-scheduler-recurrence-rule-item.dx-scheduler-recurrence-rule-item-opened:before {
   border-top: 1px solid #f2f2f2;
   border-bottom: 1px solid #f2f2f2;
@@ -14615,20 +14519,20 @@
   font-size: 16px;
 }
 .dx-scheduler-work-space-grouped:not(.dx-scheduler-agenda) .dx-scheduler-group-row th,
-.dx-scheduler-work-space.dx-scheduler-work-space-grouped .dx-scheduler-last-group-cell {
+.dx-scheduler-work-space.dx-scheduler-work-space-grouped:not(.dx-scheduler-work-space-vertical-grouped):not(.dx-scheduler-timeline) .dx-scheduler-last-group-cell {
   border-right: 1px solid #bfbfbf;
 }
 .dx-scheduler-work-space-grouped:not(.dx-scheduler-agenda) .dx-scheduler-group-row th:last-child,
-.dx-scheduler-work-space.dx-scheduler-work-space-grouped .dx-scheduler-last-group-cell:last-child {
+.dx-scheduler-work-space.dx-scheduler-work-space-grouped:not(.dx-scheduler-work-space-vertical-grouped):not(.dx-scheduler-timeline) .dx-scheduler-last-group-cell:last-child {
   border-right: none;
 }
 .dx-rtl .dx-scheduler-work-space-grouped:not(.dx-scheduler-agenda) .dx-scheduler-group-row th,
-.dx-rtl .dx-scheduler-work-space.dx-scheduler-work-space-grouped .dx-scheduler-last-group-cell {
+.dx-rtl .dx-scheduler-work-space.dx-scheduler-work-space-grouped:not(.dx-scheduler-work-space-vertical-grouped):not(.dx-scheduler-timeline) .dx-scheduler-last-group-cell {
   border-left: 1px solid #bfbfbf;
   border-right: 1px solid #e0e0e0;
 }
 .dx-rtl .dx-scheduler-work-space-grouped:not(.dx-scheduler-agenda) .dx-scheduler-group-row th:last-child,
-.dx-rtl .dx-scheduler-work-space.dx-scheduler-work-space-grouped .dx-scheduler-last-group-cell:last-child {
+.dx-rtl .dx-scheduler-work-space.dx-scheduler-work-space-grouped:not(.dx-scheduler-work-space-vertical-grouped):not(.dx-scheduler-timeline) .dx-scheduler-last-group-cell:last-child {
   border-left: none;
 }
 .dx-scheduler-appointment,
@@ -14701,14 +14605,6 @@
 .dx-scheduler-work-space-grouped:not(.dx-scheduler-work-space-all-day):not(.dx-scheduler-timeline):not(.dx-scheduler-agenda) .dx-scheduler-header-scrollable {
   height: 57px;
 }
-.dx-scheduler-work-space-grouped:not(.dx-scheduler-work-space-all-day):not(.dx-scheduler-timeline):not(.dx-scheduler-agenda).dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-day .dx-scheduler-header-scrollable {
-  height: 10px;
-}
-.dx-scheduler-work-space-grouped:not(.dx-scheduler-work-space-all-day):not(.dx-scheduler-timeline):not(.dx-scheduler-agenda).dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-week .dx-scheduler-header-scrollable,
-.dx-scheduler-work-space-grouped:not(.dx-scheduler-work-space-all-day):not(.dx-scheduler-timeline):not(.dx-scheduler-agenda).dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-work-week .dx-scheduler-header-scrollable,
-.dx-scheduler-work-space-grouped:not(.dx-scheduler-work-space-all-day):not(.dx-scheduler-timeline):not(.dx-scheduler-agenda).dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-month .dx-scheduler-header-scrollable {
-  height: 50px;
-}
 .dx-scheduler-work-space-grouped:not(.dx-scheduler-work-space-all-day):not(.dx-scheduler-timeline):not(.dx-scheduler-agenda).dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline .dx-scheduler-header-scrollable {
   height: auto;
 }
@@ -14743,14 +14639,6 @@
 }
 .dx-scheduler-work-space-grouped:not(.dx-scheduler-work-space-all-day):not(.dx-scheduler-timeline):not(.dx-scheduler-agenda).dx-scheduler-work-space-day .dx-scheduler-header-scrollable {
   height: 1px;
-}
-.dx-scheduler-work-space-grouped:not(.dx-scheduler-work-space-all-day):not(.dx-scheduler-timeline):not(.dx-scheduler-agenda).dx-scheduler-work-space-day.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-day .dx-scheduler-header-scrollable {
-  height: 10px;
-}
-.dx-scheduler-work-space-grouped:not(.dx-scheduler-work-space-all-day):not(.dx-scheduler-timeline):not(.dx-scheduler-agenda).dx-scheduler-work-space-day.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-week .dx-scheduler-header-scrollable,
-.dx-scheduler-work-space-grouped:not(.dx-scheduler-work-space-all-day):not(.dx-scheduler-timeline):not(.dx-scheduler-agenda).dx-scheduler-work-space-day.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-work-week .dx-scheduler-header-scrollable,
-.dx-scheduler-work-space-grouped:not(.dx-scheduler-work-space-all-day):not(.dx-scheduler-timeline):not(.dx-scheduler-agenda).dx-scheduler-work-space-day.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-month .dx-scheduler-header-scrollable {
-  height: 50px;
 }
 .dx-scheduler-work-space-grouped:not(.dx-scheduler-work-space-all-day):not(.dx-scheduler-timeline):not(.dx-scheduler-agenda).dx-scheduler-work-space-day.dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline .dx-scheduler-header-scrollable {
   height: auto;
@@ -14798,22 +14686,6 @@
 .dx-scheduler-work-space.dx-scheduler-timeline-work-week .dx-scheduler-header-scrollable {
   height: 113px;
 }
-.dx-scheduler-work-space.dx-scheduler-timeline-week.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-day .dx-scheduler-header-scrollable,
-.dx-scheduler-work-space.dx-scheduler-timeline.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-day .dx-scheduler-header-scrollable,
-.dx-scheduler-work-space.dx-scheduler-timeline-work-week.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-day .dx-scheduler-header-scrollable {
-  height: 10px;
-}
-.dx-scheduler-work-space.dx-scheduler-timeline-week.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-week .dx-scheduler-header-scrollable,
-.dx-scheduler-work-space.dx-scheduler-timeline.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-week .dx-scheduler-header-scrollable,
-.dx-scheduler-work-space.dx-scheduler-timeline-work-week.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-week .dx-scheduler-header-scrollable,
-.dx-scheduler-work-space.dx-scheduler-timeline-week.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-work-week .dx-scheduler-header-scrollable,
-.dx-scheduler-work-space.dx-scheduler-timeline.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-work-week .dx-scheduler-header-scrollable,
-.dx-scheduler-work-space.dx-scheduler-timeline-work-week.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-work-week .dx-scheduler-header-scrollable,
-.dx-scheduler-work-space.dx-scheduler-timeline-week.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-month .dx-scheduler-header-scrollable,
-.dx-scheduler-work-space.dx-scheduler-timeline.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-month .dx-scheduler-header-scrollable,
-.dx-scheduler-work-space.dx-scheduler-timeline-work-week.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-month .dx-scheduler-header-scrollable {
-  height: 50px;
-}
 .dx-scheduler-work-space.dx-scheduler-timeline-week.dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline .dx-scheduler-header-scrollable,
 .dx-scheduler-work-space.dx-scheduler-timeline.dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline .dx-scheduler-header-scrollable,
 .dx-scheduler-work-space.dx-scheduler-timeline-work-week.dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline .dx-scheduler-header-scrollable {
@@ -14855,14 +14727,6 @@
 .dx-scheduler-work-space-both-scrollbar .dx-scheduler-header-scrollable {
   height: 57px;
 }
-.dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-day .dx-scheduler-header-scrollable {
-  height: 10px;
-}
-.dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-week .dx-scheduler-header-scrollable,
-.dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-work-week .dx-scheduler-header-scrollable,
-.dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-month .dx-scheduler-header-scrollable {
-  height: 50px;
-}
 .dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline .dx-scheduler-header-scrollable {
   height: auto;
 }
@@ -14877,14 +14741,6 @@
 }
 .dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space-day .dx-scheduler-header-scrollable {
   height: 1px;
-}
-.dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space-day.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-day .dx-scheduler-header-scrollable {
-  height: 10px;
-}
-.dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space-day.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-week .dx-scheduler-header-scrollable,
-.dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space-day.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-work-week .dx-scheduler-header-scrollable,
-.dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space-day.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-month .dx-scheduler-header-scrollable {
-  height: 50px;
 }
 .dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space-day.dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline .dx-scheduler-header-scrollable {
   height: auto;
@@ -14901,14 +14757,6 @@
 .dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space.dx-scheduler-work-space-all-day .dx-scheduler-header-scrollable {
   height: 114px;
 }
-.dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space.dx-scheduler-work-space-all-day.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-day .dx-scheduler-header-scrollable {
-  height: 10px;
-}
-.dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space.dx-scheduler-work-space-all-day.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-week .dx-scheduler-header-scrollable,
-.dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space.dx-scheduler-work-space-all-day.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-work-week .dx-scheduler-header-scrollable,
-.dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space.dx-scheduler-work-space-all-day.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-month .dx-scheduler-header-scrollable {
-  height: 50px;
-}
 .dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space.dx-scheduler-work-space-all-day.dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline .dx-scheduler-header-scrollable {
   height: auto;
 }
@@ -14923,14 +14771,6 @@
 }
 .dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space.dx-scheduler-work-space-all-day.dx-scheduler-work-space-all-day-collapsed .dx-scheduler-header-scrollable {
   height: 76px;
-}
-.dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space.dx-scheduler-work-space-all-day.dx-scheduler-work-space-all-day-collapsed.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-day .dx-scheduler-header-scrollable {
-  height: 10px;
-}
-.dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space.dx-scheduler-work-space-all-day.dx-scheduler-work-space-all-day-collapsed.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-week .dx-scheduler-header-scrollable,
-.dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space.dx-scheduler-work-space-all-day.dx-scheduler-work-space-all-day-collapsed.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-work-week .dx-scheduler-header-scrollable,
-.dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space.dx-scheduler-work-space-all-day.dx-scheduler-work-space-all-day-collapsed.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-month .dx-scheduler-header-scrollable {
-  height: 50px;
 }
 .dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space.dx-scheduler-work-space-all-day.dx-scheduler-work-space-all-day-collapsed.dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline .dx-scheduler-header-scrollable {
   height: auto;
@@ -14947,14 +14787,6 @@
 .dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space.dx-scheduler-work-space-all-day.dx-scheduler-work-space-day:not(.dx-scheduler-work-space-count) .dx-scheduler-header-scrollable {
   height: 58px;
 }
-.dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space.dx-scheduler-work-space-all-day.dx-scheduler-work-space-day:not(.dx-scheduler-work-space-count).dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-day .dx-scheduler-header-scrollable {
-  height: 10px;
-}
-.dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space.dx-scheduler-work-space-all-day.dx-scheduler-work-space-day:not(.dx-scheduler-work-space-count).dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-week .dx-scheduler-header-scrollable,
-.dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space.dx-scheduler-work-space-all-day.dx-scheduler-work-space-day:not(.dx-scheduler-work-space-count).dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-work-week .dx-scheduler-header-scrollable,
-.dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space.dx-scheduler-work-space-all-day.dx-scheduler-work-space-day:not(.dx-scheduler-work-space-count).dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-month .dx-scheduler-header-scrollable {
-  height: 50px;
-}
 .dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space.dx-scheduler-work-space-all-day.dx-scheduler-work-space-day:not(.dx-scheduler-work-space-count).dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline .dx-scheduler-header-scrollable {
   height: auto;
 }
@@ -14969,14 +14801,6 @@
 }
 .dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space.dx-scheduler-work-space-all-day.dx-scheduler-work-space-day:not(.dx-scheduler-work-space-count).dx-scheduler-work-space-all-day-collapsed .dx-scheduler-header-scrollable {
   height: 20px;
-}
-.dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space.dx-scheduler-work-space-all-day.dx-scheduler-work-space-day:not(.dx-scheduler-work-space-count).dx-scheduler-work-space-all-day-collapsed.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-day .dx-scheduler-header-scrollable {
-  height: 10px;
-}
-.dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space.dx-scheduler-work-space-all-day.dx-scheduler-work-space-day:not(.dx-scheduler-work-space-count).dx-scheduler-work-space-all-day-collapsed.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-week .dx-scheduler-header-scrollable,
-.dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space.dx-scheduler-work-space-all-day.dx-scheduler-work-space-day:not(.dx-scheduler-work-space-count).dx-scheduler-work-space-all-day-collapsed.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-work-week .dx-scheduler-header-scrollable,
-.dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space.dx-scheduler-work-space-all-day.dx-scheduler-work-space-day:not(.dx-scheduler-work-space-count).dx-scheduler-work-space-all-day-collapsed.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-month .dx-scheduler-header-scrollable {
-  height: 50px;
 }
 .dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space.dx-scheduler-work-space-all-day.dx-scheduler-work-space-day:not(.dx-scheduler-work-space-count).dx-scheduler-work-space-all-day-collapsed.dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline .dx-scheduler-header-scrollable {
   height: auto;
@@ -14993,14 +14817,6 @@
 .dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space.dx-scheduler-work-space-all-day.dx-scheduler-work-space-day:not(.dx-scheduler-work-space-grouped) .dx-scheduler-header-scrollable {
   height: 58px;
 }
-.dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space.dx-scheduler-work-space-all-day.dx-scheduler-work-space-day:not(.dx-scheduler-work-space-grouped).dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-day .dx-scheduler-header-scrollable {
-  height: 10px;
-}
-.dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space.dx-scheduler-work-space-all-day.dx-scheduler-work-space-day:not(.dx-scheduler-work-space-grouped).dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-week .dx-scheduler-header-scrollable,
-.dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space.dx-scheduler-work-space-all-day.dx-scheduler-work-space-day:not(.dx-scheduler-work-space-grouped).dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-work-week .dx-scheduler-header-scrollable,
-.dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space.dx-scheduler-work-space-all-day.dx-scheduler-work-space-day:not(.dx-scheduler-work-space-grouped).dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-month .dx-scheduler-header-scrollable {
-  height: 50px;
-}
 .dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space.dx-scheduler-work-space-all-day.dx-scheduler-work-space-day:not(.dx-scheduler-work-space-grouped).dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline .dx-scheduler-header-scrollable {
   height: auto;
 }
@@ -15016,14 +14832,6 @@
 .dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space.dx-scheduler-work-space-all-day.dx-scheduler-work-space-day:not(.dx-scheduler-work-space-grouped).dx-scheduler-work-space-all-day-collapsed .dx-scheduler-header-scrollable {
   height: 20px;
 }
-.dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space.dx-scheduler-work-space-all-day.dx-scheduler-work-space-day:not(.dx-scheduler-work-space-grouped).dx-scheduler-work-space-all-day-collapsed.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-day .dx-scheduler-header-scrollable {
-  height: 10px;
-}
-.dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space.dx-scheduler-work-space-all-day.dx-scheduler-work-space-day:not(.dx-scheduler-work-space-grouped).dx-scheduler-work-space-all-day-collapsed.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-week .dx-scheduler-header-scrollable,
-.dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space.dx-scheduler-work-space-all-day.dx-scheduler-work-space-day:not(.dx-scheduler-work-space-grouped).dx-scheduler-work-space-all-day-collapsed.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-work-week .dx-scheduler-header-scrollable,
-.dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space.dx-scheduler-work-space-all-day.dx-scheduler-work-space-day:not(.dx-scheduler-work-space-grouped).dx-scheduler-work-space-all-day-collapsed.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-month .dx-scheduler-header-scrollable {
-  height: 50px;
-}
 .dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space.dx-scheduler-work-space-all-day.dx-scheduler-work-space-day:not(.dx-scheduler-work-space-grouped).dx-scheduler-work-space-all-day-collapsed.dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline .dx-scheduler-header-scrollable {
   height: auto;
 }
@@ -15038,14 +14846,6 @@
 }
 .dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space.dx-scheduler-work-space-month .dx-scheduler-header-scrollable {
   height: 23px;
-}
-.dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space.dx-scheduler-work-space-month.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-day .dx-scheduler-header-scrollable {
-  height: 10px;
-}
-.dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space.dx-scheduler-work-space-month.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-week .dx-scheduler-header-scrollable,
-.dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space.dx-scheduler-work-space-month.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-work-week .dx-scheduler-header-scrollable,
-.dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space.dx-scheduler-work-space-month.dx-scheduler-work-space-vertical-grouped.dx-scheduler-work-space-month .dx-scheduler-header-scrollable {
-  height: 50px;
 }
 .dx-scheduler-work-space-both-scrollbar.dx-scheduler-work-space.dx-scheduler-work-space-month.dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline .dx-scheduler-header-scrollable {
   height: auto;
@@ -15237,9 +15037,6 @@
 .dx-field-item {
   padding-bottom: 10px;
   font-size: 12px;
-}
-.dx-field-item-content .dx-textarea {
-  margin: 0;
 }
 .dx-label-v-align .dx-field-item-content .dx-textarea {
   margin-top: 6px;
