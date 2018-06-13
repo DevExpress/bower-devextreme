@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 18.1.3 (build 18155)
-* Build date: Jun 4, 2018
+* Version: 18.1.3 (build 18164)
+* Build date: Jun 13, 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -4088,7 +4088,8 @@
   background-image: linear-gradient(180deg, rgba(42, 42, 42, 0) 0%, rgba(42, 42, 42, 0.8) 60%);
 }
 .dx-device-tablet .dx-dateview-rollers,
-.dx-device-phone .dx-dateview-rollers {
+.dx-device-phone .dx-dateview-rollers,
+.dx-dateview-compact .dx-dateview-rollers {
   display: -webkit-box;
   display: -webkit-flex;
   display: -moz-flex;
@@ -4102,15 +4103,18 @@
   flex-flow: row nowrap;
 }
 .dx-device-tablet .dx-dateviewroller-month,
-.dx-device-phone .dx-dateviewroller-month {
+.dx-device-phone .dx-dateviewroller-month,
+.dx-dateview-compact .dx-dateviewroller-month {
   min-width: 4em;
 }
 .dx-device-tablet .dx-dateview-item,
-.dx-device-phone .dx-dateview-item {
+.dx-device-phone .dx-dateview-item,
+.dx-dateview-compact .dx-dateview-item {
   font-size: 1.1em;
 }
 .dx-device-tablet .dx-dateview-item-selected,
-.dx-device-phone .dx-dateview-item-selected {
+.dx-device-phone .dx-dateview-item-selected,
+.dx-dateview-compact .dx-dateview-item-selected {
   font-size: 1.4em;
 }
 .dx-toolbar {
@@ -9102,6 +9106,10 @@
   -ms-flex-flow: row nowrap;
   flex-flow: row nowrap;
 }
+.dx-scheduler-timeline-week .dx-scheduler-header-panel thead,
+.dx-scheduler-timeline-work-week .dx-scheduler-header-panel thead {
+  width: 100%;
+}
 .dx-scheduler-timeline-week .dx-scheduler-header-row,
 .dx-scheduler-timeline-work-week .dx-scheduler-header-row {
   display: -webkit-box;
@@ -9116,10 +9124,9 @@
   -ms-flex-flow: row nowrap;
   flex-flow: row nowrap;
 }
-.dx-scheduler-timeline-week .dx-scheduler-header-panel-week-cell,
-.dx-scheduler-timeline-work-week .dx-scheduler-header-panel-week-cell {
+.dx-scheduler-timeline-week .dx-scheduler-header-panel-cell,
+.dx-scheduler-timeline-work-week .dx-scheduler-header-panel-cell {
   flex-grow: 1;
-  flex-basis: 0;
   justify-content: center;
   display: -webkit-box;
   display: -webkit-flex;
@@ -10727,6 +10734,9 @@
   color: #2a2a2a;
   opacity: .99;
 }
+.dx-scheduler-dropdown-appointments-compact .dx-scheduler-dropdown-appointments-content span:last-child {
+  padding-left: 0;
+}
 .dx-scheduler-dropdown-appointment {
   border-left: 5px solid #1ca8dd;
 }
@@ -12030,9 +12040,12 @@
   font-size: 14px;
   color: #dedede;
 }
-.dx-scheduler-header-panel .dx-scheduler-group-row .dx-scheduler-group-header {
-  font-weight: bold;
+.dx-scheduler-header-panel .dx-scheduler-group-header {
   font-size: 18px;
+}
+.dx-scheduler-header-panel .dx-scheduler-group-header,
+.dx-scheduler-work-space-vertical-group-table .dx-scheduler-group-header {
+  font-weight: bold;
   color: #dedede;
 }
 .dx-scheduler-all-day-panel {
