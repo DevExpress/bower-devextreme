@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 17.2.8 (build 18151)
-* Build date: May 31, 2018
+* Version: 17.2.8 (build 18171)
+* Build date: Jun 20, 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -2081,7 +2081,7 @@
   float: left;
   margin-left: -100px;
 }
-.dx-scheduler-small .dx-scheduler-date-table .dx-scheduler-work-space:not(.dx-scheduler-timeline) {
+.dx-scheduler-small .dx-scheduler-date-table {
   margin-left: -50px;
 }
 .dx-scheduler-date-table .dx-scheduler-date-table-row:before {
@@ -7680,7 +7680,8 @@
 .dx-datagrid-container .dx-icon-filter-operation-between:before {
   content: "\f06a";
 }
-.dx-datagrid .dx-row-alt > td {
+.dx-datagrid .dx-row-alt > td,
+.dx-datagrid .dx-row-alt > tr > td {
   background-color: #E5E5E5;
 }
 .dx-datagrid .dx-row-alt.dx-row:not(.dx-row-removed) {
@@ -8108,15 +8109,21 @@
   border-bottom: 1px solid rgba(21, 194, 111, 0.5);
 }
 .dx-datagrid-rowsview .dx-selection > td,
-.dx-datagrid-rowsview .dx-selection.dx-row:hover > td {
+.dx-datagrid-rowsview .dx-selection.dx-row:hover > td,
+.dx-datagrid-rowsview .dx-selection > tr > td,
+.dx-datagrid-rowsview .dx-selection.dx-row:hover > tr > td {
   background-color: #d9f5f9;
 }
 .dx-datagrid-rowsview .dx-selection > td.dx-datagrid-group-space,
-.dx-datagrid-rowsview .dx-selection.dx-row:hover > td.dx-datagrid-group-space {
+.dx-datagrid-rowsview .dx-selection.dx-row:hover > td.dx-datagrid-group-space,
+.dx-datagrid-rowsview .dx-selection > tr > td.dx-datagrid-group-space,
+.dx-datagrid-rowsview .dx-selection.dx-row:hover > tr > td.dx-datagrid-group-space {
   border-right-color: #d9f5f9;
 }
 .dx-datagrid-rowsview .dx-selection > td.dx-focused,
-.dx-datagrid-rowsview .dx-selection.dx-row:hover > td.dx-focused {
+.dx-datagrid-rowsview .dx-selection.dx-row:hover > td.dx-focused,
+.dx-datagrid-rowsview .dx-selection > tr > td.dx-focused,
+.dx-datagrid-rowsview .dx-selection.dx-row:hover > tr > td.dx-focused {
   background-color: white;
 }
 .dx-datagrid-rowsview .dx-selection:not(.dx-row-lines) > td,
@@ -8124,7 +8131,9 @@
   border-bottom: 1px solid #d9f5f9;
 }
 .dx-datagrid-rowsview .dx-selection.dx-row > td.dx-pointer-events-none,
-.dx-datagrid-rowsview .dx-selection.dx-row:hover.dx-row > td.dx-pointer-events-none {
+.dx-datagrid-rowsview .dx-selection.dx-row:hover.dx-row > td.dx-pointer-events-none,
+.dx-datagrid-rowsview .dx-selection.dx-row > tr > td.dx-pointer-events-none,
+.dx-datagrid-rowsview .dx-selection.dx-row:hover.dx-row > tr > td.dx-pointer-events-none {
   border-bottom-color: transparent;
 }
 .dx-datagrid-rowsview .dx-master-detail-row > .dx-datagrid-group-space,
@@ -8246,7 +8255,9 @@
   background-position: left 10px top 50%;
 }
 .dx-rtl .dx-datagrid-rowsview .dx-selection > td:not(.dx-focused).dx-datagrid-group-space,
-.dx-rtl .dx-datagrid-rowsview .dx-selection.dx-row:hover > td:not(.dx-focused).dx-datagrid-group-space {
+.dx-rtl .dx-datagrid-rowsview .dx-selection.dx-row:hover > td:not(.dx-focused).dx-datagrid-group-space,
+.dx-rtl .dx-datagrid-rowsview .dx-selection > th > td:not(.dx-focused).dx-datagrid-group-space,
+.dx-rtl .dx-datagrid-rowsview .dx-selection.dx-row:hover > th > td:not(.dx-focused).dx-datagrid-group-space {
   border-left-color: #d9f5f9;
 }
 .dx-rtl .dx-datagrid-filter-row .dx-menu .dx-menu-item .dx-menu-item-content {
@@ -8503,7 +8514,8 @@
 .dx-treelist-container .dx-icon-filter-operation-between:before {
   content: "\f06a";
 }
-.dx-treelist .dx-row-alt > td {
+.dx-treelist .dx-row-alt > td,
+.dx-treelist .dx-row-alt > tr > td {
   background-color: #E5E5E5;
 }
 .dx-treelist .dx-row-alt.dx-row:not(.dx-row-removed) {
@@ -8931,15 +8943,21 @@
   border-bottom: 1px solid rgba(21, 194, 111, 0.5);
 }
 .dx-treelist-rowsview .dx-selection > td,
-.dx-treelist-rowsview .dx-selection.dx-row:hover > td {
+.dx-treelist-rowsview .dx-selection.dx-row:hover > td,
+.dx-treelist-rowsview .dx-selection > tr > td,
+.dx-treelist-rowsview .dx-selection.dx-row:hover > tr > td {
   background-color: #d9f5f9;
 }
 .dx-treelist-rowsview .dx-selection > td.dx-treelist-group-space,
-.dx-treelist-rowsview .dx-selection.dx-row:hover > td.dx-treelist-group-space {
+.dx-treelist-rowsview .dx-selection.dx-row:hover > td.dx-treelist-group-space,
+.dx-treelist-rowsview .dx-selection > tr > td.dx-treelist-group-space,
+.dx-treelist-rowsview .dx-selection.dx-row:hover > tr > td.dx-treelist-group-space {
   border-right-color: #d9f5f9;
 }
 .dx-treelist-rowsview .dx-selection > td.dx-focused,
-.dx-treelist-rowsview .dx-selection.dx-row:hover > td.dx-focused {
+.dx-treelist-rowsview .dx-selection.dx-row:hover > td.dx-focused,
+.dx-treelist-rowsview .dx-selection > tr > td.dx-focused,
+.dx-treelist-rowsview .dx-selection.dx-row:hover > tr > td.dx-focused {
   background-color: white;
 }
 .dx-treelist-rowsview .dx-selection:not(.dx-row-lines) > td,
@@ -8947,7 +8965,9 @@
   border-bottom: 1px solid #d9f5f9;
 }
 .dx-treelist-rowsview .dx-selection.dx-row > td.dx-pointer-events-none,
-.dx-treelist-rowsview .dx-selection.dx-row:hover.dx-row > td.dx-pointer-events-none {
+.dx-treelist-rowsview .dx-selection.dx-row:hover.dx-row > td.dx-pointer-events-none,
+.dx-treelist-rowsview .dx-selection.dx-row > tr > td.dx-pointer-events-none,
+.dx-treelist-rowsview .dx-selection.dx-row:hover.dx-row > tr > td.dx-pointer-events-none {
   border-bottom-color: transparent;
 }
 .dx-treelist-rowsview .dx-master-detail-row > .dx-treelist-group-space,
@@ -9069,7 +9089,9 @@
   background-position: left 10px top 50%;
 }
 .dx-rtl .dx-treelist-rowsview .dx-selection > td:not(.dx-focused).dx-treelist-group-space,
-.dx-rtl .dx-treelist-rowsview .dx-selection.dx-row:hover > td:not(.dx-focused).dx-treelist-group-space {
+.dx-rtl .dx-treelist-rowsview .dx-selection.dx-row:hover > td:not(.dx-focused).dx-treelist-group-space,
+.dx-rtl .dx-treelist-rowsview .dx-selection > th > td:not(.dx-focused).dx-treelist-group-space,
+.dx-rtl .dx-treelist-rowsview .dx-selection.dx-row:hover > th > td:not(.dx-focused).dx-treelist-group-space {
   border-left-color: #d9f5f9;
 }
 .dx-rtl .dx-treelist-filter-row .dx-menu .dx-menu-item .dx-menu-item-content {
