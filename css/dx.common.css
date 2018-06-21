@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 18.1.3 (build 18164)
-* Build date: Jun 13, 2018
+* Version: 18.1.4
+* Build date: Jun 19, 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -4290,7 +4290,8 @@
   right: 0;
   margin: -7px;
 }
-.dx-datagrid .dx-row > td {
+.dx-datagrid .dx-row > td,
+.dx-datagrid .dx-row > tr > td {
   padding: 7px;
 }
 .dx-datagrid .dx-error-row {
@@ -4407,7 +4408,8 @@ input.dx-hidden {
   display: inline-block !important;
   width: 0 !important;
 }
-.dx-row > td {
+.dx-row > td,
+.dx-row > tr > td {
   border: none;
 }
 .dx-datagrid-content .dx-datagrid-table {
@@ -4455,17 +4457,21 @@ input.dx-hidden {
 .dx-datagrid-content .dx-datagrid-table [class*="column"] + [class*="column"]:last-child {
   float: none;
 }
-.dx-datagrid-content .dx-datagrid-table .dx-row > td {
+.dx-datagrid-content .dx-datagrid-table .dx-row > td,
+.dx-datagrid-content .dx-datagrid-table .dx-row > tr > td {
   vertical-align: top;
 }
-.dx-datagrid-content .dx-datagrid-table .dx-row > td:first-child {
+.dx-datagrid-content .dx-datagrid-table .dx-row > td:first-child,
+.dx-datagrid-content .dx-datagrid-table .dx-row > tr > td:first-child {
   border-left: 0px;
 }
-.dx-datagrid-content .dx-datagrid-table .dx-row > td.dx-datagrid-group-space {
+.dx-datagrid-content .dx-datagrid-table .dx-row > td.dx-datagrid-group-space,
+.dx-datagrid-content .dx-datagrid-table .dx-row > tr > td.dx-datagrid-group-space {
   border-right: none;
   vertical-align: middle;
 }
-.dx-datagrid-content .dx-datagrid-table .dx-row > td.dx-datagrid-group-space + td {
+.dx-datagrid-content .dx-datagrid-table .dx-row > td.dx-datagrid-group-space + td,
+.dx-datagrid-content .dx-datagrid-table .dx-row > tr > td.dx-datagrid-group-space + td {
   border-left: none;
 }
 .dx-datagrid-content .dx-datagrid-table .dx-row .dx-editor-container {
@@ -4749,7 +4755,8 @@ input.dx-hidden {
 .dx-datagrid-rowsview:focus {
   outline: 0;
 }
-.dx-datagrid-rowsview .dx-row > td {
+.dx-datagrid-rowsview .dx-row > td,
+.dx-datagrid-rowsview .dx-row > tr > td {
   overflow: hidden;
   -o-text-overflow: ellipsis;
   text-overflow: ellipsis;
@@ -4757,14 +4764,17 @@ input.dx-hidden {
 .dx-datagrid-rowsview .dx-row.dx-row-lines:first-child {
   border-top: none;
 }
-.dx-datagrid-rowsview .dx-row.dx-row-lines:first-child > td {
+.dx-datagrid-rowsview .dx-row.dx-row-lines:first-child > td,
+.dx-datagrid-rowsview .dx-row.dx-row-lines:first-child > tr > td {
   border-top: none;
 }
 .dx-datagrid-rowsview .dx-data-row > td:focus {
   outline: 0;
 }
 .dx-datagrid-rowsview .dx-selection > td .dx-link,
-.dx-datagrid-rowsview .dx-selection.dx-row:hover > td .dx-link {
+.dx-datagrid-rowsview .dx-selection.dx-row:hover > td .dx-link,
+.dx-datagrid-rowsview .dx-selection > tr > td .dx-link,
+.dx-datagrid-rowsview .dx-selection.dx-row:hover > tr > td .dx-link {
   color: inherit;
 }
 .dx-datagrid-rowsview .dx-datagrid-table .dx-freespace-row,
@@ -5349,7 +5359,8 @@ input.dx-hidden {
   right: 0;
   margin: -7px;
 }
-.dx-treelist .dx-row > td {
+.dx-treelist .dx-row > td,
+.dx-treelist .dx-row > tr > td {
   padding: 7px;
 }
 .dx-treelist .dx-error-row {
@@ -5466,7 +5477,8 @@ input.dx-hidden {
   display: inline-block !important;
   width: 0 !important;
 }
-.dx-row > td {
+.dx-row > td,
+.dx-row > tr > td {
   border: none;
 }
 .dx-treelist-content .dx-treelist-table {
@@ -5514,17 +5526,21 @@ input.dx-hidden {
 .dx-treelist-content .dx-treelist-table [class*="column"] + [class*="column"]:last-child {
   float: none;
 }
-.dx-treelist-content .dx-treelist-table .dx-row > td {
+.dx-treelist-content .dx-treelist-table .dx-row > td,
+.dx-treelist-content .dx-treelist-table .dx-row > tr > td {
   vertical-align: top;
 }
-.dx-treelist-content .dx-treelist-table .dx-row > td:first-child {
+.dx-treelist-content .dx-treelist-table .dx-row > td:first-child,
+.dx-treelist-content .dx-treelist-table .dx-row > tr > td:first-child {
   border-left: 0px;
 }
-.dx-treelist-content .dx-treelist-table .dx-row > td.dx-treelist-group-space {
+.dx-treelist-content .dx-treelist-table .dx-row > td.dx-treelist-group-space,
+.dx-treelist-content .dx-treelist-table .dx-row > tr > td.dx-treelist-group-space {
   border-right: none;
   vertical-align: middle;
 }
-.dx-treelist-content .dx-treelist-table .dx-row > td.dx-treelist-group-space + td {
+.dx-treelist-content .dx-treelist-table .dx-row > td.dx-treelist-group-space + td,
+.dx-treelist-content .dx-treelist-table .dx-row > tr > td.dx-treelist-group-space + td {
   border-left: none;
 }
 .dx-treelist-content .dx-treelist-table .dx-row .dx-editor-container {
@@ -5808,7 +5824,8 @@ input.dx-hidden {
 .dx-treelist-rowsview:focus {
   outline: 0;
 }
-.dx-treelist-rowsview .dx-row > td {
+.dx-treelist-rowsview .dx-row > td,
+.dx-treelist-rowsview .dx-row > tr > td {
   overflow: hidden;
   -o-text-overflow: ellipsis;
   text-overflow: ellipsis;
@@ -5816,14 +5833,17 @@ input.dx-hidden {
 .dx-treelist-rowsview .dx-row.dx-row-lines:first-child {
   border-top: none;
 }
-.dx-treelist-rowsview .dx-row.dx-row-lines:first-child > td {
+.dx-treelist-rowsview .dx-row.dx-row-lines:first-child > td,
+.dx-treelist-rowsview .dx-row.dx-row-lines:first-child > tr > td {
   border-top: none;
 }
 .dx-treelist-rowsview .dx-data-row > td:focus {
   outline: 0;
 }
 .dx-treelist-rowsview .dx-selection > td .dx-link,
-.dx-treelist-rowsview .dx-selection.dx-row:hover > td .dx-link {
+.dx-treelist-rowsview .dx-selection.dx-row:hover > td .dx-link,
+.dx-treelist-rowsview .dx-selection > tr > td .dx-link,
+.dx-treelist-rowsview .dx-selection.dx-row:hover > tr > td .dx-link {
   color: inherit;
 }
 .dx-treelist-rowsview .dx-treelist-table .dx-freespace-row,
@@ -6572,6 +6592,18 @@ input.dx-hidden {
 }
 .dx-fileuploader-input-wrapper:after {
   clear: both;
+}
+.dx-fileuploader-input-wrapper:before,
+.dx-fileuploader-input-wrapper:after {
+  width: 100%;
+}
+.dx-fileuploader-input-wrapper:before {
+  padding-top: 1em;
+  margin-top: -1em;
+}
+.dx-fileuploader-input-wrapper:after {
+  padding-bottom: 1em;
+  margin-bottom: -1em;
 }
 .dx-fileuploader-input-wrapper .dx-button {
   float: left;
