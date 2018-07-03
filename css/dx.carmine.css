@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 17.2.8 (build 18171)
-* Build date: Jun 20, 2018
+* Version: 17.2.8 (build 18184)
+* Build date: Jul 3, 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -297,6 +297,16 @@
 .dx-pivotgrid .dx-column-header .dx-pivotgrid-fields-area-head tr > td:first-child {
   padding-left: 0;
 }
+.dx-pivotgrid .dx-filter-header .dx-area-field-container {
+  border-spacing: 8px;
+  border-collapse: separate;
+}
+.dx-pivotgrid .dx-filter-header .dx-pivotgrid-fields-area-head td {
+  padding: 2px;
+}
+.dx-pivotgrid .dx-filter-header .dx-pivotgrid-fields-area-head tr > td:first-child {
+  padding-left: 2px;
+}
 .dx-pivotgrid .dx-area-field.dx-area-box {
   margin-bottom: 0;
 }
@@ -477,6 +487,9 @@
 }
 .dx-pivotgrid .dx-pivotgrid-border .dx-filter-header {
   border-top: 1px solid #dee1e3;
+}
+.dx-pivotgrid .dx-pivotgrid-border .dx-filter-header td {
+  display: inline-block;
 }
 .dx-pivotgrid .dx-pivotgrid-border .dx-area-data-cell,
 .dx-pivotgrid .dx-pivotgrid-border .dx-area-row-cell {

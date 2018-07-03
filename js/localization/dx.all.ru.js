@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.all.ru.js)
-* Version: 17.2.8 (build 18171)
-* Build date: Wed Jun 20 2018
+* Version: 17.2.8 (build 18184)
+* Build date: Tue Jul 03 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -14,7 +14,11 @@
             factory(require("devextreme/localization"), require("devextreme/core/errors"))
         })
     } else {
-        factory(DevExpress.localization, DevExpress.errors)
+        if ("object" === typeof module && module.exports) {
+            factory(require("devextreme/localization"))
+        } else {
+            factory(DevExpress.localization, DevExpress.errors)
+        }
     }
 }(this, function(localization, errors) {
     errors.log("W0013", "devextreme/dist/js/localization/dx.all.ru.js", "16.2", "Use the 'devextreme/dist/js/localization/dx.messages.ru.js' file instead.");
