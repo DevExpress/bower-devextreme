@@ -1,6 +1,6 @@
 /*!
 * DevExtreme
-* Version: 18.2.0 (build 18184)
+* Version: 18.1.4 (build 18184)
 * Build date: Jul 3, 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
@@ -10,6 +10,7 @@
   background: -webkit-gradient(transparent 5px,  rgba(0, 0, 0, 0.2) 6px,  #FFF 7px,  #FFF 12px,  rgba(0, 0, 0, 0.2) 13px);
   background: -webkit-radial-gradient(transparent 5px,  rgba(0, 0, 0, 0.2) 6px,  #FFF 7px,  #FFF 12px,  rgba(0, 0, 0, 0.2) 13px);
   background: -moz-radial-gradient(transparent 5px,  rgba(0, 0, 0, 0.2) 6px,  #FFF 7px,  #FFF 12px,  rgba(0, 0, 0, 0.2) 13px);
+  background: -ms-radial-gradient(transparent 5px,  rgba(0, 0, 0, 0.2) 6px,  #FFF 7px,  #FFF 12px,  rgba(0, 0, 0, 0.2) 13px);
   background: -o-radial-gradient(transparent 5px,  rgba(0, 0, 0, 0.2) 6px,  #FFF 7px,  #FFF 12px,  rgba(0, 0, 0, 0.2) 13px);
   background: radial-gradient(transparent 5px,  rgba(0, 0, 0, 0.2) 6px,  #FFF 7px,  #FFF 12px,  rgba(0, 0, 0, 0.2) 13px);
   -webkit-box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.2);
@@ -226,6 +227,7 @@
 .dx-rtl .dx-datagrid .dx-datagrid-rowsview .dx-virtual-row > td[style*="text-align: left"]:before {
   -webkit-transform: scale(1);
   -moz-transform: scale(1);
+  -ms-transform: scale(1);
   -o-transform: scale(1);
   transform: scale(1);
 }
@@ -959,6 +961,7 @@
 .dx-rtl .dx-treelist-container .dx-treelist-rowsview .dx-virtual-row > td[style*="text-align: left"]:before {
   -webkit-transform: scale(1);
   -moz-transform: scale(1);
+  -ms-transform: scale(1);
   -o-transform: scale(1);
   transform: scale(1);
 }
@@ -1062,71 +1065,6 @@
   font-size: 14px;
   text-align: center;
   line-height: 14px;
-}
-.dx-recurrence-numberbox-interval,
-.dx-recurrence-numberbox-day-of-month,
-.dx-recurrence-selectbox-month-of-year,
-.dx-recurrence-numberbox-repeat-count,
-.dx-recurrence-datebox-until-date,
-.dx-recurrence-switch-repeat-end {
-  float: left;
-  position: relative !important;
-}
-.dx-recurrence-numberbox-interval.dx-rtl,
-.dx-recurrence-numberbox-day-of-month.dx-rtl,
-.dx-recurrence-selectbox-month-of-year.dx-rtl,
-.dx-recurrence-numberbox-repeat-count.dx-rtl,
-.dx-recurrence-datebox-until-date.dx-rtl,
-.dx-recurrence-switch-repeat-end.dx-rtl {
-  float: right;
-}
-.dx-recurrence-numberbox-interval,
-.dx-recurrence-numberbox-day-of-month,
-.dx-recurrence-numberbox-repeat-count {
-  width: 70px !important;
-}
-.dx-recurrence-radiogroup-repeat-type-label,
-.dx-recurrence-repeat-end-label {
-  display: inline-block;
-  padding: 0 5px;
-  vertical-align: top;
-}
-.dx-recurrence-repeat-end-label {
-  float: left;
-  width: 50px;
-  white-space: nowrap;
-  line-height: 36px;
-}
-.dx-recurrence-selectbox-month-of-year {
-  width: 120px !important;
-  top: 0 !important;
-}
-.dx-recurrence-checkbox-day-of-week {
-  position: relative !important;
-  padding-right: 10px;
-}
-.dx-recurrence-radiogroup-repeat-type {
-  margin: 0;
-}
-.dx-recurrence-radiogroup-repeat-type .dx-item:first-child {
-  padding-bottom: 10px;
-}
-.dx-recurrence-radiogroup-repeat-type.dx-rtl .dx-recurrence-repeat-end-label {
-  float: right;
-}
-.dx-recurrence-editor-container .dx-field-value:not(.dx-switch):not(.dx-checkbox):not(.dx-button),
-.dx-recurrence-editor-container .dx-field-value-static {
-  width: 100%;
-}
-.dx-recurrence-editor-container .dx-field-value:not(.dx-widget) > .dx-checkbox {
-  float: left;
-}
-.dx-recurrence-editor-container .dx-field-value:not(.dx-widget) > .dx-checkbox.dx-rtl {
-  float: right;
-}
-.dx-recurrence-editor-container .dx-field-label {
-  width: auto;
-  float: none;
 }
 .dx-theme-ios7-typography {
   background: #fff;
@@ -2127,6 +2065,7 @@
   background-size: 100%;
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
+  -ms-border-radius: 3px;
   -o-border-radius: 3px;
   border-radius: 3px;
 }
@@ -2156,6 +2095,7 @@
   background-color: white;
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
+  -ms-border-radius: 3px;
   -o-border-radius: 3px;
   border-radius: 3px;
   position: absolute;
@@ -2201,6 +2141,7 @@
   height: 31px;
   -webkit-border-radius: 16px;
   -moz-border-radius: 16px;
+  -ms-border-radius: 16px;
   -o-border-radius: 16px;
   border-radius: 16px;
   background: #e5e5e5;
@@ -2219,6 +2160,7 @@
   content: " ";
   -webkit-border-radius: 16px;
   -moz-border-radius: 16px;
+  -ms-border-radius: 16px;
   -o-border-radius: 16px;
   border-radius: 16px;
   background: #fff;
@@ -2239,6 +2181,7 @@
   bottom: 2px;
   -webkit-border-radius: 16px;
   -moz-border-radius: 16px;
+  -ms-border-radius: 16px;
   -o-border-radius: 16px;
   border-radius: 16px;
   background: #fff;
@@ -2270,6 +2213,7 @@
 .dx-state-active.dx-switch-on-value .dx-switch-handle {
   -webkit-transform: translate(-8px, 0);
   -moz-transform: translate(-8px, 0);
+  -ms-transform: translate(-8px, 0);
   -o-transform: translate(-8px, 0);
   transform: translate(-8px, 0);
 }
@@ -2285,6 +2229,7 @@
 .dx-state-active.dx-rtl .dx-switch-handle {
   -webkit-transform: translate(0, 0);
   -moz-transform: translate(0, 0);
+  -ms-transform: translate(0, 0);
   -o-transform: translate(0, 0);
   transform: translate(0, 0);
 }
@@ -2295,6 +2240,7 @@
 .dx-state-active.dx-switch-on-value.dx-rtl .dx-switch-handle {
   -webkit-transform: translate(8px, 0);
   -moz-transform: translate(8px, 0);
+  -ms-transform: translate(8px, 0);
   -o-transform: translate(8px, 0);
   transform: translate(8px, 0);
 }
@@ -2303,6 +2249,7 @@
   background: #fff;
   -webkit-border-radius: 6px;
   -moz-border-radius: 6px;
+  -ms-border-radius: 6px;
   -o-border-radius: 6px;
   border-radius: 6px;
 }
@@ -2319,12 +2266,14 @@
 .dx-tabs-nav-buttons .dx-tab:first-child {
   -webkit-border-radius: 0;
   -moz-border-radius: 0;
+  -ms-border-radius: 0;
   -o-border-radius: 0;
   border-radius: 0;
 }
 .dx-tabs-nav-buttons .dx-tab:last-child {
   -webkit-border-radius: 0;
   -moz-border-radius: 0;
+  -ms-border-radius: 0;
   -o-border-radius: 0;
   border-radius: 0;
 }
@@ -2435,6 +2384,7 @@
   table-layout: fixed;
   -webkit-border-radius: 0;
   -moz-border-radius: 0;
+  -ms-border-radius: 0;
   -o-border-radius: 0;
   border-radius: 0;
 }
@@ -2451,6 +2401,7 @@
   background: transparent;
   -webkit-border-radius: 0;
   -moz-border-radius: 0;
+  -ms-border-radius: 0;
   -o-border-radius: 0;
   border-radius: 0;
 }
@@ -2461,6 +2412,7 @@
   border: none;
   -webkit-border-radius: 0;
   -moz-border-radius: 0;
+  -ms-border-radius: 0;
   -o-border-radius: 0;
   border-radius: 0;
 }
@@ -2549,6 +2501,7 @@
   border: 1px solid #ccc;
   -webkit-border-radius: 6px;
   -moz-border-radius: 6px;
+  -ms-border-radius: 6px;
   -o-border-radius: 6px;
   border-radius: 6px;
   overflow: hidden;
@@ -2655,6 +2608,7 @@
   height: 22px;
   -webkit-border-radius: 11px;
   -moz-border-radius: 11px;
+  -ms-border-radius: 11px;
   -o-border-radius: 11px;
   border-radius: 11px;
   text-align: center;
@@ -2700,6 +2654,7 @@
   width: 100%;
   -webkit-transform: translate(50%, 0);
   -moz-transform: translate(50%, 0);
+  -ms-transform: translate(50%, 0);
   -o-transform: translate(50%, 0);
   transform: translate(50%, 0);
   -webkit-transition: transform 400ms ease;
@@ -2722,6 +2677,7 @@
   background-size: 14px 14px;
   -webkit-transform: translate(-50%, 0);
   -moz-transform: translate(-50%, 0);
+  -ms-transform: translate(-50%, 0);
   -o-transform: translate(-50%, 0);
   transform: translate(-50%, 0);
   -webkit-transition: transform 400ms ease;
@@ -2755,12 +2711,14 @@
   text-align: left;
   -webkit-transform: translate(4px, 0);
   -moz-transform: translate(4px, 0);
+  -ms-transform: translate(4px, 0);
   -o-transform: translate(4px, 0);
   transform: translate(4px, 0);
 }
 .dx-searchbox.dx-state-focused .dx-placeholder:before {
   -webkit-transform: translate(0, 0);
   -moz-transform: translate(0, 0);
+  -ms-transform: translate(0, 0);
   -o-transform: translate(0, 0);
   transform: translate(0, 0);
 }
@@ -2781,6 +2739,7 @@
   width: 100%;
   -webkit-transform: translate(50%, 0);
   -moz-transform: translate(50%, 0);
+  -ms-transform: translate(50%, 0);
   -o-transform: translate(50%, 0);
   transform: translate(50%, 0);
   -webkit-transition: transform 400ms ease;
@@ -2789,6 +2748,7 @@
   transition: transform 400ms ease;
   -webkit-transform: translate(-50%, 0);
   -moz-transform: translate(-50%, 0);
+  -ms-transform: translate(-50%, 0);
   -o-transform: translate(-50%, 0);
   transform: translate(-50%, 0);
 }
@@ -2808,6 +2768,7 @@
   background-size: 14px 14px;
   -webkit-transform: translate(-50%, 0);
   -moz-transform: translate(-50%, 0);
+  -ms-transform: translate(-50%, 0);
   -o-transform: translate(-50%, 0);
   transform: translate(-50%, 0);
   -webkit-transition: transform 400ms ease;
@@ -2824,6 +2785,7 @@
   padding-right: 22px;
   -webkit-transform: translate(50%, 0);
   -moz-transform: translate(50%, 0);
+  -ms-transform: translate(50%, 0);
   -o-transform: translate(50%, 0);
   transform: translate(50%, 0);
 }
@@ -2832,6 +2794,7 @@
   text-align: right;
   -webkit-transform: translate(-4px, 0);
   -moz-transform: translate(-4px, 0);
+  -ms-transform: translate(-4px, 0);
   -o-transform: translate(-4px, 0);
   transform: translate(-4px, 0);
 }
@@ -2839,6 +2802,7 @@
 .dx-rtl.dx-searchbox.dx-state-focused .dx-placeholder:before {
   -webkit-transform: translate(0, 0);
   -moz-transform: translate(0, 0);
+  -ms-transform: translate(0, 0);
   -o-transform: translate(0, 0);
   transform: translate(0, 0);
 }
@@ -3202,6 +3166,7 @@
   box-shadow: 0 1px 15px -3px rgba(0,0,0,.35);
   -webkit-border-radius: 0.5em;
   -moz-border-radius: 0.5em;
+  -ms-border-radius: 0.5em;
   -o-border-radius: 0.5em;
   border-radius: 0.5em;
   border: 1px solid #AAAAAA;
@@ -3438,6 +3403,7 @@
 .dx-datebox-wrapper-calendar .dx-overlay-content {
   -webkit-border-radius: 0.5em;
   -moz-border-radius: 0.5em;
+  -ms-border-radius: 0.5em;
   -o-border-radius: 0.5em;
   border-radius: 0.5em;
   -webkit-box-shadow: 0 1px 15px -3px rgba(0,0,0,.35);
@@ -3538,6 +3504,7 @@
   background-repeat: no-repeat;
   background-image: -webkit-linear-gradient(0deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 80%);
   background-image: -moz-linear-gradient(0deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 80%);
+  background-image: -ms-linear-gradient(0deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 80%);
   background-image: -o-linear-gradient(0deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 80%);
   background-image: linear-gradient(0deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 80%);
 }
@@ -3546,6 +3513,7 @@
   background-repeat: no-repeat;
   background-image: -webkit-linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 80%);
   background-image: -moz-linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 80%);
+  background-image: -ms-linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 80%);
   background-image: -o-linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 80%);
   background-image: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 80%);
 }
@@ -3634,6 +3602,7 @@
   color: white;
   -webkit-border-radius: 5px;
   -moz-border-radius: 5px;
+  -ms-border-radius: 5px;
   -o-border-radius: 5px;
   border-radius: 5px;
   text-shadow: 0px 1px 0px rgba(0, 0, 0, 0.18);
@@ -3672,6 +3641,7 @@
   background: #fff;
   -webkit-border-radius: 6px;
   -moz-border-radius: 6px;
+  -ms-border-radius: 6px;
   -o-border-radius: 6px;
   border-radius: 6px;
 }
@@ -3687,6 +3657,7 @@
 .dx-popup-content {
   -webkit-border-radius: 6px;
   -moz-border-radius: 6px;
+  -ms-border-radius: 6px;
   -o-border-radius: 6px;
   border-radius: 6px;
 }
@@ -3694,6 +3665,7 @@
   border: none;
   -webkit-border-radius: 0px;
   -moz-border-radius: 0px;
+  -ms-border-radius: 0px;
   -o-border-radius: 0px;
   border-radius: 0px;
 }
@@ -3743,6 +3715,7 @@
 .dx-dialog-root .dx-popup-content {
   -webkit-border-radius: 10px;
   -moz-border-radius: 10px;
+  -ms-border-radius: 10px;
   -o-border-radius: 10px;
   border-radius: 10px;
 }
@@ -3845,6 +3818,7 @@
   background-repeat: no-repeat;
   background-image: -webkit-linear-gradient(-90deg, transparent 5%, #74b9ff, transparent 95%);
   background-image: -moz-linear-gradient(-90deg, transparent 5%, #74b9ff, transparent 95%);
+  background-image: -ms-linear-gradient(-90deg, transparent 5%, #74b9ff, transparent 95%);
   background-image: -o-linear-gradient(-90deg, transparent 5%, #74b9ff, transparent 95%);
   background-image: linear-gradient(-90deg, transparent 5%, #74b9ff, transparent 95%);
   background-repeat: repeat;
@@ -3863,6 +3837,7 @@
   background-repeat: no-repeat;
   background-image: -webkit-linear-gradient(-90deg, transparent 5%, #b7b6bb, transparent 95%);
   background-image: -moz-linear-gradient(-90deg, transparent 5%, #b7b6bb, transparent 95%);
+  background-image: -ms-linear-gradient(-90deg, transparent 5%, #b7b6bb, transparent 95%);
   background-image: -o-linear-gradient(-90deg, transparent 5%, #b7b6bb, transparent 95%);
   background-image: linear-gradient(-90deg, transparent 5%, #b7b6bb, transparent 95%);
   background-repeat: repeat;
@@ -3878,6 +3853,7 @@
   background-repeat: no-repeat;
   background-image: -webkit-linear-gradient(-90deg, transparent 5%, #74b9ff, transparent 95%);
   background-image: -moz-linear-gradient(-90deg, transparent 5%, #74b9ff, transparent 95%);
+  background-image: -ms-linear-gradient(-90deg, transparent 5%, #74b9ff, transparent 95%);
   background-image: -o-linear-gradient(-90deg, transparent 5%, #74b9ff, transparent 95%);
   background-image: linear-gradient(-90deg, transparent 5%, #74b9ff, transparent 95%);
   background-repeat: repeat;
@@ -3899,6 +3875,14 @@
   }
 }
 @keyframes loader {
+  0% {
+    background-position-x: 0;
+  }
+  100% {
+    background-position-x: 900%;
+  }
+}
+@-ms-keyframes loader {
   0% {
     background-position-x: 0;
   }
@@ -3930,6 +3914,14 @@
     background-position-x: -900%;
   }
 }
+@-ms-keyframes loader-rtl {
+  0% {
+    background-position-x: 0;
+  }
+  100% {
+    background-position-x: -900%;
+  }
+}
 .dx-tooltip-wrapper .dx-overlay-content .dx-popup-content {
   padding: 13px 17px 11px;
 }
@@ -3942,6 +3934,7 @@
   background: #b7b6bb;
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
+  -ms-border-radius: 3px;
   -o-border-radius: 3px;
   border-radius: 3px;
 }
@@ -3963,6 +3956,7 @@
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
   -webkit-border-radius: 50%;
   -moz-border-radius: 50%;
+  -ms-border-radius: 50%;
   -o-border-radius: 50%;
   border-radius: 50%;
 }
@@ -4036,6 +4030,7 @@
   background: #fff;
   -webkit-border-radius: 50%;
   -moz-border-radius: 50%;
+  -ms-border-radius: 50%;
   -o-border-radius: 50%;
   border-radius: 50%;
   border: solid 1px #017aff;
@@ -4168,6 +4163,7 @@
   height: 22px;
   -webkit-border-radius: 11px;
   -moz-border-radius: 11px;
+  -ms-border-radius: 11px;
   -o-border-radius: 11px;
   border-radius: 11px;
   text-align: center;
@@ -4224,6 +4220,7 @@
   padding: 0;
   -webkit-border-radius: 0;
   -moz-border-radius: 0;
+  -ms-border-radius: 0;
   -o-border-radius: 0;
   border-radius: 0;
 }
@@ -4232,6 +4229,7 @@
   margin: 0 0 8px 0;
   -webkit-border-radius: 6px;
   -moz-border-radius: 6px;
+  -ms-border-radius: 6px;
   -o-border-radius: 6px;
   border-radius: 6px;
   border-top: none;
@@ -4334,6 +4332,7 @@
   background: #787878;
   -webkit-border-radius: 80%;
   -moz-border-radius: 80%;
+  -ms-border-radius: 80%;
   -o-border-radius: 80%;
   border-radius: 80%;
   -webkit-animation: dx-ios-loadindicator-opacity 1s linear infinite;
@@ -4350,6 +4349,14 @@
   }
 }
 @-moz-keyframes dx-ios-loadindicator-opacity {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+@-ms-keyframes dx-ios-loadindicator-opacity {
   from {
     opacity: 1;
   }
@@ -4376,6 +4383,7 @@
 .dx-loadindicator-icon .dx-loadindicator-segment0 {
   -webkit-transform: rotate(0deg) translate(0, -142%);
   -moz-transform: rotate(0deg) translate(0, -142%);
+  -ms-transform: rotate(0deg) translate(0, -142%);
   -o-transform: rotate(0deg) translate(0, -142%);
   transform: rotate(0deg) translate(0, -142%);
   -webkit-animation-delay: 0s;
@@ -4386,6 +4394,7 @@
 .dx-loadindicator-icon .dx-loadindicator-segment1 {
   -webkit-transform: rotate(30deg) translate(0, -142%);
   -moz-transform: rotate(30deg) translate(0, -142%);
+  -ms-transform: rotate(30deg) translate(0, -142%);
   -o-transform: rotate(30deg) translate(0, -142%);
   transform: rotate(30deg) translate(0, -142%);
   -webkit-animation-delay: -0.9167s;
@@ -4396,6 +4405,7 @@
 .dx-loadindicator-icon .dx-loadindicator-segment2 {
   -webkit-transform: rotate(60deg) translate(0, -142%);
   -moz-transform: rotate(60deg) translate(0, -142%);
+  -ms-transform: rotate(60deg) translate(0, -142%);
   -o-transform: rotate(60deg) translate(0, -142%);
   transform: rotate(60deg) translate(0, -142%);
   -webkit-animation-delay: -0.833s;
@@ -4406,6 +4416,7 @@
 .dx-loadindicator-icon .dx-loadindicator-segment3 {
   -webkit-transform: rotate(90deg) translate(0, -142%);
   -moz-transform: rotate(90deg) translate(0, -142%);
+  -ms-transform: rotate(90deg) translate(0, -142%);
   -o-transform: rotate(90deg) translate(0, -142%);
   transform: rotate(90deg) translate(0, -142%);
   -webkit-animation-delay: -0.75s;
@@ -4416,6 +4427,7 @@
 .dx-loadindicator-icon .dx-loadindicator-segment4 {
   -webkit-transform: rotate(120deg) translate(0, -142%);
   -moz-transform: rotate(120deg) translate(0, -142%);
+  -ms-transform: rotate(120deg) translate(0, -142%);
   -o-transform: rotate(120deg) translate(0, -142%);
   transform: rotate(120deg) translate(0, -142%);
   -webkit-animation-delay: -0.667s;
@@ -4426,6 +4438,7 @@
 .dx-loadindicator-icon .dx-loadindicator-segment5 {
   -webkit-transform: rotate(150deg) translate(0, -142%);
   -moz-transform: rotate(150deg) translate(0, -142%);
+  -ms-transform: rotate(150deg) translate(0, -142%);
   -o-transform: rotate(150deg) translate(0, -142%);
   transform: rotate(150deg) translate(0, -142%);
   -webkit-animation-delay: -0.5833s;
@@ -4436,6 +4449,7 @@
 .dx-loadindicator-icon .dx-loadindicator-segment6 {
   -webkit-transform: rotate(180deg) translate(0, -142%);
   -moz-transform: rotate(180deg) translate(0, -142%);
+  -ms-transform: rotate(180deg) translate(0, -142%);
   -o-transform: rotate(180deg) translate(0, -142%);
   transform: rotate(180deg) translate(0, -142%);
   -webkit-animation-delay: -0.5s;
@@ -4446,6 +4460,7 @@
 .dx-loadindicator-icon .dx-loadindicator-segment7 {
   -webkit-transform: rotate(210deg) translate(0, -142%);
   -moz-transform: rotate(210deg) translate(0, -142%);
+  -ms-transform: rotate(210deg) translate(0, -142%);
   -o-transform: rotate(210deg) translate(0, -142%);
   transform: rotate(210deg) translate(0, -142%);
   -webkit-animation-delay: -0.41667s;
@@ -4456,6 +4471,7 @@
 .dx-loadindicator-icon .dx-loadindicator-segment8 {
   -webkit-transform: rotate(240deg) translate(0, -142%);
   -moz-transform: rotate(240deg) translate(0, -142%);
+  -ms-transform: rotate(240deg) translate(0, -142%);
   -o-transform: rotate(240deg) translate(0, -142%);
   transform: rotate(240deg) translate(0, -142%);
   -webkit-animation-delay: -0.333s;
@@ -4466,6 +4482,7 @@
 .dx-loadindicator-icon .dx-loadindicator-segment9 {
   -webkit-transform: rotate(270deg) translate(0, -142%);
   -moz-transform: rotate(270deg) translate(0, -142%);
+  -ms-transform: rotate(270deg) translate(0, -142%);
   -o-transform: rotate(270deg) translate(0, -142%);
   transform: rotate(270deg) translate(0, -142%);
   -webkit-animation-delay: -0.25s;
@@ -4476,6 +4493,7 @@
 .dx-loadindicator-icon .dx-loadindicator-segment10 {
   -webkit-transform: rotate(300deg) translate(0, -142%);
   -moz-transform: rotate(300deg) translate(0, -142%);
+  -ms-transform: rotate(300deg) translate(0, -142%);
   -o-transform: rotate(300deg) translate(0, -142%);
   transform: rotate(300deg) translate(0, -142%);
   -webkit-animation-delay: -0.1667s;
@@ -4486,6 +4504,7 @@
 .dx-loadindicator-icon .dx-loadindicator-segment11 {
   -webkit-transform: rotate(330deg) translate(0, -142%);
   -moz-transform: rotate(330deg) translate(0, -142%);
+  -ms-transform: rotate(330deg) translate(0, -142%);
   -o-transform: rotate(330deg) translate(0, -142%);
   transform: rotate(330deg) translate(0, -142%);
   -webkit-animation-delay: -0.0833s;
@@ -4538,6 +4557,7 @@
 .dx-dropdownmenu-popup-wrapper .dx-overlay-content {
   -webkit-border-radius: 0.5em;
   -moz-border-radius: 0.5em;
+  -ms-border-radius: 0.5em;
   -o-border-radius: 0.5em;
   border-radius: 0.5em;
 }
@@ -4546,6 +4566,7 @@
   background-color: #fff;
   -webkit-border-radius: 0.5em;
   -moz-border-radius: 0.5em;
+  -ms-border-radius: 0.5em;
   -o-border-radius: 0.5em;
   border-radius: 0.5em;
 }
@@ -4554,6 +4575,7 @@
   overflow: hidden;
   -webkit-border-radius: 0.4em;
   -moz-border-radius: 0.4em;
+  -ms-border-radius: 0.4em;
   -o-border-radius: 0.4em;
   border-radius: 0.4em;
 }
@@ -4619,6 +4641,7 @@
   border: 1px solid #ccc;
   -webkit-border-radius: 6px;
   -moz-border-radius: 6px;
+  -ms-border-radius: 6px;
   -o-border-radius: 6px;
   border-radius: 6px;
   overflow: hidden;
@@ -4645,6 +4668,7 @@
   background-color: #007aff;
   -webkit-border-radius: 10px;
   -moz-border-radius: 10px;
+  -ms-border-radius: 10px;
   -o-border-radius: 10px;
   border-radius: 10px;
 }
@@ -4734,6 +4758,7 @@
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
   -webkit-border-radius: 50%;
   -moz-border-radius: 50%;
+  -ms-border-radius: 50%;
   -o-border-radius: 50%;
   border-radius: 50%;
 }
@@ -4755,6 +4780,7 @@
   box-shadow: 0 0 2px rgba(170, 170, 170, 0.6) inset;
   -webkit-border-radius: 50%;
   -moz-border-radius: 50%;
+  -ms-border-radius: 50%;
   -o-border-radius: 50%;
   border-radius: 50%;
 }
@@ -4980,6 +5006,7 @@
 .dx-colorbox-overlay {
   -webkit-border-radius: 0.5em;
   -moz-border-radius: 0.5em;
+  -ms-border-radius: 0.5em;
   -o-border-radius: 0.5em;
   border-radius: 0.5em;
   -webkit-box-shadow: 0 1px 15px -3px rgba(0,0,0,.35);
@@ -5192,6 +5219,7 @@
 .dx-datagrid .dx-editor-cell .dx-texteditor .dx-texteditor-input {
   -webkit-border-radius: 0px;
   -moz-border-radius: 0px;
+  -ms-border-radius: 0px;
   -o-border-radius: 0px;
   border-radius: 0px;
   border-width: 0px;
@@ -5277,6 +5305,7 @@
 .dx-datagrid-filter-range-overlay .dx-overlay-content .dx-texteditor-container {
   -webkit-border-radius: 0px;
   -moz-border-radius: 0px;
+  -ms-border-radius: 0px;
   -o-border-radius: 0px;
   border-radius: 0px;
 }
@@ -5346,6 +5375,7 @@
 .dx-datagrid-column-chooser .dx-overlay-content {
   -webkit-border-radius: 0px;
   -moz-border-radius: 0px;
+  -ms-border-radius: 0px;
   -o-border-radius: 0px;
   border-radius: 0px;
   -webkit-box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.2);
@@ -5416,6 +5446,7 @@
 }
 .dx-datagrid-headers {
   color: #4D4D4D;
+  -ms-touch-action: pinch-zoom;
   touch-action: pinch-zoom;
 }
 .dx-datagrid-headers .dx-datagrid-table .dx-row.dx-header-row > td {
@@ -5539,6 +5570,7 @@
   padding: 10px 17px 9px;
   -webkit-border-radius: 0px;
   -moz-border-radius: 0px;
+  -ms-border-radius: 0px;
   -o-border-radius: 0px;
   border-radius: 0px;
 }
@@ -5553,6 +5585,7 @@
 .dx-datagrid-rowsview .dx-adaptive-detail-row .dx-datagrid-invalid {
   -webkit-border-radius: 6px;
   -moz-border-radius: 6px;
+  -ms-border-radius: 6px;
   -o-border-radius: 6px;
   border-radius: 6px;
   border: 1px solid #FF392C;
@@ -5565,6 +5598,7 @@
 .dx-datagrid-rowsview .dx-item-modified {
   -webkit-border-radius: 6px;
   -moz-border-radius: 6px;
+  -ms-border-radius: 6px;
   -o-border-radius: 6px;
   border-radius: 6px;
   border: 2px solid rgba(90, 200, 250, 0.7);
@@ -5641,6 +5675,7 @@
 .dx-datagrid-revert-tooltip .dx-overlay-content .dx-popup-content {
   -webkit-border-radius: 4px;
   -moz-border-radius: 4px;
+  -ms-border-radius: 4px;
   -o-border-radius: 4px;
   border-radius: 4px;
 }
@@ -5693,6 +5728,7 @@
 .dx-datagrid-group-panel {
   font-size: 1em;
   vertical-align: middle;
+  -ms-touch-action: pinch-zoom;
   touch-action: pinch-zoom;
 }
 .dx-datagrid-group-panel .dx-group-panel-message {
@@ -5963,6 +5999,7 @@
 .dx-treelist .dx-editor-cell .dx-texteditor .dx-texteditor-input {
   -webkit-border-radius: 0px;
   -moz-border-radius: 0px;
+  -ms-border-radius: 0px;
   -o-border-radius: 0px;
   border-radius: 0px;
   border-width: 0px;
@@ -6048,6 +6085,7 @@
 .dx-treelist-filter-range-overlay .dx-overlay-content .dx-texteditor-container {
   -webkit-border-radius: 0px;
   -moz-border-radius: 0px;
+  -ms-border-radius: 0px;
   -o-border-radius: 0px;
   border-radius: 0px;
 }
@@ -6117,6 +6155,7 @@
 .dx-treelist-column-chooser .dx-overlay-content {
   -webkit-border-radius: 0px;
   -moz-border-radius: 0px;
+  -ms-border-radius: 0px;
   -o-border-radius: 0px;
   border-radius: 0px;
   -webkit-box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.2);
@@ -6187,6 +6226,7 @@
 }
 .dx-treelist-headers {
   color: #4D4D4D;
+  -ms-touch-action: pinch-zoom;
   touch-action: pinch-zoom;
 }
 .dx-treelist-headers .dx-treelist-table .dx-row.dx-header-row > td {
@@ -6310,6 +6350,7 @@
   padding: 10px 17px 9px;
   -webkit-border-radius: 0px;
   -moz-border-radius: 0px;
+  -ms-border-radius: 0px;
   -o-border-radius: 0px;
   border-radius: 0px;
 }
@@ -6324,6 +6365,7 @@
 .dx-treelist-rowsview .dx-adaptive-detail-row .dx-treelist-invalid {
   -webkit-border-radius: 6px;
   -moz-border-radius: 6px;
+  -ms-border-radius: 6px;
   -o-border-radius: 6px;
   border-radius: 6px;
   border: 1px solid #FF392C;
@@ -6336,6 +6378,7 @@
 .dx-treelist-rowsview .dx-item-modified {
   -webkit-border-radius: 6px;
   -moz-border-radius: 6px;
+  -ms-border-radius: 6px;
   -o-border-radius: 6px;
   border-radius: 6px;
   border: 2px solid rgba(90, 200, 250, 0.7);
@@ -6412,6 +6455,7 @@
 .dx-treelist-revert-tooltip .dx-overlay-content .dx-popup-content {
   -webkit-border-radius: 4px;
   -moz-border-radius: 4px;
+  -ms-border-radius: 4px;
   -o-border-radius: 4px;
   border-radius: 4px;
 }
@@ -6673,6 +6717,7 @@
   border: 1px solid #dfdfdf;
   -webkit-border-radius: 7px;
   -moz-border-radius: 7px;
+  -ms-border-radius: 7px;
   -o-border-radius: 7px;
   border-radius: 7px;
   -webkit-box-shadow: 0px 1px 11px 1px rgba(0, 0, 0, 0.15);
@@ -6706,6 +6751,7 @@
   background-color: #f3f3f3;
   -webkit-border-radius: 7px;
   -moz-border-radius: 7px;
+  -ms-border-radius: 7px;
   -o-border-radius: 7px;
   border-radius: 7px;
   -webkit-box-shadow: 0px 1px 11px 1px rgba(0, 0, 0, 0.15);
@@ -6845,6 +6891,7 @@
   background: transparent;
   background: -webkit-radial-gradient(circle closest-side, transparent 90%, #cbcbcb 95%, transparent 100%);
   background: -moz-radial-gradient(circle closest-side, transparent 90%, #cbcbcb 95%, transparent 100%);
+  background: -ms-radial-gradient(circle closest-side, transparent 90%, #cbcbcb 95%, transparent 100%);
   background: -o-radial-gradient(circle closest-side, transparent 90%, #cbcbcb 95%, transparent 100%);
   background: radial-gradient(circle closest-side at center, transparent 90%, #cbcbcb 95%, transparent 100%);
 }
@@ -6852,6 +6899,7 @@
   background: #e5e5e5;
   background: -webkit-radial-gradient(circle closest-side, #e5e5e5 90%, rgba(255, 255, 255, 0.5) 95%);
   background: -moz-radial-gradient(circle closest-side, #e5e5e5 90%, rgba(255, 255, 255, 0.5) 95%);
+  background: -ms-radial-gradient(circle closest-side, #e5e5e5 90%, rgba(255, 255, 255, 0.5) 95%);
   background: -o-radial-gradient(circle closest-side, #e5e5e5 90%, rgba(255, 255, 255, 0.5) 95%);
   background: radial-gradient(circle closest-side at center, #e5e5e5 90%, rgba(255, 255, 255, 0.5) 95%);
 }
@@ -6862,6 +6910,7 @@
   background: #000;
   background: -webkit-radial-gradient(circle closest-side, #000 90%, rgba(255, 255, 255, 0.5) 95%);
   background: -moz-radial-gradient(circle closest-side, #000 90%, rgba(255, 255, 255, 0.5) 95%);
+  background: -ms-radial-gradient(circle closest-side, #000 90%, rgba(255, 255, 255, 0.5) 95%);
   background: -o-radial-gradient(circle closest-side, #000 90%, rgba(255, 255, 255, 0.5) 95%);
   background: radial-gradient(circle closest-side at center, #000 90%, rgba(255, 255, 255, 0.5) 95%);
 }
@@ -6872,6 +6921,7 @@
   background: #dd5739;
   background: -webkit-radial-gradient(circle closest-side, #dd5739 90%, rgba(255, 255, 255, 0.5) 95%);
   background: -moz-radial-gradient(circle closest-side, #dd5739 90%, rgba(255, 255, 255, 0.5) 95%);
+  background: -ms-radial-gradient(circle closest-side, #dd5739 90%, rgba(255, 255, 255, 0.5) 95%);
   background: -o-radial-gradient(circle closest-side, #dd5739 90%, rgba(255, 255, 255, 0.5) 95%);
   background: radial-gradient(circle closest-side at center, #dd5739 90%, rgba(255, 255, 255, 0.5) 95%);
 }
@@ -6889,6 +6939,7 @@
   border: 1px solid transparent;
   -webkit-border-radius: 10px;
   -moz-border-radius: 10px;
+  -ms-border-radius: 10px;
   -o-border-radius: 10px;
   border-radius: 10px;
   display: inline-block;
@@ -7584,6 +7635,7 @@
 .dx-invalid-message > .dx-overlay-content {
   -webkit-border-radius: 6px;
   -moz-border-radius: 6px;
+  -ms-border-radius: 6px;
   -o-border-radius: 6px;
   border-radius: 6px;
 }
@@ -7809,49 +7861,56 @@
   margin-left: 0;
 }
 .dx-scheduler-timeline-week .dx-scheduler-header-panel,
-.dx-scheduler-timeline-work-week .dx-scheduler-header-panel,
-.dx-scheduler-timeline-day.dx-scheduler-work-space-count .dx-scheduler-header-panel {
+.dx-scheduler-timeline-work-week .dx-scheduler-header-panel {
   display: -webkit-box;
   display: -webkit-flex;
   display: -moz-flex;
+  display: -ms-flexbox;
   display: flex;
   -webkit-flex-flow: row nowrap;
   -moz-flex-flow: row nowrap;
+  -ms-flex-direction: row;
+  -ms-flex-wrap: nowrap;
+  -ms-flex-flow: row nowrap;
   flex-flow: row nowrap;
 }
 .dx-scheduler-timeline-week .dx-scheduler-header-panel thead,
-.dx-scheduler-timeline-work-week .dx-scheduler-header-panel thead,
-.dx-scheduler-timeline-day.dx-scheduler-work-space-count .dx-scheduler-header-panel thead {
+.dx-scheduler-timeline-work-week .dx-scheduler-header-panel thead {
   width: 100%;
 }
 .dx-scheduler-timeline-week .dx-scheduler-header-row,
-.dx-scheduler-timeline-work-week .dx-scheduler-header-row,
-.dx-scheduler-timeline-day.dx-scheduler-work-space-count .dx-scheduler-header-row {
+.dx-scheduler-timeline-work-week .dx-scheduler-header-row {
   display: -webkit-box;
   display: -webkit-flex;
   display: -moz-flex;
+  display: -ms-flexbox;
   display: flex;
   -webkit-flex-flow: row nowrap;
   -moz-flex-flow: row nowrap;
+  -ms-flex-direction: row;
+  -ms-flex-wrap: nowrap;
+  -ms-flex-flow: row nowrap;
   flex-flow: row nowrap;
 }
 .dx-scheduler-timeline-week .dx-scheduler-header-panel-week-cell,
-.dx-scheduler-timeline-work-week .dx-scheduler-header-panel-week-cell,
-.dx-scheduler-timeline-day.dx-scheduler-work-space-count .dx-scheduler-header-panel-week-cell {
+.dx-scheduler-timeline-work-week .dx-scheduler-header-panel-week-cell {
   flex-grow: 1;
   flex-basis: 0;
   justify-content: center;
   display: -webkit-box;
   display: -webkit-flex;
   display: -moz-flex;
+  display: -ms-flexbox;
   display: flex;
   -webkit-flex-flow: row nowrap;
   -moz-flex-flow: row nowrap;
+  -ms-flex-direction: row;
+  -ms-flex-wrap: nowrap;
+  -ms-flex-flow: row nowrap;
   flex-flow: row nowrap;
 }
 .dx-scheduler-timeline-week .dx-scheduler-header-row .dx-scheduler-header-panel-cell,
-.dx-scheduler-timeline-work-week .dx-scheduler-header-row .dx-scheduler-header-panel-cell,
-.dx-scheduler-timeline-day.dx-scheduler-work-space-count .dx-scheduler-header-row .dx-scheduler-header-panel-cell {
+.dx-scheduler-timeline-work-week .dx-scheduler-header-row .dx-scheduler-header-panel-cell {
   border-right: none;
 }
 .dx-scheduler-timeline .dx-scheduler-date-time-indicator {
@@ -8216,9 +8275,13 @@
   display: -webkit-box;
   display: -webkit-flex;
   display: -moz-flex;
+  display: -ms-flexbox;
   display: flex;
   -webkit-flex-flow: column nowrap;
   -moz-flex-flow: column nowrap;
+  -ms-flex-direction: column;
+  -ms-flex-wrap: nowrap;
+  -ms-flex-flow: column nowrap;
   flex-flow: column nowrap;
 }
 .dx-scheduler-timeline .dx-scheduler-group-table tbody {
@@ -8228,9 +8291,13 @@
   display: -webkit-box;
   display: -webkit-flex;
   display: -moz-flex;
+  display: -ms-flexbox;
   display: flex;
   -webkit-flex-flow: row nowrap;
   -moz-flex-flow: row nowrap;
+  -ms-flex-direction: row;
+  -ms-flex-wrap: nowrap;
+  -ms-flex-flow: row nowrap;
   flex-flow: row nowrap;
 }
 .dx-scheduler-timeline[dx-group-column-count='2'] .dx-scheduler-group-header:last-child,
@@ -8248,9 +8315,13 @@
   display: -webkit-box;
   display: -webkit-flex;
   display: -moz-flex;
+  display: -ms-flexbox;
   display: flex;
   -webkit-flex-flow: row nowrap;
   -moz-flex-flow: row nowrap;
+  -ms-flex-direction: row;
+  -ms-flex-wrap: nowrap;
+  -ms-flex-flow: row nowrap;
   flex-flow: row nowrap;
   padding: 0 10px 0 5px;
   height: auto;
@@ -8403,45 +8474,37 @@
   top: 0;
 }
 .dx-scheduler-work-space.dx-scheduler-timeline-week[dx-group-row-count='1'] .dx-scheduler-header-scrollable,
-.dx-scheduler-work-space.dx-scheduler-timeline-work-week[dx-group-row-count='1'] .dx-scheduler-header-scrollable,
-.dx-scheduler-work-space.dx-scheduler-work-space-count.dx-scheduler-timeline-day[dx-group-row-count='1'] .dx-scheduler-header-scrollable {
+.dx-scheduler-work-space.dx-scheduler-timeline-work-week[dx-group-row-count='1'] .dx-scheduler-header-scrollable {
   height: 121px;
 }
 .dx-scheduler-work-space.dx-scheduler-timeline-week[dx-group-row-count='2'] .dx-scheduler-header-scrollable,
-.dx-scheduler-work-space.dx-scheduler-timeline-work-week[dx-group-row-count='2'] .dx-scheduler-header-scrollable,
-.dx-scheduler-work-space.dx-scheduler-work-space-count.dx-scheduler-timeline-day[dx-group-row-count='2'] .dx-scheduler-header-scrollable {
+.dx-scheduler-work-space.dx-scheduler-timeline-work-week[dx-group-row-count='2'] .dx-scheduler-header-scrollable {
   height: 151px;
 }
 .dx-scheduler-work-space.dx-scheduler-timeline-week[dx-group-row-count='3'] .dx-scheduler-header-scrollable,
-.dx-scheduler-work-space.dx-scheduler-timeline-work-week[dx-group-row-count='3'] .dx-scheduler-header-scrollable,
-.dx-scheduler-work-space.dx-scheduler-work-space-count.dx-scheduler-timeline-day[dx-group-row-count='3'] .dx-scheduler-header-scrollable {
+.dx-scheduler-work-space.dx-scheduler-timeline-work-week[dx-group-row-count='3'] .dx-scheduler-header-scrollable {
   height: 181px;
 }
 .dx-scheduler-work-space.dx-scheduler-timeline-week .dx-scheduler-header-scrollable,
-.dx-scheduler-work-space.dx-scheduler-timeline-work-week .dx-scheduler-header-scrollable,
-.dx-scheduler-work-space.dx-scheduler-work-space-count.dx-scheduler-timeline-day .dx-scheduler-header-scrollable {
+.dx-scheduler-work-space.dx-scheduler-timeline-work-week .dx-scheduler-header-scrollable {
   height: 91px;
 }
 .dx-scheduler-work-space.dx-scheduler-timeline-week.dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline .dx-scheduler-header-scrollable,
-.dx-scheduler-work-space.dx-scheduler-timeline-work-week.dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline .dx-scheduler-header-scrollable,
-.dx-scheduler-work-space.dx-scheduler-work-space-count.dx-scheduler-timeline-day.dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline .dx-scheduler-header-scrollable {
+.dx-scheduler-work-space.dx-scheduler-timeline-work-week.dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline .dx-scheduler-header-scrollable {
   height: auto;
 }
 .dx-scheduler-work-space.dx-scheduler-timeline-week.dx-scheduler-work-space-grouped .dx-scheduler-sidebar-scrollable,
-.dx-scheduler-work-space.dx-scheduler-timeline-work-week.dx-scheduler-work-space-grouped .dx-scheduler-sidebar-scrollable,
-.dx-scheduler-work-space.dx-scheduler-work-space-count.dx-scheduler-timeline-day.dx-scheduler-work-space-grouped .dx-scheduler-sidebar-scrollable {
+.dx-scheduler-work-space.dx-scheduler-timeline-work-week.dx-scheduler-work-space-grouped .dx-scheduler-sidebar-scrollable {
   padding-bottom: 90px;
   margin-bottom: -90px;
 }
 .dx-scheduler-work-space.dx-scheduler-timeline-week.dx-scheduler-work-space-grouped .dx-scheduler-sidebar-scrollable:before,
-.dx-scheduler-work-space.dx-scheduler-timeline-work-week.dx-scheduler-work-space-grouped .dx-scheduler-sidebar-scrollable:before,
-.dx-scheduler-work-space.dx-scheduler-work-space-count.dx-scheduler-timeline-day.dx-scheduler-work-space-grouped .dx-scheduler-sidebar-scrollable:before {
+.dx-scheduler-work-space.dx-scheduler-timeline-work-week.dx-scheduler-work-space-grouped .dx-scheduler-sidebar-scrollable:before {
   height: 91px;
   margin-top: -91px;
 }
 .dx-scheduler-work-space.dx-scheduler-timeline-week .dx-scrollable.dx-scheduler-date-table-scrollable,
-.dx-scheduler-work-space.dx-scheduler-timeline-work-week .dx-scrollable.dx-scheduler-date-table-scrollable,
-.dx-scheduler-work-space.dx-scheduler-work-space-count.dx-scheduler-timeline-day .dx-scrollable.dx-scheduler-date-table-scrollable {
+.dx-scheduler-work-space.dx-scheduler-timeline-work-week .dx-scrollable.dx-scheduler-date-table-scrollable {
   padding-bottom: 90px;
   margin-bottom: -90px;
 }
@@ -9291,7 +9354,9 @@
 }
 .dx-scheduler-appointment-popup .dx-scheduler-recurrence-rule-item {
   position: relative;
+  padding-left: 0;
   padding-right: 0;
+  margin-top: 20px;
 }
 .dx-scheduler-appointment-popup .dx-scheduler-recurrence-rule-item .dx-field-item-label {
   vertical-align: top;
@@ -9320,7 +9385,6 @@
   content: "";
   position: absolute;
   top: 50px;
-  margin-top: -35px;
   bottom: 0;
   width: 100%;
   display: none;
@@ -9337,6 +9401,9 @@
 .dx-scheduler-appointment-popup .dx-field-label {
   width: auto;
 }
+.dx-scheduler-appointment-popup .dx-field-value:not(.dx-switch):not(.dx-numberbox):not(.dx-datebox) {
+  width: auto;
+}
 .dx-scheduler-appointment-popup .dx-field-value {
   padding-left: 0;
   padding-right: 0;
@@ -9345,6 +9412,59 @@
   float: left;
 }
 .dx-scheduler-appointment-popup .dx-field-value:not(.dx-widget) > .dx-checkbox.dx-rtl {
+  float: right;
+}
+.dx-numberbox.dx-recurrence-numberbox-interval,
+.dx-numberbox.dx-recurrence-numberbox-day-of-month,
+.dx-selectbox.dx-recurrence-selectbox-month-of-year,
+.dx-numberbox.dx-recurrence-numberbox-repeat-count,
+.dx-datebox.dx-recurrence-datebox-until-date,
+.dx-switch.dx-recurrence-switch-repeat-end {
+  float: left;
+  position: relative !important;
+}
+.dx-numberbox.dx-recurrence-numberbox-interval.dx-rtl,
+.dx-numberbox.dx-recurrence-numberbox-day-of-month.dx-rtl,
+.dx-selectbox.dx-recurrence-selectbox-month-of-year.dx-rtl,
+.dx-numberbox.dx-recurrence-numberbox-repeat-count.dx-rtl,
+.dx-datebox.dx-recurrence-datebox-until-date.dx-rtl,
+.dx-switch.dx-recurrence-switch-repeat-end.dx-rtl {
+  float: right;
+}
+.dx-recurrence-numberbox-interval,
+.dx-recurrence-numberbox-day-of-month,
+.dx-recurrence-numberbox-repeat-count {
+  width: 70px !important;
+}
+.dx-datebox.dx-recurrence-datebox-until-date {
+  width: inherit !important;
+}
+.dx-recurrence-radiogroup-repeat-type-label,
+.dx-recurrence-repeat-end-label {
+  display: inline-block;
+  padding: 0 5px;
+  vertical-align: top;
+}
+.dx-recurrence-repeat-end-label {
+  float: left;
+  width: 50px;
+  white-space: nowrap;
+}
+.dx-recurrence-selectbox-month-of-year {
+  width: 120px !important;
+  top: 0 !important;
+}
+.dx-recurrence-checkbox-day-of-week {
+  position: relative !important;
+  padding-right: 10px;
+}
+.dx-recurrence-radiogroup-repeat-type {
+  margin: 0;
+}
+.dx-recurrence-radiogroup-repeat-type .dx-item:first-child {
+  padding-bottom: 10px;
+}
+.dx-recurrence-radiogroup-repeat-type.dx-rtl .dx-recurrence-repeat-end-label {
   float: right;
 }
 .dx-scheduler-dropdown-appointments {
@@ -9675,20 +9795,17 @@
   margin-bottom: 170px;
 }
 .dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline.dx-scheduler-timeline-week.dx-scheduler-work-space[dx-group-row-count='1'].dx-scheduler-work-space .dx-scheduler-date-table-scrollable,
-.dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline.dx-scheduler-timeline-work-week.dx-scheduler-work-space[dx-group-row-count='1'].dx-scheduler-work-space .dx-scheduler-date-table-scrollable,
-.dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline.dx-scheduler-timeline-day.dx-scheduler-work-space-count.dx-scheduler-work-space[dx-group-row-count='1'].dx-scheduler-work-space .dx-scheduler-date-table-scrollable {
+.dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline.dx-scheduler-timeline-work-week.dx-scheduler-work-space[dx-group-row-count='1'].dx-scheduler-work-space .dx-scheduler-date-table-scrollable {
   padding-bottom: 130px;
   margin-bottom: 130px;
 }
 .dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline.dx-scheduler-timeline-week.dx-scheduler-work-space[dx-group-row-count='2'].dx-scheduler-work-space .dx-scheduler-date-table-scrollable,
-.dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline.dx-scheduler-timeline-work-week.dx-scheduler-work-space[dx-group-row-count='2'].dx-scheduler-work-space .dx-scheduler-date-table-scrollable,
-.dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline.dx-scheduler-timeline-day.dx-scheduler-work-space-count.dx-scheduler-work-space[dx-group-row-count='2'].dx-scheduler-work-space .dx-scheduler-date-table-scrollable {
+.dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline.dx-scheduler-timeline-work-week.dx-scheduler-work-space[dx-group-row-count='2'].dx-scheduler-work-space .dx-scheduler-date-table-scrollable {
   padding-bottom: 170px;
   margin-bottom: 170px;
 }
 .dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline.dx-scheduler-timeline-week.dx-scheduler-work-space[dx-group-row-count='3'].dx-scheduler-work-space .dx-scheduler-date-table-scrollable,
-.dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline.dx-scheduler-timeline-work-week.dx-scheduler-work-space[dx-group-row-count='3'].dx-scheduler-work-space .dx-scheduler-date-table-scrollable,
-.dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline.dx-scheduler-timeline-day.dx-scheduler-work-space-count.dx-scheduler-work-space[dx-group-row-count='3'].dx-scheduler-work-space .dx-scheduler-date-table-scrollable {
+.dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline.dx-scheduler-timeline-work-week.dx-scheduler-work-space[dx-group-row-count='3'].dx-scheduler-work-space .dx-scheduler-date-table-scrollable {
   padding-bottom: 210px;
   margin-bottom: 210px;
 }
@@ -9706,9 +9823,13 @@
   display: -webkit-box;
   display: -webkit-flex;
   display: -moz-flex;
+  display: -ms-flexbox;
   display: flex;
   -webkit-flex-flow: row nowrap;
   -moz-flex-flow: row nowrap;
+  -ms-flex-direction: row;
+  -ms-flex-wrap: nowrap;
+  -ms-flex-flow: row nowrap;
   flex-flow: row nowrap;
 }
 .dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline .dx-scheduler-header-row,
@@ -9716,9 +9837,13 @@
   display: -webkit-box;
   display: -webkit-flex;
   display: -moz-flex;
+  display: -ms-flexbox;
   display: flex;
   -webkit-flex-flow: row nowrap;
   -moz-flex-flow: row nowrap;
+  -ms-flex-direction: row;
+  -ms-flex-wrap: nowrap;
+  -ms-flex-flow: row nowrap;
   flex-flow: row nowrap;
 }
 .dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline.dx-scheduler-work-space-grouped .dx-scheduler-group-header {
@@ -9727,9 +9852,13 @@
   display: -webkit-box;
   display: -webkit-flex;
   display: -moz-flex;
+  display: -ms-flexbox;
   display: flex;
   -webkit-flex-flow: row nowrap;
   -moz-flex-flow: row nowrap;
+  -ms-flex-direction: row;
+  -ms-flex-wrap: nowrap;
+  -ms-flex-flow: row nowrap;
   flex-flow: row nowrap;
 }
 .dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline .dx-scheduler-header-row .dx-scheduler-header-panel-cell {
@@ -9961,9 +10090,13 @@
   display: -webkit-box;
   display: -webkit-flex;
   display: -moz-flex;
+  display: -ms-flexbox;
   display: flex;
   -webkit-flex-flow: column nowrap;
   -moz-flex-flow: column nowrap;
+  -ms-flex-direction: column;
+  -ms-flex-wrap: nowrap;
+  -ms-flex-flow: column nowrap;
   flex-flow: column nowrap;
 }
 .dx-scheduler-work-space-vertical-grouped .dx-scheduler-work-space-vertical-group-table tbody {
@@ -9973,9 +10106,13 @@
   display: -webkit-box;
   display: -webkit-flex;
   display: -moz-flex;
+  display: -ms-flexbox;
   display: flex;
   -webkit-flex-flow: row nowrap;
   -moz-flex-flow: row nowrap;
+  -ms-flex-direction: row;
+  -ms-flex-wrap: nowrap;
+  -ms-flex-flow: row nowrap;
   flex-flow: row nowrap;
 }
 .dx-scheduler-work-space-vertical-grouped .dx-scheduler-group-row:before {
@@ -9996,9 +10133,13 @@
   display: -webkit-box;
   display: -webkit-flex;
   display: -moz-flex;
+  display: -ms-flexbox;
   display: flex;
   -webkit-flex-flow: row nowrap;
   -moz-flex-flow: row nowrap;
+  -ms-flex-direction: row;
+  -ms-flex-wrap: nowrap;
+  -ms-flex-flow: row nowrap;
   flex-flow: row nowrap;
   height: auto;
   text-align: center;
@@ -10417,8 +10558,9 @@
 .dx-scheduler-work-space-both-scrollbar .dx-scheduler-all-day-title:before {
   background-color: #fff;
 }
-.dx-scheduler-appointment-popup .dx-scheduler-recurrence-rule-item {
-  padding-left: 84px;
+.dx-recurrence-radiogroup-repeat-type-label,
+.dx-recurrence-repeat-end-label {
+  line-height: 35px;
 }
 .dx-form-group-with-caption > .dx-form-group-content {
   border-top: 1px solid #ececec;
@@ -10463,8 +10605,4 @@
 }
 .dx-filterbuilder-overlay .dx-treeview-item {
   padding: 8px 20px;
-}
-.dx-recurrence-radiogroup-repeat-type-label,
-.dx-recurrence-repeat-end-label {
-  line-height: 35px;
 }

@@ -1,6 +1,6 @@
 /*!
 * DevExtreme (dx.messages.fr.js)
-* Version: 18.2.0 (build 18184)
+* Version: 18.1.4 (build 18184)
 * Build date: Tue Jul 03 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
