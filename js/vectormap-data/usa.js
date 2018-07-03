@@ -1,11 +1,12 @@
 "use strict";
 
 (function(root, factory) {
-    /* global DevExpress, define */
     if(typeof define === "function" && define.amd) {
         define(function(require, exports, module) {
             factory(exports);
         });
+    } else if(typeof module === "object" && module.exports) {
+        factory(exports);
     } else {
         factory(DevExpress.viz.map.sources);
     }
