@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 17.2.8 (build 18184)
-* Build date: Jul 3, 2018
+* Version: 17.2.9
+* Build date: Jul 6, 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -620,6 +620,9 @@
 }
 .dx-rtl.dx-pivotgrid .dx-pivotgrid-fields-area-head tr > td:last-child {
   padding-left: 10px;
+}
+.dx-rtl.dx-pivotgrid .dx-filter-header .dx-pivotgrid-fields-area-head tr > td {
+  padding: 2px;
 }
 .dx-rtl.dx-pivotgrid .dx-group-connector.dx-group-connector-prev {
   left: initial;

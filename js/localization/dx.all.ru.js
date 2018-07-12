@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.all.ru.js)
-* Version: 17.2.8 (build 18184)
-* Build date: Tue Jul 03 2018
+* Version: 17.2.9
+* Build date: Fri Jul 06 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
