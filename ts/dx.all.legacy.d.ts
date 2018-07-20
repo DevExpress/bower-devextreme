@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.all.legacy.d.ts)
-* Version: 18.1.4 (build 18184)
-* Build date: Tue Jul 03 2018
+* Version: 18.1.4 (build 18201)
+* Build date: Fri Jul 20 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/

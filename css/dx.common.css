@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 18.1.4 (build 18184)
-* Build date: Jul 3, 2018
+* Version: 18.1.4 (build 18201)
+* Build date: Jul 20, 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -672,11 +672,6 @@
 }
 .dx-item {
   outline: 0;
-}
-.dx-widget.dx-collection.dx-state-focused {
-  -webkit-box-shadow: none;
-  -moz-box-shadow: none;
-  box-shadow: none;
 }
 .dx-rtl {
   direction: rtl;
@@ -1886,11 +1881,6 @@
 }
 .dx-dropdowneditor.dx-dropdowneditor-field-clickable {
   cursor: pointer;
-}
-.dx-dropdowneditor .dx-dropdowneditor-button.dx-state-focused {
-  -webkit-box-shadow: none;
-  -moz-box-shadow: none;
-  box-shadow: none;
 }
 .dx-dropdowneditor-input-wrapper {
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
@@ -7170,6 +7160,9 @@ input.dx-hidden {
 }
 .dx-filterbuilder-overlay .dx-menu-items-container {
   padding: 0;
+}
+.dx-card {
+  overflow: hidden;
 }
 .dx-deferrendering .dx-deferrendering-loadindicator-container {
   width: 100%;

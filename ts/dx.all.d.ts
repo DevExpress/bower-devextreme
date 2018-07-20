@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.all.d.ts)
-* Version: 18.1.4 (build 18184)
-* Build date: Tue Jul 03 2018
+* Version: 18.1.4 (build 18201)
+* Build date: Fri Jul 20 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -755,7 +755,7 @@ declare module DevExpress {
         constructor(element: Element | JQuery, options?: DOMComponentOptions);
         /** Specifies the device-dependent default configuration options for this component. */
         static defaultOptions(rule: { device?: Device | Array<Device> | Function, options?: any }): void;
-        /** Removes the widget from the DOM. */
+        /** Disposes of all the resources allocated to the widget instance. */
         dispose(): void;
         /** Gets the root widget element. */
         element(): DevExpress.core.dxElement;
@@ -1361,6 +1361,7 @@ declare module DevExpress.data {
         headerFilter?: { width?: number, height?: number, allowSearch?: boolean };
         /** Specifies whether the field should be treated as a measure (a field providing data for calculation). */
         isMeasure?: boolean;
+        /** Specifies the field's identifier. */
         name?: string;
         /** @deprecated Use the format.precision option instead. */
         precision?: number;
@@ -1376,7 +1377,7 @@ declare module DevExpress.data {
         showValues?: boolean;
         /** Specifies how the field's values in the headers should be sorted. */
         sortBy?: 'displayText' | 'value' | 'none';
-        /** Sorts the field's values in the headers by the specified measure's summary values. */
+        /** Sorts the field's values in the headers by the specified measure's summary values. Accepts the measure's name, caption, dataField, or index in the fields array. */
         sortBySummaryField?: string;
         /** Specifies a path to the column or row whose summary values should be used to sort the field's values in the headers. */
         sortBySummaryPath?: Array<number | string>;
@@ -2165,7 +2166,7 @@ declare module DevExpress.ui {
         endCustomLoading(): void;
         /** Expands an adaptive detail row. */
         expandAdaptiveDetailRow(key: any): void;
-        /** Gets a filter expression applied to the widget's data source using the filter(filterExpr) method. */
+        /** Gets a filter expression applied to the widget's data source using the filter(filterExpr) method and the DataSource's filter option. */
         filter(): any;
         /** Applies a filter to the widget's data source. */
         filter(filterExpr: any): void;
@@ -2684,7 +2685,7 @@ declare module DevExpress.ui {
         activeStateEnabled?: boolean;
         /** Specifies whether or not an end user can delete list items. */
         allowItemDeleting?: boolean;
-        /** Specifies whether or not an end user can reorder list items. */
+        /** Specifies whether a user can reorder list items. Grouped items cannot be moved from one group to another. */
         allowItemReordering?: boolean;
         /** A Boolean value specifying whether to enable or disable the bounce-back effect. */
         bounceEnabled?: boolean;
@@ -2824,7 +2825,7 @@ declare module DevExpress.ui {
     export interface dxLoadPanelOptions extends dxOverlayOptions<dxLoadPanel> {
         /** Configures widget visibility animations. This object contains two fields: show and hide. */
         animation?: dxLoadPanelAnimation;
-        /** Specifies the container in which to place the widget. */
+        /** Specifies the widget's container. */
         container?: string | Element | JQuery;
         /** The delay in milliseconds after which the load panel is displayed. */
         delay?: number;
@@ -3638,7 +3639,7 @@ declare module DevExpress.ui {
         /** Specifies whether a user can switch views using tabs or a drop-down menu. */
         useDropDownViewSwitcher?: boolean;
         /** Configures individual views. */
-        views?: Array<'day' | 'week' | 'workWeek' | 'month' | 'timelineDay' | 'timelineWeek' | 'timelineWorkWeek' | 'timelineMonth' | 'agenda'>;
+        views?: Array<'day' | 'week' | 'workWeek' | 'month' | 'timelineDay' | 'timelineWeek' | 'timelineWorkWeek' | 'timelineMonth' | 'agenda' | { type?: 'agenda' | 'day' | 'month' | 'timelineDay' | 'timelineMonth' | 'timelineWeek' | 'timelineWorkWeek' | 'week' | 'workWeek', name?: string, maxAppointmentsPerCell?: number | 'auto' | 'unlimited', intervalCount?: number, startDate?: Date | number | string, startDayHour?: number, endDayHour?: number, groups?: Array<string>, firstDayOfWeek?: 0 | 1 | 2 | 3 | 4 | 5 | 6, cellDuration?: number, appointmentTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery), dropDownAppointmentTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery), appointmentTooltipTemplate?: template | ((appointmentData: any, contentElement: DevExpress.core.dxElement) => string | Element | JQuery), dateCellTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery), timeCellTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery), dataCellTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery), resourceCellTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery), agendaDuration?: number, groupOrientation?: 'horizontal' | 'vertical', forceMaxAppointmentPerCell?: boolean }>;
     }
     /** The Scheduler is a widget that represents scheduled data and allows a user to manage and edit it. */
     export class dxScheduler extends Widget {
@@ -4100,7 +4101,7 @@ declare module DevExpress.ui {
         paging?: dxTreeListPaging;
         /** Specifies which data field provides parent keys. */
         parentIdExpr?: string | Function;
-        /** Specifies what operations are performed on the server. */
+        /** Notifies the TreeList of the server's data processing operations. Applies only if data has a plain structure. */
         remoteOperations?: { sorting?: boolean, filtering?: boolean, grouping?: boolean } | 'auto';
         /** Specifies the root node's identifier. Applies if dataStructure is 'plain'. */
         rootValue?: any;
@@ -4212,6 +4213,7 @@ declare module DevExpress.ui {
         onItemRendered?: ((e: { component?: dxTreeView, element?: DevExpress.core.dxElement, model?: any, node?: dxTreeViewNode }) => any);
         /** A handler for the itemSelectionChanged event. */
         onItemSelectionChanged?: ((e: { component?: dxTreeView, element?: DevExpress.core.dxElement, model?: any, node?: dxTreeViewNode, itemElement?: DevExpress.core.dxElement }) => any);
+        /** A function that is executed after the "Select All" check box's state changes. Applies only if showCheckBoxesMode is "selectAll" and selectionMode is "multiple". */
         onSelectAllValueChanged?: ((e: { component?: dxTreeView, element?: DevExpress.core.dxElement, model?: any, value?: boolean }) => any);
         /** A handler for the selectionChanged event. Executed after selecting an item or clearing its selection. */
         onSelectionChanged?: ((e: { component?: dxTreeView, element?: DevExpress.core.dxElement, model?: any }) => any);
@@ -4603,7 +4605,7 @@ declare module DevExpress.ui {
         searchEnabled?: boolean;
         /** Specifies the name of a data source item field or an expression whose value is compared to the search criterion. */
         searchExpr?: string | Function | Array<string | Function>;
-        /** Specifies the binary operation used to filter data. */
+        /** Specifies a comparison operation used to search widget items. */
         searchMode?: 'contains' | 'startswith';
         /** Specifies the time delay, in milliseconds, after the last character has been typed in, before a search is executed. */
         searchTimeout?: number;
@@ -4826,7 +4828,7 @@ declare module DevExpress.ui {
     }
     /** Configures a button form item. */
     export interface dxFormButtonItem {
-        /** Specifies the button's horizontal alignment. */
+        /** @deprecated Use horizontalAlignment instead. */
         alignment?: 'center' | 'left' | 'right';
         /** Configures the button. */
         buttonOptions?: dxButtonOptions;
@@ -4834,10 +4836,12 @@ declare module DevExpress.ui {
         colSpan?: number;
         /** Specifies a CSS class to be applied to the item. */
         cssClass?: string;
+        horizontalAlignment?: 'center' | 'left' | 'right';
         /** Specifies the item's type. Set it to "button" to create a button item. */
         itemType?: 'empty' | 'group' | 'simple' | 'tabbed' | 'button';
         /** Specifies the item's identifier. */
         name?: string;
+        verticalAlignment?: 'bottom' | 'center' | 'top';
         /** Specifies whether the item is visible. */
         visible?: boolean;
         /** Specifies the item's position regarding other items in a group, tab, or the whole widget. */
@@ -5335,7 +5339,7 @@ declare module DevExpress.ui {
         searchEnabled?: boolean;
         /** Specifies a data object's field name or an expression whose value is compared to the search string. */
         searchExpr?: string | Function | Array<string | Function>;
-        /** Specifies whether the widget finds entries that contain your search string or entries that only start with it. */
+        /** Specifies a comparison operation used to search widget items. */
         searchMode?: 'contains' | 'startswith' | 'equals';
         /** Specifies a delay in milliseconds between when a user finishes typing, and the search is executed. */
         searchTimeout?: number;
@@ -5931,7 +5935,7 @@ declare module DevExpress.viz {
         argumentFormat?: DevExpress.ui.format;
         /** @deprecated Use the series.label.argumentFormat.precision instead. */
         argumentPrecision?: number;
-        /** Colors the background of point labels. By default, point labels inherit the color from their points. */
+        /** Colors the point labels' background. The default color is inherited from the points. */
         backgroundColor?: string;
         /** Configures the borders of point labels. */
         border?: { visible?: boolean, width?: number, color?: string, dashStyle?: 'dash' | 'dot' | 'longDash' | 'solid' };
@@ -7150,7 +7154,7 @@ declare module DevExpress.viz {
         argumentFormat?: DevExpress.ui.format;
         /** @deprecated Use the series.label.argumentFormat.precision instead. */
         argumentPrecision?: number;
-        /** Specifies a background color for point labels. */
+        /** Colors the point labels' background. The default color is inherited from the points. */
         backgroundColor?: string;
         /** Specifies border options for point labels. */
         border?: { visible?: boolean, width?: number, color?: string, dashStyle?: 'dash' | 'dot' | 'longDash' | 'solid' };
@@ -7339,13 +7343,23 @@ declare module DevExpress.viz {
 declare module DevExpress.events {
     /** Attaches an event handler to the specified elements. */
     export function on(element: Element | Array<Element>, eventName: string, selector: string, data: any, handler: Function): void;
+    export function on(element: Element | Array<Element>, eventName: string, selector: string, handler: Function): void;
+    export function on(element: Element | Array<Element>, eventName: string, data: any, handler: Function): void;
+    export function on(element: Element | Array<Element>, eventName: string, handler: Function): void;
     /** Attaches an event handler to be executed only once to the specified elements. */
     export function one(element: Element | Array<Element>, eventName: string, selector: string, data: any, handler: Function): void;
+    export function one(element: Element | Array<Element>, eventName: string, selector: string, handler: Function): void;
+    export function one(element: Element | Array<Element>, eventName: string, data: any, handler: Function): void;
+    export function one(element: Element | Array<Element>, eventName: string, handler: Function): void;
     /** Detaches an event handler from the specified elements. */
     export function off(element: Element | Array<Element>, eventName: string, selector: string, handler: Function): void;
+    export function off(element: Element | Array<Element>, eventName: string, selector: string): void;
+    export function off(element: Element | Array<Element>, eventName: string, handler: Function): void;
     /** Executes all handlers of a given event type attached to the specified elements. */
     export function trigger(element: Element | Array<Element>, event: string | event, extraParameters: any): void;
+    export function trigger(element: Element | Array<Element>, event: string | event): void;
     export function triggerHandler(element: Element | Array<Element>, event: string | event, extraParameters: any): void;
+    export function triggerHandler(element: Element | Array<Element>, event: string | event): void;
 }
 declare module DevExpress.data.utils {
     /** Compiles a getter function from a getter expression. */
