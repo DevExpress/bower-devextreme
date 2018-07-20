@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 17.2.9
-* Build date: Jul 6, 2018
+* Version: 17.2.9 (build 18201)
+* Build date: Jul 20, 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -6851,6 +6851,9 @@
   opacity: 0.65;
 }
 .dx-state-disabled.dx-radiobutton {
+  opacity: 0.65;
+}
+.dx-state-disabled .dx-radiobutton.dx-state-disabled {
   opacity: 1;
 }
 .dx-state-active.dx-radiobutton .dx-radiobutton-icon:before {
