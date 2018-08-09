@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 18.1.5
-* Build date: Jul 27, 2018
+* Version: 18.1.5 (build 18221)
+* Build date: Aug 9, 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -4210,6 +4210,9 @@
 }
 .dx-toolbar.dx-state-disabled {
   opacity: 1;
+}
+.dx-toolbar.dx-toolbar-compact .dx-button {
+  min-width: auto;
 }
 .dx-toolbar-after .dx-toolbar-item {
   padding: 0 0 0 5px;
@@ -9200,6 +9203,7 @@
   height: 100%;
   width: 100%;
   border-top: none;
+  float: left;
 }
 .dx-scheduler-work-space.dx-scheduler-work-space-grouped:not(.dx-scheduler-agenda) .dx-scheduler-all-day-title {
   border-top: 1px solid rgba(222, 225, 227, 0.6);

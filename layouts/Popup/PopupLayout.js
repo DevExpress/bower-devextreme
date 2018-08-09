@@ -1,4 +1,5 @@
 "use strict";
+
 (function(root, factory) {
     /* global define, DevExpress, jQuery */
     if (typeof define === 'function' && define.amd) {

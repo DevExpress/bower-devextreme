@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 18.1.5
-* Build date: Jul 27, 2018
+* Version: 18.1.5 (build 18221)
+* Build date: Aug 9, 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -6777,32 +6777,30 @@
 .dx-selectbox-popup-wrapper .dx-list {
   background-color: #fff;
 }
-.dx-tagbox.dx-state-hover,
-.dx-tagbox.dx-state-focused,
-.dx-tagbox.dx-state-active,
-.dx-tagbox.dx-state-disabled,
-.dx-tagbox.dx-state-readonly,
-.dx-tagbox.dx-state-readonly.dx-state-hover,
-.dx-tagbox {
-  background: transparent;
+.dx-tagbox.dx-editor-filled .dx-texteditor-input {
+  padding: 0;
 }
-.dx-tagbox:not(.dx-texteditor-empty) .dx-texteditor-input {
+.dx-tagbox.dx-editor-filled .dx-tag-container {
+  padding: 12px 12px 4px 12px;
+  min-height: 56px;
+}
+.dx-tagbox:not(.dx-texteditor-empty):not(.dx-editor-filled) .dx-texteditor-input {
   padding-left: 0;
 }
-.dx-rtl .dx-tagbox:not(.dx-texteditor-empty) .dx-texteditor-input,
-.dx-rtl.dx-tagbox:not(.dx-texteditor-empty) .dx-texteditor-input {
+.dx-rtl .dx-tagbox:not(.dx-texteditor-empty):not(.dx-editor-filled) .dx-texteditor-input,
+.dx-rtl.dx-tagbox:not(.dx-texteditor-empty):not(.dx-editor-filled) .dx-texteditor-input {
   padding-right: 0;
   padding-left: 0;
   margin-right: 0;
   margin-left: 0;
 }
-.dx-tagbox:not(.dx-texteditor-empty).dx-state-focused:before,
-.dx-tagbox:not(.dx-texteditor-empty).dx-state-active:before {
+.dx-tagbox:not(.dx-texteditor-empty):not(.dx-editor-filled).dx-state-focused:before,
+.dx-tagbox:not(.dx-texteditor-empty):not(.dx-editor-filled).dx-state-active:before {
   border-top: 0;
   border-bottom: 0;
 }
-.dx-tagbox:not(.dx-texteditor-empty).dx-state-hover:after,
-.dx-tagbox:not(.dx-texteditor-empty):after {
+.dx-tagbox:not(.dx-texteditor-empty):not(.dx-editor-filled).dx-state-hover:after,
+.dx-tagbox:not(.dx-texteditor-empty):not(.dx-editor-filled):after {
   border-bottom: 0;
 }
 .dx-dropdowneditor-button-visible .dx-tag-container {
@@ -6866,7 +6864,7 @@
   transform: none;
 }
 .dx-tag {
-  margin: 0 8px 2px 0;
+  margin: 0 8px 8px 0;
 }
 .dx-tag:hover .dx-tag-content {
   background-color: #d9d9d9;
@@ -10939,12 +10937,13 @@
 .dx-field-value-static {
   width: 60%;
 }
-.dx-field-label {
-  padding: 21px 15px 20px 0;
-}
 .dx-field {
-  min-height: 56px;
   padding: 0;
+  display: flex;
+}
+.dx-field-label {
+  align-self: center;
+  padding-right: 15px;
 }
 .dx-field-value.dx-widget,
 .dx-field-value:not(.dx-widget) > .dx-widget {
@@ -11506,6 +11505,7 @@
   height: 100%;
   width: 100%;
   border-top: none;
+  float: left;
 }
 .dx-scheduler-work-space.dx-scheduler-work-space-grouped:not(.dx-scheduler-agenda) .dx-scheduler-all-day-title {
   border-top: 1px solid #e0e0e0;
