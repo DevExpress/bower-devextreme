@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.messages.de.js)
-* Version: 18.1.5 (build 18221)
-* Build date: Thu Aug 09 2018
+* Version: 18.2.0 (build 18225)
+* Build date: Mon Aug 13 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -78,6 +78,9 @@
             "dxFileUploader-uploaded": "Hochgeladen",
             "dxFileUploader-readyToUpload": "Bereit zum hochladen",
             "dxFileUploader-uploadFailedMessage": "Fehler beim hochladen",
+            "dxFileUploader-invalidFileExtension": "",
+            "dxFileUploader-invalidMaxFileSize": "",
+            "dxFileUploader-invalidMinFileSize": "",
             "dxRangeSlider-ariaFrom": "Von",
             "dxRangeSlider-ariaTill": "Bis",
             "dxSwitch-onText": "EIN",
