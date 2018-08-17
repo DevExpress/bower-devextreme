@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.messages.zh.js)
-* Version: 17.2.9 (build 18213)
-* Build date: Wed Aug 01 2018
+* Version: 17.2.9 (build 18229)
+* Build date: Fri Aug 17 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/

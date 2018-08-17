@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 17.2.9 (build 18213)
-* Build date: Aug 1, 2018
+* Version: 17.2.9 (build 18229)
+* Build date: Aug 17, 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -5034,6 +5034,12 @@ input.dx-hidden {
 .dx-pivotgrid .dx-area-description-cell .dx-pivotgrid-fields-area {
   position: absolute;
   bottom: 0;
+}
+.dx-pivotgrid .dx-area-description-cell.dx-ie {
+  position: static;
+}
+.dx-pivotgrid .dx-area-description-cell.dx-ie .dx-pivotgrid-fields-area {
+  position: static;
 }
 .dx-pivotgrid .dx-area-field-content {
   display: inline-block;
