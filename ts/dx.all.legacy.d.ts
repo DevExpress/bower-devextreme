@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.all.legacy.d.ts)
-* Version: 18.2.0 (build 18225)
-* Build date: Mon Aug 13 2018
+* Version: 18.1.5 (build 18234)
+* Build date: Wed Aug 22 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -89,13 +89,6 @@ interface JQuery {
     dxDeferRendering(options: string): any;
     dxDeferRendering(options: string, ...params: any[]): any;
     dxDeferRendering(options: DevExpress.ui.dxDeferRenderingOptions): JQuery;
-}
-interface JQuery {
-    dxDrawer(): JQuery;
-    dxDrawer(options: "instance"): DevExpress.ui.dxDrawer;
-    dxDrawer(options: string): any;
-    dxDrawer(options: string, ...params: any[]): any;
-    dxDrawer(options: DevExpress.ui.dxDrawerOptions): JQuery;
 }
 interface JQuery {
     dxDropDownBox(): JQuery;
@@ -264,13 +257,6 @@ interface JQuery {
     dxResizable(options: string): any;
     dxResizable(options: string, ...params: any[]): any;
     dxResizable(options: DevExpress.ui.dxResizableOptions): JQuery;
-}
-interface JQuery {
-    dxRecurrenceEditor(): JQuery;
-    dxRecurrenceEditor(options: "instance"): DevExpress.ui.dxRecurrenceEditor;
-    dxRecurrenceEditor(options: string): any;
-    dxRecurrenceEditor(options: string, ...params: any[]): any;
-    dxRecurrenceEditor(options: DevExpress.ui.dxRecurrenceEditorOptions): JQuery;
 }
 interface JQuery {
     dxResponsiveBox(): JQuery;

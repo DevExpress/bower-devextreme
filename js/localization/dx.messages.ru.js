@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.messages.ru.js)
-* Version: 18.2.0 (build 18225)
-* Build date: Mon Aug 13 2018
+* Version: 18.1.5 (build 18234)
+* Build date: Wed Aug 22 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -78,9 +78,6 @@
             "dxFileUploader-uploaded": "Загружено",
             "dxFileUploader-readyToUpload": "Готово к загрузке",
             "dxFileUploader-uploadFailedMessage": "Загрузка не удалась",
-            "dxFileUploader-invalidFileExtension": "Недопустимое расширение файла",
-            "dxFileUploader-invalidMaxFileSize": "Файл слишком большой",
-            "dxFileUploader-invalidMinFileSize": "Файл слишком маленький",
             "dxRangeSlider-ariaFrom": "От",
             "dxRangeSlider-ariaTill": "До",
             "dxSwitch-onText": "ВКЛ",

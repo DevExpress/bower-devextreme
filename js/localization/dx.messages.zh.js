@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.messages.zh.js)
-* Version: 18.2.0 (build 18225)
-* Build date: Mon Aug 13 2018
+* Version: 18.1.5 (build 18234)
+* Build date: Wed Aug 22 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -78,9 +78,6 @@
             "dxFileUploader-uploaded": "上传",
             "dxFileUploader-readyToUpload": "准备上传",
             "dxFileUploader-uploadFailedMessage": "上传失败",
-            "dxFileUploader-invalidFileExtension": "",
-            "dxFileUploader-invalidMaxFileSize": "",
-            "dxFileUploader-invalidMinFileSize": "",
             "dxRangeSlider-ariaFrom": "从",
             "dxRangeSlider-ariaTill": "至",
             "dxSwitch-onText": "开",
