@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 18.1.5 (build 18234)
-* Build date: Aug 22, 2018
+* Version: 18.1.6
+* Build date: Sep 3, 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -143,6 +143,12 @@
   white-space: normal;
   word-wrap: break-word;
 }
+.dx-datagrid .dx-column-lines > td:first-child {
+  border-left: none;
+}
+.dx-datagrid .dx-column-lines > td:last-child {
+  border-right: none;
+}
 .dx-datagrid-filter-panel {
   color: #fff;
   border-top: 1px solid #999999;
@@ -230,6 +236,14 @@
   -ms-transform: scale(1);
   -o-transform: scale(1);
   transform: scale(1);
+}
+.dx-rtl .dx-datagrid .dx-column-lines > td:first-child {
+  border-right: none;
+  border-left: 1px solid #999999;
+}
+.dx-rtl .dx-datagrid .dx-column-lines > td:last-child {
+  border-left: none;
+  border-right: 1px solid #999999;
 }
 .dx-rtl .dx-datagrid-form-buttons-container {
   float: left;
@@ -811,6 +825,12 @@
   border-left: 1px solid #999999;
   border-right: 1px solid #999999;
 }
+.dx-treelist .dx-column-lines > td:first-child {
+  border-left: none;
+}
+.dx-treelist .dx-column-lines > td:last-child {
+  border-right: none;
+}
 .dx-treelist-container {
   color: #fff;
   background-color: #000000;
@@ -963,6 +983,14 @@
   word-wrap: break-word;
   color: #fff;
   margin-bottom: 20px;
+}
+.dx-rtl.dx-treelist .dx-column-lines > td:first-child {
+  border-right: none;
+  border-left: 1px solid #999999;
+}
+.dx-rtl.dx-treelist .dx-column-lines > td:last-child {
+  border-left: none;
+  border-right: 1px solid #999999;
 }
 .dx-rtl .dx-treelist-container .dx-treelist-rowsview .dx-data-row td.dx-pointer-events-none,
 .dx-rtl .dx-treelist-container .dx-treelist-rowsview .dx-freespace-row td.dx-pointer-events-none,
@@ -7571,6 +7599,7 @@
   -ms-flex-wrap: nowrap;
   -ms-flex-flow: row nowrap;
   flex-flow: row nowrap;
+  -ms-flex-align: center;
   padding: 0 10px 0 5px;
   height: auto;
   width: 100%;
