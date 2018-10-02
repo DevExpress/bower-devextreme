@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.messages.ru.js)
-* Version: 18.1.6
-* Build date: Mon Sep 03 2018
+* Version: 18.1.6 (build 18275)
+* Build date: Tue Oct 02 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -197,7 +197,7 @@
             "dxScheduler-recurrenceYearly": "Ежегодно",
             "dxScheduler-recurrenceEvery": "Интервал",
             "dxScheduler-recurrenceEnd": "Завершить повторение",
-            "dxScheduler-recurrenceAfter": "Количество повторений",
+            "dxScheduler-recurrenceAfter": "После",
             "dxScheduler-recurrenceOn": "Повторять до",
             "dxScheduler-recurrenceRepeatDaily": "дней(дня)",
             "dxScheduler-recurrenceRepeatWeekly": "недели(недель)",

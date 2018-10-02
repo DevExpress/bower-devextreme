@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.aspnet.mvc.js)
-* Version: 18.1.6
-* Build date: Mon Sep 03 2018
+* Version: 18.1.6 (build 18275)
+* Build date: Tue Oct 02 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -9,13 +9,13 @@
 ! function(factory) {
     if ("function" === typeof define && define.amd) {
         define(function(require, exports, module) {
-            module.exports = factory(require("jquery"), require("./ui/set_template_engine"), require("./ui/widget/ui.template_base").renderedCallbacks, require("./core/guid"), require("./ui/validation_engine"), require("./core/utils/iterator"))
+            module.exports = factory(require("jquery"), require("./ui/set_template_engine"), require("./ui/widget/ui.template_base").renderedCallbacks, require("./core/guid"), require("./ui/validation_engine"), require("./core/utils/iterator"), require("./core/utils/string").encodeHtml)
         })
     } else {
         var ui = DevExpress.ui;
-        DevExpress.aspnet = factory(window.jQuery, ui && ui.setTemplateEngine, ui && ui.templateRendered, DevExpress.data.Guid, DevExpress.validationEngine, DevExpress.utils.iterator)
+        DevExpress.aspnet = factory(window.jQuery, ui && ui.setTemplateEngine, ui && ui.templateRendered, DevExpress.data.Guid, DevExpress.validationEngine, DevExpress.utils.iterator, DevExpress.utils.string.encodeHtml)
     }
-}(function($, setTemplateEngine, templateRendered, Guid, validationEngine, iteratorUtils) {
+}(function($, setTemplateEngine, templateRendered, Guid, validationEngine, iteratorUtils, encodeHtml) {
     var templateCompiler = createTemplateCompiler();
 
     function createTemplateCompiler() {
@@ -23,10 +23,6 @@
             CLOSE_TAG = "%>",
             ENCODE_QUALIFIER = "-",
             INTERPOLATE_QUALIFIER = "=";
-
-        function encodeHtml(value) {
-            return String(value).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;")
-        }
 
         function acceptText(bag, text) {
             if (text) {
@@ -40,7 +36,7 @@
                 interpolate = code.charAt(0) === INTERPOLATE_QUALIFIER;
             if (encode || interpolate) {
                 bag.push("_.push(");
-                bag.push(encode ? encodeHtml(value) : value);
+                bag.push(encode ? "arguments[1](" + value + ")" : value);
                 bag.push(");")
             } else {
                 bag.push(code + "\n")
@@ -79,7 +75,7 @@
                 return templateCompiler(outerHtml(element))
             },
             render: function(template, data) {
-                return template(data)
+                return template(data, encodeHtml)
             }
         }
     }

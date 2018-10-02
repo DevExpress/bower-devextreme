@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 18.1.6
-* Build date: Sep 3, 2018
+* Version: 18.1.6 (build 18275)
+* Build date: Oct 2, 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -820,6 +820,7 @@
 .dx-box-item-content {
   -webkit-flex-direction: column;
   flex-direction: column;
+  max-width: 100%;
 }
 .dx-box-flex .dx-box-item > .dx-scrollable,
 .dx-box-flex .dx-box-item-content > .dx-scrollable,
@@ -4208,6 +4209,7 @@
   visibility: hidden;
   background-color: transparent;
   pointer-events: none;
+  border-bottom-color: transparent;
 }
 .dx-datagrid .dx-datagrid-content-fixed .dx-datagrid-table.dx-datagrid-table-fixed .dx-row td.dx-pointer-events-none {
   width: auto;
@@ -4391,6 +4393,9 @@
 input.dx-hidden {
   display: inline-block !important;
   width: 0 !important;
+}
+.dx-hidden-cell {
+  visibility: hidden;
 }
 .dx-row > td,
 .dx-row > tr > td {
@@ -4699,7 +4704,6 @@ input.dx-hidden {
 }
 .dx-datagrid-header-panel {
   text-align: left;
-  overflow: hidden;
 }
 .dx-datagrid-header-panel .dx-toolbar-menu-container .dx-button {
   margin-left: 10px;
@@ -4716,6 +4720,7 @@ input.dx-hidden {
 }
 .dx-gridbase-container > .dx-datagrid-rowsview {
   flex: auto;
+  height: auto;
 }
 .dx-gridbase-container > .dx-datagrid-rowsview.dx-scrollable {
   display: flex;
@@ -5171,6 +5176,9 @@ input.dx-hidden {
 .dx-pivotgrid .dx-incompressible-fields .dx-pivotgrid-fields-area {
   position: static;
 }
+.dx-pivotgrid .dx-incompressible-fields .dx-pivotgrid-fields-area:not(.dx-hidden) {
+  display: table-cell;
+}
 .dx-pivotgrid .dx-incompressible-fields .dx-column-indicators {
   vertical-align: top;
   float: none !important;
@@ -5307,6 +5315,7 @@ input.dx-hidden {
   visibility: hidden;
   background-color: transparent;
   pointer-events: none;
+  border-bottom-color: transparent;
 }
 .dx-treelist .dx-treelist-content-fixed .dx-treelist-table.dx-treelist-table-fixed .dx-row td.dx-pointer-events-none {
   width: auto;
@@ -5490,6 +5499,9 @@ input.dx-hidden {
 input.dx-hidden {
   display: inline-block !important;
   width: 0 !important;
+}
+.dx-hidden-cell {
+  visibility: hidden;
 }
 .dx-row > td,
 .dx-row > tr > td {
@@ -5798,7 +5810,6 @@ input.dx-hidden {
 }
 .dx-treelist-header-panel {
   text-align: left;
-  overflow: hidden;
 }
 .dx-treelist-header-panel .dx-toolbar-menu-container .dx-button {
   margin-left: 10px;
@@ -5815,6 +5826,7 @@ input.dx-hidden {
 }
 .dx-gridbase-container > .dx-treelist-rowsview {
   flex: auto;
+  height: auto;
 }
 .dx-gridbase-container > .dx-treelist-rowsview.dx-scrollable {
   display: flex;
