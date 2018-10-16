@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 18.1.6 (build 18275)
-* Build date: Oct 2, 2018
+* Version: 18.1.6 (build 18289)
+* Build date: Oct 16, 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -3607,6 +3607,7 @@
 .dx-rtl .dx-texteditor.dx-editor-filled .dx-texteditor-buttons-container,
 .dx-texteditor.dx-editor-filled.dx-rtl .dx-texteditor-buttons-container {
   left: 12px;
+  right: auto;
 }
 .dx-texteditor.dx-editor-filled.dx-state-disabled,
 .dx-texteditor.dx-editor-filled.dx-state-readonly,
@@ -3647,6 +3648,7 @@
 .dx-rtl .dx-texteditor.dx-editor-standard .dx-texteditor-buttons-container,
 .dx-texteditor.dx-editor-standard.dx-rtl .dx-texteditor-buttons-container {
   left: 0;
+  right: auto;
 }
 .dx-texteditor.dx-editor-standard.dx-state-disabled:after,
 .dx-texteditor.dx-editor-standard.dx-state-readonly:after,
@@ -11909,6 +11911,7 @@
   -ms-flex-flow: column nowrap;
   flex-flow: column nowrap;
   height: 100%;
+  min-height: 100px;
 }
 .dx-scheduler-timeline .dx-scheduler-date-table .dx-scheduler-date-table-row {
   display: -webkit-box;
@@ -14177,6 +14180,9 @@
 .dx-scheduler-time-panel-cell > div {
   margin-top: -6px;
   font-size: 12px;
+}
+.dx-scheduler-small .dx-scheduler-time-panel-cell > div {
+  font-size: 11px;
 }
 .dx-scheduler-small .dx-scheduler-time-panel-cell {
   padding-right: 2px;
