@@ -1,17 +1,17 @@
 {
   "name": "devextreme",
-  "version": "18.2.2-pre-beta",
+  "version": "18.1.7-pre-18298",
   "description": "A blazing-fast HTML5 Data Grid and rich libraries of high-performance touch-enabled data vizualization and UI widgets",
   "moduleType": [
     "globals"
   ],
-  "main": ["js/dx.all.js", "css/dx.spa.css", "css/dx.common.css", "css/dx.light.css", "css/icons/dxicons.ttf", "css/icons/dxicons.woff"],
+  "main": ["js/dx.all.js", "css/dx.spa.css", "css/dx.common.css", "css/dx.light.css", "css/icons/dxicons.eot", "css/icons/dxicons.ttf", "css/icons/dxicons.woff"],
   "authors": [
     { "name": "Developer Express Inc.", "email": "support@devexpress.com", "homepage": "https://js.devexpress.com" }
   ],
   "license": "https://js.devexpress.com/Licensing/",
   "homepage": "https://js.devexpress.com",
-  "keywords": [ "grid", "datagrid", "widgets", "charts", "gauge", "sparkline", "vector map", "viz", "visualization" ],
+  "keywords": [ "grid", "datagrid", "widgets", "charts", "gauge", "sparkline", "vector map", "viz", "visualization", "SPA" ],
   "dependencies": {
     "jquery": "^2.2.3 || ^3.0.0",
     "globalize": "^1.1",

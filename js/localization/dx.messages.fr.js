@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.messages.fr.js)
-* Version: 18.2.2-pre-beta
-* Build date: Wed Oct 24 2018
+* Version: 18.1.6 (build 18298)
+* Build date: Thu Oct 25 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -78,9 +78,6 @@
             "dxFileUploader-uploaded": "Téléchargé",
             "dxFileUploader-readyToUpload": "Pret à télécharger",
             "dxFileUploader-uploadFailedMessage": "Echec du téléchargement",
-            "dxFileUploader-invalidFileExtension": "",
-            "dxFileUploader-invalidMaxFileSize": "",
-            "dxFileUploader-invalidMinFileSize": "",
             "dxRangeSlider-ariaFrom": "De {0}",
             "dxRangeSlider-ariaTill": "à {0}",
             "dxSwitch-onText": "ON",
@@ -260,18 +257,7 @@
             "dxFilterBuilder-filterOperationIsNotBlank": "N'est pas vide",
             "dxFilterBuilder-filterOperationBetween": "Entre",
             "dxFilterBuilder-filterOperationAnyOf": "Est parmi",
-            "dxFilterBuilder-filterOperationNoneOf": "N'est pas parmi",
-            "dxHtmlEditor-dialogColorCaption": "!TODO!",
-            "dxHtmlEditor-dialogBackgroundCaption": "!TODO!",
-            "dxHtmlEditor-dialogLinkCaption": "!TODO!",
-            "dxHtmlEditor-dialogLinkUrlField": "!TODO!",
-            "dxHtmlEditor-dialogLinkTextField": "!TODO!",
-            "dxHtmlEditor-dialogLinkTargetField": "!TODO!",
-            "dxHtmlEditor-dialogImageCaption": "!TODO!",
-            "dxHtmlEditor-dialogImageUrlField": "!TODO!",
-            "dxHtmlEditor-dialogImageAltField": "!TODO!",
-            "dxHtmlEditor-dialogImageWidthField": "!TODO!",
-            "dxHtmlEditor-dialogImageHeightField": "!TODO!"
+            "dxFilterBuilder-filterOperationNoneOf": "N'est pas parmi"
         }
     })
 });

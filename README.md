@@ -1,6 +1,6 @@
 # DevExtreme Complete
 
-This repo is for distribution of the  [DevExtreme](https://js.devexpress.com/) product with **Bower**.
+This repo is for distribution of the  [DevExtreme Complete](http://js.devexpress.com) product with **Bower**.
 
 DevExtreme supplies HTML/JS tools for mobile and web development.
 
@@ -23,15 +23,22 @@ bower install devextreme
 
 To start with DevExtreme, go through the steps given on the [start page](http://js.devexpress.com/Documentation/) of the documentation.
 
+While using DevExtreme, the [videos](http://js.devexpress.com/Documentation/Videos), [tutorials](http://js.devexpress.com/Documentation/Tutorials/?version=18_1), [guides](http://js.devexpress.com/Documentation/Guide/?version=18_1) and [API reference](http://js.devexpress.com/Documentation/ApiReference/?version=18_1) provided with the documentation will be helpful.
+
 ## Demos
 
-Take a look at the [DevExtreme demos](http://js.devexpress.com/Demos/):
-- sample real-world apps built using the DevExtreme tools;
-- a vast collection of code samples illustrating the usage of DevExtreme widgets.
+Take a look at the DevExtreme demos.
+
+- [Web apps](http://js.devexpress.com/Demos/)  
+Sample real-world apps built using the DevExtreme tools.
+
+
+- [Widgets Gallery](http://js.devexpress.com/Demos/WidgetsGallery/)  
+A vast collection of code samples illustrating the usage of DevExtreme widgets.
 
 ## License
 
-Read about DevExtreme licensing here: [https://js.devexpress.com/Licensing/](https://js.devexpress.com/Licensing/).
+Read about DevExtreme licensing here: [https://js.devexpress.com/Licensing](https://js.devexpress.com/Licensing).
 
 ## Support
 

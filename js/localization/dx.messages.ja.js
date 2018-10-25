@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.messages.ja.js)
-* Version: 18.2.2-pre-beta
-* Build date: Wed Oct 24 2018
+* Version: 18.1.6 (build 18298)
+* Build date: Thu Oct 25 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -78,9 +78,6 @@
             "dxFileUploader-uploaded": "アップロード済み",
             "dxFileUploader-readyToUpload": "アップロードの準備中",
             "dxFileUploader-uploadFailedMessage": "アップロードに失敗しました",
-            "dxFileUploader-invalidFileExtension": "このファイルの種類を使用できません",
-            "dxFileUploader-invalidMaxFileSize": "ファイルが大きすぎます",
-            "dxFileUploader-invalidMinFileSize": "ファイルが小さすぎます",
             "dxRangeSlider-ariaFrom": "から",
             "dxRangeSlider-ariaTill": "まで",
             "dxSwitch-onText": "オン",
@@ -260,18 +257,7 @@
             "dxFilterBuilder-filterOperationIsNotBlank": "空白ではない",
             "dxFilterBuilder-filterOperationBetween": "～から～の間",
             "dxFilterBuilder-filterOperationAnyOf": "どちらかを含む",
-            "dxFilterBuilder-filterOperationNoneOf": "すべて含まない",
-            "dxHtmlEditor-dialogColorCaption": "フォントの色を変更",
-            "dxHtmlEditor-dialogBackgroundCaption": "背景色を変更",
-            "dxHtmlEditor-dialogLinkCaption": "リンクを追加",
-            "dxHtmlEditor-dialogLinkUrlField": "URL",
-            "dxHtmlEditor-dialogLinkTextField": "テキスト",
-            "dxHtmlEditor-dialogLinkTargetField": "リンクを新しいウィンドウで開く",
-            "dxHtmlEditor-dialogImageCaption": "画像の追加",
-            "dxHtmlEditor-dialogImageUrlField": "URL",
-            "dxHtmlEditor-dialogImageAltField": "代替テキスト",
-            "dxHtmlEditor-dialogImageWidthField": "幅 (px)",
-            "dxHtmlEditor-dialogImageHeightField": "高さ (px)"
+            "dxFilterBuilder-filterOperationNoneOf": "すべて含まない"
         }
     })
 });
