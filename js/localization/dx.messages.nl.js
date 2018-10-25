@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.messages.nl.js)
-* Version: 18.1.6 (build 18291)
-* Build date: Thu Oct 18 2018
+* Version: 18.2.2-pre-beta
+* Build date: Wed Oct 24 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -78,6 +78,9 @@
             "dxFileUploader-uploaded": "Geüpload",
             "dxFileUploader-readyToUpload": "Klaar om te uploaden",
             "dxFileUploader-uploadFailedMessage": "Uploaden is mislukt",
+            "dxFileUploader-invalidFileExtension": "Dit bestandstype is niet toegestaan",
+            "dxFileUploader-invalidMaxFileSize": "Het bestand is te groot",
+            "dxFileUploader-invalidMinFileSize": "Het bestand is te klein",
             "dxRangeSlider-ariaFrom": "Van",
             "dxRangeSlider-ariaTill": "Tot",
             "dxSwitch-onText": "AAN",
@@ -257,7 +260,18 @@
             "dxFilterBuilder-filterOperationIsNotBlank": "Is niet leeg",
             "dxFilterBuilder-filterOperationBetween": "Is tussen",
             "dxFilterBuilder-filterOperationAnyOf": "Is een van",
-            "dxFilterBuilder-filterOperationNoneOf": "Is geen van"
+            "dxFilterBuilder-filterOperationNoneOf": "Is geen van",
+            "dxHtmlEditor-dialogColorCaption": "!TODO!",
+            "dxHtmlEditor-dialogBackgroundCaption": "!TODO!",
+            "dxHtmlEditor-dialogLinkCaption": "!TODO!",
+            "dxHtmlEditor-dialogLinkUrlField": "!TODO!",
+            "dxHtmlEditor-dialogLinkTextField": "!TODO!",
+            "dxHtmlEditor-dialogLinkTargetField": "!TODO!",
+            "dxHtmlEditor-dialogImageCaption": "!TODO!",
+            "dxHtmlEditor-dialogImageUrlField": "!TODO!",
+            "dxHtmlEditor-dialogImageAltField": "!TODO!",
+            "dxHtmlEditor-dialogImageWidthField": "!TODO!",
+            "dxHtmlEditor-dialogImageHeightField": "!TODO!"
         }
     })
 });

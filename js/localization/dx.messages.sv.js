@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.messages.sv.js)
-* Version: 18.1.6 (build 18291)
-* Build date: Thu Oct 18 2018
+* Version: 18.2.2-pre-beta
+* Build date: Wed Oct 24 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -78,6 +78,9 @@
             "dxFileUploader-uploaded": "Uppladdad",
             "dxFileUploader-readyToUpload": "Klar att ladda upp",
             "dxFileUploader-uploadFailedMessage": "Uppladdning misslyckades",
+            "dxFileUploader-invalidFileExtension": "",
+            "dxFileUploader-invalidMaxFileSize": "",
+            "dxFileUploader-invalidMinFileSize": "",
             "dxRangeSlider-ariaFrom": "Från",
             "dxRangeSlider-ariaTill": "Till",
             "dxSwitch-onText": "PÅ",
@@ -257,7 +260,18 @@
             "dxFilterBuilder-filterOperationIsNotBlank": "Är inte tom",
             "dxFilterBuilder-filterOperationBetween": "Mellan",
             "dxFilterBuilder-filterOperationAnyOf": "Någon av",
-            "dxFilterBuilder-filterOperationNoneOf": "Ingen av"
+            "dxFilterBuilder-filterOperationNoneOf": "Ingen av",
+            "dxHtmlEditor-dialogColorCaption": "!TODO!",
+            "dxHtmlEditor-dialogBackgroundCaption": "!TODO!",
+            "dxHtmlEditor-dialogLinkCaption": "!TODO!",
+            "dxHtmlEditor-dialogLinkUrlField": "!TODO!",
+            "dxHtmlEditor-dialogLinkTextField": "!TODO!",
+            "dxHtmlEditor-dialogLinkTargetField": "!TODO!",
+            "dxHtmlEditor-dialogImageCaption": "!TODO!",
+            "dxHtmlEditor-dialogImageUrlField": "!TODO!",
+            "dxHtmlEditor-dialogImageAltField": "!TODO!",
+            "dxHtmlEditor-dialogImageWidthField": "!TODO!",
+            "dxHtmlEditor-dialogImageHeightField": "!TODO!"
         }
     })
 });

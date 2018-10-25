@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.messages.en.js)
-* Version: 18.1.6 (build 18291)
-* Build date: Thu Oct 18 2018
+* Version: 18.2.2-pre-beta
+* Build date: Wed Oct 24 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -78,6 +78,9 @@
             "dxFileUploader-uploaded": "Uploaded",
             "dxFileUploader-readyToUpload": "Ready to upload",
             "dxFileUploader-uploadFailedMessage": "Upload failed",
+            "dxFileUploader-invalidFileExtension": "File type is not allowed",
+            "dxFileUploader-invalidMaxFileSize": "File is too large",
+            "dxFileUploader-invalidMinFileSize": "File is too small",
             "dxRangeSlider-ariaFrom": "From",
             "dxRangeSlider-ariaTill": "Till",
             "dxSwitch-onText": "ON",
@@ -257,7 +260,18 @@
             "dxFilterBuilder-filterOperationIsNotBlank": "Is not blank",
             "dxFilterBuilder-filterOperationBetween": "Is between",
             "dxFilterBuilder-filterOperationAnyOf": "Is any of",
-            "dxFilterBuilder-filterOperationNoneOf": "Is none of"
+            "dxFilterBuilder-filterOperationNoneOf": "Is none of",
+            "dxHtmlEditor-dialogColorCaption": "Change Font Color",
+            "dxHtmlEditor-dialogBackgroundCaption": "Change Background Color",
+            "dxHtmlEditor-dialogLinkCaption": "Add Link",
+            "dxHtmlEditor-dialogLinkUrlField": "URL",
+            "dxHtmlEditor-dialogLinkTextField": "Text",
+            "dxHtmlEditor-dialogLinkTargetField": "Open link in new window",
+            "dxHtmlEditor-dialogImageCaption": "Add Image",
+            "dxHtmlEditor-dialogImageUrlField": "URL",
+            "dxHtmlEditor-dialogImageAltField": "Alternate text",
+            "dxHtmlEditor-dialogImageWidthField": "Width (px)",
+            "dxHtmlEditor-dialogImageHeightField": "Height (px)"
         }
     })
 });

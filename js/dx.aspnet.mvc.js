@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.aspnet.mvc.js)
-* Version: 18.1.6 (build 18291)
-* Build date: Thu Oct 18 2018
+* Version: 18.2.2-pre-beta
+* Build date: Wed Oct 24 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -9,13 +9,13 @@
 ! function(factory) {
     if ("function" === typeof define && define.amd) {
         define(function(require, exports, module) {
-            module.exports = factory(require("jquery"), require("./ui/set_template_engine"), require("./ui/widget/ui.template_base").renderedCallbacks, require("./core/guid"), require("./ui/validation_engine"), require("./core/utils/iterator"), require("./core/utils/string").encodeHtml)
+            module.exports = factory(require("jquery"), require("./ui/set_template_engine"), require("./ui/widget/ui.template_base").renderedCallbacks, require("./core/guid"), require("./ui/validation_engine"), require("./core/utils/iterator"), require("./core/utils/dom").extractTemplateMarkup, require("./core/utils/string").encodeHtml)
         })
     } else {
         var ui = DevExpress.ui;
-        DevExpress.aspnet = factory(window.jQuery, ui && ui.setTemplateEngine, ui && ui.templateRendered, DevExpress.data.Guid, DevExpress.validationEngine, DevExpress.utils.iterator, DevExpress.utils.string.encodeHtml)
+        DevExpress.aspnet = factory(window.jQuery, ui && ui.setTemplateEngine, ui && ui.templateRendered, DevExpress.data.Guid, DevExpress.validationEngine, DevExpress.utils.iterator, DevExpress.utils.dom.extractTemplateMarkup, DevExpress.utils.string.encodeHtml)
     }
-}(function($, setTemplateEngine, templateRendered, Guid, validationEngine, iteratorUtils, encodeHtml) {
+}(function($, setTemplateEngine, templateRendered, Guid, validationEngine, iteratorUtils, extractTemplateMarkup, encodeHtml) {
     var templateCompiler = createTemplateCompiler();
 
     function createTemplateCompiler() {
@@ -60,19 +60,9 @@
     }
 
     function createTemplateEngine() {
-        function outerHtml(element) {
-            element = $(element);
-            var templateTag = element.length && element[0].nodeName.toLowerCase();
-            if ("script" === templateTag) {
-                return element.html()
-            } else {
-                element = $("<div>").append(element);
-                return element.html()
-            }
-        }
         return {
             compile: function(element) {
-                return templateCompiler(outerHtml(element))
+                return templateCompiler(extractTemplateMarkup(element))
             },
             render: function(template, data) {
                 return template(data, encodeHtml)
