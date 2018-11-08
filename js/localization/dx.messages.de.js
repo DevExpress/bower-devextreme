@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.messages.de.js)
-* Version: 18.1.6 (build 18298)
-* Build date: Thu Oct 25 2018
+* Version: 18.2.3
+* Build date: Wed Nov 07 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -78,10 +78,13 @@
             "dxFileUploader-uploaded": "Hochgeladen",
             "dxFileUploader-readyToUpload": "Bereit zum hochladen",
             "dxFileUploader-uploadFailedMessage": "Fehler beim hochladen",
+            "dxFileUploader-invalidFileExtension": "Unzulässiger Dateityp",
+            "dxFileUploader-invalidMaxFileSize": "Datei ist zu groß",
+            "dxFileUploader-invalidMinFileSize": "Datei ist zu klein",
             "dxRangeSlider-ariaFrom": "Von",
             "dxRangeSlider-ariaTill": "Bis",
-            "dxSwitch-onText": "EIN",
-            "dxSwitch-offText": "AUS",
+            "dxSwitch-switchedOnText": "EIN",
+            "dxSwitch-switchedOffText": "AUS",
             "dxForm-optionalMark": "optional",
             "dxForm-requiredMessage": "{0} ist ein Pflichtfeld",
             "dxNumberBox-invalidValueMessage": "Der Wert muss eine Zahl sein",
@@ -257,7 +260,20 @@
             "dxFilterBuilder-filterOperationIsNotBlank": "Ist nicht leer",
             "dxFilterBuilder-filterOperationBetween": "Zwischen",
             "dxFilterBuilder-filterOperationAnyOf": "Ist enthalten in",
-            "dxFilterBuilder-filterOperationNoneOf": "Ist nicht enthalten in"
+            "dxFilterBuilder-filterOperationNoneOf": "Ist nicht enthalten in",
+            "dxHtmlEditor-dialogColorCaption": "Schriftfarbe ändern",
+            "dxHtmlEditor-dialogBackgroundCaption": "Hintergrundfarbe ändern",
+            "dxHtmlEditor-dialogLinkCaption": "Link hinzufügen",
+            "dxHtmlEditor-dialogLinkUrlField": "URL",
+            "dxHtmlEditor-dialogLinkTextField": "Text",
+            "dxHtmlEditor-dialogLinkTargetField": "Link in neuem Fenster öffnen",
+            "dxHtmlEditor-dialogImageCaption": "Bild hinzufügen",
+            "dxHtmlEditor-dialogImageUrlField": "URL",
+            "dxHtmlEditor-dialogImageAltField": "Alternativer Text",
+            "dxHtmlEditor-dialogImageWidthField": "Breite (px)",
+            "dxHtmlEditor-dialogImageHeightField": "Bildhöhe (px)",
+            "dxHtmlEditor-heading": "Überschrift",
+            "dxHtmlEditor-normalText": "Normaler Text"
         }
     })
 });

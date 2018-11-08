@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.messages.cs.js)
-* Version: 18.1.6 (build 18298)
-* Build date: Thu Oct 25 2018
+* Version: 18.2.3
+* Build date: Wed Nov 07 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -78,10 +78,13 @@
             "dxFileUploader-uploaded": "Nahráno",
             "dxFileUploader-readyToUpload": "Připraveno k nahrání",
             "dxFileUploader-uploadFailedMessage": "Nahrávání selhalo",
+            "dxFileUploader-invalidFileExtension": "",
+            "dxFileUploader-invalidMaxFileSize": "",
+            "dxFileUploader-invalidMinFileSize": "",
             "dxRangeSlider-ariaFrom": "Od",
             "dxRangeSlider-ariaTill": "Do",
-            "dxSwitch-onText": "ZAP",
-            "dxSwitch-offText": "VYP",
+            "dxSwitch-switchedOnText": "ZAP",
+            "dxSwitch-switchedOffText": "VYP",
             "dxForm-optionalMark": "volitelný",
             "dxForm-requiredMessage": "{0} je vyžadováno",
             "dxNumberBox-invalidValueMessage": "Hodnota musí být číslo",
@@ -257,7 +260,20 @@
             "dxFilterBuilder-filterOperationIsNotBlank": "Není prázdné",
             "dxFilterBuilder-filterOperationBetween": "Mezi",
             "dxFilterBuilder-filterOperationAnyOf": "Libovolný z",
-            "dxFilterBuilder-filterOperationNoneOf": "Žádný z"
+            "dxFilterBuilder-filterOperationNoneOf": "Žádný z",
+            "dxHtmlEditor-dialogColorCaption": "!TODO!",
+            "dxHtmlEditor-dialogBackgroundCaption": "!TODO!",
+            "dxHtmlEditor-dialogLinkCaption": "!TODO!",
+            "dxHtmlEditor-dialogLinkUrlField": "!TODO!",
+            "dxHtmlEditor-dialogLinkTextField": "!TODO!",
+            "dxHtmlEditor-dialogLinkTargetField": "!TODO!",
+            "dxHtmlEditor-dialogImageCaption": "!TODO!",
+            "dxHtmlEditor-dialogImageUrlField": "!TODO!",
+            "dxHtmlEditor-dialogImageAltField": "!TODO!",
+            "dxHtmlEditor-dialogImageWidthField": "!TODO!",
+            "dxHtmlEditor-dialogImageHeightField": "!TODO!",
+            "dxHtmlEditor-heading": "!TODO!",
+            "dxHtmlEditor-normalText": "!TODO!"
         }
     })
 });

@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.messages.es.js)
-* Version: 18.1.6 (build 18298)
-* Build date: Thu Oct 25 2018
+* Version: 18.2.3
+* Build date: Wed Nov 07 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -78,10 +78,13 @@
             "dxFileUploader-uploaded": "Subido",
             "dxFileUploader-readyToUpload": "Listo para subir",
             "dxFileUploader-uploadFailedMessage": "Falla ao subir",
+            "dxFileUploader-invalidFileExtension": "",
+            "dxFileUploader-invalidMaxFileSize": "",
+            "dxFileUploader-invalidMinFileSize": "",
             "dxRangeSlider-ariaFrom": "Desde",
             "dxRangeSlider-ariaTill": "Hasta",
-            "dxSwitch-onText": "ENCENDIDO",
-            "dxSwitch-offText": "APAGADO",
+            "dxSwitch-switchedOnText": "ENCENDIDO",
+            "dxSwitch-switchedOffText": "APAGADO",
             "dxForm-optionalMark": "opcional",
             "dxForm-requiredMessage": "{0} es obligatorio",
             "dxNumberBox-invalidValueMessage": "Valor debe ser un número",
@@ -257,7 +260,20 @@
             "dxFilterBuilder-filterOperationIsNotBlank": "No vacío",
             "dxFilterBuilder-filterOperationBetween": "Entre",
             "dxFilterBuilder-filterOperationAnyOf": "Alguno de",
-            "dxFilterBuilder-filterOperationNoneOf": "Ningún de"
+            "dxFilterBuilder-filterOperationNoneOf": "Ningún de",
+            "dxHtmlEditor-dialogColorCaption": "!TODO!",
+            "dxHtmlEditor-dialogBackgroundCaption": "!TODO!",
+            "dxHtmlEditor-dialogLinkCaption": "!TODO!",
+            "dxHtmlEditor-dialogLinkUrlField": "!TODO!",
+            "dxHtmlEditor-dialogLinkTextField": "!TODO!",
+            "dxHtmlEditor-dialogLinkTargetField": "!TODO!",
+            "dxHtmlEditor-dialogImageCaption": "!TODO!",
+            "dxHtmlEditor-dialogImageUrlField": "!TODO!",
+            "dxHtmlEditor-dialogImageAltField": "!TODO!",
+            "dxHtmlEditor-dialogImageWidthField": "!TODO!",
+            "dxHtmlEditor-dialogImageHeightField": "!TODO!",
+            "dxHtmlEditor-heading": "!TODO!",
+            "dxHtmlEditor-normalText": "!TODO!"
         }
     })
 });

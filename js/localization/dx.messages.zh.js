@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.messages.zh.js)
-* Version: 18.1.6 (build 18298)
-* Build date: Thu Oct 25 2018
+* Version: 18.2.3
+* Build date: Wed Nov 07 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -78,10 +78,13 @@
             "dxFileUploader-uploaded": "上传",
             "dxFileUploader-readyToUpload": "准备上传",
             "dxFileUploader-uploadFailedMessage": "上传失败",
+            "dxFileUploader-invalidFileExtension": "",
+            "dxFileUploader-invalidMaxFileSize": "",
+            "dxFileUploader-invalidMinFileSize": "",
             "dxRangeSlider-ariaFrom": "从",
             "dxRangeSlider-ariaTill": "至",
-            "dxSwitch-onText": "开",
-            "dxSwitch-offText": "关",
+            "dxSwitch-switchedOnText": "开",
+            "dxSwitch-switchedOffText": "关",
             "dxForm-optionalMark": "可选",
             "dxForm-requiredMessage": "{0} 是必须的",
             "dxNumberBox-invalidValueMessage": "值必须是一个数字",
@@ -257,7 +260,20 @@
             "dxFilterBuilder-filterOperationIsNotBlank": "不为空",
             "dxFilterBuilder-filterOperationBetween": "之间",
             "dxFilterBuilder-filterOperationAnyOf": "任何一个",
-            "dxFilterBuilder-filterOperationNoneOf": "任何一个都不"
+            "dxFilterBuilder-filterOperationNoneOf": "任何一个都不",
+            "dxHtmlEditor-dialogColorCaption": "!TODO!",
+            "dxHtmlEditor-dialogBackgroundCaption": "!TODO!",
+            "dxHtmlEditor-dialogLinkCaption": "!TODO!",
+            "dxHtmlEditor-dialogLinkUrlField": "!TODO!",
+            "dxHtmlEditor-dialogLinkTextField": "!TODO!",
+            "dxHtmlEditor-dialogLinkTargetField": "!TODO!",
+            "dxHtmlEditor-dialogImageCaption": "!TODO!",
+            "dxHtmlEditor-dialogImageUrlField": "!TODO!",
+            "dxHtmlEditor-dialogImageAltField": "!TODO!",
+            "dxHtmlEditor-dialogImageWidthField": "!TODO!",
+            "dxHtmlEditor-dialogImageHeightField": "!TODO!",
+            "dxHtmlEditor-heading": "!TODO!",
+            "dxHtmlEditor-normalText": "!TODO!"
         }
     })
 });
