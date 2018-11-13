@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 18.1.7
-* Build date: Oct 26, 2018
+* Version: 18.1.7 (build 18317)
+* Build date: Nov 13, 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -4396,10 +4396,10 @@
   border-radius: 50%;
   background-color: #000000;
 }
-.dx-radiobutton-checked .dx-radiobutton-icon {
+.dx-radiobutton-icon-checked {
   border-color: #0078d7;
 }
-.dx-radiobutton-checked .dx-radiobutton-icon-dot {
+.dx-radiobutton-icon-checked .dx-radiobutton-icon-dot {
   height: 10px;
   width: 10px;
   margin: 3px;
@@ -4410,19 +4410,19 @@
 .dx-state-focused.dx-radiobutton .dx-radiobutton-icon {
   border-color: #ffffff;
 }
-.dx-state-hover.dx-radiobutton-checked .dx-radiobutton-icon,
-.dx-state-focused.dx-radiobutton-checked .dx-radiobutton-icon {
+.dx-state-hover .dx-radiobutton-icon-checked,
+.dx-state-focused .dx-radiobutton-icon-checked {
   border-color: #0078d7;
 }
-.dx-state-hover.dx-radiobutton-checked .dx-radiobutton-icon-dot,
-.dx-state-focused.dx-radiobutton-checked .dx-radiobutton-icon-dot {
+.dx-state-hover .dx-radiobutton-icon-checked .dx-radiobutton-icon-dot,
+.dx-state-focused .dx-radiobutton-icon-checked .dx-radiobutton-icon-dot {
   background-color: #ffffff;
 }
 .dx-state-active.dx-radiobutton .dx-radiobutton-icon {
   border-color: #ffffff;
   background-color: #555555;
 }
-.dx-state-active.dx-radiobutton-checked .dx-radiobutton-icon-dot {
+.dx-state-active.dx-radiobutton .dx-radiobutton-icon-checked .dx-radiobutton-icon-dot {
   background-color: #ffffff;
 }
 .dx-radiobutton.dx-invalid .dx-radiobutton-icon {
@@ -7148,6 +7148,17 @@
 }
 .dx-scheduler-timeline-week .dx-scheduler-header-panel thead,
 .dx-scheduler-timeline-work-week .dx-scheduler-header-panel thead {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -moz-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-flow: column nowrap;
+  -moz-flex-flow: column nowrap;
+  -ms-flex-direction: column;
+  -ms-flex-wrap: nowrap;
+  -ms-flex-flow: column nowrap;
+  flex-flow: column nowrap;
   width: 100%;
 }
 .dx-scheduler-timeline-week .dx-scheduler-header-row,
@@ -8409,6 +8420,8 @@
   -moz-box-shadow: inset 0px 2px 0px 0px rgba(0, 0, 0, 0.5);
   box-shadow: inset 0px 2px 0px 0px rgba(0, 0, 0, 0.5);
   left: 0;
+  min-width: 4px;
+  min-height: 4px;
 }
 .dx-scheduler-appointment.dx-state-active,
 .dx-scheduler-appointment.dx-resizable-resizing {
@@ -8785,11 +8798,19 @@
 .dx-datebox.dx-recurrence-datebox-until-date {
   width: inherit !important;
 }
+.dx-recurrence-repeat-end-wrapper {
+  padding: 0 5px;
+}
 .dx-recurrence-radiogroup-repeat-type-label,
 .dx-recurrence-repeat-end-label {
   display: inline-block;
-  padding: 0 5px;
+  padding-right: 5px;
   vertical-align: top;
+}
+.dx-recurrence-radiogroup-repeat-type-label.dx-rtl,
+.dx-recurrence-repeat-end-label.dx-rtl {
+  padding-left: 5px;
+  padding-right: 0;
 }
 .dx-recurrence-repeat-end-label {
   float: left;

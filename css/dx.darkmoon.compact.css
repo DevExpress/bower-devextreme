@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 18.1.7
-* Build date: Oct 26, 2018
+* Version: 18.1.7 (build 18317)
+* Build date: Nov 13, 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -5560,7 +5560,7 @@
   -moz-box-sizing: content-box;
   box-sizing: content-box;
 }
-.dx-radiobutton-checked .dx-radiobutton-icon-dot {
+.dx-radiobutton-icon-checked .dx-radiobutton-icon-dot {
   display: block;
   margin-top: -12px;
   margin-left: 4px;
@@ -9185,6 +9185,17 @@
 }
 .dx-scheduler-timeline-week .dx-scheduler-header-panel thead,
 .dx-scheduler-timeline-work-week .dx-scheduler-header-panel thead {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -moz-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-flow: column nowrap;
+  -moz-flex-flow: column nowrap;
+  -ms-flex-direction: column;
+  -ms-flex-wrap: nowrap;
+  -ms-flex-flow: column nowrap;
+  flex-flow: column nowrap;
   width: 100%;
 }
 .dx-scheduler-timeline-week .dx-scheduler-header-row,
@@ -10446,6 +10457,8 @@
   -moz-box-shadow: inset 0px 2px 0px 0px rgba(0, 0, 0, 0.3);
   box-shadow: inset 0px 2px 0px 0px rgba(0, 0, 0, 0.3);
   left: 0;
+  min-width: 4px;
+  min-height: 4px;
 }
 .dx-scheduler-appointment.dx-state-active,
 .dx-scheduler-appointment.dx-resizable-resizing {
@@ -10822,11 +10835,19 @@
 .dx-datebox.dx-recurrence-datebox-until-date {
   width: inherit !important;
 }
+.dx-recurrence-repeat-end-wrapper {
+  padding: 0 5px;
+}
 .dx-recurrence-radiogroup-repeat-type-label,
 .dx-recurrence-repeat-end-label {
   display: inline-block;
-  padding: 0 5px;
+  padding-right: 5px;
   vertical-align: top;
+}
+.dx-recurrence-radiogroup-repeat-type-label.dx-rtl,
+.dx-recurrence-repeat-end-label.dx-rtl {
+  padding-left: 5px;
+  padding-right: 0;
 }
 .dx-recurrence-repeat-end-label {
   float: left;

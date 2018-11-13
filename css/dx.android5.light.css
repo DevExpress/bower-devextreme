@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 18.1.7
-* Build date: Oct 26, 2018
+* Version: 18.1.7 (build 18317)
+* Build date: Nov 13, 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -5242,10 +5242,10 @@
   -o-transition: transform .14s;
   transition: transform .14s;
 }
-.dx-radiobutton-checked .dx-radiobutton-icon {
+.dx-radiobutton-icon-checked {
   border-color: #00BCD4;
 }
-.dx-radiobutton-checked .dx-radiobutton-icon-dot {
+.dx-radiobutton-icon-checked .dx-radiobutton-icon-dot {
   -webkit-transform: scale(1);
   -moz-transform: scale(1);
   -ms-transform: scale(1);
@@ -5255,7 +5255,7 @@
 .dx-state-disabled .dx-radiobutton-icon {
   border-color: rgba(0, 0, 0, 0.26);
 }
-.dx-state-disabled .dx-radiobutton-checked .dx-radiobutton-icon:after {
+.dx-state-disabled .dx-radiobutton-icon-checked:after {
   background-color: rgba(0, 0, 0, 0.26);
 }
 .dx-invalid .dx-radiobutton-icon {
