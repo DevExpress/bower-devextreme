@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.messages.pt.js)
-* Version: 18.2.3
-* Build date: Wed Nov 07 2018
+* Version: 18.2.3 (build 18323)
+* Build date: Mon Nov 19 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -68,8 +68,8 @@
             "dxDateBox-simulatedDataPickerTitleDate": "Selecionar data",
             "dxDateBox-simulatedDataPickerTitleDateTime": "Selecionar data e hora",
             "dxDateBox-validation-datetime": "Valor deve ser uma data ou hora",
-            "dxFileUploader-selectFile": "Selecionar ficheiro",
-            "dxFileUploader-dropFile": "ou Soltar ficheiro aqui",
+            "dxFileUploader-selectFile": "Selecionar arquivo",
+            "dxFileUploader-dropFile": "ou Soltar arquivo aqui",
             "dxFileUploader-bytes": "bytes",
             "dxFileUploader-kb": "kb",
             "dxFileUploader-Mb": "Mb",
@@ -78,9 +78,9 @@
             "dxFileUploader-uploaded": "Upload concluído",
             "dxFileUploader-readyToUpload": "Pronto para upload",
             "dxFileUploader-uploadFailedMessage": "Upload falhou",
-            "dxFileUploader-invalidFileExtension": "",
-            "dxFileUploader-invalidMaxFileSize": "",
-            "dxFileUploader-invalidMinFileSize": "",
+            "dxFileUploader-invalidFileExtension": "Tipo de arquivo não é permitido",
+            "dxFileUploader-invalidMaxFileSize": "O arquivo é muito grande",
+            "dxFileUploader-invalidMinFileSize": "O arquivo é muito pequeno",
             "dxRangeSlider-ariaFrom": "De {0}",
             "dxRangeSlider-ariaTill": "Até {0}",
             "dxSwitch-switchedOnText": "LIGADO",
@@ -261,19 +261,19 @@
             "dxFilterBuilder-filterOperationBetween": "Entre",
             "dxFilterBuilder-filterOperationAnyOf": "Algum de",
             "dxFilterBuilder-filterOperationNoneOf": "Nenhum de",
-            "dxHtmlEditor-dialogColorCaption": "!TODO!",
-            "dxHtmlEditor-dialogBackgroundCaption": "!TODO!",
-            "dxHtmlEditor-dialogLinkCaption": "!TODO!",
-            "dxHtmlEditor-dialogLinkUrlField": "!TODO!",
-            "dxHtmlEditor-dialogLinkTextField": "!TODO!",
-            "dxHtmlEditor-dialogLinkTargetField": "!TODO!",
-            "dxHtmlEditor-dialogImageCaption": "!TODO!",
-            "dxHtmlEditor-dialogImageUrlField": "!TODO!",
-            "dxHtmlEditor-dialogImageAltField": "!TODO!",
-            "dxHtmlEditor-dialogImageWidthField": "!TODO!",
-            "dxHtmlEditor-dialogImageHeightField": "!TODO!",
-            "dxHtmlEditor-heading": "!TODO!",
-            "dxHtmlEditor-normalText": "!TODO!"
+            "dxHtmlEditor-dialogColorCaption": "Alterar cor da fonte",
+            "dxHtmlEditor-dialogBackgroundCaption": "Alterar cor de plano de fundo",
+            "dxHtmlEditor-dialogLinkCaption": "Adicionar link",
+            "dxHtmlEditor-dialogLinkUrlField": "URL",
+            "dxHtmlEditor-dialogLinkTextField": "Texto",
+            "dxHtmlEditor-dialogLinkTargetField": "Abrir link em nova janela",
+            "dxHtmlEditor-dialogImageCaption": "Adicionar imagem",
+            "dxHtmlEditor-dialogImageUrlField": "URL",
+            "dxHtmlEditor-dialogImageAltField": "Texto alternativo",
+            "dxHtmlEditor-dialogImageWidthField": "Largura (px)",
+            "dxHtmlEditor-dialogImageHeightField": "Altura (px)",
+            "dxHtmlEditor-heading": "Cabeçalho",
+            "dxHtmlEditor-normalText": "Texto normal"
         }
     })
 });

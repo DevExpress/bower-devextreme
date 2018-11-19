@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.messages.fr.js)
-* Version: 18.2.3
-* Build date: Wed Nov 07 2018
+* Version: 18.2.3 (build 18323)
+* Build date: Mon Nov 19 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -78,9 +78,9 @@
             "dxFileUploader-uploaded": "Téléchargé",
             "dxFileUploader-readyToUpload": "Pret à télécharger",
             "dxFileUploader-uploadFailedMessage": "Echec du téléchargement",
-            "dxFileUploader-invalidFileExtension": "",
-            "dxFileUploader-invalidMaxFileSize": "",
-            "dxFileUploader-invalidMinFileSize": "",
+            "dxFileUploader-invalidFileExtension": "Type de fichier non autorisé",
+            "dxFileUploader-invalidMaxFileSize": "Fichier trop volumineux",
+            "dxFileUploader-invalidMinFileSize": "Fichier trop petit",
             "dxRangeSlider-ariaFrom": "De {0}",
             "dxRangeSlider-ariaTill": "à {0}",
             "dxSwitch-switchedOnText": "ON",
@@ -261,19 +261,19 @@
             "dxFilterBuilder-filterOperationBetween": "Entre",
             "dxFilterBuilder-filterOperationAnyOf": "Est parmi",
             "dxFilterBuilder-filterOperationNoneOf": "N'est pas parmi",
-            "dxHtmlEditor-dialogColorCaption": "!TODO!",
-            "dxHtmlEditor-dialogBackgroundCaption": "!TODO!",
-            "dxHtmlEditor-dialogLinkCaption": "!TODO!",
-            "dxHtmlEditor-dialogLinkUrlField": "!TODO!",
-            "dxHtmlEditor-dialogLinkTextField": "!TODO!",
-            "dxHtmlEditor-dialogLinkTargetField": "!TODO!",
-            "dxHtmlEditor-dialogImageCaption": "!TODO!",
-            "dxHtmlEditor-dialogImageUrlField": "!TODO!",
-            "dxHtmlEditor-dialogImageAltField": "!TODO!",
-            "dxHtmlEditor-dialogImageWidthField": "!TODO!",
-            "dxHtmlEditor-dialogImageHeightField": "!TODO!",
-            "dxHtmlEditor-heading": "!TODO!",
-            "dxHtmlEditor-normalText": "!TODO!"
+            "dxHtmlEditor-dialogColorCaption": "Changer couleur police",
+            "dxHtmlEditor-dialogBackgroundCaption": "Changer couleur fond",
+            "dxHtmlEditor-dialogLinkCaption": "Ajouter un hyperlien",
+            "dxHtmlEditor-dialogLinkUrlField": "URL",
+            "dxHtmlEditor-dialogLinkTextField": "Texte",
+            "dxHtmlEditor-dialogLinkTargetField": "Ouvrir le lien dans une nouvelle fenêtre",
+            "dxHtmlEditor-dialogImageCaption": "Ajouter image",
+            "dxHtmlEditor-dialogImageUrlField": "URL",
+            "dxHtmlEditor-dialogImageAltField": "Texte alternatif",
+            "dxHtmlEditor-dialogImageWidthField": "Largeur (px)",
+            "dxHtmlEditor-dialogImageHeightField": "Hauteur (px)",
+            "dxHtmlEditor-heading": "Titre",
+            "dxHtmlEditor-normalText": "Texte normal"
         }
     })
 });

@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 18.2.3
-* Build date: Nov 7, 2018
+* Version: 18.2.3 (build 18323)
+* Build date: Nov 19, 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -1191,11 +1191,19 @@
 .dx-recurrence-numberbox-repeat-count {
   width: 70px !important;
 }
+.dx-recurrence-repeat-end-wrapper {
+  padding: 0 5px;
+}
 .dx-recurrence-radiogroup-repeat-type-label,
 .dx-recurrence-repeat-end-label {
   display: inline-block;
-  padding: 0 5px;
+  padding-right: 5px;
   vertical-align: top;
+}
+.dx-recurrence-radiogroup-repeat-type-label.dx-rtl,
+.dx-recurrence-repeat-end-label.dx-rtl {
+  padding-left: 5px;
+  padding-right: 0;
 }
 .dx-recurrence-repeat-end-label {
   float: left;
@@ -3448,7 +3456,7 @@
 }
 .dx-texteditor.dx-state-readonly.dx-editor-filled {
   border-color: transparent;
-  background-color: rgba(51, 51, 51, 0.03);
+  background-color: rgba(51, 51, 51, 0.02);
 }
 .dx-texteditor.dx-state-hover {
   border-color: rgba(122, 184, 235, 0.4);
@@ -7025,6 +7033,9 @@
   padding-bottom: 4px;
   padding-left: 4px;
 }
+.dx-datagrid-rowsview .dx-row-focused:focus {
+  outline: none;
+}
 .dx-datagrid-rowsview .dx-row-focused.dx-data-row:not(.dx-edit-row) > td:not(.dx-focused),
 .dx-datagrid-rowsview .dx-row-focused.dx-data-row:not(.dx-edit-row) > tr > td:not(.dx-focused),
 .dx-datagrid-rowsview .dx-row-focused.dx-data-row:not(.dx-edit-row) .dx-command-edit .dx-link {
@@ -8054,6 +8065,9 @@
   padding-bottom: 4px;
   padding-left: 4px;
 }
+.dx-treelist-rowsview .dx-row-focused:focus {
+  outline: none;
+}
 .dx-treelist-rowsview .dx-row-focused.dx-data-row:not(.dx-edit-row) > td:not(.dx-focused),
 .dx-treelist-rowsview .dx-row-focused.dx-data-row:not(.dx-edit-row) > tr > td:not(.dx-focused),
 .dx-treelist-rowsview .dx-row-focused.dx-data-row:not(.dx-edit-row) .dx-command-edit .dx-link {
@@ -8243,7 +8257,6 @@
 .dx-treelist-rowsview .dx-treelist-empty-space {
   position: relative;
   display: inline-block;
-  color: #99a1a8;
   width: 14px;
   font: 14px/1 DXIcons;
 }
@@ -8252,6 +8265,9 @@
 }
 .dx-treelist-rowsview .dx-treelist-empty-space:before {
   visibility: hidden;
+}
+.dx-treelist-rowsview tr:not(.dx-row-focused) .dx-treelist-empty-space {
+  color: #99a1a8;
 }
 .dx-treelist-rowsview .dx-treelist-expanded span {
   font: 14px/1 DXIcons;
@@ -8301,7 +8317,7 @@
   margin-left: -4px;
   margin-top: -7px;
 }
-.dx-treelist-rowsview .dx-selection .dx-treelist-empty-space {
+.dx-treelist-rowsview tr:not(.dx-row-focused).dx-selection .dx-treelist-empty-space {
   color: #333;
 }
 .dx-treelist-rowsview .dx-treelist-cell-expandable {
@@ -9491,6 +9507,16 @@
 .dx-scheduler-timeline-work-week .dx-scheduler-header-panel thead,
 .dx-scheduler-timeline-day.dx-scheduler-work-space-count .dx-scheduler-header-panel thead,
 .dx-scheduler-timeline-month .dx-scheduler-header-panel thead {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -moz-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-flow: column nowrap;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-flow: column nowrap;
+          flex-flow: column nowrap;
   width: 100%;
 }
 .dx-scheduler-timeline-week .dx-scheduler-header-row,

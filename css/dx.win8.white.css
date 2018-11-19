@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 18.2.3
-* Build date: Nov 7, 2018
+* Version: 18.2.3 (build 18323)
+* Build date: Nov 19, 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -1195,11 +1195,19 @@
 .dx-recurrence-numberbox-repeat-count {
   width: 70px !important;
 }
+.dx-recurrence-repeat-end-wrapper {
+  padding: 0 5px;
+}
 .dx-recurrence-radiogroup-repeat-type-label,
 .dx-recurrence-repeat-end-label {
   display: inline-block;
-  padding: 0 5px;
+  padding-right: 5px;
   vertical-align: top;
+}
+.dx-recurrence-radiogroup-repeat-type-label.dx-rtl,
+.dx-recurrence-repeat-end-label.dx-rtl {
+  padding-left: 5px;
+  padding-right: 0;
 }
 .dx-recurrence-repeat-end-label {
   float: left;
@@ -6589,6 +6597,16 @@ td.dx-calendar-other-view {
 .dx-scheduler-timeline-work-week .dx-scheduler-header-panel thead,
 .dx-scheduler-timeline-day.dx-scheduler-work-space-count .dx-scheduler-header-panel thead,
 .dx-scheduler-timeline-month .dx-scheduler-header-panel thead {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -moz-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-flow: column nowrap;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-flow: column nowrap;
+          flex-flow: column nowrap;
   width: 100%;
 }
 .dx-scheduler-timeline-week .dx-scheduler-header-row,
