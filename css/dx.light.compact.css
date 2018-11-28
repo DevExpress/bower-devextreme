@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 18.2.3 (build 18323)
-* Build date: Nov 19, 2018
+* Version: 18.2.3 (build 18332)
+* Build date: Nov 28, 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -1295,84 +1295,44 @@
   font-family: "dx.generic.light.compact";
 }
 .dx-theme-accent-as-text-color {
-  color: #337ab7;
+  color: #337ab7 !important;
 }
 .dx-theme-text-color {
-  color: #333;
+  color: #333 !important;
 }
 .dx-theme-background-color-as-text-color {
-  color: #fff;
+  color: #fff !important;
 }
 .dx-theme-border-color-as-text-color {
-  color: #ddd;
+  color: #ddd !important;
 }
 .dx-theme-accent-as-background-color {
-  background-color: #337ab7;
-  fill: #337ab7;
+  background-color: #337ab7 !important;
+  fill: #337ab7 !important;
 }
 .dx-theme-text-color-as-background-color {
-  background-color: #333;
-  fill: #333;
+  background-color: #333 !important;
+  fill: #333 !important;
 }
 .dx-theme-background-color {
-  background-color: #fff;
-  fill: #fff;
+  background-color: #fff !important;
+  fill: #fff !important;
 }
 .dx-theme-border-color-as-background-color {
-  background-color: #ddd;
-  fill: #ddd;
+  background-color: #ddd !important;
+  fill: #ddd !important;
 }
 .dx-theme-accent-as-border-color {
-  border-color: #337ab7;
+  border-color: #337ab7 !important;
 }
 .dx-theme-text-color-as-border-color {
-  border-color: #333;
+  border-color: #333 !important;
 }
 .dx-theme-background-color-as-border-color {
-  border-color: #fff;
+  border-color: #fff !important;
 }
 .dx-theme-border-color {
-  border-color: #ddd;
-}
-.dx-theme-generic-typography .dx-theme-accent-as-text-color {
-  color: #337ab7;
-}
-.dx-theme-generic-typography .dx-theme-text-color {
-  color: #333;
-}
-.dx-theme-generic-typography .dx-theme-background-color-as-text-color {
-  color: #fff;
-}
-.dx-theme-generic-typography .dx-theme-border-color-as-text-color {
-  color: #ddd;
-}
-.dx-theme-generic-typography .dx-theme-accent-as-background-color {
-  background-color: #337ab7;
-  fill: #337ab7;
-}
-.dx-theme-generic-typography .dx-theme-text-color-as-background-color {
-  background-color: #333;
-  fill: #333;
-}
-.dx-theme-generic-typography .dx-theme-background-color {
-  background-color: #fff;
-  fill: #fff;
-}
-.dx-theme-generic-typography .dx-theme-border-color-as-background-color {
-  background-color: #ddd;
-  fill: #ddd;
-}
-.dx-theme-generic-typography .dx-theme-accent-as-border-color {
-  border-color: #337ab7;
-}
-.dx-theme-generic-typography .dx-theme-text-color-as-border-color {
-  border-color: #333;
-}
-.dx-theme-generic-typography .dx-theme-background-color-as-border-color {
-  border-color: #fff;
-}
-.dx-theme-generic-typography .dx-theme-border-color {
-  border-color: #ddd;
+  border-color: #ddd !important;
 }
 @font-face {
   font-family: 'DXIcons';
@@ -2997,48 +2957,48 @@
 .dx-scrollable-scrollbars-alwaysvisible.dx-scrollable-both .dx-scrollable-content {
   padding-bottom: 8px;
 }
-.dx-scrollable-customizable-scrollbars {
+.dx-scrollable-customizable-scrollbars .dx-scrollable-container {
   -ms-scrollbar-base-color: #fff;
   -ms-scrollbar-arrow-color: #4b4b4b;
   -ms-scrollbar-track-color: #fff;
 }
-.dx-scrollable-customizable-scrollbars ::-webkit-scrollbar:horizontal {
+.dx-scrollable-customizable-scrollbars .dx-scrollable-container::-webkit-scrollbar:horizontal {
   height: 19px;
 }
-.dx-scrollable-customizable-scrollbars ::-webkit-scrollbar:vertical {
+.dx-scrollable-customizable-scrollbars .dx-scrollable-container::-webkit-scrollbar:vertical {
   width: 19px;
 }
-.dx-scrollable-customizable-scrollbars ::-webkit-scrollbar {
+.dx-scrollable-customizable-scrollbars .dx-scrollable-container::-webkit-scrollbar {
   background-color: transparent;
 }
-.dx-scrollable-customizable-scrollbars ::-webkit-scrollbar-thumb {
+.dx-scrollable-customizable-scrollbars .dx-scrollable-container::-webkit-scrollbar-thumb {
   background-color: #757575;
   border-right: 2px solid transparent;
   border-left: 1px solid transparent;
   background-clip: content-box;
 }
-.dx-scrollable-customizable-scrollbars ::-webkit-scrollbar-track {
+.dx-scrollable-customizable-scrollbars .dx-scrollable-container::-webkit-scrollbar-track {
   background-color: transparent;
 }
-.dx-scrollable-customizable-scrollbars ::-webkit-scrollbar-corner {
+.dx-scrollable-customizable-scrollbars .dx-scrollable-container::-webkit-scrollbar-corner {
   background-color: transparent;
 }
-.dx-scrollable-customizable-scrollbars ::-webkit-scrollbar-button {
+.dx-scrollable-customizable-scrollbars .dx-scrollable-container::-webkit-scrollbar-button {
   background-color: transparent;
 }
-.dx-scrollable-customizable-scrollbars ::-webkit-scrollbar-button:horizontal:decrement {
+.dx-scrollable-customizable-scrollbars .dx-scrollable-container::-webkit-scrollbar-button:horizontal:decrement {
   background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAYAAAAMCAQAAADrXgSlAAAAMklEQVQY02P4z/CfIRECfRngHN/E/zAOkJmIzExEZoI4cCYGB0UZmgHIRkPt8kXigLgA3gNGp/JuZjQAAAAASUVORK5CYII=) no-repeat;
   background-position: center;
 }
-.dx-scrollable-customizable-scrollbars ::-webkit-scrollbar-button:horizontal:increment {
+.dx-scrollable-customizable-scrollbars .dx-scrollable-container::-webkit-scrollbar-button:horizontal:increment {
   background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAYAAAAMCAQAAADrXgSlAAAAN0lEQVQYV2NI9E1kAMH/QMiQ+B/ChXHAXAQHyoVxwFwEB8jFwUFSBjYebjSM4wuyA2IPnPmfAQA1rkanVpjRrQAAAABJRU5ErkJggg==) no-repeat;
   background-position: center;
 }
-.dx-scrollable-customizable-scrollbars ::-webkit-scrollbar-button:vertical:decrement {
+.dx-scrollable-customizable-scrollbars .dx-scrollable-container::-webkit-scrollbar-button:vertical:decrement {
   background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAGCAQAAABd57cKAAAAM0lEQVQYV2P4z/CfIRECfYGQAcQHQTABFf4PhHApmAREGCoFghAJhDBcClMYKoVNGCwFAKZMRqcg5DihAAAAAElFTkSuQmCC) no-repeat;
   background-position: 3px 5px;
 }
-.dx-scrollable-customizable-scrollbars ::-webkit-scrollbar-button:vertical:increment {
+.dx-scrollable-customizable-scrollbars .dx-scrollable-container::-webkit-scrollbar-button:vertical:increment {
   background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAGCAQAAABd57cKAAAAMUlEQVQY023JwQ0AMAyDQBZkCO8/hPuqGqkRP46YLklZyEB/MlyYZJhwyVBKBxDfLgftpkant8t4aAAAAABJRU5ErkJggg==) no-repeat;
   background-position: 3px 5px;
 }
@@ -6661,9 +6621,6 @@
 .dx-datagrid-checkbox-size.dx-checkbox-indeterminate .dx-checkbox-icon {
   font-size: 6px;
 }
-.dx-datagrid-checkbox-size.dx-checkbox-indeterminate .dx-checkbox-icon:before {
-  top: 6.5px;
-}
 .dx-device-mobile .dx-datagrid-column-chooser-list .dx-empty-message,
 .dx-datagrid-column-chooser-list .dx-empty-message {
   color: #999999;
@@ -7692,9 +7649,6 @@
 }
 .dx-treelist-checkbox-size.dx-checkbox-indeterminate .dx-checkbox-icon {
   font-size: 6px;
-}
-.dx-treelist-checkbox-size.dx-checkbox-indeterminate .dx-checkbox-icon:before {
-  top: 6.5px;
 }
 .dx-device-mobile .dx-treelist-column-chooser-list .dx-empty-message,
 .dx-treelist-column-chooser-list .dx-empty-message {
@@ -13312,7 +13266,7 @@
   padding-top: 17px;
 }
 .dx-drawer-shader {
-  background-color: rgba(0, 0, 0, 0.9);
+  background-color: rgba(0, 0, 0, 0.5);
 }
 .dx-card {
   border: 1px solid #ddd;

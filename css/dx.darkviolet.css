@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 18.2.3 (build 18323)
-* Build date: Nov 19, 2018
+* Version: 18.2.3 (build 18332)
+* Build date: Nov 28, 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -1295,84 +1295,44 @@
   font-family: "dx.generic.darkviolet";
 }
 .dx-theme-accent-as-text-color {
-  color: #9c63ff;
+  color: #9c63ff !important;
 }
 .dx-theme-text-color {
-  color: #f5f6f7;
+  color: #f5f6f7 !important;
 }
 .dx-theme-background-color-as-text-color {
-  color: #17171f;
+  color: #17171f !important;
 }
 .dx-theme-border-color-as-text-color {
-  color: #343840;
+  color: #343840 !important;
 }
 .dx-theme-accent-as-background-color {
-  background-color: #9c63ff;
-  fill: #9c63ff;
+  background-color: #9c63ff !important;
+  fill: #9c63ff !important;
 }
 .dx-theme-text-color-as-background-color {
-  background-color: #f5f6f7;
-  fill: #f5f6f7;
+  background-color: #f5f6f7 !important;
+  fill: #f5f6f7 !important;
 }
 .dx-theme-background-color {
-  background-color: #17171f;
-  fill: #17171f;
+  background-color: #17171f !important;
+  fill: #17171f !important;
 }
 .dx-theme-border-color-as-background-color {
-  background-color: #343840;
-  fill: #343840;
+  background-color: #343840 !important;
+  fill: #343840 !important;
 }
 .dx-theme-accent-as-border-color {
-  border-color: #9c63ff;
+  border-color: #9c63ff !important;
 }
 .dx-theme-text-color-as-border-color {
-  border-color: #f5f6f7;
+  border-color: #f5f6f7 !important;
 }
 .dx-theme-background-color-as-border-color {
-  border-color: #17171f;
+  border-color: #17171f !important;
 }
 .dx-theme-border-color {
-  border-color: #343840;
-}
-.dx-theme-generic-typography .dx-theme-accent-as-text-color {
-  color: #9c63ff;
-}
-.dx-theme-generic-typography .dx-theme-text-color {
-  color: #f5f6f7;
-}
-.dx-theme-generic-typography .dx-theme-background-color-as-text-color {
-  color: #17171f;
-}
-.dx-theme-generic-typography .dx-theme-border-color-as-text-color {
-  color: #343840;
-}
-.dx-theme-generic-typography .dx-theme-accent-as-background-color {
-  background-color: #9c63ff;
-  fill: #9c63ff;
-}
-.dx-theme-generic-typography .dx-theme-text-color-as-background-color {
-  background-color: #f5f6f7;
-  fill: #f5f6f7;
-}
-.dx-theme-generic-typography .dx-theme-background-color {
-  background-color: #17171f;
-  fill: #17171f;
-}
-.dx-theme-generic-typography .dx-theme-border-color-as-background-color {
-  background-color: #343840;
-  fill: #343840;
-}
-.dx-theme-generic-typography .dx-theme-accent-as-border-color {
-  border-color: #9c63ff;
-}
-.dx-theme-generic-typography .dx-theme-text-color-as-border-color {
-  border-color: #f5f6f7;
-}
-.dx-theme-generic-typography .dx-theme-background-color-as-border-color {
-  border-color: #17171f;
-}
-.dx-theme-generic-typography .dx-theme-border-color {
-  border-color: #343840;
+  border-color: #343840 !important;
 }
 @font-face {
   font-family: 'DXIcons';
@@ -2997,48 +2957,48 @@
 .dx-scrollable-scrollbars-alwaysvisible.dx-scrollable-both .dx-scrollable-content {
   padding-bottom: 8px;
 }
-.dx-scrollable-customizable-scrollbars {
+.dx-scrollable-customizable-scrollbars .dx-scrollable-container {
   -ms-scrollbar-base-color: #17171f;
   -ms-scrollbar-arrow-color: #c8c8d6;
   -ms-scrollbar-track-color: #17171f;
 }
-.dx-scrollable-customizable-scrollbars ::-webkit-scrollbar:horizontal {
+.dx-scrollable-customizable-scrollbars .dx-scrollable-container::-webkit-scrollbar:horizontal {
   height: 19px;
 }
-.dx-scrollable-customizable-scrollbars ::-webkit-scrollbar:vertical {
+.dx-scrollable-customizable-scrollbars .dx-scrollable-container::-webkit-scrollbar:vertical {
   width: 19px;
 }
-.dx-scrollable-customizable-scrollbars ::-webkit-scrollbar {
+.dx-scrollable-customizable-scrollbars .dx-scrollable-container::-webkit-scrollbar {
   background-color: transparent;
 }
-.dx-scrollable-customizable-scrollbars ::-webkit-scrollbar-thumb {
+.dx-scrollable-customizable-scrollbars .dx-scrollable-container::-webkit-scrollbar-thumb {
   background-color: #9797b2;
   border-right: 2px solid transparent;
   border-left: 1px solid transparent;
   background-clip: content-box;
 }
-.dx-scrollable-customizable-scrollbars ::-webkit-scrollbar-track {
+.dx-scrollable-customizable-scrollbars .dx-scrollable-container::-webkit-scrollbar-track {
   background-color: transparent;
 }
-.dx-scrollable-customizable-scrollbars ::-webkit-scrollbar-corner {
+.dx-scrollable-customizable-scrollbars .dx-scrollable-container::-webkit-scrollbar-corner {
   background-color: transparent;
 }
-.dx-scrollable-customizable-scrollbars ::-webkit-scrollbar-button {
+.dx-scrollable-customizable-scrollbars .dx-scrollable-container::-webkit-scrollbar-button {
   background-color: transparent;
 }
-.dx-scrollable-customizable-scrollbars ::-webkit-scrollbar-button:horizontal:decrement {
+.dx-scrollable-customizable-scrollbars .dx-scrollable-container::-webkit-scrollbar-button:horizontal:decrement {
   background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAYAAAAMCAQAAADrXgSlAAAAKUlEQVQY02P4zwCD932RmPeRmfeRmfeRmfeRmegcFGVoBqAZjWYphAsAStVj99j7/WMAAAAASUVORK5CYII=) no-repeat;
   background-position: center;
 }
-.dx-scrollable-customizable-scrollbars ::-webkit-scrollbar-button:horizontal:increment {
+.dx-scrollable-customizable-scrollbars .dx-scrollable-container::-webkit-scrollbar-button:horizontal:increment {
   background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAYAAAAMCAQAAADrXgSlAAAALUlEQVQY02O47/ufAQYZ7v9HcEEcOBfCgXJhHDAXwQFycXB8sRrgi9VSJOcAAMTJY/eJQvZcAAAAAElFTkSuQmCC) no-repeat;
   background-position: center;
 }
-.dx-scrollable-customizable-scrollbars ::-webkit-scrollbar-button:vertical:decrement {
+.dx-scrollable-customizable-scrollbars .dx-scrollable-container::-webkit-scrollbar-button:vertical:decrement {
   background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAGCAQAAABd57cKAAAAKUlEQVQYV2P4zwCD933v+yJ4yML/gRAuhSqMJIUuDJfCFIZKYRMGSwEAYXZj99VJzp4AAAAASUVORK5CYII=) no-repeat;
   background-position: 3px 5px;
 }
-.dx-scrollable-customizable-scrollbars ::-webkit-scrollbar-button:vertical:increment {
+.dx-scrollable-customizable-scrollbars .dx-scrollable-container::-webkit-scrollbar-button:vertical:increment {
   background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAGCAQAAABd57cKAAAAMklEQVQYV2O473v/Pxboy/CfAYuU738GoASGlC9IDCyBIgUWhkvApaDCSBJgKbjwfwYAVjpj95dOQnAAAAAASUVORK5CYII=) no-repeat;
   background-position: 3px 5px;
 }
@@ -6661,9 +6621,6 @@
 .dx-datagrid-checkbox-size.dx-checkbox-indeterminate .dx-checkbox-icon {
   font-size: 6px;
 }
-.dx-datagrid-checkbox-size.dx-checkbox-indeterminate .dx-checkbox-icon:before {
-  top: 6.5px;
-}
 .dx-device-mobile .dx-datagrid-column-chooser-list .dx-empty-message,
 .dx-datagrid-column-chooser-list .dx-empty-message {
   color: #84909c;
@@ -7692,9 +7649,6 @@
 }
 .dx-treelist-checkbox-size.dx-checkbox-indeterminate .dx-checkbox-icon {
   font-size: 6px;
-}
-.dx-treelist-checkbox-size.dx-checkbox-indeterminate .dx-checkbox-icon:before {
-  top: 6.5px;
 }
 .dx-device-mobile .dx-treelist-column-chooser-list .dx-empty-message,
 .dx-treelist-column-chooser-list .dx-empty-message {
@@ -13312,7 +13266,7 @@
   padding-top: 17px;
 }
 .dx-drawer-shader {
-  background-color: rgba(255, 255, 255, 0.9);
+  background-color: rgba(255, 255, 255, 0.5);
 }
 .dx-card {
   border: 1px solid #343840;

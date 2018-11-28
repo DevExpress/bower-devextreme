@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 18.2.3 (build 18323)
-* Build date: Nov 19, 2018
+* Version: 18.2.3 (build 18332)
+* Build date: Nov 28, 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -4402,7 +4402,7 @@ input.dx-hidden {
   display: -ms-flexbox;
   display: flex;
 }
-.dx-gridbase-container > .dx-datagrid-rowsview.dx-scrollable .dx-scrollable-wrapper {
+.dx-gridbase-container > .dx-datagrid-rowsview.dx-scrollable > .dx-scrollable-wrapper {
   -webkit-box-flex: 1;
   -webkit-flex: 1;
       -ms-flex: 1;
@@ -5543,7 +5543,7 @@ input.dx-hidden {
   display: -ms-flexbox;
   display: flex;
 }
-.dx-gridbase-container > .dx-treelist-rowsview.dx-scrollable .dx-scrollable-wrapper {
+.dx-gridbase-container > .dx-treelist-rowsview.dx-scrollable > .dx-scrollable-wrapper {
   -webkit-box-flex: 1;
   -webkit-flex: 1;
       -ms-flex: 1;
@@ -6911,8 +6911,7 @@ input.dx-hidden {
   top: 0px;
   bottom: 0px;
 }
-.dx-drawer-right .dx-drawer-panel-content,
-.dx-drawer-left.dx-rtl .dx-drawer-panel-content {
+.dx-drawer-right .dx-drawer-panel-content {
   right: 0px;
 }
 .dx-drawer-left .dx-drawer-panel-content {
