@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 18.2.3 (build 18332)
-* Build date: Nov 28, 2018
+* Version: 18.2.3 (build 18334)
+* Build date: Nov 30, 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -6525,7 +6525,9 @@
   min-height: 26px;
 }
 .dx-datagrid-headers .dx-numberbox.dx-show-clear-button.dx-texteditor-empty:not(.dx-invalid) .dx-texteditor-input,
-.dx-datagrid-rowsview .dx-numberbox.dx-show-clear-button.dx-texteditor-empty:not(.dx-invalid) .dx-texteditor-input {
+.dx-datagrid-rowsview .dx-numberbox.dx-show-clear-button.dx-texteditor-empty:not(.dx-invalid) .dx-texteditor-input,
+.dx-datagrid-headers .dx-textbox.dx-show-clear-button.dx-texteditor-empty:not(.dx-invalid) .dx-texteditor-input,
+.dx-datagrid-rowsview .dx-textbox.dx-show-clear-button.dx-texteditor-empty:not(.dx-invalid) .dx-texteditor-input {
   padding-right: 5px;
 }
 .dx-datagrid-headers .dx-lookup,
@@ -7554,7 +7556,9 @@
   min-height: 26px;
 }
 .dx-treelist-headers .dx-numberbox.dx-show-clear-button.dx-texteditor-empty:not(.dx-invalid) .dx-texteditor-input,
-.dx-treelist-rowsview .dx-numberbox.dx-show-clear-button.dx-texteditor-empty:not(.dx-invalid) .dx-texteditor-input {
+.dx-treelist-rowsview .dx-numberbox.dx-show-clear-button.dx-texteditor-empty:not(.dx-invalid) .dx-texteditor-input,
+.dx-treelist-headers .dx-textbox.dx-show-clear-button.dx-texteditor-empty:not(.dx-invalid) .dx-texteditor-input,
+.dx-treelist-rowsview .dx-textbox.dx-show-clear-button.dx-texteditor-empty:not(.dx-invalid) .dx-texteditor-input {
   padding-right: 5px;
 }
 .dx-treelist-headers .dx-lookup,
@@ -9642,10 +9646,10 @@
   padding-bottom: 165px;
   margin-bottom: -165px;
 }
-.dx-scheduler-work-space:not(.dx-scheduler-work-space-all-day).dx-scheduler-work-space:not(.dx-scheduler-work-space-month).dx-scheduler-work-space:not(.dx-scheduler-timeline) .dx-scheduler-header-panel {
+.dx-scheduler-work-space:not(.dx-scheduler-work-space-all-day):not(.dx-scheduler-work-space-month):not(.dx-scheduler-timeline) .dx-scheduler-header-panel {
   border-bottom: 2px solid rgba(52, 56, 64, 0.6);
 }
-.dx-scheduler-work-space.dx-scheduler-work-space-month.dx-scheduler-work-space:not(.dx-scheduler-work-space-vertical-grouped) .dx-scheduler-header-panel {
+.dx-scheduler-work-space.dx-scheduler-work-space-month:not(.dx-scheduler-work-space-vertical-grouped) .dx-scheduler-header-panel {
   border-bottom: 1px solid rgba(52, 56, 64, 0.6);
 }
 .dx-scheduler-date-table-scrollable .dx-scrollable-content {
@@ -9768,7 +9772,7 @@
   border-left: 1px solid rgba(52, 56, 64, 0.6);
   border-top: 1px solid rgba(52, 56, 64, 0.6);
 }
-.dx-scheduler-work-space-day:not(.dx-scheduler-work-space-count).dx-scheduler-work-space-day:not(.dx-scheduler-work-space-grouped) .dx-scheduler-all-day-table-cell {
+.dx-scheduler-work-space-day:not(.dx-scheduler-work-space-count):not(.dx-scheduler-work-space-grouped) .dx-scheduler-all-day-table-cell {
   border-top: none;
   border-left: none;
 }

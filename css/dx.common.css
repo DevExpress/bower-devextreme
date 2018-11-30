@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 18.2.3 (build 18332)
-* Build date: Nov 28, 2018
+* Version: 18.2.3 (build 18334)
+* Build date: Nov 30, 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -2806,6 +2806,12 @@
 }
 .dx-gallery-item-image {
   max-width: 100%;
+  -webkit-align-self: flex-start;
+      -ms-flex-item-align: start;
+          align-self: flex-start;
+  -webkit-flex-shrink: 0;
+      -ms-flex-negative: 0;
+          flex-shrink: 0;
   height: auto;
   margin: auto;
 }
@@ -4228,7 +4234,8 @@ input.dx-hidden {
   padding-top: 7px;
   padding-bottom: 7px;
 }
-.dx-row .dx-numberbox.dx-show-clear-button .dx-texteditor-input {
+.dx-row .dx-numberbox.dx-show-clear-button .dx-texteditor-input,
+.dx-row .dx-textbox.dx-show-clear-button .dx-texteditor-input {
   padding-right: 32px;
 }
 .dx-column-lines .dx-highlight-outline::after {
@@ -5369,7 +5376,8 @@ input.dx-hidden {
   padding-top: 7px;
   padding-bottom: 7px;
 }
-.dx-row .dx-numberbox.dx-show-clear-button .dx-texteditor-input {
+.dx-row .dx-numberbox.dx-show-clear-button .dx-texteditor-input,
+.dx-row .dx-textbox.dx-show-clear-button .dx-texteditor-input {
   padding-right: 32px;
 }
 .dx-column-lines .dx-highlight-outline::after {
