@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.all.d.ts)
-* Version: 18.2.3 (build 18334)
-* Build date: Fri Nov 30 2018
+* Version: 18.2.3 (build 18345)
+* Build date: Tue Dec 11 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -2697,7 +2697,7 @@ declare module DevExpress.ui {
         minFileSize?: number;
         /** Specifies whether the widget enables an end-user to select a single file or multiple files. */
         multiple?: boolean;
-        /** Specifies the value passed to the name attribute of the underlying input element. */
+        /** Specifies the value passed to the name attribute of the underlying input element. Required to access uploaded files on the server. */
         name?: string;
         /** A function that is executed when a file segment is uploaded. */
         onProgress?: ((e: { component?: dxFileUploader, element?: DevExpress.core.dxElement, model?: any, file?: File, segmentSize?: number, bytesLoaded?: number, bytesTotal?: number, jQueryEvent?: JQueryEventObject, event?: event, request?: XMLHttpRequest }) => any);
@@ -3811,6 +3811,7 @@ declare module DevExpress.ui {
     export interface dxSchedulerOptions extends WidgetOptions<dxScheduler> {
         /** Specifies the name of the data source item field whose value defines whether or not the corresponding appointment is an all-day appointment. */
         allDayExpr?: string;
+        appointmentCollectorTemplate?: template | ((data: any, contentElement: DevExpress.core.dxElement) => string | Element | JQuery);
         /** Specifies a custom template for appointments. */
         appointmentTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery);
         /** Specifies a custom template for appointment tooltips. */
@@ -3922,7 +3923,7 @@ declare module DevExpress.ui {
         /** Specifies whether a user can switch views using tabs or a drop-down menu. */
         useDropDownViewSwitcher?: boolean;
         /** Configures individual views. */
-        views?: Array<'day' | 'week' | 'workWeek' | 'month' | 'timelineDay' | 'timelineWeek' | 'timelineWorkWeek' | 'timelineMonth' | 'agenda' | { type?: 'agenda' | 'day' | 'month' | 'timelineDay' | 'timelineMonth' | 'timelineWeek' | 'timelineWorkWeek' | 'week' | 'workWeek', name?: string, maxAppointmentsPerCell?: number | 'auto' | 'unlimited', intervalCount?: number, groupByDate?: boolean, startDate?: Date | number | string, startDayHour?: number, endDayHour?: number, groups?: Array<string>, firstDayOfWeek?: 0 | 1 | 2 | 3 | 4 | 5 | 6, cellDuration?: number, appointmentTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery), dropDownAppointmentTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery), appointmentTooltipTemplate?: template | ((appointmentData: any, contentElement: DevExpress.core.dxElement) => string | Element | JQuery), dateCellTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery), timeCellTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery), dataCellTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery), resourceCellTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery), agendaDuration?: number, groupOrientation?: 'horizontal' | 'vertical' }>;
+        views?: Array<'day' | 'week' | 'workWeek' | 'month' | 'timelineDay' | 'timelineWeek' | 'timelineWorkWeek' | 'timelineMonth' | 'agenda' | { type?: 'agenda' | 'day' | 'month' | 'timelineDay' | 'timelineMonth' | 'timelineWeek' | 'timelineWorkWeek' | 'week' | 'workWeek', name?: string, maxAppointmentsPerCell?: number | 'auto' | 'unlimited', intervalCount?: number, groupByDate?: boolean, startDate?: Date | number | string, startDayHour?: number, endDayHour?: number, groups?: Array<string>, firstDayOfWeek?: 0 | 1 | 2 | 3 | 4 | 5 | 6, cellDuration?: number, appointmentTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery), dropDownAppointmentTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery), appointmentTooltipTemplate?: template | ((appointmentData: any, contentElement: DevExpress.core.dxElement) => string | Element | JQuery), dateCellTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery), timeCellTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery), dataCellTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery), resourceCellTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery), appointmentCollectorTemplate?: template | ((data: any, contentElement: DevExpress.core.dxElement) => string | Element | JQuery), agendaDuration?: number, groupOrientation?: 'horizontal' | 'vertical' }>;
     }
     /** The Scheduler is a widget that represents scheduled data and allows a user to manage and edit it. */
     export class dxScheduler extends Widget {
@@ -4601,6 +4602,7 @@ declare module DevExpress.ui {
     }
     /** A validation rule that demands that the validated field has a numeric value. */
     export interface NumericRule {
+        ignoreEmptyValue?: boolean;
         /** Specifies the message that is shown for end-users if the current rule is broken. */
         message?: string;
         /** Specifies the type of the current rule. */
@@ -4608,6 +4610,7 @@ declare module DevExpress.ui {
     }
     /** A validation rule that demands the target value be within the specified value range (including the range's end points). */
     export interface RangeRule {
+        ignoreEmptyValue?: boolean;
         /** Specifies the maximum value allowed for the validated value. */
         max?: Date | number;
         /** Specifies the message that is shown to end-users if the current rule is broken. */
@@ -4621,6 +4624,7 @@ declare module DevExpress.ui {
     }
     /** A validation rule that demands the target value length be within the specified value range (including the range's end points). */
     export interface StringLengthRule {
+        ignoreEmptyValue?: boolean;
         /** Specifies the maximum length allowed for the validated value. */
         max?: number;
         /** Specifies the message that is shown for end-users if the current rule is broken. */
@@ -4634,6 +4638,7 @@ declare module DevExpress.ui {
     }
     /** A validation rule with custom validation logic. */
     export interface CustomRule {
+        ignoreEmptyValue?: boolean;
         /** Specifies the message that is shown for end-users if the current rule is broken. */
         message?: string;
         /** Indicates whether the rule should be always checked for the target value or only when the target value changes. */
@@ -4649,6 +4654,7 @@ declare module DevExpress.ui {
         comparisonTarget?: (() => any);
         /** Specifies the operator to be used for comparing the validated value with the target. */
         comparisonType?: '!=' | '!==' | '<' | '<=' | '==' | '===' | '>' | '>=';
+        ignoreEmptyValue?: boolean;
         /** Specifies the message that is shown for end-users if the current rule is broken. */
         message?: string;
         /** Indicates whether or not the rule should be always checked for the target value or only when the target value changes. */
@@ -4658,6 +4664,7 @@ declare module DevExpress.ui {
     }
     /** A validation rule that demands that the validated field match a specified pattern. */
     export interface PatternRule {
+        ignoreEmptyValue?: boolean;
         /** Specifies the message that is shown for end-users if the current rule is broken. */
         message?: string;
         /** Specifies the regular expression that the validated value must match. */
@@ -4667,6 +4674,7 @@ declare module DevExpress.ui {
     }
     /** A validation rule that demands that the validated field match the Email pattern. */
     export interface EmailRule {
+        ignoreEmptyValue?: boolean;
         /** Specifies the message that is shown for end-users if the current rule is broken. */
         message?: string;
         /** Specifies the type of the current rule. */
@@ -6090,6 +6098,8 @@ declare module DevExpress.viz {
         minorTickCount?: number;
         /** Specifies the interval between minor ticks. Applies only to the axes of the "continuous" type. */
         minorTickInterval?: number | any | 'day' | 'hour' | 'millisecond' | 'minute' | 'month' | 'quarter' | 'second' | 'week' | 'year';
+        /** A class describing various time intervals. Inherited by tick intervals in Chart and RangeSelector. */
+        minVisualRangeLength?: number | any | 'day' | 'hour' | 'millisecond' | 'minute' | 'month' | 'quarter' | 'second' | 'week' | 'year';
         /** Relocates the argument axis. */
         position?: 'bottom' | 'left' | 'right' | 'top';
         /** Dates to be included on the axis when workdaysOnly is true. */
@@ -6397,6 +6407,8 @@ declare module DevExpress.viz {
         minorTickCount?: number;
         /** Specifies the interval between minor ticks. Applies only to continuous axes. */
         minorTickInterval?: number | any | 'day' | 'hour' | 'millisecond' | 'minute' | 'month' | 'quarter' | 'second' | 'week' | 'year';
+        /** A class describing various time intervals. Inherited by tick intervals in Chart and RangeSelector. */
+        minVisualRangeLength?: number | any | 'day' | 'hour' | 'millisecond' | 'minute' | 'month' | 'quarter' | 'second' | 'week' | 'year';
         /** Adds a pixel-measured empty space between two side-by-side value axes. Applies if several value axes are located on one side of the chart. */
         multipleAxesSpacing?: number;
         /** Specifies the name of the value axis. */

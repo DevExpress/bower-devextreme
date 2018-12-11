@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 18.2.3 (build 18334)
-* Build date: Nov 30, 2018
+* Version: 18.2.3 (build 18345)
+* Build date: Dec 11, 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -1618,6 +1618,9 @@
   -ms-user-select: text;
   -o-user-select: text;
   user-select: text;
+}
+.dx-texteditor-input:-webkit-autofill + .dx-placeholder {
+  display: none;
 }
 .dx-show-clear-button {
   position: relative;
@@ -4840,11 +4843,18 @@ input.dx-hidden {
   position: absolute;
   bottom: 0;
 }
-.dx-pivotgrid .dx-area-description-cell.dx-ie {
-  position: static;
+.dx-pivotgrid .dx-ie {
+  height: 1px;
 }
-.dx-pivotgrid .dx-area-description-cell.dx-ie .dx-pivotgrid-fields-area {
+.dx-pivotgrid .dx-ie .dx-area-description-cell {
   position: static;
+  height: inherit;
+  vertical-align: bottom;
+  font-size: 0;
+}
+.dx-pivotgrid .dx-ie .dx-area-description-cell .dx-pivotgrid-fields-area {
+  position: relative;
+  display: inline-block;
 }
 .dx-pivotgrid .dx-area-field-content {
   display: inline-block;
@@ -6840,6 +6850,9 @@ input.dx-hidden {
   display: inline-block;
   cursor: pointer;
   white-space: pre;
+}
+.dx-filterbuilder .dx-filterbuilder-group .dx-filterbuilder-group-item .dx-filterbuilder-text .dx-filterbuilder-range {
+  white-space: nowrap;
 }
 .dx-filterbuilder .dx-filterbuilder-group .dx-filterbuilder-group-item .dx-filterbuilder-text .dx-filterbuilder-text-separator,
 .dx-filterbuilder .dx-filterbuilder-group .dx-filterbuilder-group-item .dx-filterbuilder-text .dx-filterbuilder-range-separator {
