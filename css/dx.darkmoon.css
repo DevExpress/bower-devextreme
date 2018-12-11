@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 18.1.7 (build 18334)
-* Build date: Nov 30, 2018
+* Version: 18.1.7 (build 18345)
+* Build date: Dec 11, 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -347,6 +347,18 @@
 .dx-pivotgrid .dx-column-header,
 .dx-pivotgrid .dx-area-description-cell.dx-pivotgrid-background {
   background-color: #42516c;
+}
+.dx-pivotgrid .dx-ie .dx-pivotgrid-fields-area {
+  color: #fff;
+  font-weight: normal;
+  font-size: 14px;
+  font-family: 'Helvetica Neue', 'Segoe UI', Helvetica, Verdana, sans-serif;
+  line-height: 1.35715;
+}
+.dx-pivotgrid .dx-ie .dx-pivotgrid-fields-area input,
+.dx-pivotgrid .dx-ie .dx-pivotgrid-fields-area textarea {
+  font-family: 'Helvetica Neue', 'Segoe UI', Helvetica, Verdana, sans-serif;
+  line-height: 1.35715;
 }
 .dx-pivotgrid .dx-column-header .dx-pivotgrid-fields-area {
   margin-left: -5px;
