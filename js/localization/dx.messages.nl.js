@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.messages.nl.js)
-* Version: 18.1.7 (build 18345)
-* Build date: Tue Dec 11 2018
+* Version: 18.1.7 (build 18348)
+* Build date: Fri Dec 14 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -75,7 +75,7 @@
             "dxFileUploader-Mb": "Mb",
             "dxFileUploader-Gb": "Gb",
             "dxFileUploader-upload": "Uploaden",
-            "dxFileUploader-uploaded": "Geüpload",
+            "dxFileUploader-uploaded": "Ge\xfcpload",
             "dxFileUploader-readyToUpload": "Klaar om te uploaden",
             "dxFileUploader-uploadFailedMessage": "Uploaden is mislukt",
             "dxRangeSlider-ariaFrom": "Van",
