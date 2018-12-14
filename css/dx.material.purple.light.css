@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 18.2.3 (build 18345)
-* Build date: Dec 11, 2018
+* Version: 18.2.3 (build 18348)
+* Build date: Dec 14, 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -8493,8 +8493,6 @@
   padding-top: 0;
 }
 .dx-datagrid-rowsview .dx-adaptive-detail-row .dx-field-item-content {
-  padding-left: 14px;
-  padding-right: 14px;
   line-height: 40px;
   height: 40px;
   font-size: 14px;
@@ -8512,6 +8510,10 @@
 .dx-datagrid-rowsview .dx-adaptive-detail-row .dx-texteditor:after,
 .dx-datagrid-rowsview .dx-adaptive-detail-row .dx-texteditor:before {
   content: none;
+}
+.dx-datagrid-rowsview .dx-adaptive-detail-row .dx-texteditor.dx-editor-outlined {
+  -webkit-box-shadow: none;
+  box-shadow: none;
 }
 .dx-datagrid-rowsview .dx-item-modified {
   background-color: rgba(139, 195, 74, 0.32);
@@ -9981,8 +9983,6 @@
   padding-top: 0;
 }
 .dx-treelist-rowsview .dx-adaptive-detail-row .dx-field-item-content {
-  padding-left: 14px;
-  padding-right: 14px;
   line-height: 40px;
   height: 40px;
   font-size: 14px;
@@ -10000,6 +10000,10 @@
 .dx-treelist-rowsview .dx-adaptive-detail-row .dx-texteditor:after,
 .dx-treelist-rowsview .dx-adaptive-detail-row .dx-texteditor:before {
   content: none;
+}
+.dx-treelist-rowsview .dx-adaptive-detail-row .dx-texteditor.dx-editor-outlined {
+  -webkit-box-shadow: none;
+  box-shadow: none;
 }
 .dx-treelist-rowsview .dx-item-modified {
   background-color: rgba(139, 195, 74, 0.32);

@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 18.2.3 (build 18345)
-* Build date: Dec 11, 2018
+* Version: 18.2.3 (build 18348)
+* Build date: Dec 14, 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -3605,6 +3605,11 @@
 .dx-pager.dx-rtl .dx-pages .dx-page {
   direction: ltr;
 }
+.dx-rtl .dx-pager .dx-pages .dx-info,
+.dx-pager.dx-rtl .dx-pages .dx-info {
+  margin-left: 9px;
+  margin-right: 0;
+}
 .dx-rtl .dx-pager .dx-page-sizes,
 .dx-pager.dx-rtl .dx-page-sizes {
   float: right;
@@ -6005,6 +6010,33 @@ input.dx-hidden {
 }
 .dx-menu-adaptive-mode .dx-treeview-node-container:first-child > .dx-treeview-node:last-child {
   border-bottom: none;
+}
+.dx-menu-adaptive-mode-overlay-wrapper {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -moz-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-flow: row wrap;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+      -ms-flex-flow: row wrap;
+          flex-flow: row wrap;
+}
+.dx-menu-adaptive-mode-overlay-wrapper .dx-overlay-content {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  position: relative;
+}
+.dx-menu-adaptive-mode-overlay-wrapper .dx-overlay-content .dx-treeview {
+  height: auto;
+  -webkit-box-flex: 1;
+  -webkit-flex: 1 1 auto;
+  -moz-flex: 1 1 auto;
+  -ms-flex: 1 1 auto;
+      flex: 1 1 auto;
 }
 .dx-context-menu.dx-overlay-content {
   overflow: inherit;

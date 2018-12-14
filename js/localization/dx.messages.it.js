@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.messages.it.js)
-* Version: 18.2.3 (build 18345)
-* Build date: Tue Dec 11 2018
+* Version: 18.2.3 (build 18348)
+* Build date: Fri Dec 14 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -23,7 +23,7 @@
 }(this, function(localization) {
     localization.loadMessages({
         it: {
-            Yes: "Sì",
+            Yes: "S\xec",
             No: "No",
             Cancel: "Annulla",
             Clear: "Cancella",
@@ -35,22 +35,22 @@
             OK: "OK",
             "dxCollectionWidget-noDataText": "Nessun dato da mostrare",
             "validation-required": "Richiesto",
-            "validation-required-formatted": "{0} è richiesto",
+            "validation-required-formatted": "{0} \xe8 richiesto",
             "validation-numeric": "Il valore deve essere numerico",
             "validation-numeric-formatted": "{0} deve essere numerico",
-            "validation-range": "Il valore non è compreso nell'intervallo",
-            "validation-range-formatted": "{0} non è compreso nell'intervallo",
+            "validation-range": "Il valore non \xe8 compreso nell'intervallo",
+            "validation-range-formatted": "{0} non \xe8 compreso nell'intervallo",
             "validation-stringLength": "Lunghezza del valore errata",
-            "validation-stringLength-formatted": "La lunghezza di {0} è errata",
-            "validation-custom": "Il valore non è corretto",
-            "validation-custom-formatted": "{0} non è corretto",
+            "validation-stringLength-formatted": "La lunghezza di {0} \xe8 errata",
+            "validation-custom": "Il valore non \xe8 corretto",
+            "validation-custom-formatted": "{0} non \xe8 corretto",
             "validation-compare": "I valori non corrispondono",
             "validation-compare-formatted": "{0} non corrisponde",
-            "validation-pattern": "Il valore non è corretto",
-            "validation-pattern-formatted": "{0} non è corretto",
-            "validation-email": "L'Email non è corretta",
-            "validation-email-formatted": "{0} non è una email corretta",
-            "validation-mask": "Il valore non è corretto",
+            "validation-pattern": "Il valore non \xe8 corretto",
+            "validation-pattern-formatted": "{0} non \xe8 corretto",
+            "validation-email": "L'Email non \xe8 corretta",
+            "validation-email-formatted": "{0} non \xe8 una email corretta",
+            "validation-mask": "Il valore non \xe8 corretto",
             "dxLookup-searchPlaceholder": "Lunghezza minima: {0}",
             "dxList-pullingDownText": "Trascina in basso per aggiornare...",
             "dxList-pulledDownText": "Rilascia per aggiornare...",
@@ -86,7 +86,7 @@
             "dxSwitch-switchedOnText": "ON",
             "dxSwitch-switchedOffText": "OFF",
             "dxForm-optionalMark": "opzionale",
-            "dxForm-requiredMessage": "{0} è richiesto",
+            "dxForm-requiredMessage": "{0} \xe8 richiesto",
             "dxNumberBox-invalidValueMessage": "Il valore deve essere numerico",
             "dxDataGrid-columnChooserTitle": "Selezione colonne",
             "dxDataGrid-columnChooserEmptyText": "Trascina qui una colonna per nasconderla",
@@ -130,13 +130,13 @@
             "dxDataGrid-editingCancelAllChanges": "Annulla le modifiche",
             "dxDataGrid-editingAddRow": "Aggiungi una riga",
             "dxDataGrid-summaryMin": "Min: {0}",
-            "dxDataGrid-summaryMinOtherColumn": "Min di {1} è {0}",
+            "dxDataGrid-summaryMinOtherColumn": "Min di {1} \xe8 {0}",
             "dxDataGrid-summaryMax": "Max: {0}",
-            "dxDataGrid-summaryMaxOtherColumn": "Max di {1} è {0}",
+            "dxDataGrid-summaryMaxOtherColumn": "Max di {1} \xe8 {0}",
             "dxDataGrid-summaryAvg": "Media: {0}",
-            "dxDataGrid-summaryAvgOtherColumn": "Media di {1} è {0}",
+            "dxDataGrid-summaryAvgOtherColumn": "Media di {1} \xe8 {0}",
             "dxDataGrid-summarySum": "Somma: {0}",
-            "dxDataGrid-summarySumOtherColumn": "Somma di {1} è {0}",
+            "dxDataGrid-summarySumOtherColumn": "Somma di {1} \xe8 {0}",
             "dxDataGrid-summaryCount": "Elementi: {0}",
             "dxDataGrid-columnFixingFix": "Blocca",
             "dxDataGrid-columnFixingUnfix": "Sblocca",
@@ -256,8 +256,8 @@
             "dxFilterBuilder-filterOperationContains": "Contiene",
             "dxFilterBuilder-filterOperationNotContains": "Non contiene",
             "dxFilterBuilder-filterOperationEndsWith": "Termina con",
-            "dxFilterBuilder-filterOperationIsBlank": "È vuoto",
-            "dxFilterBuilder-filterOperationIsNotBlank": "Non è vuoto",
+            "dxFilterBuilder-filterOperationIsBlank": "\xc8 vuoto",
+            "dxFilterBuilder-filterOperationIsNotBlank": "Non \xe8 vuoto",
             "dxFilterBuilder-filterOperationBetween": "Compreso",
             "dxFilterBuilder-filterOperationAnyOf": "Include",
             "dxFilterBuilder-filterOperationNoneOf": "Non include",
