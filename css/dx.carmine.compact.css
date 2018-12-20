@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 18.2.3 (build 18348)
-* Build date: Dec 14, 2018
+* Version: 18.2.4
+* Build date: Dec 17, 2018
 *
 * Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -2494,6 +2494,69 @@
   border-color: #afb6bb;
   color: #333;
 }
+.dx-button-mode-contained.dx-button-danger {
+  background-color: #f74d61;
+  border-color: transparent;
+  color: #fff;
+}
+.dx-button-mode-contained.dx-button-danger .dx-icon {
+  color: #fff;
+}
+.dx-button-mode-contained.dx-button-danger.dx-state-hover {
+  background-color: #f51c36;
+  border-color: transparent;
+}
+.dx-button-mode-contained.dx-button-danger.dx-state-focused {
+  background-color: #ed0b25;
+  border-color: transparent;
+}
+.dx-button-mode-contained.dx-button-danger.dx-state-active {
+  background-color: #d40a21;
+  border-color: transparent;
+  color: #fff;
+}
+.dx-button-mode-contained.dx-button-success {
+  background-color: #5cb85c;
+  border-color: transparent;
+  color: #fff;
+}
+.dx-button-mode-contained.dx-button-success .dx-icon {
+  color: #fff;
+}
+.dx-button-mode-contained.dx-button-success.dx-state-hover {
+  background-color: #449d44;
+  border-color: transparent;
+}
+.dx-button-mode-contained.dx-button-success.dx-state-focused {
+  background-color: #3d8b3d;
+  border-color: transparent;
+}
+.dx-button-mode-contained.dx-button-success.dx-state-active {
+  background-color: #357935;
+  border-color: transparent;
+  color: #fff;
+}
+.dx-button-mode-contained.dx-button-default {
+  background-color: #f05b41;
+  border-color: transparent;
+  color: #fff;
+}
+.dx-button-mode-contained.dx-button-default .dx-icon {
+  color: #fff;
+}
+.dx-button-mode-contained.dx-button-default.dx-state-hover {
+  background-color: #eb3313;
+  border-color: transparent;
+}
+.dx-button-mode-contained.dx-button-default.dx-state-focused {
+  background-color: #d42e11;
+  border-color: transparent;
+}
+.dx-button-mode-contained.dx-button-default.dx-state-active {
+  background-color: #bc290f;
+  border-color: transparent;
+  color: #fff;
+}
 .dx-button-mode-outlined {
   background-color: transparent;
   border-color: #afb6bb;
@@ -2514,6 +2577,69 @@
   background-color: rgba(175, 182, 187, 0.3);
   border-color: #afb6bb;
   color: #333;
+}
+.dx-button-mode-outlined.dx-button-danger {
+  background-color: transparent;
+  border-color: #f6354b;
+  color: #f6354b;
+}
+.dx-button-mode-outlined.dx-button-danger .dx-icon {
+  color: #f6354b;
+}
+.dx-button-mode-outlined.dx-button-danger.dx-state-hover {
+  background-color: rgba(246, 53, 75, 0.1);
+  border-color: #f6354b;
+}
+.dx-button-mode-outlined.dx-button-danger.dx-state-focused {
+  background-color: rgba(246, 53, 75, 0.2);
+  border-color: #f6354b;
+}
+.dx-button-mode-outlined.dx-button-danger.dx-state-active {
+  background-color: rgba(246, 53, 75, 0.3);
+  border-color: #f6354b;
+  color: #f6354b;
+}
+.dx-button-mode-outlined.dx-button-success {
+  background-color: transparent;
+  border-color: #4cae4c;
+  color: #4cae4c;
+}
+.dx-button-mode-outlined.dx-button-success .dx-icon {
+  color: #4cae4c;
+}
+.dx-button-mode-outlined.dx-button-success.dx-state-hover {
+  background-color: rgba(76, 174, 76, 0.1);
+  border-color: #4cae4c;
+}
+.dx-button-mode-outlined.dx-button-success.dx-state-focused {
+  background-color: rgba(76, 174, 76, 0.2);
+  border-color: #4cae4c;
+}
+.dx-button-mode-outlined.dx-button-success.dx-state-active {
+  background-color: rgba(76, 174, 76, 0.3);
+  border-color: #4cae4c;
+  color: #4cae4c;
+}
+.dx-button-mode-outlined.dx-button-default {
+  background-color: transparent;
+  border-color: #ee4729;
+  color: #ee4729;
+}
+.dx-button-mode-outlined.dx-button-default .dx-icon {
+  color: #ee4729;
+}
+.dx-button-mode-outlined.dx-button-default.dx-state-hover {
+  background-color: rgba(238, 71, 41, 0.1);
+  border-color: #ee4729;
+}
+.dx-button-mode-outlined.dx-button-default.dx-state-focused {
+  background-color: rgba(238, 71, 41, 0.2);
+  border-color: #ee4729;
+}
+.dx-button-mode-outlined.dx-button-default.dx-state-active {
+  background-color: rgba(238, 71, 41, 0.3);
+  border-color: #ee4729;
+  color: #ee4729;
 }
 .dx-button-mode-text {
   background-color: transparent;
@@ -2536,199 +2662,73 @@
   border-color: transparent;
   color: #333;
 }
+.dx-button-mode-text.dx-button-danger {
+  background-color: transparent;
+  border-color: transparent;
+  color: #f6354b;
+}
+.dx-button-mode-text.dx-button-danger .dx-icon {
+  color: #f6354b;
+}
+.dx-button-mode-text.dx-button-danger.dx-state-hover {
+  background-color: rgba(246, 53, 75, 0.1);
+  border-color: transparent;
+}
+.dx-button-mode-text.dx-button-danger.dx-state-focused {
+  background-color: rgba(246, 53, 75, 0.2);
+  border-color: transparent;
+}
+.dx-button-mode-text.dx-button-danger.dx-state-active {
+  background-color: rgba(246, 53, 75, 0.3);
+  border-color: transparent;
+  color: #f6354b;
+}
+.dx-button-mode-text.dx-button-success {
+  background-color: transparent;
+  border-color: transparent;
+  color: #4cae4c;
+}
+.dx-button-mode-text.dx-button-success .dx-icon {
+  color: #4cae4c;
+}
+.dx-button-mode-text.dx-button-success.dx-state-hover {
+  background-color: rgba(76, 174, 76, 0.1);
+  border-color: transparent;
+}
+.dx-button-mode-text.dx-button-success.dx-state-focused {
+  background-color: rgba(76, 174, 76, 0.2);
+  border-color: transparent;
+}
+.dx-button-mode-text.dx-button-success.dx-state-active {
+  background-color: rgba(76, 174, 76, 0.3);
+  border-color: transparent;
+  color: #4cae4c;
+}
+.dx-button-mode-text.dx-button-default {
+  background-color: transparent;
+  border-color: transparent;
+  color: #ee4729;
+}
+.dx-button-mode-text.dx-button-default .dx-icon {
+  color: #ee4729;
+}
+.dx-button-mode-text.dx-button-default.dx-state-hover {
+  background-color: rgba(238, 71, 41, 0.1);
+  border-color: transparent;
+}
+.dx-button-mode-text.dx-button-default.dx-state-focused {
+  background-color: rgba(238, 71, 41, 0.2);
+  border-color: transparent;
+}
+.dx-button-mode-text.dx-button-default.dx-state-active {
+  background-color: rgba(238, 71, 41, 0.3);
+  border-color: transparent;
+  color: #ee4729;
+}
 .dx-button-normal.dx-state-hover .dx-button-content,
 .dx-button-back.dx-state-hover .dx-button-content {
   background-color: transparent;
   border-radius: 2px;
-}
-.dx-button-danger.dx-button-mode-contained {
-  background-color: #f74d61;
-  border-color: transparent;
-  color: #fff;
-}
-.dx-button-danger.dx-button-mode-contained .dx-icon {
-  color: #fff;
-}
-.dx-button-danger.dx-button-mode-contained.dx-state-hover {
-  background-color: #f51c36;
-  border-color: transparent;
-}
-.dx-button-danger.dx-button-mode-contained.dx-state-focused {
-  background-color: #ed0b25;
-  border-color: transparent;
-}
-.dx-button-danger.dx-button-mode-contained.dx-state-active {
-  background-color: #d40a21;
-  border-color: transparent;
-  color: #fff;
-}
-.dx-button-danger.dx-button-mode-outlined {
-  background-color: transparent;
-  border-color: #f6354b;
-  color: #f6354b;
-}
-.dx-button-danger.dx-button-mode-outlined .dx-icon {
-  color: #f6354b;
-}
-.dx-button-danger.dx-button-mode-outlined.dx-state-hover {
-  background-color: rgba(246, 53, 75, 0.1);
-  border-color: #f6354b;
-}
-.dx-button-danger.dx-button-mode-outlined.dx-state-focused {
-  background-color: rgba(246, 53, 75, 0.2);
-  border-color: #f6354b;
-}
-.dx-button-danger.dx-button-mode-outlined.dx-state-active {
-  background-color: rgba(246, 53, 75, 0.3);
-  border-color: #f6354b;
-  color: #f6354b;
-}
-.dx-button-danger.dx-button-mode-text {
-  background-color: transparent;
-  border-color: transparent;
-  color: #f6354b;
-}
-.dx-button-danger.dx-button-mode-text .dx-icon {
-  color: #f6354b;
-}
-.dx-button-danger.dx-button-mode-text.dx-state-hover {
-  background-color: rgba(246, 53, 75, 0.1);
-  border-color: transparent;
-}
-.dx-button-danger.dx-button-mode-text.dx-state-focused {
-  background-color: rgba(246, 53, 75, 0.2);
-  border-color: transparent;
-}
-.dx-button-danger.dx-button-mode-text.dx-state-active {
-  background-color: rgba(246, 53, 75, 0.3);
-  border-color: transparent;
-  color: #f6354b;
-}
-.dx-button-success.dx-button-mode-contained {
-  background-color: #5cb85c;
-  border-color: transparent;
-  color: #fff;
-}
-.dx-button-success.dx-button-mode-contained .dx-icon {
-  color: #fff;
-}
-.dx-button-success.dx-button-mode-contained.dx-state-hover {
-  background-color: #449d44;
-  border-color: transparent;
-}
-.dx-button-success.dx-button-mode-contained.dx-state-focused {
-  background-color: #3d8b3d;
-  border-color: transparent;
-}
-.dx-button-success.dx-button-mode-contained.dx-state-active {
-  background-color: #357935;
-  border-color: transparent;
-  color: #fff;
-}
-.dx-button-success.dx-button-mode-outlined {
-  background-color: transparent;
-  border-color: #4cae4c;
-  color: #4cae4c;
-}
-.dx-button-success.dx-button-mode-outlined .dx-icon {
-  color: #4cae4c;
-}
-.dx-button-success.dx-button-mode-outlined.dx-state-hover {
-  background-color: rgba(76, 174, 76, 0.1);
-  border-color: #4cae4c;
-}
-.dx-button-success.dx-button-mode-outlined.dx-state-focused {
-  background-color: rgba(76, 174, 76, 0.2);
-  border-color: #4cae4c;
-}
-.dx-button-success.dx-button-mode-outlined.dx-state-active {
-  background-color: rgba(76, 174, 76, 0.3);
-  border-color: #4cae4c;
-  color: #4cae4c;
-}
-.dx-button-success.dx-button-mode-text {
-  background-color: transparent;
-  border-color: transparent;
-  color: #4cae4c;
-}
-.dx-button-success.dx-button-mode-text .dx-icon {
-  color: #4cae4c;
-}
-.dx-button-success.dx-button-mode-text.dx-state-hover {
-  background-color: rgba(76, 174, 76, 0.1);
-  border-color: transparent;
-}
-.dx-button-success.dx-button-mode-text.dx-state-focused {
-  background-color: rgba(76, 174, 76, 0.2);
-  border-color: transparent;
-}
-.dx-button-success.dx-button-mode-text.dx-state-active {
-  background-color: rgba(76, 174, 76, 0.3);
-  border-color: transparent;
-  color: #4cae4c;
-}
-.dx-button-default.dx-button-mode-contained {
-  background-color: #f05b41;
-  border-color: transparent;
-  color: #fff;
-}
-.dx-button-default.dx-button-mode-contained .dx-icon {
-  color: #fff;
-}
-.dx-button-default.dx-button-mode-contained.dx-state-hover {
-  background-color: #eb3313;
-  border-color: transparent;
-}
-.dx-button-default.dx-button-mode-contained.dx-state-focused {
-  background-color: #d42e11;
-  border-color: transparent;
-}
-.dx-button-default.dx-button-mode-contained.dx-state-active {
-  background-color: #bc290f;
-  border-color: transparent;
-  color: #fff;
-}
-.dx-button-default.dx-button-mode-outlined {
-  background-color: transparent;
-  border-color: #ee4729;
-  color: #ee4729;
-}
-.dx-button-default.dx-button-mode-outlined .dx-icon {
-  color: #ee4729;
-}
-.dx-button-default.dx-button-mode-outlined.dx-state-hover {
-  background-color: rgba(238, 71, 41, 0.1);
-  border-color: #ee4729;
-}
-.dx-button-default.dx-button-mode-outlined.dx-state-focused {
-  background-color: rgba(238, 71, 41, 0.2);
-  border-color: #ee4729;
-}
-.dx-button-default.dx-button-mode-outlined.dx-state-active {
-  background-color: rgba(238, 71, 41, 0.3);
-  border-color: #ee4729;
-  color: #ee4729;
-}
-.dx-button-default.dx-button-mode-text {
-  background-color: transparent;
-  border-color: transparent;
-  color: #ee4729;
-}
-.dx-button-default.dx-button-mode-text .dx-icon {
-  color: #ee4729;
-}
-.dx-button-default.dx-button-mode-text.dx-state-hover {
-  background-color: rgba(238, 71, 41, 0.1);
-  border-color: transparent;
-}
-.dx-button-default.dx-button-mode-text.dx-state-focused {
-  background-color: rgba(238, 71, 41, 0.2);
-  border-color: transparent;
-}
-.dx-button-default.dx-button-mode-text.dx-state-active {
-  background-color: rgba(238, 71, 41, 0.3);
-  border-color: transparent;
-  color: #ee4729;
 }
 .dx-button-mode-outlined.dx-buttongroup-item,
 .dx-button-mode-contained.dx-buttongroup-item {
