@@ -1,26 +1,25 @@
 /*!
 * DevExtreme
-* Version: 18.2.4
-* Build date: Dec 17, 2018
+* Version: 18.2.4 (build 19010)
+* Build date: Jan 10, 2019
 *
-* Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
+* Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
 */
 .dx-colorview-palette-handle {
-  background: -webkit-gradient(transparent 5px,  rgba(0, 0, 0, 0.2) 6px,  #FFF 7px,  #FFF 12px,  rgba(0, 0, 0, 0.2) 13px);
-  background: radial-gradient(transparent 5px,  rgba(0, 0, 0, 0.2) 6px,  #FFF 7px,  #FFF 12px,  rgba(0, 0, 0, 0.2) 13px);
+  background: radial-gradient(transparent 5px, rgba(0, 0, 0, 0.2) 6px, #FFF 7px, #FFF 12px, rgba(0, 0, 0, 0.2) 13px);
   -webkit-box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.2);
-  box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.2);
+          box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.2);
 }
 .dx-colorview-hue-scale-handle {
   border: 1px solid rgba(0, 0, 0, 0.2);
-  -webkit-box-shadow: inset -5px 0px 0px 3px #FFF , inset 5px 0px 0px 3px #FFF , inset -6px 0px 1px 4px rgba(0, 0, 0, 0.2) , inset 6px 0px 1px 4px rgba(0, 0, 0, 0.2);
-  box-shadow: inset -5px 0px 0px 3px #FFF , inset 5px 0px 0px 3px #FFF , inset -6px 0px 1px 4px rgba(0, 0, 0, 0.2) , inset 6px 0px 1px 4px rgba(0, 0, 0, 0.2);
+  -webkit-box-shadow: inset -5px 0px 0px 3px #FFF, inset 5px 0px 0px 3px #FFF, inset -6px 0px 1px 4px rgba(0, 0, 0, 0.2), inset 6px 0px 1px 4px rgba(0, 0, 0, 0.2);
+          box-shadow: inset -5px 0px 0px 3px #FFF, inset 5px 0px 0px 3px #FFF, inset -6px 0px 1px 4px rgba(0, 0, 0, 0.2), inset 6px 0px 1px 4px rgba(0, 0, 0, 0.2);
 }
 .dx-colorview-alpha-channel-handle {
   border: 1px solid rgba(0, 0, 0, 0.2);
-  -webkit-box-shadow:   inset 0px -5px 0px 3px #FFF , inset 0px 5px 0px 3px #FFF , inset 0px -6px 1px 4px rgba(0, 0, 0, 0.2) , inset 0px 6px 1px 4px rgba(0, 0, 0, 0.2);
-  box-shadow:   inset 0px -5px 0px 3px #FFF , inset 0px 5px 0px 3px #FFF , inset 0px -6px 1px 4px rgba(0, 0, 0, 0.2) , inset 0px 6px 1px 4px rgba(0, 0, 0, 0.2);
+  -webkit-box-shadow: inset 0px -5px 0px 3px #FFF, inset 0px 5px 0px 3px #FFF, inset 0px -6px 1px 4px rgba(0, 0, 0, 0.2), inset 0px 6px 1px 4px rgba(0, 0, 0, 0.2);
+          box-shadow: inset 0px -5px 0px 3px #FFF, inset 0px 5px 0px 3px #FFF, inset 0px -6px 1px 4px rgba(0, 0, 0, 0.2), inset 0px 6px 1px 4px rgba(0, 0, 0, 0.2);
 }
 .dx-datagrid-borders > .dx-datagrid-headers,
 .dx-datagrid-borders > .dx-datagrid-rowsview,
@@ -121,7 +120,7 @@
 }
 .dx-datagrid .dx-datagrid-rowsview .dx-virtual-row > td[style*="text-align: right"]:before {
   -webkit-transform: scaleX(-1);
-  transform: scaleX(-1);
+          transform: scaleX(-1);
 }
 .dx-datagrid .dx-datagrid-filter-row .dx-filter-range-content {
   color: black;
@@ -214,11 +213,11 @@
 }
 .dx-rtl .dx-datagrid .dx-datagrid-rowsview .dx-virtual-row > td:before {
   -webkit-transform: scaleX(-1);
-  transform: scaleX(-1);
+          transform: scaleX(-1);
 }
 .dx-rtl .dx-datagrid .dx-datagrid-rowsview .dx-virtual-row > td[style*="text-align: left"]:before {
   -webkit-transform: scale(1);
-  transform: scale(1);
+          transform: scale(1);
 }
 .dx-rtl .dx-datagrid .dx-column-lines > td:first-child {
   border-right: none;
@@ -236,10 +235,6 @@
   margin-right: 10px;
 }
 .dx-datagrid-cell-updated-animation {
-  -webkit-animation: dx-datagrid-highlight-change 1s;
-          animation: dx-datagrid-highlight-change 1s;
-}
-.dx-datagrid-row-inserted-animation {
   -webkit-animation: dx-datagrid-highlight-change 1s;
           animation: dx-datagrid-highlight-change 1s;
 }
@@ -317,7 +312,7 @@
 }
 .dx-pivotgrid-fields-container.dx-drag .dx-area-field.dx-area-box {
   -webkit-box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.1), 0px 1px 3px rgba(0, 0, 0, 0.2);
-  box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.1), 0px 1px 3px rgba(0, 0, 0, 0.2);
+          box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.1), 0px 1px 3px rgba(0, 0, 0, 0.2);
   border: 1px solid rgba(96, 96, 96, 0.5);
 }
 .dx-pivotgrid-fields-container .dx-area-field.dx-area-box {
@@ -645,13 +640,13 @@
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
-  -webkit-flex-grow: 1;
   -webkit-box-flex: 1;
+  -webkit-flex-grow: 1;
       -ms-flex-positive: 1;
           flex-grow: 1;
-  -webkit-flex-direction: column;
   -webkit-box-orient: vertical;
   -webkit-box-direction: normal;
+  -webkit-flex-direction: column;
       -ms-flex-direction: column;
           flex-direction: column;
   height: 0;
@@ -663,13 +658,13 @@
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
-  -webkit-flex-grow: 1;
   -webkit-box-flex: 1;
+  -webkit-flex-grow: 1;
       -ms-flex-positive: 1;
           flex-grow: 1;
-  -webkit-flex-direction: column;
   -webkit-box-orient: vertical;
   -webkit-box-direction: normal;
+  -webkit-flex-direction: column;
       -ms-flex-direction: column;
           flex-direction: column;
   height: 0;
@@ -823,7 +818,7 @@
 }
 .dx-rtl.dx-pivotgrid .dx-pivotgrid-collapsed .dx-expand-icon-container {
   -webkit-transform: scaleX(-1);
-  transform: scaleX(-1);
+          transform: scaleX(-1);
 }
 .dx-rtl.dx-pivotgrid .dx-icon-sorted {
   margin-left: 0;
@@ -953,7 +948,7 @@
 }
 .dx-treelist-container .dx-treelist-rowsview .dx-virtual-row > td[style*="text-align: right"]:before {
   -webkit-transform: scaleX(-1);
-  transform: scaleX(-1);
+          transform: scaleX(-1);
 }
 .dx-treelist-container .dx-treelist-filter-row .dx-filter-range-content {
   color: black;
@@ -1048,11 +1043,11 @@
 }
 .dx-rtl .dx-treelist-container .dx-treelist-rowsview .dx-virtual-row > td:before {
   -webkit-transform: scaleX(-1);
-  transform: scaleX(-1);
+          transform: scaleX(-1);
 }
 .dx-rtl .dx-treelist-container .dx-treelist-rowsview .dx-virtual-row > td[style*="text-align: left"]:before {
   -webkit-transform: scale(1);
-  transform: scale(1);
+          transform: scale(1);
 }
 .dx-rtl .dx-treelist-form-buttons-container {
   float: left;
@@ -1062,10 +1057,6 @@
   margin-right: 10px;
 }
 .dx-treelist-cell-updated-animation {
-  -webkit-animation: dx-treelist-highlight-change 1s;
-          animation: dx-treelist-highlight-change 1s;
-}
-.dx-treelist-row-inserted-animation {
   -webkit-animation: dx-treelist-highlight-change 1s;
           animation: dx-treelist-highlight-change 1s;
 }
@@ -1085,7 +1076,7 @@
     background-color: rgba(0, 0, 0, 0.08);
   }
 }
-.dx-treeview .dx-loadindicator {
+.dx-treeview-node-loadindicator {
   left: auto;
   right: 0px;
 }
@@ -2302,10 +2293,9 @@
 .dx-state-disabled .dx-widget {
   opacity: 0.65;
   -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  -o-user-select: none;
-  user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
   -webkit-touch-callout: none;
   zoom: 1;
   cursor: default;
@@ -2545,11 +2535,10 @@
   background: #fff;
   -webkit-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 4px 5px rgba(0, 0, 0, 0.2);
           box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 4px 5px rgba(0, 0, 0, 0.2);
-  -webkit-transition: margin-left .24s ease 0s, left .24s ease 0s, width .14s ease .1s, transform .14s ease .1s;
-  -webkit-transition: margin-left .24s ease 0s, left .24s ease 0s, width .14s ease .1s, -webkit-transform .14s ease .1s;
-  transition: margin-left .24s ease 0s, left .24s ease 0s, width .14s ease .1s, -webkit-transform .14s ease .1s;
-  transition: margin-left .24s ease 0s, left .24s ease 0s, width .14s ease .1s, transform .14s ease .1s;
-  transition: margin-left .24s ease 0s, left .24s ease 0s, width .14s ease .1s, transform .14s ease .1s, -webkit-transform .14s ease .1s;
+  -webkit-transition: margin-left 0.24s ease 0s, left 0.24s ease 0s, width 0.14s ease 0.1s, -webkit-transform 0.14s ease 0.1s;
+  transition: margin-left 0.24s ease 0s, left 0.24s ease 0s, width 0.14s ease 0.1s, -webkit-transform 0.14s ease 0.1s;
+  transition: margin-left 0.24s ease 0s, left 0.24s ease 0s, width 0.14s ease 0.1s, transform 0.14s ease 0.1s;
+  transition: margin-left 0.24s ease 0s, left 0.24s ease 0s, width 0.14s ease 0.1s, transform 0.14s ease 0.1s, -webkit-transform 0.14s ease 0.1s;
 }
 .dx-state-active .dx-switch-handle {
   width: 35px;
@@ -2570,21 +2559,20 @@
 }
 .dx-state-active.dx-switch-on-value .dx-switch-handle {
   -webkit-transform: translate(-8px, 0);
-  transform: translate(-8px, 0);
+          transform: translate(-8px, 0);
 }
 .dx-rtl .dx-switch-handle {
   left: auto;
   right: 50%;
   margin-right: -27px;
-  -webkit-transition: margin-right .24s ease 0s, right .24s ease 0s, width .14s ease .1s, transform .14s ease .1s;
-  -webkit-transition: margin-right .24s ease 0s, right .24s ease 0s, width .14s ease .1s, -webkit-transform .14s ease .1s;
-  transition: margin-right .24s ease 0s, right .24s ease 0s, width .14s ease .1s, -webkit-transform .14s ease .1s;
-  transition: margin-right .24s ease 0s, right .24s ease 0s, width .14s ease .1s, transform .14s ease .1s;
-  transition: margin-right .24s ease 0s, right .24s ease 0s, width .14s ease .1s, transform .14s ease .1s, -webkit-transform .14s ease .1s;
+  -webkit-transition: margin-right 0.24s ease 0s, right 0.24s ease 0s, width 0.14s ease 0.1s, -webkit-transform 0.14s ease 0.1s;
+  transition: margin-right 0.24s ease 0s, right 0.24s ease 0s, width 0.14s ease 0.1s, -webkit-transform 0.14s ease 0.1s;
+  transition: margin-right 0.24s ease 0s, right 0.24s ease 0s, width 0.14s ease 0.1s, transform 0.14s ease 0.1s;
+  transition: margin-right 0.24s ease 0s, right 0.24s ease 0s, width 0.14s ease 0.1s, transform 0.14s ease 0.1s, -webkit-transform 0.14s ease 0.1s;
 }
 .dx-state-active.dx-rtl .dx-switch-handle {
   -webkit-transform: translate(0, 0);
-  transform: translate(0, 0);
+          transform: translate(0, 0);
 }
 .dx-switch-on-value.dx-rtl .dx-switch-handle {
   margin-left: 0;
@@ -2592,7 +2580,7 @@
 }
 .dx-state-active.dx-switch-on-value.dx-rtl .dx-switch-handle {
   -webkit-transform: translate(8px, 0);
-  transform: translate(8px, 0);
+          transform: translate(8px, 0);
 }
 .dx-tabs {
   border: 0;
@@ -2834,7 +2822,7 @@
 }
 .dx-texteditor-input:invalid {
   -webkit-box-shadow: none;
-  box-shadow: none;
+          box-shadow: none;
 }
 .dx-show-clear-button .dx-texteditor-input {
   padding-right: 34px;
@@ -2953,8 +2941,7 @@
 .dx-searchbox .dx-placeholder {
   width: 100%;
   -webkit-transform: translate(50%, 0);
-  transform: translate(50%, 0);
-  -webkit-transition: transform 400ms ease;
+          transform: translate(50%, 0);
   -webkit-transition: -webkit-transform 400ms ease;
   transition: -webkit-transform 400ms ease;
   transition: transform 400ms ease;
@@ -2972,8 +2959,7 @@
   background-repeat: no-repeat;
   background-size: 14px 14px;
   -webkit-transform: translate(-50%, 0);
-  transform: translate(-50%, 0);
-  -webkit-transition: transform 400ms ease;
+          transform: translate(-50%, 0);
   -webkit-transition: -webkit-transform 400ms ease;
   transition: -webkit-transform 400ms ease;
   transition: transform 400ms ease;
@@ -3002,11 +2988,11 @@
 .dx-searchbox.dx-state-focused .dx-placeholder {
   text-align: left;
   -webkit-transform: translate(4px, 0);
-  transform: translate(4px, 0);
+          transform: translate(4px, 0);
 }
 .dx-searchbox.dx-state-focused .dx-placeholder:before {
   -webkit-transform: translate(0, 0);
-  transform: translate(0, 0);
+          transform: translate(0, 0);
 }
 .dx-searchbar {
   position: relative;
@@ -3024,14 +3010,13 @@
 .dx-rtl.dx-searchbox .dx-placeholder {
   width: 100%;
   -webkit-transform: translate(50%, 0);
-  transform: translate(50%, 0);
-  -webkit-transition: transform 400ms ease;
+          transform: translate(50%, 0);
   -webkit-transition: -webkit-transform 400ms ease;
   transition: -webkit-transform 400ms ease;
   transition: transform 400ms ease;
   transition: transform 400ms ease, -webkit-transform 400ms ease;
   -webkit-transform: translate(-50%, 0);
-  transform: translate(-50%, 0);
+          transform: translate(-50%, 0);
 }
 .dx-rtl .dx-searchbox .dx-placeholder:before,
 .dx-rtl.dx-searchbox .dx-placeholder:before {
@@ -3046,8 +3031,7 @@
   background-repeat: no-repeat;
   background-size: 14px 14px;
   -webkit-transform: translate(-50%, 0);
-  transform: translate(-50%, 0);
-  -webkit-transition: transform 400ms ease;
+          transform: translate(-50%, 0);
   -webkit-transition: -webkit-transform 400ms ease;
   transition: -webkit-transform 400ms ease;
   transition: transform 400ms ease;
@@ -3061,18 +3045,18 @@
   margin-left: 0;
   padding-right: 22px;
   -webkit-transform: translate(50%, 0);
-  transform: translate(50%, 0);
+          transform: translate(50%, 0);
 }
 .dx-rtl .dx-searchbox.dx-state-focused .dx-placeholder,
 .dx-rtl.dx-searchbox.dx-state-focused .dx-placeholder {
   text-align: right;
   -webkit-transform: translate(-4px, 0);
-  transform: translate(-4px, 0);
+          transform: translate(-4px, 0);
 }
 .dx-rtl .dx-searchbox.dx-state-focused .dx-placeholder:before,
 .dx-rtl.dx-searchbox.dx-state-focused .dx-placeholder:before {
   -webkit-transform: translate(0, 0);
-  transform: translate(0, 0);
+          transform: translate(0, 0);
 }
 .dx-rtl .dx-searchbox.dx-show-clear-button .dx-texteditor-input,
 .dx-rtl.dx-searchbox.dx-show-clear-button .dx-texteditor-input {
@@ -3106,9 +3090,7 @@
   width: 25px;
 }
 .dx-dropdowneditor-button-visible .dx-texteditor-input {
-  -moz-border-top-right-radius: 0;
   border-top-right-radius: 0;
-  -moz-border-bottom-right-radius: 0;
   border-bottom-right-radius: 0;
 }
 .dx-dropdowneditor-active .dx-dropdowneditor-icon,
@@ -3193,7 +3175,6 @@
   color: #8e8e93;
   text-align: center;
   overflow: hidden;
-  -ms-text-overflow: ellipsis;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -3439,8 +3420,8 @@
 }
 .dx-list-context-menucontent {
   -webkit-box-shadow: 0 1px 15px -3px rgba(0,0,0,.35);
-  box-shadow: 0 1px 15px -3px rgba(0,0,0,.35);
-  border-radius: 0.5em;
+          box-shadow: 0 1px 15px -3px rgba(0,0,0,.35);
+  border-radius: .5em;
   border: 1px solid #AAAAAA;
   background-color: #fff;
 }
@@ -3673,9 +3654,9 @@
   padding-right: 6px;
 }
 .dx-datebox-wrapper-calendar .dx-overlay-content {
-  border-radius: 0.5em;
+  border-radius: .5em;
   -webkit-box-shadow: 0 1px 15px -3px rgba(0,0,0,.35);
-  box-shadow: 0 1px 15px -3px rgba(0,0,0,.35);
+          box-shadow: 0 1px 15px -3px rgba(0,0,0,.35);
   background-color: #ffffff;
   border: 1px solid #d1d1d1;
 }
@@ -3842,8 +3823,8 @@
   padding: 5px 10px;
 }
 .dx-overlay-wrapper {
-  -webkit-transition: background-color .4s ease;
-  transition: background-color .4s ease;
+  -webkit-transition: background-color 0.4s ease;
+  transition: background-color 0.4s ease;
   color: #000;
   font-weight: normal;
   font-size: 1em;
@@ -3865,7 +3846,7 @@
   text-shadow: 0px 1px 0px rgba(0, 0, 0, 0.18);
 }
 .dx-toast-icon {
-  background-size: contain 100%;
+  background-size: contain;
 }
 .dx-toast-info {
   background-color: #6aa8dc;
@@ -4047,7 +4028,7 @@
   background-color: #0b6aff;
   background-size: 90% 7px;
   -webkit-animation: loader 2s linear infinite;
-  animation: loader 2s linear infinite;
+          animation: loader 2s linear infinite;
   background-repeat: no-repeat;
   background-image: -webkit-gradient(linear, right top, left top, color-stop(5%, transparent), color-stop(#74b9ff), color-stop(95%, transparent));
   background-image: linear-gradient(-90deg, transparent 5%, #74b9ff, transparent 95%);
@@ -4061,7 +4042,7 @@
 }
 .dx-state-disabled .dx-progressbar-animating-container {
   -webkit-animation: none;
-  animation: none;
+          animation: none;
   background-repeat: no-repeat;
   background-image: -webkit-gradient(linear, right top, left top, color-stop(5%, transparent), color-stop(#b7b6bb), color-stop(95%, transparent));
   background-image: linear-gradient(-90deg, transparent 5%, #b7b6bb, transparent 95%);
@@ -4072,7 +4053,7 @@
 .dx-rtl .dx-progressbar .dx-progressbar-animating-container,
 .dx-rtl.dx-progressbar .dx-progressbar-animating-container {
   -webkit-animation: loader-rtl 1s linear infinite;
-  animation: loader-rtl 1s linear infinite;
+          animation: loader-rtl 1s linear infinite;
   background-repeat: no-repeat;
   background-image: -webkit-gradient(linear, right top, left top, color-stop(5%, transparent), color-stop(#74b9ff), color-stop(95%, transparent));
   background-image: linear-gradient(-90deg, transparent 5%, #74b9ff, transparent 95%);
@@ -4136,7 +4117,7 @@
   border: 1px solid #b7b6bb;
   background: #fcfcfc;
   -webkit-box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
   border-radius: 50%;
 }
 .dx-hairlines .dx-slider-handle {
@@ -4488,7 +4469,7 @@
   background: #787878;
   border-radius: 80%;
   -webkit-animation: dx-ios-loadindicator-opacity 1s linear infinite;
-  animation: dx-ios-loadindicator-opacity 1s linear infinite;
+          animation: dx-ios-loadindicator-opacity 1s linear infinite;
 }
 @-webkit-keyframes dx-ios-loadindicator-opacity {
   from {
@@ -4508,75 +4489,75 @@
 }
 .dx-loadindicator-icon .dx-loadindicator-segment0 {
   -webkit-transform: rotate(0deg) translate(0, -142%);
-  transform: rotate(0deg) translate(0, -142%);
+          transform: rotate(0deg) translate(0, -142%);
   -webkit-animation-delay: 0s;
-  animation-delay: 0s;
+          animation-delay: 0s;
 }
 .dx-loadindicator-icon .dx-loadindicator-segment1 {
   -webkit-transform: rotate(30deg) translate(0, -142%);
-  transform: rotate(30deg) translate(0, -142%);
+          transform: rotate(30deg) translate(0, -142%);
   -webkit-animation-delay: -0.9167s;
-  animation-delay: -0.9167s;
+          animation-delay: -0.9167s;
 }
 .dx-loadindicator-icon .dx-loadindicator-segment2 {
   -webkit-transform: rotate(60deg) translate(0, -142%);
-  transform: rotate(60deg) translate(0, -142%);
+          transform: rotate(60deg) translate(0, -142%);
   -webkit-animation-delay: -0.833s;
-  animation-delay: -0.833s;
+          animation-delay: -0.833s;
 }
 .dx-loadindicator-icon .dx-loadindicator-segment3 {
   -webkit-transform: rotate(90deg) translate(0, -142%);
-  transform: rotate(90deg) translate(0, -142%);
+          transform: rotate(90deg) translate(0, -142%);
   -webkit-animation-delay: -0.75s;
-  animation-delay: -0.75s;
+          animation-delay: -0.75s;
 }
 .dx-loadindicator-icon .dx-loadindicator-segment4 {
   -webkit-transform: rotate(120deg) translate(0, -142%);
-  transform: rotate(120deg) translate(0, -142%);
+          transform: rotate(120deg) translate(0, -142%);
   -webkit-animation-delay: -0.667s;
-  animation-delay: -0.667s;
+          animation-delay: -0.667s;
 }
 .dx-loadindicator-icon .dx-loadindicator-segment5 {
   -webkit-transform: rotate(150deg) translate(0, -142%);
-  transform: rotate(150deg) translate(0, -142%);
+          transform: rotate(150deg) translate(0, -142%);
   -webkit-animation-delay: -0.5833s;
-  animation-delay: -0.5833s;
+          animation-delay: -0.5833s;
 }
 .dx-loadindicator-icon .dx-loadindicator-segment6 {
   -webkit-transform: rotate(180deg) translate(0, -142%);
-  transform: rotate(180deg) translate(0, -142%);
+          transform: rotate(180deg) translate(0, -142%);
   -webkit-animation-delay: -0.5s;
-  animation-delay: -0.5s;
+          animation-delay: -0.5s;
 }
 .dx-loadindicator-icon .dx-loadindicator-segment7 {
   -webkit-transform: rotate(210deg) translate(0, -142%);
-  transform: rotate(210deg) translate(0, -142%);
+          transform: rotate(210deg) translate(0, -142%);
   -webkit-animation-delay: -0.41667s;
-  animation-delay: -0.41667s;
+          animation-delay: -0.41667s;
 }
 .dx-loadindicator-icon .dx-loadindicator-segment8 {
   -webkit-transform: rotate(240deg) translate(0, -142%);
-  transform: rotate(240deg) translate(0, -142%);
+          transform: rotate(240deg) translate(0, -142%);
   -webkit-animation-delay: -0.333s;
-  animation-delay: -0.333s;
+          animation-delay: -0.333s;
 }
 .dx-loadindicator-icon .dx-loadindicator-segment9 {
   -webkit-transform: rotate(270deg) translate(0, -142%);
-  transform: rotate(270deg) translate(0, -142%);
+          transform: rotate(270deg) translate(0, -142%);
   -webkit-animation-delay: -0.25s;
-  animation-delay: -0.25s;
+          animation-delay: -0.25s;
 }
 .dx-loadindicator-icon .dx-loadindicator-segment10 {
   -webkit-transform: rotate(300deg) translate(0, -142%);
-  transform: rotate(300deg) translate(0, -142%);
+          transform: rotate(300deg) translate(0, -142%);
   -webkit-animation-delay: -0.1667s;
-  animation-delay: -0.1667s;
+          animation-delay: -0.1667s;
 }
 .dx-loadindicator-icon .dx-loadindicator-segment11 {
   -webkit-transform: rotate(330deg) translate(0, -142%);
-  transform: rotate(330deg) translate(0, -142%);
+          transform: rotate(330deg) translate(0, -142%);
   -webkit-animation-delay: -0.0833s;
-  animation-delay: -0.0833s;
+          animation-delay: -0.0833s;
 }
 .dx-loadindicator-icon .dx-loadindicator-segment12,
 .dx-loadindicator-icon .dx-loadindicator-segment13,
@@ -4598,7 +4579,7 @@
 }
 .dx-autocomplete-popup-wrapper .dx-overlay-content {
   -webkit-box-shadow: 0 1px 15px -3px rgba(0,0,0,.35);
-  box-shadow: 0 1px 15px -3px rgba(0,0,0,.35);
+          box-shadow: 0 1px 15px -3px rgba(0,0,0,.35);
 }
 .dx-autocomplete-popup-wrapper .dx-popup-content {
   border-color: #D9D9D9;
@@ -4620,17 +4601,17 @@
   right: auto;
 }
 .dx-dropdownmenu-popup-wrapper .dx-overlay-content {
-  border-radius: 0.5em;
+  border-radius: .5em;
 }
 .dx-dropdownmenu-popup-wrapper .dx-popup-content {
   padding: 0px;
   background-color: #fff;
-  border-radius: 0.5em;
+  border-radius: .5em;
 }
 .dx-dropdownmenu-popup-wrapper .dx-scrollview-content {
   position: static;
   overflow: hidden;
-  border-radius: 0.4em;
+  border-radius: .4em;
 }
 .dx-dropdownmenu-popup-wrapper .dx-list-item {
   position: static;
@@ -4660,7 +4641,7 @@
 }
 .dx-selectbox-popup-wrapper .dx-overlay-content {
   -webkit-box-shadow: 0 1px 15px -3px rgba(0,0,0,.35);
-  box-shadow: 0 1px 15px -3px rgba(0,0,0,.35);
+          box-shadow: 0 1px 15px -3px rgba(0,0,0,.35);
 }
 .dx-selectbox-popup-wrapper .dx-list {
   background-color: #fff;
@@ -4798,13 +4779,13 @@
   top: 8px;
   background: #fff;
   -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
-  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+          box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
   border-radius: 50%;
 }
 .dx-radiobutton-checked .dx-radiobutton-icon:before {
   background: #007aff;
   -webkit-box-shadow: none;
-  box-shadow: none;
+          box-shadow: none;
 }
 .dx-radiobutton-icon:before {
   position: absolute;
@@ -4814,7 +4795,7 @@
   height: 100%;
   background-color: #fff;
   -webkit-box-shadow: 0 0 2px rgba(170, 170, 170, 0.6) inset;
-  box-shadow: 0 0 2px rgba(170, 170, 170, 0.6) inset;
+          box-shadow: 0 0 2px rgba(170, 170, 170, 0.6) inset;
   border-radius: 50%;
 }
 .dx-state-disabled .dx-radiobutton-icon {
@@ -4926,7 +4907,7 @@
 }
 .dx-slideoutview-content {
   -webkit-box-sizing: content-box;
-  box-sizing: content-box;
+          box-sizing: content-box;
   background-color: #fff;
   margin-left: -1px;
   border-left: 1px solid #e0e0e0;
@@ -5036,9 +5017,9 @@
   border-color: #d1d1d1;
 }
 .dx-colorbox-overlay {
-  border-radius: 0.5em;
+  border-radius: .5em;
   -webkit-box-shadow: 0 1px 15px -3px rgba(0,0,0,.35);
-  box-shadow: 0 1px 15px -3px rgba(0,0,0,.35);
+          box-shadow: 0 1px 15px -3px rgba(0,0,0,.35);
   background-color: #ffffff;
 }
 .dx-colorbox-overlay .dx-popup-content {
@@ -5262,7 +5243,7 @@
 }
 .dx-datagrid .dx-editor-cell .dx-dropdowneditor-icon {
   -webkit-box-shadow: none;
-  box-shadow: none;
+          box-shadow: none;
 }
 .dx-datagrid .dx-error-row .dx-closebutton {
   float: right;
@@ -5312,7 +5293,7 @@
   border: 1px solid #C8C8C8;
   overflow: inherit;
   -webkit-box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.15);
-  box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.15);
+          box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.15);
 }
 .dx-datagrid-filter-range-overlay .dx-overlay-content .dx-texteditor-container {
   border: none;
@@ -5387,7 +5368,7 @@
 .dx-datagrid-column-chooser .dx-overlay-content {
   border-radius: 0px;
   -webkit-box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.2);
-  box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.2);
+          box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.2);
 }
 .dx-datagrid-column-chooser .dx-overlay-content .dx-popup-content .dx-list-item-content::after {
   height: 0px;
@@ -5396,7 +5377,7 @@
   padding: 0px;
   border: 1px solid #C8C8C8;
   -webkit-box-shadow: 0px 1px 3px -1px rgba(0, 0, 0, 0.2);
-  box-shadow: 0px 1px 3px -1px rgba(0, 0, 0, 0.2);
+          box-shadow: 0px 1px 3px -1px rgba(0, 0, 0, 0.2);
   background-color: #E5E5E5;
 }
 .dx-datagrid-column-chooser .dx-overlay-content .dx-popup-content .dx-column-chooser-item .dx-treeview-item-content {
@@ -5411,7 +5392,7 @@
 }
 .dx-datagrid-drag-header {
   -webkit-box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.1), 0px 1px 3px rgba(0, 0, 0, 0.2);
-  box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.1), 0px 1px 3px rgba(0, 0, 0, 0.2);
+          box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.1), 0px 1px 3px rgba(0, 0, 0, 0.2);
   text-transform: uppercase;
   font-size: 0.9em;
   font-weight: bold;
@@ -5996,7 +5977,7 @@
 }
 .dx-treelist .dx-editor-cell .dx-dropdowneditor-icon {
   -webkit-box-shadow: none;
-  box-shadow: none;
+          box-shadow: none;
 }
 .dx-treelist .dx-error-row .dx-closebutton {
   float: right;
@@ -6046,7 +6027,7 @@
   border: 1px solid #C8C8C8;
   overflow: inherit;
   -webkit-box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.15);
-  box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.15);
+          box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.15);
 }
 .dx-treelist-filter-range-overlay .dx-overlay-content .dx-texteditor-container {
   border: none;
@@ -6121,7 +6102,7 @@
 .dx-treelist-column-chooser .dx-overlay-content {
   border-radius: 0px;
   -webkit-box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.2);
-  box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.2);
+          box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.2);
 }
 .dx-treelist-column-chooser .dx-overlay-content .dx-popup-content .dx-list-item-content::after {
   height: 0px;
@@ -6130,7 +6111,7 @@
   padding: 0px;
   border: 1px solid #C8C8C8;
   -webkit-box-shadow: 0px 1px 3px -1px rgba(0, 0, 0, 0.2);
-  box-shadow: 0px 1px 3px -1px rgba(0, 0, 0, 0.2);
+          box-shadow: 0px 1px 3px -1px rgba(0, 0, 0, 0.2);
   background-color: #E5E5E5;
 }
 .dx-treelist-column-chooser .dx-overlay-content .dx-popup-content .dx-column-chooser-item .dx-treeview-item-content {
@@ -6145,7 +6126,7 @@
 }
 .dx-treelist-drag-header {
   -webkit-box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.1), 0px 1px 3px rgba(0, 0, 0, 0.2);
-  box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.1), 0px 1px 3px rgba(0, 0, 0, 0.2);
+          box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.1), 0px 1px 3px rgba(0, 0, 0, 0.2);
   text-transform: uppercase;
   font-size: 0.9em;
   font-weight: bold;
@@ -6547,7 +6528,7 @@
 .dx-rtl .dx-treelist-rowsview .dx-treelist-expanded,
 .dx-rtl .dx-treelist-rowsview .dx-treelist-collapsed {
   -webkit-transform: scaleX(-1);
-  transform: scaleX(-1);
+          transform: scaleX(-1);
 }
 .dx-rtl .dx-treelist-rowsview .dx-treelist-table-fixed .dx-treelist-icon-container {
   float: right;
@@ -6652,7 +6633,7 @@
   border: 1px solid #dfdfdf;
   border-radius: 7px;
   -webkit-box-shadow: 0px 1px 11px 1px rgba(0, 0, 0, 0.15);
-  box-shadow: 0px 1px 11px 1px rgba(0, 0, 0, 0.15);
+          box-shadow: 0px 1px 11px 1px rgba(0, 0, 0, 0.15);
 }
 .dx-menu-adaptive-mode .dx-treeview-node {
   padding-left: 31px;
@@ -6681,7 +6662,7 @@
   background-color: #f3f3f3;
   border-radius: 7px;
   -webkit-box-shadow: 0px 1px 11px 1px rgba(0, 0, 0, 0.15);
-  box-shadow: 0px 1px 11px 1px rgba(0, 0, 0, 0.15);
+          box-shadow: 0px 1px 11px 1px rgba(0, 0, 0, 0.15);
   margin-left: -5px;
 }
 .dx-context-menu .dx-menu-item-wrapper {
@@ -6691,9 +6672,7 @@
   border-bottom: none;
 }
 .dx-context-menu .dx-menu-item-wrapper:first-child > .dx-menu-item {
-  -moz-border-top-left-radius: 7px;
   border-top-left-radius: 7px;
-  -moz-border-top-right-radius: 7px;
   border-top-right-radius: 7px;
 }
 .dx-context-menu .dx-menu-item-wrapper:last-child {
@@ -6701,9 +6680,7 @@
 }
 .dx-context-menu .dx-menu-item-wrapper:last-child > .dx-menu-item {
   border-bottom: none;
-  -moz-border-bottom-left-radius: 7px;
   border-bottom-left-radius: 7px;
-  -moz-border-bottom-right-radius: 7px;
   border-bottom-right-radius: 7px;
 }
 .dx-context-menu .dx-menu-separator {
@@ -6740,7 +6717,7 @@
 .dx-rtl .dx-context-menu .dx-menu-item-content .dx-menu-item-popout,
 .dx-rtl.dx-context-menu .dx-menu-item-content .dx-menu-item-popout {
   -webkit-transform: scaleX(-1);
-  transform: scaleX(-1);
+          transform: scaleX(-1);
 }
 .dx-context-menu .dx-menu-no-icons > .dx-menu-item-wrapper > .dx-menu-item > .dx-menu-item-content .dx-menu-item-text {
   padding: 9px 35px 11px 0;
@@ -7233,7 +7210,7 @@
   height: 100%;
   text-align: left;
   -webkit-box-sizing: content-box;
-  box-sizing: content-box;
+          box-sizing: content-box;
 }
 .dx-field-value.dx-lookup .dx-lookup-field {
   padding: 8px 40px 8px 8px;
@@ -7248,7 +7225,7 @@
 .dx-field-value .dx-tagbox-single-line {
   border: none;
   -webkit-box-shadow: none;
-  box-shadow: none;
+          box-shadow: none;
 }
 .dx-field-value.dx-textarea {
   padding-top: 2px;
@@ -7317,7 +7294,7 @@
 }
 .dx-field-value:not(.dx-widget) > .dx-lookup {
   -webkit-box-sizing: content-box;
-  box-sizing: content-box;
+          box-sizing: content-box;
   padding-right: 10px;
   margin-right: -10px;
   min-height: 39px;
@@ -7441,7 +7418,7 @@
 @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
   .dx-field-value:not(.dx-widget) > .dx-lookup {
     -webkit-box-sizing: content-box;
-    box-sizing: content-box;
+            box-sizing: content-box;
     padding-right: 10px;
     margin-right: -10px;
     min-height: 41px;
@@ -7545,6 +7522,7 @@
   width: 50px;
 }
 .dx-scheduler-fixed-appointments {
+  width: 100%;
   z-index: 100;
   position: absolute;
   left: 100px;
@@ -7651,7 +7629,7 @@
   position: absolute;
   pointer-events: none;
   -webkit-box-shadow: 0 1px 0 0px rgba(255, 255, 255, 0.1);
-  box-shadow: 0 1px 0 0px rgba(255, 255, 255, 0.1);
+          box-shadow: 0 1px 0 0px rgba(255, 255, 255, 0.1);
 }
 .dx-scheduler-date-time-indicator:before {
   font-size: 30px;
@@ -7750,12 +7728,11 @@
 .dx-scheduler-timeline-month .dx-scheduler-header-panel {
   display: -webkit-box;
   display: -webkit-flex;
-  display: -moz-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-flex-flow: row nowrap;
   -webkit-box-orient: horizontal;
   -webkit-box-direction: normal;
+  -webkit-flex-flow: row nowrap;
       -ms-flex-flow: row nowrap;
           flex-flow: row nowrap;
 }
@@ -7765,12 +7742,11 @@
 .dx-scheduler-timeline-month .dx-scheduler-header-panel thead {
   display: -webkit-box;
   display: -webkit-flex;
-  display: -moz-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-flex-flow: column nowrap;
   -webkit-box-orient: vertical;
   -webkit-box-direction: normal;
+  -webkit-flex-flow: column nowrap;
       -ms-flex-flow: column nowrap;
           flex-flow: column nowrap;
   width: 100%;
@@ -7781,12 +7757,11 @@
 .dx-scheduler-timeline-month .dx-scheduler-header-row {
   display: -webkit-box;
   display: -webkit-flex;
-  display: -moz-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-flex-flow: row nowrap;
   -webkit-box-orient: horizontal;
   -webkit-box-direction: normal;
+  -webkit-flex-flow: row nowrap;
       -ms-flex-flow: row nowrap;
           flex-flow: row nowrap;
 }
@@ -7808,12 +7783,11 @@
           align-items: center;
   display: -webkit-box;
   display: -webkit-flex;
-  display: -moz-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-flex-flow: row nowrap;
   -webkit-box-orient: horizontal;
   -webkit-box-direction: normal;
+  -webkit-flex-flow: row nowrap;
       -ms-flex-flow: row nowrap;
           flex-flow: row nowrap;
 }
@@ -7858,7 +7832,7 @@
 .dx-scheduler-timeline .dx-scheduler-header-panel-cell.dx-scheduler-header-panel-current-time-cell {
   border-bottom: 2px solid #007aff;
   -webkit-box-shadow: none;
-  box-shadow: none;
+          box-shadow: none;
 }
 .dx-scheduler-timeline .dx-scheduler-header-panel-cell.dx-scheduler-header-panel-current-time-cell:before {
   content: none;
@@ -7966,10 +7940,9 @@
 .dx-scheduler-time-panel-cell,
 .dx-scheduler-group-header {
   -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  -o-user-select: none;
-  user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
   -webkit-touch-callout: none;
   cursor: default;
 }
@@ -8188,24 +8161,22 @@
 .dx-scheduler-timeline .dx-scheduler-date-table {
   display: -webkit-box;
   display: -webkit-flex;
-  display: -moz-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-flex-flow: column nowrap;
   -webkit-box-orient: vertical;
   -webkit-box-direction: normal;
+  -webkit-flex-flow: column nowrap;
       -ms-flex-flow: column nowrap;
           flex-flow: column nowrap;
 }
 .dx-scheduler-timeline .dx-scheduler-date-table tbody {
   display: -webkit-box;
   display: -webkit-flex;
-  display: -moz-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-flex-flow: column nowrap;
   -webkit-box-orient: vertical;
   -webkit-box-direction: normal;
+  -webkit-flex-flow: column nowrap;
       -ms-flex-flow: column nowrap;
           flex-flow: column nowrap;
   height: 100%;
@@ -8214,12 +8185,11 @@
 .dx-scheduler-timeline .dx-scheduler-date-table .dx-scheduler-date-table-row {
   display: -webkit-box;
   display: -webkit-flex;
-  display: -moz-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-flex-flow: row nowrap;
   -webkit-box-orient: horizontal;
   -webkit-box-direction: normal;
+  -webkit-flex-flow: row nowrap;
       -ms-flex-flow: row nowrap;
           flex-flow: row nowrap;
   -webkit-box-flex: 1;
@@ -8230,12 +8200,11 @@
 .dx-scheduler-timeline .dx-scheduler-date-table .dx-scheduler-date-table-cell {
   display: -webkit-box;
   display: -webkit-flex;
-  display: -moz-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-flex-flow: row nowrap;
   -webkit-box-orient: horizontal;
   -webkit-box-direction: normal;
+  -webkit-flex-flow: row nowrap;
       -ms-flex-flow: row nowrap;
           flex-flow: row nowrap;
   -webkit-box-align: stretch;
@@ -8253,24 +8222,22 @@
   border-collapse: separate;
   display: -webkit-box;
   display: -webkit-flex;
-  display: -moz-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-flex-flow: column nowrap;
   -webkit-box-orient: vertical;
   -webkit-box-direction: normal;
+  -webkit-flex-flow: column nowrap;
       -ms-flex-flow: column nowrap;
           flex-flow: column nowrap;
 }
 .dx-scheduler-timeline .dx-scheduler-group-table tbody {
   display: -webkit-box;
   display: -webkit-flex;
-  display: -moz-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-flex-flow: column nowrap;
   -webkit-box-orient: vertical;
   -webkit-box-direction: normal;
+  -webkit-flex-flow: column nowrap;
       -ms-flex-flow: column nowrap;
           flex-flow: column nowrap;
   height: 100%;
@@ -8278,12 +8245,11 @@
 .dx-scheduler-timeline .dx-scheduler-group-row {
   display: -webkit-box;
   display: -webkit-flex;
-  display: -moz-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-flex-flow: row nowrap;
   -webkit-box-orient: horizontal;
   -webkit-box-direction: normal;
+  -webkit-flex-flow: row nowrap;
       -ms-flex-flow: row nowrap;
           flex-flow: row nowrap;
   -webkit-box-flex: 1;
@@ -8294,12 +8260,11 @@
 .dx-scheduler-timeline .dx-scheduler-group-header {
   display: -webkit-box;
   display: -webkit-flex;
-  display: -moz-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-flex-flow: row nowrap;
   -webkit-box-orient: horizontal;
   -webkit-box-direction: normal;
+  -webkit-flex-flow: row nowrap;
       -ms-flex-flow: row nowrap;
           flex-flow: row nowrap;
   -webkit-box-align: center;
@@ -8427,6 +8392,9 @@
 .dx-scheduler-timeline.dx-scheduler-work-space-grouped[dx-group-column-count='1'] .dx-scheduler-sidebar-scrollable:before {
   width: 100px;
 }
+.dx-scheduler-timeline.dx-scheduler-work-space-grouped[dx-group-column-count='1'] .dx-scheduler-group-header-content {
+  width: 100%;
+}
 .dx-scheduler-timeline.dx-scheduler-work-space-grouped[dx-group-column-count='1'] .dx-scheduler-date-table-scrollable,
 .dx-scheduler-timeline.dx-scheduler-work-space-grouped[dx-group-column-count='1'] .dx-scheduler-header-scrollable {
   margin-left: 100px;
@@ -8444,6 +8412,9 @@
 .dx-scheduler-timeline.dx-scheduler-work-space-grouped[dx-group-column-count='2'] .dx-scheduler-sidebar-scrollable:before {
   width: 160px;
 }
+.dx-scheduler-timeline.dx-scheduler-work-space-grouped[dx-group-column-count='2'] .dx-scheduler-group-header-content {
+  width: 100%;
+}
 .dx-scheduler-timeline.dx-scheduler-work-space-grouped[dx-group-column-count='2'] .dx-scheduler-date-table-scrollable,
 .dx-scheduler-timeline.dx-scheduler-work-space-grouped[dx-group-column-count='2'] .dx-scheduler-header-scrollable {
   margin-left: 160px;
@@ -8460,6 +8431,9 @@
 .dx-scheduler-timeline.dx-scheduler-work-space-grouped[dx-group-column-count='3'] .dx-scheduler-sidebar-scrollable,
 .dx-scheduler-timeline.dx-scheduler-work-space-grouped[dx-group-column-count='3'] .dx-scheduler-sidebar-scrollable:before {
   width: 180px;
+}
+.dx-scheduler-timeline.dx-scheduler-work-space-grouped[dx-group-column-count='3'] .dx-scheduler-group-header-content {
+  width: 100%;
 }
 .dx-scheduler-timeline.dx-scheduler-work-space-grouped[dx-group-column-count='3'] .dx-scheduler-date-table-scrollable,
 .dx-scheduler-timeline.dx-scheduler-work-space-grouped[dx-group-column-count='3'] .dx-scheduler-header-scrollable {
@@ -8892,7 +8866,6 @@
   text-align: center;
   font-weight: normal;
   overflow: hidden;
-  -ms-text-overflow: ellipsis;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -8923,10 +8896,9 @@
   text-align: center;
   border-bottom: 2px solid rgba(200, 200, 200, 0.6);
   -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  -o-user-select: none;
-  user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
   -webkit-touch-callout: none;
 }
 .dx-scheduler-small .dx-scheduler-all-day-title {
@@ -9067,15 +9039,14 @@
   position: absolute;
   cursor: default;
   -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  -o-user-select: none;
-  user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
   -webkit-touch-callout: none;
   background-color: #65bccd;
   color: #000;
   -webkit-box-shadow: inset 0px 2px 0px 0px rgba(0, 0, 0, 0.3);
-  box-shadow: inset 0px 2px 0px 0px rgba(0, 0, 0, 0.3);
+          box-shadow: inset 0px 2px 0px 0px rgba(0, 0, 0, 0.3);
   left: 0;
   min-width: 4px;
   min-height: 4px;
@@ -9083,11 +9054,11 @@
 .dx-scheduler-appointment.dx-state-active,
 .dx-scheduler-appointment.dx-resizable-resizing {
   -webkit-box-shadow: inset 0px -2px 0px 0px rgba(0, 0, 0, 0.3), inset 0px 2px 0px 0px rgba(0, 0, 0, 0.3);
-  box-shadow: inset 0px -2px 0px 0px rgba(0, 0, 0, 0.3), inset 0px 2px 0px 0px rgba(0, 0, 0, 0.3);
+          box-shadow: inset 0px -2px 0px 0px rgba(0, 0, 0, 0.3), inset 0px 2px 0px 0px rgba(0, 0, 0, 0.3);
 }
 .dx-scheduler-appointment.dx-state-focused {
   -webkit-box-shadow: none;
-  box-shadow: none;
+          box-shadow: none;
 }
 .dx-scheduler-appointment.dx-state-focused:before {
   pointer-events: none;
@@ -9104,11 +9075,11 @@
 }
 .dx-scheduler-appointment.dx-state-hover {
   -webkit-box-shadow: inset 0px 5px 0px 0px rgba(0, 0, 0, 0.3);
-  box-shadow: inset 0px 5px 0px 0px rgba(0, 0, 0, 0.3);
+          box-shadow: inset 0px 5px 0px 0px rgba(0, 0, 0, 0.3);
 }
 .dx-scheduler-appointment.dx-state-hover.dx-resizable {
   -webkit-box-shadow: inset 0px 5px 0px 0px rgba(0, 0, 0, 0.3), inset 0px -2px 0px 0px rgba(0, 0, 0, 0.3);
-  box-shadow: inset 0px 5px 0px 0px rgba(0, 0, 0, 0.3), inset 0px -2px 0px 0px rgba(0, 0, 0, 0.3);
+          box-shadow: inset 0px 5px 0px 0px rgba(0, 0, 0, 0.3), inset 0px -2px 0px 0px rgba(0, 0, 0, 0.3);
 }
 .dx-scheduler-appointment.dx-state-hover .dx-resizable-handle-top {
   height: 5px;
@@ -9118,7 +9089,7 @@
 }
 .dx-scheduler-appointment.dx-draggable-dragging {
   -webkit-box-shadow: 7px 7px 15px 0px rgba(50, 50, 50, 0.2), inset 0px -2px 0px 0px rgba(0, 0, 0, 0.3), inset 0px 2px 0px 0px rgba(0, 0, 0, 0.3);
-  box-shadow: 7px 7px 15px 0px rgba(50, 50, 50, 0.2), inset 0px -2px 0px 0px rgba(0, 0, 0, 0.3), inset 0px 2px 0px 0px rgba(0, 0, 0, 0.3);
+          box-shadow: 7px 7px 15px 0px rgba(50, 50, 50, 0.2), inset 0px -2px 0px 0px rgba(0, 0, 0, 0.3), inset 0px 2px 0px 0px rgba(0, 0, 0, 0.3);
 }
 .dx-scheduler-appointment.dx-resizable-resizing,
 .dx-scheduler-appointment.dx-draggable-dragging {
@@ -9173,13 +9144,13 @@
 .dx-scheduler-work-space-month .dx-scheduler-appointment,
 .dx-scheduler-all-day-appointment {
   -webkit-box-shadow: inset 2px 0px 0px 0px rgba(0, 0, 0, 0.3);
-  box-shadow: inset 2px 0px 0px 0px rgba(0, 0, 0, 0.3);
+          box-shadow: inset 2px 0px 0px 0px rgba(0, 0, 0, 0.3);
 }
 .dx-rtl .dx-scheduler-timeline .dx-scheduler-appointment,
 .dx-rtl .dx-scheduler-work-space-month .dx-scheduler-appointment,
 .dx-rtl .dx-scheduler-all-day-appointment {
   -webkit-box-shadow: inset -2px 0px 0px 0px rgba(0, 0, 0, 0.3);
-  box-shadow: inset -2px 0px 0px 0px rgba(0, 0, 0, 0.3);
+          box-shadow: inset -2px 0px 0px 0px rgba(0, 0, 0, 0.3);
 }
 .dx-scheduler-timeline .dx-scheduler-appointment.dx-state-active,
 .dx-scheduler-work-space-month .dx-scheduler-appointment.dx-state-active,
@@ -9188,13 +9159,13 @@
 .dx-scheduler-work-space-month .dx-scheduler-appointment.dx-resizable-resizing,
 .dx-scheduler-all-day-appointment.dx-resizable-resizing {
   -webkit-box-shadow: inset -2px 0px 0px 0px rgba(0, 0, 0, 0.3), inset 2px 0px 0px 0px rgba(0, 0, 0, 0.3);
-  box-shadow: inset -2px 0px 0px 0px rgba(0, 0, 0, 0.3), inset 2px 0px 0px 0px rgba(0, 0, 0, 0.3);
+          box-shadow: inset -2px 0px 0px 0px rgba(0, 0, 0, 0.3), inset 2px 0px 0px 0px rgba(0, 0, 0, 0.3);
 }
 .dx-scheduler-timeline .dx-scheduler-appointment.dx-state-focused,
 .dx-scheduler-work-space-month .dx-scheduler-appointment.dx-state-focused,
 .dx-scheduler-all-day-appointment.dx-state-focused {
   -webkit-box-shadow: none;
-  box-shadow: none;
+          box-shadow: none;
 }
 .dx-scheduler-timeline .dx-scheduler-appointment.dx-state-focused:before,
 .dx-scheduler-work-space-month .dx-scheduler-appointment.dx-state-focused:before,
@@ -9217,31 +9188,31 @@
 .dx-scheduler-work-space-month .dx-scheduler-appointment.dx-state-hover,
 .dx-scheduler-all-day-appointment.dx-state-hover {
   -webkit-box-shadow: inset 5px 0px 0px 0px rgba(0, 0, 0, 0.3);
-  box-shadow: inset 5px 0px 0px 0px rgba(0, 0, 0, 0.3);
+          box-shadow: inset 5px 0px 0px 0px rgba(0, 0, 0, 0.3);
 }
 .dx-scheduler-timeline .dx-scheduler-appointment.dx-state-hover.dx-resizable,
 .dx-scheduler-work-space-month .dx-scheduler-appointment.dx-state-hover.dx-resizable,
 .dx-scheduler-all-day-appointment.dx-state-hover.dx-resizable {
   -webkit-box-shadow: inset 5px 0px 0px 0px rgba(0, 0, 0, 0.3), inset -2px 0px 0px 0px rgba(0, 0, 0, 0.3);
-  box-shadow: inset 5px 0px 0px 0px rgba(0, 0, 0, 0.3), inset -2px 0px 0px 0px rgba(0, 0, 0, 0.3);
+          box-shadow: inset 5px 0px 0px 0px rgba(0, 0, 0, 0.3), inset -2px 0px 0px 0px rgba(0, 0, 0, 0.3);
 }
 .dx-rtl .dx-scheduler-timeline .dx-scheduler-appointment.dx-state-hover,
 .dx-rtl .dx-scheduler-work-space-month .dx-scheduler-appointment.dx-state-hover,
 .dx-rtl .dx-scheduler-all-day-appointment.dx-state-hover {
   -webkit-box-shadow: inset -5px 0px 0px 0px rgba(0, 0, 0, 0.3);
-  box-shadow: inset -5px 0px 0px 0px rgba(0, 0, 0, 0.3);
+          box-shadow: inset -5px 0px 0px 0px rgba(0, 0, 0, 0.3);
 }
 .dx-rtl .dx-scheduler-timeline .dx-scheduler-appointment.dx-state-hover.dx-resizable,
 .dx-rtl .dx-scheduler-work-space-month .dx-scheduler-appointment.dx-state-hover.dx-resizable,
 .dx-rtl .dx-scheduler-all-day-appointment.dx-state-hover.dx-resizable {
   -webkit-box-shadow: inset -5px 0px 0px 0px rgba(0, 0, 0, 0.3), inset 2px 0px 0px 0px rgba(0, 0, 0, 0.3);
-  box-shadow: inset -5px 0px 0px 0px rgba(0, 0, 0, 0.3), inset 2px 0px 0px 0px rgba(0, 0, 0, 0.3);
+          box-shadow: inset -5px 0px 0px 0px rgba(0, 0, 0, 0.3), inset 2px 0px 0px 0px rgba(0, 0, 0, 0.3);
 }
 .dx-scheduler-timeline .dx-scheduler-appointment.dx-draggable-dragging,
 .dx-scheduler-work-space-month .dx-scheduler-appointment.dx-draggable-dragging,
 .dx-scheduler-all-day-appointment.dx-draggable-dragging {
   -webkit-box-shadow: inset -2px 0px 0px 0px rgba(0, 0, 0, 0.3), inset 2px 0px 0px 0px rgba(0, 0, 0, 0.3), 7px 7px 15px 0px rgba(50, 50, 50, 0.2);
-  box-shadow: inset -2px 0px 0px 0px rgba(0, 0, 0, 0.3), inset 2px 0px 0px 0px rgba(0, 0, 0, 0.3), 7px 7px 15px 0px rgba(50, 50, 50, 0.2);
+          box-shadow: inset -2px 0px 0px 0px rgba(0, 0, 0, 0.3), inset 2px 0px 0px 0px rgba(0, 0, 0, 0.3), 7px 7px 15px 0px rgba(50, 50, 50, 0.2);
 }
 .dx-scheduler-all-day-appointment .dx-scheduler-appointment-reduced-icon {
   position: absolute;
@@ -9254,7 +9225,6 @@
 }
 .dx-scheduler-group-header-content div {
   overflow: hidden;
-  -ms-text-overflow: ellipsis;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -9282,7 +9252,6 @@
   cursor: pointer;
   height: 100%;
   overflow: hidden;
-  -ms-text-overflow: ellipsis;
   text-overflow: ellipsis;
   white-space: nowrap;
   opacity: .99;
@@ -9292,7 +9261,6 @@
 }
 .dx-scheduler-appointment-content > * {
   overflow: hidden;
-  -ms-text-overflow: ellipsis;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -9314,7 +9282,6 @@
   opacity: .7;
   display: inline-block;
   overflow: hidden;
-  -ms-text-overflow: ellipsis;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -9331,7 +9298,6 @@
 .dx-scheduler-appointment-tooltip-date,
 .dx-scheduler-appointment-tooltip-title {
   overflow: hidden;
-  -ms-text-overflow: ellipsis;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -9420,7 +9386,7 @@
   color: #000;
   border: none;
   -webkit-box-shadow: none;
-  box-shadow: none;
+          box-shadow: none;
 }
 .dx-scheduler-dropdown-appointments.dx-button .dx-button-content,
 .dx-scheduler-dropdown-appointments.dx-button.dx-state-hover .dx-button-content,
@@ -9527,7 +9493,7 @@
 .dx-scheduler-agenda .dx-scheduler-appointment {
   position: relative;
   -webkit-box-shadow: none;
-  box-shadow: none;
+          box-shadow: none;
 }
 .dx-scheduler-agenda .dx-scheduler-time-panel {
   margin-top: 0;
@@ -9691,7 +9657,6 @@
 .dx-scheduler-agenda .dx-scheduler-appointment-content-allday {
   display: inline-block;
   overflow: hidden;
-  -ms-text-overflow: ellipsis;
   text-overflow: ellipsis;
   white-space: nowrap;
   padding-right: 5px;
@@ -9763,12 +9728,11 @@
 .dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline .dx-scheduler-header-panel {
   display: -webkit-box;
   display: -webkit-flex;
-  display: -moz-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-flex-flow: row nowrap;
   -webkit-box-orient: horizontal;
   -webkit-box-direction: normal;
+  -webkit-flex-flow: row nowrap;
       -ms-flex-flow: row nowrap;
           flex-flow: row nowrap;
 }
@@ -9776,12 +9740,11 @@
 .dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline .dx-scheduler-group-row {
   display: -webkit-box;
   display: -webkit-flex;
-  display: -moz-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-flex-flow: row nowrap;
   -webkit-box-orient: horizontal;
   -webkit-box-direction: normal;
+  -webkit-flex-flow: row nowrap;
       -ms-flex-flow: row nowrap;
           flex-flow: row nowrap;
 }
@@ -9795,12 +9758,11 @@
           flex-basis: 0;
   display: -webkit-box;
   display: -webkit-flex;
-  display: -moz-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-flex-flow: row nowrap;
   -webkit-box-orient: horizontal;
   -webkit-box-direction: normal;
+  -webkit-flex-flow: row nowrap;
       -ms-flex-flow: row nowrap;
           flex-flow: row nowrap;
 }
@@ -9817,6 +9779,9 @@
 }
 .dx-scheduler-work-space-vertical-grouped[dx-group-column-count='1'] .dx-scheduler-work-space-vertical-group-table {
   width: 100px;
+}
+.dx-scheduler-work-space-vertical-grouped[dx-group-column-count='1'] .dx-scheduler-group-header-content {
+  width: 100%;
 }
 .dx-scheduler-work-space-vertical-grouped[dx-group-column-count='1'] .dx-scheduler-date-table {
   margin-left: -200px;
@@ -9895,6 +9860,9 @@
 .dx-scheduler-work-space-vertical-grouped[dx-group-column-count='2'] .dx-scheduler-work-space-vertical-group-table {
   width: 150px;
 }
+.dx-scheduler-work-space-vertical-grouped[dx-group-column-count='2'] .dx-scheduler-group-header-content {
+  width: 100%;
+}
 .dx-scheduler-work-space-vertical-grouped[dx-group-column-count='2'] .dx-scheduler-date-table {
   margin-left: -250px;
 }
@@ -9971,6 +9939,9 @@
 }
 .dx-scheduler-work-space-vertical-grouped[dx-group-column-count='3'] .dx-scheduler-work-space-vertical-group-table {
   width: 200px;
+}
+.dx-scheduler-work-space-vertical-grouped[dx-group-column-count='3'] .dx-scheduler-group-header-content {
+  width: 100%;
 }
 .dx-scheduler-work-space-vertical-grouped[dx-group-column-count='3'] .dx-scheduler-date-table {
   margin-left: -300px;
@@ -10055,12 +10026,11 @@
   border-collapse: collapse;
   display: -webkit-box;
   display: -webkit-flex;
-  display: -moz-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-flex-flow: column nowrap;
   -webkit-box-orient: vertical;
   -webkit-box-direction: normal;
+  -webkit-flex-flow: column nowrap;
       -ms-flex-flow: column nowrap;
           flex-flow: column nowrap;
 }
@@ -10068,24 +10038,22 @@
   height: 100%;
   display: -webkit-box;
   display: -webkit-flex;
-  display: -moz-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-flex-flow: column nowrap;
   -webkit-box-orient: vertical;
   -webkit-box-direction: normal;
+  -webkit-flex-flow: column nowrap;
       -ms-flex-flow: column nowrap;
           flex-flow: column nowrap;
 }
 .dx-scheduler-work-space-vertical-grouped .dx-scheduler-group-row {
   display: -webkit-box;
   display: -webkit-flex;
-  display: -moz-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-flex-flow: row nowrap;
   -webkit-box-orient: horizontal;
   -webkit-box-direction: normal;
+  -webkit-flex-flow: row nowrap;
       -ms-flex-flow: row nowrap;
           flex-flow: row nowrap;
   -webkit-box-flex: 1;
@@ -10099,12 +10067,11 @@
 .dx-scheduler-work-space-vertical-grouped .dx-scheduler-group-header {
   display: -webkit-box;
   display: -webkit-flex;
-  display: -moz-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-flex-flow: row nowrap;
   -webkit-box-orient: horizontal;
   -webkit-box-direction: normal;
+  -webkit-flex-flow: row nowrap;
       -ms-flex-flow: row nowrap;
           flex-flow: row nowrap;
   -webkit-box-flex: 1;
