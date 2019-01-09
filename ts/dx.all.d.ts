@@ -1,9 +1,9 @@
 /*!
 * DevExtreme (dx.all.d.ts)
-* Version: 18.1.7 (build 18348)
-* Build date: Fri Dec 14 2018
+* Version: 18.1.7 (build 19009)
+* Build date: Wed Jan 09 2019
 *
-* Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
+* Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
 */
 /* #StartGlobalDeclaration */
@@ -2497,7 +2497,7 @@ declare module DevExpress.ui {
         labelText?: string;
         /** Specifies whether the widget enables an end-user to select a single file or multiple files. */
         multiple?: boolean;
-        /** Specifies the value passed to the name attribute of the underlying input element. */
+        /** Specifies the value passed to the name attribute of the underlying input element. Required to access uploaded files on the server. */
         name?: string;
         /** A function that is executed when a file segment is uploaded. */
         onProgress?: ((e: { component?: dxFileUploader, element?: DevExpress.core.dxElement, model?: any, file?: File, segmentSize?: number, bytesLoaded?: number, bytesTotal?: number, jQueryEvent?: JQueryEventObject, event?: event, request?: XMLHttpRequest }) => any);
@@ -3547,6 +3547,7 @@ declare module DevExpress.ui {
         currentDate?: Date | number | string;
         /** Specifies the currently displayed view. Accepts the view's name or type. */
         currentView?: 'agenda' | 'day' | 'month' | 'timelineDay' | 'timelineMonth' | 'timelineWeek' | 'timelineWorkWeek' | 'week' | 'workWeek';
+        customizeDateNavigatorText?: ((info: { startDate?: Date, endDate?: Date, text?: string }) => string);
         /** Specifies a custom template for table cells. */
         dataCellTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery);
         /** Specifies the origin of data for the widget. */
@@ -3565,7 +3566,7 @@ declare module DevExpress.ui {
         endDateExpr?: string;
         /** Specifies the name of the data source item field that defines the timezone of the appointment end date. */
         endDateTimeZoneExpr?: string;
-        /** Specifies an end hour in the scheduler view's time interval. */
+        /** Specifies the last hour in the time scale. Cannot be greater than 24. */
         endDayHour?: number;
         /** Specifies the first day of a week. Does not apply to the agenda view. */
         firstDayOfWeek?: 0 | 1 | 2 | 3 | 4 | 5 | 6;
@@ -3597,7 +3598,7 @@ declare module DevExpress.ui {
         onAppointmentDeleted?: ((e: { component?: dxScheduler, element?: DevExpress.core.dxElement, model?: any, appointmentData?: any, error?: Error }) => any);
         /** A function that is executed before an appointment is deleted from the data source. */
         onAppointmentDeleting?: ((e: { component?: dxScheduler, element?: DevExpress.core.dxElement, model?: any, appointmentData?: any, cancel?: boolean | Promise<boolean> | JQueryPromise<boolean> }) => any);
-        /** A function that is executed when an appointment's edit form is created. */
+        /** A function that is executed before an appointment details form is opened. */
         onAppointmentFormCreated?: ((e: { component?: dxScheduler, element?: DevExpress.core.dxElement, model?: any, appointmentData?: any, form?: dxForm }) => any);
         /** A function that is executed when an appointment is rendered. */
         onAppointmentRendered?: ((e: { component?: dxScheduler, element?: DevExpress.core.dxElement, model?: any, appointmentData?: any, targetedAppointmentData?: any, appointmentElement?: DevExpress.core.dxElement }) => any);
@@ -3633,7 +3634,7 @@ declare module DevExpress.ui {
         startDateExpr?: string;
         /** Specifies the name of the data source item field that defines the timezone of the appointment start date. */
         startDateTimeZoneExpr?: string;
-        /** Specifies a start hour in the scheduler view's time interval. */
+        /** Specifies the first hour in the time scale. */
         startDayHour?: number;
         /** Specifies the name of the data source item field that holds the subject of an appointment. */
         textExpr?: string;
@@ -5642,6 +5643,7 @@ declare module DevExpress.viz {
         getSeriesByPos(seriesIndex: number): chartSeriesObject;
         /** Hides all widget tooltips. */
         hideTooltip(): void;
+        /** Reloads data and repaints the widget. */
         refresh(): void;
         /** Redraws the widget. */
         render(): void;
@@ -6568,6 +6570,7 @@ declare module DevExpress.viz {
     }
     /** A base object for gauge value and subvalue indicators. Includes the options of indicators of all types. */
     export interface GaugeIndicator extends CommonIndicator {
+        /** Specifies the type of gauge indicators. */
         type?: 'circle' | 'rangeBar' | 'rectangle' | 'rectangleNeedle' | 'rhombus' | 'textCloud' | 'triangleMarker' | 'triangleNeedle' | 'twoColorNeedle';
     }
     /** A base object for gauge value and subvalue indicators. Includes the options of indicators of all types. */
