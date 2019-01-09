@@ -1,9 +1,9 @@
 /*!
 * DevExtreme (dx.messages.ru.js)
-* Version: 17.2.11 (build 18323)
-* Build date: Mon Nov 19 2018
+* Version: 17.2.11 (build 19009)
+* Build date: Wed Jan 09 2019
 *
-* Copyright (c) 2012 - 2018 Developer Express Inc. ALL RIGHTS RESERVED
+* Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
 */
 "use strict";
