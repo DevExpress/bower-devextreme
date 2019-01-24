@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 18.1.7 (build 19009)
-* Build date: Jan 9, 2019
+* Version: 18.1.8
+* Build date: Jan 23, 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -5762,9 +5762,6 @@
   -o-border-radius: 0;
   border-radius: 0;
 }
-.dx-popup-wrapper .dx-button.dx-button-has-text {
-  min-width: 64px;
-}
 .dx-popup-title {
   position: relative;
   padding: 0 8px 0 24px;
@@ -6393,12 +6390,41 @@
 .dx-lookup.dx-state-focused:before {
   content: none;
 }
+.dx-lookup.dx-invalid {
+  border-bottom-color: rgba(244, 67, 54, 0.4);
+}
+.dx-lookup.dx-invalid .dx-lookup-arrow:after {
+  pointer-events: none;
+  font-weight: 500;
+  background-color: #F44336;
+  color: #fff;
+  content: '!';
+  position: absolute;
+  top: 50%;
+  margin-top: -11px;
+  width: 22px;
+  height: 22px;
+  -webkit-border-radius: 50%;
+  -moz-border-radius: 50%;
+  -ms-border-radius: 50%;
+  -o-border-radius: 50%;
+  border-radius: 50%;
+  text-align: center;
+  line-height: 23px;
+  font-size: 14px;
+  right: 24px;
+}
+.dx-lookup.dx-invalid.dx-rtl .dx-lookup-arrow:after,
+.dx-rtl .dx-lookup.dx-invalid .dx-lookup-arrow:after {
+  left: 24px;
+  right: auto;
+}
 .dx-lookup-field {
   font-size: 16px;
 }
 .dx-lookup-arrow {
   font: 14px/1 DXIcons;
-  width: 54px;
+  width: 24px;
   color: rgba(0, 0, 0, 0.54);
   font-size: 24px;
   text-align: center;
@@ -6438,9 +6464,6 @@
 }
 .dx-lookup-empty .dx-lookup-field {
   color: rgba(148, 148, 148, 0.87);
-}
-.dx-invalid.dx-lookup {
-  border-bottom-color: rgba(244, 67, 54, 0.4);
 }
 .dx-lookup-validation-message {
   font-size: 14px;
@@ -8398,7 +8421,7 @@
 }
 .dx-datagrid-rowsview .dx-adaptive-detail-row .dx-field-item-content {
   line-height: 40px;
-  height: 40px;
+  min-height: 40px;
   font-size: 14px;
 }
 .dx-datagrid-rowsview .dx-adaptive-detail-row .dx-field-item-content.dx-focused {
@@ -9942,7 +9965,7 @@
 }
 .dx-treelist-rowsview .dx-adaptive-detail-row .dx-field-item-content {
   line-height: 40px;
-  height: 40px;
+  min-height: 40px;
   font-size: 14px;
 }
 .dx-treelist-rowsview .dx-adaptive-detail-row .dx-field-item-content.dx-focused {
@@ -15772,7 +15795,11 @@
 .dx-form-group-with-caption .dx-form-group-content {
   padding-bottom: 20px;
 }
-.dx-scrollable .dx-layout-manager {
+.dx-form > .dx-scrollable-wrapper > .dx-scrollable-container {
+  margin-left: -10px;
+  padding-left: 10px;
+}
+.dx-scrollable-content > .dx-layout-manager {
   padding-right: 5px;
 }
 .dx-layout-manager .dx-field-item:not(.dx-last-col) {
