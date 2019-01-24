@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 18.2.4 (build 19010)
-* Build date: Jan 10, 2019
+* Version: 18.2.5
+* Build date: Jan 23, 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -3140,23 +3140,29 @@
   border-top-right-radius: 4px;
   border-bottom-right-radius: 4px;
 }
-.dx-buttongroup-item.dx-button-mode-outlined.dx-state-disabled {
+.dx-buttongroup-item.dx-button.dx-button-mode-outlined.dx-state-disabled {
   opacity: 1;
 }
-.dx-buttongroup-item.dx-button-mode-outlined.dx-state-disabled .dx-button-content {
+.dx-buttongroup-item.dx-button.dx-button-mode-outlined.dx-state-disabled .dx-button-content {
   opacity: 0.6;
 }
-.dx-buttongroup-item.dx-item-selected {
+.dx-buttongroup-item.dx-button.dx-state-focused {
+  background-color: rgba(255, 255, 255, 0.04);
+}
+.dx-buttongroup-item.dx-button.dx-state-hover {
+  background-color: rgba(255, 255, 255, 0.04);
+}
+.dx-buttongroup-item.dx-button.dx-item-selected {
   background-color: #1f1f24;
 }
-.dx-buttongroup-item.dx-item-selected.dx-button-success {
+.dx-buttongroup-item.dx-button.dx-item-selected.dx-button-success {
   background-color: #71a436;
 }
-.dx-buttongroup-item.dx-item-selected.dx-button-default {
+.dx-buttongroup-item.dx-button.dx-item-selected.dx-button-default {
   background-color: #ee3900;
   color: rgba(0, 0, 0, 0.87);
 }
-.dx-buttongroup-item.dx-item-selected.dx-button-danger {
+.dx-buttongroup-item.dx-button.dx-item-selected.dx-button-danger {
   background-color: #c1134e;
   color: rgba(0, 0, 0, 0.87);
 }
@@ -6099,9 +6105,6 @@
 .dx-popup-wrapper > .dx-popup-fullscreen {
   border-radius: 0;
 }
-.dx-popup-wrapper .dx-button.dx-button-has-text {
-  min-width: 64px;
-}
 .dx-popup-title {
   position: relative;
   padding: 0 8px 0 24px;
@@ -6657,6 +6660,17 @@
 .dx-lookup.dx-editor-outlined .dx-lookup-field {
   padding: 19px 12px 18px;
 }
+.dx-lookup.dx-editor-filled .dx-lookup-arrow,
+.dx-lookup.dx-editor-outlined .dx-lookup-arrow {
+  right: 12px;
+}
+.dx-lookup.dx-editor-filled.dx-rtl .dx-lookup-arrow,
+.dx-lookup.dx-editor-outlined.dx-rtl .dx-lookup-arrow,
+.dx-rtl .dx-lookup.dx-editor-filled .dx-lookup-arrow,
+.dx-rtl .dx-lookup.dx-editor-outlined .dx-lookup-arrow {
+  left: 12px;
+  right: auto;
+}
 .dx-lookup.dx-editor-underlined {
   height: 32px;
 }
@@ -6666,12 +6680,37 @@
 .dx-lookup.dx-state-focused:before {
   content: none;
 }
+.dx-lookup.dx-invalid {
+  border-bottom-color: rgba(233, 30, 99, 0.4);
+}
+.dx-lookup.dx-invalid .dx-lookup-arrow:after {
+  pointer-events: none;
+  font-weight: 500;
+  background-color: #E91E63;
+  color: rgba(0, 0, 0, 0.87);
+  content: '!';
+  position: absolute;
+  top: 50%;
+  margin-top: -11px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  text-align: center;
+  line-height: 23px;
+  font-size: 14px;
+  right: 24px;
+}
+.dx-lookup.dx-invalid.dx-rtl .dx-lookup-arrow:after,
+.dx-rtl .dx-lookup.dx-invalid .dx-lookup-arrow:after {
+  left: 24px;
+  right: auto;
+}
 .dx-lookup-field {
   font-size: 16px;
 }
 .dx-lookup-arrow {
   font: 14px/1 DXIcons;
-  width: 54px;
+  width: 24px;
   color: rgba(255, 255, 255, 0.54);
   font-size: 24px;
   text-align: center;
@@ -6711,9 +6750,6 @@
 }
 .dx-lookup-empty .dx-lookup-field {
   color: #808080;
-}
-.dx-invalid.dx-lookup {
-  border-bottom-color: rgba(233, 30, 99, 0.4);
 }
 .dx-lookup-validation-message {
   font-size: 14px;
@@ -8475,7 +8511,7 @@
 }
 .dx-datagrid-rowsview .dx-adaptive-detail-row .dx-field-item-content {
   line-height: 40px;
-  height: 40px;
+  min-height: 40px;
   font-size: 14px;
 }
 .dx-datagrid-rowsview .dx-adaptive-detail-row .dx-field-item-content.dx-focused {
@@ -9965,7 +10001,7 @@
 }
 .dx-treelist-rowsview .dx-adaptive-detail-row .dx-field-item-content {
   line-height: 40px;
-  height: 40px;
+  min-height: 40px;
   font-size: 14px;
 }
 .dx-treelist-rowsview .dx-adaptive-detail-row .dx-field-item-content.dx-focused {
@@ -15735,7 +15771,11 @@
 .dx-form-group-with-caption .dx-form-group-content {
   padding-bottom: 20px;
 }
-.dx-scrollable .dx-layout-manager {
+.dx-form > .dx-scrollable-wrapper > .dx-scrollable-container {
+  margin-left: -10px;
+  padding-left: 10px;
+}
+.dx-scrollable-content > .dx-layout-manager {
   padding-right: 5px;
 }
 .dx-layout-manager .dx-field-item:not(.dx-last-col) {

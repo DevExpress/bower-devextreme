@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 18.2.4 (build 19010)
-* Build date: Jan 10, 2019
+* Version: 18.2.5
+* Build date: Jan 23, 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -3859,6 +3859,15 @@
       -ms-user-select: initial;
           user-select: initial;
 }
+.dx-datagrid .dx-error-row .dx-error-message {
+  -webkit-user-select: text;
+     -moz-user-select: text;
+      -ms-user-select: text;
+          user-select: text;
+}
+.dx-datagrid .dx-error-row .dx-error-message a {
+  color: inherit;
+}
 .dx-datagrid-column-chooser .dx-overlay-content .dx-popup-title {
   border-bottom: none;
   font-size: 16px;
@@ -5003,6 +5012,15 @@ input.dx-hidden {
      -moz-user-select: initial;
       -ms-user-select: initial;
           user-select: initial;
+}
+.dx-treelist .dx-error-row .dx-error-message {
+  -webkit-user-select: text;
+     -moz-user-select: text;
+      -ms-user-select: text;
+          user-select: text;
+}
+.dx-treelist .dx-error-row .dx-error-message a {
+  color: inherit;
 }
 .dx-treelist-column-chooser .dx-overlay-content .dx-popup-title {
   border-bottom: none;

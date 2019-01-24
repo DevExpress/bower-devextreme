@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 18.2.4 (build 19010)
-* Build date: Jan 10, 2019
+* Version: 18.2.5
+* Build date: Jan 23, 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -2755,40 +2755,46 @@
 .dx-button-mode-text.dx-buttongroup-first-item {
   margin-left: 0;
 }
-.dx-buttongroup-item.dx-button-mode-outlined.dx-state-disabled,
-.dx-buttongroup-item.dx-button-mode-contained.dx-state-disabled {
+.dx-buttongroup-item.dx-button.dx-button-mode-outlined.dx-state-disabled,
+.dx-buttongroup-item.dx-button.dx-button-mode-contained.dx-state-disabled {
   opacity: 1;
 }
-.dx-buttongroup-item.dx-button-mode-outlined.dx-state-disabled .dx-button-content,
-.dx-buttongroup-item.dx-button-mode-contained.dx-state-disabled .dx-button-content {
+.dx-buttongroup-item.dx-button.dx-button-mode-outlined.dx-state-disabled .dx-button-content,
+.dx-buttongroup-item.dx-button.dx-button-mode-contained.dx-state-disabled .dx-button-content {
   opacity: 0.6;
 }
-.dx-buttongroup-item.dx-item-selected {
+.dx-buttongroup-item.dx-button.dx-state-focused {
+  background-color: rgba(51, 51, 51, 0.04);
+}
+.dx-buttongroup-item.dx-button.dx-state-hover {
+  background-color: rgba(51, 51, 51, 0.04);
+}
+.dx-buttongroup-item.dx-button.dx-item-selected {
   background-color: #e6e6e6;
 }
-.dx-buttongroup-item.dx-item-selected.dx-button-success {
+.dx-buttongroup-item.dx-button.dx-item-selected.dx-button-success {
   background-color: #449d44;
 }
-.dx-buttongroup-item.dx-item-selected.dx-button-default {
+.dx-buttongroup-item.dx-button.dx-item-selected.dx-button-default {
   background-color: #285f8f;
 }
-.dx-buttongroup-item.dx-item-selected.dx-button-danger {
+.dx-buttongroup-item.dx-button.dx-item-selected.dx-button-danger {
   background-color: #c9302c;
 }
-.dx-buttongroup-item.dx-item-selected.dx-button-normal,
-.dx-buttongroup-item.dx-item-selected.dx-button-normal .dx-icon {
+.dx-buttongroup-item.dx-button.dx-item-selected.dx-button-normal,
+.dx-buttongroup-item.dx-button.dx-item-selected.dx-button-normal .dx-icon {
   color: #333;
 }
-.dx-buttongroup-item.dx-item-selected.dx-button-success,
-.dx-buttongroup-item.dx-item-selected.dx-button-success .dx-icon {
+.dx-buttongroup-item.dx-button.dx-item-selected.dx-button-success,
+.dx-buttongroup-item.dx-button.dx-item-selected.dx-button-success .dx-icon {
   color: #fff;
 }
-.dx-buttongroup-item.dx-item-selected.dx-button-default,
-.dx-buttongroup-item.dx-item-selected.dx-button-default .dx-icon {
+.dx-buttongroup-item.dx-button.dx-item-selected.dx-button-default,
+.dx-buttongroup-item.dx-button.dx-item-selected.dx-button-default .dx-icon {
   color: #fff;
 }
-.dx-buttongroup-item.dx-item-selected.dx-button-danger,
-.dx-buttongroup-item.dx-item-selected.dx-button-danger .dx-icon {
+.dx-buttongroup-item.dx-button.dx-item-selected.dx-button-danger,
+.dx-buttongroup-item.dx-button.dx-item-selected.dx-button-danger .dx-icon {
   color: #fff;
 }
 .dx-rtl.dx-button-mode-outlined.dx-buttongroup-first-item,
