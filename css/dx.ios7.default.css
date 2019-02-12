@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 18.2.5
-* Build date: Jan 23, 2019
+* Version: 18.2.6
+* Build date: Feb 5, 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -7848,6 +7848,9 @@
   border-top: none;
   float: left;
 }
+.dx-scheduler-work-space.dx-scheduler-timeline-month:not(.dx-scheduler-agenda) .dx-scheduler-date-table-cell {
+  border-right: none;
+}
 .dx-scheduler-work-space.dx-scheduler-work-space-grouped:not(.dx-scheduler-agenda) .dx-scheduler-all-day-title {
   border-top: 1px solid rgba(200, 200, 200, 0.6);
 }
@@ -8193,9 +8196,9 @@
       -ms-flex-flow: row nowrap;
           flex-flow: row nowrap;
   -webkit-box-flex: 1;
-  -webkit-flex-grow: 1;
-      -ms-flex-positive: 1;
-          flex-grow: 1;
+  -webkit-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
 }
 .dx-scheduler-timeline .dx-scheduler-date-table .dx-scheduler-date-table-cell {
   display: -webkit-box;
@@ -8322,7 +8325,7 @@
   height: auto;
 }
 .dx-scheduler-timeline.dx-scheduler-work-space-both-scrollbar .dx-scheduler-date-table .dx-scheduler-date-table-row:first-child .dx-scheduler-date-table-cell {
-  border-top: none;
+  border-top-color: transparent;
 }
 .dx-scheduler-timeline.dx-scheduler-work-space-both-scrollbar .dx-scheduler-header-panel {
   border-bottom: 1px solid #aeaeae;

@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 18.2.5
-* Build date: Jan 23, 2019
+* Version: 18.2.6
+* Build date: Feb 5, 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -3411,11 +3411,24 @@
   border-radius: 2px;
 }
 .dx-texteditor.dx-state-readonly {
-  border-color: rgba(89, 105, 128, 0.5);
+  border-style: dashed;
 }
 .dx-texteditor.dx-state-readonly.dx-editor-filled {
   border-color: transparent;
-  background-color: rgba(255, 255, 255, 0.02);
+  background-color: rgba(255, 255, 255, 0.03);
+}
+.dx-texteditor.dx-state-readonly.dx-editor-filled.dx-state-focused {
+  background-color: rgba(255, 255, 255, 0.03);
+}
+.dx-texteditor.dx-state-readonly.dx-editor-filled.dx-state-hover {
+  background-color: rgba(61, 235, 211, 0.07);
+}
+.dx-texteditor.dx-state-readonly.dx-editor-underlined {
+  border-style: none;
+  border-bottom-style: dashed;
+}
+.dx-texteditor.dx-state-readonly .dx-texteditor-buttons-container {
+  display: none;
 }
 .dx-texteditor.dx-state-hover {
   border-color: rgba(61, 235, 211, 0.4);
@@ -5226,7 +5239,7 @@
   min-width: 100px;
 }
 .dx-popup-content.dx-dialog-content {
-  min-width: 220px;
+  min-width: 180px;
   padding: 20px;
 }
 .dx-dialog-message {
@@ -5346,6 +5359,18 @@
   -webkit-box-shadow: none;
           box-shadow: none;
 }
+.dx-slider .dx-state-active.dx-slider-handle {
+  border: 1px solid #465672;
+  background: #8cf3e5;
+}
+.dx-slider .dx-state-focused.dx-slider-handle:not(.dx-state-active) {
+  border: 1px solid #465672;
+  background: #6bf0dd;
+}
+.dx-slider .dx-state-hover.dx-slider-handle:not(.dx-state-active) {
+  border: 1px solid #465672;
+  background: #6bf0dd;
+}
 .dx-slider-wrapper {
   height: 28px;
 }
@@ -5391,17 +5416,15 @@
 .dx-state-disabled.dx-slider .dx-slider-bar {
   opacity: .5;
 }
-.dx-state-active.dx-slider-handle {
-  border: 1px solid #465672;
-  background: #8cf3e5;
+.dx-invalid .dx-slider-handle {
+  background-color: #f9517e;
 }
-.dx-state-focused.dx-slider-handle:not(.dx-state-active) {
-  border: 1px solid #465672;
-  background: #6bf0dd;
+.dx-invalid .dx-slider-range-visible {
+  background-color: #f9517e;
+  border-color: #f9517e;
 }
-.dx-state-hover.dx-slider-handle:not(.dx-state-active) {
-  border: 1px solid #465672;
-  background: #6bf0dd;
+.dx-invalid .dx-slider-bar {
+  background-color: rgba(249, 81, 126, 0.4);
 }
 .dx-rtl .dx-slider-handle {
   margin-left: -7.5px;
@@ -9566,6 +9589,9 @@
   border-top: none;
   float: left;
 }
+.dx-scheduler-work-space.dx-scheduler-timeline-month:not(.dx-scheduler-agenda) .dx-scheduler-date-table-cell {
+  border-right: none;
+}
 .dx-scheduler-work-space.dx-scheduler-work-space-grouped:not(.dx-scheduler-agenda) .dx-scheduler-all-day-title {
   border-top: 1px solid rgba(89, 105, 128, 0.6);
 }
@@ -9911,9 +9937,9 @@
       -ms-flex-flow: row nowrap;
           flex-flow: row nowrap;
   -webkit-box-flex: 1;
-  -webkit-flex-grow: 1;
-      -ms-flex-positive: 1;
-          flex-grow: 1;
+  -webkit-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
 }
 .dx-scheduler-timeline .dx-scheduler-date-table .dx-scheduler-date-table-cell {
   display: -webkit-box;
@@ -10040,7 +10066,7 @@
   height: auto;
 }
 .dx-scheduler-timeline.dx-scheduler-work-space-both-scrollbar .dx-scheduler-date-table .dx-scheduler-date-table-row:first-child .dx-scheduler-date-table-cell {
-  border-top: none;
+  border-top-color: transparent;
 }
 .dx-scheduler-timeline.dx-scheduler-work-space-both-scrollbar .dx-scheduler-header-panel {
   border-bottom: 1px solid #70829b;
