@@ -1,7 +1,7 @@
 /*!
  * DevExtreme (dx.vectormaputils.node.js)
- * Version: 18.1.8
- * Build date: Wed Jan 23 2019
+ * Version: 18.1.9
+ * Build date: Fri Feb 01 2019
  *
  * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
  * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -199,14 +199,13 @@ function parseShape(stream, errors) {
         timeEnd = new Date
     } catch (e) {
         errors.push("shp: records parsing error: " + e.message + " / " + e.description)
-    } finally {
-        return {
-            bBox: header.bBox_XY,
-            type: header.shapeType,
-            shapes: records,
-            errors: errors,
-            time: timeEnd - timeStart
-        }
+    }
+    return {
+        bBox: header.bBox_XY,
+        type: header.shapeType,
+        shapes: records,
+        errors: errors,
+        time: timeEnd - timeStart
     }
 }
 
@@ -490,12 +489,11 @@ function parseDBF(stream, errors) {
         timeEnd = new Date
     } catch (e) {
         errors.push("dbf: parsing error: " + e.message + " / " + e.description)
-    } finally {
-        return {
-            records: records,
-            errors: errors,
-            time: timeEnd - timeStart
-        }
+    }
+    return {
+        records: records,
+        errors: errors,
+        time: timeEnd - timeStart
     }
 }
 

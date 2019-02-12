@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 18.1.8
-* Build date: Jan 23, 2019
+* Version: 18.1.9
+* Build date: Feb 1, 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -4726,7 +4726,7 @@
   min-width: 100px;
 }
 .dx-popup-content.dx-dialog-content {
-  min-width: 220px;
+  min-width: 200px;
   padding: 10px;
 }
 .dx-dialog-message {
@@ -9644,7 +9644,7 @@
   -ms-flex-wrap: nowrap;
   -ms-flex-flow: row nowrap;
   flex-flow: row nowrap;
-  flex-grow: 1;
+  flex: 1;
 }
 .dx-scheduler-timeline .dx-scheduler-date-table .dx-scheduler-date-table-cell {
   display: -webkit-box;
