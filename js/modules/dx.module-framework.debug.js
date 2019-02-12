@@ -1,9 +1,9 @@
 /*! 
 * DevExtreme (Single Page App Framework)
-* Version: 15.2.17
-* Build date: Nov 3, 2017
+* Version: 15.2.18
+* Build date: Feb 1, 2019
 *
-* Copyright (c) 2012 - 2017 Developer Express Inc. ALL RIGHTS RESERVED
+* Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
 */
 
