@@ -1,6 +1,6 @@
 {
   "name": "devextreme",
-  "version": "17.2.13-pre-19046",
+  "version": "17.2.13-pre-19050",
   "description": "A blazing-fast HTML5 Data Grid and rich libraries of high-performance touch-enabled data vizualization and UI widgets",
   "moduleType": [
     "globals"
