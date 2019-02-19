@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.all.d.ts)
-* Version: 18.2.6
-* Build date: Tue Feb 05 2019
+* Version: 18.2.6 (build 19050)
+* Build date: Tue Feb 19 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -5716,11 +5716,11 @@ declare module DevExpress.ui {
     /** An object that serves as a namespace for methods displaying a message in an application/site. */
     export class dialog {
         /** Creates an alert dialog message containing a single "OK" button. */
-        static alert(message: string, title: string): Promise<void> & JQueryPromise<void>;
+        static alert(messageHtml: string, title: string): Promise<void> & JQueryPromise<void>;
         /** Creates a confirm dialog that contains "Yes" and "No" buttons. */
-        static confirm(message: string, title: string): Promise<boolean> & JQueryPromise<boolean>;
+        static confirm(messageHtml: string, title: string): Promise<boolean> & JQueryPromise<boolean>;
         /** Creates a dialog with custom buttons. */
-        static custom(options: { title?: string, message?: string, buttons?: Array<dxButtonOptions>, showTitle?: boolean }): any;
+        static custom(options: { title?: string, messageHtml?: string, buttons?: Array<dxButtonOptions>, showTitle?: boolean, message?: string }): any;
     }
     /** An object that serves as a namespace for the methods that work with DevExtreme CSS Themes. */
     export class themes {

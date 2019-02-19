@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 18.2.6
-* Build date: Feb 5, 2019
+* Version: 18.2.6 (build 19050)
+* Build date: Feb 19, 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -13286,8 +13286,17 @@
   border-radius: 2px;
   background-color: #f5f5f5;
 }
+.dx-htmleditor {
+  border-color: #dedede;
+}
 .dx-htmleditor .dx-htmleditor-toolbar-wrapper:first-child {
   border-bottom: 1px solid #dedede;
+}
+.dx-htmleditor.dx-invalid {
+  border-color: rgba(247, 74, 94, 0.4);
+}
+.dx-htmleditor.dx-invalid.dx-state-focused {
+  border-color: #f74a5e;
 }
 .dx-htmleditor-content pre {
   color: rgba(40, 72, 79, 0.8);
