@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Core Library)
-* Version: 15.2.18
-* Build date: Feb 1, 2019
+* Version: 15.2.19
+* Build date: Mar 7, 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
@@ -4385,7 +4385,7 @@ if (!window.DevExpress || !DevExpress.MOD_CORE) {
     });
     /*! Module core, file version.js */
     DevExpress.define("/version", [], function() {
-        return "15.2.18"
+        return "15.2.19"
     });
     /*! Module core, file errors.js */
     DevExpress.define("/errors", ["/utils/utils.error"], function(errorUtils) {

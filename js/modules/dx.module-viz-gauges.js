@@ -1,7 +1,7 @@
 /*! 
 * DevExtreme (Gauges)
-* Version: 15.2.18
-* Build date: Feb 1, 2019
+* Version: 15.2.19
+* Build date: Mar 7, 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * EULA: https://www.devexpress.com/Support/EULAs/DevExtreme.xml
