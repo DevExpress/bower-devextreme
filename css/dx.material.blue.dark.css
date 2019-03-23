@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 18.2.7
-* Build date: Mar 9, 2019
+* Version: 18.2.7 (build 19082)
+* Build date: Mar 23, 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -110,11 +110,7 @@
 }
 .dx-datagrid .dx-datagrid-rowsview .dx-virtual-row > td:not(.dx-datagrid-group-space):before {
   display: block;
-  position: absolute;
-  left: 7px;
-  right: 7px;
-  top: 0;
-  bottom: 0;
+  height: 100%;
   content: '';
   background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAADzCAYAAABwgbOvAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyFpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNi1jMTQyIDc5LjE2MDkyNCwgMjAxNy8wNy8xMy0wMTowNjozOSAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIChXaW5kb3dzKSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDpBRjExRDRGQTNENjQxMUU4QUZEMEE1N0M1QzIyNEE4QyIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDpBRjExRDRGQjNENjQxMUU4QUZEMEE1N0M1QzIyNEE4QyI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOkFGMTFENEY4M0Q2NDExRThBRkQwQTU3QzVDMjI0QThDIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOkFGMTFENEY5M0Q2NDExRThBRkQwQTU3QzVDMjI0QThDIi8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+57ApqAAAAUNJREFUeNrs3LENwzAMRUEzi2T/sTSJgowQRAI+pbvehf0KFiZYc84nUVU9AAAAAAAAAHf5/id9+wxLjX8efvl+WQQRBEEEQRBBEEQQBBEEQQAAAAAAAAAAflRuLmaxdSIIggiCIIIgiCAIIgiCIAgAyyUfMBs3BjHUBUEQQRBEEAQRBEEEQRAE6cKyNQAAAAAAAADQQuySw9aXDl6gsAYkCIIIgiCCIIggCCIIgiAIcILkA2Y7xR5HM0MEQRBBEEQQBBEEQQRBEAQBAAAAAAAAAHq78l5WMlsngiCIIAgiCIIIgiCCIAiCALDcrQfMDHUEEQRBBEEQQRAEQQRBEEEAAAAAAAAAALZoecCsqo4NYutEEAQRBEEEQRBBEEQQBEEQAJbresBsGOoIIgiCIIggCCIIggiCIIIAAAAAAAAc5iPAAIcKFwANDofzAAAAAElFTkSuQmCC);
   background-repeat: no-repeat repeat;
@@ -200,6 +196,7 @@
 .dx-rtl .dx-datagrid .dx-datagrid-rowsview .dx-freespace-row td.dx-pointer-events-none,
 .dx-rtl .dx-datagrid .dx-datagrid-headers .dx-row td.dx-pointer-events-none {
   border-left: 2px solid #515159;
+  border-right: 2px solid #515159;
 }
 .dx-rtl .dx-datagrid .dx-datagrid-rowsview .dx-data-row td.dx-pointer-events-none.dx-first-cell,
 .dx-rtl .dx-datagrid .dx-datagrid-rowsview .dx-freespace-row td.dx-pointer-events-none.dx-first-cell,
@@ -936,11 +933,7 @@
 }
 .dx-treelist-container .dx-treelist-rowsview .dx-virtual-row > td:before {
   display: block;
-  position: absolute;
-  left: 7px;
-  right: 7px;
-  top: 0;
-  bottom: 0;
+  height: 100%;
   content: '';
   background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAADzCAYAAABwgbOvAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyFpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNi1jMTQyIDc5LjE2MDkyNCwgMjAxNy8wNy8xMy0wMTowNjozOSAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIChXaW5kb3dzKSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDpBRjExRDRGQTNENjQxMUU4QUZEMEE1N0M1QzIyNEE4QyIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDpBRjExRDRGQjNENjQxMUU4QUZEMEE1N0M1QzIyNEE4QyI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOkFGMTFENEY4M0Q2NDExRThBRkQwQTU3QzVDMjI0QThDIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOkFGMTFENEY5M0Q2NDExRThBRkQwQTU3QzVDMjI0QThDIi8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+57ApqAAAAUNJREFUeNrs3LENwzAMRUEzi2T/sTSJgowQRAI+pbvehf0KFiZYc84nUVU9AAAAAAAAAHf5/id9+wxLjX8efvl+WQQRBEEEQRBBEEQQBBEEQQAAAAAAAAAAflRuLmaxdSIIggiCIIIgiCAIIgiCIAgAyyUfMBs3BjHUBUEQQRBEEAQRBEEEQRAE6cKyNQAAAAAAAADQQuySw9aXDl6gsAYkCIIIgiCCIIggCCIIgiAIcILkA2Y7xR5HM0MEQRBBEEQQBBEEQQRBEAQBAAAAAAAAAHq78l5WMlsngiCIIAgiCIIIgiCCIAiCALDcrQfMDHUEEQRBBEEQQRAEQQRBEEEAAAAAAAAAALZoecCsqo4NYutEEAQRBEEEQRBBEEQQBEEQAJbresBsGOoIIgiCIIggCCIIggiCIIIAAAAAAAAc5iPAAIcKFwANDofzAAAAAElFTkSuQmCC);
   background-repeat: no-repeat repeat;
@@ -1028,6 +1021,7 @@
 .dx-rtl .dx-treelist-container .dx-treelist-rowsview .dx-freespace-row td.dx-pointer-events-none,
 .dx-rtl .dx-treelist-container .dx-treelist-headers .dx-row td.dx-pointer-events-none {
   border-left: 2px solid #515159;
+  border-right: 2px solid #515159;
 }
 .dx-rtl .dx-treelist-container .dx-treelist-rowsview .dx-data-row td.dx-pointer-events-none.dx-first-cell,
 .dx-rtl .dx-treelist-container .dx-treelist-rowsview .dx-freespace-row td.dx-pointer-events-none.dx-first-cell,
@@ -2458,7 +2452,6 @@
   padding: 6px;
 }
 .dx-button .dx-icon {
-  color: rgba(255, 255, 255, 0.54);
   width: 24px;
   height: 24px;
   background-position: 0px 0px;
@@ -2482,7 +2475,6 @@
   padding: 6px;
 }
 .dx-button-has-icon .dx-icon {
-  color: rgba(255, 255, 255, 0.54);
   width: 24px;
   height: 24px;
   background-position: 0px 0px;
@@ -2506,7 +2498,6 @@
   padding: 6px 16px;
 }
 .dx-button-has-text .dx-icon {
-  color: rgba(255, 255, 255, 0.54);
   width: 18px;
   height: 18px;
   background-position: 0px 0px;
@@ -2527,7 +2518,6 @@
   padding: 6px 16px;
 }
 .dx-button-has-icon.dx-button-has-text .dx-icon {
-  color: rgba(255, 255, 255, 0.54);
   width: 18px;
   height: 18px;
   background-position: 0px 0px;
@@ -2549,9 +2539,6 @@
   -webkit-box-shadow: none;
           box-shadow: none;
 }
-.dx-button-has-icon:not(.dx-button-has-text) .dx-icon {
-  color: #fff;
-}
 .dx-button {
   height: 36px;
   position: relative;
@@ -2569,7 +2556,7 @@
   overflow: hidden;
 }
 .dx-button .dx-icon {
-  color: rgba(255, 255, 255, 0.54);
+  color: #fff;
 }
 .dx-button.dx-state-hover {
   background-color: #23232a;
@@ -2761,7 +2748,6 @@
   padding: 6px;
 }
 .dx-button.dx-button-back .dx-icon {
-  color: rgba(255, 255, 255, 0.54);
   width: 24px;
   height: 24px;
   background-position: 0px 0px;
@@ -2780,9 +2766,6 @@
 }
 .dx-button.dx-button-back .dx-button-text {
   display: none;
-}
-.dx-button.dx-button-back .dx-icon {
-  color: #fff;
 }
 .dx-button-mode-text {
   background-color: transparent;
@@ -4630,7 +4613,6 @@
   padding: 6px 16px;
 }
 .dx-list-next-button .dx-button .dx-icon {
-  color: rgba(255, 255, 255, 0.54);
   width: 18px;
   height: 18px;
   background-position: 0px 0px;
@@ -5023,7 +5005,6 @@
   padding: 6px 16px;
 }
 .dx-device-mobile .dx-list-next-button .dx-button .dx-icon {
-  color: rgba(255, 255, 255, 0.54);
   width: 18px;
   height: 18px;
   background-position: 0px 0px;
@@ -6004,7 +5985,6 @@
   padding: 6px;
 }
 .dx-toolbar-text-auto-hide .dx-button .dx-icon {
-  color: rgba(255, 255, 255, 0.54);
   width: 24px;
   height: 24px;
   background-position: 0px 0px;
@@ -6762,37 +6742,12 @@
 .dx-lookup-empty .dx-lookup-field {
   color: #808080;
 }
-.dx-lookup-validation-message {
-  font-size: 14px;
-  line-height: 14px;
-  padding: 13px 20px 12px;
-  margin-bottom: 20px;
-  margin-left: -20px;
-  border-bottom: 1px solid #515159;
-  color: #F44336;
-}
-.dx-rtl .dx-lookup-validation-message {
-  margin-right: -20px;
-  margin-left: 0;
-}
 .dx-lookup-popup-search .dx-list {
   height: calc(100% -  70px);
 }
 .dx-lookup-search-wrapper {
   padding: 20px;
   padding-bottom: 14px;
-}
-.dx-popup-content.dx-lookup-invalid {
-  padding-top: 0;
-}
-.dx-popup-content.dx-lookup-invalid .dx-lookup-validation-message {
-  display: inline-block;
-}
-.dx-popup-content.dx-lookup-invalid .dx-list {
-  top: 40px;
-}
-.dx-lookup-popup-search .dx-popup-content.dx-lookup-invalid .dx-list {
-  top: 110px;
 }
 .dx-actionsheet-container .dx-actionsheet-item {
   margin: 0 0 10px 0;
@@ -8652,7 +8607,6 @@
   padding: 2px;
 }
 .dx-datagrid-revert-tooltip .dx-revert-button .dx-icon {
-  color: rgba(255, 255, 255, 0.54);
   width: 18px;
   height: 18px;
   background-position: 0px 0px;
@@ -10146,7 +10100,6 @@
   padding: 2px;
 }
 .dx-treelist-revert-tooltip .dx-revert-button .dx-icon {
-  color: rgba(255, 255, 255, 0.54);
   width: 18px;
   height: 18px;
   background-position: 0px 0px;
@@ -14914,6 +14867,8 @@
   border: none;
   -webkit-box-shadow: 0 7px 25px rgba(0, 0, 0, 0.25);
           box-shadow: 0 7px 25px rgba(0, 0, 0, 0.25);
+  background-color: #363640;
+  color: #fff;
 }
 .dx-scheduler-appointment-tooltip-wrapper.dx-tooltip-wrapper .dx-overlay-content .dx-popup-content.dx-scheduler-appointment-tooltip {
   width: 300px;

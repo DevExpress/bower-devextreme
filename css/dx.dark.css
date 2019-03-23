@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 18.2.7
-* Build date: Mar 9, 2019
+* Version: 18.2.7 (build 19082)
+* Build date: Mar 23, 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -109,11 +109,7 @@
 }
 .dx-datagrid .dx-datagrid-rowsview .dx-virtual-row > td:not(.dx-datagrid-group-space):before {
   display: block;
-  position: absolute;
-  left: 7px;
-  right: 7px;
-  top: 0;
-  bottom: 0;
+  height: 100%;
   content: '';
   background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAACqCAYAAABbAOqQAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA39pVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNi1jMTQyIDc5LjE2MDkyNCwgMjAxNy8wNy8xMy0wMTowNjozOSAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDpjYWQ2ODE5MS00ZDMxLWRjNGYtOTU0NC1jNjJkMTIxMjY2M2IiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6MkZBMzM1MzUzRDYzMTFFOEIwNEVFMkJENjkwODU5NTIiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6MkZBMzM1MzQzRDYzMTFFOEIwNEVFMkJENjkwODU5NTIiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIChXaW5kb3dzKSI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOjVlMjM1Y2U0LTc5ZWUtNGI0NC05ZjlkLTk2NTZmZGFjNjhhNCIgc3RSZWY6ZG9jdW1lbnRJRD0iYWRvYmU6ZG9jaWQ6cGhvdG9zaG9wOjk1OTQ2MjBiLTUyMTQtYTM0Yy04Nzc5LTEwMmEyMTY4MTlhOSIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/Pi/HBW0AAAE4SURBVHja7N2xDYQwEEVBjOiB/svbKtaEBBsQIGTsedI1wOgTsbqWmZvGafcIgAgIEAEBIiBABGTtjut3egyvFhbilSUgQAREQIAICBABASIgQPR5zXdZFiIgQAQEiIAAERAgAiIgQAQEiIAAERAgAqKykS+owkIERECACAgQAQEiIEAERECA6GEuqCxEQIAICBABASIgQAREQIAICBABASIgQAREdav+B1VYiIAAERAgAgJEQAQEiIAAEZCpckFlIQICRECACAgQAQEiIAICRECACAgQAQEiIKpb9YLKQgQEiIAAERAgAiIgQAQEiIDMlQsqCxEQIAICRECACAgQAREQIAICRECACAgQAVHdXy+owkIEBIiACAgQAQEiIEAEBIiA6JYLKgsRECACAkRAgAgIEI1UF2AAmMEXXlD4taoAAAAASUVORK5CYII=);
   background-repeat: no-repeat repeat;
@@ -199,6 +195,7 @@
 .dx-rtl .dx-datagrid .dx-datagrid-rowsview .dx-freespace-row td.dx-pointer-events-none,
 .dx-rtl .dx-datagrid .dx-datagrid-headers .dx-row td.dx-pointer-events-none {
   border-left: 2px solid #4d4d4d;
+  border-right: 2px solid #4d4d4d;
 }
 .dx-rtl .dx-datagrid .dx-datagrid-rowsview .dx-data-row td.dx-pointer-events-none.dx-first-cell,
 .dx-rtl .dx-datagrid .dx-datagrid-rowsview .dx-freespace-row td.dx-pointer-events-none.dx-first-cell,
@@ -935,11 +932,7 @@
 }
 .dx-treelist-container .dx-treelist-rowsview .dx-virtual-row > td:before {
   display: block;
-  position: absolute;
-  left: 7px;
-  right: 7px;
-  top: 0;
-  bottom: 0;
+  height: 100%;
   content: '';
   background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAACqCAYAAABbAOqQAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA39pVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNi1jMTQyIDc5LjE2MDkyNCwgMjAxNy8wNy8xMy0wMTowNjozOSAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDpjYWQ2ODE5MS00ZDMxLWRjNGYtOTU0NC1jNjJkMTIxMjY2M2IiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6MkZBMzM1MzUzRDYzMTFFOEIwNEVFMkJENjkwODU5NTIiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6MkZBMzM1MzQzRDYzMTFFOEIwNEVFMkJENjkwODU5NTIiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIChXaW5kb3dzKSI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOjVlMjM1Y2U0LTc5ZWUtNGI0NC05ZjlkLTk2NTZmZGFjNjhhNCIgc3RSZWY6ZG9jdW1lbnRJRD0iYWRvYmU6ZG9jaWQ6cGhvdG9zaG9wOjk1OTQ2MjBiLTUyMTQtYTM0Yy04Nzc5LTEwMmEyMTY4MTlhOSIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/Pi/HBW0AAAE4SURBVHja7N2xDYQwEEVBjOiB/svbKtaEBBsQIGTsedI1wOgTsbqWmZvGafcIgAgIEAEBIiBABGTtjut3egyvFhbilSUgQAREQIAICBABASIgQPR5zXdZFiIgQAQEiIAAERAgAiIgQAQEiIAAERAgAqKykS+owkIERECACAgQAQEiIEAERECA6GEuqCxEQIAICBABASIgQAREQIAICBABASIgQAREdav+B1VYiIAAERAgAgJEQAQEiIAAEZCpckFlIQICRECACAgQAQEiIAICRECACAgQAQEiIKpb9YLKQgQEiIAAERAgAiIgQAQEiIDMlQsqCxEQIAICRECACAgQAREQIAICRECACAgQAVHdXy+owkIEBIiACAgQAQEiIEAEBIiA6JYLKgsRECACAkRAgAgIEI1UF2AAmMEXXlD4taoAAAAASUVORK5CYII=);
   background-repeat: no-repeat repeat;
@@ -1027,6 +1020,7 @@
 .dx-rtl .dx-treelist-container .dx-treelist-rowsview .dx-freespace-row td.dx-pointer-events-none,
 .dx-rtl .dx-treelist-container .dx-treelist-headers .dx-row td.dx-pointer-events-none {
   border-left: 2px solid #4d4d4d;
+  border-right: 2px solid #4d4d4d;
 }
 .dx-rtl .dx-treelist-container .dx-treelist-rowsview .dx-data-row td.dx-pointer-events-none.dx-first-cell,
 .dx-rtl .dx-treelist-container .dx-treelist-rowsview .dx-freespace-row td.dx-pointer-events-none.dx-first-cell,
@@ -5621,37 +5615,12 @@
   right: auto;
   left: 38px;
 }
-.dx-lookup-validation-message {
-  font-size: 14px;
-  line-height: 14px;
-  padding: 13px 20px 12px;
-  margin-bottom: 20px;
-  margin-left: -20px;
-  border-bottom: 1px solid #4d4d4d;
-  color: #d9534f;
-}
-.dx-rtl .dx-lookup-validation-message {
-  margin-right: -20px;
-  margin-left: 0;
-}
 .dx-lookup-popup-search .dx-list {
   height: calc(100% -  70px);
 }
 .dx-lookup-search-wrapper {
   padding: 20px;
   padding-bottom: 14px;
-}
-.dx-popup-content.dx-lookup-invalid {
-  padding-top: 0;
-}
-.dx-popup-content.dx-lookup-invalid .dx-lookup-validation-message {
-  display: inline-block;
-}
-.dx-popup-content.dx-lookup-invalid .dx-list {
-  top: 40px;
-}
-.dx-lookup-popup-search .dx-popup-content.dx-lookup-invalid .dx-list {
-  top: 110px;
 }
 .dx-actionsheet-container .dx-actionsheet-item {
   margin: 0 0 10px 0;
