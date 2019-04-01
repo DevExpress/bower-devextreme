@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.messages.el.js)
-* Version: 18.2.7 (build 19082)
-* Build date: Sat Mar 23 2019
+* Version: 18.2.7 (build 19091)
+* Build date: Mon Apr 01 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -29,6 +29,7 @@
             Clear: "\u0395\u03ba\u03ba\u03b1\u03b8\u03ac\u03c1\u03b9\u03c3\u03b7",
             Done: "\u039a\u03b1\u03c4\u03b1\u03c7\u03ce\u03c1\u03b7\u03c3\u03b7",
             Loading: "\u03a6\u03cc\u03c1\u03c4\u03c9\u03c3\u03b7",
+            Select: "\u0395\u03c0\u03b9\u03bb\u03ad\u03be\u03c4\u03b5...",
             Search: "\u0391\u03bd\u03b1\u03b6\u03ae\u03c4\u03b7\u03c3\u03b7",
             Back: "\u03a0\u03af\u03c3\u03c9",
             OK: "\u039f\u039a",

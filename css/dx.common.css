@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 18.2.7 (build 19082)
-* Build date: Mar 23, 2019
+* Version: 18.2.7 (build 19091)
+* Build date: Apr 1, 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -1345,6 +1345,9 @@
   table-layout: fixed;
   position: relative;
 }
+.dx-tabs.dx-tabs-stretched {
+  table-layout: auto;
+}
 .dx-tabs.dx-overflow-hidden {
   overflow: hidden;
 }
@@ -2419,6 +2422,31 @@
 .dx-popup-content > .dx-treeview > .dx-scrollable > .dx-scrollable-wrapper > .dx-scrollable-container {
   max-height: inherit;
   min-height: inherit;
+}
+.dx-popup-content > .dx-widget {
+  max-height: inherit;
+}
+.dx-popup-content > .dx-template-wrapper {
+  max-height: inherit;
+  min-height: inherit;
+}
+.dx-popup-content > .dx-template-wrapper > .dx-treeview,
+.dx-popup-content > .dx-template-wrapper > .dx-scrollable,
+.dx-popup-content > .dx-template-wrapper > .dx-treeview > .dx-scrollable {
+  max-height: inherit;
+  min-height: inherit;
+}
+.dx-popup-content > .dx-template-wrapper > .dx-treeview > .dx-scrollable-wrapper,
+.dx-popup-content > .dx-template-wrapper > .dx-scrollable > .dx-scrollable-wrapper,
+.dx-popup-content > .dx-template-wrapper > .dx-treeview > .dx-scrollable > .dx-scrollable-wrapper,
+.dx-popup-content > .dx-template-wrapper > .dx-treeview > .dx-scrollable-wrapper > .dx-scrollable-container,
+.dx-popup-content > .dx-template-wrapper > .dx-scrollable > .dx-scrollable-wrapper > .dx-scrollable-container,
+.dx-popup-content > .dx-template-wrapper > .dx-treeview > .dx-scrollable > .dx-scrollable-wrapper > .dx-scrollable-container {
+  max-height: inherit;
+  min-height: inherit;
+}
+.dx-popup-content > .dx-template-wrapper > .dx-widget {
+  max-height: inherit;
 }
 .dx-dialog-root .dx-overlay-shader {
   background-color: #444;
