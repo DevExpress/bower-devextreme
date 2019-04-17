@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 18.2.7 (build 19091)
-* Build date: Apr 1, 2019
+* Version: 18.2.7 (build 19107)
+* Build date: Apr 17, 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -861,6 +861,7 @@
   border-top-width: 0;
   border-left: 1px solid #fff;
   border-right: 1px solid #fff;
+  border-bottom: 1px solid #fff;
 }
 .dx-treelist .dx-column-lines > td:first-child {
   border-left: none;
@@ -3256,6 +3257,7 @@
 .dx-tab {
   padding: 4px;
   background-color: #000;
+  color: #fff;
 }
 .dx-tab .dx-icon {
   color: #fff;
@@ -3340,9 +3342,14 @@
   padding: 0;
   border: none;
 }
+.dx-nav-item,
+.dx-rtl .dx-nav-item {
+  background: #000;
+}
 .dx-nav-item .dx-tab-text,
 .dx-rtl .dx-nav-item .dx-tab-text {
   line-height: normal;
+  color: #fff;
 }
 .dx-navbar .dx-nav-item .dx-icon,
 .dx-navbar .dx-rtl .dx-nav-item .dx-icon {
@@ -3354,6 +3361,7 @@
   font-size: 26px;
   text-align: center;
   line-height: 26px;
+  color: #fff;
 }
 .dx-nav-item.dx-tab-selected:after,
 .dx-rtl .dx-nav-item.dx-tab-selected:after,
@@ -3366,6 +3374,12 @@
 .dx-nav-item.dx-tab-selected,
 .dx-rtl .dx-nav-item.dx-tab-selected {
   background: #ffffff;
+}
+.dx-nav-item.dx-tab-selected .dx-tab-text,
+.dx-rtl .dx-nav-item.dx-tab-selected .dx-tab-text,
+.dx-nav-item.dx-tab-selected .dx-icon,
+.dx-rtl .dx-nav-item.dx-tab-selected .dx-icon {
+  color: #fff;
 }
 .dx-nav-item.dx-state-active,
 .dx-rtl .dx-nav-item.dx-state-active {
@@ -3834,7 +3848,7 @@
 }
 .dx-list:not(.dx-list-select-decorator-enabled) .dx-list-item.dx-state-focused.dx-list-item-selected {
   background-color: #ffffff;
-  color: #000000;
+  color: #fff;
 }
 .dx-list:not(.dx-list-select-decorator-enabled) .dx-list-item.dx-state-active {
   background-color: #ffffff;
@@ -4083,7 +4097,7 @@
 }
 .dx-device-mobile .dx-list:not(.dx-list-select-decorator-enabled) .dx-list-item.dx-state-focused.dx-list-item-selected {
   background-color: #ffffff;
-  color: #000000;
+  color: #fff;
 }
 .dx-device-mobile .dx-list:not(.dx-list-select-decorator-enabled) .dx-list-item.dx-state-active {
   background-color: #ffffff;
@@ -4969,7 +4983,7 @@
   height: 25px;
 }
 .dx-toast-info {
-  background-color: 80b 9e 4;
+  background-color: #80b9e4;
 }
 .dx-toast-info .dx-toast-icon {
   background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACMAAAAjCAQAAAC00HvSAAABoklEQVRIx63WPUvDQBjA8QMFsZNLlgpxtINjBsFVqINghm4dRAe/Rpdm6UcQHERwUYdAJ8HvkKHEQdrPEBQUrf7PoabtveSSSrit3PPjeve8RCCsyyMkIiYlAzJSYiJCPPt+248BfRKkdSX0CcoZnx7jAiJfY3r4LqbNsITI15B2EdNlVBGRSEZ0bUyXyQqIRDJZQIu/M1oRmZ2ovcz4zjt558NxR/6C6Vk2fHLPOXtsIhA0aHHGA1/Gvl7OBMYT/3BF05poTS5Be/5gxvQ15JWjgtyerWPelP19hMDTMvabQyciEJwoJ0rwBKF2lutSRCC4UWJCQaQx+5WYAyUmEsQas1WJ2VJiYkGqMTuVmG0lJhVkGnNaiblQYjKhZYHkmY1SpMGLEoN5Gskt605kjTstIjPvRiJ50tuSksePxv7UfKm8HAe0DGKXgZbB85eKHLWdKkjHUpjzvAmdHaUKIgnNmrIzLiTBs1W4ybiQvwq39RuV6TB1jpvA1f1yxo0sdT9XLy5DlF5cPBmmq0yG2uZUbVOzthle2xdFbd83//za+gXw/JH9LjmoAgAAAABJRU5ErkJggg==);
@@ -6921,7 +6935,8 @@
   text-align: center;
   line-height: 17px;
 }
-.dx-datagrid-rowsview {
+.dx-datagrid-borders .dx-datagrid-rowsview,
+.dx-datagrid-headers + .dx-datagrid-rowsview {
   border-top: 1px solid #fff;
 }
 .dx-datagrid-rowsview .dx-row {
@@ -7955,7 +7970,8 @@
   text-align: center;
   line-height: 17px;
 }
-.dx-treelist-rowsview {
+.dx-treelist-borders .dx-treelist-rowsview,
+.dx-treelist-headers + .dx-treelist-rowsview {
   border-top: 1px solid #fff;
 }
 .dx-treelist-rowsview .dx-row {

@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.all.d.ts)
-* Version: 18.2.7 (build 19091)
-* Build date: Mon Apr 01 2019
+* Version: 18.2.7 (build 19107)
+* Build date: Wed Apr 17 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -1489,6 +1489,8 @@ declare module DevExpress.exporter {
         column?: DevExpress.ui.dxDataGridColumn;
         /** The data object of the cell's row. */
         data?: any;
+        /** The group index of the row. Available when the rowType is "group". */
+        rowGroupIndex?: number;
         /** Information about group summary items the cell represents. */
         groupSummaryItems?: Array<{ name?: string, value?: any }>;
         /** The type of the cell's row. */
