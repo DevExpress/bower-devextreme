@@ -7,10 +7,6 @@ DevExtreme supplies HTML/JS tools for mobile and web development.
 - **A blazing-fast HTML5 Data Grid and rich libraries of high-performance touch-enabled data visualization and UI widgets**  
 DevExtreme ships with a rich library of client-side widgets that can be used in **any** web application and on any website.
 
-- **DevExtreme SPA framework**  
-DevExtreme allows you to build HTML/JS applications that can be packed as native mobile applications using the PhoneGap Build and can then be installed on mobile devices. When installed, DevExtreme applications look and behave like native mobile applications.
-
-
 ## Install
 
 To install with `bower`, run the following command:

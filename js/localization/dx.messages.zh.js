@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.messages.zh.js)
-* Version: 18.2.7 (build 19107)
-* Build date: Wed Apr 17 2019
+* Version: 19.1.2
+* Build date: Fri Apr 19 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -198,7 +198,8 @@
             "dxScheduler-recurrenceWeekly": "\u6bcf\u5468",
             "dxScheduler-recurrenceMonthly": "\u6bcf\u6708",
             "dxScheduler-recurrenceYearly": "\u6bcf\u5e74",
-            "dxScheduler-recurrenceEvery": "\u6240\u6709",
+            "dxScheduler-recurrenceRepeatEvery": "\u6240\u6709",
+            "dxScheduler-recurrenceRepeatOn": "Repeat On",
             "dxScheduler-recurrenceEnd": "\u505c\u6b62\u91cd\u590d",
             "dxScheduler-recurrenceAfter": "\u4e4b\u540e",
             "dxScheduler-recurrenceOn": "\u5728",

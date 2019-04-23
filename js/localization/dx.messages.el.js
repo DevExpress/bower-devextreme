@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.messages.el.js)
-* Version: 18.2.7 (build 19107)
-* Build date: Wed Apr 17 2019
+* Version: 19.1.2
+* Build date: Fri Apr 19 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -198,7 +198,8 @@
             "dxScheduler-recurrenceWeekly": "\u0395\u03b2\u03b4\u03bf\u03bc\u03b1\u03b4\u03b9\u03b1\u03af\u03b1",
             "dxScheduler-recurrenceMonthly": "\u039c\u03b7\u03bd\u03b9\u03b1\u03af\u03b1",
             "dxScheduler-recurrenceYearly": "\u0395\u03c4\u03ae\u03c3\u03b9\u03b1",
-            "dxScheduler-recurrenceEvery": "\u039a\u03ac\u03b8\u03b5",
+            "dxScheduler-recurrenceRepeatEvery": "\u039a\u03ac\u03b8\u03b5",
+            "dxScheduler-recurrenceRepeatOn": "Repeat On",
             "dxScheduler-recurrenceEnd": "\u03a4\u03b5\u03c1\u03bc\u03b1\u03c4\u03b9\u03c3\u03bc\u03cc\u03c2 \u03b5\u03c0\u03b1\u03bd\u03ac\u03bb\u03b7\u03c8\u03b7\u03c2",
             "dxScheduler-recurrenceAfter": "\u039c\u03b5\u03c4\u03ac",
             "dxScheduler-recurrenceOn": "On",
