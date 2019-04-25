@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 18.2.7 (build 19107)
-* Build date: Apr 17, 2019
+* Version: 18.2.8
+* Build date: Apr 23, 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -3847,8 +3847,8 @@
   border-color: #fff;
 }
 .dx-list:not(.dx-list-select-decorator-enabled) .dx-list-item.dx-state-focused.dx-list-item-selected {
-  background-color: rgba(255, 255, 255, 0.7);
-  color: #333;
+  background-color: rgba(51, 122, 183, 0.7);
+  color: #fff;
 }
 .dx-list:not(.dx-list-select-decorator-enabled) .dx-list-item.dx-state-active {
   background-color: #337ab7;
@@ -4096,8 +4096,8 @@
   border-color: #fff;
 }
 .dx-device-mobile .dx-list:not(.dx-list-select-decorator-enabled) .dx-list-item.dx-state-focused.dx-list-item-selected {
-  background-color: rgba(255, 255, 255, 0.7);
-  color: #333;
+  background-color: rgba(51, 122, 183, 0.7);
+  color: #fff;
 }
 .dx-device-mobile .dx-list:not(.dx-list-select-decorator-enabled) .dx-list-item.dx-state-active {
   background-color: #337ab7;
@@ -8864,7 +8864,7 @@
   background-color: #e6e6e6;
 }
 .dx-treeview-item-without-checkbox.dx-state-focused > .dx-treeview-item {
-  background-color: #fff;
+  background-color: #337ab7;
 }
 .dx-treeview-item-without-checkbox.dx-state-focused > .dx-treeview-item * {
   color: #fff;

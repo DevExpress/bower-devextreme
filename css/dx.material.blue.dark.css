@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 18.2.7 (build 19107)
-* Build date: Apr 17, 2019
+* Version: 18.2.8
+* Build date: Apr 23, 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -4504,7 +4504,7 @@
   color: #ffffff;
 }
 .dx-list:not(.dx-list-select-decorator-enabled) .dx-list-item.dx-state-focused.dx-list-item-selected {
-  background-color: rgba(0, 0, 0, 0.7);
+  background-color: rgba(101, 101, 119, 0.7);
   color: #ffffff;
 }
 .dx-list:not(.dx-list-select-decorator-enabled) .dx-list-item.dx-state-active {
@@ -4896,7 +4896,7 @@
   color: #ffffff;
 }
 .dx-device-mobile .dx-list:not(.dx-list-select-decorator-enabled) .dx-list-item.dx-state-focused.dx-list-item-selected {
-  background-color: rgba(0, 0, 0, 0.7);
+  background-color: rgba(101, 101, 119, 0.7);
   color: #ffffff;
 }
 .dx-device-mobile .dx-list:not(.dx-list-select-decorator-enabled) .dx-list-item.dx-state-active {
@@ -8441,7 +8441,6 @@
 }
 .dx-datagrid-adaptive-more {
   vertical-align: middle;
-  color: rgba(255, 255, 255, 0.54);
   width: 24px;
   height: 24px;
   background-position: 0px 0px;
@@ -8450,6 +8449,10 @@
   font-size: 24px;
   text-align: center;
   line-height: 24px;
+  color: rgba(255, 255, 255, 0.54);
+}
+.dx-row.dx-row-focused .dx-datagrid-adaptive-more {
+  color: inherit;
 }
 .dx-datagrid-rowsview {
   border-top: 1px solid #515159;
@@ -9940,7 +9943,6 @@
 }
 .dx-treelist-adaptive-more {
   vertical-align: middle;
-  color: rgba(255, 255, 255, 0.54);
   width: 24px;
   height: 24px;
   background-position: 0px 0px;
@@ -9949,6 +9951,10 @@
   font-size: 24px;
   text-align: center;
   line-height: 24px;
+  color: rgba(255, 255, 255, 0.54);
+}
+.dx-row.dx-row-focused .dx-treelist-adaptive-more {
+  color: inherit;
 }
 .dx-treelist-rowsview {
   border-top: 1px solid #515159;
