@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 18.2.8
-* Build date: Apr 23, 2019
+* Version: 18.2.8 (build 19128)
+* Build date: May 8, 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -2835,8 +2835,8 @@
 }
 .dx-scrollable-scroll.dx-state-invisible {
   opacity: 0;
-  -webkit-transition: opacity .5s linear 1s;
-  transition: opacity .5s linear 1s;
+  -webkit-transition: opacity 0.5s linear 1s;
+  transition: opacity 0.5s linear 1s;
 }
 .dx-scrollable-scroll-content {
   width: 100%;
@@ -3336,7 +3336,7 @@
   opacity: 1;
 }
 .dx-state-disabled .dx-tab-content {
-  opacity: .3;
+  opacity: 0.3;
 }
 .dx-navbar {
   padding: 0;
@@ -3394,7 +3394,7 @@
 }
 .dx-nav-item.dx-state-disabled .dx-icon,
 .dx-rtl .dx-nav-item.dx-state-disabled .dx-icon {
-  opacity: .5;
+  opacity: 0.5;
 }
 .dx-navbar-item-badge {
   margin-right: -26px;
@@ -3814,7 +3814,7 @@
   border: none;
 }
 .dx-list.dx-list-with-search .dx-scrollable-wrapper {
-  height: calc(100% -  29px);
+  height: calc(100% - 29px);
 }
 .dx-list .dx-empty-message {
   text-align: left;
@@ -4031,7 +4031,7 @@
 .dx-state-disabled.dx-list-item,
 .dx-state-disabled .dx-list-item {
   background-color: transparent;
-  opacity: .6;
+  opacity: 0.6;
 }
 .dx-rtl .dx-list .dx-empty-message,
 .dx-rtl.dx-list .dx-empty-message {
@@ -4063,7 +4063,7 @@
   border: none;
 }
 .dx-device-mobile .dx-list.dx-list-with-search .dx-scrollable-wrapper {
-  height: calc(100% -  29px);
+  height: calc(100% - 29px);
 }
 .dx-device-mobile .dx-list .dx-empty-message {
   text-align: left;
@@ -4280,7 +4280,7 @@
 .dx-device-mobile .dx-state-disabled.dx-list-item,
 .dx-device-mobile .dx-state-disabled .dx-list-item {
   background-color: transparent;
-  opacity: .6;
+  opacity: 0.6;
 }
 .dx-device-mobile .dx-rtl .dx-list .dx-empty-message,
 .dx-device-mobile .dx-rtl.dx-list .dx-empty-message {
@@ -5425,7 +5425,7 @@
 }
 .dx-state-disabled .dx-slider .dx-slider-bar,
 .dx-state-disabled.dx-slider .dx-slider-bar {
-  opacity: .5;
+  opacity: 0.5;
 }
 .dx-invalid .dx-slider-handle {
   background-color: #f74a5e;
@@ -5585,7 +5585,7 @@
   margin-left: -7px;
 }
 .dx-state-readonly .dx-lookup-field:before {
-  opacity: .5;
+  opacity: 0.5;
 }
 .dx-lookup-popup-wrapper .dx-list-item {
   border-top: none;
@@ -5630,7 +5630,7 @@
   left: 26px;
 }
 .dx-lookup-popup-search .dx-list {
-  height: calc(100% -  45px);
+  height: calc(100% - 45px);
 }
 .dx-lookup-search-wrapper {
   padding: 10px;
@@ -5806,7 +5806,7 @@
   padding-right: 46px;
 }
 .dx-tagbox-single-line.dx-dropdowneditor-button-visible .dx-texteditor-container {
-  width: calc(100% -  24px);
+  width: calc(100% - 24px);
 }
 .dx-tagbox-single-line .dx-tag-container {
   padding-right: 0;
@@ -8326,7 +8326,7 @@
   float: right;
 }
 .dx-rtl .dx-treelist-select-all .dx-checkbox {
-  left: calc(100% -  35px);
+  left: calc(100% - 35px);
 }
 .dx-rtl .dx-treelist-headers .dx-header-row > .dx-treelist-select-all {
   padding-right: 40px;
@@ -8614,7 +8614,7 @@
   opacity: 1;
 }
 .dx-calendar-navigator .dx-button.dx-calendar-disabled-navigator-link .dx-button-content {
-  opacity: .5;
+  opacity: 0.5;
 }
 .dx-calendar-navigator .dx-button.dx-state-active:not(.dx-calendar-disabled-navigator-link) {
   z-index: 1;
@@ -8823,7 +8823,7 @@
   margin-bottom: 3px;
 }
 .dx-treeview-with-search > .dx-scrollable {
-  height: calc(100% -  29px);
+  height: calc(100% - 29px);
 }
 .dx-treeview-border-visible {
   border: 1px solid #dedede;
@@ -9056,8 +9056,6 @@
 }
 .dx-device-mobile .dx-field:last-of-type {
   margin: 0;
-}
-.dx-tabpanel {
 }
 .dx-tabpanel .dx-tabs {
   display: block;
@@ -10803,7 +10801,7 @@
 }
 .dx-scheduler-appointment.dx-state-focused:before {
   background-color: rgba(0, 0, 0, 0.2);
-  opacity: .98;
+  opacity: 0.98;
 }
 .dx-scheduler-appointment.dx-state-hover {
   -webkit-box-shadow: inset 0px 5px 0px 0px rgba(0, 0, 0, 0.2);
@@ -10826,7 +10824,7 @@
 .dx-scheduler-appointment.dx-resizable-resizing,
 .dx-scheduler-appointment.dx-draggable-dragging {
   z-index: 1000;
-  opacity: .7;
+  opacity: 0.7;
 }
 .dx-scheduler-appointment .dx-resizable-handle-left {
   left: -1px;
@@ -10854,7 +10852,7 @@
 }
 .dx-scheduler-appointment.dx-state-disabled {
   cursor: default;
-  opacity: .6;
+  opacity: 0.6;
 }
 .dx-scheduler-work-space-week .dx-scheduler-appointment-reduced .dx-scheduler-appointment-content,
 .dx-scheduler-work-space-work-week .dx-scheduler-appointment-reduced .dx-scheduler-appointment-content,
@@ -10914,7 +10912,7 @@
 .dx-scheduler-work-space-month .dx-scheduler-appointment.dx-state-focused:before,
 .dx-scheduler-all-day-appointment.dx-state-focused:before {
   background-color: rgba(0, 0, 0, 0.2);
-  opacity: .98;
+  opacity: 0.98;
 }
 .dx-scheduler-timeline .dx-scheduler-appointment.dx-state-hover,
 .dx-scheduler-work-space-month .dx-scheduler-appointment.dx-state-hover,
@@ -10986,7 +10984,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  opacity: .99;
+  opacity: 0.99;
 }
 .dx-scheduler-work-space-grouped.dx-scheduler-work-space-month .dx-scheduler-appointment-content {
   font-size: 12px;
@@ -11011,7 +11009,7 @@
   display: none;
 }
 .dx-scheduler-appointment-content-date {
-  opacity: .7;
+  opacity: 0.7;
   display: inline-block;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -11135,11 +11133,11 @@
   right: 0;
   bottom: 0;
   background-color: rgba(0, 0, 0, 0.2);
-  opacity: .98;
+  opacity: 0.98;
 }
 .dx-scheduler-dropdown-appointments.dx-button.dx-state-hover .dx-scheduler-dropdown-appointments-content {
   color: #fff;
-  opacity: .99;
+  opacity: 0.99;
 }
 .dx-scheduler-dropdown-appointments-compact .dx-scheduler-dropdown-appointments-content span:last-child {
   padding-left: 0;
@@ -12221,6 +12219,9 @@
 .dx-scheduler-header-panel-cell.dx-scheduler-header-panel-current-time-cell:before {
   top: 28px;
   height: 2px;
+}
+.dx-scheduler-timeline .dx-scheduler-date-table-cell {
+  height: 50px;
 }
 .dx-scheduler-work-space:not(.dx-scheduler-work-space-vertical-grouped) .dx-scrollable.dx-scheduler-date-table-scrollable,
 .dx-scheduler-work-space:not(.dx-scheduler-work-space-vertical-grouped) .dx-scrollable.dx-scheduler-sidebar-scrollable {

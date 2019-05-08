@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 18.2.8
-* Build date: Apr 23, 2019
+* Version: 18.2.8 (build 19128)
+* Build date: May 8, 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -3181,7 +3181,7 @@
   font-weight: normal;
 }
 .dx-dropdownlist-popup-wrapper .dx-list:not(.dx-list-select-decorator-enabled) .dx-list-item-content {
-  padding: .45em .23em;
+  padding: 0.45em 0.23em;
 }
 .dx-dropdownlist-popup-wrapper .dx-list-item,
 .dx-dropdownlist-popup-wrapper .dx-list-select-all {
@@ -3568,7 +3568,7 @@
   height: 88px;
   background: #ffffff;
   line-height: 88px;
-  opacity: .95;
+  opacity: 0.95;
 }
 .dx-toolbar .dx-overlay-wrapper {
   width: 100%;
@@ -4181,7 +4181,7 @@
 .dx-state-disabled.dx-slider,
 .dx-state-disabled .dx-slider {
   cursor: default;
-  opacity: .7;
+  opacity: 0.7;
 }
 .dx-state-disabled .dx-slider-handle {
   opacity: 1;
@@ -4626,7 +4626,7 @@
   display: none;
 }
 .dx-dropdowneditor.dx-selectbox .dx-texteditor-input {
-  padding-right: .3em;
+  padding-right: 0.3em;
 }
 .dx-selectbox-popup .dx-list-item {
   font-size: 11pt;
@@ -4634,7 +4634,7 @@
 }
 .dx-rtl .dx-dropdowneditor.dx-selectbox .dx-texteditor-input,
 .dx-rtl.dx-dropdowneditor.dx-selectbox .dx-texteditor-input {
-  padding-left: .3em;
+  padding-left: 0.3em;
 }
 .dx-show-clear-button .dx-tag-container {
   margin-right: 25px;
@@ -5146,7 +5146,7 @@
 .dx-datagrid .dx-editor-cell .dx-numberbox-spin-down-icon,
 .dx-datagrid .dx-editor-cell .dx-dropdowneditor-icon,
 .dx-datagrid .dx-editor-cell .dx-lookup-field::before {
-  opacity: .4;
+  opacity: 0.4;
 }
 .dx-datagrid .dx-error-row td {
   background-color: #f28f8f;
@@ -6179,7 +6179,7 @@ td.dx-calendar-other-view {
 }
 .dx-field {
   min-height: 40px;
-  padding: .3em 0;
+  padding: 0.3em 0;
 }
 .dx-field-label {
   color: #888;
@@ -7901,7 +7901,7 @@ td.dx-calendar-other-view {
 }
 .dx-scheduler-appointment.dx-state-focused:before {
   background-color: rgba(0, 0, 0, 0.3);
-  opacity: .98;
+  opacity: 0.98;
 }
 .dx-scheduler-appointment.dx-state-hover {
   -webkit-box-shadow: inset 0px 5px 0px 0px rgba(0, 0, 0, 0.3);
@@ -7924,7 +7924,7 @@ td.dx-calendar-other-view {
 .dx-scheduler-appointment.dx-resizable-resizing,
 .dx-scheduler-appointment.dx-draggable-dragging {
   z-index: 1000;
-  opacity: .7;
+  opacity: 0.7;
 }
 .dx-scheduler-appointment .dx-resizable-handle-left {
   left: -1px;
@@ -7952,7 +7952,7 @@ td.dx-calendar-other-view {
 }
 .dx-scheduler-appointment.dx-state-disabled {
   cursor: default;
-  opacity: .6;
+  opacity: 0.6;
 }
 .dx-scheduler-work-space-week .dx-scheduler-appointment-reduced .dx-scheduler-appointment-content,
 .dx-scheduler-work-space-work-week .dx-scheduler-appointment-reduced .dx-scheduler-appointment-content,
@@ -8012,7 +8012,7 @@ td.dx-calendar-other-view {
 .dx-scheduler-work-space-month .dx-scheduler-appointment.dx-state-focused:before,
 .dx-scheduler-all-day-appointment.dx-state-focused:before {
   background-color: rgba(0, 0, 0, 0.3);
-  opacity: .98;
+  opacity: 0.98;
 }
 .dx-scheduler-timeline .dx-scheduler-appointment.dx-state-hover,
 .dx-scheduler-work-space-month .dx-scheduler-appointment.dx-state-hover,
@@ -8084,7 +8084,7 @@ td.dx-calendar-other-view {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  opacity: .99;
+  opacity: 0.99;
 }
 .dx-scheduler-work-space-grouped.dx-scheduler-work-space-month .dx-scheduler-appointment-content {
   font-size: 12px;
@@ -8109,7 +8109,7 @@ td.dx-calendar-other-view {
   display: none;
 }
 .dx-scheduler-appointment-content-date {
-  opacity: .7;
+  opacity: 0.7;
   display: inline-block;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -8233,11 +8233,11 @@ td.dx-calendar-other-view {
   right: 0;
   bottom: 0;
   background-color: rgba(0, 0, 0, 0.3);
-  opacity: .98;
+  opacity: 0.98;
 }
 .dx-scheduler-dropdown-appointments.dx-button.dx-state-hover .dx-scheduler-dropdown-appointments-content {
   color: #ffffff;
-  opacity: .99;
+  opacity: 0.99;
 }
 .dx-scheduler-dropdown-appointments-compact .dx-scheduler-dropdown-appointments-content span:last-child {
   padding-left: 0;

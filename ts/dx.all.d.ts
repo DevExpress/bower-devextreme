@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.all.d.ts)
-* Version: 18.2.8
-* Build date: Tue Apr 23 2019
+* Version: 18.2.8 (build 19128)
+* Build date: Wed May 08 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -8825,7 +8825,7 @@ declare module DevExpress.viz {
         /** Specifies the RangeSelector's behavior options. */
         behavior?: { animationEnabled?: boolean, snapToTicks?: boolean, moveSelectedRangeByClick?: boolean, manualRangeSelectionEnabled?: boolean, allowSlidersSwap?: boolean, callValueChanged?: 'onMoving' | 'onMovingComplete' };
         /** Specifies the options required to display a chart as the range selector's background. */
-        chart?: { commonSeriesSettings?: dxChartCommonSeriesSettings, bottomIndent?: number, topIndent?: number, dataPrepareSettings?: { checkTypeForAllData?: boolean, convertToAxisDataType?: boolean, sortingMethod?: boolean | ((a: { arg?: Date | number | string, val?: Date | number | string }, b: { arg?: Date | number | string, val?: Date | number | string }) => number) }, useAggregation?: boolean, valueAxis?: { min?: number, max?: number, inverted?: boolean, valueType?: 'datetime' | 'numeric' | 'string', type?: 'continuous' | 'logarithmic', logarithmBase?: number }, series?: ChartSeries | Array<ChartSeries>, seriesTemplate?: { nameField?: string, customizeSeries?: ((seriesName: any) => ChartSeries) }, equalBarWidth?: boolean, barWidth?: number, barGroupPadding?: number, barGroupWidth?: number, negativesAsZeroes?: boolean, palette?: Array<string> | 'Bright' | 'Default' | 'Harmony Light' | 'Ocean' | 'Pastel' | 'Soft' | 'Soft Pastel' | 'Vintage' | 'Violet' | 'Carmine' | 'Dark Moon' | 'Dark Violet' | 'Green Mist' | 'Soft Blue' | 'Material' | 'Office', paletteExtensionMode?: 'alternate' | 'blend' | 'extrapolate' };
+        chart?: { commonSeriesSettings?: dxChartCommonSeriesSettings, bottomIndent?: number, topIndent?: number, dataPrepareSettings?: { checkTypeForAllData?: boolean, convertToAxisDataType?: boolean, sortingMethod?: boolean | ((a: { arg?: Date | number | string, val?: Date | number | string }, b: { arg?: Date | number | string, val?: Date | number | string }) => number) }, useAggregation?: boolean, valueAxis?: { min?: number, max?: number, inverted?: boolean, valueType?: 'datetime' | 'numeric' | 'string', type?: 'continuous' | 'logarithmic', logarithmBase?: number }, series?: ChartSeries | Array<ChartSeries>, seriesTemplate?: { nameField?: string, customizeSeries?: ((seriesName: any) => ChartSeries) }, equalBarWidth?: boolean, barWidth?: number, barGroupPadding?: number, barGroupWidth?: number, maxBubbleSize?: number, minBubbleSize?: number, negativesAsZeroes?: boolean, palette?: Array<string> | 'Bright' | 'Default' | 'Harmony Light' | 'Ocean' | 'Pastel' | 'Soft' | 'Soft Pastel' | 'Vintage' | 'Violet' | 'Carmine' | 'Dark Moon' | 'Dark Violet' | 'Green Mist' | 'Soft Blue' | 'Material' | 'Office', paletteExtensionMode?: 'alternate' | 'blend' | 'extrapolate' };
         /** Specifies the color of the parent page element. */
         containerBackgroundColor?: string;
         /** Specifies a data source for the scale values and for the chart at the background. */
