@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 18.2.8 (build 19128)
-* Build date: May 8, 2019
+* Version: 18.2.8 (build 19135)
+* Build date: May 15, 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -7014,9 +7014,13 @@
 .dx-selectbox-popup-wrapper .dx-list {
   background-color: #363640;
 }
+.dx-tagbox .dx-texteditor-input {
+  height: 32px;
+}
 .dx-tagbox.dx-editor-filled .dx-texteditor-input,
 .dx-tagbox.dx-editor-outlined .dx-texteditor-input {
   padding: 0;
+  margin-top: 8px;
 }
 .dx-tagbox.dx-editor-filled .dx-tag-container,
 .dx-tagbox.dx-editor-outlined .dx-tag-container {
@@ -7028,6 +7032,7 @@
 }
 .dx-tagbox:not(.dx-texteditor-empty):not(.dx-editor-filled):not(.dx-editor-outlined) .dx-texteditor-input {
   padding-left: 0;
+  margin-top: 8px;
 }
 .dx-rtl .dx-tagbox:not(.dx-texteditor-empty):not(.dx-editor-filled):not(.dx-editor-outlined) .dx-texteditor-input,
 .dx-rtl.dx-tagbox:not(.dx-texteditor-empty):not(.dx-editor-filled):not(.dx-editor-outlined) .dx-texteditor-input {
@@ -7035,6 +7040,11 @@
   padding-left: 0;
   margin-right: 0;
   margin-left: 0;
+}
+.dx-tagbox:not(.dx-texteditor-empty):not(.dx-editor-filled):not(.dx-editor-outlined) .dx-texteditor-buttons-container {
+  top: 8px;
+  bottom: 0;
+  height: auto;
 }
 .dx-tagbox:not(.dx-texteditor-empty):not(.dx-editor-filled):not(.dx-editor-outlined).dx-state-focused:before,
 .dx-tagbox:not(.dx-texteditor-empty):not(.dx-editor-filled):not(.dx-editor-outlined).dx-state-active:before {
