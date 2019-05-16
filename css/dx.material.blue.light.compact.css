@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 19.1.2
-* Build date: Apr 19, 2019
+* Version: 19.1.3
+* Build date: May 14, 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -59,6 +59,18 @@
 .dx-datagrid .dx-sort-down:before {
   content: "\f052";
 }
+.dx-datagrid .dx-datagrid-header-panel .dx-group-panel-item,
+.dx-datagrid .dx-datagrid-header-panel .dx-header-filter {
+  outline: none;
+}
+.dx-datagrid .dx-datagrid-header-panel.dx-state-focused .dx-datagrid-group-panel .dx-group-panel-item:focus,
+.dx-datagrid .dx-datagrid-header-panel.dx-state-focused .dx-datagrid-group-panel .dx-header-filter:focus {
+  outline: 2px solid #03A9F4;
+  outline-offset: -2px;
+}
+.dx-datagrid .dx-datagrid-header-panel.dx-state-focused .dx-datagrid-group-panel .dx-header-filter:focus {
+  outline-offset: 2px;
+}
 .dx-datagrid .dx-datagrid-headers .dx-header-row > td,
 .dx-datagrid .dx-datagrid-headers .dx-header-filter {
   outline: none;
@@ -66,12 +78,10 @@
 .dx-datagrid .dx-datagrid-headers.dx-state-focused .dx-header-row td:focus,
 .dx-datagrid .dx-datagrid-headers.dx-state-focused .dx-header-row td .dx-header-filter:focus {
   outline: 2px solid #03A9F4;
+  outline-offset: 2px;
 }
 .dx-datagrid .dx-datagrid-headers.dx-state-focused .dx-header-row td:focus {
   outline-offset: -2px;
-}
-.dx-datagrid .dx-datagrid-headers.dx-state-focused .dx-header-row td .dx-header-filter:focus {
-  outline-offset: 2px;
 }
 .dx-datagrid .dx-header-filter {
   position: relative;
@@ -119,6 +129,10 @@
 .dx-datagrid .dx-datagrid-rowsview.dx-state-focused .dx-data-row > td.dx-command-edit > a.dx-link:focus {
   outline: 2px solid #03A9F4;
   outline-offset: 2px;
+}
+.dx-datagrid .dx-datagrid-rowsview.dx-state-focused .dx-data-row.dx-row-focused > td.dx-command-edit > a.dx-link:focus {
+  outline-color: #fff;
+  outline-offset: 0;
 }
 .dx-datagrid .dx-datagrid-rowsview .dx-datagrid-edit-form {
   background-color: #fff;
@@ -914,18 +928,18 @@
 .dx-treelist-container .dx-sort-down:before {
   content: "\f052";
 }
-.dx-treelist-container .dx-header-row > .dx-cell-focus-disabled,
-.dx-treelist-container .dx-header-row > .dx-cell-focus-disabled .dx-header-filter {
+.dx-treelist-container .dx-treelist-headers .dx-header-row > td,
+.dx-treelist-container .dx-treelist-headers .dx-header-filter {
   outline: none;
 }
-.dx-treelist-container .dx-header-row.dx-state-focused td:focus,
-.dx-treelist-container .dx-header-row.dx-state-focused td .dx-header-filter:focus {
+.dx-treelist-container .dx-treelist-headers.dx-state-focused .dx-header-row td:focus,
+.dx-treelist-container .dx-treelist-headers.dx-state-focused .dx-header-row td .dx-header-filter:focus {
   outline: 2px solid #03A9F4;
 }
-.dx-treelist-container .dx-header-row.dx-state-focused td:focus {
+.dx-treelist-container .dx-treelist-headers.dx-state-focused .dx-header-row td:focus {
   outline-offset: -2px;
 }
-.dx-treelist-container .dx-header-row.dx-state-focused td .dx-header-filter:focus {
+.dx-treelist-container .dx-treelist-headers.dx-state-focused .dx-header-row td .dx-header-filter:focus {
   outline-offset: 2px;
 }
 .dx-treelist-container .dx-header-filter {
@@ -972,6 +986,10 @@
   outline: 2px solid #03A9F4;
   outline-offset: 2px;
 }
+.dx-treelist-container .dx-treelist-rowsview.dx-state-focused .dx-data-row.dx-row-focused > td.dx-command-edit > a.dx-link:focus {
+  outline-color: #fff;
+  outline-offset: 0;
+}
 .dx-treelist-container .dx-treelist-rowsview .dx-treelist-edit-form {
   background-color: #fff;
 }
@@ -1004,6 +1022,16 @@
 .dx-treelist-filter-panel {
   color: rgba(0, 0, 0, 0.87);
   border-top: 1px solid #e0e0e0;
+}
+.dx-treelist-filter-panel .dx-icon-filter,
+.dx-treelist-filter-panel .dx-treelist-filter-panel-text,
+.dx-treelist-filter-panel .dx-treelist-filter-panel-clear-filter {
+  outline: none;
+}
+.dx-treelist-filter-panel.dx-state-focused .dx-icon-filter:focus,
+.dx-treelist-filter-panel.dx-state-focused .dx-treelist-filter-panel-text:focus,
+.dx-treelist-filter-panel.dx-state-focused .dx-treelist-filter-panel-clear-filter:focus {
+  outline: 2px solid #03A9F4;
 }
 .dx-treelist-form-buttons-container {
   float: right;
@@ -1133,6 +1161,11 @@
 .dx-invalid-message > .dx-overlay-content {
   color: #fff;
   background-color: #F44336;
+}
+.dx-popup-wrapper.dx-scheduler-appointment-tooltip-wrapper .dx-overlay-content,
+.dx-scheduler .dx-scheduler-overlay-panel .dx-overlay-content {
+  -webkit-box-shadow: 0px 0px 15px 0px rgba(0, 0, 0, 0.15);
+          box-shadow: 0px 0px 15px 0px rgba(0, 0, 0, 0.15);
 }
 .dx-popup-wrapper.dx-scheduler-appointment-tooltip-wrapper .dx-tooltip-appointment-item-marker-body,
 .dx-scheduler .dx-scheduler-overlay-panel .dx-tooltip-appointment-item-marker-body {
@@ -1283,6 +1316,69 @@
 .dx-recurrence-editor-container .dx-field-label {
   width: auto;
   float: none;
+}
+.dx-scheduler-appointment-popup .dx-scheduler-recurrence-rule-item.dx-field-item .dx-recurrence-selectbox-freq.dx-field-value {
+  width: 100%;
+}
+.dx-scheduler-appointment-popup .dx-scheduler-recurrence-rule-item.dx-field-item.dx-label-v-align .dx-recurrence-interval-field {
+  display: block;
+  margin-bottom: 2px;
+}
+.dx-scheduler-appointment-popup .dx-scheduler-recurrence-rule-item.dx-field-item.dx-label-v-align .dx-recurrence-repeat-on {
+  display: block;
+  padding-top: 5px;
+}
+.dx-scheduler-appointment-popup .dx-scheduler-recurrence-rule-item.dx-field-item.dx-label-v-align .dx-recurrence-repeat-on .dx-recurrence-repeat-on-label {
+  padding-top: 10px;
+}
+.dx-scheduler-appointment-popup .dx-scheduler-recurrence-rule-item.dx-field-item.dx-label-v-align .dx-recurrence-numberbox-interval-label,
+.dx-scheduler-appointment-popup .dx-scheduler-recurrence-rule-item.dx-field-item.dx-label-v-align .dx-recurrence-repeat-on-label {
+  padding-bottom: 0;
+}
+.dx-scheduler-appointment-popup .dx-scheduler-recurrence-rule-item.dx-field-item.dx-label-v-align .dx-recurrence-numberbox-interval-label,
+.dx-scheduler-appointment-popup .dx-scheduler-recurrence-rule-item.dx-field-item.dx-label-v-align .dx-recurrence-repeat-on-label,
+.dx-scheduler-appointment-popup .dx-scheduler-recurrence-rule-item.dx-field-item.dx-label-v-align .dx-recurrence-repeat-end-container-label,
+.dx-scheduler-appointment-popup .dx-scheduler-recurrence-rule-item.dx-field-item.dx-label-v-align .dx-recurrence-radiogroup-repeat-type {
+  left: 0;
+  position: inherit;
+}
+.dx-scheduler-appointment-popup .dx-scheduler-recurrence-rule-item.dx-field-item.dx-label-v-align .dx-recurrence-numberbox-interval-label {
+  padding-top: 0;
+}
+.dx-scheduler-appointment-popup .dx-scheduler-recurrence-rule-item.dx-field-item.dx-label-v-align .dx-recurrence-repeat-end-container-label {
+  padding-bottom: 2px;
+  padding-top: 0;
+}
+.dx-scheduler-appointment-popup .dx-scheduler-recurrence-rule-item.dx-field-item.dx-label-v-align .dx-recurrence-freq-field {
+  margin-bottom: 0;
+}
+.dx-scheduler-appointment-popup .dx-scheduler-recurrence-rule-item.dx-field-item.dx-label-v-align .dx-recurrence-repeat-end-container.dx-field {
+  padding-top: 0;
+  position: static;
+}
+.dx-scheduler-appointment-popup .dx-scheduler-recurrence-rule-item.dx-field-item.dx-label-v-align .dx-recurrence-repeat-end-container.dx-field .dx-recurrence-radiogroup-repeat-type {
+  margin-top: 0;
+}
+.dx-scheduler-recurrence-rule-item.dx-field-item {
+  border-top: 1px solid #e0e0e0;
+}
+.dx-scheduler-recurrence-rule-item.dx-field-item .dx-recurrence-numberbox-interval-label,
+.dx-scheduler-recurrence-rule-item.dx-field-item .dx-recurrence-repeat-on-label,
+.dx-scheduler-recurrence-rule-item.dx-field-item .dx-recurrence-repeat-end-container-label {
+  left: -90px;
+}
+.dx-scheduler-recurrence-rule-item.dx-field-item .dx-recurrence-radiogroup-repeat-type {
+  left: -88px;
+}
+.dx-scheduler-recurrence-rule-item.dx-field-item .dx-field-item-label:first-child {
+  padding-top: 7px;
+}
+.dx-scheduler-recurrence-rule-item.dx-field-item.dx-label-h-align .dx-recurrence-repeat-on-week {
+  padding-top: 7px;
+  padding-bottom: 7px;
+}
+.dx-scheduler-recurrence-rule-item.dx-field-item.dx-label-h-align .dx-recurrence-repeat-end-container.dx-field {
+  padding-top: 10px;
 }
 @font-face {
   font-family: 'RobotoFallback';
@@ -3354,8 +3450,8 @@
 }
 .dx-scrollable-scroll.dx-state-invisible {
   opacity: 0;
-  -webkit-transition: opacity .5s linear 1s;
-  transition: opacity .5s linear 1s;
+  -webkit-transition: opacity 0.5s linear 1s;
+  transition: opacity 0.5s linear 1s;
 }
 .dx-scrollable-scroll-content {
   width: 100%;
@@ -3965,7 +4061,7 @@
   opacity: 1;
 }
 .dx-state-disabled .dx-tab-content {
-  opacity: .3;
+  opacity: 0.3;
 }
 .dx-navbar {
   padding: 0;
@@ -4023,7 +4119,7 @@
 }
 .dx-nav-item.dx-state-disabled .dx-icon,
 .dx-rtl .dx-nav-item.dx-state-disabled .dx-icon {
-  opacity: .5;
+  opacity: 0.5;
 }
 .dx-navbar-item-badge {
   margin-right: -26px;
@@ -4593,7 +4689,7 @@
   color: rgba(0, 0, 0, 0.54);
 }
 .dx-list.dx-list-with-search .dx-scrollable-wrapper {
-  height: calc(100% -  36px);
+  height: calc(100% - 36px);
 }
 .dx-list .dx-empty-message {
   text-align: left;
@@ -4621,7 +4717,7 @@
   color: #000000;
 }
 .dx-list:not(.dx-list-select-decorator-enabled) .dx-list-item.dx-state-focused.dx-list-item-selected {
-  background-color: rgba(255, 255, 255, 0.7);
+  background-color: rgba(204, 204, 204, 0.7);
   color: #000000;
 }
 .dx-list:not(.dx-list-select-decorator-enabled) .dx-list-item.dx-state-active {
@@ -4951,7 +5047,7 @@
 .dx-state-disabled.dx-list-item,
 .dx-state-disabled .dx-list-item {
   background-color: transparent;
-  opacity: .6;
+  opacity: 0.6;
 }
 .dx-rtl .dx-list .dx-empty-message,
 .dx-rtl.dx-list .dx-empty-message {
@@ -4994,7 +5090,7 @@
   color: rgba(0, 0, 0, 0.54);
 }
 .dx-device-mobile .dx-list.dx-list-with-search .dx-scrollable-wrapper {
-  height: calc(100% -  36px);
+  height: calc(100% - 36px);
 }
 .dx-device-mobile .dx-list .dx-empty-message {
   text-align: left;
@@ -5022,7 +5118,7 @@
   color: #000000;
 }
 .dx-device-mobile .dx-list:not(.dx-list-select-decorator-enabled) .dx-list-item.dx-state-focused.dx-list-item-selected {
-  background-color: rgba(255, 255, 255, 0.7);
+  background-color: rgba(204, 204, 204, 0.7);
   color: #000000;
 }
 .dx-device-mobile .dx-list:not(.dx-list-select-decorator-enabled) .dx-list-item.dx-state-active {
@@ -5352,7 +5448,7 @@
 .dx-device-mobile .dx-state-disabled.dx-list-item,
 .dx-device-mobile .dx-state-disabled .dx-list-item {
   background-color: transparent;
-  opacity: .6;
+  opacity: 0.6;
 }
 .dx-device-mobile .dx-rtl .dx-list .dx-empty-message,
 .dx-device-mobile .dx-rtl.dx-list .dx-empty-message {
@@ -6812,7 +6908,7 @@
   margin-left: -9px;
 }
 .dx-state-readonly .dx-lookup-field:before {
-  opacity: .5;
+  opacity: 0.5;
 }
 .dx-lookup-popup-wrapper .dx-list-item {
   border-top: none;
@@ -6831,7 +6927,7 @@
   color: rgba(148, 148, 148, 0.87);
 }
 .dx-lookup-popup-search .dx-list {
-  height: calc(100% -  70px);
+  height: calc(100% - 70px);
 }
 .dx-lookup-search-wrapper {
   padding: 8px;
@@ -7124,11 +7220,11 @@
 }
 .dx-tagbox.dx-editor-filled .dx-tag-container,
 .dx-tagbox.dx-editor-outlined .dx-tag-container {
-  padding: 8px 8px 2px 8px;
+  padding: 2px 8px 7px 8px;
   min-height: 40px;
 }
 .dx-tagbox:not(.dx-texteditor-empty):not(.dx-editor-filled):not(.dx-editor-outlined) .dx-tag-container {
-  margin-top: 1px;
+  margin-top: -5px;
 }
 .dx-tagbox:not(.dx-texteditor-empty):not(.dx-editor-filled):not(.dx-editor-outlined) .dx-texteditor-input {
   padding-left: 0;
@@ -7149,15 +7245,12 @@
 .dx-tagbox:not(.dx-texteditor-empty):not(.dx-editor-filled):not(.dx-editor-outlined):after {
   border-bottom: 0;
 }
-.dx-tagbox-single-line.dx-dropdowneditor-button-visible .dx-texteditor-container {
-  width: calc(100% -  18px);
-}
 .dx-tagbox-single-line .dx-tag-container {
   padding-right: 0;
 }
 .dx-tag-content {
   margin: 0;
-  padding: 4px 32px 4px 8px;
+  padding: 5px 32px 5px 8px;
   min-width: 40px;
   background-color: #e0e0e0;
   color: rgba(0, 0, 0, 0.6);
@@ -7190,7 +7283,7 @@
           transform: none;
 }
 .dx-tag {
-  margin: 0 5px 5px 0;
+  margin: 5px 5px 0 0;
 }
 .dx-tag:hover .dx-tag-content {
   background-color: #d9d9d9;
@@ -8049,7 +8142,6 @@
   text-align: center;
   line-height: 16px;
   margin: 0 2px;
-  color: #03A9F4;
   vertical-align: middle;
 }
 .dx-datagrid .dx-datagrid-content .dx-datagrid-table .dx-row > td.dx-command-expand,
@@ -8505,7 +8597,6 @@
 }
 .dx-datagrid-adaptive-more {
   vertical-align: middle;
-  color: rgba(0, 0, 0, 0.54);
   width: 18px;
   height: 18px;
   background-position: 0px 0px;
@@ -8514,6 +8605,10 @@
   font-size: 18px;
   text-align: center;
   line-height: 18px;
+  color: rgba(0, 0, 0, 0.54);
+}
+.dx-row.dx-row-focused .dx-datagrid-adaptive-more {
+  color: inherit;
 }
 .dx-datagrid-rowsview {
   border-top: 1px solid #e0e0e0;
@@ -9542,7 +9637,6 @@
   text-align: center;
   line-height: 16px;
   margin: 0 2px;
-  color: #03A9F4;
   vertical-align: middle;
 }
 .dx-treelist .dx-treelist-content .dx-treelist-table .dx-row > td.dx-command-expand,
@@ -9998,7 +10092,6 @@
 }
 .dx-treelist-adaptive-more {
   vertical-align: middle;
-  color: rgba(0, 0, 0, 0.54);
   width: 18px;
   height: 18px;
   background-position: 0px 0px;
@@ -10007,6 +10100,10 @@
   font-size: 18px;
   text-align: center;
   line-height: 18px;
+  color: rgba(0, 0, 0, 0.54);
+}
+.dx-row.dx-row-focused .dx-treelist-adaptive-more {
+  color: inherit;
 }
 .dx-treelist-rowsview {
   border-top: 1px solid #e0e0e0;
@@ -10486,7 +10583,7 @@
   float: right;
 }
 .dx-rtl .dx-treelist-select-all .dx-checkbox {
-  left: calc(100% -  50px);
+  left: calc(100% - 50px);
 }
 .dx-rtl.dx-treelist .dx-treelist-headers .dx-treelist-content .dx-treelist-table .dx-header-row > .dx-treelist-select-all {
   padding-right: 60px;
@@ -10755,7 +10852,7 @@
   opacity: 1;
 }
 .dx-calendar-navigator .dx-button.dx-calendar-disabled-navigator-link .dx-button-content {
-  opacity: .5;
+  opacity: 0.5;
 }
 .dx-calendar-navigator .dx-button.dx-state-active:not(.dx-calendar-disabled-navigator-link) {
   z-index: 1;
@@ -10960,7 +11057,7 @@
   margin-bottom: 4px;
 }
 .dx-treeview-with-search > .dx-scrollable {
-  height: calc(100% -  37px);
+  height: calc(100% - 37px);
 }
 .dx-treeview-border-visible {
   border: 1px solid #e0e0e0;
@@ -11395,7 +11492,6 @@
   width: 32.5px;
 }
 .dx-scheduler-fixed-appointments {
-  width: 100%;
   z-index: 100;
   position: absolute;
   left: 65px;
@@ -12947,7 +13043,7 @@
 }
 .dx-scheduler-appointment.dx-state-focused:before {
   background-color: rgba(0, 0, 0, 0.3);
-  opacity: .98;
+  opacity: 0.98;
 }
 .dx-scheduler-appointment.dx-state-hover {
   -webkit-box-shadow: inset 0px 5px 0px 0px rgba(0, 0, 0, 0.3);
@@ -12970,7 +13066,7 @@
 .dx-scheduler-appointment.dx-resizable-resizing,
 .dx-scheduler-appointment.dx-draggable-dragging {
   z-index: 1000;
-  opacity: .7;
+  opacity: 0.7;
 }
 .dx-scheduler-appointment .dx-resizable-handle-left {
   left: -1px;
@@ -12998,7 +13094,7 @@
 }
 .dx-scheduler-appointment.dx-state-disabled {
   cursor: default;
-  opacity: .6;
+  opacity: 0.6;
 }
 .dx-scheduler-work-space-week .dx-scheduler-appointment-reduced .dx-scheduler-appointment-content,
 .dx-scheduler-work-space-work-week .dx-scheduler-appointment-reduced .dx-scheduler-appointment-content,
@@ -13058,7 +13154,7 @@
 .dx-scheduler-work-space-month .dx-scheduler-appointment.dx-state-focused:before,
 .dx-scheduler-all-day-appointment.dx-state-focused:before {
   background-color: rgba(0, 0, 0, 0.3);
-  opacity: .98;
+  opacity: 0.98;
 }
 .dx-scheduler-timeline .dx-scheduler-appointment.dx-state-hover,
 .dx-scheduler-work-space-month .dx-scheduler-appointment.dx-state-hover,
@@ -13130,7 +13226,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  opacity: .99;
+  opacity: 0.99;
 }
 .dx-scheduler-work-space-grouped.dx-scheduler-work-space-month .dx-scheduler-appointment-content {
   font-size: 12px;
@@ -13155,7 +13251,7 @@
   display: none;
 }
 .dx-scheduler-appointment-content-date {
-  opacity: .7;
+  opacity: 0.7;
   display: inline-block;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -13219,27 +13315,27 @@
 .dx-scheduler-appointment-popup .dx-field-value:not(.dx-widget) > .dx-checkbox.dx-rtl {
   float: right;
 }
-.dx-scheduler-dropdown-appointments {
+.dx-scheduler-appointment-collector {
   background-color: #03A9F4;
   color: #fff;
 }
-.dx-scheduler-dropdown-appointments.dx-button,
-.dx-scheduler-dropdown-appointments.dx-button.dx-state-hover,
-.dx-scheduler-dropdown-appointments.dx-button.dx-state-active,
-.dx-scheduler-dropdown-appointments.dx-button.dx-state-focused {
+.dx-scheduler-appointment-collector.dx-button,
+.dx-scheduler-appointment-collector.dx-button.dx-state-hover,
+.dx-scheduler-appointment-collector.dx-button.dx-state-active,
+.dx-scheduler-appointment-collector.dx-button.dx-state-focused {
   background-color: #03A9F4;
   color: #fff;
   border: none;
   -webkit-box-shadow: none;
           box-shadow: none;
 }
-.dx-scheduler-dropdown-appointments.dx-button .dx-button-content,
-.dx-scheduler-dropdown-appointments.dx-button.dx-state-hover .dx-button-content,
-.dx-scheduler-dropdown-appointments.dx-button.dx-state-active .dx-button-content,
-.dx-scheduler-dropdown-appointments.dx-button.dx-state-focused .dx-button-content {
+.dx-scheduler-appointment-collector.dx-button .dx-button-content,
+.dx-scheduler-appointment-collector.dx-button.dx-state-hover .dx-button-content,
+.dx-scheduler-appointment-collector.dx-button.dx-state-active .dx-button-content,
+.dx-scheduler-appointment-collector.dx-button.dx-state-focused .dx-button-content {
   line-height: inherit;
 }
-.dx-scheduler-dropdown-appointments.dx-button.dx-state-hover:before {
+.dx-scheduler-appointment-collector.dx-button.dx-state-hover:before {
   pointer-events: none;
   content: "";
   position: absolute;
@@ -13248,13 +13344,13 @@
   right: 0;
   bottom: 0;
   background-color: rgba(0, 0, 0, 0.3);
-  opacity: .98;
+  opacity: 0.98;
 }
-.dx-scheduler-dropdown-appointments.dx-button.dx-state-hover .dx-scheduler-dropdown-appointments-content {
+.dx-scheduler-appointment-collector.dx-button.dx-state-hover .dx-scheduler-appointment-collector-content {
   color: #fff;
-  opacity: .99;
+  opacity: 0.99;
 }
-.dx-scheduler-dropdown-appointments-compact .dx-scheduler-dropdown-appointments-content span:last-child {
+.dx-scheduler-appointment-collector-compact .dx-scheduler-appointment-collector-content span:last-child {
   padding-left: 0;
 }
 .dx-scheduler-agenda .dx-scheduler-date-table-scrollable {
@@ -14278,7 +14374,7 @@
 .dx-scheduler-agenda .dx-scheduler-appointment-content .dx-scheduler-appointment-content-allday {
   font-size: 10px;
   font-weight: normal;
-  opacity: .7;
+  opacity: 0.7;
 }
 [dx-group-row-count='1'] .dx-scheduler-all-day-title {
   top: 78px;
@@ -14683,9 +14779,6 @@
   font-size: 20px;
   line-height: 25px;
 }
-.dx-scheduler-dropdown-appointments {
-  margin-top: 2px;
-}
 .dx-scheduler-work-space .dx-scrollable.dx-scheduler-date-table-scrollable,
 .dx-scheduler-work-space .dx-scrollable.dx-scheduler-sidebar-scrollable {
   padding-bottom: 40px;
@@ -14894,7 +14987,7 @@
   margin-left: 4px;
   line-height: 22px;
 }
-.dx-scheduler-work-space.dx-scheduler-work-space-month .dx-scheduler-dropdown-appointments {
+.dx-scheduler-work-space.dx-scheduler-work-space-month .dx-scheduler-appointment-collector {
   margin-top: 3px;
   margin-left: 52px;
 }
@@ -14905,18 +14998,26 @@
 .dx-scheduler-work-space.dx-scheduler-work-space-month .dx-scheduler-date-table-current-date {
   color: #03A9F4;
 }
-.dx-scheduler-dropdown-appointments {
+.dx-scheduler-adaptive .dx-scheduler-work-space.dx-scheduler-work-space-month .dx-scheduler-appointment-collector {
+  margin: 0;
+}
+.dx-scheduler-adaptive .dx-scheduler-work-space-week .dx-scheduler-header-panel-cell {
+  white-space: nowrap;
+}
+.dx-scheduler-appointment-collector {
+  margin-top: 2px;
   position: absolute;
 }
-.dx-scheduler-dropdown-appointments.dx-button {
+.dx-scheduler-appointment-collector.dx-button {
+  border-radius: 12px;
   height: 18px;
   min-width: auto;
   width: auto;
 }
-.dx-scheduler-dropdown-appointments.dx-button:before {
+.dx-scheduler-appointment-collector.dx-button:before {
   display: none;
 }
-.dx-scheduler-dropdown-appointments.dx-button .dx-button-content {
+.dx-scheduler-appointment-collector.dx-button .dx-button-content {
   padding: 2px 0;
   font-size: 12px;
 }
@@ -15185,28 +15286,8 @@
   margin-left: 4px;
   margin-right: 0;
 }
-.dx-scheduler-appointment-popup .dx-scheduler-recurrence-rule-item.dx-field-item .dx-recurrence-numberbox-interval-label,
-.dx-scheduler-appointment-popup .dx-scheduler-recurrence-rule-item.dx-field-item .dx-recurrence-repeat-on-label,
-.dx-scheduler-appointment-popup .dx-scheduler-recurrence-rule-item.dx-field-item .dx-recurrence-repeat-end-container-label {
-  position: relative;
-  left: 0px;
-}
-.dx-scheduler-appointment-popup .dx-scheduler-recurrence-rule-item.dx-field-item .dx-recurrence-repeat-end-container-label,
-.dx-scheduler-appointment-popup .dx-scheduler-recurrence-rule-item.dx-field-item .dx-recurrence-repeat-end-container {
-  padding-top: 0px;
-}
-.dx-scheduler-appointment-popup .dx-scheduler-recurrence-rule-item.dx-field-item .dx-recurrence-radiogroup-repeat-type {
-  left: 0px;
-  top: 0px;
-}
-.dx-scheduler-appointment-popup .dx-scheduler-recurrence-rule-item.dx-field-item .dx-recurrence-repeat-end-container {
-  margin: 0;
-}
-.dx-scheduler-appointment-popup .dx-scheduler-recurrence-rule-item.dx-field-item .dx-recurrence-radiogroup-repeat-type-label,
-.dx-scheduler-appointment-popup .dx-scheduler-recurrence-rule-item.dx-field-item .dx-recurrence-numberbox-interval-label,
-.dx-scheduler-appointment-popup .dx-scheduler-recurrence-rule-item.dx-field-item .dx-recurrence-repeat-on-label,
-.dx-scheduler-appointment-popup .dx-scheduler-recurrence-rule-item.dx-field-item .dx-recurrence-repeat-end-container-label {
-  line-height: 40px;
+.dx-scheduler-appointment-popup .dx-layout-manager .dx-label-h-align .dx-field-item-content .dx-switch-wrapper {
+  padding-top: 30px;
 }
 .dx-scheduler-appointment-popup .dx-form-validation-summary {
   padding: 10px 20px;
@@ -15697,6 +15778,55 @@
   text-align: center;
   line-height: 18px;
 }
+.dx-scheduler .dx-scheduler-appointment-tooltip-wrapper .dx-overlay-content,
+.dx-scheduler .dx-scheduler-overlay-panel .dx-overlay-content {
+  background-color: #fff;
+}
+.dx-scheduler .dx-scheduler-appointment-tooltip-wrapper .dx-overlay-content .dx-popup-content,
+.dx-scheduler .dx-scheduler-overlay-panel .dx-overlay-content .dx-popup-content {
+  padding: 0;
+}
+.dx-scheduler .dx-scheduler-appointment-tooltip-wrapper .dx-overlay-content .dx-list .dx-list-item,
+.dx-scheduler .dx-scheduler-overlay-panel .dx-overlay-content .dx-list .dx-list-item {
+  margin-bottom: 0;
+  margin-top: 0;
+  border-bottom: 1px solid #e0e0e0;
+}
+.dx-scheduler .dx-scheduler-appointment-tooltip-wrapper .dx-overlay-content .dx-list .dx-list-item:last-of-type,
+.dx-scheduler .dx-scheduler-overlay-panel .dx-overlay-content .dx-list .dx-list-item:last-of-type {
+  border-bottom-left-radius: 2px;
+  border-bottom-right-radius: 2px;
+  border-bottom: none;
+}
+.dx-scheduler .dx-scheduler-appointment-tooltip-wrapper .dx-overlay-content .dx-list .dx-list-item:first-of-type,
+.dx-scheduler .dx-scheduler-overlay-panel .dx-overlay-content .dx-list .dx-list-item:first-of-type {
+  border-top-left-radius: 2px;
+  border-top-right-radius: 2px;
+}
+.dx-scheduler .dx-scheduler-appointment-tooltip-wrapper .dx-overlay-content .dx-list .dx-list-item .dx-tooltip-appointment-item,
+.dx-scheduler .dx-scheduler-overlay-panel .dx-overlay-content .dx-list .dx-list-item .dx-tooltip-appointment-item {
+  margin-left: 8px;
+}
+.dx-scheduler .dx-scheduler-appointment-tooltip-wrapper .dx-overlay-content .dx-list .dx-list-item .dx-tooltip-appointment-item .dx-tooltip-appointment-item-marker-body,
+.dx-scheduler .dx-scheduler-overlay-panel .dx-overlay-content .dx-list .dx-list-item .dx-tooltip-appointment-item .dx-tooltip-appointment-item-marker-body {
+  width: 18px;
+  height: 18px;
+}
+.dx-scheduler .dx-scheduler-appointment-tooltip-wrapper .dx-overlay-content .dx-list .dx-list-item .dx-tooltip-appointment-item .dx-tooltip-appointment-item-content .dx-tooltip-appointment-item-content-subject,
+.dx-scheduler .dx-scheduler-overlay-panel .dx-overlay-content .dx-list .dx-list-item .dx-tooltip-appointment-item .dx-tooltip-appointment-item-content .dx-tooltip-appointment-item-content-subject {
+  margin-top: 3px;
+  font-size: 14px;
+}
+.dx-scheduler .dx-scheduler-appointment-tooltip-wrapper .dx-overlay-content .dx-list .dx-list-item .dx-tooltip-appointment-item .dx-tooltip-appointment-item-content .dx-tooltip-appointment-item-content-date,
+.dx-scheduler .dx-scheduler-overlay-panel .dx-overlay-content .dx-list .dx-list-item .dx-tooltip-appointment-item .dx-tooltip-appointment-item-content .dx-tooltip-appointment-item-content-date {
+  font-size: 11px;
+  opacity: 1;
+  margin-top: 4px;
+}
+.dx-scheduler .dx-scheduler-appointment-tooltip-wrapper .dx-overlay-content .dx-list .dx-list-item .dx-tooltip-appointment-item .dx-tooltip-appointment-item-delete-button-container,
+.dx-scheduler .dx-scheduler-overlay-panel .dx-overlay-content .dx-list .dx-list-item .dx-tooltip-appointment-item .dx-tooltip-appointment-item-delete-button-container {
+  padding-top: 2px;
+}
 .dx-form-group-with-caption > .dx-form-group-content {
   border-top: 1px solid #e0e0e0;
 }
@@ -15820,6 +15950,35 @@
   position: relative;
   margin-bottom: 21px;
   padding-top: 17px;
+}
+.dx-recurrence-editor-container .dx-recurrence-interval-field {
+  margin-bottom: 20px;
+}
+.dx-scheduler-recurrence-rule-item.dx-field-item .dx-recurrence-radiogroup-repeat-type {
+  top: 10px;
+}
+.dx-scheduler-recurrence-rule-item.dx-field-item .dx-recurrence-repeat-end-container {
+  margin: 0;
+}
+.dx-scheduler-recurrence-rule-item.dx-field-item .dx-recurrence-repeat-on {
+  margin-bottom: 10px;
+}
+.dx-scheduler-recurrence-rule-item.dx-field-item .dx-recurrence-radiogroup-repeat-type-label,
+.dx-scheduler-recurrence-rule-item.dx-field-item .dx-recurrence-numberbox-interval-label,
+.dx-scheduler-recurrence-rule-item.dx-field-item .dx-recurrence-repeat-on-label,
+.dx-scheduler-recurrence-rule-item.dx-field-item .dx-recurrence-repeat-end-container-label {
+  line-height: 40px;
+}
+.dx-scheduler-recurrence-rule-item.dx-field-item .dx-recurrence-repeat-end-container-label,
+.dx-scheduler-recurrence-rule-item.dx-field-item .dx-recurrence-repeat-end-container {
+  padding-top: 0px;
+  line-height: 38px;
+}
+.dx-scheduler-recurrence-rule-item.dx-field-item .dx-recurrence-datebox-until-date {
+  margin-left: 23px;
+}
+.dx-scheduler-recurrence-rule-item.dx-field-item .dx-recurrence-numberbox-repeat-count {
+  margin-left: 11px;
 }
 .dx-drawer-shader {
   background-color: rgba(0, 0, 0, 0.5);
@@ -15988,11 +16147,136 @@
   background-color: #d9d9d9;
   color: rgba(0, 0, 0, 0.87);
 }
+.dx-filemanager {
+  border-color: #e0e0e0;
+}
+.dx-filemanager .dx-filemanager-toolbar {
+  background: #fff;
+}
+.dx-filemanager .dx-filemanager-toolbar.dx-filemanager-file-toolbar,
+.dx-filemanager .dx-filemanager-toolbar.dx-filemanager-file-toolbar .dx-toolbar {
+  background: #f7f7f7;
+}
+.dx-filemanager .dx-filemanager-toolbar .dx-filemanager-toolbar-separator-item {
+  height: 26px;
+  background: #e0e0e0;
+}
+.dx-filemanager .dx-filemanager-toolbar .dx-filemanager-toolbar-viewmode-item .dx-texteditor {
+  width: 150px;
+}
+.dx-filemanager .dx-filemanager-toolbar .dx-texteditor.dx-editor-filled {
+  background: transparent;
+}
+.dx-filemanager .dx-filemanager-toolbar .dx-texteditor.dx-editor-filled.dx-state-hover,
+.dx-filemanager .dx-filemanager-toolbar .dx-texteditor.dx-editor-filled.dx-state-active,
+.dx-filemanager .dx-filemanager-toolbar .dx-texteditor.dx-editor-filled.dx-state-focused {
+  background: rgba(0, 0, 0, 0.1);
+}
+.dx-filemanager .dx-filemanager-toolbar .dx-texteditor.dx-editor-filled.dx-dropdowneditor {
+  border-color: transparent;
+}
+.dx-filemanager .dx-filemanager-toolbar .dx-texteditor.dx-editor-filled.dx-dropdowneditor .dx-dropdowneditor-icon {
+  background: transparent;
+}
+.dx-filemanager .dx-filemanager-toolbar .dx-texteditor.dx-editor-filled.dx-dropdowneditor.dx-state-hover .dx-dropdowneditor-icon,
+.dx-filemanager .dx-filemanager-toolbar .dx-texteditor.dx-editor-filled.dx-dropdowneditor.dx-state-active .dx-dropdowneditor-icon {
+  background: transparent;
+  border-color: transparent;
+}
+.dx-filemanager .dx-filemanager-container {
+  border-top-color: #e0e0e0;
+}
+.dx-filemanager .dx-filemanager-dirs-panel {
+  border-right-color: #e0e0e0;
+}
+.dx-filemanager .dx-filemanager-breadcrumbs {
+  border-bottom-color: #e0e0e0;
+}
+.dx-filemanager .dx-filemanager-breadcrumbs .dx-menu-item.dx-state-focused {
+  background: #e0e0e0;
+  color: rgba(0, 0, 0, 0.87);
+}
+.dx-filemanager .dx-filemanager-breadcrumbs .dx-filemanager-breadcrumbs-separator-item .dx-menu-item-content {
+  background: #e0e0e0;
+}
+.dx-filemanager .dx-filemanager-breadcrumbs .dx-filemanager-breadcrumbs-separator-item.dx-state-hover,
+.dx-filemanager .dx-filemanager-breadcrumbs .dx-filemanager-breadcrumbs-path-separator-item.dx-state-hover {
+  background: transparent;
+}
+.dx-filemanager .dx-filemanager-thumbnails.dx-filemanager-inactive-area .dx-filemanager-thumbnails-view-port .dx-filemanager-thumbnails-item.dx-filemanager-item-selected {
+  color: rgba(0, 0, 0, 0.87);
+  background: #fff;
+}
+.dx-filemanager .dx-filemanager-thumbnails .dx-filemanager-thumbnails-item.dx-filemanager-item-selected {
+  color: #fff;
+  background: #03A9F4;
+}
+.dx-filemanager .dx-filemanager-thumbnails .dx-filemanager-thumbnails-item.dx-filemanager-item-focused {
+  border-color: rgba(0, 0, 0, 0.87);
+}
+.dx-filemanager .dx-filemanager-thumbnails .dx-filemanager-thumbnails-item .dx-filemanager-item-custom-thumbnail {
+  color: #e0e0e0;
+}
+.dx-filemanager .dx-filemanager-files-view {
+  background: #fff;
+}
+.dx-filemanager-dirs-tree.dx-treeview .dx-state-focused > .dx-treeview-item {
+  background: transparent;
+}
+.dx-filemanager-dirs-tree.dx-treeview .dx-state-focused > .dx-treeview-item.dx-state-hover {
+  background: #ebebeb;
+}
+.dx-filemanager-dirs-tree.dx-treeview .dx-state-focused > .dx-treeview-item * {
+  color: rgba(0, 0, 0, 0.87);
+}
+.dx-filemanager-dirs-tree.dx-treeview .dx-treeview-item-without-checkbox > .dx-treeview-item.dx-filemanager-focused-item {
+  background: #ebebeb;
+}
+.dx-filemanager-dirs-tree.dx-treeview .dx-treeview-item-without-checkbox > .dx-treeview-item.dx-filemanager-focused-item * {
+  color: rgba(0, 0, 0, 0.87);
+}
+.dx-filemanager .dx-filemanager-container .dx-filemanager-dirs-panel {
+  min-width: 300px;
+  max-width: 350px;
+}
+.dx-filemanager .dx-row .dx-filemanager-file-actions-button .dx-button {
+  margin: -4px 0;
+  height: 18px;
+}
+.dx-filemanager-file-actions-button .dx-button {
+  min-width: 26px;
+  height: 22px;
+}
+.dx-filemanager-file-actions-button .dx-button .dx-button-content {
+  padding: 2px 6px;
+}
+.dx-filemanager-context-menu .dx-menu-item-has-text:not(.dx-menu-item-has-icon) .dx-menu-item-text {
+  margin-left: 30px;
+}
 .dx-diagram {
   border-color: #e0e0e0;
 }
 .dx-diagram .dx-diagram-toolbar-wrapper:first-child {
   border-bottom: 1px solid #e0e0e0;
+}
+.dx-diagram .dx-diagram-left-panel,
+.dx-diagram .dx-diagram-right-panel {
+  background: #fff;
+}
+.dx-diagram .dx-diagram-left-panel .dx-accordion .dx-accordion-item,
+.dx-diagram .dx-diagram-right-panel .dx-accordion .dx-accordion-item {
+  border-left: none;
+  border-right: none;
+}
+.dx-diagram .dx-diagram-left-panel .dx-accordion .dx-accordion-item:first-of-type,
+.dx-diagram .dx-diagram-right-panel .dx-accordion .dx-accordion-item:first-of-type {
+  border-top: none;
+}
+.dx-diagram .dx-diagram-left-panel {
+  border-right-color: #e0e0e0;
+}
+.dx-diagram .dx-diagram-right-panel {
+  border-left-color: #e0e0e0;
 }
 .dx-diagram-toolbar {
   background-color: transparent;
@@ -16008,8 +16292,4 @@
 }
 .dx-diagram-toolbar .dx-format-active:not(.dx-color-format):not(.dx-background-format).dx-button-danger {
   background-color: #ea1c0d;
-}
-.dx-diagram-toolbox .dx-accordion .dx-accordion-item,
-.dx-diagram-options .dx-accordion .dx-accordion-item {
-  border: none;
 }

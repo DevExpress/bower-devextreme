@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.all.d.ts)
-* Version: 19.1.2
-* Build date: Fri Apr 19 2019
+* Version: 19.1.3
+* Build date: Tue May 14 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -117,16 +117,11 @@ interface JQuery {
     dxDeferRendering(options: string, ...params: any[]): any;
     dxDeferRendering(options: DevExpress.ui.dxDeferRenderingOptions): JQuery;
 }
-
 interface JQuery {
     dxDiagram(): JQuery;
-
     dxDiagram(options: "instance"): DevExpress.ui.dxDiagram;
-
     dxDiagram(options: string): any;
-
     dxDiagram(options: string, ...params: any[]): any;
-
     dxDiagram(options: DevExpress.ui.dxDiagramOptions): JQuery;
 }
 interface JQuery {
@@ -571,6 +566,4441 @@ interface JQuery {
     dxVectorMap(options: DevExpress.viz.dxVectorMapOptions): JQuery;
 }
 /* #EndJQueryAugmentation */
+declare module DevExpress.ui {
+    
+    export interface AjaxFileProviderOptions extends FileProviderOptions<AjaxFileProvider> {
+        
+        itemsExpr?: string | Function;
+        
+        url?: string;
+    }
+    
+    export class AjaxFileProvider extends FileProvider {
+        constructor(options?: AjaxFileProviderOptions)
+    }
+    
+    export interface ArrayFileProviderOptions extends FileProviderOptions<ArrayFileProvider> {
+        
+        data?: Array<any>;
+        
+        itemsExpr?: string | Function;
+    }
+    
+    export class ArrayFileProvider extends FileProvider {
+        constructor(options?: ArrayFileProviderOptions)
+    }
+    /** Specifies dependency between the screen factor and the count of columns. */
+    export interface ColCountResponsible {
+        /** The count of columns for a large screen size. */
+        lg?: number;
+        /** The count of columns for a middle-sized screen. */
+        md?: number;
+        /** The count of columns for a small-sized screen. */
+        sm?: number;
+        /** The count of columns for an extra small-sized screen. */
+        xs?: number;
+    }
+    
+    export interface CollectionWidgetOptions<T = CollectionWidget> extends WidgetOptions<T> {
+        /** Binds the widget to data. */
+        dataSource?: string | Array<string | CollectionWidgetItem> | DevExpress.data.DataSource | DevExpress.data.DataSourceOptions;
+        /** The time period in milliseconds before the onItemHold event is raised. */
+        itemHoldTimeout?: number;
+        /** Specifies a custom template for items. */
+        itemTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery);
+        /** An array of items displayed by the widget. */
+        items?: Array<string | CollectionWidgetItem | any>;
+        /** Specifies which data field provides keys for widget items. */
+        keyExpr?: string | Function;
+        /** The text or HTML markup displayed by the widget if the item collection is empty. */
+        noDataText?: string;
+        /** A function that is executed when a collection item is clicked or tapped. */
+        onItemClick?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, itemData?: any, itemElement?: DevExpress.core.dxElement, itemIndex?: number, jQueryEvent?: JQueryEventObject, event?: event }) => any) | string;
+        /** A function that is executed when a collection item is right-clicked or pressed. */
+        onItemContextMenu?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, itemData?: any, itemElement?: DevExpress.core.dxElement, itemIndex?: number, jQueryEvent?: JQueryEventObject, event?: event }) => any);
+        /** A function that is executed when a collection item has been held for a specified period. */
+        onItemHold?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, itemData?: any, itemElement?: DevExpress.core.dxElement, itemIndex?: number, event?: event }) => any);
+        /** A function that is executed after a collection item is rendered. */
+        onItemRendered?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, itemData?: any, itemElement?: DevExpress.core.dxElement, itemIndex?: number }) => any);
+        /** A function that is executed when a collection item is selected or selection is canceled. */
+        onSelectionChanged?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, addedItems?: Array<any>, removedItems?: Array<any> }) => any);
+        /** The index of the currently selected widget item. */
+        selectedIndex?: number;
+        /** The selected item object. */
+        selectedItem?: any;
+        /** Specifies an array of currently selected item keys. */
+        selectedItemKeys?: Array<any>;
+        /** An array of currently selected item objects. */
+        selectedItems?: Array<any>;
+    }
+    /** The base class for widgets containing an item collection. */
+    export class CollectionWidget extends Widget {
+        constructor(element: Element, options?: CollectionWidgetOptions)
+        constructor(element: JQuery, options?: CollectionWidgetOptions)
+        /** Gets the DataSource instance. */
+        getDataSource(): DevExpress.data.DataSource;
+    }
+    /** This section lists the data source fields that are used in a default item template. */
+    export interface CollectionWidgetItem {
+        /** Specifies whether or not a widget item must be displayed disabled. */
+        disabled?: boolean;
+        /** Specifies html code inserted into the widget item element. */
+        html?: string;
+        /** Specifies an item template that should be used to render this item only. */
+        template?: template | (() => string | Element | JQuery);
+        /** Specifies text displayed for the widget item. */
+        text?: string;
+        /** Specifies whether or not a widget item must be displayed. */
+        visible?: boolean;
+    }
+    /** A validation rule that demands that a validated editor has a value that is equal to a specified expression. */
+    export interface CompareRule {
+        /** Specifies the function whose return value is used for comparison with the validated value. */
+        comparisonTarget?: (() => any);
+        /** Specifies the operator to be used for comparing the validated value with the target. */
+        comparisonType?: '!=' | '!==' | '<' | '<=' | '==' | '===' | '>' | '>=';
+        /** Specifies whether empty values are valid. */
+        ignoreEmptyValue?: boolean;
+        /** Specifies the message that is shown for end-users if the current rule is broken. */
+        message?: string;
+        /** Indicates whether or not the rule should be always checked for the target value or only when the target value changes. */
+        reevaluate?: boolean;
+        /** Specifies the type of the current rule. */
+        type?: 'required' | 'numeric' | 'range' | 'stringLength' | 'custom' | 'compare' | 'pattern' | 'email';
+    }
+    /** A validation rule with custom validation logic. */
+    export interface CustomRule {
+        /** Specifies whether the validationCallback should be called for null and undefined values. */
+        ignoreEmptyValue?: boolean;
+        /** Specifies the message that is shown for end-users if the current rule is broken. */
+        message?: string;
+        /** Indicates whether the rule should be always checked for the target value or only when the target value changes. */
+        reevaluate?: boolean;
+        /** Specifies the type of the current rule. */
+        type?: 'required' | 'numeric' | 'range' | 'stringLength' | 'custom' | 'compare' | 'pattern' | 'email';
+        /** A function that validates the target value. */
+        validationCallback?: ((options: { value?: string | number, rule?: any, validator?: any, data?: any }) => boolean);
+    }
+    
+    export interface DataExpressionMixinOptions<T = DataExpressionMixin> {
+        /** Binds the widget to data. */
+        dataSource?: string | Array<CollectionWidgetItem | any> | DevExpress.data.DataSource | DevExpress.data.DataSourceOptions;
+        /** Specifies the data field whose values should be displayed. */
+        displayExpr?: string | ((item: any) => any);
+        /** Specifies a custom template for items. */
+        itemTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery);
+        /** An array of items displayed by the widget. */
+        items?: Array<CollectionWidgetItem | any>;
+        /** Specifies the currently selected value. May be an object if dataSource contains objects and valueExpr is not set. */
+        value?: any;
+        /** Specifies which data field provides unique values to the widget's value. When the data field is not set, the value is the entire data object. */
+        valueExpr?: string | Function;
+    }
+    
+    export class DataExpressionMixin {
+        constructor(options?: DataExpressionMixinOptions)
+        /** Gets the DataSource instance. */
+        getDataSource(): DevExpress.data.DataSource;
+    }
+    
+    export interface DiagramDataSourceParameters {
+        
+        edges?: { dataSource?: Array<any> | DevExpress.data.DataSource | DevExpress.data.DataSourceOptions, fromExpr?: string | ((data: any) => any), keyExpr?: string | ((data: any) => any), toExpr?: string | ((data: any) => any) };
+        
+        key?: string;
+        
+        layout?: 'tree' | 'sugiyama';
+        
+        nodes?: { dataSource?: Array<any> | DevExpress.data.DataSource | DevExpress.data.DataSourceOptions, itemsExpr?: string | ((data: any) => any), keyExpr?: string | ((data: any) => any), parentKeyExpr?: string | ((data: any) => any), textExpr?: string | ((data: any) => any), typeExpr?: string | ((data: any) => any) };
+        
+        title?: string;
+    }
+    
+    export interface EditorOptions<T = Editor> extends WidgetOptions<T> {
+        /** Specifies whether the editor's value is valid. */
+        isValid?: boolean;
+        /** A function that is executed after the widget's value is changed. */
+        onValueChanged?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, value?: any, previousValue?: any, jQueryEvent?: JQueryEventObject, event?: event }) => any);
+        /** A Boolean value specifying whether or not the widget is read-only. */
+        readOnly?: boolean;
+        /** Specifies information on the validation error when using a custom validation engine. Should be changed at runtime along with the isValid option. */
+        validationError?: any;
+        /** Specifies how the message about the validation rules that are not satisfied by this editor's value is displayed. */
+        validationMessageMode?: 'always' | 'auto';
+        /** Specifies the widget's value. */
+        value?: any;
+    }
+    /** A base class for editors. */
+    export class Editor extends Widget {
+        constructor(element: Element, options?: EditorOptions)
+        constructor(element: JQuery, options?: EditorOptions)
+        /** Resets the value option to the default value. */
+        reset(): void;
+    }
+    /** A validation rule that demands that the validated field match the Email pattern. */
+    export interface EmailRule {
+        /** Specifies whether empty values are valid. */
+        ignoreEmptyValue?: boolean;
+        /** Specifies the message that is shown for end-users if the current rule is broken. */
+        message?: string;
+        /** Specifies the type of the current rule. */
+        type?: 'required' | 'numeric' | 'range' | 'stringLength' | 'custom' | 'compare' | 'pattern' | 'email';
+    }
+    
+    export interface FileProviderOptions<T = FileProvider> {
+        
+        dateModifiedExpr?: string | Function;
+        
+        isDirectoryExpr?: string | Function;
+        
+        nameExpr?: string | Function;
+        
+        sizeExpr?: string | Function;
+        
+        thumbnailExpr?: string | Function;
+    }
+    
+    export class FileProvider {
+        constructor(options?: FileProviderOptions)
+    }
+    
+    export interface GridBaseOptions<T = GridBase> extends WidgetOptions<T> {
+        /** Specifies whether a user can reorder columns. */
+        allowColumnReordering?: boolean;
+        /** Specifies whether a user can resize columns. */
+        allowColumnResizing?: boolean;
+        /** Specifies whether data should be cached. */
+        cacheEnabled?: boolean;
+        /** Enables a hint that appears when a user hovers the mouse pointer over a cell with truncated content. */
+        cellHintEnabled?: boolean;
+        /** Specifies whether columns should adjust their widths to the content. */
+        columnAutoWidth?: boolean;
+        /** Configures the column chooser. */
+        columnChooser?: { allowSearch?: boolean, emptyPanelText?: string, enabled?: boolean, height?: number, mode?: 'dragAndDrop' | 'select', searchTimeout?: number, title?: string, width?: number };
+        /** Configures column fixing. */
+        columnFixing?: { enabled?: boolean, texts?: { fix?: string, leftPosition?: string, rightPosition?: string, unfix?: string } };
+        /** Specifies whether the widget should hide columns to adapt to the screen or container size. Ignored if allowColumnResizing is true and columnResizingMode is "widget". */
+        columnHidingEnabled?: boolean;
+        /** Specifies the minimum width of columns. */
+        columnMinWidth?: number;
+        /** Specifies how the widget resizes columns. Applies only if allowColumnResizing is true. */
+        columnResizingMode?: 'nextColumn' | 'widget';
+        /** Specifies the width for all data columns. Has a lower priority than the column.width option. */
+        columnWidth?: number;
+        /** Overridden. */
+        columns?: Array<GridBaseColumn | string>;
+        /** Binds the widget to data. */
+        dataSource?: string | Array<any> | DevExpress.data.DataSource | DevExpress.data.DataSourceOptions;
+        /** Specifies date-time values' serialization format. Use it only if you do not specify the dataSource at design time. */
+        dateSerializationFormat?: string;
+        /** Overriden. */
+        editing?: GridBaseEditing;
+        /** Indicates whether to show the error row. */
+        errorRowEnabled?: boolean;
+        /** Configures the integrated filter builder. */
+        filterBuilder?: dxFilterBuilderOptions;
+        /** Configures the popup in which the integrated filter builder is shown. */
+        filterBuilderPopup?: dxPopupOptions;
+        /** Configures the filter panel. */
+        filterPanel?: { customizeText?: ((e: { component?: T, filterValue?: any, text?: string }) => string), filterEnabled?: boolean, texts?: { clearFilter?: string, createFilter?: string, filterEnabledHint?: string }, visible?: boolean };
+        /** Configures the filter row. */
+        filterRow?: { applyFilter?: 'auto' | 'onClick', applyFilterText?: string, betweenEndText?: string, betweenStartText?: string, operationDescriptions?: { between?: string, contains?: string, endsWith?: string, equal?: string, greaterThan?: string, greaterThanOrEqual?: string, lessThan?: string, lessThanOrEqual?: string, notContains?: string, notEqual?: string, startsWith?: string }, resetOperationText?: string, showAllText?: string, showOperationChooser?: boolean, visible?: boolean };
+        /** Specifies whether to synchronize the filter row, header filter, and filter builder. The synchronized filter expression is stored in the filterValue option. */
+        filterSyncEnabled?: boolean | 'auto';
+        /** Specifies a filter expression. */
+        filterValue?: string | Array<any> | Function;
+        /** Specifies the index of the column focused initially or currently in the data row area. */
+        focusedColumnIndex?: number;
+        /** Specifies whether the focused row feature is enabled. */
+        focusedRowEnabled?: boolean;
+        /** Specifies the initially or currently focused grid row's index. Use it when focusedRowEnabled is true. */
+        focusedRowIndex?: number;
+        /** Specifies initially or currently focused grid row's key. Use it when focusedRowEnabled is true. */
+        focusedRowKey?: any;
+        /** Configures the header filter feature. */
+        headerFilter?: { allowSearch?: boolean, height?: number, searchTimeout?: number, texts?: { cancel?: string, emptyValue?: string, ok?: string }, visible?: boolean, width?: number };
+        /** Specifies whether to highlight rows and cells whose data changed. */
+        highlightChanges?: boolean;
+        /** Configures keyboard navigation. */
+        keyboardNavigation?: { editOnKeyPress?: boolean, enterKeyAction?: 'startEdit' | 'moveFocus', enterKeyDirection?: 'none' | 'column' | 'row' };
+        /** Configures the load panel. */
+        loadPanel?: { enabled?: boolean | 'auto', height?: number, indicatorSrc?: string, shading?: boolean, shadingColor?: string, showIndicator?: boolean, showPane?: boolean, text?: string, width?: number };
+        /** Specifies text shown when the widget does not display any data. */
+        noDataText?: string;
+        /** A function that is executed before an adaptive detail row is rendered. */
+        onAdaptiveDetailRowPreparing?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, formOptions?: any }) => any);
+        /** A function that is executed when an error occurs in the data source. */
+        onDataErrorOccurred?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, error?: Error }) => any);
+        /** A function that is executed before a new row is added to the widget. */
+        onInitNewRow?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, data?: any }) => any);
+        /** A function that is executed when the widget is in focus and a key has been pressed down. */
+        onKeyDown?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, jQueryEvent?: JQueryEventObject, event?: event, handled?: boolean }) => any);
+        /** A function that is executed after a row is collapsed. */
+        onRowCollapsed?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, key?: any }) => any);
+        /** A function that is executed before a row is collapsed. */
+        onRowCollapsing?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, key?: any, cancel?: boolean }) => any);
+        /** A function that is executed after a row is expanded. */
+        onRowExpanded?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, key?: any }) => any);
+        /** A function that is executed before a row is expanded. */
+        onRowExpanding?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, key?: any, cancel?: boolean }) => any);
+        /** A function that is executed after a new row has been inserted into the data source. */
+        onRowInserted?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, data?: any, key?: any, error?: Error }) => any);
+        /** A function that is executed before a new row is inserted into the data source. */
+        onRowInserting?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, data?: any, cancel?: boolean | Promise<void> | JQueryPromise<void> }) => any);
+        /** A function that is executed after a row has been removed from the data source. */
+        onRowRemoved?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, data?: any, key?: any, error?: Error }) => any);
+        /** A function that is executed before a row is removed from the data source. */
+        onRowRemoving?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, data?: any, key?: any, cancel?: boolean | Promise<void> | JQueryPromise<void> }) => any);
+        /** A function that is executed after a row has been updated in the data source. */
+        onRowUpdated?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, data?: any, key?: any, error?: Error }) => any);
+        /** A function that is executed before a row is updated in the data source. */
+        onRowUpdating?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, oldData?: any, newData?: any, key?: any, cancel?: boolean | Promise<void> | JQueryPromise<void> }) => any);
+        /** A function that is executed after cells in a row are validated against validation rules. */
+        onRowValidating?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, brokenRules?: Array<RequiredRule | NumericRule | RangeRule | StringLengthRule | CustomRule | CompareRule | PatternRule | EmailRule>, isValid?: boolean, key?: any, newData?: any, oldData?: any, errorText?: string }) => any);
+        /** A function that is executed after selecting a row or clearing its selection. */
+        onSelectionChanged?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, currentSelectedRowKeys?: Array<any>, currentDeselectedRowKeys?: Array<any>, selectedRowKeys?: Array<any>, selectedRowsData?: Array<any> }) => any);
+        /** A function that is executed before the toolbar is created. */
+        onToolbarPreparing?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, toolbarOptions?: dxToolbarOptions }) => any);
+        /** Configures the pager. */
+        pager?: { allowedPageSizes?: Array<number> | 'auto', infoText?: string, showInfo?: boolean, showNavigationButtons?: boolean, showPageSizeSelector?: boolean, visible?: boolean | 'auto' };
+        /** Configures paging. */
+        paging?: GridBasePaging;
+        /** Specifies whether to render the filter row, command columns, and columns with showEditorAlways set to true after other elements. */
+        renderAsync?: boolean;
+        /** Specifies whether to repaint only those cells whose data changed. */
+        repaintChangesOnly?: boolean;
+        /** Specifies whether rows should be shaded differently. */
+        rowAlternationEnabled?: boolean;
+        /** Overridden. A configuration object specifying scrolling options. */
+        scrolling?: GridBaseScrolling;
+        /** Configures the search panel. */
+        searchPanel?: { highlightCaseSensitive?: boolean, highlightSearchText?: boolean, placeholder?: string, searchVisibleColumnsOnly?: boolean, text?: string, visible?: boolean, width?: number };
+        /** Allows you to select rows or determine which rows are selected. */
+        selectedRowKeys?: Array<any>;
+        /** Overridden. */
+        selection?: GridBaseSelection;
+        /** Specifies whether the outer borders of the widget are visible. */
+        showBorders?: boolean;
+        /** Specifies whether column headers are visible. */
+        showColumnHeaders?: boolean;
+        /** Specifies whether vertical lines that separate one column from another are visible. */
+        showColumnLines?: boolean;
+        /** Specifies whether horizontal lines that separate one row from another are visible. */
+        showRowLines?: boolean;
+        /** Configures runtime sorting. */
+        sorting?: { ascendingText?: string, clearText?: string, descendingText?: string, mode?: 'multiple' | 'none' | 'single' };
+        /** Configures state storing. */
+        stateStoring?: { customLoad?: (() => Promise<any> | JQueryPromise<any>), customSave?: ((gridState: any) => any), enabled?: boolean, savingTimeout?: number, storageKey?: string, type?: 'custom' | 'localStorage' | 'sessionStorage' };
+        /** Specifies whether to enable two-way data binding. */
+        twoWayBindingEnabled?: boolean;
+        /** Specifies whether text that does not fit into a column should be wrapped. */
+        wordWrapEnabled?: boolean;
+    }
+    /** Overriden. */
+    export interface GridBaseEditing {
+        /** Configures the form. Used only if editing.mode is "form" or "popup". */
+        form?: dxFormOptions;
+        /** Specifies how a user edits data. */
+        mode?: 'batch' | 'cell' | 'row' | 'form' | 'popup';
+        /** Configures the popup. Used only if editing.mode is "popup". */
+        popup?: dxPopupOptions;
+        /** Specifies operations that are performed after saving changes. */
+        refreshMode?: 'full' | 'reshape' | 'repaint';
+        /** Specifies whether to select text in a cell when a user starts editing. */
+        selectTextOnEditStart?: boolean;
+        /** Specifies whether a single or double click should switch a cell to the editing state. Applies if editing.mode is "cell" or "batch". */
+        startEditAction?: 'click' | 'dblClick';
+        /** Overriden. */
+        texts?: GridBaseEditingTexts;
+        /** Specifies whether the editing column uses icons instead of links. */
+        useIcons?: boolean;
+    }
+    /** Overriden. */
+    export interface GridBaseEditingTexts {
+        /** Specifies text for a hint that appears when a user pauses on the global "Add" button. Applies only if editing.allowAdding is true. */
+        addRow?: string;
+        /** Specifies text for a hint that appears when a user pauses on the "Discard" button. Applies only if editing.mode is "batch". */
+        cancelAllChanges?: string;
+        /** Specifies text for a button that cancels changes in a row. Applies only if editing.allowUpdating is true and editing.mode is "row". */
+        cancelRowChanges?: string;
+        /** Specifies a message that prompts a user to confirm deletion. */
+        confirmDeleteMessage?: string;
+        /** Specifies a title for the window that asks a user to confirm deletion. */
+        confirmDeleteTitle?: string;
+        /** Specifies text for buttons that delete rows. Applies only if allowDeleting is true. */
+        deleteRow?: string;
+        /** Specifies text for buttons that switch rows into the editing state. Applies only if allowUpdating is true. */
+        editRow?: string;
+        /** Specifies text for a hint that appears when a user pauses on the global "Save" button. Applies only if editing.mode is "batch". */
+        saveAllChanges?: string;
+        /** Specifies text for a button that saves changes made in a row. Applies only if allowUpdating is true. */
+        saveRowChanges?: string;
+        /** Specifies text for buttons that recover deleted rows. Applies only if allowDeleting is true and editing.mode is "batch". */
+        undeleteRow?: string;
+        /** Specifies text for a hint appearing when a user pauses on the button that cancels changes in a cell. Applies only if editing.mode is "cell" and data validation is enabled. */
+        validationCancelChanges?: string;
+    }
+    /** Configures paging. */
+    export interface GridBasePaging {
+        /** Enables paging. */
+        enabled?: boolean;
+        /** Specifies the page to be displayed using a zero-based index. */
+        pageIndex?: number;
+        /** Specifies the page size. */
+        pageSize?: number;
+    }
+    /** Overridden. A configuration object specifying scrolling options. */
+    export interface GridBaseScrolling {
+        /** Specifies the rendering mode for columns. Applies when columns are left outside the viewport. Requires the columnWidth, columnAutoWidth, or width (for all columns) option specified. */
+        columnRenderingMode?: 'standard' | 'virtual';
+        /** Specifies whether the widget should load pages adjacent to the current page. Applies only if scrolling.mode is "virtual". */
+        preloadEnabled?: boolean;
+        /** Specifies the rendering mode for loaded rows. */
+        rowRenderingMode?: 'standard' | 'virtual';
+        /** Specifies whether a user can scroll the content with a swipe gesture. Applies only if useNative is false. */
+        scrollByContent?: boolean;
+        /** Specifies whether a user can scroll the content with the scrollbar. Applies only if useNative is false. */
+        scrollByThumb?: boolean;
+        /** Specifies when to show scrollbars. Applies only if useNative is false. */
+        showScrollbar?: 'always' | 'never' | 'onHover' | 'onScroll';
+        /** Specifies whether the widget should use native or simulated scrolling. */
+        useNative?: boolean | 'auto';
+    }
+    /** Overridden. */
+    export interface GridBaseSelection {
+        /** Specifies whether a user can select all rows at once. */
+        allowSelectAll?: boolean;
+        /** Specifies the selection mode. */
+        mode?: 'multiple' | 'none' | 'single';
+    }
+    
+    export class GridBase extends Widget {
+        constructor(element: Element, options?: GridBaseOptions)
+        constructor(element: JQuery, options?: GridBaseOptions)
+        /** Shows the load panel. */
+        beginCustomLoading(messageText: string): void;
+        /** Gets a data object with a specific key. */
+        byKey(key: any | string | number): Promise<any> & JQueryPromise<any>;
+        /** Discards changes that a user made to data. */
+        cancelEditData(): void;
+        /** Gets the value of a cell with a specific row index and a data field, column caption or name. */
+        cellValue(rowIndex: number, dataField: string): any;
+        /** Sets a new value to a cell with a specific row index and a data field, column caption or name. */
+        cellValue(rowIndex: number, dataField: string, value: any): void;
+        /** Gets the value of a cell with specific row and column indexes. */
+        cellValue(rowIndex: number, visibleColumnIndex: number): any;
+        /** Sets a new value to a cell with specific row and column indexes. */
+        cellValue(rowIndex: number, visibleColumnIndex: number, value: any): void;
+        /** Clears all filters applied to widget rows. */
+        clearFilter(): void;
+        /** Clears all row filters of a specific type. */
+        clearFilter(filterName: string): void;
+        /** Clears selection of all rows on all pages. */
+        clearSelection(): void;
+        /** Clears sorting settings of all columns at once. */
+        clearSorting(): void;
+        /** Switches the cell being edited back to the normal state. Takes effect only if editing.mode is batch and showEditorAlways is false. */
+        closeEditCell(): void;
+        /** Collapses the currently expanded adaptive detail row (if there is one). */
+        collapseAdaptiveDetailRow(): void;
+        /** Gets the data column count. Includes visible and hidden columns, excludes command columns. */
+        columnCount(): number;
+        /** Gets all options of a column with a specific identifier. */
+        columnOption(id: number | string): any;
+        /** Gets the value of a single column option. */
+        columnOption(id: number | string, optionName: string): any;
+        /** Updates the value of a single column option. */
+        columnOption(id: number | string, optionName: string, optionValue: any): void;
+        /** Updates the values of several column options. */
+        columnOption(id: number | string, options: any): void;
+        /** Removes a column. */
+        deleteColumn(id: number | string): void;
+        /** Removes a row with a specific index. */
+        deleteRow(rowIndex: number): void;
+        /** Clears the selection of all rows on all pages or the currently rendered page only. */
+        deselectAll(): Promise<void> & JQueryPromise<void>;
+        /** Cancels the selection of rows with specific keys. */
+        deselectRows(keys: Array<any>): Promise<any> & JQueryPromise<any>;
+        /** Switches a cell with a specific row index and a data field to the editing state. Takes effect only if the editing mode is "batch" or "cell". */
+        editCell(rowIndex: number, dataField: string): void;
+        /** Switches a cell with specific row and column indexes to the editing state. Takes effect only if the editing mode is "batch" or "cell". */
+        editCell(rowIndex: number, visibleColumnIndex: number): void;
+        /** Switches a row with a specific index to the editing state. Takes effect only if the editing mode is "row", "popup" or "form". */
+        editRow(rowIndex: number): void;
+        /** Hides the load panel. */
+        endCustomLoading(): void;
+        /** Expands an adaptive detail row. */
+        expandAdaptiveDetailRow(key: any): void;
+        /** Gets a filter expression applied to the widget's data source using the filter(filterExpr) method and the DataSource's filter option. */
+        filter(): any;
+        /** Applies a filter to the widget's data source. */
+        filter(filterExpr: any): void;
+        /** Sets focus on the widget. */
+        focus(): void;
+        /** Sets focus on a specific cell. */
+        focus(element: Element | JQuery): void;
+        /** Gets a cell with a specific row index and a data field, column caption or name. */
+        getCellElement(rowIndex: number, dataField: string): DevExpress.core.dxElement | undefined;
+        /** Gets a cell with specific row and column indexes. */
+        getCellElement(rowIndex: number, visibleColumnIndex: number): DevExpress.core.dxElement | undefined;
+        /** Gets the total filter that combines all the filters applied. */
+        getCombinedFilter(): any;
+        /** Gets the total filter that combines all the filters applied. */
+        getCombinedFilter(returnDataField: boolean): any;
+        /** Gets the DataSource instance. */
+        getDataSource(): DevExpress.data.DataSource;
+        /** Gets the key of a row with a specific index. */
+        getKeyByRowIndex(rowIndex: number): any;
+        /** Gets the container of a row with a specific index. */
+        getRowElement(rowIndex: number): Array<Element> & JQuery | undefined;
+        /** Gets the index of a row with a specific key. */
+        getRowIndexByKey(key: any | string | number): number;
+        /** Gets the instance of the widget's scrollable part. */
+        getScrollable(): dxScrollable;
+        /** Checks whether the widget has unsaved changes. */
+        hasEditData(): boolean;
+        /** Hides the column chooser. */
+        hideColumnChooser(): void;
+        /** Checks whether an adaptive detail row is expanded or collapsed. */
+        isAdaptiveDetailRowExpanded(key: any): boolean;
+        /** Checks whether a row with a specific key is focused. */
+        isRowFocused(key: any): boolean;
+        /** Checks whether a row with a specific key is selected. */
+        isRowSelected(key: any): boolean;
+        /** Gets a data object's key. */
+        keyOf(obj: any): any;
+        /** Scrolls the grid to the row with the specified key. */
+        navigateToRow(key: any): void;
+        /** Gets the total page count. */
+        pageCount(): number;
+        /** Gets the current page index. */
+        pageIndex(): number;
+        /** Switches the widget to a specific page using a zero-based index. */
+        pageIndex(newIndex: number): Promise<void> & JQueryPromise<void>;
+        /** Gets the current page size. */
+        pageSize(): number;
+        /** Sets the page size. */
+        pageSize(value: number): void;
+        /** Reloads data and repaints the widget. */
+        refresh(): Promise<void> & JQueryPromise<void>;
+        /** Reloads data and repaints the widget or elements whose data changed. */
+        refresh(changesOnly: boolean): Promise<void> & JQueryPromise<void>;
+        /** Repaints specific rows. */
+        repaintRows(rowIndexes: Array<number>): void;
+        /** Saves changes that a user made to data. */
+        saveEditData(): Promise<void> & JQueryPromise<void>;
+        /** Seeks a search string in the columns whose allowSearch option is true. */
+        searchByText(text: string): void;
+        /** Selects all rows. */
+        selectAll(): Promise<void> & JQueryPromise<void>;
+        /** Selects rows with specific keys. */
+        selectRows(keys: Array<any>, preserve: boolean): Promise<any> & JQueryPromise<any>;
+        /** Selects rows with specific indexes. */
+        selectRowsByIndexes(indexes: Array<number>): Promise<any> & JQueryPromise<any>;
+        /** Shows the column chooser. */
+        showColumnChooser(): void;
+        /** Gets the current widget state. */
+        state(): any;
+        /** Sets the widget state. */
+        state(state: any): void;
+        /** Recovers a row deleted in batch editing mode. */
+        undeleteRow(rowIndex: number): void;
+        /** Updates the widget's content after resizing. */
+        updateDimensions(): void;
+    }
+    
+    export interface GridBaseColumn {
+        /** Aligns the content of the column. */
+        alignment?: 'center' | 'left' | 'right' | undefined;
+        /** Specifies whether a user can edit values in the column at runtime. By default, inherits the value of the editing.allowUpdating option. */
+        allowEditing?: boolean;
+        /** Specifies whether data can be filtered by this column. Applies only if filterRow.visible is true. */
+        allowFiltering?: boolean;
+        /** Specifies whether a user can fix the column at runtime. Applies only if columnFixing.enabled is true. */
+        allowFixing?: boolean;
+        /** Specifies whether the header filter can be used to filter data by this column. Applies only if headerFilter.visible is true. By default, inherits the value of the allowFiltering option. */
+        allowHeaderFiltering?: boolean;
+        /** Specifies whether a user can hide the column using the column chooser at runtime. Applies only if columnChooser.enabled is true. */
+        allowHiding?: boolean;
+        /** Specifies whether this column can be used in column reordering at runtime. Applies only if allowColumnReordering is true. */
+        allowReordering?: boolean;
+        /** Specifies whether a user can resize the column at runtime. Applies only if allowColumnResizing is true. */
+        allowResizing?: boolean;
+        /** Specifies whether this column can be searched. Applies only if searchPanel.visible is true. Inherits the value of the allowFiltering option by default. */
+        allowSearch?: boolean;
+        /** Specifies whether a user can sort rows by this column at runtime. Applies only if sorting.mode differs from "none". */
+        allowSorting?: boolean;
+        /** Calculates custom values for column cells. */
+        calculateCellValue?: ((rowData: any) => any);
+        /** Calculates custom display values for column cells. Requires specifying the dataField or calculateCellValue option. Used in lookup optimization. */
+        calculateDisplayValue?: string | ((rowData: any) => any);
+        /** Specifies the column's custom filtering rules. */
+        calculateFilterExpression?: ((filterValue: any, selectedFilterOperation: string, target: string) => string | Array<any> | Function);
+        /** Calculates custom values to be used in sorting. */
+        calculateSortValue?: string | ((rowData: any) => any);
+        /** Specifies a caption for the column. */
+        caption?: string;
+        /** Specifies a custom template for column cells. */
+        cellTemplate?: template | ((cellElement: DevExpress.core.dxElement, cellInfo: any) => any);
+        /** Specifies a CSS class to be applied to the column. */
+        cssClass?: string;
+        /** Customizes the text displayed in column cells. */
+        customizeText?: ((cellInfo: { value?: string | number | Date, valueText?: string, target?: string, groupInterval?: string | number }) => string);
+        /** Binds the column to a field of the dataSource. */
+        dataField?: string;
+        /** Casts column values to a specific data type. */
+        dataType?: 'string' | 'number' | 'date' | 'boolean' | 'object' | 'datetime';
+        /** Specifies a custom template for column cells in the editing state. */
+        editCellTemplate?: template | ((cellElement: DevExpress.core.dxElement, cellInfo: any) => any);
+        /** Specifies options for the underlain editor. */
+        editorOptions?: any;
+        /** Specifies whether HTML tags are displayed as plain text or applied to the values of the column. */
+        encodeHtml?: boolean;
+        /** In a boolean column, replaces all false items with a specified text. Applies only if showEditorAlways option is false. */
+        falseText?: string;
+        /** Specifies a set of available filter operations. Applies only if filterRow.visible and allowFiltering are true. */
+        filterOperations?: Array<'=' | '<>' | '<' | '<=' | '>' | '>=' | 'notcontains' | 'contains' | 'startswith' | 'endswith' | 'between'>;
+        /** Specifies whether a user changes the current filter by including (selecting) or excluding (clearing the selection of) values. Applies only if headerFilter.visible and allowHeaderFiltering are true. */
+        filterType?: 'exclude' | 'include';
+        /** Specifies the column's filter value displayed in the filter row. */
+        filterValue?: any;
+        /** Specifies values selected in the column's header filter. */
+        filterValues?: Array<any>;
+        /** Fixes the column. */
+        fixed?: boolean;
+        /** Specifies the widget's edge to which the column is fixed. Applies only if columns].[fixed is true. */
+        fixedPosition?: 'left' | 'right';
+        /** Configures the form item that the column produces in the editing state. Applies only if editing.mode is "form" or "popup". */
+        formItem?: dxFormSimpleItem;
+        /** Formats a value before it is displayed in a column cell. */
+        format?: format;
+        /** Specifies a custom template for column headers. */
+        headerCellTemplate?: template | ((columnHeader: DevExpress.core.dxElement, headerInfo: any) => any);
+        /** Specifies data settings for the header filter. */
+        headerFilter?: { allowSearch?: boolean, dataSource?: Array<any> | ((options: { component?: any, dataSource?: DevExpress.data.DataSourceOptions }) => any) | DevExpress.data.DataSourceOptions, groupInterval?: 'day' | 'hour' | 'minute' | 'month' | 'quarter' | 'second' | 'year' | number, height?: number, searchMode?: 'contains' | 'startswith' | 'equals', width?: number };
+        /** Specifies the order in which columns are hidden when the widget adapts to the screen or container size. Ignored if allowColumnResizing is true and columnResizingMode is "widget". */
+        hidingPriority?: number;
+        /** Specifies whether the column bands other columns or not. */
+        isBand?: boolean;
+        /** Specifies options of a lookup column. */
+        lookup?: { allowClearing?: boolean, dataSource?: Array<any> | DevExpress.data.DataSourceOptions | DevExpress.data.Store | ((options: { data?: any, key?: any }) => Array<any> | DevExpress.data.DataSourceOptions | DevExpress.data.Store), displayExpr?: string | ((data: any) => any), valueExpr?: string };
+        /** Specifies the minimum width of the column. */
+        minWidth?: number;
+        /** Specifies the identifier of the column. */
+        name?: string;
+        /** Specifies the band column that owns the current column. Accepts the index of the band column in the columns array. */
+        ownerBand?: number;
+        /** Specifies whether to render the column after other columns and elements. Use if column cells have a complex template. Requires the width option specified. */
+        renderAsync?: boolean;
+        /** Specifies the column's filter operation displayed in the filter row. */
+        selectedFilterOperation?: '<' | '<=' | '<>' | '=' | '>' | '>=' | 'between' | 'contains' | 'endswith' | 'notcontains' | 'startswith';
+        /** Specifies a function to be invoked after the user has edited a cell value, but before it will be saved in the data source. */
+        setCellValue?: ((newData: any, value: any, currentRowData: any) => any);
+        /** Specifies whether the column displays its values using editors. */
+        showEditorAlways?: boolean;
+        /** Specifies whether the column chooser can contain the column header. */
+        showInColumnChooser?: boolean;
+        /** Specifies the index according to which columns participate in sorting. */
+        sortIndex?: number;
+        /** Specifies the sort order of column values. */
+        sortOrder?: 'asc' | 'desc' | undefined;
+        /** Specifies a custom comparison function for sorting. Applies only when sorting is performed on the client. */
+        sortingMethod?: ((value1: any, value2: any) => number);
+        /** In a boolean column, replaces all true items with a specified text. Applies only if showEditorAlways option is false. */
+        trueText?: string;
+        /** Specifies validation rules to be checked on updating cell values. */
+        validationRules?: Array<RequiredRule | NumericRule | RangeRule | StringLengthRule | CustomRule | CompareRule | PatternRule | EmailRule>;
+        /** Specifies whether the column is visible, that is, occupies space in the table. */
+        visible?: boolean;
+        /** Specifies the position of the column regarding other columns in the resulting widget. */
+        visibleIndex?: number;
+        /** Specifies the column's width in pixels or as a percentage. Ignored if it is less than minWidth. */
+        width?: number | string;
+    }
+    /** Allows you to customize buttons in the editing column or create a custom command column. Applies only if the column's type is "buttons". */
+    export interface GridBaseColumnButton {
+        /** Specifies a CSS class to be applied to the button. */
+        cssClass?: string;
+        /** Specifies the text for the hint that appears when the button is hovered over or long-pressed. */
+        hint?: string;
+        /** Specifies the button's icon. */
+        icon?: string;
+        /** Specifies the button's text. Applies only if the button's icon is not specified. */
+        text?: string;
+    }
+    
+    export interface HierarchicalCollectionWidgetOptions<T = HierarchicalCollectionWidget> extends CollectionWidgetOptions<T> {
+        /** Specifies the name of the data source item field whose value defines whether or not the corresponding widget item is disabled. */
+        disabledExpr?: string | Function;
+        /** Specifies the data field whose values should be displayed. */
+        displayExpr?: string | ((item: any) => any);
+        /** Specifies whether the widget can be focused using keyboard navigation. */
+        focusStateEnabled?: boolean;
+        /** Specifies whether the widget changes its state when a user pauses on it. */
+        hoverStateEnabled?: boolean;
+        /** Specifies which data field contains nested items. */
+        itemsExpr?: string | Function;
+        /** Specifies which data field provides keys for TreeView items. */
+        keyExpr?: string | Function;
+        /** Specifies the name of the data source item field whose value defines whether or not the corresponding widget items is selected. */
+        selectedExpr?: string | Function;
+    }
+    
+    export class HierarchicalCollectionWidget extends CollectionWidget {
+        constructor(element: Element, options?: HierarchicalCollectionWidgetOptions)
+        constructor(element: JQuery, options?: HierarchicalCollectionWidgetOptions)
+    }
+    
+    export interface MapLocation {
+        /** The latitude location of the widget. */
+        lat?: number;
+        /** The longitude location of the widget. */
+        lng?: number;
+    }
+    /** A validation rule that demands that the validated field has a numeric value. */
+    export interface NumericRule {
+        /** Specifies whether empty values are valid. */
+        ignoreEmptyValue?: boolean;
+        /** Specifies the message that is shown for end-users if the current rule is broken. */
+        message?: string;
+        /** Specifies the type of the current rule. */
+        type?: 'required' | 'numeric' | 'range' | 'stringLength' | 'custom' | 'compare' | 'pattern' | 'email';
+    }
+    
+    export interface OneDriveFileProvider extends FileProvider {
+    }
+    /** A validation rule that demands that the validated field match a specified pattern. */
+    export interface PatternRule {
+        /** Specifies whether empty values are valid. */
+        ignoreEmptyValue?: boolean;
+        /** Specifies the message that is shown for end-users if the current rule is broken. */
+        message?: string;
+        /** Specifies the regular expression that the validated value must match. */
+        pattern?: RegExp | string;
+        /** Specifies the type of the current rule. */
+        type?: 'required' | 'numeric' | 'range' | 'stringLength' | 'custom' | 'compare' | 'pattern' | 'email';
+    }
+    /** A validation rule that demands the target value be within the specified value range (including the range's end points). */
+    export interface RangeRule {
+        /** Specifies whether empty values are valid. */
+        ignoreEmptyValue?: boolean;
+        /** Specifies the maximum value allowed for the validated value. */
+        max?: Date | number;
+        /** Specifies the message that is shown to end-users if the current rule is broken. */
+        message?: string;
+        /** Specifies the minimum value allowed for the validated value. */
+        min?: Date | number;
+        /** Indicates whether the rule should be always checked for the target value or only when the target value changes. */
+        reevaluate?: boolean;
+        /** Specifies the type of the current rule. */
+        type?: 'required' | 'numeric' | 'range' | 'stringLength' | 'custom' | 'compare' | 'pattern' | 'email';
+    }
+    /** A validation rule that demands that a validated field has a value. */
+    export interface RequiredRule {
+        /** Specifies the message that is shown for end-users if the current rule is broken. */
+        message?: string;
+        /** Indicates whether to remove the Space characters from the validated value. */
+        trim?: boolean;
+        /** Specifies the type of the current rule. */
+        type?: 'required' | 'numeric' | 'range' | 'stringLength' | 'custom' | 'compare' | 'pattern' | 'email';
+    }
+    
+    export interface SearchBoxMixinOptions<T = SearchBoxMixin> {
+        /** Configures the search panel. */
+        searchEditorOptions?: dxTextBoxOptions;
+        /** Specifies whether the search panel is visible. */
+        searchEnabled?: boolean;
+        /** Specifies a data object's field name or an expression whose value is compared to the search string. */
+        searchExpr?: string | Function | Array<string | Function>;
+        /** Specifies a comparison operation used to search widget items. */
+        searchMode?: 'contains' | 'startswith' | 'equals';
+        /** Specifies a delay in milliseconds between when a user finishes typing, and the search is executed. */
+        searchTimeout?: number;
+        /** Specifies the current search string. */
+        searchValue?: string;
+    }
+    
+    export class SearchBoxMixin {
+        constructor(options?: SearchBoxMixinOptions)
+    }
+    /** A validation rule that demands the target value length be within the specified value range (including the range's end points). */
+    export interface StringLengthRule {
+        /** Specifies whether empty values are valid. */
+        ignoreEmptyValue?: boolean;
+        /** Specifies the maximum length allowed for the validated value. */
+        max?: number;
+        /** Specifies the message that is shown for end-users if the current rule is broken. */
+        message?: string;
+        /** Specifies the minimum length allowed for the validated value. */
+        min?: number;
+        /** Indicates whether or not to remove the Space characters from the validated value. */
+        trim?: boolean;
+        /** Specifies the type of the current rule. */
+        type?: 'required' | 'numeric' | 'range' | 'stringLength' | 'custom' | 'compare' | 'pattern' | 'email';
+    }
+    
+    export interface WebApiFileProviderOptions extends FileProviderOptions<WebApiFileProvider> {
+        
+        endpointUrl?: string;
+        
+        hasSubDirectoriesExpr?: string | Function;
+    }
+    
+    export class WebApiFileProvider extends FileProvider {
+        constructor(options?: WebApiFileProviderOptions)
+    }
+    
+    export interface WidgetOptions<T = Widget> extends DOMComponentOptions<T> {
+        /** Specifies the shortcut key that sets focus on the widget. */
+        accessKey?: string;
+        /** Specifies whether or not the widget changes its state when interacting with a user. */
+        activeStateEnabled?: boolean;
+        /** Specifies whether the widget responds to user interaction. */
+        disabled?: boolean;
+        /** Specifies whether the widget can be focused using keyboard navigation. */
+        focusStateEnabled?: boolean;
+        /** Specifies text for a hint that appears when a user pauses on the widget. */
+        hint?: string;
+        /** Specifies whether the widget changes its state when a user pauses on it. */
+        hoverStateEnabled?: boolean;
+        /** A function that is executed when the widget's content is ready and each time the content is changed. */
+        onContentReady?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any }) => any);
+        /** Specifies the number of the element when the Tab key is used for navigating. */
+        tabIndex?: number;
+        /** Specifies whether the widget is visible. */
+        visible?: boolean;
+    }
+    /** The base class for widgets. */
+    export class Widget extends DOMComponent {
+        constructor(element: Element, options?: WidgetOptions)
+        constructor(element: JQuery, options?: WidgetOptions)
+        /** Sets focus on the widget. */
+        focus(): void;
+        /** Registers a handler to be executed when a user presses a specific key. */
+        registerKeyHandler(key: string, handler: Function): void;
+        /** Repaints the widget without reloading data. Call it to update the widget's markup. */
+        repaint(): void;
+    }
+    
+    export interface dxAccordionOptions extends CollectionWidgetOptions<dxAccordion> {
+        /** A number specifying the time in milliseconds spent on the animation of the expanding or collapsing of a panel. */
+        animationDuration?: number;
+        /** Specifies whether all items can be collapsed or whether at least one item must always be expanded. */
+        collapsible?: boolean;
+        /** Specifies whether to render the panel's content when it is displayed. If false, the content is rendered immediately. */
+        deferRendering?: boolean;
+        /** Specifies whether the widget can be focused using keyboard navigation. */
+        focusStateEnabled?: boolean;
+        /** Specifies the widget's height. */
+        height?: number | string | (() => number | string);
+        /** Specifies whether the widget changes its state when a user pauses on it. */
+        hoverStateEnabled?: boolean;
+        /** Specifies a custom template for items. */
+        itemTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery);
+        /** Specifies a custom template for item titles. */
+        itemTitleTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery);
+        /** An array of items displayed by the widget. */
+        items?: Array<string | dxAccordionItem | any>;
+        /** Specifies whether the widget can expand several items or only a single item at once. */
+        multiple?: boolean;
+        /** A function that is executed when an accordion item's title is clicked or tapped. */
+        onItemTitleClick?: ((e: { component?: dxAccordion, element?: DevExpress.core.dxElement, model?: any, itemData?: any, itemElement?: DevExpress.core.dxElement, itemIndex?: number, event?: event }) => any) | string;
+        /** Specifies whether to repaint only those elements whose data changed. */
+        repaintChangesOnly?: boolean;
+        /** The index number of the currently selected item. */
+        selectedIndex?: number;
+    }
+    /** The Accordion widget contains several panels displayed one under another. These panels can be collapsed or expanded by an end user, which makes this widget very useful for presenting information in a limited amount of space. */
+    export class dxAccordion extends CollectionWidget {
+        constructor(element: Element, options?: dxAccordionOptions)
+        constructor(element: JQuery, options?: dxAccordionOptions)
+        /** Collapses an item with a specific index. */
+        collapseItem(index: number): Promise<void> & JQueryPromise<void>;
+        /** Expands an item with a specific index. */
+        expandItem(index: number): Promise<void> & JQueryPromise<void>;
+        /** Updates the dimensions of the widget contents. */
+        updateDimensions(): Promise<void> & JQueryPromise<void>;
+    }
+    /** This section lists the data source fields that are used in a default template for Accordion items. */
+    export interface dxAccordionItem extends CollectionWidgetItem {
+        /** Specifies the icon to be displayed in the panel's title. */
+        icon?: string;
+        /** Specifies text displayed for the widget item title. */
+        title?: string;
+    }
+    
+    export interface dxActionSheetOptions extends CollectionWidgetOptions<dxActionSheet> {
+        /** The text displayed in the button that closes the action sheet. */
+        cancelText?: string;
+        /** An array of items displayed by the widget. */
+        items?: Array<string | dxActionSheetItem | any>;
+        /** A function that is executed when the Cancel button is clicked or tapped. */
+        onCancelClick?: ((e: { component?: dxActionSheet, element?: DevExpress.core.dxElement, model?: any, cancel?: boolean }) => any) | string;
+        /** Specifies whether or not to display the Cancel button in action sheet. */
+        showCancelButton?: boolean;
+        /** A Boolean value specifying whether or not the title of the action sheet is visible. */
+        showTitle?: boolean;
+        /** Specifies the element the action sheet popover points at. Applies only if usePopover is true. */
+        target?: string | Element | JQuery;
+        /** The title of the action sheet. */
+        title?: string;
+        /** Specifies whether or not to show the action sheet within a Popover widget. */
+        usePopover?: boolean;
+        /** A Boolean value specifying whether or not the ActionSheet widget is visible. */
+        visible?: boolean;
+    }
+    /** The ActionSheet widget is a sheet containing a set of buttons located one under the other. These buttons usually represent several choices relating to a single task. */
+    export class dxActionSheet extends CollectionWidget {
+        constructor(element: Element, options?: dxActionSheetOptions)
+        constructor(element: JQuery, options?: dxActionSheetOptions)
+        /** Hides the widget. */
+        hide(): Promise<void> & JQueryPromise<void>;
+        /** Shows the widget. */
+        show(): Promise<void> & JQueryPromise<void>;
+        /** Shows or hides the widget depending on the argument. */
+        toggle(showing: boolean): Promise<void> & JQueryPromise<void>;
+    }
+    /** This section lists the data source fields that are used in a default template for action sheet items. */
+    export interface dxActionSheetItem extends CollectionWidgetItem {
+        /** Specifies the icon to be displayed on the action sheet button. */
+        icon?: string;
+        /** A handler for the click event raised for the button representing the given action sheet button. */
+        onClick?: ((e: { component?: dxActionSheet, element?: DevExpress.core.dxElement, model?: any, jQueryEvent?: JQueryEventObject, event?: event }) => any) | string;
+        /** Specifies the type of the button that represents an action sheet item. */
+        type?: 'back' | 'danger' | 'default' | 'normal' | 'success';
+    }
+    
+    export interface dxAutocompleteOptions extends dxDropDownListOptions<dxAutocomplete> {
+        /** Specifies the maximum count of items displayed by the widget. */
+        maxItemCount?: number;
+        /** The minimum number of characters that must be entered into the text box to begin a search. */
+        minSearchLength?: number;
+        /** Specifies whether the drop-down button is visible. */
+        showDropDownButton?: boolean;
+        /** Specifies the current value displayed by the widget. */
+        value?: string;
+    }
+    /** The Autocomplete widget is a textbox that provides suggestions while a user types into it. */
+    export class dxAutocomplete extends dxDropDownList {
+        constructor(element: Element, options?: dxAutocompleteOptions)
+        constructor(element: JQuery, options?: dxAutocompleteOptions)
+    }
+    
+    export interface dxBoxOptions extends CollectionWidgetOptions<dxBox> {
+        /** Specifies how widget items are aligned along the main direction. */
+        align?: 'center' | 'end' | 'space-around' | 'space-between' | 'start';
+        /** Specifies how widget items are aligned cross-wise. */
+        crossAlign?: 'center' | 'end' | 'start' | 'stretch';
+        /** Specifies the direction of item positioning in the widget. */
+        direction?: 'col' | 'row';
+        /** An array of items displayed by the widget. */
+        items?: Array<string | dxBoxItem | any>;
+    }
+    /** The Box widget allows you to arrange various elements within it. Separate and adaptive, the Box widget acts as a building block for the layout. */
+    export class dxBox extends CollectionWidget {
+        constructor(element: Element, options?: dxBoxOptions)
+        constructor(element: JQuery, options?: dxBoxOptions)
+    }
+    /** This section lists the data source fields that are used in a default template for list items. */
+    export interface dxBoxItem extends CollectionWidgetItem {
+        /** Specifies the base size of an item element along the main direction. */
+        baseSize?: number | 'auto';
+        /** Holds a Box configuration object for the item. */
+        box?: dxBoxOptions;
+        /** Specifies the ratio value used to count the item element size along the main direction. */
+        ratio?: number;
+        /** A factor that defines how much an item shrinks relative to the rest of the items in the container. */
+        shrink?: number;
+    }
+    
+    export interface dxButtonOptions extends WidgetOptions<dxButton> {
+        /** A Boolean value specifying whether or not the widget changes its state when interacting with a user. */
+        activeStateEnabled?: boolean;
+        /** Specifies whether the widget can be focused using keyboard navigation. */
+        focusStateEnabled?: boolean;
+        /** Specifies whether the widget changes its state when a user pauses on it. */
+        hoverStateEnabled?: boolean;
+        /** Specifies the icon to be displayed on the button. */
+        icon?: string;
+        /** A function that is executed when the Button is clicked or tapped. */
+        onClick?: ((e: { component?: dxButton, element?: DevExpress.core.dxElement, model?: any, jQueryEvent?: JQueryEventObject, event?: event, validationGroup?: any }) => any);
+        /** Specifies how the button is styled. */
+        stylingMode?: 'text' | 'outlined' | 'contained';
+        /** Specifies a custom template for the Button widget. */
+        template?: template | ((buttonData: { text?: string, icon?: string }, contentElement: DevExpress.core.dxElement) => string | Element | JQuery);
+        /** The text displayed on the button. */
+        text?: string;
+        /** Specifies the button type. */
+        type?: 'back' | 'danger' | 'default' | 'normal' | 'success';
+        /** Specifies whether or not the button must submit an HTML form. */
+        useSubmitBehavior?: boolean;
+        /** Specifies the name of the validation group to be accessed in the click event handler. */
+        validationGroup?: string;
+    }
+    /** The Button widget is a simple button that performs specified commands when a user clicks it. */
+    export class dxButton extends Widget {
+        constructor(element: Element, options?: dxButtonOptions)
+        constructor(element: JQuery, options?: dxButtonOptions)
+    }
+    /** This section lists the fields of a context object available in a button template. */
+    export interface dxButtonDefaultTemplate {
+        /** Holds an icon that is specified using the icon option. */
+        icon?: string;
+        /** Holds the text that is specified using the text option. */
+        text?: string;
+    }
+    
+    export interface dxButtonGroupOptions extends WidgetOptions<dxButtonGroup> {
+        /** Specifies whether the widget can be focused using keyboard navigation. */
+        focusStateEnabled?: boolean;
+        /** Specifies whether the widget changes its state when a user pauses on it. */
+        hoverStateEnabled?: boolean;
+        /** Specifies a custom button template. */
+        itemTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery);
+        /** Configures buttons in the group. */
+        items?: Array<dxButtonGroupItem>;
+        /** Specifies which data field provides keys used to distinguish between the selected buttons. */
+        keyExpr?: string | Function;
+        /** A function that is executed when a button is clicked or tapped. */
+        onItemClick?: ((e: { component?: dxButtonGroup, element?: DevExpress.core.dxElement, model?: any, itemData?: any, itemElement?: DevExpress.core.dxElement, itemIndex?: number, event?: event }) => any);
+        /** A function that is executed when a button is selected or selection is canceled. */
+        onSelectionChanged?: ((e: { component?: dxButtonGroup, element?: DevExpress.core.dxElement, model?: any, addedItems?: Array<any>, removedItems?: Array<any> }) => any);
+        /** Contains the keys of the selected buttons and allows selecting buttons initially. */
+        selectedItemKeys?: Array<any>;
+        /** Contains the data objects that correspond to the selected buttons. The data objects are taken from the items array. */
+        selectedItems?: Array<any>;
+        /** Specifies whether a single or multiple buttons can be in the selected state simultaneously. */
+        selectionMode?: 'multiple' | 'single';
+        /** Specifies how buttons in the group are styled. */
+        stylingMode?: 'text' | 'outlined' | 'contained';
+    }
+    /** The ButtonGroup is a widget that contains a set of toggle buttons and can be used as a mode switcher. */
+    export class dxButtonGroup extends Widget {
+        constructor(element: Element, options?: dxButtonGroupOptions)
+        constructor(element: JQuery, options?: dxButtonGroupOptions)
+    }
+    /** This section describes object fields that can be used in the default item template. */
+    export interface dxButtonGroupItem extends CollectionWidgetItem {
+        /** Specifies a text for the hint that appears when the button is hovered over or long-pressed. */
+        hint?: string;
+        /** Specifies the icon to be displayed on the button. */
+        icon?: string;
+        /** Specifies the button type. */
+        type?: 'back' | 'danger' | 'default' | 'normal' | 'success';
+    }
+    
+    export interface dxCalendarOptions extends EditorOptions<dxCalendar> {
+        /** Specifies whether or not the widget changes its state when interacting with a user. */
+        activeStateEnabled?: boolean;
+        /** Specifies a custom template for calendar cells. */
+        cellTemplate?: template | ((itemData: { date?: Date, view?: string, text?: string }, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery);
+        /** Specifies the date-time value serialization format. Use it only if you do not specify the value at design time. */
+        dateSerializationFormat?: string;
+        /** Specifies dates to be disabled. */
+        disabledDates?: Array<Date> | ((data: { component?: any, date?: Date, view?: string }) => boolean);
+        /** Specifies the first day of a week. */
+        firstDayOfWeek?: 0 | 1 | 2 | 3 | 4 | 5 | 6;
+        /** Specifies whether the widget can be focused using keyboard navigation. */
+        focusStateEnabled?: boolean;
+        /** Specifies whether the widget changes its state when a user pauses on it. */
+        hoverStateEnabled?: boolean;
+        /** The latest date the widget allows to select. */
+        max?: Date | number | string;
+        /** Specifies the maximum zoom level of the calendar. */
+        maxZoomLevel?: 'century' | 'decade' | 'month' | 'year';
+        /** The earliest date the widget allows to select. */
+        min?: Date | number | string;
+        /** Specifies the minimum zoom level of the calendar. */
+        minZoomLevel?: 'century' | 'decade' | 'month' | 'year';
+        /** The value to be assigned to the `name` attribute of the underlying HTML element. */
+        name?: string;
+        /** Specifies whether or not the widget displays a button that selects the current date. */
+        showTodayButton?: boolean;
+        /** An object or a value specifying the date and time currently selected in the calendar. */
+        value?: Date | number | string;
+        /** Specifies the current calendar zoom level. */
+        zoomLevel?: 'century' | 'decade' | 'month' | 'year';
+    }
+    /** The Calendar is a widget that displays a calendar and allows an end user to select the required date within a specified date range. */
+    export class dxCalendar extends Editor {
+        constructor(element: Element, options?: dxCalendarOptions)
+        constructor(element: JQuery, options?: dxCalendarOptions)
+    }
+    /** This section lists the fields that are used in a default template for calendar cells. */
+    export interface dxCalendarCellTemplate {
+        /** The Date object associated with the cell. */
+        date?: Date;
+        /** The text displayed by the cell. */
+        text?: string;
+        /** The current view's name. */
+        view?: 'month' | 'year' | 'decade' | 'century';
+    }
+    
+    export interface dxCheckBoxOptions extends EditorOptions<dxCheckBox> {
+        /** Specifies whether or not the widget changes its state when interacting with a user. */
+        activeStateEnabled?: boolean;
+        /** Specifies whether the widget can be focused using keyboard navigation. */
+        focusStateEnabled?: boolean;
+        /** Specifies whether the widget changes its state when a user pauses on it. */
+        hoverStateEnabled?: boolean;
+        /** The value to be assigned to the `name` attribute of the underlying HTML element. */
+        name?: string;
+        /** Specifies the text displayed by the check box. */
+        text?: string;
+        /** Specifies the widget state. */
+        value?: boolean;
+    }
+    /** The CheckBox is a small box, which when selected by the end user, shows that a particular feature has been enabled or a specific option has been chosen. */
+    export class dxCheckBox extends Editor {
+        constructor(element: Element, options?: dxCheckBoxOptions)
+        constructor(element: JQuery, options?: dxCheckBoxOptions)
+    }
+    
+    export interface dxColorBoxOptions extends dxDropDownEditorOptions<dxColorBox> {
+        /** Specifies the text displayed on the button that applies changes and closes the drop-down editor. */
+        applyButtonText?: string;
+        /** Specifies the way an end-user applies the selected value. */
+        applyValueMode?: 'instantly' | 'useButtons';
+        /** Specifies the text displayed on the button that cancels changes and closes the drop-down editor. */
+        cancelButtonText?: string;
+        /** Specifies whether or not the widget value includes the alpha channel component. */
+        editAlphaChannel?: boolean;
+        /** Specifies a custom template for the input field. Must contain the TextBox widget. */
+        fieldTemplate?: template | ((value: string, fieldElement: DevExpress.core.dxElement) => string | Element | JQuery);
+        /** Specifies the size of a step by which a handle is moved using a keyboard shortcut. */
+        keyStep?: number;
+        /** Specifies the currently selected value. */
+        value?: string;
+    }
+    /** The ColorBox is a widget that allows an end user to enter a color or pick it out from the drop-down editor. */
+    export class dxColorBox extends dxDropDownEditor {
+        constructor(element: Element, options?: dxColorBoxOptions)
+        constructor(element: JQuery, options?: dxColorBoxOptions)
+    }
+    
+    export interface dxContextMenuOptions extends dxMenuBaseOptions<dxContextMenu> {
+        /** Specifies whether to close the ContextMenu if a user clicks outside it. */
+        closeOnOutsideClick?: boolean | ((event: event) => boolean);
+        /** Holds an array of menu items. */
+        items?: Array<dxContextMenuItem>;
+        /** A function that is executed after the ContextMenu is hidden. */
+        onHidden?: ((e: { component?: dxContextMenu, element?: DevExpress.core.dxElement, model?: any }) => any);
+        /** A function that is executed before the ContextMenu is hidden. */
+        onHiding?: ((e: { component?: dxContextMenu, element?: DevExpress.core.dxElement, model?: any, cancel?: boolean }) => any);
+        /** A function that is executed before the ContextMenu is positioned. */
+        onPositioning?: ((e: { component?: dxContextMenu, element?: DevExpress.core.dxElement, model?: any, jQueryEvent?: JQueryEventObject, event?: event, position?: positionConfig }) => any);
+        /** A function that is executed before the ContextMenu is shown. */
+        onShowing?: ((e: { component?: dxContextMenu, element?: DevExpress.core.dxElement, model?: any, cancel?: boolean }) => any);
+        /** A function that is executed after the ContextMenu is shown. */
+        onShown?: ((e: { component?: dxContextMenu, element?: DevExpress.core.dxElement, model?: any }) => any);
+        /** An object defining widget positioning options. */
+        position?: positionConfig;
+        /** Specifies options for displaying the widget. */
+        showEvent?: { delay?: number, name?: string } | string;
+        /** Specifies the direction at which submenus are displayed. */
+        submenuDirection?: 'auto' | 'left' | 'right';
+        /** The target element associated with the context menu. */
+        target?: string | Element | JQuery;
+        /** A Boolean value specifying whether or not the widget is visible. */
+        visible?: boolean;
+    }
+    /** The ContextMenu widget displays a single- or multi-level context menu. An end user invokes this menu by a right click or a long press. */
+    export class dxContextMenu extends dxMenuBase {
+        constructor(element: Element, options?: dxContextMenuOptions)
+        constructor(element: JQuery, options?: dxContextMenuOptions)
+        /** Hides the widget. */
+        hide(): Promise<void> & JQueryPromise<void>;
+        /** Shows the widget. */
+        show(): Promise<void> & JQueryPromise<void>;
+        /** Shows or hides the widget depending on the argument. */
+        toggle(showing: boolean): Promise<void> & JQueryPromise<void>;
+    }
+    /** This section lists the data source fields that are used in a default item template. */
+    export interface dxContextMenuItem extends dxMenuBaseItem {
+        /** Holds an array of menu items. */
+        items?: Array<dxContextMenuItem>;
+    }
+    
+    export interface dxDataGridOptions extends GridBaseOptions<dxDataGrid> {
+        /** An array of grid columns. */
+        columns?: Array<dxDataGridColumn | string>;
+        /** Customizes columns after they are created. */
+        customizeColumns?: ((columns: Array<dxDataGridColumn>) => any);
+        /** Customizes data before export. You can use the export.customizeExcelCell function instead. */
+        customizeExportData?: ((columns: Array<dxDataGridColumn>, rows: Array<dxDataGridRowObject>) => any);
+        /** Configures editing. */
+        editing?: dxDataGridEditing;
+        /** Configures client-side exporting. */
+        export?: { allowExportSelectedData?: boolean, customizeExcelCell?: ((options: { component?: dxDataGrid, horizontalAlignment?: 'center' | 'centerContinuous' | 'distributed' | 'fill' | 'general' | 'justify' | 'left' | 'right', verticalAlignment?: 'bottom' | 'center' | 'distributed' | 'justify' | 'top', wrapTextEnabled?: boolean, backgroundColor?: string, fillPatternType?: 'darkDown' | 'darkGray' | 'darkGrid' | 'darkHorizontal' | 'darkTrellis' | 'darkUp' | 'darkVertical' | 'gray0625' | 'gray125' | 'lightDown' | 'lightGray' | 'lightGrid' | 'lightHorizontal' | 'lightTrellis' | 'lightUp' | 'lightVertical' | 'mediumGray' | 'none' | 'solid', fillPatternColor?: string, font?: DevExpress.exporter.ExcelFont, value?: string | number | Date, numberFormat?: string, gridCell?: DevExpress.exporter.ExcelDataGridCell }) => any), enabled?: boolean, excelFilterEnabled?: boolean, excelWrapTextEnabled?: boolean, fileName?: string, ignoreExcelErrors?: boolean, proxyUrl?: string, texts?: { exportAll?: string, exportSelectedRows?: string, exportTo?: string } };
+        /** Configures the group panel. */
+        groupPanel?: { allowColumnDragging?: boolean, emptyPanelText?: string, visible?: boolean | 'auto' };
+        /** Configures grouping. */
+        grouping?: { allowCollapsing?: boolean, autoExpandAll?: boolean, contextMenuEnabled?: boolean, expandMode?: 'buttonClick' | 'rowClick', texts?: { groupByThisColumn?: string, groupContinuedMessage?: string, groupContinuesMessage?: string, ungroup?: string, ungroupAll?: string } };
+        /** Specifies which data field provides keys for data items. Applies only if data is a simple array. */
+        keyExpr?: string | Array<string>;
+        /** Allows you to build a master-detail interface in the grid. */
+        masterDetail?: { autoExpandAll?: boolean, enabled?: boolean, template?: template | ((detailElement: DevExpress.core.dxElement, detailInfo: { key?: any, data?: any, watch?: Function }) => any) };
+        /** A function that is executed when a cell is clicked or tapped. Executed before onRowClick. */
+        onCellClick?: ((e: { component?: dxDataGrid, element?: DevExpress.core.dxElement, model?: any, jQueryEvent?: JQueryEventObject, event?: event, data?: any, key?: any, value?: any, displayValue?: any, text?: string, columnIndex?: number, column?: any, rowIndex?: number, rowType?: string, cellElement?: DevExpress.core.dxElement, row?: dxDataGridRowObject }) => any) | string;
+        /** A function that is executed when a cell is double-clicked or double-tapped. Executed before onRowDblClick. */
+        onCellDblClick?: ((e: { component?: dxDataGrid, element?: DevExpress.core.dxElement, model?: any, event?: event, data?: any, key?: any, value?: any, displayValue?: any, text?: string, columnIndex?: number, column?: dxDataGridColumn, rowIndex?: number, rowType?: string, cellElement?: DevExpress.core.dxElement, row?: dxDataGridRowObject }) => any);
+        /** A function that is executed after the pointer enters or leaves a cell. */
+        onCellHoverChanged?: ((e: { component?: dxDataGrid, element?: DevExpress.core.dxElement, model?: any, eventType?: string, data?: any, key?: any, value?: any, text?: string, displayValue?: any, columnIndex?: number, rowIndex?: number, column?: dxDataGridColumn, rowType?: string, cellElement?: DevExpress.core.dxElement, row?: dxDataGridRowObject }) => any);
+        /** A function that is executed after a cell is created. */
+        onCellPrepared?: ((e: { component?: dxDataGrid, element?: DevExpress.core.dxElement, model?: any, data?: any, key?: any, value?: any, displayValue?: any, text?: string, columnIndex?: number, column?: dxDataGridColumn, rowIndex?: number, rowType?: string, row?: dxDataGridRowObject, isSelected?: boolean, isExpanded?: boolean, cellElement?: DevExpress.core.dxElement, watch?: Function, oldValue?: any }) => any);
+        /** A function that is executed before the context menu is rendered. */
+        onContextMenuPreparing?: ((e: { component?: dxDataGrid, element?: DevExpress.core.dxElement, model?: any, items?: Array<any>, target?: string, targetElement?: DevExpress.core.dxElement, columnIndex?: number, column?: dxDataGridColumn, rowIndex?: number, row?: dxDataGridRowObject }) => any);
+        /** A function that is executed before a cell or row switches to the editing state. */
+        onEditingStart?: ((e: { component?: dxDataGrid, element?: DevExpress.core.dxElement, model?: any, data?: any, key?: any, cancel?: boolean, column?: any }) => any);
+        /** A function that is executed after an editor is created. */
+        onEditorPrepared?: ((options: { component?: dxDataGrid, element?: DevExpress.core.dxElement, model?: any, parentType?: string, value?: any, setValue?: any, updateValueTimeout?: number, width?: number, disabled?: boolean, rtlEnabled?: boolean, editorElement?: DevExpress.core.dxElement, readOnly?: boolean, dataField?: string, row?: dxDataGridRowObject }) => any);
+        /** A function that is executed before a cell's editor is created. Not executed for cells with an editCellTemplate. */
+        onEditorPreparing?: ((e: { component?: dxDataGrid, element?: DevExpress.core.dxElement, model?: any, parentType?: string, value?: any, setValue?: any, updateValueTimeout?: number, width?: number, disabled?: boolean, rtlEnabled?: boolean, cancel?: boolean, editorElement?: DevExpress.core.dxElement, readOnly?: boolean, editorName?: string, editorOptions?: any, dataField?: string, row?: dxDataGridRowObject }) => any);
+        /** A function that is executed after data is exported. */
+        onExported?: ((e: { component?: dxDataGrid, element?: DevExpress.core.dxElement, model?: any }) => any);
+        /** A function that is executed before data is exported. */
+        onExporting?: ((e: { component?: dxDataGrid, element?: DevExpress.core.dxElement, model?: any, fileName?: string, cancel?: boolean }) => any);
+        /** A function that is executed before a file with exported data is saved to the user's local storage. */
+        onFileSaving?: ((e: { component?: dxDataGrid, element?: DevExpress.core.dxElement, model?: any, fileName?: string, format?: string, data?: Blob, cancel?: boolean }) => any);
+        /** A function that is executed after the focused cell changes. */
+        onFocusedCellChanged?: ((e: { component?: dxDataGrid, element?: DevExpress.core.dxElement, model?: any, cellElement?: DevExpress.core.dxElement, columnIndex?: number, rowIndex?: number, row?: dxDataGridRowObject, column?: dxDataGridColumn }) => any);
+        /** A function that is executed before the focused cell changes. */
+        onFocusedCellChanging?: ((e: { component?: dxDataGrid, element?: DevExpress.core.dxElement, model?: any, cellElement?: DevExpress.core.dxElement, prevColumnIndex?: number, prevRowIndex?: number, newColumnIndex?: number, newRowIndex?: number, event?: event, rows?: Array<dxDataGridRowObject>, columns?: Array<dxDataGridColumn>, cancel?: boolean, isHighlighted?: boolean }) => any);
+        /** A function that is executed after the focused row changes. Applies only when focusedRowEnabled is true. */
+        onFocusedRowChanged?: ((e: { component?: dxDataGrid, element?: DevExpress.core.dxElement, model?: any, rowElement?: DevExpress.core.dxElement, rowIndex?: number, row?: dxDataGridRowObject }) => any);
+        /** A function that is executed before the focused row changes. Applies only when focusedRowEnabled is true. */
+        onFocusedRowChanging?: ((e: { component?: dxDataGrid, element?: DevExpress.core.dxElement, model?: any, rowElement?: DevExpress.core.dxElement, prevRowIndex?: number, newRowIndex?: number, event?: event, rows?: Array<dxDataGridRowObject>, cancel?: boolean }) => any);
+        /** A function that is executed when a row is clicked or tapped. */
+        onRowClick?: ((e: { component?: dxDataGrid, element?: DevExpress.core.dxElement, model?: any, jQueryEvent?: JQueryEventObject, event?: event, data?: any, key?: any, values?: Array<any>, columns?: Array<any>, rowIndex?: number, rowType?: string, isSelected?: boolean, isExpanded?: boolean, groupIndex?: number, rowElement?: DevExpress.core.dxElement, handled?: boolean }) => any) | string;
+        /** A function that is executed when a row is double-clicked or double-tapped. Executed after onCellDblClick. */
+        onRowDblClick?: ((e: { component?: dxDataGrid, element?: DevExpress.core.dxElement, model?: any, event?: event, data?: any, key?: any, values?: Array<any>, columns?: Array<dxDataGridColumn>, rowIndex?: number, rowType?: string, isSelected?: boolean, isExpanded?: boolean, groupIndex?: number, rowElement?: DevExpress.core.dxElement }) => any);
+        /** A function that is executed after a row is created. */
+        onRowPrepared?: ((e: { component?: dxDataGrid, element?: DevExpress.core.dxElement, model?: any, data?: any, key?: any, values?: Array<any>, columns?: Array<dxDataGridColumn>, rowIndex?: number, rowType?: string, groupIndex?: number, isSelected?: boolean, isExpanded?: boolean, rowElement?: DevExpress.core.dxElement }) => any);
+        /** Notifies the DataGrid of the server's data processing operations. */
+        remoteOperations?: boolean | { filtering?: boolean, groupPaging?: boolean, grouping?: boolean, paging?: boolean, sorting?: boolean, summary?: boolean } | 'auto';
+        /** Specifies a custom template for rows. */
+        rowTemplate?: template | ((rowElement: DevExpress.core.dxElement, rowInfo: any) => any);
+        /** Configures scrolling. */
+        scrolling?: dxDataGridScrolling;
+        /** Configures runtime selection. */
+        selection?: dxDataGridSelection;
+        /** Specifies filters for the rows that must be selected initially. Applies only if selection.deferred is true. */
+        selectionFilter?: string | Array<any> | Function;
+        /** Allows you to sort groups according to the values of group summary items. */
+        sortByGroupSummaryInfo?: Array<{ groupColumn?: string, sortOrder?: 'asc' | 'desc', summaryItem?: string | number }>;
+        /** Specifies the options of the grid summary. */
+        summary?: { calculateCustomSummary?: ((options: { component?: dxDataGrid, name?: string, summaryProcess?: string, value?: any, totalValue?: any, groupIndex?: number }) => any), groupItems?: Array<{ alignByColumn?: boolean, column?: string, customizeText?: ((itemInfo: { value?: string | number | Date, valueText?: string }) => string), displayFormat?: string, name?: string, showInColumn?: string, showInGroupFooter?: boolean, skipEmptyValues?: boolean, summaryType?: 'avg' | 'count' | 'custom' | 'max' | 'min' | 'sum' | string, valueFormat?: format }>, recalculateWhileEditing?: boolean, skipEmptyValues?: boolean, texts?: { avg?: string, avgOtherColumn?: string, count?: string, max?: string, maxOtherColumn?: string, min?: string, minOtherColumn?: string, sum?: string, sumOtherColumn?: string }, totalItems?: Array<{ alignment?: 'center' | 'left' | 'right', column?: string, cssClass?: string, customizeText?: ((itemInfo: { value?: string | number | Date, valueText?: string }) => string), displayFormat?: string, name?: string, showInColumn?: string, skipEmptyValues?: boolean, summaryType?: 'avg' | 'count' | 'custom' | 'max' | 'min' | 'sum' | string, valueFormat?: format }> };
+    }
+    /** Configures editing. */
+    export interface dxDataGridEditing extends GridBaseEditing {
+        /** Specifies whether a user can add new rows. */
+        allowAdding?: boolean;
+        /** Specifies whether a user can delete rows. It is called for each data row when defined as a function. */
+        allowDeleting?: boolean | ((options: { component?: dxDataGrid, row?: dxDataGridRowObject }) => boolean);
+        /** Specifies whether a user can update rows. It is called for each data row when defined as a function. */
+        allowUpdating?: boolean | ((options: { component?: dxDataGrid, row?: dxDataGridRowObject }) => boolean);
+        /** Contains options that specify texts for editing-related UI elements. */
+        texts?: any;
+    }
+    /** Configures scrolling. */
+    export interface dxDataGridScrolling extends GridBaseScrolling {
+        /** Specifies the scrolling mode. */
+        mode?: 'infinite' | 'standard' | 'virtual';
+    }
+    /** Configures runtime selection. */
+    export interface dxDataGridSelection extends GridBaseSelection {
+        /** Makes selection deferred. */
+        deferred?: boolean;
+        /** Specifies the mode in which all the records are selected. Applies only if selection.allowSelectAll is true. */
+        selectAllMode?: 'allPages' | 'page';
+        /** Specifies when to display check boxes in rows. Applies only if selection.mode is "multiple". */
+        showCheckBoxesMode?: 'always' | 'none' | 'onClick' | 'onLongTap';
+    }
+    /** The DataGrid is a widget that represents data from a local or remote source in the form of a grid. This widget offers such basic features as sorting, grouping, filtering, as well as more advanced capabilities, like state storing, export to Excel, master-detail interface, and many others. */
+    export class dxDataGrid extends GridBase {
+        constructor(element: Element, options?: dxDataGridOptions)
+        constructor(element: JQuery, options?: dxDataGridOptions)
+        /** Adds a new column. */
+        addColumn(columnOptions: any | string): void;
+        /** Adds an empty data row. */
+        addRow(): void;
+        /** Ungroups grid records. */
+        clearGrouping(): void;
+        /** Collapses master rows or groups of a specific level. */
+        collapseAll(groupIndex?: number): void;
+        /** Collapses a group or a master row with a specific key. */
+        collapseRow(key: any): Promise<void> & JQueryPromise<void>;
+        /** Expands master rows or groups of a specific level. Does not apply if data is remote. */
+        expandAll(groupIndex?: number): void;
+        /** Expands a group or a master row with a specific key. */
+        expandRow(key: any): Promise<void> & JQueryPromise<void>;
+        /** Exports grid data to Excel. */
+        exportToExcel(selectionOnly: boolean): void;
+        /** Gets the currently selected rows' keys. */
+        getSelectedRowKeys(): Array<any> & Promise<any> & JQueryPromise<any>;
+        /** Gets the selected rows' data objects. */
+        getSelectedRowsData(): Array<any> & Promise<any> & JQueryPromise<any>;
+        /** Gets the value of a total summary item. */
+        getTotalSummaryValue(summaryItemName: string): any;
+        /** Gets all visible columns. */
+        getVisibleColumns(): Array<dxDataGridColumn>;
+        /** Gets all visible columns at a specific hierarchical level of column headers. Use it to access banded columns. */
+        getVisibleColumns(headerLevel: number): Array<dxDataGridColumn>;
+        /** Gets currently rendered rows. */
+        getVisibleRows(): Array<dxDataGridRowObject>;
+        /** @deprecated Use addRow instead. */
+        /** Adds a new data row to a grid. */
+        insertRow(): void;
+        /** Checks whether a specific group or master row is expanded or collapsed. */
+        isRowExpanded(key: any): boolean;
+        /** Checks whether a row found using its data object is selected. Takes effect only if selection.deferred is true. */
+        isRowSelected(data: any): boolean;
+        /** Checks whether a row with a specific key is selected. */
+        isRowSelected(key: any): boolean;
+        /** @deprecated Use deleteRow instead. */
+        /** Removes a row with a specific index. */
+        removeRow(rowIndex: number): void;
+        /** Gets the total row count. */
+        totalCount(): number;
+    }
+    
+    export interface dxDataGridColumn extends GridBaseColumn {
+        /** Specifies whether data from this column should be exported. Applies only if the column is visible. */
+        allowExporting?: boolean;
+        /** Specifies whether the user can group data by values of this column. Applies only when grouping is enabled. */
+        allowGrouping?: boolean;
+        /** Specifies whether groups appear expanded or not when records are grouped by a specific column. Setting this option makes sense only when grouping is allowed for this column. */
+        autoExpandGroup?: boolean;
+        /** Allows you to customize buttons in the editing column or create a custom command column. Applies only if the column's type is "buttons". */
+        buttons?: Array<'cancel' | 'delete' | 'edit' | 'save' | 'undelete' | dxDataGridColumnButton>;
+        /** Specifies a field name or a function that returns a field name or a value to be used for grouping column cells. */
+        calculateGroupValue?: string | ((rowData: any) => any);
+        /** An array of grid columns. */
+        columns?: Array<dxDataGridColumn | string>;
+        /** Specifies a custom template for group cells. */
+        groupCellTemplate?: template | ((cellElement: DevExpress.core.dxElement, cellInfo: any) => any);
+        /** Specifies the index of a column when grid records are grouped by the values of this column. */
+        groupIndex?: number;
+        /** Specifies whether or not to display the column when grid records are grouped by it. */
+        showWhenGrouped?: boolean;
+        /** Specifies the command column that this object customizes. */
+        type?: 'adaptive' | 'buttons' | 'detailExpand' | 'groupExpand' | 'selection';
+    }
+    /** Allows you to customize buttons in the editing column or create a custom command column. Applies only if the column's type is "buttons". */
+    export interface dxDataGridColumnButton extends GridBaseColumnButton {
+        /** The name used to identify a built-in button. */
+        name?: 'cancel' | 'delete' | 'edit' | 'save' | 'undelete' | string;
+        /** A function that is executed when the button is clicked or tapped. */
+        onClick?: ((e: { component?: dxDataGrid, element?: DevExpress.core.dxElement, model?: any, event?: event, row?: dxDataGridRowObject, column?: dxDataGridColumn }) => any) | string;
+        /** Specifies a custom button template. */
+        template?: template | ((cellElement: DevExpress.core.dxElement, cellInfo: { component?: dxDataGrid, data?: any, key?: any, columnIndex?: number, column?: dxDataGridColumn, rowIndex?: number, rowType?: string, row?: dxDataGridRowObject }) => string | Element | JQuery);
+        /** Specifies the button's visibility. */
+        visible?: boolean | ((options: { component?: dxDataGrid, row?: dxDataGridRowObject, column?: dxDataGridColumn }) => boolean);
+    }
+    /** This section describes the properties of a grid row. An object containing these properties comes to certain event-handling functions. */
+    export interface dxDataGridRowObject {
+        /** The data object represented by the row. */
+        data?: any;
+        /** The group index of the row. Available when the rowType is "group". */
+        groupIndex?: number;
+        /** Indicates whether the row is in the editing state. */
+        isEditing?: boolean;
+        /** Indicates whether the row is expanded or collapsed. Available if rowType is "data", "detail" or "group". */
+        isExpanded?: boolean;
+        /** Indicates whether the row is selected. Available if rowType is "data". */
+        isSelected?: boolean;
+        /** The key of the data object represented by the row. */
+        key?: any;
+        /** The visible index of the row. */
+        rowIndex?: number;
+        /** The row's type. */
+        rowType?: string;
+        /** Values of the row as they exist in the data source. */
+        values?: Array<any>;
+    }
+    
+    export interface dxDateBoxOptions extends dxDropDownEditorOptions<dxDateBox> {
+        /** Specifies whether or not adaptive widget rendering is enabled on a small screen. */
+        adaptivityEnabled?: boolean;
+        /** The text displayed on the Apply button. */
+        applyButtonText?: string;
+        /** Configures the calendar's value picker. Applies only if the pickerType is "calendar". */
+        calendarOptions?: dxCalendarOptions;
+        /** The text displayed on the Cancel button. */
+        cancelButtonText?: string;
+        /** Specifies the message displayed if the specified date is later than the max value or earlier than the min value. */
+        dateOutOfRangeMessage?: string;
+        /** Specifies the date-time value serialization format. Use it only if you do not specify the value at design time. */
+        dateSerializationFormat?: string;
+        /** Specifies dates to be disabled. Applies only if pickerType is "calendar". */
+        disabledDates?: Array<Date> | ((data: { component?: dxDateBox, date?: Date, view?: string }) => boolean);
+        /** Specifies the date display format. Ignored if the pickerType option is "native" */
+        displayFormat?: format;
+        /** Specifies the interval between neighboring values in the popup list in minutes. */
+        interval?: number;
+        /** Specifies the message displayed if the typed value is not a valid date or time. */
+        invalidDateMessage?: string;
+        /** The last date that can be selected within the widget. */
+        max?: Date | number | string;
+        /** @deprecated Use the calendarOptions option instead. */
+        /** Specifies the maximum zoom level of a calendar, which is used to pick the date. */
+        maxZoomLevel?: 'century' | 'decade' | 'month' | 'year';
+        /** The minimum date that can be selected within the widget. */
+        min?: Date | number | string;
+        /** @deprecated Use the calendarOptions option instead. */
+        /** Specifies the minimal zoom level of a calendar, which is used to pick the date. */
+        minZoomLevel?: 'century' | 'decade' | 'month' | 'year';
+        /** Specifies the type of the date/time picker. */
+        pickerType?: 'calendar' | 'list' | 'native' | 'rollers';
+        /** Specifies a placeholder for the input field. */
+        placeholder?: string;
+        /** Specifies whether to show the analog clock in the value picker. Applies only if type is "datetime" and pickerType is "calendar". */
+        showAnalogClock?: boolean;
+        /** A format used to display date/time information. */
+        type?: 'date' | 'datetime' | 'time';
+        /** Specifies whether to control user input using a mask created based on the displayFormat. */
+        useMaskBehavior?: boolean;
+        /** An object or a value specifying the date and time currently selected using the date box. */
+        value?: Date | number | string;
+    }
+    /** The DateBox is a widget that displays date and time in a specified format, and enables a user to pick or type in the required date/time value. */
+    export class dxDateBox extends dxDropDownEditor {
+        constructor(element: Element, options?: dxDateBoxOptions)
+        constructor(element: JQuery, options?: dxDateBoxOptions)
+        /** Closes the drop-down editor. */
+        close(): void;
+        /** Opens the drop-down editor. */
+        open(): void;
+    }
+    
+    export interface dxDeferRenderingOptions extends WidgetOptions<dxDeferRendering> {
+        /** Specifies the animation to be used to show the rendered content. */
+        animation?: animationConfig;
+        /** A function that is executed when the content is rendered but not yet displayed. */
+        onRendered?: ((e: { component?: dxDeferRendering, element?: DevExpress.core.dxElement, model?: any }) => any);
+        /** A function that is executed when the content is displayed and animation is completed. */
+        onShown?: ((e: { component?: dxDeferRendering, element?: DevExpress.core.dxElement, model?: any }) => any);
+        /** Specifies when the widget content is rendered. */
+        renderWhen?: Promise<void> | JQueryPromise<void> | boolean;
+        /** Indicates if a load indicator should be shown until the widget's content is rendered. */
+        showLoadIndicator?: boolean;
+        /** Specifies a jQuery selector of items that should be rendered using a staggered animation. */
+        staggerItemSelector?: string;
+    }
+    /** The DeferRendering is a widget that waits for its content to be ready before rendering it. While the content is getting ready, the DeferRendering displays a loading indicator. */
+    export class dxDeferRendering extends Widget {
+        constructor(element: Element, options?: dxDeferRenderingOptions)
+        constructor(element: JQuery, options?: dxDeferRenderingOptions)
+    }
+    
+    export interface dxDiagramOptions extends WidgetOptions<dxDiagram> {
+        
+        customShapes?: Array<{ allowHasText?: boolean, defaultHeight?: number, defaultWidth?: number, id?: number, svgUrl?: string, title?: string }>;
+        
+        edges?: { dataSource?: Array<any> | DevExpress.data.DataSource | DevExpress.data.DataSourceOptions, fromExpr?: string | ((data: any) => any), keyExpr?: string | ((data: any) => any), toExpr?: string | ((data: any) => any) };
+        
+        export?: { fileName?: string, proxyUrl?: string };
+        
+        layout?: 'tree' | 'sugiyama';
+        
+        nodes?: { dataSource?: Array<any> | DevExpress.data.DataSource | DevExpress.data.DataSourceOptions, itemsExpr?: string | ((data: any) => any), keyExpr?: string | ((data: any) => any), parentKeyExpr?: string | ((data: any) => any), textExpr?: string | ((data: any) => any), typeExpr?: string | ((data: any) => any) };
+        
+        onDataChanged?: ((e: { component?: dxDiagram, element?: DevExpress.core.dxElement, model?: any, data?: string }) => any);
+    }
+    
+    export class dxDiagram extends Widget {
+        constructor(element: Element, options?: dxDiagramOptions)
+        constructor(element: JQuery, options?: dxDiagramOptions)
+        
+        createDataSource(parameters: DiagramDataSourceParameters): void;
+        
+        deleteDataSource(key: string): void;
+        
+        getData(): string;
+        
+        setData(data: string, updateExistingItemsOnly: boolean): void;
+    }
+    
+    export interface dxDrawerOptions extends WidgetOptions<dxDrawer> {
+        /** Specifies the duration of the drawer's opening and closing animation (in milliseconds). Applies only if animationEnabled is true. */
+        animationDuration?: number;
+        /** Specifies whether to use an opening and closing animation. */
+        animationEnabled?: boolean;
+        /** Specifies whether to close the drawer if a user clicks or taps the view area. */
+        closeOnOutsideClick?: boolean | ((event: event) => boolean);
+        /** Specifies the drawer's width or height (depending on the drawer's position) in the opened state. */
+        maxSize?: number;
+        /** Specifies the drawer's width or height (depending on the drawer's position) in the closed state. */
+        minSize?: number;
+        /** Specifies whether the drawer is opened. */
+        opened?: boolean;
+        /** Specifies how the drawer interacts with the view in the opened state. */
+        openedStateMode?: 'overlap' | 'shrink' | 'push';
+        /** Specifies the drawer's position in relation to the view. */
+        position?: 'left' | 'right' | 'top' | 'bottom' | 'before' | 'after';
+        /** Specifies the drawer's reveal mode. */
+        revealMode?: 'slide' | 'expand';
+        /** Specifies whether to shade the view when the drawer is opened. */
+        shading?: boolean;
+        /** Specifies the target element associated with the drawer. Applies only when the openedStateMode is "overlap". */
+        target?: string | Element | JQuery;
+        /** Specifies the drawer's content. */
+        template?: template | ((Element: DevExpress.core.dxElement) => any);
+    }
+    /** The Drawer is a dismissible or permanently visible panel used for navigation in responsive web application layouts. */
+    export class dxDrawer extends Widget {
+        constructor(element: Element, options?: dxDrawerOptions)
+        constructor(element: JQuery, options?: dxDrawerOptions)
+        /** Gets the drawer's content. */
+        content(): DevExpress.core.dxElement;
+        /** Closes the drawer. */
+        hide(): Promise<void> & JQueryPromise<void>;
+        /** Opens the drawer. */
+        show(): Promise<void> & JQueryPromise<void>;
+        /** Opens or closes the drawer, reversing the current state. */
+        toggle(): Promise<void> & JQueryPromise<void>;
+    }
+    
+    export interface dxDropDownBoxOptions extends DataExpressionMixinOptions<dxDropDownBox>, dxDropDownEditorOptions<dxDropDownBox> {
+        /** Specifies whether the widget allows a user to enter a custom value. */
+        acceptCustomValue?: boolean;
+        /** Specifies a custom template for the drop-down content. */
+        contentTemplate?: template | ((templateData: { component?: dxDropDownBox, value?: any }, contentElement: DevExpress.core.dxElement) => string | Element | JQuery);
+        /** Configures the drop-down field which holds the content. */
+        dropDownOptions?: dxPopupOptions;
+        /** Specifies a custom template for the text field. Must contain the TextBox widget. */
+        fieldTemplate?: template | ((value: any, fieldElement: DevExpress.core.dxElement) => string | Element | JQuery);
+        /** Specifies whether a user can open the drop-down list by clicking a text field. */
+        openOnFieldClick?: boolean;
+        /** Specifies the DOM events after which the widget's value should be updated. */
+        valueChangeEvent?: string;
+    }
+    /** The DropDownBox widget consists of a text field, which displays the current value, and a drop-down field, which can contain any UI element. */
+    export class dxDropDownBox extends dxDropDownEditor {
+        constructor(element: Element, options?: dxDropDownBoxOptions)
+        constructor(element: JQuery, options?: dxDropDownBoxOptions)
+        /** Gets the DataSource instance. */
+        getDataSource(): DevExpress.data.DataSource;
+    }
+    
+    export interface dxDropDownButtonOptions extends WidgetOptions<dxDropDownButton> {
+        /** Provides data for the drop-down menu. */
+        dataSource?: string | Array<CollectionWidgetItem | any> | DevExpress.data.DataSource | DevExpress.data.DataSourceOptions;
+        /** Specifies whether to wait until the drop-down menu is opened the first time to render its content. */
+        deferRendering?: boolean;
+        /** Specifies the data field whose values should be displayed in the drop-down menu. */
+        displayExpr?: string | ((itemData: any) => string);
+        /** Specifies custom content for the drop-down field. */
+        dropDownContentTemplate?: template | ((data: Array<string | number | any> | DevExpress.data.DataSource, contentElement: DevExpress.core.dxElement) => string | Element | JQuery);
+        /** Configures the drop-down field. */
+        dropDownOptions?: dxPopupOptions;
+        /** Specifies whether users can use keyboard to focus the widget. */
+        focusStateEnabled?: boolean;
+        /** Specifies whether the widget changes its state when a user hovers the mouse pointer over it. */
+        hoverStateEnabled?: boolean;
+        /** Specifies the button's icon. Applies only if splitButton is true. */
+        icon?: string;
+        /** Specifies a custom template for drop-down menu items. */
+        itemTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery);
+        /** Provides drop-down menu items. */
+        items?: Array<CollectionWidgetItem | any>;
+        /** Specifies which data field provides keys used to distinguish between the selected drop-down menu items. */
+        keyExpr?: string;
+        /** Specifies text or HTML markup displayed in the drop-down menu when it does not contain any items. */
+        noDataText?: string;
+        /** A function that is executed when the button is clicked or tapped. If splitButton is true, this function is executed for the action button only. */
+        onButtonClick?: ((e: { component?: dxDropDownButton, element?: DevExpress.core.dxElement, model?: any, event?: event, selectedItem?: any }) => any) | string;
+        /** A function that is executed when a drop-down menu item is clicked. */
+        onItemClick?: ((e: { component?: dxDropDownButton, element?: DevExpress.core.dxElement, model?: any, event?: event, itemData?: any, itemElement?: DevExpress.core.dxElement }) => any) | string;
+        /** A function that is executed when an item is selected or selection is canceled. In effect when useSelectMode is true. */
+        onSelectionChanged?: ((e: { component?: dxDropDownButton, element?: DevExpress.core.dxElement, model?: any, item?: any, previousItem?: any }) => any) | string;
+        
+        opened?: boolean;
+        /** Contains the selected item's data. Available when useSelectMode is true. */
+        selectedItem?: string | number | any;
+        /** Contains the selected item's key and allows you to specify the initially selected item. Applies when useSelectMode is true. */
+        selectedItemKey?: string | number;
+        /** Specifies whether to split the button in two: one executes an action, the other opens and closes the drop-down menu. */
+        splitButton?: boolean;
+        /** Specifies how the button is styled. */
+        stylingMode?: 'text' | 'outlined' | 'contained';
+        /** Specifies the button's text. Applies only if useSelectMode is false and selectedItemKey is unspecified. */
+        text?: string;
+        /** Specifies whether the widget stores the selected drop-down menu item. */
+        useSelectMode?: boolean;
+    }
+    /** The DropDownButton is a button that opens a drop-down menu. */
+    export class dxDropDownButton extends Widget {
+        constructor(element: Element, options?: dxDropDownButtonOptions)
+        constructor(element: JQuery, options?: dxDropDownButtonOptions)
+        /** Closes the drop-down menu. */
+        close(): Promise<void> & JQueryPromise<void>;
+        /** Gets the DataSource instance. */
+        getDataSource(): DevExpress.data.DataSource;
+        /** Opens the drop-down menu. */
+        open(): Promise<void> & JQueryPromise<void>;
+        /** Opens or closes the drop-down menu, reversing the current state. */
+        toggle(): Promise<void> & JQueryPromise<void>;
+        /** Opens or closes the drop-down menu, depending on the argument. */
+        toggle(visibility: boolean): Promise<void> & JQueryPromise<void>;
+    }
+    
+    export interface dxDropDownEditorOptions<T = dxDropDownEditor> extends dxTextBoxOptions<T> {
+        /** Specifies whether or not the widget allows an end-user to enter a custom value. */
+        acceptCustomValue?: boolean;
+        /** Specifies whether or not the widget changes its state when interacting with a user. */
+        activeStateEnabled?: boolean;
+        /** Specifies the way an end-user applies the selected value. */
+        applyValueMode?: 'instantly' | 'useButtons';
+        /** Allows you to add custom buttons to the input text field. */
+        buttons?: Array<'clear' | 'dropDown' | dxTextEditorButton>;
+        /** Specifies whether to render the drop-down field's content when it is displayed. If false, the content is rendered immediately. */
+        deferRendering?: boolean;
+        /** Specifies a custom template for the drop-down button. */
+        dropDownButtonTemplate?: template | ((buttonData: { text?: string, icon?: string }, contentElement: DevExpress.core.dxElement) => string | Element | JQuery);
+        /** A function that is executed once the drop-down editor is closed. */
+        onClosed?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any }) => any);
+        /** A function that is executed once the drop-down editor is opened. */
+        onOpened?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any }) => any);
+        /** Specifies whether a user can open the drop-down list by clicking a text field. */
+        openOnFieldClick?: boolean;
+        /** Specifies whether or not the drop-down editor is displayed. */
+        opened?: boolean;
+        /** Specifies whether the drop-down button is visible. */
+        showDropDownButton?: boolean;
+        /** Specifies the currently selected value. */
+        value?: any;
+    }
+    /** A drop-down editor widget. */
+    export class dxDropDownEditor extends dxTextBox {
+        constructor(element: Element, options?: dxDropDownEditorOptions)
+        constructor(element: JQuery, options?: dxDropDownEditorOptions)
+        /** Closes the drop-down editor. */
+        close(): void;
+        /** Gets the popup window's content. */
+        content(): DevExpress.core.dxElement;
+        /** Gets the widget's `` element. */
+        field(): DevExpress.core.dxElement;
+        /** Opens the drop-down editor. */
+        open(): void;
+        /** Resets the value option to the default value. */
+        reset(): void;
+    }
+    
+    export interface dxDropDownListOptions<T = dxDropDownList> extends DataExpressionMixinOptions<T>, dxDropDownEditorOptions<T> {
+        /** Returns the value currently displayed by the widget. */
+        displayValue?: string;
+        /** Specifies a custom template for group captions. */
+        groupTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery);
+        /** Specifies whether data items should be grouped. */
+        grouped?: boolean;
+        /** The minimum number of characters that must be entered into the text box to begin a search. Applies only if searchEnabled is true. */
+        minSearchLength?: number;
+        /** The text or HTML markup displayed by the widget if the item collection is empty. */
+        noDataText?: string;
+        /** A function that is executed when a list item is clicked or tapped. */
+        onItemClick?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, itemData?: any, itemElement?: any, itemIndex?: number | any, event?: event }) => any);
+        /** A function that is executed when a list item is selected or selection is canceled. */
+        onSelectionChanged?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, selectedItem?: any }) => any);
+        /** A function that is executed after the widget's value is changed. */
+        onValueChanged?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, value?: any, previousValue?: any, jQueryEvent?: JQueryEventObject, event?: event }) => any);
+        /** Specifies whether to allow searching. */
+        searchEnabled?: boolean;
+        /** Specifies the name of a data source item field or an expression whose value is compared to the search criterion. */
+        searchExpr?: string | Function | Array<string | Function>;
+        /** Specifies a comparison operation used to search widget items. */
+        searchMode?: 'contains' | 'startswith';
+        /** Specifies the time delay, in milliseconds, after the last character has been typed in, before a search is executed. */
+        searchTimeout?: number;
+        /** Gets the currently selected item. */
+        selectedItem?: any;
+        /** Specifies whether or not the widget displays unfiltered values until a user types a number of characters exceeding the minSearchLength option value. */
+        showDataBeforeSearch?: boolean;
+        /** Specifies the currently selected value. May be an object if dataSource contains objects and valueExpr is not set. */
+        value?: any;
+        /** Specifies the DOM events after which the widget's value should be updated. */
+        valueChangeEvent?: string;
+    }
+    /** A base class for drop-down list widgets. */
+    export class dxDropDownList extends dxDropDownEditor {
+        constructor(element: Element, options?: dxDropDownListOptions)
+        constructor(element: JQuery, options?: dxDropDownListOptions)
+        /** Gets the DataSource instance. */
+        getDataSource(): DevExpress.data.DataSource;
+    }
+    
+    export interface dxDropDownMenuOptions extends WidgetOptions<dxDropDownMenu> {
+        /** Specifies whether or not the widget changes its state when interacting with a user. */
+        activeStateEnabled?: boolean;
+        /** The name of the icon to be displayed by the DropDownMenu button. */
+        buttonIcon?: string;
+        /** The text displayed in the DropDownMenu button. */
+        buttonText?: string;
+        /** Overriden */
+        dataSource?: string | Array<any> | DevExpress.data.DataSource | DevExpress.data.DataSourceOptions;
+        /** Specifies whether the widget changes its state when a user pauses on it. */
+        hoverStateEnabled?: boolean;
+        /** Specifies a custom template for items. */
+        itemTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery);
+        /** An array of items displayed by the widget. */
+        items?: Array<any>;
+        /** A function that is executed when the button that opens the drop-down menu is clicked or tapped. */
+        onButtonClick?: ((e: { component?: dxDropDownMenu, element?: DevExpress.core.dxElement, model?: any, jQueryEvent?: JQueryEventObject, event?: event }) => any) | string;
+        /** A function that is executed when a menu item is clicked or tapped. */
+        onItemClick?: ((e: { component?: dxDropDownMenu, element?: DevExpress.core.dxElement, model?: any, itemData?: any, itemElement?: DevExpress.core.dxElement, itemIndex?: number, event?: event }) => any) | string;
+        /** Specifies whether or not the drop-down menu is displayed. */
+        opened?: boolean;
+        /** Specifies the popup element's height in pixels. */
+        popupHeight?: number | string | Function;
+        /** Specifies the popup element's width in pixels. */
+        popupWidth?: number | string | Function;
+        /** Specifies whether or not to show the drop down menu within a Popover widget. */
+        usePopover?: boolean;
+    }
+    /** A drop-down menu widget. */
+    export class dxDropDownMenu extends Widget {
+        constructor(element: Element, options?: dxDropDownMenuOptions)
+        constructor(element: JQuery, options?: dxDropDownMenuOptions)
+        /** Closes the drop-down menu. */
+        close(): void;
+        /** Opens the drop-down menu. */
+        open(): void;
+    }
+    
+    export interface dxFileManagerOptions extends WidgetOptions<dxFileManager> {
+        
+        customizeDetailColumns?: ((columns: Array<dxDataGridColumn>) => Array<dxDataGridColumn>);
+        /** Allows you to provide custom thumbnails. */
+        customizeThumbnail?: ((fileItem: any) => string);
+        
+        fileProvider?: any;
+        /** Configures the file and folder view. */
+        itemView?: { mode?: 'details' | 'thumbnails', showFolders?: boolean, showParentFolder?: boolean };
+        
+        onSelectedFileOpened?: ((e: { component?: dxFileManager, element?: DevExpress.core.dxElement, model?: any, fileItem?: any }) => any);
+        /** Specifies actions that a user is allowed to perform on files and folders. */
+        permissions?: { copy?: boolean, create?: boolean, move?: boolean, remove?: boolean, rename?: boolean, upload?: boolean };
+        /** Specifies whether a user can select a single or multiple files and folders in the item view simultaneously. */
+        selectionMode?: 'multiple' | 'single';
+    }
+    /** [tags] ctp The FileManager is a widget that allows users to upload, select, and manage files and folders on different file storages. [note] The FileManager is at the Community Technology Preview (CTP) development stage: the component is available for testing, but its concept, design, and behavior can be reconsidered and changed without notice. */
+    export class dxFileManager extends Widget {
+        constructor(element: Element, options?: dxFileManagerOptions)
+        constructor(element: JQuery, options?: dxFileManagerOptions)
+    }
+    
+    export interface dxFileUploaderOptions extends EditorOptions<dxFileUploader> {
+        /** Specifies a file type or several types accepted by the widget. */
+        accept?: string;
+        /** Specifies if an end user can remove a file from the selection and interrupt uploading. */
+        allowCanceling?: boolean;
+        /** Restricts file extensions that can be uploaded to the server. */
+        allowedFileExtensions?: Array<string>;
+        /** Specifies the chunk size in bytes. Applies only if uploadMode is "instantly" or "useButtons". Requires a server that can process file chunks. */
+        chunkSize?: number;
+        /** Specifies whether the widget can be focused using keyboard navigation. */
+        focusStateEnabled?: boolean;
+        /** The text displayed when the extension of the file being uploaded is not an allowed file extension. */
+        invalidFileExtensionMessage?: string;
+        /** The text displayed when the size of the file being uploaded is greater than the maxFileSize. */
+        invalidMaxFileSizeMessage?: string;
+        /** The text displayed when the size of the file being uploaded is less than the minFileSize. */
+        invalidMinFileSizeMessage?: string;
+        /** Specifies the text displayed on the area to which an end-user can drop a file. */
+        labelText?: string;
+        /** Specifies the maximum file size (in bytes) allowed for uploading. Applies only if uploadMode is "instantly" or "useButtons". */
+        maxFileSize?: number;
+        /** Specifies the minimum file size (in bytes) allowed for uploading. Applies only if uploadMode is "instantly" or "useButtons". */
+        minFileSize?: number;
+        /** Specifies whether the widget enables an end-user to select a single file or multiple files. */
+        multiple?: boolean;
+        /** Specifies the value passed to the name attribute of the underlying input element. Required to access uploaded files on the server. */
+        name?: string;
+        /** A function that is executed when a file segment is uploaded. */
+        onProgress?: ((e: { component?: dxFileUploader, element?: DevExpress.core.dxElement, model?: any, file?: File, segmentSize?: number, bytesLoaded?: number, bytesTotal?: number, jQueryEvent?: JQueryEventObject, event?: event, request?: XMLHttpRequest }) => any);
+        /** A function that is executed when the file upload is aborted. */
+        onUploadAborted?: ((e: { component?: dxFileUploader, element?: DevExpress.core.dxElement, model?: any, file?: File, jQueryEvent?: JQueryEventObject, event?: event, request?: XMLHttpRequest }) => any);
+        /** A function that is executed when an error occurs during the file upload. */
+        onUploadError?: ((e: { component?: dxFileUploader, element?: DevExpress.core.dxElement, model?: any, file?: File, jQueryEvent?: JQueryEventObject, event?: event, request?: XMLHttpRequest }) => any);
+        /** A function that is executed when the file upload is started. */
+        onUploadStarted?: ((e: { component?: dxFileUploader, element?: DevExpress.core.dxElement, model?: any, file?: File, jQueryEvent?: JQueryEventObject, event?: event, request?: XMLHttpRequest }) => any);
+        /** A function that is executed when a file is successfully uploaded. */
+        onUploaded?: ((e: { component?: dxFileUploader, element?: DevExpress.core.dxElement, model?: any, file?: File, jQueryEvent?: JQueryEventObject, event?: event, request?: XMLHttpRequest }) => any);
+        /** A function that is executed when one or several files are added to or removed from the selection. */
+        onValueChanged?: ((e: { component?: dxFileUploader, element?: DevExpress.core.dxElement, model?: any, value?: Array<File>, previousValue?: Array<File>, jQueryEvent?: JQueryEventObject, event?: event }) => any);
+        /** Gets the current progress in percentages. */
+        progress?: number;
+        /** The message displayed by the widget when it is ready to upload the specified files. */
+        readyToUploadMessage?: string;
+        /** The text displayed on the button that opens the file browser. */
+        selectButtonText?: string;
+        /** Specifies whether or not the widget displays the list of selected files. */
+        showFileList?: boolean;
+        /** The text displayed on the button that starts uploading. */
+        uploadButtonText?: string;
+        /** The message displayed by the widget on uploading failure. */
+        uploadFailedMessage?: string;
+        /** Specifies headers for the upload request. */
+        uploadHeaders?: any;
+        /** Specifies the method for the upload request. */
+        uploadMethod?: 'POST' | 'PUT';
+        /** Specifies how the widget uploads files. */
+        uploadMode?: 'instantly' | 'useButtons' | 'useForm';
+        /** Specifies a target Url for the upload request. */
+        uploadUrl?: string;
+        /** The message displayed by the widget when uploading is finished. */
+        uploadedMessage?: string;
+        /** Specifies a File instance representing the selected file. Read-only when uploadMode is "useForm". */
+        value?: Array<File>;
+    }
+    /** The FileUploader widget enables an end user to upload files to the server. An end user can select files in the file explorer or drag and drop files to the FileUploader area on the page. */
+    export class dxFileUploader extends Editor {
+        constructor(element: Element, options?: dxFileUploaderOptions)
+        constructor(element: JQuery, options?: dxFileUploaderOptions)
+    }
+    
+    export interface dxFilterBuilderOptions extends WidgetOptions<dxFilterBuilder> {
+        /** Specifies whether the widget can display hierarchical data fields. */
+        allowHierarchicalFields?: boolean;
+        /** Configures custom filter operations. */
+        customOperations?: Array<dxFilterBuilderCustomOperation>;
+        /** Configures fields. */
+        fields?: Array<dxFilterBuilderField>;
+        /** Specifies filter operation descriptions. */
+        filterOperationDescriptions?: { between?: string, contains?: string, endsWith?: string, equal?: string, greaterThan?: string, greaterThanOrEqual?: string, isBlank?: string, isNotBlank?: string, lessThan?: string, lessThanOrEqual?: string, notContains?: string, notEqual?: string, startsWith?: string };
+        /** Specifies group operation descriptions. */
+        groupOperationDescriptions?: { and?: string, notAnd?: string, notOr?: string, or?: string };
+        /** Specifies a set of available group operations. */
+        groupOperations?: Array<'and' | 'or' | 'notAnd' | 'notOr'>;
+        /** Specifies groups' maximum nesting level. */
+        maxGroupLevel?: number;
+        /** A function that is executed after an editor is created. */
+        onEditorPrepared?: ((e: { component?: dxFilterBuilder, element?: DevExpress.core.dxElement, model?: any, value?: any, setValue?: any, editorElement?: DevExpress.core.dxElement, editorName?: string, dataField?: string, filterOperation?: string, updateValueTimeout?: number, width?: number, readOnly?: boolean, disabled?: boolean, rtlEnabled?: boolean }) => any);
+        /** A function that is executed before an editor is created. */
+        onEditorPreparing?: ((e: { component?: dxFilterBuilder, element?: DevExpress.core.dxElement, model?: any, value?: any, setValue?: any, cancel?: boolean, editorElement?: DevExpress.core.dxElement, editorName?: string, editorOptions?: any, dataField?: string, filterOperation?: string, updateValueTimeout?: number, width?: number, readOnly?: boolean, disabled?: boolean, rtlEnabled?: boolean }) => any);
+        /** A function that is executed after the widget's value is changed. */
+        onValueChanged?: ((e: { component?: dxFilterBuilder, element?: DevExpress.core.dxElement, model?: any, value?: any, previousValue?: any }) => any);
+        /** Allows you to specify a filter. */
+        value?: string | Array<any> | Function;
+    }
+    /** The FilterBuilder widget allows a user to build complex filter expressions with an unlimited number of filter conditions, combined by logical operations using the UI. */
+    export class dxFilterBuilder extends Widget {
+        constructor(element: Element, options?: dxFilterBuilderOptions)
+        constructor(element: JQuery, options?: dxFilterBuilderOptions)
+        /** Gets a filter expression that contains only operations supported by the DataSource. */
+        getFilterExpression(): string | Array<any> | Function;
+    }
+    
+    export interface dxFilterBuilderCustomOperation {
+        /** Specifies a function that returns a filter expression for this custom operation. */
+        calculateFilterExpression?: ((filterValue: any, field: dxFilterBuilderField) => string | Array<any> | Function);
+        /** Specifies the operation's caption. */
+        caption?: string;
+        /** Customizes the field value's text representation. */
+        customizeText?: ((fieldInfo: { value?: string | number | Date, valueText?: string, field?: dxFilterBuilderField }) => string);
+        /** Specifies for which data types the operation is available by default. */
+        dataTypes?: Array<'string' | 'number' | 'date' | 'boolean' | 'object' | 'datetime'>;
+        /** Specifies a custom template for the widget used to edit the field value. */
+        editorTemplate?: template | ((conditionInfo: { value?: string | number | Date, field?: dxFilterBuilderField, setValue?: Function }, container: DevExpress.core.dxElement) => string | Element | JQuery);
+        /** Specifies whether the operation can have a value. If it can, the editor is displayed. */
+        hasValue?: boolean;
+        /** Specifies the icon that should represent the filter operation. */
+        icon?: string;
+        /** Specifies the operation's identifier. */
+        name?: string;
+    }
+    /** The FilterBuilder's field structure. */
+    export interface dxFilterBuilderField {
+        /** Specifies the field's custom filtering rules. */
+        calculateFilterExpression?: ((filterValue: any, selectedFilterOperation: string) => string | Array<any> | Function);
+        /** Specifies the data field's caption. */
+        caption?: string;
+        /** Customizes the input value's display text. */
+        customizeText?: ((fieldInfo: { value?: string | number | Date, valueText?: string }) => string);
+        /** Specifies the name of a field to be filtered. */
+        dataField?: string;
+        /** Casts field values to a specific data type. */
+        dataType?: 'string' | 'number' | 'date' | 'boolean' | 'object' | 'datetime';
+        /** Configures the widget used to edit the field value. */
+        editorOptions?: any;
+        /** Specifies the editor's custom template. */
+        editorTemplate?: template | ((conditionInfo: { value?: string | number | Date, filterOperation?: string, field?: dxFilterBuilderField, setValue?: Function }, container: DevExpress.core.dxElement) => string | Element | JQuery);
+        /** Specifies the false value text. Applies only if dataType is "boolean". */
+        falseText?: string;
+        /** Specifies a set of available filter operations. */
+        filterOperations?: Array<'=' | '<>' | '<' | '<=' | '>' | '>=' | 'contains' | 'endswith' | 'isblank' | 'isnotblank' | 'notcontains' | 'startswith' | 'between' | string>;
+        /** Formats a value before it is displayed. */
+        format?: format;
+        /** Configures the lookup field. */
+        lookup?: { allowClearing?: boolean, dataSource?: Array<any> | DevExpress.data.DataSourceOptions, displayExpr?: string | ((data: any) => any), valueExpr?: string | Function };
+        /** Specifies the true value text. Applies only if dataType is "boolean". */
+        trueText?: string;
+    }
+    
+    export interface dxFormOptions extends WidgetOptions<dxForm> {
+        /** Specifies whether or not all root item labels are aligned. */
+        alignItemLabels?: boolean;
+        /** Specifies whether or not item labels in all groups are aligned. */
+        alignItemLabelsInAllGroups?: boolean;
+        /** The count of columns in the form layout. */
+        colCount?: number | 'auto';
+        /** Specifies dependency between the screen factor and the count of columns in the form layout. */
+        colCountByScreen?: any;
+        /** Specifies a function that customizes a form item after it has been created. */
+        customizeItem?: ((item: dxFormSimpleItem | dxFormGroupItem | dxFormTabbedItem | dxFormEmptyItem | dxFormButtonItem) => any);
+        /** Provides the Form's data. Gets updated every time form fields change. */
+        formData?: any;
+        /** Holds an array of form items. */
+        items?: Array<dxFormSimpleItem | dxFormGroupItem | dxFormTabbedItem | dxFormEmptyItem | dxFormButtonItem>;
+        /** Specifies the location of a label against the editor. */
+        labelLocation?: 'left' | 'right' | 'top';
+        /** The minimum column width used for calculating column count in the form layout. */
+        minColWidth?: number;
+        /** A function that is executed when the Enter key has been pressed while an editor is focused. */
+        onEditorEnterKey?: ((e: { component?: dxForm, element?: DevExpress.core.dxElement, model?: any, dataField?: string }) => any);
+        /** A function that is executed when the value of a formData object field is changed. */
+        onFieldDataChanged?: ((e: { component?: dxForm, element?: DevExpress.core.dxElement, model?: any, dataField?: string, value?: any }) => any);
+        /** The text displayed for optional fields. */
+        optionalMark?: string;
+        /** Specifies whether all editors on the form are read-only. Applies only to non-templated items. */
+        readOnly?: boolean;
+        /** The text displayed for required fields. */
+        requiredMark?: string;
+        /** Specifies the message that is shown for end-users if a required field value is not specified. */
+        requiredMessage?: string;
+        /** Specifies a function that categorizes screens by their width. */
+        screenByWidth?: Function;
+        /** A Boolean value specifying whether to enable or disable form scrolling. */
+        scrollingEnabled?: boolean;
+        /** Specifies whether or not a colon is displayed at the end of form labels. */
+        showColonAfterLabel?: boolean;
+        /** Specifies whether or not the optional mark is displayed for optional fields. */
+        showOptionalMark?: boolean;
+        /** Specifies whether or not the required mark is displayed for required fields. */
+        showRequiredMark?: boolean;
+        /** Specifies whether or not the total validation summary is displayed on the form. */
+        showValidationSummary?: boolean;
+        /** Gives a name to the internal validation group. */
+        validationGroup?: string;
+    }
+    /** The Form widget represents fields of a data object as a collection of label-editor pairs. These pairs can be arranged in several groups, tabs and columns. */
+    export class dxForm extends Widget {
+        constructor(element: Element, options?: dxFormOptions)
+        constructor(element: JQuery, options?: dxFormOptions)
+        /** Gets a button's instance. */
+        getButton(name: string): dxButton | undefined;
+        /** Gets an editor instance. Takes effect only if the form item is visible. */
+        getEditor(dataField: string): Editor | undefined;
+        /** Gets a form item's configuration. */
+        itemOption(id: string): any;
+        /** Updates the value of a single item option. */
+        itemOption(id: string, option: string, value: any): void;
+        /** Updates the values of several item options. */
+        itemOption(id: string, options: any): void;
+        /** Resets the editor's value to undefined. */
+        resetValues(): void;
+        /** Updates formData fields and the corresponding editors. */
+        updateData(data: any): void;
+        /** Updates a formData field and the corresponding editor. */
+        updateData(dataField: string, value: any): void;
+        /** Updates the dimensions of the widget contents. */
+        updateDimensions(): Promise<void> & JQueryPromise<void>;
+        /** Validates the values of all editors on the form against the list of the validation rules specified for each form item. */
+        validate(): dxValidationGroupResult;
+    }
+    /** Configures a button form item. */
+    export interface dxFormButtonItem {
+        /** @deprecated Use horizontalAlignment instead. */
+        /** Specifies the button's horizontal alignment. */
+        alignment?: 'center' | 'left' | 'right';
+        /** Configures the button. */
+        buttonOptions?: dxButtonOptions;
+        /** Specifies how many columns the item spans. */
+        colSpan?: number;
+        /** Specifies a CSS class to be applied to the item. */
+        cssClass?: string;
+        /** Specifies the button's horizontal alignment. */
+        horizontalAlignment?: 'center' | 'left' | 'right';
+        /** Specifies the item's type. Set it to "button" to create a button item. */
+        itemType?: 'empty' | 'group' | 'simple' | 'tabbed' | 'button';
+        /** Specifies the item's identifier. */
+        name?: string;
+        /** Specifies the button's vertical alignment. */
+        verticalAlignment?: 'bottom' | 'center' | 'top';
+        /** Specifies whether the item is visible. */
+        visible?: boolean;
+        /** Specifies the item's position regarding other items in a group, tab, or the whole widget. */
+        visibleIndex?: number;
+    }
+    /** This article describes configuration options of an empty form item. */
+    export interface dxFormEmptyItem {
+        /** Specifies the number of columns spanned by the item. */
+        colSpan?: number;
+        /** Specifies a CSS class to be applied to the form item. */
+        cssClass?: string;
+        /** Specifies the item's type. Set it to "empty" to create an empty item. */
+        itemType?: 'empty' | 'group' | 'simple' | 'tabbed' | 'button';
+        /** Specifies a name that identifies the form item. */
+        name?: string;
+        /** Specifies whether or not the current form item is visible. */
+        visible?: boolean;
+        /** Specifies the sequence number of the item in a form, group or tab. */
+        visibleIndex?: number;
+    }
+    /** This article describes configuration options of a group form item. */
+    export interface dxFormGroupItem {
+        /** Specifies whether or not all group item labels are aligned. */
+        alignItemLabels?: boolean;
+        /** Specifies the group caption. */
+        caption?: string;
+        /** The count of columns in the group layout. */
+        colCount?: number;
+        /** Specifies the relation between the screen size qualifier and the number of columns in the grouped layout. */
+        colCountByScreen?: any;
+        /** Specifies the number of columns spanned by the item. */
+        colSpan?: number;
+        /** Specifies a CSS class to be applied to the form item. */
+        cssClass?: string;
+        /** Specifies the item's type. Set it to "group" to create a group item. */
+        itemType?: 'empty' | 'group' | 'simple' | 'tabbed' | 'button';
+        /** Holds an array of form items displayed within the group. */
+        items?: Array<dxFormSimpleItem | dxFormGroupItem | dxFormTabbedItem | dxFormEmptyItem | dxFormButtonItem>;
+        /** Specifies a name that identifies the form item. */
+        name?: string;
+        /** A template to be used for rendering a group item. */
+        template?: template | ((data: { component?: dxForm, formData?: any }, itemElement: DevExpress.core.dxElement) => string | Element | JQuery);
+        /** Specifies whether or not the current form item is visible. */
+        visible?: boolean;
+        /** Specifies the sequence number of the item in a form, group or tab. */
+        visibleIndex?: number;
+    }
+    /** This article describes configuration options of a simple form item. */
+    export interface dxFormSimpleItem {
+        /** Specifies the number of columns spanned by the item. */
+        colSpan?: number;
+        /** Specifies a CSS class to be applied to the form item. */
+        cssClass?: string;
+        /** Specifies the path to the formData object field bound to the current form item. */
+        dataField?: string;
+        /** Configures the form item's editor. */
+        editorOptions?: any;
+        /** Specifies which editor widget is used to display and edit the form item value. */
+        editorType?: 'dxAutocomplete' | 'dxCalendar' | 'dxCheckBox' | 'dxColorBox' | 'dxDateBox' | 'dxDropDownBox' | 'dxLookup' | 'dxNumberBox' | 'dxRadioGroup' | 'dxRangeSlider' | 'dxSelectBox' | 'dxSlider' | 'dxSwitch' | 'dxTagBox' | 'dxTextArea' | 'dxTextBox';
+        /** Specifies the help text displayed for the current form item. */
+        helpText?: string;
+        /** Specifies whether the current form item is required. */
+        isRequired?: boolean;
+        /** Specifies the item's type. Set it to "simple" to create a simple item. */
+        itemType?: 'empty' | 'group' | 'simple' | 'tabbed' | 'button';
+        /** Specifies options for the form item label. */
+        label?: { alignment?: 'center' | 'left' | 'right', location?: 'left' | 'right' | 'top', showColon?: boolean, text?: string, visible?: boolean };
+        /** Specifies a name that identifies the form item. */
+        name?: string;
+        /** A template to be used for rendering the form item. */
+        template?: template | ((data: { component?: dxForm, dataField?: string, editorOptions?: any, editorType?: string }, itemElement: DevExpress.core.dxElement) => string | Element | JQuery);
+        /** An array of validation rules to be checked for the form item editor. */
+        validationRules?: Array<RequiredRule | NumericRule | RangeRule | StringLengthRule | CustomRule | CompareRule | PatternRule | EmailRule>;
+        /** Specifies whether or not the current form item is visible. */
+        visible?: boolean;
+        /** Specifies the sequence number of the item in a form, group or tab. */
+        visibleIndex?: number;
+    }
+    /** This article describes configuration options of a tabbed form item. */
+    export interface dxFormTabbedItem {
+        /** Specifies the number of columns spanned by the item. */
+        colSpan?: number;
+        /** Specifies a CSS class to be applied to the form item. */
+        cssClass?: string;
+        /** Specifies the item's type. Set it to "tabbed" to create a tabbed item. */
+        itemType?: 'empty' | 'group' | 'simple' | 'tabbed' | 'button';
+        /** Specifies a name that identifies the form item. */
+        name?: string;
+        /** Holds a configuration object for the TabPanel widget used to display the current form item. */
+        tabPanelOptions?: dxTabPanelOptions;
+        /** An array of tab configuration objects. */
+        tabs?: Array<{ alignItemLabels?: boolean, badge?: string, colCount?: number, colCountByScreen?: any, disabled?: boolean, icon?: string, items?: Array<dxFormSimpleItem | dxFormGroupItem | dxFormTabbedItem | dxFormEmptyItem | dxFormButtonItem>, tabTemplate?: template | ((tabData: any, tabIndex: number, tabElement: DevExpress.core.dxElement) => any), template?: template | ((tabData: any, tabIndex: number, tabElement: DevExpress.core.dxElement) => any), title?: string }>;
+        /** Specifies whether or not the current form item is visible. */
+        visible?: boolean;
+        /** Specifies the sequence number of the item in a form, group or tab. */
+        visibleIndex?: number;
+    }
+    
+    export interface dxGalleryOptions extends CollectionWidgetOptions<dxGallery> {
+        /** The time, in milliseconds, spent on slide animation. */
+        animationDuration?: number;
+        /** Specifies whether or not to animate the displayed item change. */
+        animationEnabled?: boolean;
+        /** Specifies whether the widget can be focused using keyboard navigation. */
+        focusStateEnabled?: boolean;
+        /** A Boolean value specifying whether or not to allow users to switch between items by clicking an indicator. */
+        indicatorEnabled?: boolean;
+        /** Specifies the width of an area used to display a single image. */
+        initialItemWidth?: number;
+        /** An array of items displayed by the widget. */
+        items?: Array<string | dxGalleryItem | any>;
+        /** A Boolean value specifying whether or not to scroll back to the first item after the last item is swiped. */
+        loop?: boolean;
+        /** The index of the currently active gallery item. */
+        selectedIndex?: number;
+        /** A Boolean value specifying whether or not to display an indicator that points to the selected gallery item. */
+        showIndicator?: boolean;
+        /** A Boolean value that specifies the availability of the "Forward" and "Back" navigation buttons. */
+        showNavButtons?: boolean;
+        /** The time interval in milliseconds, after which the gallery switches to the next item. */
+        slideshowDelay?: number;
+        /** Specifies if the widget stretches images to fit the total gallery width. */
+        stretchImages?: boolean;
+        /** A Boolean value specifying whether or not to allow users to switch between items by swiping. */
+        swipeEnabled?: boolean;
+        /** Specifies whether or not to display parts of previous and next images along the sides of the current image. */
+        wrapAround?: boolean;
+    }
+    /** The Gallery is a widget that displays a collection of images in a carousel. The widget is supplied with various navigation controls that allow a user to switch between images. */
+    export class dxGallery extends CollectionWidget {
+        constructor(element: Element, options?: dxGalleryOptions)
+        constructor(element: JQuery, options?: dxGalleryOptions)
+        /** Shows a specific image. */
+        goToItem(itemIndex: number, animation: boolean): Promise<void> & JQueryPromise<void>;
+        /** Shows the next image. */
+        nextItem(animation: boolean): Promise<void> & JQueryPromise<void>;
+        /** Shows the previous image. */
+        prevItem(animation: boolean): Promise<void> & JQueryPromise<void>;
+    }
+    /** This section lists the data source fields that are used in a default template for gallery items. */
+    export interface dxGalleryItem extends CollectionWidgetItem {
+        /** Specifies the text passed to the alt attribute of the image markup element. */
+        imageAlt?: string;
+        /** Specifies the URL of the image displayed by the item. */
+        imageSrc?: string;
+    }
+    
+    export interface dxHtmlEditorOptions extends EditorOptions<dxHtmlEditor> {
+        /** Allows you to customize Quill and 3rd-party modules. */
+        customizeModules?: ((config: any) => any);
+        /** Specifies whether the widget can be focused using keyboard navigation. */
+        focusStateEnabled?: boolean;
+        /** Configures media resizing. */
+        mediaResizing?: dxHtmlEditorMediaResizing;
+        /** Configures mentions. */
+        mentions?: Array<dxHtmlEditorMention>;
+        /** The value to be assigned to the `name` attribute of the underlying HTML element. */
+        name?: string;
+        /** A function that is executed when the widget gets focus. */
+        onFocusIn?: ((e: { component?: dxHtmlEditor, element?: DevExpress.core.dxElement, model?: any, event?: event }) => any);
+        /** A function that is executed when the widget loses focus. */
+        onFocusOut?: ((e: { component?: dxHtmlEditor, element?: DevExpress.core.dxElement, model?: any, event?: event }) => any);
+        /** Specifies the text displayed when the input field is empty. */
+        placeholder?: string;
+        /** Configures the widget's toolbar. */
+        toolbar?: dxHtmlEditorToolbar;
+        /** Specifies in which markup language the value is stored. */
+        valueType?: 'html' | 'markdown';
+        /** Configures variables, which are placeholders to be replaced with actual values when processing text. */
+        variables?: dxHtmlEditorVariables;
+    }
+    /** [tags] ctp HtmlEditor is a WYSIWYG text editor build on top of Quill, designed to support HTML and Markdown output formats. HtmlEditor is at the Community Technology Preview (CTP) development stage. That means that the widget is available for testing, but its concept, design and behavior can be reconsidered and changed without notice. */
+    export class dxHtmlEditor extends Editor {
+        constructor(element: Element, options?: dxHtmlEditorOptions)
+        constructor(element: JQuery, options?: dxHtmlEditorOptions)
+        /** Clears the history of changes. */
+        clearHistory(): void;
+        /** Deletes content from the given range. */
+        delete(index: number, length: number): void;
+        /** Applies a format to the selected content. Cannot be used with embedded formats. */
+        format(formatName: string, formatValue: any): void;
+        /** Applies a single block format to all lines in the given range. */
+        formatLine(index: number, length: number, formatName: string, formatValue: any): void;
+        /** Applies several block formats to all lines in the given range. */
+        formatLine(index: number, length: number, formats: any): void;
+        /** Applies a single text format to all characters in the given range. */
+        formatText(index: number, length: number, formatName: string, formatValue: any): void;
+        /** Applies several text formats to all characters in the given range. */
+        formatText(index: number, length: number, formats: any): void;
+        /** Gets a format, module, or Parchment. */
+        get(componentPath: string): any;
+        /** Gets formats applied to the content in the specified range. */
+        getFormat(index: number, length: number): any;
+        /** Gets the instance of a widget found using its DOM node. */
+        static getInstance(element: Element | JQuery): DOMComponent;
+        /** Gets the entire content's length. */
+        getLength(): number;
+        /** Gets Quill's instance. */
+        getQuillInstance(): any;
+        /** Gets the selected content's position and length. */
+        getSelection(): any;
+        /** Inserts an embedded content at the specified position. */
+        insertEmbed(index: number, type: string, config: any): void;
+        /** Inserts formatted text at the specified position. Used with all formats except embedded. */
+        insertText(index: number, text: string, formats: any): void;
+        /** Reapplies the most recent undone change. Repeated calls reapply preceding undone changes. */
+        redo(): void;
+        /** Registers custom formats and modules. */
+        register(modules: any): void;
+        /** Registers a handler to be executed when a user presses a specific key. */
+        registerKeyHandler(key: string, handler: Function): void;
+        /** Removes all formatting and embedded content from the specified range. */
+        removeFormat(index: number, length: number): void;
+        /** Selects and highlights content in the specified range. */
+        setSelection(index: number, length: number): void;
+        /** Reverses the most recent change. Repeated calls reverse preceding changes. */
+        undo(): void;
+    }
+    
+    export interface dxHtmlEditorMediaResizing {
+        /** Specifies media types that can be resized. Currently, only images are supported. */
+        allowedTargets?: Array<string>;
+        /** Enables media resizing. */
+        enabled?: boolean;
+    }
+    
+    export interface dxHtmlEditorMention {
+        /** Provides data for the suggestion list. */
+        dataSource?: Array<string> | DevExpress.data.DataSource | DevExpress.data.DataSourceOptions;
+        /** Specifies the data field whose values should be displayed in the suggestion list. */
+        displayExpr?: string | ((item: any) => string);
+        /** Specifies a custom template for suggestion list items. */
+        itemTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery);
+        /** Specifies the prefix that a user enters to activate mentions. You can use different prefixes with different dataSources. */
+        marker?: string;
+        /** Specifies the minimum number of characters that a user should type to trigger the search. */
+        minSearchLength?: number;
+        /** Specifies one or several data fields to search. */
+        searchExpr?: string | Function | Array<string | Function>;
+        /** Specifies the delay between when a user stops typing and when the search is executed. */
+        searchTimeout?: number;
+        /** Specifies a custom template for mentions. */
+        template?: template | ((mentionData: { marker?: string, id?: string | number, value?: any }, contentElement: DevExpress.core.dxElement) => string | Element | JQuery);
+        /** Specifies which data field provides unique values to the template's `id` parameter. */
+        valueExpr?: string | Function;
+    }
+    
+    export interface dxHtmlEditorToolbar {
+        /** Specifies the container in which to place the toolbar. */
+        container?: string | Element | JQuery;
+        
+        items?: Array<dxHtmlEditorToolbarItem | string>;
+    }
+    /** Configures toolbar controls. These controls allow users to format text and execute commands. */
+    export interface dxHtmlEditorToolbarItem extends dxToolbarItem {
+        /** Specifies the built-in control that this object customizes or a format with multiple choices. */
+        formatName?: string;
+        /** Specifies values for a format with multiple choices. Should be used with the formatName. */
+        formatValues?: Array<string | number | boolean>;
+        /** Specifies a location for the item on the toolbar. */
+        location?: 'after' | 'before' | 'center';
+    }
+    
+    export interface dxHtmlEditorVariables {
+        /** Specifies a collection of variables available for a user. */
+        dataSource?: string | Array<string> | DevExpress.data.DataSource | DevExpress.data.DataSourceOptions;
+        /** Specifies the special character(s) that should surround the variables. */
+        escapeChar?: string | Array<string>;
+    }
+    /** Specifies markup for a widget item. */
+    export var dxItem: any;
+    
+    export interface dxListOptions extends CollectionWidgetOptions<dxList>, SearchBoxMixinOptions<dxList> {
+        /** Specifies whether or not the widget changes its state when interacting with a user. */
+        activeStateEnabled?: boolean;
+        /** Specifies whether or not an end user can delete list items. */
+        allowItemDeleting?: boolean;
+        /** Specifies whether a user can reorder list items. Grouped items cannot be moved from one group to another. */
+        allowItemReordering?: boolean;
+        /** A Boolean value specifying whether to enable or disable the bounce-back effect. */
+        bounceEnabled?: boolean;
+        /** Specifies whether or not an end-user can collapse groups. */
+        collapsibleGroups?: boolean;
+        /** Specifies the data field whose values should be displayed. Defaults to "text" when the data source contains objects. */
+        displayExpr?: string | ((item: any) => any);
+        /** Specifies whether the widget can be focused using keyboard navigation. */
+        focusStateEnabled?: boolean;
+        /** Specifies a custom template for group captions. */
+        groupTemplate?: template | ((groupData: any, groupIndex: number, groupElement: DevExpress.core.dxElement) => string | Element | JQuery);
+        /** Specifies whether data items should be grouped. */
+        grouped?: boolean;
+        /** Specifies whether the widget changes its state when a user pauses on it. */
+        hoverStateEnabled?: boolean;
+        /** Specifies whether or not to show the loading panel when the DataSource bound to the widget is loading data. */
+        indicateLoading?: boolean;
+        /** Specifies the way a user can delete items from the list. */
+        itemDeleteMode?: 'context' | 'slideButton' | 'slideItem' | 'static' | 'swipe' | 'toggle';
+        /** An array of items displayed by the widget. */
+        items?: Array<string | dxListItem | any>;
+        /** Specifies the array of items for a context menu called for a list item. */
+        menuItems?: Array<{ action?: ((itemElement: DevExpress.core.dxElement, itemData: any) => any), text?: string }>;
+        /** Specifies whether an item context menu is shown when a user holds or swipes an item. */
+        menuMode?: 'context' | 'slide';
+        /** The text displayed on the button used to load the next page from the data source. */
+        nextButtonText?: string;
+        /** A function that is executed when a group element is rendered. */
+        onGroupRendered?: ((e: { component?: dxList, element?: DevExpress.core.dxElement, model?: any, groupData?: any, groupElement?: DevExpress.core.dxElement, groupIndex?: number }) => any);
+        /** A function that is executed when a collection item is clicked or tapped. */
+        onItemClick?: ((e: { component?: dxList, element?: DevExpress.core.dxElement, model?: any, itemData?: any, itemElement?: DevExpress.core.dxElement, itemIndex?: number | any, jQueryEvent?: JQueryEventObject, event?: event }) => any) | string;
+        /** A function that is executed when a collection item is right-clicked or pressed. */
+        onItemContextMenu?: ((e: { component?: dxList, element?: DevExpress.core.dxElement, model?: any, itemData?: any, itemElement?: DevExpress.core.dxElement, itemIndex?: number | any, jQueryEvent?: JQueryEventObject, event?: event }) => any);
+        /** A function that is executed after a list item is deleted from the data source. */
+        onItemDeleted?: ((e: { component?: dxList, element?: DevExpress.core.dxElement, model?: any, itemData?: any, itemElement?: DevExpress.core.dxElement, itemIndex?: number | any }) => any);
+        /** A function that is executed before a collection item is deleted from the data source. */
+        onItemDeleting?: ((e: { component?: dxList, element?: DevExpress.core.dxElement, model?: any, itemData?: any, itemElement?: DevExpress.core.dxElement, itemIndex?: number | any, cancel?: boolean | Promise<void> | JQueryPromise<void> }) => any);
+        /** A function that is executed when a collection item has been held for a specified period. */
+        onItemHold?: ((e: { component?: dxList, element?: DevExpress.core.dxElement, model?: any, itemData?: any, itemElement?: DevExpress.core.dxElement, itemIndex?: number | any, jQueryEvent?: JQueryEventObject, event?: event }) => any);
+        /** A function that is executed after a list item is moved to another position. */
+        onItemReordered?: ((e: { component?: dxList, element?: DevExpress.core.dxElement, model?: any, itemData?: any, itemElement?: DevExpress.core.dxElement, itemIndex?: number | any, fromIndex?: number, toIndex?: number }) => any);
+        /** A function that is executed when a list item is swiped. */
+        onItemSwipe?: ((e: { component?: dxList, element?: DevExpress.core.dxElement, model?: any, jQueryEvent?: JQueryEventObject, event?: event, itemData?: any, itemElement?: DevExpress.core.dxElement, itemIndex?: number | any, direction?: string }) => any);
+        /** A function that is executed before the next page is loaded. */
+        onPageLoading?: ((e: { component?: dxList, element?: DevExpress.core.dxElement, model?: any }) => any);
+        /** A function that is executed when the "pull to refresh" gesture is performed. Supported in mobile themes only. */
+        onPullRefresh?: ((e: { component?: dxList, element?: DevExpress.core.dxElement, model?: any }) => any);
+        /** A function that is executed on each scroll gesture. */
+        onScroll?: ((e: { component?: dxList, element?: DevExpress.core.dxElement, model?: any, jQueryEvent?: JQueryEventObject, event?: event, scrollOffset?: any, reachedLeft?: boolean, reachedRight?: boolean, reachedTop?: boolean, reachedBottom?: boolean }) => any);
+        /** A function that is executed when the "Select All" check box value is changed. Applies only if the selectionMode is "all". */
+        onSelectAllValueChanged?: ((e: { component?: dxList, element?: DevExpress.core.dxElement, model?: any, value?: boolean }) => any);
+        /** Specifies whether the next page is loaded when a user scrolls the widget to the bottom or when the "next" button is clicked. */
+        pageLoadMode?: 'nextButton' | 'scrollBottom';
+        /** Specifies the text shown in the pullDown panel, which is displayed when the list is scrolled to the bottom. */
+        pageLoadingText?: string;
+        /** A Boolean value specifying whether or not the widget supports the "pull down to refresh" gesture. */
+        pullRefreshEnabled?: boolean;
+        /** Specifies the text displayed in the pullDown panel when the list is pulled below the refresh threshold. */
+        pulledDownText?: string;
+        /** Specifies the text shown in the pullDown panel while the list is being pulled down to the refresh threshold. */
+        pullingDownText?: string;
+        /** Specifies the text displayed in the pullDown panel while the list is being refreshed. */
+        refreshingText?: string;
+        /** Specifies whether to repaint only those elements whose data changed. */
+        repaintChangesOnly?: boolean;
+        /** A Boolean value specifying if the list is scrolled by content. */
+        scrollByContent?: boolean;
+        /** A Boolean value specifying if the list is scrolled using the scrollbar. */
+        scrollByThumb?: boolean;
+        /** A Boolean value specifying whether to enable or disable list scrolling. */
+        scrollingEnabled?: boolean;
+        /** Specifies the mode in which all items are selected. */
+        selectAllMode?: 'allPages' | 'page';
+        /** Specifies item selection mode. */
+        selectionMode?: 'all' | 'multiple' | 'none' | 'single';
+        /** Specifies when the widget shows the scrollbar. */
+        showScrollbar?: 'always' | 'never' | 'onHover' | 'onScroll';
+        /** Specifies whether or not to display controls used to select list items. */
+        showSelectionControls?: boolean;
+        /** Specifies whether or not the widget uses native scrolling. */
+        useNativeScrolling?: boolean;
+    }
+    /** The List is a widget that represents a collection of items in a scrollable list. */
+    export class dxList extends CollectionWidget {
+        constructor(element: Element, options?: dxListOptions)
+        constructor(element: JQuery, options?: dxListOptions)
+        /** Gets the widget's height in pixels. */
+        clientHeight(): number;
+        /** Collapses a group with a specific index. */
+        collapseGroup(groupIndex: number): Promise<void> & JQueryPromise<void>;
+        /** Removes an item found using its DOM node. */
+        deleteItem(itemElement: Element): Promise<void> & JQueryPromise<void>;
+        /** Removes an item with a specific index. */
+        deleteItem(itemIndex: number | any): Promise<void> & JQueryPromise<void>;
+        /** Expands a group with a specific index. */
+        expandGroup(groupIndex: number): Promise<void> & JQueryPromise<void>;
+        /** Checks whether an item found using its DOM node is selected. */
+        isItemSelected(itemElement: Element): boolean;
+        /** Checks whether an item with a specific index is selected. */
+        isItemSelected(itemIndex: number | any): boolean;
+        /** Reloads list data. */
+        reload(): void;
+        /** Reorders items found using their DOM nodes. */
+        reorderItem(itemElement: Element, toItemElement: Element): Promise<void> & JQueryPromise<void>;
+        /** Reorders items with specific indexes. */
+        reorderItem(itemIndex: number | any, toItemIndex: number | any): Promise<void> & JQueryPromise<void>;
+        /** Scrolls the content by a specified distance. */
+        scrollBy(distance: number): void;
+        /** Gets the content's height in pixels. */
+        scrollHeight(): number;
+        /** Scrolls the content to a specific position. */
+        scrollTo(location: number): void;
+        /** Scrolls the content to an item found using its DOM node. */
+        scrollToItem(itemElement: Element): void;
+        /** Scrolls the content to an item with a specific index. */
+        scrollToItem(itemIndex: number | any): void;
+        /** Gets the top scroll offset. */
+        scrollTop(): number;
+        /** Selects all items. */
+        selectAll(): void;
+        /** Selects an item found using its DOM node. */
+        selectItem(itemElement: Element): void;
+        /** Selects an item with a specific index. */
+        selectItem(itemIndex: number | any): void;
+        /** Cancels the selection of all items. */
+        unselectAll(): void;
+        /** Cancels the selection of an item found using its DOM node. */
+        unselectItem(itemElement: Element): void;
+        /** Cancels the selection of an item with a specific index. */
+        unselectItem(itemIndex: number | any): void;
+        /** Updates the widget scrollbar according to widget content size. */
+        updateDimensions(): Promise<void> & JQueryPromise<void>;
+    }
+    /** This section lists the data source fields that are used in a default template for list items. */
+    export interface dxListItem extends CollectionWidgetItem {
+        /** Specifies the text of a badge displayed for the list item. */
+        badge?: string;
+        /** Specifies the list item's icon. */
+        icon?: string;
+        /** Specifies the name of the list items group in a grouped list. */
+        key?: string;
+        /** Specifies whether or not to display a chevron for the list item. */
+        showChevron?: boolean;
+    }
+    
+    export interface dxLoadIndicatorOptions extends WidgetOptions<dxLoadIndicator> {
+        /** Specifies the path to an image used as the indicator. */
+        indicatorSrc?: string;
+    }
+    /** The LoadIndicator is a UI element notifying the viewer that a process is in progress. */
+    export class dxLoadIndicator extends Widget {
+        constructor(element: Element, options?: dxLoadIndicatorOptions)
+        constructor(element: JQuery, options?: dxLoadIndicatorOptions)
+    }
+    
+    export interface dxLoadPanelOptions extends dxOverlayOptions<dxLoadPanel> {
+        /** Configures widget visibility animations. This object contains two fields: show and hide. */
+        animation?: dxLoadPanelAnimation;
+        /** Specifies the widget's container. */
+        container?: string | Element | JQuery;
+        /** The delay in milliseconds after which the load panel is displayed. */
+        delay?: number;
+        /** Specifies whether or not the widget can be focused. */
+        focusStateEnabled?: boolean;
+        /** Specifies the widget's height in pixels. */
+        height?: number | string | (() => number | string);
+        /** A URL pointing to an image to be used as a load indicator. */
+        indicatorSrc?: string;
+        /** Specifies the maximum height the widget can reach while resizing. */
+        maxHeight?: number | string | (() => number | string);
+        /** Specifies the maximum width the widget can reach while resizing. */
+        maxWidth?: number | string | (() => number | string);
+        /** The text displayed in the load panel. */
+        message?: string;
+        /** Positions the widget. */
+        position?: 'bottom' | 'center' | 'left' | 'left bottom' | 'left top' | 'right' | 'right bottom' | 'right top' | 'top' | positionConfig | Function;
+        /** Specifies the shading color. */
+        shadingColor?: string;
+        /** A Boolean value specifying whether or not to show a load indicator. */
+        showIndicator?: boolean;
+        /** A Boolean value specifying whether or not to show the pane behind the load indicator. */
+        showPane?: boolean;
+        /** Specifies the widget's width in pixels. */
+        width?: number | string | (() => number | string);
+    }
+    /** Configures widget visibility animations. This object contains two fields: show and hide. */
+    export interface dxLoadPanelAnimation extends dxOverlayAnimation {
+        /** An object that defines the animation options used when the widget is being hidden. */
+        hide?: animationConfig;
+        /** An object that defines the animation options used when the widget is being shown. */
+        show?: animationConfig;
+    }
+    /** The LoadPanel is an overlay widget notifying the viewer that loading is in progress. */
+    export class dxLoadPanel extends dxOverlay {
+        constructor(element: Element, options?: dxLoadPanelOptions)
+        constructor(element: JQuery, options?: dxLoadPanelOptions)
+    }
+    
+    export interface dxLookupOptions extends dxDropDownListOptions<dxLookup> {
+        /** Configures widget visibility animations. This object contains two fields: show and hide. */
+        animation?: { hide?: animationConfig, show?: animationConfig };
+        /** The text displayed on the Apply button. */
+        applyButtonText?: string;
+        /** Specifies the way an end-user applies the selected value. */
+        applyValueMode?: 'instantly' | 'useButtons';
+        /** The text displayed on the Cancel button. */
+        cancelButtonText?: string;
+        /** Specifies whether or not the widget cleans the search box when the popup window is displayed. */
+        cleanSearchOnOpening?: boolean;
+        /** The text displayed on the Clear button. */
+        clearButtonText?: string;
+        /** Specifies whether to close the drop-down menu if a user clicks outside it. */
+        closeOnOutsideClick?: boolean | (() => boolean);
+        /** Specifies a custom template for the input field. */
+        fieldTemplate?: template | ((selectedItem: any, fieldElement: DevExpress.core.dxElement) => string | Element | JQuery);
+        /** Specifies whether the widget can be focused using keyboard navigation. */
+        focusStateEnabled?: boolean;
+        /** A Boolean value specifying whether or not to display the lookup in full-screen mode. */
+        fullScreen?: boolean;
+        /** Specifies a custom template for group captions. */
+        groupTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery);
+        /** A Boolean value specifying whether or not to group widget items. */
+        grouped?: boolean;
+        /** The text displayed on the button used to load the next page from the data source. */
+        nextButtonText?: string;
+        /** A function that is executed before the next page is loaded. */
+        onPageLoading?: ((e: { component?: dxLookup, element?: DevExpress.core.dxElement, model?: any }) => any);
+        /** A function that is executed when the "pull to refresh" gesture is performed on the drop-down item list. Supported in mobile themes only. */
+        onPullRefresh?: ((e: { component?: dxLookup, element?: DevExpress.core.dxElement, model?: any }) => any);
+        /** A function that is executed on each scroll gesture performed on the drop-down item list. */
+        onScroll?: ((e: { component?: dxLookup, element?: DevExpress.core.dxElement, model?: any, jQueryEvent?: JQueryEventObject, event?: event, scrollOffset?: any, reachedLeft?: boolean, reachedRight?: boolean, reachedTop?: boolean, reachedBottom?: boolean }) => any);
+        /** A function that is executed when the drop-down list's title is rendered. */
+        onTitleRendered?: ((e: { component?: dxLookup, element?: DevExpress.core.dxElement, model?: any, titleElement?: DevExpress.core.dxElement }) => any);
+        /** A function that is executed after the widget's value is changed. */
+        onValueChanged?: ((e: { component?: dxLookup, element?: DevExpress.core.dxElement, model?: any, value?: any, previousValue?: any, jQueryEvent?: JQueryEventObject, event?: event }) => any);
+        /** Specifies whether the next page is loaded when a user scrolls the widget to the bottom or when the "next" button is clicked. */
+        pageLoadMode?: 'nextButton' | 'scrollBottom';
+        /** Specifies the text shown in the pullDown panel, which is displayed when the widget is scrolled to the bottom. */
+        pageLoadingText?: string;
+        /** The text displayed by the widget when nothing is selected. */
+        placeholder?: string;
+        /** Specifies the popup element's height. Applies only if fullScreen is false. */
+        popupHeight?: number | string | (() => number | string);
+        /** Specifies the popup element's width. Applies only if fullScreen is false. */
+        popupWidth?: number | string | (() => number | string);
+        /** An object defining widget positioning options. */
+        position?: positionConfig;
+        /** A Boolean value specifying whether or not the widget supports the "pull down to refresh" gesture. */
+        pullRefreshEnabled?: boolean;
+        /** Specifies the text displayed in the pullDown panel when the widget is pulled below the refresh threshold. */
+        pulledDownText?: string;
+        /** Specifies the text shown in the pullDown panel while the list is being pulled down to the refresh threshold. */
+        pullingDownText?: string;
+        /** Specifies the text displayed in the pullDown panel while the widget is being refreshed. */
+        refreshingText?: string;
+        /** Specifies whether the search box is visible. */
+        searchEnabled?: boolean;
+        /** The text that is provided as a hint in the lookup's search bar. */
+        searchPlaceholder?: string;
+        /** Specifies whether to shade the container when the lookup is active. Applies only if usePopover is false. */
+        shading?: boolean;
+        /** Specifies whether to display the Cancel button in the lookup window. */
+        showCancelButton?: boolean;
+        /** Specifies whether or not to display the Clear button in the lookup window. */
+        showClearButton?: boolean;
+        /** A Boolean value specifying whether or not to display the title in the popup window. */
+        showPopupTitle?: boolean;
+        /** The title of the lookup window. */
+        title?: string;
+        /** Specifies a custom template for the title. */
+        titleTemplate?: template | ((titleElement: DevExpress.core.dxElement) => string | Element | JQuery);
+        /** Specifies whether or not the widget uses native scrolling. */
+        useNativeScrolling?: boolean;
+        /** Specifies whether or not to show lookup contents in a Popover widget. */
+        usePopover?: boolean;
+    }
+    /** The Lookup is a widget that allows an end user to search for an item in a collection shown in a drop-down menu. */
+    export class dxLookup extends dxDropDownList {
+        constructor(element: Element, options?: dxLookupOptions)
+        constructor(element: JQuery, options?: dxLookupOptions)
+    }
+    
+    export interface dxMapOptions extends WidgetOptions<dxMap> {
+        /** Specifies whether the widget automatically adjusts center and zoom option values when adding a new marker or route, or if a new widget contains markers or routes by default. */
+        autoAdjust?: boolean;
+        /** An object, a string, or an array specifying which part of the map is displayed at the widget's center using coordinates. The widget can change this value if autoAdjust is enabled. */
+        center?: any | string | Array<number>;
+        /** Specifies whether or not map widget controls are available. */
+        controls?: boolean;
+        /** Specifies whether the widget can be focused using keyboard navigation. */
+        focusStateEnabled?: boolean;
+        /** Specifies the widget's height. */
+        height?: number | string | (() => number | string);
+        /** A key used to authenticate the application within the required map provider. */
+        key?: string | { bing?: string, google?: string, googleStatic?: string };
+        /** A URL pointing to the custom icon to be used for map markers. */
+        markerIconSrc?: string;
+        /** An array of markers displayed on a map. */
+        markers?: Array<{ iconSrc?: string, location?: any | string | Array<number>, onClick?: Function, tooltip?: string | { isShown?: boolean, text?: string } }>;
+        /** A function that is executed when any location on the map is clicked or tapped. */
+        onClick?: ((e: { component?: dxMap, element?: DevExpress.core.dxElement, model?: any, location?: any, jQueryEvent?: JQueryEventObject, event?: event }) => any) | string;
+        /** A function that is executed when a marker is created on the map. */
+        onMarkerAdded?: ((e: { component?: dxMap, element?: DevExpress.core.dxElement, model?: any, options?: any, originalMarker?: any }) => any);
+        /** A function that is executed when a marker is removed from the map. */
+        onMarkerRemoved?: ((e: { component?: dxMap, element?: DevExpress.core.dxElement, model?: any, options?: any }) => any);
+        /** A function that is executed when the map is ready. */
+        onReady?: ((e: { component?: dxMap, element?: DevExpress.core.dxElement, model?: any, originalMap?: any }) => any);
+        /** A function that is executed when a route is created on the map. */
+        onRouteAdded?: ((e: { component?: dxMap, element?: DevExpress.core.dxElement, model?: any, options?: any, originalRoute?: any }) => any);
+        /** A function that is executed when a route is removed from the map. */
+        onRouteRemoved?: ((e: { component?: dxMap, element?: DevExpress.core.dxElement, model?: any, options?: any }) => any);
+        /** The name of the current map data provider. */
+        provider?: 'bing' | 'google' | 'googleStatic';
+        /** An array of routes shown on the map. */
+        routes?: Array<{ color?: string, locations?: Array<any>, mode?: 'driving' | 'walking', opacity?: number, weight?: number }>;
+        /** The type of a map to display. */
+        type?: 'hybrid' | 'roadmap' | 'satellite';
+        /** Specifies the widget's width. */
+        width?: number | string | (() => number | string);
+        /** The map's zoom level. The widget can change this value if autoAdjust is enabled. */
+        zoom?: number;
+    }
+    /** The Map is an interactive widget that displays a geographic map with markers and routes. */
+    export class dxMap extends Widget {
+        constructor(element: Element, options?: dxMapOptions)
+        constructor(element: JQuery, options?: dxMapOptions)
+        /** Adds a marker to the map. */
+        addMarker(markerOptions: any | Array<any>): Promise<any> & JQueryPromise<any>;
+        /** Adds a route to the map. */
+        addRoute(options: any | Array<any>): Promise<any> & JQueryPromise<any>;
+        /** Removes a marker from the map. */
+        removeMarker(marker: any | number | Array<any>): Promise<void> & JQueryPromise<void>;
+        /** Removes a route from the map. */
+        removeRoute(route: any | number | Array<any>): Promise<void> & JQueryPromise<void>;
+    }
+    
+    export interface dxMenuOptions extends dxMenuBaseOptions<dxMenu> {
+        /** Specifies whether adaptive widget rendering is enabled on small screens. Applies only if the orientation is "horizontal". */
+        adaptivityEnabled?: boolean;
+        /** Specifies whether or not the submenu is hidden when the mouse pointer leaves it. */
+        hideSubmenuOnMouseLeave?: boolean;
+        /** Holds an array of menu items. */
+        items?: Array<dxMenuItem>;
+        /** A function that is executed after a submenu is hidden. */
+        onSubmenuHidden?: ((e: { component?: dxMenu, element?: DevExpress.core.dxElement, model?: any, rootItem?: DevExpress.core.dxElement }) => any);
+        /** A function that is executed before a submenu is hidden. */
+        onSubmenuHiding?: ((e: { component?: dxMenu, element?: DevExpress.core.dxElement, model?: any, rootItem?: DevExpress.core.dxElement, cancel?: boolean }) => any);
+        /** A function that is executed before a submenu is displayed. */
+        onSubmenuShowing?: ((e: { component?: dxMenu, element?: DevExpress.core.dxElement, model?: any, rootItem?: DevExpress.core.dxElement }) => any);
+        /** A function that is executed after a submenu is displayed. */
+        onSubmenuShown?: ((e: { component?: dxMenu, element?: DevExpress.core.dxElement, model?: any, rootItem?: DevExpress.core.dxElement }) => any);
+        /** Specifies whether the menu has horizontal or vertical orientation. */
+        orientation?: 'horizontal' | 'vertical';
+        /** Specifies options for showing and hiding the first level submenu. */
+        showFirstSubmenuMode?: { delay?: { hide?: number, show?: number } | number, name?: 'onClick' | 'onHover' } | 'onClick' | 'onHover';
+        /** Specifies the direction at which the submenus are displayed. */
+        submenuDirection?: 'auto' | 'leftOrTop' | 'rightOrBottom';
+    }
+    /** The Menu widget is a panel with clickable items. A click on an item opens a drop-down menu, which can contain several submenus. */
+    export class dxMenu extends dxMenuBase {
+        constructor(element: Element, options?: dxMenuOptions)
+        constructor(element: JQuery, options?: dxMenuOptions)
+    }
+    
+    export interface dxMenuBaseOptions<T = dxMenuBase> extends HierarchicalCollectionWidgetOptions<T> {
+        /** A Boolean value specifying whether or not the widget changes its state when interacting with a user. */
+        activeStateEnabled?: boolean;
+        /** Configures widget visibility animations. This object contains two fields: show and hide. */
+        animation?: { hide?: animationConfig, show?: animationConfig };
+        /** Specifies the name of the CSS class to be applied to the root menu level and all submenus. */
+        cssClass?: string;
+        /** Holds an array of menu items. */
+        items?: Array<dxMenuBaseItem>;
+        /** Specifies whether or not an item becomes selected if a user clicks it. */
+        selectByClick?: boolean;
+        /** Specifies the selection mode supported by the menu. */
+        selectionMode?: 'none' | 'single';
+        /** Specifies options of submenu showing and hiding. */
+        showSubmenuMode?: { delay?: { hide?: number, show?: number } | number, name?: 'onClick' | 'onHover' } | 'onClick' | 'onHover';
+    }
+    
+    export class dxMenuBase extends HierarchicalCollectionWidget {
+        constructor(element: Element, options?: dxMenuBaseOptions)
+        constructor(element: JQuery, options?: dxMenuBaseOptions)
+        /** Selects an item found using its DOM node. */
+        selectItem(itemElement: Element): void;
+        /** Cancels the selection of an item found using its DOM node. */
+        unselectItem(itemElement: Element): void;
+    }
+    /** This section lists the data source fields that are used in a default item template. */
+    export interface dxMenuBaseItem extends CollectionWidgetItem {
+        /** Specifies whether a group separator is displayed over the item. */
+        beginGroup?: boolean;
+        /** Specifies if a menu is closed when a user clicks the item. */
+        closeMenuOnClick?: boolean;
+        /** Specifies whether or not the menu item is disabled. */
+        disabled?: boolean;
+        /** Specifies the menu item's icon. */
+        icon?: string;
+        /** Holds an array of menu items. */
+        items?: Array<dxMenuBaseItem>;
+        /** Specifies whether or not a user can select a menu item. */
+        selectable?: boolean;
+        /** Specifies whether or not the item is selected. */
+        selected?: boolean;
+        /** Specifies the text inserted into the item element. */
+        text?: string;
+        /** Specifies whether or not the menu item is visible. */
+        visible?: boolean;
+    }
+    /** This section lists the data source fields that are used in a default item template. */
+    export interface dxMenuItem extends dxMenuBaseItem {
+        /** Holds an array of menu items. */
+        items?: Array<dxMenuItem>;
+    }
+    
+    export interface dxMultiViewOptions<T = dxMultiView> extends CollectionWidgetOptions<T> {
+        /** Specifies whether or not to animate the displayed item change. */
+        animationEnabled?: boolean;
+        /** Specifies whether to render the view's content when it is displayed. If false, the content is rendered immediately. */
+        deferRendering?: boolean;
+        /** Specifies whether the widget can be focused using keyboard navigation. */
+        focusStateEnabled?: boolean;
+        /** An array of items displayed by the widget. */
+        items?: Array<string | dxMultiViewItem | any>;
+        /** A Boolean value specifying whether or not to scroll back to the first item after the last item is swiped. */
+        loop?: boolean;
+        /** The index of the currently displayed item. */
+        selectedIndex?: number;
+        /** A Boolean value specifying whether or not to allow users to change the selected index by swiping. */
+        swipeEnabled?: boolean;
+    }
+    /** The MultiView is a widget that contains several views. An end user navigates through the views by swiping them in the horizontal direction. */
+    export class dxMultiView extends CollectionWidget {
+        constructor(element: Element, options?: dxMultiViewOptions)
+        constructor(element: JQuery, options?: dxMultiViewOptions)
+    }
+    /** This section lists the data source fields that are used in a default template for multi-view items. */
+    export interface dxMultiViewItem extends CollectionWidgetItem {
+    }
+    
+    export interface dxNavBarOptions extends dxTabsOptions<dxNavBar> {
+        /** Specifies whether or not an end-user can scroll tabs by swiping. */
+        scrollByContent?: boolean;
+    }
+    /** The NavBar is a widget that navigates the application views. */
+    export class dxNavBar extends dxTabs {
+        constructor(element: Element, options?: dxNavBarOptions)
+        constructor(element: JQuery, options?: dxNavBarOptions)
+    }
+    /** This section lists the data source fields that are used in a default template for navbar items. */
+    export interface dxNavBarItem extends dxTabsItem {
+        /** Specifies a badge text for the navbar item. */
+        badge?: string;
+    }
+    
+    export interface dxNumberBoxOptions extends dxTextEditorOptions<dxNumberBox> {
+        /** Allows you to add custom buttons to the input text field. */
+        buttons?: Array<'clear' | 'spins' | dxTextEditorButton>;
+        /** Specifies the value's display format and controls user input accordingly. */
+        format?: format;
+        /** Specifies the text of the message displayed if the specified value is not a number. */
+        invalidValueMessage?: string;
+        /** The maximum value accepted by the number box. */
+        max?: number;
+        /** The minimum value accepted by the number box. */
+        min?: number;
+        /** Specifies the value to be passed to the type attribute of the underlying `` element. */
+        mode?: 'number' | 'text' | 'tel';
+        /** Specifies whether to show the buttons that change the value by a step. */
+        showSpinButtons?: boolean;
+        /** Specifies how much the widget's value changes when using the spin buttons, Up/Down arrow keys, or mouse wheel. */
+        step?: number;
+        /** Specifies whether to use touch friendly spin buttons. Applies only if showSpinButtons is true. */
+        useLargeSpinButtons?: boolean;
+        /** The current number box value. */
+        value?: number;
+    }
+    /** The NumberBox is a widget that displays a numeric value and allows a user to modify it by typing in a value, and incrementing or decrementing it using the keyboard or mouse. */
+    export class dxNumberBox extends dxTextEditor {
+        constructor(element: Element, options?: dxNumberBoxOptions)
+        constructor(element: JQuery, options?: dxNumberBoxOptions)
+    }
+    
+    export interface dxOverlayOptions<T = dxOverlay> extends WidgetOptions<T> {
+        /** Configures widget visibility animations. This object contains two fields: show and hide. */
+        animation?: dxOverlayAnimation;
+        /** A Boolean value specifying whether or not the widget is closed if a user presses the Back hardware button. */
+        closeOnBackButton?: boolean;
+        /** Specifies whether to close the widget if a user clicks outside it. */
+        closeOnOutsideClick?: boolean | ((event: event) => boolean);
+        /** Specifies a custom template for the widget content. */
+        contentTemplate?: template | ((contentElement: DevExpress.core.dxElement) => string | Element | JQuery);
+        /** Specifies whether to render the widget's content when it is displayed. If false, the content is rendered immediately. */
+        deferRendering?: boolean;
+        /** Specifies whether or not an end-user can drag the widget. */
+        dragEnabled?: boolean;
+        /** Specifies the widget's height in pixels. */
+        height?: number | string | (() => number | string);
+        /** Specifies the maximum height the widget can reach while resizing. */
+        maxHeight?: number | string | (() => number | string);
+        /** Specifies the maximum width the widget can reach while resizing. */
+        maxWidth?: number | string | (() => number | string);
+        /** Specifies the minimum height the widget can reach while resizing. */
+        minHeight?: number | string | (() => number | string);
+        /** Specifies the minimum width the widget can reach while resizing. */
+        minWidth?: number | string | (() => number | string);
+        /** A function that is executed after the widget is hidden. */
+        onHidden?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any }) => any);
+        /** A function that is executed before the widget is hidden. */
+        onHiding?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, cancel?: boolean }) => any);
+        /** A function that is executed before the widget is displayed. */
+        onShowing?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any }) => any);
+        /** A function that is executed after the widget is displayed. */
+        onShown?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any }) => any);
+        /** Positions the widget. */
+        position?: any;
+        /** Specifies whether to shade the container when the widget is active. */
+        shading?: boolean;
+        /** Specifies the shading color. */
+        shadingColor?: string;
+        /** A Boolean value specifying whether or not the widget is visible. */
+        visible?: boolean;
+        /** Specifies the widget's width in pixels. */
+        width?: number | string | (() => number | string);
+    }
+    /** Configures widget visibility animations. This object contains two fields: show and hide. */
+    export interface dxOverlayAnimation {
+        /** An object that defines the animation options used when the widget is being hidden. */
+        hide?: animationConfig;
+        /** An object that defines the animation options used when the widget is being shown. */
+        show?: animationConfig;
+    }
+    /** The Overlay widget represents a window overlaying the current view. It displays data located within the HTML element representing the widget. */
+    export class dxOverlay extends Widget {
+        constructor(element: Element, options?: dxOverlayOptions)
+        constructor(element: JQuery, options?: dxOverlayOptions)
+        /** Gets the widget's content. */
+        content(): DevExpress.core.dxElement;
+        /** Hides the widget. */
+        hide(): Promise<void> & JQueryPromise<void>;
+        /** Recalculates the widget's size and position without rerendering. */
+        repaint(): void;
+        /** Shows the widget. */
+        show(): Promise<void> & JQueryPromise<void>;
+        /** Shows or hides the widget depending on the argument. */
+        toggle(showing: boolean): Promise<void> & JQueryPromise<void>;
+    }
+    
+    export interface dxPivotGridOptions extends WidgetOptions<dxPivotGrid> {
+        /** Allows an end-user to expand/collapse all header items within a header level. */
+        allowExpandAll?: boolean;
+        /** Allows a user to filter fields by selecting or deselecting values in the popup menu. */
+        allowFiltering?: boolean;
+        /** Allows an end-user to change sorting options. */
+        allowSorting?: boolean;
+        /** Allows an end-user to sort columns by summary values. */
+        allowSortingBySummary?: boolean;
+        /** Specifies the area to which data field headers must belong. */
+        dataFieldArea?: 'column' | 'row';
+        /** Binds the widget to data. */
+        dataSource?: Array<any> | DevExpress.data.PivotGridDataSource | DevExpress.data.PivotGridDataSourceOptions;
+        /** Configures client-side exporting. */
+        export?: { enabled?: boolean, fileName?: string, ignoreExcelErrors?: boolean, proxyUrl?: string };
+        /** The Field Chooser configuration options. */
+        fieldChooser?: { allowSearch?: boolean, applyChangesMode?: 'instantly' | 'onDemand', enabled?: boolean, height?: number, layout?: 0 | 1 | 2, searchTimeout?: number, texts?: { allFields?: string, columnFields?: string, dataFields?: string, filterFields?: string, rowFields?: string }, title?: string, width?: number };
+        /** Configures the field panel. */
+        fieldPanel?: { allowFieldDragging?: boolean, showColumnFields?: boolean, showDataFields?: boolean, showFilterFields?: boolean, showRowFields?: boolean, texts?: { columnFieldArea?: string, dataFieldArea?: string, filterFieldArea?: string, rowFieldArea?: string }, visible?: boolean };
+        /** Configures the header filter feature. */
+        headerFilter?: { allowSearch?: boolean, height?: number, searchTimeout?: number, showRelevantValues?: boolean, texts?: { cancel?: string, emptyValue?: string, ok?: string }, width?: number };
+        /** Specifies whether or not to hide rows and columns with no data. */
+        hideEmptySummaryCells?: boolean;
+        /** Specifies options configuring the load panel. */
+        loadPanel?: { enabled?: boolean, height?: number, indicatorSrc?: string, showIndicator?: boolean, showPane?: boolean, text?: string, width?: number };
+        /** A function that is executed when a pivot grid cell is clicked or tapped. */
+        onCellClick?: ((e: { component?: dxPivotGrid, element?: DevExpress.core.dxElement, model?: any, area?: string, cellElement?: DevExpress.core.dxElement, cell?: dxPivotGridPivotGridCell, rowIndex?: number, columnIndex?: number, columnFields?: Array<DevExpress.data.PivotGridDataSourceField>, rowFields?: Array<DevExpress.data.PivotGridDataSourceField>, dataFields?: Array<DevExpress.data.PivotGridDataSourceField>, jQueryEvent?: JQueryEventObject, event?: event, cancel?: boolean }) => any);
+        /** A function that is executed after a pivot grid cell is created. */
+        onCellPrepared?: ((e: { component?: dxPivotGrid, element?: DevExpress.core.dxElement, model?: any, area?: string, cellElement?: DevExpress.core.dxElement, cell?: dxPivotGridPivotGridCell, rowIndex?: number, columnIndex?: number }) => any);
+        /** A function that is executed before the context menu is rendered. */
+        onContextMenuPreparing?: ((e: { component?: dxPivotGrid, element?: DevExpress.core.dxElement, model?: any, items?: Array<any>, area?: string, cell?: dxPivotGridPivotGridCell, cellElement?: DevExpress.core.dxElement, columnIndex?: number, rowIndex?: number, dataFields?: Array<DevExpress.data.PivotGridDataSourceField>, rowFields?: Array<DevExpress.data.PivotGridDataSourceField>, columnFields?: Array<DevExpress.data.PivotGridDataSourceField>, field?: DevExpress.data.PivotGridDataSourceField }) => any);
+        /** A function that is executed after data is exported. */
+        onExported?: ((e: { component?: dxPivotGrid, element?: DevExpress.core.dxElement, model?: any }) => any);
+        /** A function that is executed before data is exported. */
+        onExporting?: ((e: { component?: dxPivotGrid, element?: DevExpress.core.dxElement, model?: any, fileName?: string, cancel?: boolean }) => any);
+        /** A function that is executed before a file with exported data is saved to the user's local storage. */
+        onFileSaving?: ((e: { component?: dxPivotGrid, element?: DevExpress.core.dxElement, model?: any, fileName?: string, format?: string, data?: Blob, cancel?: boolean }) => any);
+        /** Specifies the layout of items in the row header. */
+        rowHeaderLayout?: 'standard' | 'tree';
+        /** A configuration object specifying scrolling options. */
+        scrolling?: { mode?: 'standard' | 'virtual', useNative?: boolean | 'auto' };
+        /** Specifies whether the outer borders of the grid are visible or not. */
+        showBorders?: boolean;
+        /** Specifies whether to display the Grand Total column. */
+        showColumnGrandTotals?: boolean;
+        /** Specifies whether to display the Total columns. */
+        showColumnTotals?: boolean;
+        /** Specifies whether to display the Grand Total row. */
+        showRowGrandTotals?: boolean;
+        /** Specifies whether to display the Total rows. Applies only if rowHeaderLayout is "standard". */
+        showRowTotals?: boolean;
+        /** Specifies where to show the total rows or columns. Applies only if rowHeaderLayout is "standard". */
+        showTotalsPrior?: 'both' | 'columns' | 'none' | 'rows';
+        /** A configuration object specifying options related to state storing. */
+        stateStoring?: { customLoad?: (() => Promise<any> | JQueryPromise<any>), customSave?: ((state: any) => any), enabled?: boolean, savingTimeout?: number, storageKey?: string, type?: 'custom' | 'localStorage' | 'sessionStorage' };
+        /** Strings that can be changed or localized in the PivotGrid widget. */
+        texts?: { collapseAll?: string, dataNotAvailable?: string, expandAll?: string, exportToExcel?: string, grandTotal?: string, noData?: string, removeAllSorting?: string, showFieldChooser?: string, sortColumnBySummary?: string, sortRowBySummary?: string, total?: string };
+        /** Specifies whether long text in header items should be wrapped. */
+        wordWrapEnabled?: boolean;
+    }
+    /** The PivotGrid is a widget that allows you to display and analyze multi-dimensional data from a local storage or an OLAP cube. */
+    export class dxPivotGrid extends Widget {
+        constructor(element: Element, options?: dxPivotGridOptions)
+        constructor(element: JQuery, options?: dxPivotGridOptions)
+        /** Binds a Chart to the PivotGrid. */
+        bindChart(chart: string | JQuery | any, integrationOptions: { inverted?: boolean, dataFieldsDisplayMode?: string, putDataFieldsInto?: string, alternateDataFields?: boolean, processCell?: Function, customizeChart?: Function, customizeSeries?: Function }): Function & null;
+        /** Exports pivot grid data to the Excel file. */
+        exportToExcel(): void;
+        /** Gets the PivotGridDataSource instance. */
+        getDataSource(): DevExpress.data.PivotGridDataSource;
+        /** Gets the Popup instance of the field chooser window. */
+        getFieldChooserPopup(): dxPopup;
+        /** Updates the widget to the size of its content. */
+        updateDimensions(): void;
+    }
+    
+    export interface dxPivotGridFieldChooserOptions extends WidgetOptions<dxPivotGridFieldChooser> {
+        /** Specifies whether the field chooser allows searching in the "All Fields" section. */
+        allowSearch?: boolean;
+        /** Specifies when to apply changes made in the widget to the PivotGrid. */
+        applyChangesMode?: 'instantly' | 'onDemand';
+        /** The data source of a PivotGrid widget. */
+        dataSource?: DevExpress.data.PivotGridDataSource;
+        /** Configures the header filter feature. */
+        headerFilter?: { allowSearch?: boolean, height?: number, searchTimeout?: number, showRelevantValues?: boolean, texts?: { cancel?: string, emptyValue?: string, ok?: string }, width?: number };
+        /** Specifies the widget's height. */
+        height?: number | string | (() => number | string);
+        /** Specifies the field chooser layout. */
+        layout?: 0 | 1 | 2;
+        /** A function that is executed before the context menu is rendered. */
+        onContextMenuPreparing?: ((e: { component?: dxPivotGridFieldChooser, element?: DevExpress.core.dxElement, model?: any, items?: Array<any>, area?: string, field?: DevExpress.data.PivotGridDataSourceField, jQueryEvent?: JQueryEventObject, event?: event }) => any);
+        /** Specifies a delay in milliseconds between when a user finishes typing in the field chooser's search panel, and when the search is executed. */
+        searchTimeout?: number;
+        /** The widget's state. */
+        state?: any;
+        /** Strings that can be changed or localized in the PivotGridFieldChooser widget. */
+        texts?: { allFields?: string, columnFields?: string, dataFields?: string, filterFields?: string, rowFields?: string };
+    }
+    /** A complementary widget for the PivotGrid that allows you to manage data displayed in the PivotGrid. The field chooser is already integrated in the PivotGrid and can be invoked using the context menu. If you need to continuously display the field chooser near the PivotGrid widget, use the PivotGridFieldChooser widget. */
+    export class dxPivotGridFieldChooser extends Widget {
+        constructor(element: Element, options?: dxPivotGridFieldChooserOptions)
+        constructor(element: JQuery, options?: dxPivotGridFieldChooserOptions)
+        /** Applies changes made in the widget to the PivotGrid. Takes effect only if applyChangesMode is "onDemand". */
+        applyChanges(): void;
+        /** Cancels changes made in the widget without applying them to the PivotGrid. Takes effect only if applyChangesMode is "onDemand". */
+        cancelChanges(): void;
+        /** Gets the PivotGridDataSource instance. */
+        getDataSource(): DevExpress.data.PivotGridDataSource;
+        /** Updates the widget to the size of its content. */
+        updateDimensions(): void;
+    }
+    /** An object containing information about the pivot grid cell. */
+    export interface dxPivotGridPivotGridCell {
+        /** The cell's column path. Available for data area cells only. */
+        columnPath?: Array<string | number | Date>;
+        /** The type of the column to which the cell belongs. Available for data area cells only. */
+        columnType?: 'D' | 'T' | 'GT';
+        /** The data field's index. Available for data area cells only. */
+        dataIndex?: number;
+        /** Indicates whether the cell is expanded. Available for row or column area cells only. */
+        expanded?: boolean;
+        /** The path to the row/column cell. Available for row or column area cells only. */
+        path?: Array<string | number | Date>;
+        /** The cell's row path. Available for data area cells only. */
+        rowPath?: Array<string | number | Date>;
+        /** The type of the row to which the cell belongs. Available for data area cells only. */
+        rowType?: 'D' | 'T' | 'GT';
+        /** The text displayed in the cell. */
+        text?: string;
+        /** The cell's type. Available for row or column area cells only. */
+        type?: 'D' | 'T' | 'GT';
+        /** The cell's value. */
+        value?: any;
+    }
+    /** An object exposing methods that manipulate a summary cell and provide access to its neighboring cells. */
+    export class dxPivotGridSummaryCell {
+        /** Gets the child cell in a specified direction. */
+        child(direction: string, fieldValue: number | string): dxPivotGridSummaryCell;
+        /** Gets all child cells in a specified direction. */
+        children(direction: string): Array<dxPivotGridSummaryCell>;
+        /** Gets a pivot grid field that corresponds to the summary cell. */
+        field(area: string): DevExpress.data.PivotGridDataSourceField;
+        /** Gets the Grand Total of the entire pivot grid. */
+        grandTotal(): dxPivotGridSummaryCell;
+        /** Gets a partial Grand Total cell of a row or column. */
+        grandTotal(direction: string): dxPivotGridSummaryCell;
+        /** Gets the cell next to the current one in a specified direction. */
+        next(direction: string): dxPivotGridSummaryCell;
+        /** Gets the cell next to current in a specified direction. */
+        next(direction: string, allowCrossGroup: boolean): dxPivotGridSummaryCell;
+        /** Gets the parent cell in a specified direction. */
+        parent(direction: string): dxPivotGridSummaryCell;
+        /** Gets the cell prior to the current one in a specified direction. */
+        prev(direction: string): dxPivotGridSummaryCell;
+        /** Gets the cell previous to current in a specified direction. */
+        prev(direction: string, allowCrossGroup: boolean): dxPivotGridSummaryCell;
+        /** Gets the cell located by the path of the source cell with one field value changed. */
+        slice(field: DevExpress.data.PivotGridDataSourceField, value: number | string): dxPivotGridSummaryCell;
+        /** Gets the value of the current cell. */
+        value(): any;
+        /** Gets the value of any field linked with the current cell. */
+        value(field: DevExpress.data.PivotGridDataSourceField | string): any;
+        /** Gets the value of any field linked with the current cell. */
+        value(field: DevExpress.data.PivotGridDataSourceField | string, isCalculatedValue: boolean): any;
+        /** Gets the value of the current cell. */
+        value(isCalculatedValue: boolean): any;
+    }
+    
+    export interface dxPopoverOptions<T = dxPopover> extends dxPopupOptions<T> {
+        /** Configures widget visibility animations. This object contains two fields: show and hide. */
+        animation?: dxPopoverAnimation;
+        /** A Boolean value specifying whether or not the widget is closed if a user clicks outside of the popover window and outside the target element. */
+        closeOnOutsideClick?: boolean | ((event: event) => boolean);
+        /** Specifies the widget's height. */
+        height?: number | string | (() => number | string);
+        /** Specifies options of popover hiding. */
+        hideEvent?: { delay?: number, name?: string } | string;
+        /** An object defining widget positioning options. */
+        position?: 'bottom' | 'left' | 'right' | 'top' | positionConfig;
+        /** Specifies whether to shade the container when the widget is active. */
+        shading?: boolean;
+        /** Specifies options for displaying the widget. */
+        showEvent?: { delay?: number, name?: string } | string;
+        /** A Boolean value specifying whether or not to display the title in the overlay window. */
+        showTitle?: boolean;
+        /** The target element associated with the widget. */
+        target?: string | Element | JQuery;
+        /** Specifies the widget's width. */
+        width?: number | string | (() => number | string);
+    }
+    /** Configures widget visibility animations. This object contains two fields: show and hide. */
+    export interface dxPopoverAnimation extends dxPopupAnimation {
+        /** An object that defines the animation options used when the widget is being hidden. */
+        hide?: animationConfig;
+        /** An object that defines the animation options used when the widget is being shown. */
+        show?: animationConfig;
+    }
+    /** The Popover is a widget that shows notifications within a box with an arrow pointing to a specified UI element. */
+    export class dxPopover extends dxPopup {
+        constructor(element: Element, options?: dxPopoverOptions)
+        constructor(element: JQuery, options?: dxPopoverOptions)
+        /** Shows the widget. */
+        show(): Promise<void> & JQueryPromise<void>;
+        /** Shows the widget for a target element. */
+        show(target: string | Element | JQuery): Promise<void> & JQueryPromise<void>;
+    }
+    
+    export interface dxPopupOptions<T = dxPopup> extends dxOverlayOptions<T> {
+        /** Configures widget visibility animations. This object contains two fields: show and hide. */
+        animation?: dxPopupAnimation;
+        /** Specifies the container in which to place the widget. */
+        container?: string | Element | JQuery;
+        /** Specifies whether or not to allow a user to drag the popup window. */
+        dragEnabled?: boolean;
+        /** Specifies whether the widget can be focused using keyboard navigation. */
+        focusStateEnabled?: boolean;
+        /** A Boolean value specifying whether or not to display the widget in full-screen mode. */
+        fullScreen?: boolean;
+        /** Specifies the widget's height in pixels. */
+        height?: number | string | (() => number | string);
+        /** A function that is executed each time the widget is resized by one pixel. */
+        onResize?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any }) => any);
+        /** A function that is executed when resizing ends. */
+        onResizeEnd?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any }) => any);
+        /** A function that is executed when resizing starts. */
+        onResizeStart?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any }) => any);
+        /** A function that is executed when the widget's title is rendered. */
+        onTitleRendered?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, titleElement?: DevExpress.core.dxElement }) => any);
+        /** Positions the widget. */
+        position?: 'bottom' | 'center' | 'left' | 'left bottom' | 'left top' | 'right' | 'right bottom' | 'right top' | 'top' | positionConfig | Function;
+        /** Specifies whether or not an end user can resize the widget. */
+        resizeEnabled?: boolean;
+        /** Specifies whether or not the widget displays the Close button. */
+        showCloseButton?: boolean;
+        /** A Boolean value specifying whether or not to display the title in the popup window. */
+        showTitle?: boolean;
+        /** The title in the overlay window. */
+        title?: string;
+        /** Specifies a custom template for the widget title. Does not apply if the title is defined. */
+        titleTemplate?: template | ((titleElement: DevExpress.core.dxElement) => string | Element | JQuery);
+        /** Configures toolbar items. */
+        toolbarItems?: Array<dxPopupToolbarItem>;
+        /** Specifies the widget's width in pixels. */
+        width?: number | string | (() => number | string);
+    }
+    /** Configures widget visibility animations. This object contains two fields: show and hide. */
+    export interface dxPopupAnimation extends dxOverlayAnimation {
+        /** An object that defines the animation options used when the widget is being hidden. */
+        hide?: animationConfig;
+        /** An object that defines the animation options used when the widget is being shown. */
+        show?: animationConfig;
+    }
+    /** Configures toolbar items. */
+    export interface dxPopupToolbarItem {
+        /** Specifies whether or not a toolbar item must be displayed disabled. */
+        disabled?: boolean;
+        /** Specifies html code inserted into the toolbar item element. */
+        html?: string;
+        /** Specifies a location for the item on the toolbar. */
+        location?: 'after' | 'before' | 'center';
+        /** Specifies a configuration object for the widget that presents a toolbar item. */
+        options?: any;
+        /** Specifies an item template that should be used to render this item only. */
+        template?: template;
+        /** Specifies text displayed for the toolbar item. */
+        text?: string;
+        /** Specifies whether the item is displayed on a top or bottom toolbar. */
+        toolbar?: 'bottom' | 'top';
+        /** Specifies whether or not a widget item must be displayed. */
+        visible?: boolean;
+        /** A widget that presents a toolbar item. */
+        widget?: 'dxAutocomplete' | 'dxButton' | 'dxCheckBox' | 'dxDateBox' | 'dxMenu' | 'dxSelectBox' | 'dxTabs' | 'dxTextBox' | 'dxButtonGroup' | 'dxDropDownButton';
+    }
+    /** The Popup widget is a pop-up window overlaying the current view. */
+    export class dxPopup extends dxOverlay {
+        constructor(element: Element, options?: dxPopupOptions)
+        constructor(element: JQuery, options?: dxPopupOptions)
+    }
+    
+    export interface dxProgressBarOptions extends dxTrackBarOptions<dxProgressBar> {
+        /** A function that is executed when the value reaches the maximum. */
+        onComplete?: ((e: { component?: dxProgressBar, element?: DevExpress.core.dxElement, model?: any, jQueryEvent?: JQueryEventObject, event?: event }) => any);
+        /** Specifies whether or not the widget displays a progress status. */
+        showStatus?: boolean;
+        /** Specifies a format for the progress status. */
+        statusFormat?: string | ((ratio: number, value: number) => string);
+        /** The current widget value. */
+        value?: number;
+    }
+    /** The ProgressBar is a widget that shows current progress. */
+    export class dxProgressBar extends dxTrackBar {
+        constructor(element: Element, options?: dxProgressBarOptions)
+        constructor(element: JQuery, options?: dxProgressBarOptions)
+    }
+    
+    export interface dxRadioGroupOptions extends EditorOptions<dxRadioGroup>, DataExpressionMixinOptions<dxRadioGroup> {
+        /** Specifies whether or not the widget changes its state when interacting with a user. */
+        activeStateEnabled?: boolean;
+        /** Specifies whether the widget can be focused using keyboard navigation. */
+        focusStateEnabled?: boolean;
+        /** Specifies whether the widget changes its state when a user pauses on it. */
+        hoverStateEnabled?: boolean;
+        /** Specifies the radio group layout. */
+        layout?: 'horizontal' | 'vertical';
+        /** The value to be assigned to the `name` attribute of the underlying HTML element. */
+        name?: string;
+        /** Specifies the widget's value. */
+        value?: any;
+    }
+    /** The RadioGroup is a widget that contains a set of radio buttons and allows an end user to make a single selection from the set. */
+    export class dxRadioGroup extends Editor {
+        constructor(element: Element, options?: dxRadioGroupOptions)
+        constructor(element: JQuery, options?: dxRadioGroupOptions)
+        /** Gets the DataSource instance. */
+        getDataSource(): DevExpress.data.DataSource;
+    }
+    
+    export interface dxRangeSliderOptions extends dxSliderBaseOptions<dxRangeSlider> {
+        /** The right edge of the interval currently selected using the range slider. */
+        end?: number;
+        /** The value to be assigned to the name attribute of the underlying `` element. */
+        endName?: string;
+        /** A function that is executed after the widget's value is changed. */
+        onValueChanged?: ((e: { component?: dxRangeSlider, element?: DevExpress.core.dxElement, model?: any }) => any);
+        /** The left edge of the interval currently selected using the range slider. */
+        start?: number;
+        /** The value to be assigned to the name attribute of the underlying `` element. */
+        startName?: string;
+        /** Specifies the widget's value. */
+        value?: Array<number>;
+    }
+    /** The RangeSlider is a widget that allows an end user to choose a range of numeric values. */
+    export class dxRangeSlider extends dxSliderBase {
+        constructor(element: Element, options?: dxRangeSliderOptions)
+        constructor(element: JQuery, options?: dxRangeSliderOptions)
+        /** Resets the value option to the default value. */
+        reset(): void;
+    }
+    
+    export interface dxRecurrenceEditorOptions extends EditorOptions<dxRecurrenceEditor> {
+        /** Specifies the widget's value. */
+        value?: string;
+    }
+    /** A base class for editors. */
+    export class dxRecurrenceEditor extends Editor {
+        constructor(element: Element, options?: dxRecurrenceEditorOptions)
+        constructor(element: JQuery, options?: dxRecurrenceEditorOptions)
+    }
+    
+    export interface dxResizableOptions extends DOMComponentOptions<dxResizable> {
+        /** Specifies which borders of the widget element are used as a handle. */
+        handles?: 'bottom' | 'left' | 'right' | 'top' | 'all' | string;
+        /** Specifies the widget's height. */
+        height?: number | string | (() => number | string);
+        /** Specifies the upper height boundary for resizing. */
+        maxHeight?: number;
+        /** Specifies the upper width boundary for resizing. */
+        maxWidth?: number;
+        /** Specifies the lower height boundary for resizing. */
+        minHeight?: number;
+        /** Specifies the lower width boundary for resizing. */
+        minWidth?: number;
+        /** A function that is executed each time the widget is resized by one pixel. */
+        onResize?: ((e: { component?: dxResizable, element?: DevExpress.core.dxElement, model?: any, jQueryEvent?: JQueryEventObject, event?: event, width?: number, height?: number }) => any);
+        /** A function that is executed when resizing ends. */
+        onResizeEnd?: ((e: { component?: dxResizable, element?: DevExpress.core.dxElement, model?: any, jQueryEvent?: JQueryEventObject, event?: event, width?: number, height?: number }) => any);
+        /** A function that is executed when resizing starts. */
+        onResizeStart?: ((e: { component?: dxResizable, element?: DevExpress.core.dxElement, model?: any, jQueryEvent?: JQueryEventObject, event?: event, width?: number, height?: number }) => any);
+        /** Specifies the widget's width. */
+        width?: number | string | (() => number | string);
+    }
+    /** The Resizable widget enables its content to be resizable in the UI. */
+    export class dxResizable extends DOMComponent {
+        constructor(element: Element, options?: dxResizableOptions)
+        constructor(element: JQuery, options?: dxResizableOptions)
+    }
+    
+    export interface dxResponsiveBoxOptions extends CollectionWidgetOptions<dxResponsiveBox> {
+        /** Specifies the collection of columns for the grid used to position layout elements. */
+        cols?: Array<{ baseSize?: number | 'auto', ratio?: number, screen?: string, shrink?: number }>;
+        /** Specifies the widget's height. */
+        height?: number | string | (() => number | string);
+        /** An array of items displayed by the widget. */
+        items?: Array<string | dxResponsiveBoxItem | any>;
+        /** Specifies the collection of rows for the grid used to position layout elements. */
+        rows?: Array<{ baseSize?: number | 'auto', ratio?: number, screen?: string, shrink?: number }>;
+        /** Specifies the function returning the size qualifier depending on the screen's width. */
+        screenByWidth?: Function;
+        /** Specifies on which screens all layout elements should be arranged in a single column. Accepts a single or several size qualifiers separated by a space. */
+        singleColumnScreen?: string;
+        /** Specifies the widget's width. */
+        width?: number | string | (() => number | string);
+    }
+    /** The ResponsiveBox widget allows you to create an application or a website with a layout adapted to different screen sizes. */
+    export class dxResponsiveBox extends CollectionWidget {
+        constructor(element: Element, options?: dxResponsiveBoxOptions)
+        constructor(element: JQuery, options?: dxResponsiveBoxOptions)
+    }
+    /** This section lists the fields that are used in a default template for widget items. */
+    export interface dxResponsiveBoxItem extends CollectionWidgetItem {
+        /** Specifies the item location and size against the widget grid. */
+        location?: { col?: number, colspan?: number, row?: number, rowspan?: number, screen?: string } | Array<{ col?: number, colspan?: number, row?: number, rowspan?: number, screen?: string }>;
+    }
+    
+    export interface dxSchedulerOptions extends WidgetOptions<dxScheduler> {
+        /** Specifies whether the widget adapts to small screens. */
+        adaptivityEnabled?: boolean;
+        /** Specifies the name of the data source item field whose value defines whether or not the corresponding appointment is an all-day appointment. */
+        allDayExpr?: string;
+        /** Specifies an appointment collector's custom template. */
+        appointmentCollectorTemplate?: template | ((data: { appointmentCount?: number, isCompact?: boolean }, collectorElement: DevExpress.core.dxElement) => string | Element | JQuery);
+        /** Specifies a custom template for appointments. */
+        appointmentTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery);
+        /** Specifies a custom template for appointment tooltips and appointments in the appointment collector's drop-down list. */
+        appointmentTooltipTemplate?: template | ((appointmentData: any, contentElement: DevExpress.core.dxElement, targetedAppointmentData: any, itemIndex: number) => string | Element | JQuery);
+        /** Specifies cell duration in minutes. */
+        cellDuration?: number;
+        /** Specifies whether or not an end-user can scroll the view in both directions at the same time. */
+        crossScrollingEnabled?: boolean;
+        /** Specifies a date displayed on the current scheduler view by default. */
+        currentDate?: Date | number | string;
+        /** Specifies the currently displayed view. Accepts the view's name or type. */
+        currentView?: 'agenda' | 'day' | 'month' | 'timelineDay' | 'timelineMonth' | 'timelineWeek' | 'timelineWorkWeek' | 'week' | 'workWeek';
+        /** Customizes the date navigator's text. */
+        customizeDateNavigatorText?: ((info: { startDate?: Date, endDate?: Date, text?: string }) => string);
+        /** Specifies a custom template for table cells. */
+        dataCellTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery);
+        /** Binds the widget to data. */
+        dataSource?: string | Array<dxSchedulerAppointment> | DevExpress.data.DataSource | DevExpress.data.DataSourceOptions;
+        /** Specifies a custom template for day scale items. */
+        dateCellTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery);
+        /** Specifies the date-time values' serialization format. Use it only if you do not specify the dataSource at design time. */
+        dateSerializationFormat?: string;
+        /** Specifies the name of the data source item field whose value holds the description of the corresponding appointment. */
+        descriptionExpr?: string;
+        /** Specifies a custom template for appointments in the appointment collector's drop-down list. */
+        dropDownAppointmentTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery);
+        /** Specifies which editing operations an end-user can perform on appointments. */
+        editing?: boolean | { allowAdding?: boolean, allowDeleting?: boolean, allowDragging?: boolean, allowResizing?: boolean, allowUpdating?: boolean };
+        /** Specifies the name of the data source item field that defines the ending of an appointment. */
+        endDateExpr?: string;
+        /** Specifies the name of the data source item field that defines the timezone of the appointment end date. */
+        endDateTimeZoneExpr?: string;
+        /** Specifies the last hour in the time scale. Cannot be greater than 24. */
+        endDayHour?: number;
+        /** Specifies the first day of a week. Does not apply to the agenda view. */
+        firstDayOfWeek?: 0 | 1 | 2 | 3 | 4 | 5 | 6;
+        /** Specifies whether the widget can be focused using keyboard navigation. */
+        focusStateEnabled?: boolean;
+        /** Specifies whether to group appointments by date first. Applies only if groupOrientation is "horizontal". */
+        groupByDate?: boolean;
+        /** Specifies the resource kinds by which the scheduler's appointments are grouped in a timetable. */
+        groups?: Array<string>;
+        /** Specifies the time interval between when the date-time indicator changes its position, in milliseconds. */
+        indicatorUpdateInterval?: number;
+        /** The latest date the widget allows you to select. */
+        max?: Date | number | string;
+        /** Specifies the limit of full-sized appointments displayed per cell. Applies to all views except "agenda". */
+        maxAppointmentsPerCell?: number | 'auto' | 'unlimited';
+        /** The earliest date the widget allows you to select. */
+        min?: Date | number | string;
+        /** The text or HTML markup displayed by the widget if the item collection is empty. Available for the Agenda view only. */
+        noDataText?: string;
+        /** A function that is executed after an appointment is added to the data source. */
+        onAppointmentAdded?: ((e: { component?: dxScheduler, element?: DevExpress.core.dxElement, model?: any, appointmentData?: any, error?: Error }) => any);
+        /** A function that is executed before an appointment is added to the data source. */
+        onAppointmentAdding?: ((e: { component?: dxScheduler, element?: DevExpress.core.dxElement, model?: any, appointmentData?: any, cancel?: boolean | Promise<boolean> | JQueryPromise<boolean> }) => any);
+        /** A function that is executed when an appointment is clicked or tapped. */
+        onAppointmentClick?: ((e: { component?: dxScheduler, element?: DevExpress.core.dxElement, model?: any, appointmentData?: any, targetedAppointmentData?: any, appointmentElement?: DevExpress.core.dxElement, jQueryEvent?: JQueryEventObject, event?: event, cancel?: boolean }) => any) | string;
+        /** A function that is executed when a user attempts to open the browser's context menu for an appointment. Allows you to replace this context menu with a custom context menu. */
+        onAppointmentContextMenu?: ((e: { component?: dxScheduler, element?: DevExpress.core.dxElement, model?: any, appointmentData?: any, targetedAppointmentData?: any, appointmentElement?: DevExpress.core.dxElement, jQueryEvent?: JQueryEventObject, event?: event }) => any) | string;
+        /** A function that is executed when an appointment is double-clicked or double-tapped. */
+        onAppointmentDblClick?: ((e: { component?: dxScheduler, element?: DevExpress.core.dxElement, model?: any, appointmentData?: any, targetedAppointmentData?: any, appointmentElement?: DevExpress.core.dxElement, jQueryEvent?: JQueryEventObject, event?: event, cancel?: boolean }) => any) | string;
+        /** A function that is executed after an appointment is deleted from the data source. */
+        onAppointmentDeleted?: ((e: { component?: dxScheduler, element?: DevExpress.core.dxElement, model?: any, appointmentData?: any, error?: Error }) => any);
+        /** A function that is executed before an appointment is deleted from the data source. */
+        onAppointmentDeleting?: ((e: { component?: dxScheduler, element?: DevExpress.core.dxElement, model?: any, appointmentData?: any, cancel?: boolean | Promise<boolean> | JQueryPromise<boolean> }) => any);
+        /** @deprecated Use the onAppointmentFormOpening option instead. */
+        /** A function that is executed before an appointment details form is opened. */
+        onAppointmentFormCreated?: ((e: { component?: dxScheduler, element?: DevExpress.core.dxElement, model?: any, appointmentData?: any, form?: dxForm }) => any);
+        /** A function that is executed before an appointment details form is opened. */
+        onAppointmentFormOpening?: ((e: { component?: dxScheduler, element?: DevExpress.core.dxElement, model?: any, appointmentData?: any, form?: dxForm }) => any);
+        /** A function that is executed when an appointment is rendered. */
+        onAppointmentRendered?: ((e: { component?: dxScheduler, element?: DevExpress.core.dxElement, model?: any, appointmentData?: any, targetedAppointmentData?: any, appointmentElement?: DevExpress.core.dxElement }) => any);
+        /** A function that is executed after an appointment is updated in the data source. */
+        onAppointmentUpdated?: ((e: { component?: dxScheduler, element?: DevExpress.core.dxElement, model?: any, appointmentData?: any, error?: Error }) => any);
+        /** A function that is executed before an appointment is updated in the data source. */
+        onAppointmentUpdating?: ((e: { component?: dxScheduler, element?: DevExpress.core.dxElement, model?: any, oldData?: any, newData?: any, cancel?: boolean | Promise<boolean> | JQueryPromise<boolean> }) => any);
+        /** A function that is executed when a view cell is clicked. */
+        onCellClick?: ((e: { component?: dxScheduler, element?: DevExpress.core.dxElement, model?: any, cellData?: any, cellElement?: DevExpress.core.dxElement, jQueryEvent?: JQueryEventObject, event?: event, cancel?: boolean }) => any) | string;
+        /** A function that is executed when a user attempts to open the browser's context menu for a cell. Allows you to replace this context menu with a custom context menu. */
+        onCellContextMenu?: ((e: { component?: dxScheduler, element?: DevExpress.core.dxElement, model?: any, cellData?: any, cellElement?: DevExpress.core.dxElement, jQueryEvent?: JQueryEventObject, event?: event }) => any) | string;
+        /** Specifies the edit mode for recurring appointments. */
+        recurrenceEditMode?: 'dialog' | 'occurrence' | 'series';
+        /** Specifies the name of the data source item field that defines exceptions for the current recurring appointment. */
+        recurrenceExceptionExpr?: string;
+        /** Specifies the name of the data source item field that defines a recurrence rule for generating recurring appointments. */
+        recurrenceRuleExpr?: string;
+        /** Specifies whether filtering is performed on the server or client side. */
+        remoteFiltering?: boolean;
+        /** Specifies a custom template for resource headers. */
+        resourceCellTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery);
+        /** Specifies an array of resources available in the scheduler. */
+        resources?: Array<{ allowMultiple?: boolean, colorExpr?: string, dataSource?: string | Array<any> | DevExpress.data.DataSource | DevExpress.data.DataSourceOptions, displayExpr?: string | ((resource: any) => any), fieldExpr?: string, label?: string, useColorAsDefault?: boolean, valueExpr?: string | Function }>;
+        /** Currently selected cells' data. */
+        selectedCellData?: Array<any>;
+        /** Specifies whether to apply shading to cover the timetable up to the current time. */
+        shadeUntilCurrentTime?: boolean;
+        /** Specifies the "All-day" panel's visibility. Setting this option to false hides the panel along with the all-day appointments. */
+        showAllDayPanel?: boolean;
+        /** Specifies the current date-time indicator's visibility. */
+        showCurrentTimeIndicator?: boolean;
+        /** Specifies the name of the data source item field that defines the start of an appointment. */
+        startDateExpr?: string;
+        /** Specifies the name of the data source item field that defines the timezone of the appointment start date. */
+        startDateTimeZoneExpr?: string;
+        /** Specifies the first hour in the time scale. */
+        startDayHour?: number;
+        /** Specifies the name of the data source item field that holds the subject of an appointment. */
+        textExpr?: string;
+        /** Specifies a custom template for time scale items. */
+        timeCellTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery);
+        /** Specifies the timezone of the widget. */
+        timeZone?: string;
+        /** Specifies whether a user can switch views using tabs or a drop-down menu. */
+        useDropDownViewSwitcher?: boolean;
+        /** Configures individual views. */
+        views?: Array<'day' | 'week' | 'workWeek' | 'month' | 'timelineDay' | 'timelineWeek' | 'timelineWorkWeek' | 'timelineMonth' | 'agenda' | { agendaDuration?: number, appointmentCollectorTemplate?: template | ((data: { appointmentCount?: number, isCompact?: boolean }, collectorElement: DevExpress.core.dxElement) => string | Element | JQuery), appointmentTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery), appointmentTooltipTemplate?: template | ((appointmentData: any, contentElement: DevExpress.core.dxElement, targetedAppointmentData: any, itemIndex: number) => string | Element | JQuery), cellDuration?: number, dataCellTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery), dateCellTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery), dropDownAppointmentTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery), endDayHour?: number, firstDayOfWeek?: 0 | 1 | 2 | 3 | 4 | 5 | 6, groupByDate?: boolean, groupOrientation?: 'horizontal' | 'vertical', groups?: Array<string>, intervalCount?: number, maxAppointmentsPerCell?: number | 'auto' | 'unlimited', name?: string, resourceCellTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery), startDate?: Date | number | string, startDayHour?: number, timeCellTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery), type?: 'agenda' | 'day' | 'month' | 'timelineDay' | 'timelineMonth' | 'timelineWeek' | 'timelineWorkWeek' | 'week' | 'workWeek' }>;
+    }
+    /** The Scheduler is a widget that represents scheduled data and allows a user to manage and edit it. */
+    export class dxScheduler extends Widget {
+        constructor(element: Element, options?: dxSchedulerOptions)
+        constructor(element: JQuery, options?: dxSchedulerOptions)
+        /** Adds an appointment. */
+        addAppointment(appointment: any): void;
+        /** Deletes an appointment from the timetable and its object from the data source. */
+        deleteAppointment(appointment: any): void;
+        /** Gets the DataSource instance. */
+        getDataSource(): DevExpress.data.DataSource;
+        /** Gets the current view's end date. */
+        getEndViewDate(): Date;
+        /** Gets the current view's start date. */
+        getStartViewDate(): Date;
+        /** Hides an appointment details form. */
+        hideAppointmentPopup(saveChanges?: boolean): void;
+        /** Hides an appointment tooltip. */
+        hideAppointmentTooltip(): void;
+        /** Registers a handler to be executed when a user presses a specific key. */
+        registerKeyHandler(): void;
+        /** Scrolls the current view to a specific day and time. */
+        scrollToTime(hours: number, minutes: number, date?: Date): void;
+        /** Shows the appointment details form. */
+        showAppointmentPopup(appointmentData?: any, createNewAppointment?: boolean, currentAppointmentData?: any): void;
+        /** Shows a tooltip for a target element. */
+        showAppointmentTooltip(appointmentData: any, target: string | Element | JQuery, currentAppointmentData?: any): void;
+        /** Updates an appointment. */
+        updateAppointment(target: any, appointment: any): void;
+    }
+    /** This section lists the fields that are used in a default template for scheduler appointments. */
+    export interface dxSchedulerAppointment extends CollectionWidgetItem {
+        /** Specifies whether the appointment lasts all day. */
+        allDay?: boolean;
+        /** Specifies a detail description of the appointment. */
+        description?: string;
+        /** Specifies whether or not an appointment must be displayed disabled. */
+        disabled?: boolean;
+        /** Specifies the ending of the appointment. */
+        endDate?: Date;
+        /** Specifies the timezone of the appointment end date. Applies only if timeZone is not specified. */
+        endDateTimeZone?: string;
+        /** Specifies HTML code inserted into the appointment element. */
+        html?: string;
+        /** Specifies exceptions for the current recurring appointment. */
+        recurrenceException?: string;
+        /** Specifies a recurrence rule for generating recurring appointments in the scheduler. */
+        recurrenceRule?: string;
+        /** Specifies the start of the appointment. */
+        startDate?: Date;
+        /** Specifies the timezone of the appointment start date. Applies only if timeZone is not specified. */
+        startDateTimeZone?: string;
+        /** Specifies an appointment template that should be used to render this appointment only. */
+        template?: template;
+        /** Specifies the subject of the appointment. */
+        text?: string;
+        /** Specifies whether or not an appointment must be displayed. */
+        visible?: boolean;
+    }
+    /** This section lists the fields that are used in a default template for scheduler appointment tooltips. */
+    export interface dxSchedulerAppointmentTooltipTemplate {
+        /** Specifies whether or not the current appointment is an all-day appointment. */
+        allDay?: boolean;
+        /** Specifies the appointment description. */
+        description?: string;
+        /** Specifies the ending of the appointment. */
+        endDate?: Date;
+        /** Specifies the timezone of the appointment end date. */
+        endDateTimeZone?: string;
+        /** Specifies exceptions for a the current recurring appointment. */
+        recurrenceException?: string;
+        /** Specifies a recurrence rule for generating recurring appointments in the scheduler. */
+        recurrenceRule?: string;
+        /** Specifies the start of the appointment. */
+        startDate?: Date;
+        /** Specifies the timezone of the appointment start date. */
+        startDateTimeZone?: string;
+        /** Specifies the subject of the appointment. */
+        text?: string;
+    }
+    
+    export interface dxScrollViewOptions extends dxScrollableOptions<dxScrollView> {
+        /** A function that is executed when the "pull to refresh" gesture is performed. Supported in mobile themes only. */
+        onPullDown?: ((e: { component?: dxScrollView, element?: DevExpress.core.dxElement, model?: any }) => any);
+        /** A function that is executed when the content is scrolled down to the bottom. */
+        onReachBottom?: ((e: { component?: dxScrollView, element?: DevExpress.core.dxElement, model?: any }) => any);
+        /** Specifies the text shown in the pullDown panel when pulling the content down lowers the refresh threshold. */
+        pulledDownText?: string;
+        /** Specifies the text shown in the pullDown panel while pulling the content down to the refresh threshold. */
+        pullingDownText?: string;
+        /** Specifies the text shown in the pullDown panel displayed when content is scrolled to the bottom. */
+        reachBottomText?: string;
+        /** Specifies the text shown in the pullDown panel displayed when the content is being refreshed. */
+        refreshingText?: string;
+    }
+    /** The ScrollView is a widget that enables a user to scroll its content. */
+    export class dxScrollView extends dxScrollable {
+        constructor(element: Element, options?: dxScrollViewOptions)
+        constructor(element: JQuery, options?: dxScrollViewOptions)
+        /** Locks the widget until the release(preventScrollBottom) method is called and executes the function passed to the onPullDown option and the handler assigned to the pullDown event. */
+        refresh(): void;
+        /** Notifies the ScrollView that data loading is finished. */
+        release(preventScrollBottom: boolean): Promise<void> & JQueryPromise<void>;
+    }
+    
+    export interface dxScrollableOptions<T = dxScrollable> extends DOMComponentOptions<T> {
+        /** A Boolean value specifying whether to enable or disable the bounce-back effect. */
+        bounceEnabled?: boolean;
+        /** A string value specifying the available scrolling directions. */
+        direction?: 'both' | 'horizontal' | 'vertical';
+        /** A Boolean value specifying whether or not the widget can respond to user interaction. */
+        disabled?: boolean;
+        /** A function that is executed on each scroll gesture. */
+        onScroll?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, jQueryEvent?: JQueryEventObject, event?: event, scrollOffset?: any, reachedLeft?: boolean, reachedRight?: boolean, reachedTop?: boolean, reachedBottom?: boolean }) => any);
+        /** A function that is executed each time the widget is updated. */
+        onUpdated?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, jQueryEvent?: JQueryEventObject, event?: event, scrollOffset?: any, reachedLeft?: boolean, reachedRight?: boolean, reachedTop?: boolean, reachedBottom?: boolean }) => any);
+        /** A Boolean value specifying whether or not an end-user can scroll the widget content swiping it up or down. Applies only if useNative is false */
+        scrollByContent?: boolean;
+        /** A Boolean value specifying whether or not an end-user can scroll the widget content using the scrollbar. */
+        scrollByThumb?: boolean;
+        /** Specifies when the widget shows the scrollbar. */
+        showScrollbar?: 'onScroll' | 'onHover' | 'always' | 'never';
+        /** Indicates whether to use native or simulated scrolling. */
+        useNative?: boolean;
+    }
+    /** A widget used to display scrollable content. */
+    export class dxScrollable extends DOMComponent {
+        constructor(element: Element, options?: dxScrollableOptions)
+        constructor(element: JQuery, options?: dxScrollableOptions)
+        /** Gets the widget's height. */
+        clientHeight(): number;
+        /** Gets the widget's width. */
+        clientWidth(): number;
+        /** Gets the widget's content. */
+        content(): DevExpress.core.dxElement;
+        /** Scrolls the content by a specific distance. */
+        scrollBy(distance: number): void;
+        /** Scrolls the content by a specific distance in horizontal and vertical directions. */
+        scrollBy(distanceObject: any): void;
+        /** Gets the scrollable content's height in pixels. */
+        scrollHeight(): number;
+        /** Gets the left scroll offset. */
+        scrollLeft(): number;
+        /** Gets the scroll offset. */
+        scrollOffset(): any;
+        /** Scrolls the content to a specific position. */
+        scrollTo(targetLocation: number): void;
+        /** Scrolls the content to a specific position. */
+        scrollTo(targetLocation: any): void;
+        /** Scrolls the content to an element. */
+        scrollToElement(element: Element | JQuery): void;
+        /** Gets the top scroll offset. */
+        scrollTop(): number;
+        /** Gets the scrollable content's width in pixels. */
+        scrollWidth(): number;
+        /** Updates the scrollable contents' dimensions. */
+        update(): Promise<void> & JQueryPromise<void>;
+    }
+    
+    export interface dxSelectBoxOptions<T = dxSelectBox> extends dxDropDownListOptions<T> {
+        /** Specifies whether the widget allows a user to enter a custom value. Requires the onCustomItemCreating handler implementation. */
+        acceptCustomValue?: boolean;
+        /** Specifies a custom template for the text field. Must contain the TextBox widget. */
+        fieldTemplate?: template | ((selectedItem: any, fieldElement: DevExpress.core.dxElement) => string | Element | JQuery);
+        /** A function that is executed when a user adds a custom item. Requires acceptCustomValue to be set to true. */
+        onCustomItemCreating?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, text?: string, customItem?: string | any | Promise<any> | JQueryPromise<any> }) => any);
+        /** Specifies whether a user can open the drop-down list by clicking a text field. */
+        openOnFieldClick?: boolean;
+        /** The text that is provided as a hint in the select box editor. */
+        placeholder?: string;
+        /** Specifies whether the drop-down button is visible. */
+        showDropDownButton?: boolean;
+        /** Specifies whether or not to display selection controls. */
+        showSelectionControls?: boolean;
+        /** Specifies the DOM events after which the widget's value should be updated. Applies only if acceptCustomValue is set to true. */
+        valueChangeEvent?: string;
+    }
+    /** The SelectBox widget is an editor that allows an end user to select an item from a drop-down list. */
+    export class dxSelectBox extends dxDropDownList {
+        constructor(element: Element, options?: dxSelectBoxOptions)
+        constructor(element: JQuery, options?: dxSelectBoxOptions)
+    }
+    
+    export interface dxSlideOutOptions extends CollectionWidgetOptions<dxSlideOut> {
+        /** A Boolean value specifying whether or not the widget changes its state when interacting with a user. */
+        activeStateEnabled?: boolean;
+        /** Specifies a custom template for the widget content. Rendered only once - when the widget is created. */
+        contentTemplate?: template | ((container: DevExpress.core.dxElement) => string | Element | JQuery);
+        /** An array of items displayed by the widget. */
+        items?: Array<string | dxSlideOutItem | any>;
+        /** Specifies a custom template for group captions. */
+        menuGroupTemplate?: template | ((groupData: any, groupIndex: number, groupElement: any) => string | Element | JQuery);
+        /** A Boolean value specifying whether or not to display a grouped menu. */
+        menuGrouped?: boolean;
+        /** Specifies a custom template for menu items. */
+        menuItemTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery);
+        /** Specifies the current menu position. */
+        menuPosition?: 'inverted' | 'normal';
+        /** Specifies whether or not the slide-out menu is displayed. */
+        menuVisible?: boolean;
+        /** A function that is executed when a group menu item is rendered. */
+        onMenuGroupRendered?: ((e: { component?: dxSlideOut, element?: DevExpress.core.dxElement, model?: any }) => any);
+        /** A function that is executed when a regular menu item is rendered. */
+        onMenuItemRendered?: ((e: { component?: dxSlideOut, element?: DevExpress.core.dxElement, model?: any }) => any);
+        /** The index number of the currently selected item. */
+        selectedIndex?: number;
+        /** Indicates whether the menu can be shown/hidden by swiping the widget's main panel. */
+        swipeEnabled?: boolean;
+    }
+    /** The SlideOut widget is a classic slide-out menu paired with a view. An end user opens the menu by swiping away the view. */
+    export class dxSlideOut extends CollectionWidget {
+        constructor(element: Element, options?: dxSlideOutOptions)
+        constructor(element: JQuery, options?: dxSlideOutOptions)
+        /** Hides the widget's slide-out menu. */
+        hideMenu(): Promise<void> & JQueryPromise<void>;
+        /** Displays the widget's slide-out menu. */
+        showMenu(): Promise<void> & JQueryPromise<void>;
+        /** Shows or hides the slide-out menu depending on the argument. */
+        toggleMenuVisibility(showing: boolean): Promise<void> & JQueryPromise<void>;
+    }
+    /** This section lists the data source fields that are used in a default template for SlideOut items. */
+    export interface dxSlideOutItem extends CollectionWidgetItem {
+        /** Specifies a template that should be used to render a menu item. */
+        menuTemplate?: template | (() => string | Element | JQuery);
+    }
+    
+    export interface dxSlideOutViewOptions extends WidgetOptions<dxSlideOutView> {
+        /** Specifies a custom template for the widget content. */
+        contentTemplate?: template | ((contentElement: DevExpress.core.dxElement) => any);
+        /** Specifies the current menu position. */
+        menuPosition?: 'inverted' | 'normal';
+        /** Specifies a custom template for the menu content. */
+        menuTemplate?: template | ((menuElement: DevExpress.core.dxElement) => any);
+        /** Specifies whether or not the menu panel is visible. */
+        menuVisible?: boolean;
+        /** Specifies whether or not the menu is shown when a user swipes the widget content. */
+        swipeEnabled?: boolean;
+    }
+    /** The SlideOutView widget is a classic slide-out menu paired with a view. This widget is very similar to the SlideOut with only one difference - the SlideOut always contains the List in the slide-out menu, while the SlideOutView can hold any collection there. */
+    export class dxSlideOutView extends Widget {
+        constructor(element: Element, options?: dxSlideOutViewOptions)
+        constructor(element: JQuery, options?: dxSlideOutViewOptions)
+        /** Gets the widget's content. */
+        content(): DevExpress.core.dxElement;
+        /** Hides the widget's slide-out menu. */
+        hideMenu(): Promise<void> & JQueryPromise<void>;
+        /** Gets the slide-out menu's content. */
+        menuContent(): DevExpress.core.dxElement;
+        /** Shows the slide-out menu. */
+        showMenu(): Promise<void> & JQueryPromise<void>;
+        /** Shows or hides the slide-out menu depending on the argument. */
+        toggleMenuVisibility(): Promise<void> & JQueryPromise<void>;
+    }
+    
+    export interface dxSliderOptions extends dxSliderBaseOptions<dxSlider> {
+        /** The current slider value. */
+        value?: number;
+    }
+    /** The Slider is a widget that allows an end user to set a numeric value on a continuous range of possible values. */
+    export class dxSlider extends dxSliderBase {
+        constructor(element: Element, options?: dxSliderOptions)
+        constructor(element: JQuery, options?: dxSliderOptions)
+    }
+    
+    export interface dxSliderBaseOptions<T = dxSliderBase> extends dxTrackBarOptions<T> {
+        /** Specifies whether or not the widget changes its state when interacting with a user. */
+        activeStateEnabled?: boolean;
+        /** Specifies whether the widget can be focused using keyboard navigation. */
+        focusStateEnabled?: boolean;
+        /** Specifies whether the widget changes its state when a user pauses on it. */
+        hoverStateEnabled?: boolean;
+        /** Specifies the step by which a handle moves when a user presses Page Up or Page Down. */
+        keyStep?: number;
+        /** Configures the labels displayed at the min and max values. */
+        label?: { format?: format, position?: 'bottom' | 'top', visible?: boolean };
+        /** The value to be assigned to the `name` attribute of the underlying HTML element. */
+        name?: string;
+        /** Specifies whether to highlight the selected range. */
+        showRange?: boolean;
+        /** Specifies the step by which the widget's value changes when a user drags a handler. */
+        step?: number;
+        /** Configures a tooltip. */
+        tooltip?: { enabled?: boolean, format?: format, position?: 'bottom' | 'top', showMode?: 'always' | 'onHover' };
+    }
+    
+    export class dxSliderBase extends dxTrackBar {
+        constructor(element: Element, options?: dxSliderBaseOptions)
+        constructor(element: JQuery, options?: dxSliderBaseOptions)
+    }
+    
+    export interface dxSpeedDialActionOptions extends WidgetOptions<dxSpeedDialAction> {
+        /** Specifies the icon the FAB or speed dial action button displays. */
+        icon?: string;
+        /** A function that is executed when the FAB or speed dial action button is clicked or tapped. */
+        onClick?: ((e: { event?: event, component?: dxSpeedDialAction, element?: DevExpress.core.dxElement }) => any);
+    }
+    /** The SpeedDialAction is a button that performs a custom action. It can be represented by a Floating Action Button (FAB) or a button in a speed dial menu opened with the FAB. */
+    export class dxSpeedDialAction extends Widget {
+        constructor(element: Element, options?: dxSpeedDialActionOptions)
+        constructor(element: JQuery, options?: dxSpeedDialActionOptions)
+    }
+    
+    export interface dxSwitchOptions extends EditorOptions<dxSwitch> {
+        /** Specifies whether or not the widget changes its state when interacting with a user. */
+        activeStateEnabled?: boolean;
+        /** Specifies whether the widget can be focused using keyboard navigation. */
+        focusStateEnabled?: boolean;
+        /** Specifies whether the widget changes its state when a user pauses on it. */
+        hoverStateEnabled?: boolean;
+        /** The value to be assigned to the `name` attribute of the underlying HTML element. */
+        name?: string;
+        /** @deprecated Use the switchedOffText option instead. */
+        /** Text displayed when the widget is in a disabled state. */
+        offText?: string;
+        /** @deprecated Use the switchedOnText option instead. */
+        /** Text displayed when the widget is in an enabled state. */
+        onText?: string;
+        /** Specifies the text displayed when the widget is switched off. */
+        switchedOffText?: string;
+        /** Specifies the text displayed when the widget is switched on. */
+        switchedOnText?: string;
+        /** A Boolean value specifying whether the current switch state is "On" or "Off". */
+        value?: boolean;
+    }
+    /** The Switch is a widget that can be in two states: "On" and "Off". */
+    export class dxSwitch extends Editor {
+        constructor(element: Element, options?: dxSwitchOptions)
+        constructor(element: JQuery, options?: dxSwitchOptions)
+    }
+    
+    export interface dxTabPanelOptions extends dxMultiViewOptions<dxTabPanel> {
+        /** Specifies whether or not to animate the displayed item change. */
+        animationEnabled?: boolean;
+        /** Specifies whether the widget can be focused using keyboard navigation. */
+        focusStateEnabled?: boolean;
+        /** Specifies whether the widget changes its state when a user pauses on it. */
+        hoverStateEnabled?: boolean;
+        /** Specifies a custom template for item titles. */
+        itemTitleTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery);
+        /** An array of items displayed by the widget. */
+        items?: Array<string | dxTabPanelItem | any>;
+        /** A function that is executed when a tab is clicked or tapped. */
+        onTitleClick?: ((e: { component?: dxTabPanel, element?: DevExpress.core.dxElement, model?: any, itemData?: any, itemElement?: DevExpress.core.dxElement, event?: event }) => any) | string;
+        /** A function that is executed when a tab has been held for a specified period. */
+        onTitleHold?: ((e: { component?: dxTabPanel, element?: DevExpress.core.dxElement, model?: any, itemData?: any, itemElement?: DevExpress.core.dxElement, event?: event }) => any);
+        /** A function that is executed after a tab is rendered. */
+        onTitleRendered?: ((e: { component?: dxTabPanel, element?: DevExpress.core.dxElement, model?: any, itemData?: any, itemElement?: DevExpress.core.dxElement }) => any);
+        /** Specifies whether to repaint only those elements whose data changed. */
+        repaintChangesOnly?: boolean;
+        /** A Boolean value specifying if tabs in the title are scrolled by content. */
+        scrollByContent?: boolean;
+        /** A Boolean indicating whether or not to add scrolling support for tabs in the title. */
+        scrollingEnabled?: boolean;
+        /** Specifies whether navigation buttons should be available when tabs exceed the widget's width. */
+        showNavButtons?: boolean;
+        /** A Boolean value specifying whether or not to allow users to change the selected index by swiping. */
+        swipeEnabled?: boolean;
+    }
+    /** The TabPanel is a widget consisting of the Tabs and MultiView widgets. It automatically synchronizes the selected tab with the currently displayed view and vice versa. */
+    export class dxTabPanel extends dxMultiView {
+        constructor(element: Element, options?: dxTabPanelOptions)
+        constructor(element: JQuery, options?: dxTabPanelOptions)
+    }
+    /** This section lists the data source fields that are used in a default template for tab panel items. */
+    export interface dxTabPanelItem extends dxMultiViewItem {
+        /** Specifies a badge text for the tab. */
+        badge?: string;
+        /** Specifies the icon to be displayed in the tab's title. */
+        icon?: string;
+        /** Specifies a template that should be used to render the tab for this item only. */
+        tabTemplate?: template | (() => string | Element | JQuery);
+        /** Specifies the item title text displayed on a corresponding tab. */
+        title?: string;
+    }
+    
+    export interface dxTabsOptions<T = dxTabs> extends CollectionWidgetOptions<T> {
+        /** Specifies whether the widget can be focused using keyboard navigation. */
+        focusStateEnabled?: boolean;
+        /** Specifies whether the widget changes its state when a user pauses on it. */
+        hoverStateEnabled?: boolean;
+        /** An array of items displayed by the widget. */
+        items?: Array<string | dxTabsItem | any>;
+        /** Specifies whether to repaint only those elements whose data changed. */
+        repaintChangesOnly?: boolean;
+        /** Specifies whether or not an end-user can scroll tabs by swiping. */
+        scrollByContent?: boolean;
+        /** Specifies whether or not an end-user can scroll tabs. */
+        scrollingEnabled?: boolean;
+        /** An array of currently selected item objects. */
+        selectedItems?: Array<string | number | any>;
+        /** Specifies whether the widget enables an end-user to select only a single item or multiple items. */
+        selectionMode?: 'multiple' | 'single';
+        /** Specifies whether navigation buttons should be available when tabs exceed the widget's width. */
+        showNavButtons?: boolean;
+    }
+    /** The Tabs is a tab strip used to switch between pages or views. This widget is included in the TabPanel widget, but you can use the Tabs separately as well. */
+    export class dxTabs extends CollectionWidget {
+        constructor(element: Element, options?: dxTabsOptions)
+        constructor(element: JQuery, options?: dxTabsOptions)
+    }
+    /** This section lists the data source fields that are used in a default template for tabs. */
+    export interface dxTabsItem extends CollectionWidgetItem {
+        /** Specifies a badge text for the tab. */
+        badge?: string;
+        /** Specifies the icon to be displayed on the tab. */
+        icon?: string;
+    }
+    
+    export interface dxTagBoxOptions extends dxSelectBoxOptions<dxTagBox> {
+        /** Specifies how the widget applies values. */
+        applyValueMode?: 'instantly' | 'useButtons';
+        /** A Boolean value specifying whether or not to hide selected items. */
+        hideSelectedItems?: boolean;
+        /** Specifies the limit on displayed tags. On exceeding it, the widget replaces all tags with a single multi-tag that displays the number of selected items. */
+        maxDisplayedTags?: number;
+        /** A Boolean value specifying whether or not the widget is multiline. */
+        multiline?: boolean;
+        /** A function that is executed before the multi-tag is rendered. */
+        onMultiTagPreparing?: ((e: { component?: dxTagBox, element?: DevExpress.core.dxElement, model?: any, multiTagElement?: DevExpress.core.dxElement, selectedItems?: Array<string | number | any>, text?: string, cancel?: boolean }) => any);
+        /** A function that is executed when the "Select All" check box value is changed. Applies only if showSelectionControls is true. */
+        onSelectAllValueChanged?: ((e: { component?: dxTagBox, element?: DevExpress.core.dxElement, model?: any, value?: boolean }) => any);
+        /** A function that is executed when a list item is selected or selection is canceled. */
+        onSelectionChanged?: ((e: { component?: dxTagBox, element?: DevExpress.core.dxElement, model?: any, addedItems?: Array<string | number | any>, removedItems?: Array<string | number | any> }) => any);
+        /** Specifies the mode in which all items are selected. */
+        selectAllMode?: 'allPages' | 'page';
+        /** Gets the currently selected items. */
+        selectedItems?: Array<string | number | any>;
+        /** Specifies whether the drop-down button is visible. */
+        showDropDownButton?: boolean;
+        /** Specifies whether the multi-tag is shown without ordinary tags. */
+        showMultiTagOnly?: boolean;
+        /** Specifies a custom template for tags. */
+        tagTemplate?: template | ((itemData: any, itemElement: DevExpress.core.dxElement) => string | Element | JQuery);
+        /** Specifies the selected items. */
+        value?: Array<string | number | any>;
+    }
+    /** The TagBox widget is an editor that allows an end user to select multiple items from a drop-down list. */
+    export class dxTagBox extends dxSelectBox {
+        constructor(element: Element, options?: dxTagBoxOptions)
+        constructor(element: JQuery, options?: dxTagBoxOptions)
+    }
+    
+    export interface dxTemplateOptions {
+        /** Specifies the name of the template. */
+        name?: string;
+    }
+    /** A custom template's markup. */
+    export class dxTemplate {
+        constructor(options?: dxTemplateOptions)
+    }
+    
+    export interface dxTextAreaOptions extends dxTextBoxOptions<dxTextArea> {
+        /** A Boolean value specifying whether or not the auto resizing mode is enabled. */
+        autoResizeEnabled?: boolean;
+        /** Specifies the maximum height of the widget. */
+        maxHeight?: number | string;
+        /** Specifies the minimum height of the widget. */
+        minHeight?: number | string;
+        /** Specifies whether or not the widget checks the inner text for spelling mistakes. */
+        spellcheck?: boolean;
+    }
+    /** The TextArea is a widget that enables a user to enter and edit a multi-line text. */
+    export class dxTextArea extends dxTextBox {
+        constructor(element: Element, options?: dxTextAreaOptions)
+        constructor(element: JQuery, options?: dxTextAreaOptions)
+    }
+    
+    export interface dxTextBoxOptions<T = dxTextBox> extends dxTextEditorOptions<T> {
+        /** Specifies the maximum number of characters you can enter into the textbox. */
+        maxLength?: string | number;
+        /** The "mode" attribute value of the actual HTML input element representing the text box. */
+        mode?: 'email' | 'password' | 'search' | 'tel' | 'text' | 'url';
+        /** Specifies a value the widget displays. */
+        value?: string;
+    }
+    /** The TextBox is a widget that enables a user to enter and edit a single line of text. */
+    export class dxTextBox extends dxTextEditor {
+        constructor(element: Element, options?: dxTextBoxOptions)
+        constructor(element: JQuery, options?: dxTextBoxOptions)
+    }
+    
+    export interface dxTextEditorOptions<T = dxTextEditor> extends EditorOptions<T> {
+        /** Allows you to add custom buttons to the input text field. */
+        buttons?: Array<string | 'clear' | dxTextEditorButton>;
+        /** Specifies whether the widget can be focused using keyboard navigation. */
+        focusStateEnabled?: boolean;
+        /** Specifies whether the widget changes its state when a user pauses on it. */
+        hoverStateEnabled?: boolean;
+        /** Specifies the attributes to be passed on to the underlying HTML element. */
+        inputAttr?: any;
+        /** The editor mask that specifies the format of the entered string. */
+        mask?: string;
+        /** Specifies a mask placeholder character. */
+        maskChar?: string;
+        /** A message displayed when the entered text does not match the specified pattern. */
+        maskInvalidMessage?: string;
+        /** Specifies custom mask rules. */
+        maskRules?: any;
+        /** The value to be assigned to the `name` attribute of the underlying HTML element. */
+        name?: string;
+        /** A function that is executed when the widget loses focus after the text field's content was changed using the keyboard. */
+        onChange?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, jQueryEvent?: JQueryEventObject, event?: event }) => any);
+        /** A function that is executed when the widget's input has been copied. */
+        onCopy?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, jQueryEvent?: JQueryEventObject, event?: event }) => any);
+        /** A function that is executed when the widget's input has been cut. */
+        onCut?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, jQueryEvent?: JQueryEventObject, event?: event }) => any);
+        /** A function that is executed when the Enter key has been pressed while the widget is focused. */
+        onEnterKey?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, jQueryEvent?: JQueryEventObject, event?: event }) => any);
+        /** A function that is executed when the widget gets focus. */
+        onFocusIn?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, jQueryEvent?: JQueryEventObject, event?: event }) => any);
+        /** A function that is executed when the widget loses focus. */
+        onFocusOut?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, jQueryEvent?: JQueryEventObject, event?: event }) => any);
+        /** A function that is executed each time the widget's input is changed while the widget is focused. */
+        onInput?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, jQueryEvent?: JQueryEventObject, event?: event }) => any);
+        /** A function that is executed when a user is pressing a key on the keyboard. */
+        onKeyDown?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, jQueryEvent?: JQueryEventObject, event?: event }) => any);
+        /** A function that is executed when a user presses a key on the keyboard. */
+        onKeyPress?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, jQueryEvent?: JQueryEventObject, event?: event }) => any);
+        /** A function that is executed when a user releases a key on the keyboard. */
+        onKeyUp?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, jQueryEvent?: JQueryEventObject, event?: event }) => any);
+        /** A function that is executed when the widget's input has been pasted. */
+        onPaste?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, jQueryEvent?: JQueryEventObject, event?: event }) => any);
+        /** The text displayed by the widget when the widget value is empty. */
+        placeholder?: string;
+        /** Specifies whether to display the Clear button in the widget. */
+        showClearButton?: boolean;
+        /** Specifies when the widget shows the mask. Applies only if useMaskedValue is true. */
+        showMaskMode?: 'always' | 'onFocus';
+        /** Specifies whether or not the widget checks the inner text for spelling mistakes. */
+        spellcheck?: boolean;
+        /** Specifies how the widget's text field is styled. */
+        stylingMode?: 'outlined' | 'underlined' | 'filled';
+        /** The read-only option that holds the text displayed by the widget input element. */
+        text?: string;
+        /** Specifies whether the value should contain mask characters or not. */
+        useMaskedValue?: boolean;
+        /** Specifies the current value displayed by the widget. */
+        value?: any;
+        /** Specifies the DOM events after which the widget's value should be updated. */
+        valueChangeEvent?: string;
+    }
+    /** A base class for text editing widgets. */
+    export class dxTextEditor extends Editor {
+        constructor(element: Element, options?: dxTextEditorOptions)
+        constructor(element: JQuery, options?: dxTextEditorOptions)
+        /** Removes focus from the input element. */
+        blur(): void;
+        /** Sets focus to the input element representing the widget. */
+        focus(): void;
+        /** Gets an instance of a custom action button. */
+        getButton(name: string): dxButton | undefined;
+    }
+    
+    export interface dxTextEditorButton {
+        /** Specifies whether to place the button before or after the input text field. */
+        location?: 'after' | 'before';
+        /** Specifies the button's name. */
+        name?: string;
+        /** Configures the Button widget used as the action button. */
+        options?: dxButtonOptions;
+    }
+    
+    export interface dxTileViewOptions extends CollectionWidgetOptions<dxTileView> {
+        /** A Boolean value specifying whether or not the widget changes its state when interacting with a user. */
+        activeStateEnabled?: boolean;
+        /** Specifies the height of the base tile view item. */
+        baseItemHeight?: number;
+        /** Specifies the width of the base tile view item. */
+        baseItemWidth?: number;
+        /** Specifies whether tiles are placed horizontally or vertically. */
+        direction?: 'horizontal' | 'vertical';
+        /** Specifies whether the widget can be focused using keyboard navigation. */
+        focusStateEnabled?: boolean;
+        /** Specifies the widget's height. */
+        height?: number | string;
+        /** Specifies whether the widget changes its state when a user pauses on it. */
+        hoverStateEnabled?: boolean;
+        /** Specifies the distance in pixels between adjacent tiles. */
+        itemMargin?: number;
+        /** An array of items displayed by the widget. */
+        items?: Array<string | dxTileViewItem | any>;
+        /** A Boolean value specifying whether or not to display a scrollbar. */
+        showScrollbar?: boolean;
+    }
+    /** The TileView widget contains a collection of tiles. Tiles can store much more information than ordinary buttons, that is why they are very popular in apps designed for touch devices. */
+    export class dxTileView extends CollectionWidget {
+        constructor(element: Element, options?: dxTileViewOptions)
+        constructor(element: JQuery, options?: dxTileViewOptions)
+        /** Gets the current scroll position. */
+        scrollPosition(): number;
+    }
+    /** This section lists the data source fields that are used in a default template for tile view items. */
+    export interface dxTileViewItem extends CollectionWidgetItem {
+        /** Specifies a multiplier for the baseItemHeight option value (for the purpose of obtaining the actual item height). */
+        heightRatio?: number;
+        /** Specifies a multiplier for the baseItemWidth option value (for the purpose of obtaining the actual item width). */
+        widthRatio?: number;
+    }
+    
+    export interface dxToastOptions extends dxOverlayOptions<dxToast> {
+        /** Configures widget visibility animations. This object contains two fields: show and hide. */
+        animation?: dxToastAnimation;
+        /** A Boolean value specifying whether or not the widget is closed if a user presses the Back hardware button. */
+        closeOnBackButton?: boolean;
+        /** A Boolean value specifying whether or not the toast is closed if a user clicks it. */
+        closeOnClick?: boolean;
+        /** Specifies whether to close the widget if a user clicks outside it. */
+        closeOnOutsideClick?: boolean | ((event: event) => boolean);
+        /** A Boolean value specifying whether or not the toast is closed if a user swipes it out of the screen boundaries. */
+        closeOnSwipe?: boolean;
+        /** The time span in milliseconds during which the Toast widget is visible. */
+        displayTime?: number;
+        /** Specifies the widget's height in pixels. */
+        height?: number | string | (() => number | string);
+        /** Specifies the maximum width the widget can reach while resizing. */
+        maxWidth?: number | string | (() => number | string);
+        /** The Toast message text. */
+        message?: string;
+        /** Specifies the minimum width the widget can reach while resizing. */
+        minWidth?: number | string | (() => number | string);
+        /** Positions the widget. */
+        position?: positionConfig | string;
+        /** Specifies whether to shade the container when the widget is active. */
+        shading?: boolean;
+        /** Specifies the Toast widget type. */
+        type?: 'custom' | 'error' | 'info' | 'success' | 'warning';
+        /** Specifies the widget's width in pixels. */
+        width?: number | string | (() => number | string);
+    }
+    /** Configures widget visibility animations. This object contains two fields: show and hide. */
+    export interface dxToastAnimation extends dxOverlayAnimation {
+        /** An object that defines the animation options used when the widget is being hidden. */
+        hide?: animationConfig;
+        /** An object that defines the animation options used when the widget is being shown. */
+        show?: animationConfig;
+    }
+    /** The Toast is a widget that provides pop-up notifications. */
+    export class dxToast extends dxOverlay {
+        constructor(element: Element, options?: dxToastOptions)
+        constructor(element: JQuery, options?: dxToastOptions)
+    }
+    
+    export interface dxToolbarOptions extends CollectionWidgetOptions<dxToolbar> {
+        /** An array of items displayed by the widget. */
+        items?: Array<string | dxToolbarItem | any>;
+        /** Specifies a custom template for menu items. */
+        menuItemTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery);
+        /** Informs the widget about its location in a view HTML markup. */
+        renderAs?: 'bottomToolbar' | 'topToolbar';
+    }
+    /** The Toolbar is a widget containing items that usually manage screen content. Those items can be plain text or widgets. */
+    export class dxToolbar extends CollectionWidget {
+        constructor(element: Element, options?: dxToolbarOptions)
+        constructor(element: JQuery, options?: dxToolbarOptions)
+    }
+    /** This section lists the data source fields that are used in a default template for toolbar items. */
+    export interface dxToolbarItem extends CollectionWidgetItem {
+        /** Specifies a CSS class to be applied to the item. */
+        cssClass?: string;
+        /** Specifies when to display an item in the toolbar's overflow menu. */
+        locateInMenu?: 'always' | 'auto' | 'never';
+        /** Specifies a location for the item on the toolbar. */
+        location?: 'after' | 'before' | 'center';
+        /** Specifies a template that should be used to render a menu item. */
+        menuItemTemplate?: template | (() => string | Element | JQuery);
+        /** Specifies a configuration object for the widget that presents a toolbar item. */
+        options?: any;
+        /** Specifies when to display the text for the widget item. */
+        showText?: 'always' | 'inMenu';
+        /** A widget that presents a toolbar item. */
+        widget?: 'dxAutocomplete' | 'dxButton' | 'dxCheckBox' | 'dxDateBox' | 'dxMenu' | 'dxSelectBox' | 'dxTabs' | 'dxTextBox' | 'dxButtonGroup' | 'dxDropDownButton';
+    }
+    
+    export interface dxTooltipOptions extends dxPopoverOptions<dxTooltip> {
+    }
+    /** The Tooltip widget displays a tooltip for a specified element on the page. */
+    export class dxTooltip extends dxPopover {
+        constructor(element: Element, options?: dxTooltipOptions)
+        constructor(element: JQuery, options?: dxTooltipOptions)
+    }
+    
+    export interface dxTrackBarOptions<T = dxTrackBar> extends EditorOptions<T> {
+        /** The maximum value the widget can accept. */
+        max?: number;
+        /** The minimum value the widget can accept. */
+        min?: number;
+    }
+    /** A base class for track bar widgets. */
+    export class dxTrackBar extends Editor {
+        constructor(element: Element, options?: dxTrackBarOptions)
+        constructor(element: JQuery, options?: dxTrackBarOptions)
+    }
+    
+    export interface dxTreeListOptions extends GridBaseOptions<dxTreeList> {
+        /** Specifies whether all rows are expanded initially. */
+        autoExpandAll?: boolean;
+        /** Configures columns. */
+        columns?: Array<dxTreeListColumn | string>;
+        /** Customizes columns after they are created. */
+        customizeColumns?: ((columns: Array<dxTreeListColumn>) => any);
+        /** Notifies the widget of the used data structure. */
+        dataStructure?: 'plain' | 'tree';
+        /** Configures editing. */
+        editing?: dxTreeListEditing;
+        /** Specifies whether nodes appear expanded or collapsed after filtering is applied. */
+        expandNodesOnFiltering?: boolean;
+        /** Specifies keys of the initially expanded rows. */
+        expandedRowKeys?: Array<any>;
+        /** Specifies whether to show filtered rows with ancestors and descendants (full branch) or with ancestors only. */
+        filterMode?: 'fullBranch' | 'withAncestors';
+        /** Specifies which data field defines whether the node has children. */
+        hasItemsExpr?: string | Function;
+        /** Specifies which data field contains nested items. Set this option when your data has a hierarchical structure. */
+        itemsExpr?: string | Function;
+        /** Specifies which data field provides keys for nodes. */
+        keyExpr?: string | Function;
+        /** A function that is executed when a cell is clicked or tapped. Executed before onRowClick. */
+        onCellClick?: ((e: { component?: dxTreeList, element?: DevExpress.core.dxElement, model?: any, jQueryEvent?: JQueryEventObject, event?: event, data?: any, key?: any, value?: any, displayValue?: any, text?: string, columnIndex?: number, column?: any, rowIndex?: number, rowType?: string, cellElement?: DevExpress.core.dxElement, row?: dxTreeListRowObject }) => any) | string;
+        /** A function that is executed when a cell is double-clicked or double-tapped. Executed before onRowDblClick. */
+        onCellDblClick?: ((e: { component?: dxTreeList, element?: DevExpress.core.dxElement, model?: any, event?: event, data?: any, key?: any, value?: any, displayValue?: any, text?: string, columnIndex?: number, column?: dxTreeListColumn, rowIndex?: number, rowType?: string, cellElement?: DevExpress.core.dxElement, row?: dxTreeListRowObject }) => any);
+        /** A function that is executed after the pointer enters or leaves a cell. */
+        onCellHoverChanged?: ((e: { component?: dxTreeList, element?: DevExpress.core.dxElement, model?: any, eventType?: string, data?: any, key?: any, value?: any, text?: string, displayValue?: any, columnIndex?: number, rowIndex?: number, column?: dxTreeListColumn, rowType?: string, cellElement?: DevExpress.core.dxElement, row?: dxTreeListRowObject }) => any);
+        /** A function that is executed after a grid cell is created. */
+        onCellPrepared?: ((e: { component?: dxTreeList, element?: DevExpress.core.dxElement, model?: any, data?: any, key?: any, value?: any, displayValue?: any, text?: string, columnIndex?: number, column?: dxTreeListColumn, rowIndex?: number, rowType?: string, row?: dxTreeListRowObject, isSelected?: boolean, isExpanded?: boolean, cellElement?: DevExpress.core.dxElement, watch?: Function, oldValue?: any }) => any);
+        /** A function that is executed before the context menu is rendered. */
+        onContextMenuPreparing?: ((e: { component?: dxTreeList, element?: DevExpress.core.dxElement, model?: any, items?: Array<any>, target?: string, targetElement?: DevExpress.core.dxElement, columnIndex?: number, column?: dxTreeListColumn, rowIndex?: number, row?: dxTreeListRowObject }) => any);
+        /** A function that is executed before a cell or row switches to the editing state. */
+        onEditingStart?: ((e: { component?: dxTreeList, element?: DevExpress.core.dxElement, model?: any, data?: any, key?: any, cancel?: boolean, column?: any }) => any);
+        /** A function that is executed after an editor is created. */
+        onEditorPrepared?: ((options: { component?: dxTreeList, element?: DevExpress.core.dxElement, model?: any, parentType?: string, value?: any, setValue?: any, updateValueTimeout?: number, width?: number, disabled?: boolean, rtlEnabled?: boolean, editorElement?: DevExpress.core.dxElement, readOnly?: boolean, dataField?: string, row?: dxTreeListRowObject }) => any);
+        /** A function that is executed before a cell's editor is created. Not executed for cells with an editCellTemplate. */
+        onEditorPreparing?: ((e: { component?: dxTreeList, element?: DevExpress.core.dxElement, model?: any, parentType?: string, value?: any, setValue?: any, updateValueTimeout?: number, width?: number, disabled?: boolean, rtlEnabled?: boolean, cancel?: boolean, editorElement?: DevExpress.core.dxElement, readOnly?: boolean, editorName?: string, editorOptions?: any, dataField?: string, row?: dxTreeListRowObject }) => any);
+        /** A function that is executed after the focused cell changes. */
+        onFocusedCellChanged?: ((e: { component?: dxTreeList, element?: DevExpress.core.dxElement, model?: any, cellElement?: DevExpress.core.dxElement, columnIndex?: number, rowIndex?: number, row?: dxTreeListRowObject, column?: dxTreeListColumn }) => any);
+        /** A function that is executed before the focused cell changes. */
+        onFocusedCellChanging?: ((e: { component?: dxTreeList, element?: DevExpress.core.dxElement, model?: any, cellElement?: DevExpress.core.dxElement, prevColumnIndex?: number, prevRowIndex?: number, newColumnIndex?: number, newRowIndex?: number, event?: event, rows?: Array<dxTreeListRowObject>, columns?: Array<dxTreeListColumn>, cancel?: boolean, isHighlighted?: boolean }) => any);
+        /** A function that executed when the focused row changes. Applies only when focusedRowEnabled is true. */
+        onFocusedRowChanged?: ((e: { component?: dxTreeList, element?: DevExpress.core.dxElement, model?: any, rowElement?: DevExpress.core.dxElement, rowIndex?: number, row?: dxTreeListRowObject }) => any);
+        /** A function that is executed before the focused row changes. Applies only when focusedRowEnabled is true. */
+        onFocusedRowChanging?: ((e: { component?: dxTreeList, element?: DevExpress.core.dxElement, model?: any, rowElement?: DevExpress.core.dxElement, prevRowIndex?: number, newRowIndex?: number, event?: event, rows?: Array<dxTreeListRowObject>, cancel?: boolean }) => any);
+        /** A function that is executed after the loaded nodes are initialized. */
+        onNodesInitialized?: ((e: { component?: dxTreeList, element?: DevExpress.core.dxElement, model?: any, root?: dxTreeListNode }) => any);
+        /** A function that is executed when a grid row is clicked or tapped. */
+        onRowClick?: ((e: { component?: dxTreeList, element?: DevExpress.core.dxElement, model?: any, jQueryEvent?: JQueryEventObject, event?: event, data?: any, key?: any, values?: Array<any>, columns?: Array<any>, rowIndex?: number, rowType?: string, isSelected?: boolean, isExpanded?: boolean, rowElement?: DevExpress.core.dxElement, handled?: boolean }) => any) | string;
+        /** A function that is executed when a row is double-clicked or double-tapped. Executed after onCellDblClick. */
+        onRowDblClick?: ((e: { component?: dxTreeList, element?: DevExpress.core.dxElement, model?: any, event?: event, data?: any, key?: any, values?: Array<any>, columns?: Array<dxTreeListColumn>, rowIndex?: number, rowType?: string, isSelected?: boolean, isExpanded?: boolean, rowElement?: DevExpress.core.dxElement }) => any);
+        /** A function that is executed after a row is created. */
+        onRowPrepared?: ((e: { component?: dxTreeList, element?: DevExpress.core.dxElement, model?: any, data?: any, key?: any, values?: Array<any>, columns?: Array<dxTreeListColumn>, rowIndex?: number, rowType?: string, isSelected?: boolean, isExpanded?: boolean, rowElement?: DevExpress.core.dxElement }) => any);
+        /** Configures paging. */
+        paging?: dxTreeListPaging;
+        /** Specifies which data field provides parent keys. */
+        parentIdExpr?: string | Function;
+        /** Notifies the TreeList of the server's data processing operations. Applies only if data has a plain structure. */
+        remoteOperations?: { filtering?: boolean, grouping?: boolean, sorting?: boolean } | 'auto';
+        /** Specifies the root node's identifier. Applies if dataStructure is "plain". */
+        rootValue?: any;
+        /** Configures scrolling. */
+        scrolling?: dxTreeListScrolling;
+        /** Configures runtime selection. */
+        selection?: dxTreeListSelection;
+    }
+    /** Configures editing. */
+    export interface dxTreeListEditing extends GridBaseEditing {
+        /** Specifies whether a user can add new rows. It is called for each data row when defined as a function. */
+        allowAdding?: boolean | ((options: { component?: dxTreeList, row?: dxTreeListRowObject }) => boolean);
+        /** Specifies whether a user can delete rows. It is called for each data row when defined as a function. */
+        allowDeleting?: boolean | ((options: { component?: dxTreeList, row?: dxTreeListRowObject }) => boolean);
+        /** Specifies whether a user can update rows. It is called for each data row when defined as a function */
+        allowUpdating?: boolean | ((options: { component?: dxTreeList, row?: dxTreeListRowObject }) => boolean);
+        /** Contains options that specify texts for editing-related UI elements. */
+        texts?: dxTreeListEditingTexts;
+    }
+    /** Contains options that specify texts for editing-related UI elements. */
+    export interface dxTreeListEditingTexts extends GridBaseEditingTexts {
+        /** Specifies text for the button that adds a new nested row. Applies if the editing.mode is "batch" or "cell". */
+        addRowToNode?: string;
+    }
+    /** Configures paging. */
+    export interface dxTreeListPaging extends GridBasePaging {
+        /** Enables paging. */
+        enabled?: boolean;
+    }
+    /** Configures scrolling. */
+    export interface dxTreeListScrolling extends GridBaseScrolling {
+        /** Specifies the scrolling mode. */
+        mode?: 'standard' | 'virtual';
+    }
+    /** Configures runtime selection. */
+    export interface dxTreeListSelection extends GridBaseSelection {
+        /** Specifies whether selection is recursive. */
+        recursive?: boolean;
+    }
+    /** The TreeList is a widget that represents data from a local or remote source in the form of a multi-column tree view. This widget offers such features as sorting, filtering, editing, selection, etc. */
+    export class dxTreeList extends GridBase {
+        constructor(element: Element, options?: dxTreeListOptions)
+        constructor(element: JQuery, options?: dxTreeListOptions)
+        /** Adds a new column. */
+        addColumn(columnOptions: any | string): void;
+        /** Adds an empty data row to the highest hierarchical level. */
+        addRow(): void;
+        /** Adds an empty data row to a specified parent row. */
+        addRow(parentId: any): void;
+        /** Collapses a row with a specific key. */
+        collapseRow(key: any): Promise<void> & JQueryPromise<void>;
+        /** Expands a row with a specific key. */
+        expandRow(key: any): Promise<void> & JQueryPromise<void>;
+        /** Performs a pre-order tree traversal, executing a function on each visited node. Starts traversing from the top level nodes. */
+        forEachNode(callback: Function): void;
+        /** Performs a pre-order tree traversal, executing a function on each visited node. Starts traversing from the specified nodes. */
+        forEachNode(nodes: Array<dxTreeListNode>, callback: Function): void;
+        /** Gets a node with a specific key. */
+        getNodeByKey(key: any | string | number): dxTreeListNode;
+        /** Gets the root node. */
+        getRootNode(): dxTreeListNode;
+        /** Gets the keys of the rows selected explicitly via the API or via a click or tap. */
+        getSelectedRowKeys(): Array<any>;
+        /** @deprecated Use the [getSelectedRowKeys(mode)](/Documentation/ApiReference/UI_Widgets/dxTreeList/Methods/#getSelectedRowKeysmode) method instead. */
+        /** Gets the selected rows' keys. */
+        getSelectedRowKeys(leavesOnly: boolean): Array<any>;
+        /** Gets the selected rows' keys. */
+        getSelectedRowKeys(mode: string): Array<any>;
+        /** Gets the data objects of the rows selected explicitly via the API or via a click or tap. */
+        getSelectedRowsData(): Array<any>;
+        /** Gets the selected rows' data objects. */
+        getSelectedRowsData(mode: string): Array<any>;
+        /** Gets all visible columns. */
+        getVisibleColumns(): Array<dxTreeListColumn>;
+        /** Gets all visible columns at a specific hierarchical level of column headers. Use it to access banded columns. */
+        getVisibleColumns(headerLevel: number): Array<dxTreeListColumn>;
+        /** Gets currently rendered rows. */
+        getVisibleRows(): Array<dxTreeListRowObject>;
+        /** Checks whether a row is expanded or collapsed. */
+        isRowExpanded(key: any): boolean;
+        /** Loads all root node descendants (all data items). Takes effect only if data has the plain structure and remoteOperations | filtering is true. */
+        loadDescendants(): Promise<void> & JQueryPromise<void>;
+        /** Loads a specific node's descendants. Takes effect only if data has the plain structure and remoteOperations | filtering is true. */
+        loadDescendants(keys: Array<any>): Promise<void> & JQueryPromise<void>;
+        /** Loads all or only direct descendants of specific nodes. Takes effect only if data has the plain structure and remoteOperations | filtering is true. */
+        loadDescendants(keys: Array<any>, childrenOnly: boolean): Promise<void> & JQueryPromise<void>;
+    }
+    
+    export interface dxTreeListColumn extends GridBaseColumn {
+        /** Allows you to customize buttons in the editing column or create a custom command column. Applies only if the column's type is "buttons". */
+        buttons?: Array<'add' | 'cancel' | 'delete' | 'edit' | 'save' | 'undelete' | dxTreeListColumnButton>;
+        /** Configures columns. */
+        columns?: Array<dxTreeListColumn | string>;
+        /** Specifies the command column that this object customizes. */
+        type?: 'adaptive' | 'buttons';
+    }
+    /** Allows you to customize buttons in the editing column or create a custom command column. Applies only if the column's type is "buttons". */
+    export interface dxTreeListColumnButton extends GridBaseColumnButton {
+        /** The name used to identify a built-in button. */
+        name?: 'add' | 'cancel' | 'delete' | 'edit' | 'save' | 'undelete' | string;
+        /** A function that is executed when the button is clicked or tapped. */
+        onClick?: ((e: { component?: dxTreeList, element?: DevExpress.core.dxElement, model?: any, event?: event, row?: dxTreeListRowObject, column?: dxTreeListColumn }) => any) | string;
+        /** Specifies a custom button template. */
+        template?: template | ((cellElement: DevExpress.core.dxElement, cellInfo: { component?: dxTreeList, data?: any, key?: any, columnIndex?: number, column?: dxTreeListColumn, rowIndex?: number, rowType?: string, row?: dxTreeListRowObject }) => string | Element | JQuery);
+        /** Specifies the button's visibility. */
+        visible?: boolean | ((options: { component?: dxTreeList, row?: dxTreeListRowObject, column?: dxTreeListColumn }) => boolean);
+    }
+    /** A TreeList node's structure. */
+    export interface dxTreeListNode {
+        /** Contains all child nodes. */
+        children?: Array<dxTreeListNode>;
+        /** The node's data object. */
+        data?: any;
+        /** Indicates whether the node has child nodes. */
+        hasChildren?: boolean;
+        /** The node's key. */
+        key?: any;
+        /** The node's hierarchical level. */
+        level?: number;
+        /** The parent node. */
+        parent?: dxTreeListNode;
+        /** Indicates whether the node is visualized as a row. */
+        visible?: boolean;
+    }
+    /** The TreeList row object's structure. */
+    export interface dxTreeListRowObject {
+        /** Indicates whether the row is in the editing state. */
+        isEditing?: boolean;
+        /** Indicates whether the row is expanded or collapsed. Available if rowType is "data" or "detail". */
+        isExpanded?: boolean;
+        /** Indicates whether the row is selected. Available if rowType is "data" or "detail". */
+        isSelected?: boolean;
+        /** The row's key. Available if rowType is "data", "detail" or "detailAdaptive". */
+        key?: any;
+        /** The row's hierarchical level. Available if rowType is "data" or "detail". */
+        level?: number;
+        /** The row's node. Available if rowType is "data" or "detail". */
+        node?: dxTreeListNode;
+        /** The row's visible index. This index is zero-based and available if rowType is "data", "detail" or "detailAdaptive". */
+        rowIndex?: number;
+        /** The row's type. */
+        rowType?: string;
+        /** Values displayed in the row's cells. */
+        values?: Array<any>;
+    }
+    
+    export interface dxTreeViewOptions extends HierarchicalCollectionWidgetOptions<dxTreeView>, SearchBoxMixinOptions<dxTreeView> {
+        /** Specifies whether or not to animate item collapsing and expanding. */
+        animationEnabled?: boolean;
+        /** Allows you to load nodes. Applies if the dataStructure is "plain" and the dataSource and items are undefined. */
+        createChildren?: ((parentNode: dxTreeViewNode) => Promise<any> | JQueryPromise<any> | Array<any>);
+        /** Notifies the widget of the used data structure. */
+        dataStructure?: 'plain' | 'tree';
+        /** Specifies whether or not a user can expand all tree view items by the "*" hot key. */
+        expandAllEnabled?: boolean;
+        /** Specifies the event on which to expand/collapse a node. */
+        expandEvent?: 'dblclick' | 'click';
+        /** Specifies whether or not all parent nodes of an initially expanded node are displayed expanded. */
+        expandNodesRecursive?: boolean;
+        /** Specifies which data source field specifies whether an item is expanded. */
+        expandedExpr?: string | Function;
+        /** Specifies the name of the data source item field whose value defines whether or not the corresponding node includes child nodes. */
+        hasItemsExpr?: string | Function;
+        /** An array of items displayed by the widget. */
+        items?: Array<dxTreeViewItem>;
+        /** A function that is executed when a collection item is clicked or tapped. */
+        onItemClick?: ((e: { component?: dxTreeView, element?: DevExpress.core.dxElement, model?: any, itemData?: any, itemElement?: DevExpress.core.dxElement, itemIndex?: number | any, jQueryEvent?: JQueryEventObject, event?: event, node?: dxTreeViewNode }) => any);
+        /** A function that is executed when a tree view item is collapsed. */
+        onItemCollapsed?: ((e: { component?: dxTreeView, element?: DevExpress.core.dxElement, model?: any, itemData?: any, itemElement?: DevExpress.core.dxElement, itemIndex?: number, jQueryEvent?: JQueryEventObject, event?: event, node?: dxTreeViewNode }) => any);
+        /** A function that is executed when a collection item is right-clicked or pressed. */
+        onItemContextMenu?: ((e: { component?: dxTreeView, element?: DevExpress.core.dxElement, model?: any, itemData?: any, itemElement?: DevExpress.core.dxElement, itemIndex?: number | any, jQueryEvent?: JQueryEventObject, event?: event, node?: dxTreeViewNode }) => any);
+        /** A function that is executed when a tree view item is expanded. */
+        onItemExpanded?: ((e: { component?: dxTreeView, element?: DevExpress.core.dxElement, model?: any, itemData?: any, itemElement?: DevExpress.core.dxElement, itemIndex?: number, jQueryEvent?: JQueryEventObject, event?: event, node?: dxTreeViewNode }) => any);
+        /** A function that is executed when a collection item has been held for a specified period. */
+        onItemHold?: ((e: { component?: dxTreeView, element?: DevExpress.core.dxElement, model?: any, itemData?: any, itemElement?: DevExpress.core.dxElement, itemIndex?: number, event?: event, node?: dxTreeViewNode }) => any);
+        /** A function that is executed after a collection item is rendered. */
+        onItemRendered?: ((e: { component?: dxTreeView, element?: DevExpress.core.dxElement, model?: any, itemData?: any, itemElement?: DevExpress.core.dxElement, itemIndex?: number, node?: dxTreeViewNode }) => any);
+        /** A function that is executed when a tree view item is selected or selection is canceled. */
+        onItemSelectionChanged?: ((e: { component?: dxTreeView, element?: DevExpress.core.dxElement, model?: any, node?: dxTreeViewNode, itemElement?: DevExpress.core.dxElement }) => any);
+        /** A function that is executed when the "Select All" check box value is changed. Applies only if showCheckBoxesMode is "selectAll" and selectionMode is "multiple". */
+        onSelectAllValueChanged?: ((e: { component?: dxTreeView, element?: DevExpress.core.dxElement, model?: any, value?: boolean }) => any);
+        /** A function that is executed when a tree view item is selected or selection is canceled. */
+        onSelectionChanged?: ((e: { component?: dxTreeView, element?: DevExpress.core.dxElement, model?: any }) => any);
+        /** Specifies the name of the data source item field for holding the parent key of the corresponding node. */
+        parentIdExpr?: string | Function;
+        /** Specifies the parent ID value of the root item. */
+        rootValue?: any;
+        /** A string value specifying available scrolling directions. */
+        scrollDirection?: 'both' | 'horizontal' | 'vertical';
+        /** Specifies the text displayed at the "Select All" check box. */
+        selectAllText?: string;
+        /** Specifies whether or not an item becomes selected if a user clicks it. */
+        selectByClick?: boolean;
+        /** Specifies whether or not to select nodes recursively. */
+        selectNodesRecursive?: boolean;
+        /** Specifies item selection mode. */
+        selectionMode?: 'multiple' | 'single';
+        /** Specifies the current check boxes display mode. */
+        showCheckBoxesMode?: 'none' | 'normal' | 'selectAll';
+        /** Specifies if the virtual mode is enabled. */
+        virtualModeEnabled?: boolean;
+    }
+    /** The TreeView widget is a tree-like representation of textual data. */
+    export class dxTreeView extends HierarchicalCollectionWidget {
+        constructor(element: Element, options?: dxTreeViewOptions)
+        constructor(element: JQuery, options?: dxTreeViewOptions)
+        /** Collapses all items. */
+        collapseAll(): void;
+        /** Collapses an item with a specific key. */
+        collapseItem(itemData: any): void;
+        /** Collapses an item found using its DOM node. */
+        collapseItem(itemElement: Element): void;
+        /** Collapses an item with a specific key. */
+        collapseItem(key: any): void;
+        /** Expands all items. If you load items on demand, this method expands only the loaded items. */
+        expandAll(): void;
+        /** Expands an item found using its data object. */
+        expandItem(itemData: any): void;
+        /** Expands an item found using its DOM node. */
+        expandItem(itemElement: Element): void;
+        /** Expands an item with a specific key. */
+        expandItem(key: any): void;
+        /** Gets all nodes. */
+        getNodes(): Array<dxTreeViewNode>;
+        /** Selects all items. */
+        selectAll(): void;
+        /** Selects an item found using its data object. */
+        selectItem(itemData: any): void;
+        /** Selects an item found using its DOM node. */
+        selectItem(itemElement: Element): void;
+        /** Selects an item with a specific key. */
+        selectItem(key: any): void;
+        /** Cancels the selection of all items. */
+        unselectAll(): void;
+        /** Cancels the selection of an item found using its data object. */
+        unselectItem(itemData: any): void;
+        /** Cancels the selection of an item found using its DOM node. */
+        unselectItem(itemElement: Element): void;
+        /** Cancels the selection of an item with a specific key. */
+        unselectItem(key: any): void;
+        /** Updates the tree view scrollbars according to the current size of the widget content. */
+        updateDimensions(): Promise<void> & JQueryPromise<void>;
+    }
+    /** This section lists the data source fields that are used in a default item template. */
+    export interface dxTreeViewItem extends CollectionWidgetItem {
+        /** Specifies whether or not the tree view item is displayed expanded. */
+        expanded?: boolean;
+        /** Specifies whether or not the tree view item has children. */
+        hasItems?: boolean;
+        /** Specifies the tree view item's icon. */
+        icon?: string;
+        /** Holds an array of tree view items. */
+        items?: Array<dxTreeViewItem>;
+        /** Holds the key of the parent item. */
+        parentId?: number | string;
+        /** Specifies whether or not the tree view item is displayed selected. */
+        selected?: boolean;
+    }
+    /** A TreeView node. */
+    export interface dxTreeViewNode {
+        /** Contains all the child nodes of the current node. */
+        children?: Array<dxTreeViewNode>;
+        /** Equals to true if the node is disabled; otherwise false. */
+        disabled?: boolean;
+        /** Equals true if the node is expanded; false if collapsed. */
+        expanded?: boolean;
+        /** Contains the data source object corresponding to the node. */
+        itemData?: any;
+        /** Contains the key value of the node. */
+        key?: any;
+        /** Refers to the parent node of the current node. */
+        parent?: dxTreeViewNode;
+        /** Equals to true if the node is selected; false if not. */
+        selected?: boolean;
+        /** Contains the text displayed by the node. */
+        text?: string;
+    }
+    
+    export interface dxValidationGroupOptions extends DOMComponentOptions<dxValidationGroup> {
+    }
+    /** The ValidationGroup is a widget that allows you to validate several editors simultaneously. */
+    export class dxValidationGroup extends DOMComponent {
+        constructor(element: Element, options?: dxValidationGroupOptions)
+        constructor(element: JQuery, options?: dxValidationGroupOptions)
+        /** Resets the value and validation result of the editors that are included to the current validation group. */
+        reset(): void;
+        /** Validates rules of the validators that belong to the current validation group. */
+        validate(): dxValidationGroupResult;
+    }
+    /** A group validation result. */
+    export interface dxValidationGroupResult {
+        /** Rules that failed to pass the check. */
+        brokenRules?: Array<RequiredRule | NumericRule | RangeRule | StringLengthRule | CustomRule | CompareRule | PatternRule | EmailRule>;
+        /** Indicates whether all the rules checked for the group are satisfied. */
+        isValid?: boolean;
+        /** Validator widgets included in the validated group. */
+        validators?: Array<any>;
+    }
+    
+    export interface dxValidationSummaryOptions extends CollectionWidgetOptions<dxValidationSummary> {
+        /** Specifies the validation group for which summary should be generated. */
+        validationGroup?: string;
+    }
+    /** A widget for displaying the result of checking validation rules for editors. */
+    export class dxValidationSummary extends CollectionWidget {
+        constructor(element: Element, options?: dxValidationSummaryOptions)
+        constructor(element: JQuery, options?: dxValidationSummaryOptions)
+    }
+    
+    export interface dxValidatorOptions extends DOMComponentOptions<dxValidator> {
+        /** An object that specifies what and when to validate, and how to apply the validation result. */
+        adapter?: { applyValidationResults?: Function, bypass?: Function, focus?: Function, getValue?: Function, reset?: Function, validationRequestsCallbacks?: Array<Function> | JQueryCallback };
+        /** Specifies the editor name to be used in the validation default messages. */
+        name?: string;
+        /** A function that is executed after a value is validated. */
+        onValidated?: ((validatedInfo: { name?: string, isValid?: boolean, value?: any, validationRules?: Array<RequiredRule | NumericRule | RangeRule | StringLengthRule | CustomRule | CompareRule | PatternRule | EmailRule>, brokenRule?: RequiredRule | NumericRule | RangeRule | StringLengthRule | CustomRule | CompareRule | PatternRule | EmailRule }) => any);
+        /** Specifies the validation group the editor will be related to. */
+        validationGroup?: string;
+        /** An array of validation rules to be checked for the editor with which the dxValidator object is associated. */
+        validationRules?: Array<RequiredRule | NumericRule | RangeRule | StringLengthRule | CustomRule | CompareRule | PatternRule | EmailRule>;
+    }
+    /** A widget that is used to validate the associated DevExtreme editors against the defined validation rules. */
+    export class dxValidator extends DOMComponent {
+        constructor(element: Element, options?: dxValidatorOptions)
+        constructor(element: JQuery, options?: dxValidatorOptions)
+        /** Sets focus to the editor associated with the current Validator object. */
+        focus(): void;
+        /** Resets the value and validation result of the editor associated with the current Validator object. */
+        reset(): void;
+        /** Validates the value of the editor that is controlled by the current Validator object against the list of the specified validation rules. */
+        validate(): dxValidatorResult;
+    }
+    /** A validation result. */
+    export interface dxValidatorResult {
+        /** A rule that failed to pass the check. */
+        brokenRule?: RequiredRule | NumericRule | RangeRule | StringLengthRule | CustomRule | CompareRule | PatternRule | EmailRule;
+        /** Indicates whether all the checked rules are satisfied. */
+        isValid?: boolean;
+        /** Validation rules specified for the Validator. */
+        validationRules?: Array<RequiredRule | NumericRule | RangeRule | StringLengthRule | CustomRule | CompareRule | PatternRule | EmailRule>;
+        /** The value being validated. */
+        value?: any;
+    }
+    /** Formats values. */
+    export type format = 'billions' | 'currency' | 'day' | 'decimal' | 'exponential' | 'fixedPoint' | 'largeNumber' | 'longDate' | 'longTime' | 'millions' | 'millisecond' | 'month' | 'monthAndDay' | 'monthAndYear' | 'percent' | 'quarter' | 'quarterAndYear' | 'shortDate' | 'shortTime' | 'thousands' | 'trillions' | 'year' | 'dayOfWeek' | 'hour' | 'longDateLongTime' | 'minute' | 'second' | 'shortDateShortTime' | string | ((value: number | Date) => string) | { currency?: string, formatter?: ((value: number | Date) => string), parser?: ((value: string) => number | Date), precision?: number, type?: 'billions' | 'currency' | 'day' | 'decimal' | 'exponential' | 'fixedPoint' | 'largeNumber' | 'longDate' | 'longTime' | 'millions' | 'millisecond' | 'month' | 'monthAndDay' | 'monthAndYear' | 'percent' | 'quarter' | 'quarterAndYear' | 'shortDate' | 'shortTime' | 'thousands' | 'trillions' | 'year' | 'dayOfWeek' | 'hour' | 'longDateLongTime' | 'minute' | 'second' | 'shortDateShortTime' };
+    /** A template notation used to specify templates for widget elements. */
+    export type template = string | Function | Element | JQuery;
+    /** An object that serves as a namespace for methods displaying a message in an application/site. */
+    export class dialog {
+        /** Displays an alert dialog with a message and OK button. */
+        static alert(messageHtml: string, title: string): Promise<void> & JQueryPromise<void>;
+        /** Creates a confirmation dialog with a message and Yes and No buttons. */
+        static confirm(messageHtml: string, title: string): Promise<boolean> & JQueryPromise<boolean>;
+        /** Creates a dialog with custom buttons. */
+        static custom(options: { title?: string, messageHtml?: string, buttons?: Array<dxButtonOptions>, showTitle?: boolean, message?: string }): any;
+    }
+    /** An object that serves as a namespace for the methods that work with DevExtreme CSS Themes. */
+    export class themes {
+        /** Gets the current theme's name. */
+        static current(): string;
+        /** Sets a theme with a specific name. */
+        static current(themeName: string): void;
+        /** Specifies a function to be executed after the theme is loaded. */
+        static ready(callback: Function): void;
+    }
+}
 declare module DevExpress.data {
     
     export interface ArrayStoreOptions<T = ArrayStore> extends StoreOptions<T> {
@@ -883,7 +5313,7 @@ declare module DevExpress.data {
         onLoadError?: ((error: any) => any);
         /** A function that is executed when the data loading status changes. */
         onLoadingChanged?: ((isLoading: boolean) => any);
-        /** Specifies whether the PivotGridDataSource should load data in portions. */
+        /** Specifies whether the PivotGridDataSource should load data in portions. Can be used only with an XmlaStore. */
         paginate?: boolean;
         /** Specifies whether the data processing operations (filtering, grouping, summary calculation) should be performed on the server. */
         remoteOperations?: boolean;
@@ -1197,9 +5627,9 @@ declare module DevExpress.viz {
         /** A function that is executed when a series point is selected or selection is canceled. */
         onPointSelectionChanged?: ((e: { component?: any, element?: any, target?: basePointObject }) => any);
         /** A function that is executed when a tooltip becomes hidden. */
-        onTooltipHidden?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, target?: basePointObject }) => any);
+        onTooltipHidden?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, target?: basePointObject | dxChartAnnotationConfig | any }) => any);
         /** A function that is executed when a tooltip appears. */
-        onTooltipShown?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, target?: basePointObject }) => any);
+        onTooltipShown?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, target?: basePointObject | dxChartAnnotationConfig | any }) => any);
         /** Sets the palette to be used for colorizing series and their elements. */
         palette?: Array<string> | 'Bright' | 'Default' | 'Harmony Light' | 'Ocean' | 'Pastel' | 'Soft' | 'Soft Pastel' | 'Vintage' | 'Violet' | 'Carmine' | 'Dark Moon' | 'Dark Violet' | 'Green Mist' | 'Soft Blue' | 'Material' | 'Office';
         /** Specifies what to do with colors in the palette when their number is less than the number of series (in the Chart widget) or points in a series (in the PieChart widget). */
@@ -2005,7 +6435,7 @@ declare module DevExpress.viz {
     export interface dxChartOptions extends BaseChartOptions<dxChart> {
         /** Specifies whether to adjust the value axis's visualRange when the argument axis is being zoomed or panned. */
         adjustOnZoom?: boolean;
-        
+        /** Specifies the annotation collection. */
         annotations?: Array<dxChartAnnotationConfig | any>;
         /** Configures the argument axis. */
         argumentAxis?: dxChartArgumentAxis;
@@ -2018,7 +6448,7 @@ declare module DevExpress.viz {
         /** @deprecated Use CommonSeries.barPadding instead. */
         /** Controls the width of bars in the widget. Applies only to bar-like series and when the equalBarWidth option is true. */
         barWidth?: number;
-        
+        /** Specifies settings common for all annotations in the chart. */
         commonAnnotationSettings?: dxChartCommonAnnotationConfig;
         /** Defines common settings for both the argument and value axis in a chart. */
         commonAxisSettings?: dxChartCommonAxisSettings;
@@ -2030,7 +6460,7 @@ declare module DevExpress.viz {
         containerBackgroundColor?: string;
         /** Configures the crosshair feature. */
         crosshair?: { color?: string, dashStyle?: 'dash' | 'dot' | 'longDash' | 'solid', enabled?: boolean, horizontalLine?: { color?: string, dashStyle?: 'dash' | 'dot' | 'longDash' | 'solid', label?: { backgroundColor?: string, customizeText?: ((info: { value?: Date | number | string, valueText?: string, point?: chartPointObject }) => string), font?: Font, format?: DevExpress.ui.format, visible?: boolean }, opacity?: number, visible?: boolean, width?: number } | boolean, label?: { backgroundColor?: string, customizeText?: ((info: { value?: Date | number | string, valueText?: string, point?: chartPointObject }) => string), font?: Font, format?: DevExpress.ui.format, visible?: boolean }, opacity?: number, verticalLine?: { color?: string, dashStyle?: 'dash' | 'dot' | 'longDash' | 'solid', label?: { backgroundColor?: string, customizeText?: ((info: { value?: Date | number | string, valueText?: string, point?: chartPointObject }) => string), font?: Font, format?: DevExpress.ui.format, visible?: boolean }, opacity?: number, visible?: boolean, width?: number } | boolean, width?: number };
-        
+        /** Customizes an individual annotation. */
         customizeAnnotation?: ((annotationItem: dxChartAnnotationConfig | any) => dxChartAnnotationConfig);
         /** Processes data before visualizing it. */
         dataPrepareSettings?: { checkTypeForAllData?: boolean, convertToAxisDataType?: boolean, sortingMethod?: boolean | ((a: any, b: any) => number) };
@@ -2566,56 +6996,60 @@ declare module DevExpress.viz {
     }
     
     export interface dxChartAnnotationConfig extends dxChartCommonAnnotationConfig {
-        
+        /** Specifies the annotation's name. */
         name?: string;
     }
     
     export interface dxChartCommonAnnotationConfig {
-        
+        /** Positions the annotation relative to a specific argument. */
         argument?: number | Date | string;
-        
+        /** Specifies the length of the annotation's arrow in pixels. */
         arrowLength?: number;
-        
+        /** Specifies the width of the annotation's arrow at its junction with the annotation rectangle. */
         arrowWidth?: number;
-        
+        /** Specifies the name of the value axis on which the value is specified. Useful for a multi-axis chart. */
         axis?: string;
-        
+        /** Configures the appearance of the annotation's border. */
         border?: { color?: string, dashStyle?: 'dash' | 'dot' | 'longDash' | 'solid', opacity?: number, visible?: boolean, width?: number };
-        
+        /** Specifies the color that fills the annotation. */
         color?: string;
-        
+        /** Customizes the text and appearance of the annotation's tooltip. */
         customizeTooltip?: ((annotationItem: dxChartAnnotationConfig | any) => any);
-        
+        /** Specifies the annotation's description displayed in the tooltip. */
         description?: string;
-        
+        /** Specifies the annotation's font options. Applies only to text annotations. */
         font?: Font;
-        
+        /** Specifies the annotation's height in pixels. */
         height?: number;
-        
+        /** Configures the image to be displayed in the annotation. Applies only if the type is "image". */
         image?: string | { height?: number, url?: string, width?: number };
-        
+        /** Specifies the annotation's opacity. */
         opacity?: number;
-        
+        /** Along with paddingTopBottom, generates an empty space around the annotation's text or image; specified in pixels. */
         paddingLeftRight?: number;
-        
+        /** Along with paddingLeftRight, generates an empty space around the annotation's text or image; specified in pixels. */
         paddingTopBottom?: number;
-        
+        /** Anchors the annotation to a series point. Accepts the name of the point's series. */
         series?: string;
-        
+        /** Configures the annotation's shadows. */
         shadow?: { blur?: number, color?: string, offsetX?: number, offsetY?: number, opacity?: number };
-        
+        /** Specifies the annotation's text. Applies only if the type is "text". */
         text?: string;
-        
+        /** Specifies what to do with the annotation's text when it overflows the allocated space after applying wordWrap: hide, truncate it and display an ellipsis, or do nothing. */
+        textOverflow?: 'ellipsis' | 'hide' | 'none';
+        /** Specifies whether the annotation tooltip is enabled. */
         tooltipEnabled?: boolean;
-        
+        /** Specifies whether the annotation displays a text or an image. This is a required setting. */
         type?: 'text' | 'image';
-        
+        /** Positions the annotation relative to a value on the specified value axis. */
         value?: number | Date | string;
-        
+        /** Specifies the annotation's width in pixels. */
         width?: number;
-        
+        /** Specifies how to wrap the annotation's text if it does not fit into a single line. */
+        wordWrap?: 'normal' | 'breakWord' | 'none';
+        /** Along with y, positions the annotation's center at a specific pixel coordinate. (0, 0) is the upper left corner of the chart. */
         x?: number;
-        
+        /** Along with x, positions the annotation's center at a specific pixel coordinate. (0, 0) is the upper left corner of the chart. */
         y?: number;
     }
     /** This section lists objects that define options used to configure series of specific types. */
@@ -3843,6 +8277,8 @@ declare module DevExpress.viz {
         label?: dxPolarChartArgumentAxisLabel;
         /** Specifies the value to be raised to a power when generating ticks for a logarithmic axis. */
         logarithmBase?: number;
+        /** Specifies the options of the minor ticks. */
+        minorTick?: dxPolarChartArgumentAxisMinorTick;
         /** Specifies the number of minor ticks between two neighboring major ticks. */
         minorTickCount?: number;
         /** Specifies the interval between minor ticks. */
@@ -3855,6 +8291,8 @@ declare module DevExpress.viz {
         startAngle?: number;
         /** Specifies options for argument axis strips. */
         strips?: Array<dxPolarChartArgumentAxisStrips>;
+        /** An object defining the configuration options for axis ticks. */
+        tick?: dxPolarChartArgumentAxisTick;
         /** Specifies an interval between axis ticks/grid lines. */
         tickInterval?: number | any | 'day' | 'hour' | 'millisecond' | 'minute' | 'month' | 'quarter' | 'second' | 'week' | 'year';
         /** Specifies the required type of the argument axis. */
@@ -3885,6 +8323,11 @@ declare module DevExpress.viz {
         /** Formats a value before it is displayed in an axis label. */
         format?: DevExpress.ui.format;
     }
+    /** Specifies the options of the minor ticks. */
+    export interface dxPolarChartArgumentAxisMinorTick extends dxPolarChartCommonAxisSettingsMinorTick {
+        /** Shifts minor ticks from the reference position. */
+        shift?: number;
+    }
     /** Specifies options for argument axis strips. */
     export interface dxPolarChartArgumentAxisStrips extends dxPolarChartCommonAxisSettingsStripStyle {
         /** Specifies a color for a strip. */
@@ -3900,6 +8343,11 @@ declare module DevExpress.viz {
     export interface dxPolarChartArgumentAxisStripsLabel extends dxPolarChartCommonAxisSettingsStripStyleLabel {
         /** Specifies the text displayed in a strip. */
         text?: string;
+    }
+    /** An object defining the configuration options for axis ticks. */
+    export interface dxPolarChartArgumentAxisTick extends dxPolarChartCommonAxisSettingsTick {
+        /** Shifts ticks from the reference position. */
+        shift?: number;
     }
     /** An object defining the configuration options that are common for all axes of the PolarChart widget. */
     export interface dxPolarChartCommonAxisSettings {
@@ -3922,7 +8370,7 @@ declare module DevExpress.viz {
         /** Specifies the options of the minor grid. */
         minorGrid?: { color?: string, opacity?: number, visible?: boolean, width?: number };
         /** Specifies the options of the minor ticks. */
-        minorTick?: { color?: string, length?: number, opacity?: number, visible?: boolean, width?: number };
+        minorTick?: dxPolarChartCommonAxisSettingsMinorTick;
         /** Specifies the opacity of the line that represents an axis. */
         opacity?: number;
         /** An object defining configuration options for strip style. */
@@ -3962,6 +8410,19 @@ declare module DevExpress.viz {
         overlappingBehavior?: 'none' | 'hide';
         /** Indicates whether or not axis labels are visible. */
         visible?: boolean;
+    }
+    /** Specifies the options of the minor ticks. */
+    export interface dxPolarChartCommonAxisSettingsMinorTick {
+        /** Specifies a color for the minor ticks. */
+        color?: string;
+        /** Specifies minor tick length. */
+        length?: number;
+        /** Specifies an opacity for the minor ticks. */
+        opacity?: number;
+        /** Indicates whether or not the minor ticks are displayed on an axis. */
+        visible?: boolean;
+        /** Specifies minor tick width. */
+        width?: number;
     }
     /** An object defining configuration options for strip style. */
     export interface dxPolarChartCommonAxisSettingsStripStyle {
@@ -4711,4361 +9172,6 @@ declare module DevExpress.viz {
     export class polarPointObject extends basePointObject {
     }
 }
-declare module DevExpress.ui {
-    /** Specifies dependency between the screen factor and the count of columns. */
-    export interface ColCountResponsible {
-        /** The count of columns for a large screen size. */
-        lg?: number;
-        /** The count of columns for a middle-sized screen. */
-        md?: number;
-        /** The count of columns for a small-sized screen. */
-        sm?: number;
-        /** The count of columns for an extra small-sized screen. */
-        xs?: number;
-    }
-    
-    export interface CollectionWidgetOptions<T = CollectionWidget> extends WidgetOptions<T> {
-        /** Binds the widget to data. */
-        dataSource?: string | Array<string | CollectionWidgetItem> | DevExpress.data.DataSource | DevExpress.data.DataSourceOptions;
-        /** The time period in milliseconds before the onItemHold event is raised. */
-        itemHoldTimeout?: number;
-        /** Specifies a custom template for items. */
-        itemTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery);
-        /** An array of items displayed by the widget. */
-        items?: Array<string | CollectionWidgetItem | any>;
-        /** Specifies which data field provides keys for widget items. */
-        keyExpr?: string | Function;
-        /** The text or HTML markup displayed by the widget if the item collection is empty. */
-        noDataText?: string;
-        /** A function that is executed when a collection item is clicked or tapped. */
-        onItemClick?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, itemData?: any, itemElement?: DevExpress.core.dxElement, itemIndex?: number, jQueryEvent?: JQueryEventObject, event?: event }) => any) | string;
-        /** A function that is executed when a collection item is right-clicked or pressed. */
-        onItemContextMenu?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, itemData?: any, itemElement?: DevExpress.core.dxElement, itemIndex?: number, jQueryEvent?: JQueryEventObject, event?: event }) => any);
-        /** A function that is executed when a collection item has been held for a specified period. */
-        onItemHold?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, itemData?: any, itemElement?: DevExpress.core.dxElement, itemIndex?: number, event?: event }) => any);
-        /** A function that is executed after a collection item is rendered. */
-        onItemRendered?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, itemData?: any, itemElement?: DevExpress.core.dxElement, itemIndex?: number }) => any);
-        /** A function that is executed when a collection item is selected or selection is canceled. */
-        onSelectionChanged?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, addedItems?: Array<any>, removedItems?: Array<any> }) => any);
-        /** The index of the currently selected widget item. */
-        selectedIndex?: number;
-        /** The selected item object. */
-        selectedItem?: any;
-        /** Specifies an array of currently selected item keys. */
-        selectedItemKeys?: Array<any>;
-        /** An array of currently selected item objects. */
-        selectedItems?: Array<any>;
-    }
-    /** The base class for widgets containing an item collection. */
-    export class CollectionWidget extends Widget {
-        constructor(element: Element, options?: CollectionWidgetOptions)
-        constructor(element: JQuery, options?: CollectionWidgetOptions)
-        /** Gets the DataSource instance. */
-        getDataSource(): DevExpress.data.DataSource;
-    }
-    /** This section lists the data source fields that are used in a default item template. */
-    export interface CollectionWidgetItem {
-        /** Specifies whether or not a widget item must be displayed disabled. */
-        disabled?: boolean;
-        /** Specifies html code inserted into the widget item element. */
-        html?: string;
-        /** Specifies an item template that should be used to render this item only. */
-        template?: template | (() => string | Element | JQuery);
-        /** Specifies text displayed for the widget item. */
-        text?: string;
-        /** Specifies whether or not a widget item must be displayed. */
-        visible?: boolean;
-    }
-    /** A validation rule that demands that a validated editor has a value that is equal to a specified expression. */
-    export interface CompareRule {
-        /** Specifies the function whose return value is used for comparison with the validated value. */
-        comparisonTarget?: (() => any);
-        /** Specifies the operator to be used for comparing the validated value with the target. */
-        comparisonType?: '!=' | '!==' | '<' | '<=' | '==' | '===' | '>' | '>=';
-        /** Specifies whether empty values are valid. */
-        ignoreEmptyValue?: boolean;
-        /** Specifies the message that is shown for end-users if the current rule is broken. */
-        message?: string;
-        /** Indicates whether or not the rule should be always checked for the target value or only when the target value changes. */
-        reevaluate?: boolean;
-        /** Specifies the type of the current rule. */
-        type?: 'required' | 'numeric' | 'range' | 'stringLength' | 'custom' | 'compare' | 'pattern' | 'email';
-    }
-    /** A validation rule with custom validation logic. */
-    export interface CustomRule {
-        /** Specifies whether the validationCallback should be called for null and undefined values. */
-        ignoreEmptyValue?: boolean;
-        /** Specifies the message that is shown for end-users if the current rule is broken. */
-        message?: string;
-        /** Indicates whether the rule should be always checked for the target value or only when the target value changes. */
-        reevaluate?: boolean;
-        /** Specifies the type of the current rule. */
-        type?: 'required' | 'numeric' | 'range' | 'stringLength' | 'custom' | 'compare' | 'pattern' | 'email';
-        /** A function that validates the target value. */
-        validationCallback?: ((options: { value?: string | number, rule?: any, validator?: any, data?: any }) => boolean);
-    }
-    
-    export interface DataExpressionMixinOptions<T = DataExpressionMixin> {
-        /** Binds the widget to data. */
-        dataSource?: string | Array<CollectionWidgetItem | any> | DevExpress.data.DataSource | DevExpress.data.DataSourceOptions;
-        /** Specifies the data field whose values should be displayed. */
-        displayExpr?: string | ((item: any) => any);
-        /** Specifies a custom template for items. */
-        itemTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery);
-        /** An array of items displayed by the widget. */
-        items?: Array<CollectionWidgetItem | any>;
-        /** Specifies the currently selected value. May be an object if dataSource contains objects and valueExpr is not set. */
-        value?: any;
-        /** Specifies which data field provides unique values to the widget's value. When the data field is not set, the value is the entire data object. */
-        valueExpr?: string | Function;
-    }
-    
-    export class DataExpressionMixin {
-        constructor(options?: DataExpressionMixinOptions)
-        /** Gets the DataSource instance. */
-        getDataSource(): DevExpress.data.DataSource;
-    }
-    
-    export interface EditorOptions<T = Editor> extends WidgetOptions<T> {
-        /** Specifies whether the editor's value is valid. */
-        isValid?: boolean;
-        /** A function that is executed after the widget's value is changed. */
-        onValueChanged?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, value?: any, previousValue?: any, jQueryEvent?: JQueryEventObject, event?: event }) => any);
-        /** A Boolean value specifying whether or not the widget is read-only. */
-        readOnly?: boolean;
-        /** Specifies information on the validation error when using a custom validation engine. Should be changed at runtime along with the isValid option. */
-        validationError?: any;
-        /** Specifies how the message about the validation rules that are not satisfied by this editor's value is displayed. */
-        validationMessageMode?: 'always' | 'auto';
-        /** Specifies the widget's value. */
-        value?: any;
-    }
-    /** A base class for editors. */
-    export class Editor extends Widget {
-        constructor(element: Element, options?: EditorOptions)
-        constructor(element: JQuery, options?: EditorOptions)
-        /** Resets the value option to the default value. */
-        reset(): void;
-    }
-    /** A validation rule that demands that the validated field match the Email pattern. */
-    export interface EmailRule {
-        /** Specifies whether empty values are valid. */
-        ignoreEmptyValue?: boolean;
-        /** Specifies the message that is shown for end-users if the current rule is broken. */
-        message?: string;
-        /** Specifies the type of the current rule. */
-        type?: 'required' | 'numeric' | 'range' | 'stringLength' | 'custom' | 'compare' | 'pattern' | 'email';
-    }
-    
-    export type FileProvider = any;
-    
-    export interface GridBaseOptions<T = GridBase> extends WidgetOptions<T> {
-        /** Specifies whether a user can reorder columns. */
-        allowColumnReordering?: boolean;
-        /** Specifies whether a user can resize columns. */
-        allowColumnResizing?: boolean;
-        /** Specifies whether data should be cached. */
-        cacheEnabled?: boolean;
-        /** Enables a hint that appears when a user hovers the mouse pointer over a cell with truncated content. */
-        cellHintEnabled?: boolean;
-        /** Specifies whether columns should adjust their widths to the content. */
-        columnAutoWidth?: boolean;
-        /** Configures the column chooser. */
-        columnChooser?: { allowSearch?: boolean, emptyPanelText?: string, enabled?: boolean, height?: number, mode?: 'dragAndDrop' | 'select', searchTimeout?: number, title?: string, width?: number };
-        /** Configures column fixing. */
-        columnFixing?: { enabled?: boolean, texts?: { fix?: string, leftPosition?: string, rightPosition?: string, unfix?: string } };
-        /** Specifies whether the widget should hide columns to adapt to the screen or container size. Ignored if allowColumnResizing is true and columnResizingMode is "widget". */
-        columnHidingEnabled?: boolean;
-        /** Specifies the minimum width of columns. */
-        columnMinWidth?: number;
-        /** Specifies how the widget resizes columns. Applies only if allowColumnResizing is true. */
-        columnResizingMode?: 'nextColumn' | 'widget';
-        /** Specifies the width for all data columns. Has a lower priority than the column.width option. */
-        columnWidth?: number;
-        /** Overridden. */
-        columns?: Array<GridBaseColumn | string>;
-        /** Binds the widget to data. */
-        dataSource?: string | Array<any> | DevExpress.data.DataSource | DevExpress.data.DataSourceOptions;
-        /** Specifies date-time values' serialization format. Use it only if you do not specify the dataSource at design time. */
-        dateSerializationFormat?: string;
-        /** Overriden. */
-        editing?: GridBaseEditing;
-        /** Indicates whether to show the error row. */
-        errorRowEnabled?: boolean;
-        /** Configures the integrated filter builder. */
-        filterBuilder?: dxFilterBuilderOptions;
-        /** Configures the popup in which the integrated filter builder is shown. */
-        filterBuilderPopup?: dxPopupOptions;
-        /** Configures the filter panel. */
-        filterPanel?: { customizeText?: ((e: { component?: T, filterValue?: any, text?: string }) => string), filterEnabled?: boolean, texts?: { clearFilter?: string, createFilter?: string, filterEnabledHint?: string }, visible?: boolean };
-        /** Configures the filter row. */
-        filterRow?: { applyFilter?: 'auto' | 'onClick', applyFilterText?: string, betweenEndText?: string, betweenStartText?: string, operationDescriptions?: { between?: string, contains?: string, endsWith?: string, equal?: string, greaterThan?: string, greaterThanOrEqual?: string, lessThan?: string, lessThanOrEqual?: string, notContains?: string, notEqual?: string, startsWith?: string }, resetOperationText?: string, showAllText?: string, showOperationChooser?: boolean, visible?: boolean };
-        /** Specifies whether to synchronize the filter row, header filter, and filter builder. The synchronized filter expression is stored in the filterValue option. */
-        filterSyncEnabled?: boolean | 'auto';
-        /** Specifies a filter expression. */
-        filterValue?: string | Array<any> | Function;
-        /** Specifies the index of the column focused initially or currently in the data row area. */
-        focusedColumnIndex?: number;
-        /** Specifies whether the focused row feature is enabled. */
-        focusedRowEnabled?: boolean;
-        /** Specifies the initially or currently focused grid row's index. Use it when focusedRowEnabled is true. */
-        focusedRowIndex?: number;
-        /** Specifies initially or currently focused grid row's key. Use it when focusedRowEnabled is true. */
-        focusedRowKey?: any;
-        /** Configures the header filter feature. */
-        headerFilter?: { allowSearch?: boolean, height?: number, searchTimeout?: number, texts?: { cancel?: string, emptyValue?: string, ok?: string }, visible?: boolean, width?: number };
-        /** Specifies whether to highlight rows and cells whose data changed. */
-        highlightChanges?: boolean;
-        /** Configures keyboard navigation. */
-        keyboardNavigation?: { editOnKeyPress?: boolean, enterKeyAction?: 'startEdit' | 'moveFocus', enterKeyDirection?: 'none' | 'column' | 'row' };
-        /** Configures the load panel. */
-        loadPanel?: { enabled?: boolean | 'auto', height?: number, indicatorSrc?: string, shading?: boolean, shadingColor?: string, showIndicator?: boolean, showPane?: boolean, text?: string, width?: number };
-        /** Specifies text shown when the widget does not display any data. */
-        noDataText?: string;
-        /** A function that is executed before an adaptive detail row is rendered. */
-        onAdaptiveDetailRowPreparing?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, formOptions?: any }) => any);
-        /** A function that is executed when an error occurs in the data source. */
-        onDataErrorOccurred?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, error?: Error }) => any);
-        /** A function that is executed before a new row is added to the widget. */
-        onInitNewRow?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, data?: any }) => any);
-        /** A function that is executed when the widget is in focus and a key has been pressed down. */
-        onKeyDown?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, jQueryEvent?: JQueryEventObject, event?: event, handled?: boolean }) => any);
-        /** A function that is executed after a row is collapsed. */
-        onRowCollapsed?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, key?: any }) => any);
-        /** A function that is executed before a row is collapsed. */
-        onRowCollapsing?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, key?: any, cancel?: boolean }) => any);
-        /** A function that is executed after a row is expanded. */
-        onRowExpanded?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, key?: any }) => any);
-        /** A function that is executed before a row is expanded. */
-        onRowExpanding?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, key?: any, cancel?: boolean }) => any);
-        /** A function that is executed after a new row has been inserted into the data source. */
-        onRowInserted?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, data?: any, key?: any, error?: Error }) => any);
-        /** A function that is executed before a new row is inserted into the data source. */
-        onRowInserting?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, data?: any, cancel?: boolean | Promise<void> | JQueryPromise<void> }) => any);
-        /** A function that is executed after a row has been removed from the data source. */
-        onRowRemoved?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, data?: any, key?: any, error?: Error }) => any);
-        /** A function that is executed before a row is removed from the data source. */
-        onRowRemoving?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, data?: any, key?: any, cancel?: boolean | Promise<void> | JQueryPromise<void> }) => any);
-        /** A function that is executed after a row has been updated in the data source. */
-        onRowUpdated?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, data?: any, key?: any, error?: Error }) => any);
-        /** A function that is executed before a row is updated in the data source. */
-        onRowUpdating?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, oldData?: any, newData?: any, key?: any, cancel?: boolean | Promise<void> | JQueryPromise<void> }) => any);
-        /** A function that is executed after cells in a row are validated against validation rules. */
-        onRowValidating?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, brokenRules?: Array<RequiredRule | NumericRule | RangeRule | StringLengthRule | CustomRule | CompareRule | PatternRule | EmailRule>, isValid?: boolean, key?: any, newData?: any, oldData?: any, errorText?: string }) => any);
-        /** A function that is executed after selecting a row or clearing its selection. */
-        onSelectionChanged?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, currentSelectedRowKeys?: Array<any>, currentDeselectedRowKeys?: Array<any>, selectedRowKeys?: Array<any>, selectedRowsData?: Array<any> }) => any);
-        /** A function that is executed before the toolbar is created. */
-        onToolbarPreparing?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, toolbarOptions?: dxToolbarOptions }) => any);
-        /** Configures the pager. */
-        pager?: { allowedPageSizes?: Array<number> | 'auto', infoText?: string, showInfo?: boolean, showNavigationButtons?: boolean, showPageSizeSelector?: boolean, visible?: boolean | 'auto' };
-        /** Configures paging. */
-        paging?: GridBasePaging;
-        /** Specifies whether to render the filter row, command columns, and columns with showEditorAlways set to true after other elements. */
-        renderAsync?: boolean;
-        /** Specifies whether to repaint only those cells whose data changed. */
-        repaintChangesOnly?: boolean;
-        /** Specifies whether rows should be shaded differently. */
-        rowAlternationEnabled?: boolean;
-        /** Overridden. A configuration object specifying scrolling options. */
-        scrolling?: GridBaseScrolling;
-        /** Configures the search panel. */
-        searchPanel?: { highlightCaseSensitive?: boolean, highlightSearchText?: boolean, placeholder?: string, searchVisibleColumnsOnly?: boolean, text?: string, visible?: boolean, width?: number };
-        /** Allows you to select rows or determine which rows are selected. */
-        selectedRowKeys?: Array<any>;
-        /** Overridden. */
-        selection?: GridBaseSelection;
-        /** Specifies whether the outer borders of the widget are visible. */
-        showBorders?: boolean;
-        /** Specifies whether column headers are visible. */
-        showColumnHeaders?: boolean;
-        /** Specifies whether vertical lines that separate one column from another are visible. */
-        showColumnLines?: boolean;
-        /** Specifies whether horizontal lines that separate one row from another are visible. */
-        showRowLines?: boolean;
-        /** Configures runtime sorting. */
-        sorting?: { ascendingText?: string, clearText?: string, descendingText?: string, mode?: 'multiple' | 'none' | 'single' };
-        /** Configures state storing. */
-        stateStoring?: { customLoad?: (() => Promise<any> | JQueryPromise<any>), customSave?: ((gridState: any) => any), enabled?: boolean, savingTimeout?: number, storageKey?: string, type?: 'custom' | 'localStorage' | 'sessionStorage' };
-        /** Specifies whether to enable two-way data binding. */
-        twoWayBindingEnabled?: boolean;
-        /** Specifies whether text that does not fit into a column should be wrapped. */
-        wordWrapEnabled?: boolean;
-    }
-    /** Overriden. */
-    export interface GridBaseEditing {
-        /** Configures the form. Used only if editing.mode is "form" or "popup". */
-        form?: dxFormOptions;
-        /** Specifies how a user edits data. */
-        mode?: 'batch' | 'cell' | 'row' | 'form' | 'popup';
-        /** Configures the popup. Used only if editing.mode is "popup". */
-        popup?: dxPopupOptions;
-        /** Specifies operations that are performed after saving changes. */
-        refreshMode?: 'full' | 'reshape' | 'repaint';
-        /** Specifies whether to select text in a cell when a user starts editing. */
-        selectTextOnEditStart?: boolean;
-        /** Specifies whether a single or double click should switch a cell to the editing state. Applies if editing.mode is "cell" or "batch". */
-        startEditAction?: 'click' | 'dblClick';
-        /** Overriden. */
-        texts?: GridBaseEditingTexts;
-        /** Specifies whether the editing column uses icons instead of links. */
-        useIcons?: boolean;
-    }
-    /** Overriden. */
-    export interface GridBaseEditingTexts {
-        /** Specifies text for a hint that appears when a user pauses on the global "Add" button. Applies only if editing.allowAdding is true. */
-        addRow?: string;
-        /** Specifies text for a hint that appears when a user pauses on the "Discard" button. Applies only if editing.mode is "batch". */
-        cancelAllChanges?: string;
-        /** Specifies text for a button that cancels changes in a row. Applies only if editing.allowUpdating is true and editing.mode is "row". */
-        cancelRowChanges?: string;
-        /** Specifies a message that prompts a user to confirm deletion. */
-        confirmDeleteMessage?: string;
-        /** Specifies a title for the window that asks a user to confirm deletion. */
-        confirmDeleteTitle?: string;
-        /** Specifies text for buttons that delete rows. Applies only if allowDeleting is true. */
-        deleteRow?: string;
-        /** Specifies text for buttons that switch rows into the editing state. Applies only if allowUpdating is true. */
-        editRow?: string;
-        /** Specifies text for a hint that appears when a user pauses on the global "Save" button. Applies only if editing.mode is "batch". */
-        saveAllChanges?: string;
-        /** Specifies text for a button that saves changes made in a row. Applies only if allowUpdating is true. */
-        saveRowChanges?: string;
-        /** Specifies text for buttons that recover deleted rows. Applies only if allowDeleting is true and editing.mode is "batch". */
-        undeleteRow?: string;
-        /** Specifies text for a hint appearing when a user pauses on the button that cancels changes in a cell. Applies only if editing.mode is "cell" and data validation is enabled. */
-        validationCancelChanges?: string;
-    }
-    /** Configures paging. */
-    export interface GridBasePaging {
-        /** Enables paging. */
-        enabled?: boolean;
-        /** Specifies the page to be displayed using a zero-based index. */
-        pageIndex?: number;
-        /** Specifies the page size. */
-        pageSize?: number;
-    }
-    /** Overridden. A configuration object specifying scrolling options. */
-    export interface GridBaseScrolling {
-        /** Specifies the rendering mode for columns. Applies when columns are left outside the viewport. Requires the columnWidth, columnAutoWidth, or width (for all columns) option specified. */
-        columnRenderingMode?: 'standard' | 'virtual';
-        /** Specifies whether the widget should load pages adjacent to the current page. Applies only if scrolling.mode is "virtual". */
-        preloadEnabled?: boolean;
-        /** Specifies the rendering mode for loaded rows. */
-        rowRenderingMode?: 'standard' | 'virtual';
-        /** Specifies whether a user can scroll the content with a swipe gesture. Applies only if useNative is false. */
-        scrollByContent?: boolean;
-        /** Specifies whether a user can scroll the content with the scrollbar. Applies only if useNative is false. */
-        scrollByThumb?: boolean;
-        /** Specifies when to show scrollbars. Applies only if useNative is false. */
-        showScrollbar?: 'always' | 'never' | 'onHover' | 'onScroll';
-        /** Specifies whether the widget should use native or simulated scrolling. */
-        useNative?: boolean | 'auto';
-    }
-    /** Overridden. */
-    export interface GridBaseSelection {
-        /** Specifies whether a user can select all rows at once. */
-        allowSelectAll?: boolean;
-        /** Specifies the selection mode. */
-        mode?: 'multiple' | 'none' | 'single';
-    }
-    
-    export class GridBase extends Widget {
-        constructor(element: Element, options?: GridBaseOptions)
-        constructor(element: JQuery, options?: GridBaseOptions)
-        /** Shows the load panel. */
-        beginCustomLoading(messageText: string): void;
-        /** Gets a data object with a specific key. */
-        byKey(key: any | string | number): Promise<any> & JQueryPromise<any>;
-        /** Discards changes that a user made to data. */
-        cancelEditData(): void;
-        /** Gets the value of a cell with a specific row index and a data field, column caption or name. */
-        cellValue(rowIndex: number, dataField: string): any;
-        /** Sets a new value to a cell with a specific row index and a data field, column caption or name. */
-        cellValue(rowIndex: number, dataField: string, value: any): void;
-        /** Gets the value of a cell with specific row and column indexes. */
-        cellValue(rowIndex: number, visibleColumnIndex: number): any;
-        /** Sets a new value to a cell with specific row and column indexes. */
-        cellValue(rowIndex: number, visibleColumnIndex: number, value: any): void;
-        /** Clears all filters applied to widget rows. */
-        clearFilter(): void;
-        /** Clears all row filters of a specific type. */
-        clearFilter(filterName: string): void;
-        /** Clears selection of all rows on all pages. */
-        clearSelection(): void;
-        /** Clears sorting settings of all columns at once. */
-        clearSorting(): void;
-        /** Switches the cell being edited back to the normal state. Takes effect only if editing.mode is batch and showEditorAlways is false. */
-        closeEditCell(): void;
-        /** Collapses the currently expanded adaptive detail row (if there is one). */
-        collapseAdaptiveDetailRow(): void;
-        /** Gets the data column count. Includes visible and hidden columns, excludes command columns. */
-        columnCount(): number;
-        /** Gets all options of a column with a specific identifier. */
-        columnOption(id: number | string): any;
-        /** Gets the value of a single column option. */
-        columnOption(id: number | string, optionName: string): any;
-        /** Updates the value of a single column option. */
-        columnOption(id: number | string, optionName: string, optionValue: any): void;
-        /** Updates the values of several column options. */
-        columnOption(id: number | string, options: any): void;
-        /** Removes a column. */
-        deleteColumn(id: number | string): void;
-        /** Removes a row with a specific index. */
-        deleteRow(rowIndex: number): void;
-        /** Clears the selection of all rows on all pages or the currently rendered page only. */
-        deselectAll(): Promise<void> & JQueryPromise<void>;
-        /** Cancels the selection of rows with specific keys. */
-        deselectRows(keys: Array<any>): Promise<any> & JQueryPromise<any>;
-        /** Switches a cell with a specific row index and a data field to the editing state. Takes effect only if the editing mode is "batch" or "cell". */
-        editCell(rowIndex: number, dataField: string): void;
-        /** Switches a cell with specific row and column indexes to the editing state. Takes effect only if the editing mode is "batch" or "cell". */
-        editCell(rowIndex: number, visibleColumnIndex: number): void;
-        /** Switches a row with a specific index to the editing state. Takes effect only if the editing mode is "row", "popup" or "form". */
-        editRow(rowIndex: number): void;
-        /** Hides the load panel. */
-        endCustomLoading(): void;
-        /** Expands an adaptive detail row. */
-        expandAdaptiveDetailRow(key: any): void;
-        /** Gets a filter expression applied to the widget's data source using the filter(filterExpr) method and the DataSource's filter option. */
-        filter(): any;
-        /** Applies a filter to the widget's data source. */
-        filter(filterExpr: any): void;
-        /** Sets focus on the widget. */
-        focus(): void;
-        /** Sets focus on a specific cell. */
-        focus(element: Element | JQuery): void;
-        /** Gets a cell with a specific row index and a data field, column caption or name. */
-        getCellElement(rowIndex: number, dataField: string): DevExpress.core.dxElement | undefined;
-        /** Gets a cell with specific row and column indexes. */
-        getCellElement(rowIndex: number, visibleColumnIndex: number): DevExpress.core.dxElement | undefined;
-        /** Gets the total filter that combines all the filters applied. */
-        getCombinedFilter(): any;
-        /** Gets the total filter that combines all the filters applied. */
-        getCombinedFilter(returnDataField: boolean): any;
-        /** Gets the DataSource instance. */
-        getDataSource(): DevExpress.data.DataSource;
-        /** Gets the key of a row with a specific index. */
-        getKeyByRowIndex(rowIndex: number): any;
-        /** Gets the container of a row with a specific index. */
-        getRowElement(rowIndex: number): Array<Element> & JQuery | undefined;
-        /** Gets the index of a row with a specific key. */
-        getRowIndexByKey(key: any | string | number): number;
-        /** Gets the instance of the widget's scrollable part. */
-        getScrollable(): dxScrollable;
-        /** Checks whether the widget has unsaved changes. */
-        hasEditData(): boolean;
-        /** Hides the column chooser. */
-        hideColumnChooser(): void;
-        /** Checks whether an adaptive detail row is expanded or collapsed. */
-        isAdaptiveDetailRowExpanded(key: any): boolean;
-        /** Checks whether a row with a specific key is focused. */
-        isRowFocused(key: any): boolean;
-        /** Checks whether a row with a specific key is selected. */
-        isRowSelected(key: any): boolean;
-        /** Gets a data object's key. */
-        keyOf(obj: any): any;
-        /** Scrolls the grid to the row with the specified key. */
-        navigateToRow(key: any): void;
-        /** Gets the total page count. */
-        pageCount(): number;
-        /** Gets the current page index. */
-        pageIndex(): number;
-        /** Switches the widget to a specific page using a zero-based index. */
-        pageIndex(newIndex: number): Promise<void> & JQueryPromise<void>;
-        /** Gets the current page size. */
-        pageSize(): number;
-        /** Sets the page size. */
-        pageSize(value: number): void;
-        /** Reloads data and repaints the widget. */
-        refresh(): Promise<void> & JQueryPromise<void>;
-        /** Reloads data and repaints the widget or elements whose data changed. */
-        refresh(changesOnly: boolean): Promise<void> & JQueryPromise<void>;
-        /** Repaints specific rows. */
-        repaintRows(rowIndexes: Array<number>): void;
-        /** Saves changes that a user made to data. */
-        saveEditData(): Promise<void> & JQueryPromise<void>;
-        /** Seeks a search string in the columns whose allowSearch option is true. */
-        searchByText(text: string): void;
-        /** Selects all rows. */
-        selectAll(): Promise<void> & JQueryPromise<void>;
-        /** Selects rows with specific keys. */
-        selectRows(keys: Array<any>, preserve: boolean): Promise<any> & JQueryPromise<any>;
-        /** Selects rows with specific indexes. */
-        selectRowsByIndexes(indexes: Array<number>): Promise<any> & JQueryPromise<any>;
-        /** Shows the column chooser. */
-        showColumnChooser(): void;
-        /** Gets the current widget state. */
-        state(): any;
-        /** Sets the widget state. */
-        state(state: any): void;
-        /** Recovers a row deleted in batch editing mode. */
-        undeleteRow(rowIndex: number): void;
-        /** Updates the widget's content after resizing. */
-        updateDimensions(): void;
-    }
-    
-    export interface GridBaseColumn {
-        /** Aligns the content of the column. */
-        alignment?: 'center' | 'left' | 'right' | undefined;
-        /** Specifies whether a user can edit values in the column at runtime. By default, inherits the value of the editing.allowUpdating option. */
-        allowEditing?: boolean;
-        /** Specifies whether data can be filtered by this column. Applies only if filterRow.visible is true. */
-        allowFiltering?: boolean;
-        /** Specifies whether a user can fix the column at runtime. Applies only if columnFixing.enabled is true. */
-        allowFixing?: boolean;
-        /** Specifies whether the header filter can be used to filter data by this column. Applies only if headerFilter.visible is true. By default, inherits the value of the allowFiltering option. */
-        allowHeaderFiltering?: boolean;
-        /** Specifies whether a user can hide the column using the column chooser at runtime. Applies only if columnChooser.enabled is true. */
-        allowHiding?: boolean;
-        /** Specifies whether this column can be used in column reordering at runtime. Applies only if allowColumnReordering is true. */
-        allowReordering?: boolean;
-        /** Specifies whether a user can resize the column at runtime. Applies only if allowColumnResizing is true. */
-        allowResizing?: boolean;
-        /** Specifies whether this column can be searched. Applies only if searchPanel.visible is true. Inherits the value of the allowFiltering option by default. */
-        allowSearch?: boolean;
-        /** Specifies whether a user can sort rows by this column at runtime. Applies only if sorting.mode differs from "none". */
-        allowSorting?: boolean;
-        /** Calculates custom values for column cells. */
-        calculateCellValue?: ((rowData: any) => any);
-        /** Calculates custom display values for column cells. Requires specifying the dataField or calculateCellValue option. Used in lookup optimization. */
-        calculateDisplayValue?: string | ((rowData: any) => any);
-        /** Specifies the column's custom filtering rules. */
-        calculateFilterExpression?: ((filterValue: any, selectedFilterOperation: string, target: string) => string | Array<any> | Function);
-        /** Calculates custom values to be used in sorting. */
-        calculateSortValue?: string | ((rowData: any) => any);
-        /** Specifies a caption for the column. */
-        caption?: string;
-        /** Specifies a custom template for column cells. */
-        cellTemplate?: template | ((cellElement: DevExpress.core.dxElement, cellInfo: any) => any);
-        /** Specifies a CSS class to be applied to the column. */
-        cssClass?: string;
-        /** Customizes the text displayed in column cells. */
-        customizeText?: ((cellInfo: { value?: string | number | Date, valueText?: string, target?: string, groupInterval?: string | number }) => string);
-        /** Binds the column to a field of the dataSource. */
-        dataField?: string;
-        /** Casts column values to a specific data type. */
-        dataType?: 'string' | 'number' | 'date' | 'boolean' | 'object' | 'datetime';
-        /** Specifies a custom template for column cells in the editing state. */
-        editCellTemplate?: template | ((cellElement: DevExpress.core.dxElement, cellInfo: any) => any);
-        /** Specifies options for the underlain editor. */
-        editorOptions?: any;
-        /** Specifies whether HTML tags are displayed as plain text or applied to the values of the column. */
-        encodeHtml?: boolean;
-        /** In a boolean column, replaces all false items with a specified text. Applies only if showEditorAlways option is false. */
-        falseText?: string;
-        /** Specifies a set of available filter operations. Applies only if filterRow.visible and allowFiltering are true. */
-        filterOperations?: Array<'=' | '<>' | '<' | '<=' | '>' | '>=' | 'notcontains' | 'contains' | 'startswith' | 'endswith' | 'between'>;
-        /** Specifies whether a user changes the current filter by including (selecting) or excluding (clearing the selection of) values. Applies only if headerFilter.visible and allowHeaderFiltering are true. */
-        filterType?: 'exclude' | 'include';
-        /** Specifies the column's filter value displayed in the filter row. */
-        filterValue?: any;
-        /** Specifies values selected in the column's header filter. */
-        filterValues?: Array<any>;
-        /** Fixes the column. */
-        fixed?: boolean;
-        /** Specifies the widget's edge to which the column is fixed. Applies only if columns].[fixed is true. */
-        fixedPosition?: 'left' | 'right';
-        /** Configures the form item that the column produces in the editing state. Applies only if editing.mode is "form" or "popup". */
-        formItem?: dxFormSimpleItem;
-        /** Formats a value before it is displayed in a column cell. */
-        format?: format;
-        /** Specifies a custom template for column headers. */
-        headerCellTemplate?: template | ((columnHeader: DevExpress.core.dxElement, headerInfo: any) => any);
-        /** Specifies data settings for the header filter. */
-        headerFilter?: { allowSearch?: boolean, dataSource?: Array<any> | ((options: { component?: any, dataSource?: DevExpress.data.DataSourceOptions }) => any) | DevExpress.data.DataSourceOptions, groupInterval?: 'day' | 'hour' | 'minute' | 'month' | 'quarter' | 'second' | 'year' | number, height?: number, searchMode?: 'contains' | 'startswith' | 'equals', width?: number };
-        /** Specifies the order in which columns are hidden when the widget adapts to the screen or container size. Ignored if allowColumnResizing is true and columnResizingMode is "widget". */
-        hidingPriority?: number;
-        /** Specifies whether the column bands other columns or not. */
-        isBand?: boolean;
-        /** Specifies options of a lookup column. */
-        lookup?: { allowClearing?: boolean, dataSource?: Array<any> | DevExpress.data.DataSourceOptions | DevExpress.data.Store | ((options: { data?: any, key?: any }) => Array<any> | DevExpress.data.DataSourceOptions | DevExpress.data.Store), displayExpr?: string | ((data: any) => any), valueExpr?: string };
-        /** Specifies the minimum width of the column. */
-        minWidth?: number;
-        /** Specifies the identifier of the column. */
-        name?: string;
-        /** Specifies the band column that owns the current column. Accepts the index of the band column in the columns array. */
-        ownerBand?: number;
-        /** Specifies whether to render the column after other columns and elements. Use if column cells have a complex template. Requires the width option specified. */
-        renderAsync?: boolean;
-        /** Specifies the column's filter operation displayed in the filter row. */
-        selectedFilterOperation?: '<' | '<=' | '<>' | '=' | '>' | '>=' | 'between' | 'contains' | 'endswith' | 'notcontains' | 'startswith';
-        /** Specifies a function to be invoked after the user has edited a cell value, but before it will be saved in the data source. */
-        setCellValue?: ((newData: any, value: any, currentRowData: any) => any);
-        /** Specifies whether the column displays its values using editors. */
-        showEditorAlways?: boolean;
-        /** Specifies whether the column chooser can contain the column header. */
-        showInColumnChooser?: boolean;
-        /** Specifies the index according to which columns participate in sorting. */
-        sortIndex?: number;
-        /** Specifies the sort order of column values. */
-        sortOrder?: 'asc' | 'desc' | undefined;
-        /** Specifies a custom comparison function for sorting. Applies only when sorting is performed on the client. */
-        sortingMethod?: ((value1: any, value2: any) => number);
-        /** In a boolean column, replaces all true items with a specified text. Applies only if showEditorAlways option is false. */
-        trueText?: string;
-        /** Specifies validation rules to be checked on updating cell values. */
-        validationRules?: Array<RequiredRule | NumericRule | RangeRule | StringLengthRule | CustomRule | CompareRule | PatternRule | EmailRule>;
-        /** Specifies whether the column is visible, that is, occupies space in the table. */
-        visible?: boolean;
-        /** Specifies the position of the column regarding other columns in the resulting widget. */
-        visibleIndex?: number;
-        /** Specifies the column's width in pixels or as a percentage. Ignored if it is less than minWidth. */
-        width?: number | string;
-    }
-    /** Allows you to customize buttons in the editing column or create a custom command column. Applies only if the column's type is "buttons". */
-    export interface GridBaseColumnButton {
-        /** Specifies a CSS class to be applied to the button. */
-        cssClass?: string;
-        /** Specifies the text for the hint that appears when the button is hovered over or long-pressed. */
-        hint?: string;
-        /** Specifies the button's icon. */
-        icon?: string;
-        /** Specifies the button's text. Applies only if the button's icon is not specified. */
-        text?: string;
-    }
-    
-    export interface HierarchicalCollectionWidgetOptions<T = HierarchicalCollectionWidget> extends CollectionWidgetOptions<T> {
-        /** Specifies the name of the data source item field whose value defines whether or not the corresponding widget item is disabled. */
-        disabledExpr?: string | Function;
-        /** Specifies the data field whose values should be displayed. */
-        displayExpr?: string | ((item: any) => any);
-        /** Specifies whether the widget can be focused using keyboard navigation. */
-        focusStateEnabled?: boolean;
-        /** Specifies whether the widget changes its state when a user pauses on it. */
-        hoverStateEnabled?: boolean;
-        /** Specifies which data field contains nested items. */
-        itemsExpr?: string | Function;
-        /** Specifies which data field provides keys for TreeView items. */
-        keyExpr?: string | Function;
-        /** Specifies the name of the data source item field whose value defines whether or not the corresponding widget items is selected. */
-        selectedExpr?: string | Function;
-    }
-    
-    export class HierarchicalCollectionWidget extends CollectionWidget {
-        constructor(element: Element, options?: HierarchicalCollectionWidgetOptions)
-        constructor(element: JQuery, options?: HierarchicalCollectionWidgetOptions)
-    }
-    
-    export interface MapLocation {
-        /** The latitude location of the widget. */
-        lat?: number;
-        /** The longitude location of the widget. */
-        lng?: number;
-    }
-    /** A validation rule that demands that the validated field has a numeric value. */
-    export interface NumericRule {
-        /** Specifies whether empty values are valid. */
-        ignoreEmptyValue?: boolean;
-        /** Specifies the message that is shown for end-users if the current rule is broken. */
-        message?: string;
-        /** Specifies the type of the current rule. */
-        type?: 'required' | 'numeric' | 'range' | 'stringLength' | 'custom' | 'compare' | 'pattern' | 'email';
-    }
-    
-    export type OneDriveFileProvider = any;
-    /** A validation rule that demands that the validated field match a specified pattern. */
-    export interface PatternRule {
-        /** Specifies whether empty values are valid. */
-        ignoreEmptyValue?: boolean;
-        /** Specifies the message that is shown for end-users if the current rule is broken. */
-        message?: string;
-        /** Specifies the regular expression that the validated value must match. */
-        pattern?: RegExp | string;
-        /** Specifies the type of the current rule. */
-        type?: 'required' | 'numeric' | 'range' | 'stringLength' | 'custom' | 'compare' | 'pattern' | 'email';
-    }
-    /** A validation rule that demands the target value be within the specified value range (including the range's end points). */
-    export interface RangeRule {
-        /** Specifies whether empty values are valid. */
-        ignoreEmptyValue?: boolean;
-        /** Specifies the maximum value allowed for the validated value. */
-        max?: Date | number;
-        /** Specifies the message that is shown to end-users if the current rule is broken. */
-        message?: string;
-        /** Specifies the minimum value allowed for the validated value. */
-        min?: Date | number;
-        /** Indicates whether the rule should be always checked for the target value or only when the target value changes. */
-        reevaluate?: boolean;
-        /** Specifies the type of the current rule. */
-        type?: 'required' | 'numeric' | 'range' | 'stringLength' | 'custom' | 'compare' | 'pattern' | 'email';
-    }
-    /** A validation rule that demands that a validated field has a value. */
-    export interface RequiredRule {
-        /** Specifies the message that is shown for end-users if the current rule is broken. */
-        message?: string;
-        /** Indicates whether to remove the Space characters from the validated value. */
-        trim?: boolean;
-        /** Specifies the type of the current rule. */
-        type?: 'required' | 'numeric' | 'range' | 'stringLength' | 'custom' | 'compare' | 'pattern' | 'email';
-    }
-    
-    export interface SearchBoxMixinOptions<T = SearchBoxMixin> {
-        /** Configures the search panel. */
-        searchEditorOptions?: dxTextBoxOptions;
-        /** Specifies whether the search panel is visible. */
-        searchEnabled?: boolean;
-        /** Specifies a data object's field name or an expression whose value is compared to the search string. */
-        searchExpr?: string | Function | Array<string | Function>;
-        /** Specifies a comparison operation used to search widget items. */
-        searchMode?: 'contains' | 'startswith' | 'equals';
-        /** Specifies a delay in milliseconds between when a user finishes typing, and the search is executed. */
-        searchTimeout?: number;
-        /** Specifies the current search string. */
-        searchValue?: string;
-    }
-    
-    export class SearchBoxMixin {
-        constructor(options?: SearchBoxMixinOptions)
-    }
-    /** A validation rule that demands the target value length be within the specified value range (including the range's end points). */
-    export interface StringLengthRule {
-        /** Specifies whether empty values are valid. */
-        ignoreEmptyValue?: boolean;
-        /** Specifies the maximum length allowed for the validated value. */
-        max?: number;
-        /** Specifies the message that is shown for end-users if the current rule is broken. */
-        message?: string;
-        /** Specifies the minimum length allowed for the validated value. */
-        min?: number;
-        /** Indicates whether or not to remove the Space characters from the validated value. */
-        trim?: boolean;
-        /** Specifies the type of the current rule. */
-        type?: 'required' | 'numeric' | 'range' | 'stringLength' | 'custom' | 'compare' | 'pattern' | 'email';
-    }
-    
-    export interface WebApiFileProviderOptions {
-        
-        endpointUrl?: string;
-    }
-    
-    export class WebApiFileProvider {
-        constructor(options?: WebApiFileProviderOptions)
-    }
-    
-    export interface WidgetOptions<T = Widget> extends DOMComponentOptions<T> {
-        /** Specifies the shortcut key that sets focus on the widget. */
-        accessKey?: string;
-        /** Specifies whether or not the widget changes its state when interacting with a user. */
-        activeStateEnabled?: boolean;
-        /** Specifies whether the widget responds to user interaction. */
-        disabled?: boolean;
-        /** Specifies whether the widget can be focused using keyboard navigation. */
-        focusStateEnabled?: boolean;
-        /** Specifies text for a hint that appears when a user pauses on the widget. */
-        hint?: string;
-        /** Specifies whether the widget changes its state when a user pauses on it. */
-        hoverStateEnabled?: boolean;
-        /** A function that is executed when the widget's content is ready and each time the content is changed. */
-        onContentReady?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any }) => any);
-        /** Specifies the number of the element when the Tab key is used for navigating. */
-        tabIndex?: number;
-        /** Specifies whether the widget is visible. */
-        visible?: boolean;
-    }
-    /** The base class for widgets. */
-    export class Widget extends DOMComponent {
-        constructor(element: Element, options?: WidgetOptions)
-        constructor(element: JQuery, options?: WidgetOptions)
-        /** Sets focus on the widget. */
-        focus(): void;
-        /** Registers a handler to be executed when a user presses a specific key. */
-        registerKeyHandler(key: string, handler: Function): void;
-        /** Repaints the widget without reloading data. Call it to update the widget's markup. */
-        repaint(): void;
-    }
-    
-    export interface dxAccordionOptions extends CollectionWidgetOptions<dxAccordion> {
-        /** A number specifying the time in milliseconds spent on the animation of the expanding or collapsing of a panel. */
-        animationDuration?: number;
-        /** Specifies whether all items can be collapsed or whether at least one item must always be expanded. */
-        collapsible?: boolean;
-        /** Specifies whether to render the panel's content when it is displayed. If false, the content is rendered immediately. */
-        deferRendering?: boolean;
-        /** Specifies whether the widget can be focused using keyboard navigation. */
-        focusStateEnabled?: boolean;
-        /** Specifies the widget's height. */
-        height?: number | string | (() => number | string);
-        /** Specifies whether the widget changes its state when a user pauses on it. */
-        hoverStateEnabled?: boolean;
-        /** Specifies a custom template for items. */
-        itemTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery);
-        /** Specifies a custom template for item titles. */
-        itemTitleTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery);
-        /** An array of items displayed by the widget. */
-        items?: Array<string | dxAccordionItem | any>;
-        /** Specifies whether the widget can expand several items or only a single item at once. */
-        multiple?: boolean;
-        /** A function that is executed when an accordion item's title is clicked or tapped. */
-        onItemTitleClick?: ((e: { component?: dxAccordion, element?: DevExpress.core.dxElement, model?: any, itemData?: any, itemElement?: DevExpress.core.dxElement, itemIndex?: number, event?: event }) => any) | string;
-        /** Specifies whether to repaint only those elements whose data changed. */
-        repaintChangesOnly?: boolean;
-        /** The index number of the currently selected item. */
-        selectedIndex?: number;
-    }
-    /** The Accordion widget contains several panels displayed one under another. These panels can be collapsed or expanded by an end user, which makes this widget very useful for presenting information in a limited amount of space. */
-    export class dxAccordion extends CollectionWidget {
-        constructor(element: Element, options?: dxAccordionOptions)
-        constructor(element: JQuery, options?: dxAccordionOptions)
-        /** Collapses an item with a specific index. */
-        collapseItem(index: number): Promise<void> & JQueryPromise<void>;
-        /** Expands an item with a specific index. */
-        expandItem(index: number): Promise<void> & JQueryPromise<void>;
-        /** Updates the dimensions of the widget contents. */
-        updateDimensions(): Promise<void> & JQueryPromise<void>;
-    }
-    /** This section lists the data source fields that are used in a default template for Accordion items. */
-    export interface dxAccordionItem extends CollectionWidgetItem {
-        /** Specifies the icon to be displayed in the panel's title. */
-        icon?: string;
-        /** Specifies text displayed for the widget item title. */
-        title?: string;
-    }
-    
-    export interface dxActionButton {
-        /** Specifies whether to place the button before or after the input text field. */
-        location?: 'after' | 'before';
-        /** Specifies the button's name. */
-        name?: string;
-        /** Configures the Button widget used as the action button. */
-        options?: dxButtonOptions;
-    }
-    
-    export interface dxActionSheetOptions extends CollectionWidgetOptions<dxActionSheet> {
-        /** The text displayed in the button that closes the action sheet. */
-        cancelText?: string;
-        /** An array of items displayed by the widget. */
-        items?: Array<string | dxActionSheetItem | any>;
-        /** A function that is executed when the Cancel button is clicked or tapped. */
-        onCancelClick?: ((e: { component?: dxActionSheet, element?: DevExpress.core.dxElement, model?: any, cancel?: boolean }) => any) | string;
-        /** Specifies whether or not to display the Cancel button in action sheet. */
-        showCancelButton?: boolean;
-        /** A Boolean value specifying whether or not the title of the action sheet is visible. */
-        showTitle?: boolean;
-        /** Specifies the element the action sheet popover points at. Applies only if usePopover is true. */
-        target?: string | Element | JQuery;
-        /** The title of the action sheet. */
-        title?: string;
-        /** Specifies whether or not to show the action sheet within a Popover widget. */
-        usePopover?: boolean;
-        /** A Boolean value specifying whether or not the ActionSheet widget is visible. */
-        visible?: boolean;
-    }
-    /** The ActionSheet widget is a sheet containing a set of buttons located one under the other. These buttons usually represent several choices relating to a single task. */
-    export class dxActionSheet extends CollectionWidget {
-        constructor(element: Element, options?: dxActionSheetOptions)
-        constructor(element: JQuery, options?: dxActionSheetOptions)
-        /** Hides the widget. */
-        hide(): Promise<void> & JQueryPromise<void>;
-        /** Shows the widget. */
-        show(): Promise<void> & JQueryPromise<void>;
-        /** Shows or hides the widget depending on the argument. */
-        toggle(showing: boolean): Promise<void> & JQueryPromise<void>;
-    }
-    /** This section lists the data source fields that are used in a default template for action sheet items. */
-    export interface dxActionSheetItem extends CollectionWidgetItem {
-        /** Specifies the icon to be displayed on the action sheet button. */
-        icon?: string;
-        /** A handler for the click event raised for the button representing the given action sheet button. */
-        onClick?: ((e: { component?: dxActionSheet, element?: DevExpress.core.dxElement, model?: any, jQueryEvent?: JQueryEventObject, event?: event }) => any) | string;
-        /** Specifies the type of the button that represents an action sheet item. */
-        type?: 'back' | 'danger' | 'default' | 'normal' | 'success';
-    }
-    
-    export interface dxAutocompleteOptions extends dxDropDownListOptions<dxAutocomplete> {
-        /** Specifies the maximum count of items displayed by the widget. */
-        maxItemCount?: number;
-        /** The minimum number of characters that must be entered into the text box to begin a search. */
-        minSearchLength?: number;
-        /** Specifies whether the drop-down button is visible. */
-        showDropDownButton?: boolean;
-        /** Specifies the current value displayed by the widget. */
-        value?: string;
-    }
-    /** The Autocomplete widget is a textbox that provides suggestions while a user types into it. */
-    export class dxAutocomplete extends dxDropDownList {
-        constructor(element: Element, options?: dxAutocompleteOptions)
-        constructor(element: JQuery, options?: dxAutocompleteOptions)
-    }
-    
-    export interface dxBoxOptions extends CollectionWidgetOptions<dxBox> {
-        /** Specifies how widget items are aligned along the main direction. */
-        align?: 'center' | 'end' | 'space-around' | 'space-between' | 'start';
-        /** Specifies how widget items are aligned cross-wise. */
-        crossAlign?: 'center' | 'end' | 'start' | 'stretch';
-        /** Specifies the direction of item positioning in the widget. */
-        direction?: 'col' | 'row';
-        /** An array of items displayed by the widget. */
-        items?: Array<string | dxBoxItem | any>;
-    }
-    /** The Box widget allows you to arrange various elements within it. Separate and adaptive, the Box widget acts as a building block for the layout. */
-    export class dxBox extends CollectionWidget {
-        constructor(element: Element, options?: dxBoxOptions)
-        constructor(element: JQuery, options?: dxBoxOptions)
-    }
-    /** This section lists the data source fields that are used in a default template for list items. */
-    export interface dxBoxItem extends CollectionWidgetItem {
-        /** Specifies the base size of an item element along the main direction. */
-        baseSize?: number | 'auto';
-        /** Holds a Box configuration object for the item. */
-        box?: dxBoxOptions;
-        /** Specifies the ratio value used to count the item element size along the main direction. */
-        ratio?: number;
-        /** A factor that defines how much an item shrinks relative to the rest of the items in the container. */
-        shrink?: number;
-    }
-    
-    export interface dxButtonOptions extends WidgetOptions<dxButton> {
-        /** A Boolean value specifying whether or not the widget changes its state when interacting with a user. */
-        activeStateEnabled?: boolean;
-        /** Specifies whether the widget can be focused using keyboard navigation. */
-        focusStateEnabled?: boolean;
-        /** Specifies whether the widget changes its state when a user pauses on it. */
-        hoverStateEnabled?: boolean;
-        /** Specifies the icon to be displayed on the button. */
-        icon?: string;
-        /** A function that is executed when the Button is clicked or tapped. */
-        onClick?: ((e: { component?: dxButton, element?: DevExpress.core.dxElement, model?: any, jQueryEvent?: JQueryEventObject, event?: event, validationGroup?: any }) => any);
-        /** Specifies how the button is styled. */
-        stylingMode?: 'text' | 'outlined' | 'contained';
-        /** Specifies a custom template for the Button widget. */
-        template?: template | ((buttonData: { text?: string, icon?: string }, contentElement: DevExpress.core.dxElement) => string | Element | JQuery);
-        /** The text displayed on the button. */
-        text?: string;
-        /** Specifies the button type. */
-        type?: 'back' | 'danger' | 'default' | 'normal' | 'success';
-        /** Specifies whether or not the button must submit an HTML form. */
-        useSubmitBehavior?: boolean;
-        /** Specifies the name of the validation group to be accessed in the click event handler. */
-        validationGroup?: string;
-    }
-    /** The Button widget is a simple button that performs specified commands when a user clicks it. */
-    export class dxButton extends Widget {
-        constructor(element: Element, options?: dxButtonOptions)
-        constructor(element: JQuery, options?: dxButtonOptions)
-    }
-    /** This section lists the fields of a context object available in a button template. */
-    export interface dxButtonDefaultTemplate {
-        /** Holds an icon that is specified using the icon option. */
-        icon?: string;
-        /** Holds the text that is specified using the text option. */
-        text?: string;
-    }
-    
-    export interface dxButtonGroupOptions extends WidgetOptions<dxButtonGroup> {
-        /** Specifies whether the widget can be focused using keyboard navigation. */
-        focusStateEnabled?: boolean;
-        /** Specifies whether the widget changes its state when a user pauses on it. */
-        hoverStateEnabled?: boolean;
-        /** Specifies a custom button template. */
-        itemTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery);
-        /** Configures buttons in the group. */
-        items?: Array<dxButtonGroupItem>;
-        /** Specifies which data field provides keys used to distinguish between the selected buttons. */
-        keyExpr?: string | Function;
-        /** A function that is executed when a button is clicked or tapped. */
-        onItemClick?: ((e: { component?: dxButtonGroup, element?: DevExpress.core.dxElement, model?: any, itemData?: any, itemElement?: DevExpress.core.dxElement, itemIndex?: number, event?: event }) => any);
-        /** A function that is executed when a button is selected or selection is canceled. */
-        onSelectionChanged?: ((e: { component?: dxButtonGroup, element?: DevExpress.core.dxElement, model?: any, addedItems?: Array<any>, removedItems?: Array<any> }) => any);
-        /** Contains the keys of the selected buttons and allows selecting buttons initially. */
-        selectedItemKeys?: Array<any>;
-        /** Contains the data objects that correspond to the selected buttons. The data objects are taken from the items array. */
-        selectedItems?: Array<any>;
-        /** Specifies whether a single or multiple buttons can be in the selected state simultaneously. */
-        selectionMode?: 'multiple' | 'single';
-        /** Specifies how buttons in the group are styled. */
-        stylingMode?: 'text' | 'outlined' | 'contained';
-    }
-    /** The ButtonGroup is a widget that contains a set of toggle buttons and can be used as a mode switcher. */
-    export class dxButtonGroup extends Widget {
-        constructor(element: Element, options?: dxButtonGroupOptions)
-        constructor(element: JQuery, options?: dxButtonGroupOptions)
-    }
-    /** This section describes object fields that can be used in the default item template. */
-    export interface dxButtonGroupItem extends CollectionWidgetItem {
-        /** Specifies a text for the hint that appears when the button is hovered over or long-pressed. */
-        hint?: string;
-        /** Specifies the icon to be displayed on the button. */
-        icon?: string;
-        /** Specifies the button type. */
-        type?: 'back' | 'danger' | 'default' | 'normal' | 'success';
-    }
-    
-    export interface dxCalendarOptions extends EditorOptions<dxCalendar> {
-        /** Specifies whether or not the widget changes its state when interacting with a user. */
-        activeStateEnabled?: boolean;
-        /** Specifies a custom template for calendar cells. */
-        cellTemplate?: template | ((itemData: { date?: Date, view?: string, text?: string }, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery);
-        /** Specifies the date-time value serialization format. Use it only if you do not specify the value at design time. */
-        dateSerializationFormat?: string;
-        /** Specifies dates to be disabled. */
-        disabledDates?: Array<Date> | ((data: { component?: any, date?: Date, view?: string }) => boolean);
-        /** Specifies the first day of a week. */
-        firstDayOfWeek?: 0 | 1 | 2 | 3 | 4 | 5 | 6;
-        /** Specifies whether the widget can be focused using keyboard navigation. */
-        focusStateEnabled?: boolean;
-        /** Specifies whether the widget changes its state when a user pauses on it. */
-        hoverStateEnabled?: boolean;
-        /** The latest date the widget allows to select. */
-        max?: Date | number | string;
-        /** Specifies the maximum zoom level of the calendar. */
-        maxZoomLevel?: 'century' | 'decade' | 'month' | 'year';
-        /** The earliest date the widget allows to select. */
-        min?: Date | number | string;
-        /** Specifies the minimum zoom level of the calendar. */
-        minZoomLevel?: 'century' | 'decade' | 'month' | 'year';
-        /** The value to be assigned to the `name` attribute of the underlying HTML element. */
-        name?: string;
-        /** Specifies whether or not the widget displays a button that selects the current date. */
-        showTodayButton?: boolean;
-        /** An object or a value specifying the date and time currently selected in the calendar. */
-        value?: Date | number | string;
-        /** Specifies the current calendar zoom level. */
-        zoomLevel?: 'century' | 'decade' | 'month' | 'year';
-    }
-    /** The Calendar is a widget that displays a calendar and allows an end user to select the required date within a specified date range. */
-    export class dxCalendar extends Editor {
-        constructor(element: Element, options?: dxCalendarOptions)
-        constructor(element: JQuery, options?: dxCalendarOptions)
-    }
-    /** This section lists the fields that are used in a default template for calendar cells. */
-    export interface dxCalendarCellTemplate {
-        /** The Date object associated with the cell. */
-        date?: Date;
-        /** The text displayed by the cell. */
-        text?: string;
-        /** The current view's name. */
-        view?: 'month' | 'year' | 'decade' | 'century';
-    }
-    
-    export interface dxCheckBoxOptions extends EditorOptions<dxCheckBox> {
-        /** Specifies whether or not the widget changes its state when interacting with a user. */
-        activeStateEnabled?: boolean;
-        /** Specifies whether the widget can be focused using keyboard navigation. */
-        focusStateEnabled?: boolean;
-        /** Specifies whether the widget changes its state when a user pauses on it. */
-        hoverStateEnabled?: boolean;
-        /** The value to be assigned to the `name` attribute of the underlying HTML element. */
-        name?: string;
-        /** Specifies the text displayed by the check box. */
-        text?: string;
-        /** Specifies the widget state. */
-        value?: boolean;
-    }
-    /** The CheckBox is a small box, which when selected by the end user, shows that a particular feature has been enabled or a specific option has been chosen. */
-    export class dxCheckBox extends Editor {
-        constructor(element: Element, options?: dxCheckBoxOptions)
-        constructor(element: JQuery, options?: dxCheckBoxOptions)
-    }
-    
-    export interface dxColorBoxOptions extends dxDropDownEditorOptions<dxColorBox> {
-        /** Specifies the text displayed on the button that applies changes and closes the drop-down editor. */
-        applyButtonText?: string;
-        /** Specifies the way an end-user applies the selected value. */
-        applyValueMode?: 'instantly' | 'useButtons';
-        /** Specifies the text displayed on the button that cancels changes and closes the drop-down editor. */
-        cancelButtonText?: string;
-        /** Specifies whether or not the widget value includes the alpha channel component. */
-        editAlphaChannel?: boolean;
-        /** Specifies a custom template for the input field. Must contain the TextBox widget. */
-        fieldTemplate?: template | ((value: string, fieldElement: DevExpress.core.dxElement) => string | Element | JQuery);
-        /** Specifies the size of a step by which a handle is moved using a keyboard shortcut. */
-        keyStep?: number;
-        /** Specifies the currently selected value. */
-        value?: string;
-    }
-    /** The ColorBox is a widget that allows an end user to enter a color or pick it out from the drop-down editor. */
-    export class dxColorBox extends dxDropDownEditor {
-        constructor(element: Element, options?: dxColorBoxOptions)
-        constructor(element: JQuery, options?: dxColorBoxOptions)
-    }
-    
-    export interface dxContextMenuOptions extends dxMenuBaseOptions<dxContextMenu> {
-        /** Specifies whether to close the ContextMenu if a user clicks outside it. */
-        closeOnOutsideClick?: boolean | ((event: event) => boolean);
-        /** Holds an array of menu items. */
-        items?: Array<dxContextMenuItem>;
-        /** A function that is executed after the ContextMenu is hidden. */
-        onHidden?: ((e: { component?: dxContextMenu, element?: DevExpress.core.dxElement, model?: any }) => any);
-        /** A function that is executed before the ContextMenu is hidden. */
-        onHiding?: ((e: { component?: dxContextMenu, element?: DevExpress.core.dxElement, model?: any, cancel?: boolean }) => any);
-        /** A function that is executed before the ContextMenu is positioned. */
-        onPositioning?: ((e: { component?: dxContextMenu, element?: DevExpress.core.dxElement, model?: any, jQueryEvent?: JQueryEventObject, event?: event, position?: positionConfig }) => any);
-        /** A function that is executed before the ContextMenu is shown. */
-        onShowing?: ((e: { component?: dxContextMenu, element?: DevExpress.core.dxElement, model?: any, cancel?: boolean }) => any);
-        /** A function that is executed after the ContextMenu is shown. */
-        onShown?: ((e: { component?: dxContextMenu, element?: DevExpress.core.dxElement, model?: any }) => any);
-        /** An object defining widget positioning options. */
-        position?: positionConfig;
-        /** Specifies options for displaying the widget. */
-        showEvent?: { delay?: number, name?: string } | string;
-        /** Specifies the direction at which submenus are displayed. */
-        submenuDirection?: 'auto' | 'left' | 'right';
-        /** The target element associated with the context menu. */
-        target?: string | Element | JQuery;
-        /** A Boolean value specifying whether or not the widget is visible. */
-        visible?: boolean;
-    }
-    /** The ContextMenu widget displays a single- or multi-level context menu. An end user invokes this menu by a right click or a long press. */
-    export class dxContextMenu extends dxMenuBase {
-        constructor(element: Element, options?: dxContextMenuOptions)
-        constructor(element: JQuery, options?: dxContextMenuOptions)
-        /** Hides the widget. */
-        hide(): Promise<void> & JQueryPromise<void>;
-        /** Shows the widget. */
-        show(): Promise<void> & JQueryPromise<void>;
-        /** Shows or hides the widget depending on the argument. */
-        toggle(showing: boolean): Promise<void> & JQueryPromise<void>;
-    }
-    /** This section lists the data source fields that are used in a default item template. */
-    export interface dxContextMenuItem extends dxMenuBaseItem {
-        /** Holds an array of menu items. */
-        items?: Array<dxContextMenuItem>;
-    }
-    
-    export interface dxDataGridOptions extends GridBaseOptions<dxDataGrid> {
-        /** An array of grid columns. */
-        columns?: Array<dxDataGridColumn | string>;
-        /** Customizes columns after they are created. */
-        customizeColumns?: ((columns: Array<dxDataGridColumn>) => any);
-        /** Customizes data before export. You can use the export.customizeExcelCell function instead. */
-        customizeExportData?: ((columns: Array<dxDataGridColumn>, rows: Array<dxDataGridRowObject>) => any);
-        /** Configures editing. */
-        editing?: dxDataGridEditing;
-        /** Configures client-side exporting. */
-        export?: { allowExportSelectedData?: boolean, customizeExcelCell?: ((options: { component?: dxDataGrid, horizontalAlignment?: 'center' | 'centerContinuous' | 'distributed' | 'fill' | 'general' | 'justify' | 'left' | 'right', verticalAlignment?: 'bottom' | 'center' | 'distributed' | 'justify' | 'top', wrapTextEnabled?: boolean, backgroundColor?: string, fillPatternType?: 'darkDown' | 'darkGray' | 'darkGrid' | 'darkHorizontal' | 'darkTrellis' | 'darkUp' | 'darkVertical' | 'gray0625' | 'gray125' | 'lightDown' | 'lightGray' | 'lightGrid' | 'lightHorizontal' | 'lightTrellis' | 'lightUp' | 'lightVertical' | 'mediumGray' | 'none' | 'solid', fillPatternColor?: string, font?: DevExpress.exporter.ExcelFont, value?: string | number | Date, numberFormat?: string, gridCell?: DevExpress.exporter.ExcelDataGridCell }) => any), enabled?: boolean, excelFilterEnabled?: boolean, excelWrapTextEnabled?: boolean, fileName?: string, ignoreExcelErrors?: boolean, proxyUrl?: string, texts?: { exportAll?: string, exportSelectedRows?: string, exportTo?: string } };
-        /** Configures the group panel. */
-        groupPanel?: { allowColumnDragging?: boolean, emptyPanelText?: string, visible?: boolean | 'auto' };
-        /** Configures grouping. */
-        grouping?: { allowCollapsing?: boolean, autoExpandAll?: boolean, contextMenuEnabled?: boolean, expandMode?: 'buttonClick' | 'rowClick', texts?: { groupByThisColumn?: string, groupContinuedMessage?: string, groupContinuesMessage?: string, ungroup?: string, ungroupAll?: string } };
-        /** Specifies which data field provides keys for data items. Applies only if data is a simple array. */
-        keyExpr?: string | Array<string>;
-        /** Allows you to build a master-detail interface in the grid. */
-        masterDetail?: { autoExpandAll?: boolean, enabled?: boolean, template?: template | ((detailElement: DevExpress.core.dxElement, detailInfo: { key?: any, data?: any, watch?: Function }) => any) };
-        /** A function that is executed when a cell is clicked or tapped. Executed before onRowClick. */
-        onCellClick?: ((e: { component?: dxDataGrid, element?: DevExpress.core.dxElement, model?: any, jQueryEvent?: JQueryEventObject, event?: event, data?: any, key?: any, value?: any, displayValue?: any, text?: string, columnIndex?: number, column?: any, rowIndex?: number, rowType?: string, cellElement?: DevExpress.core.dxElement, row?: dxDataGridRowObject }) => any) | string;
-        /** A function that is executed when a cell is double-clicked or double-tapped. Executed before onRowDblClick. */
-        onCellDblClick?: ((e: { component?: dxDataGrid, element?: DevExpress.core.dxElement, model?: any, event?: event, data?: any, key?: any, value?: any, displayValue?: any, text?: string, columnIndex?: number, column?: dxDataGridColumn, rowIndex?: number, rowType?: string, cellElement?: DevExpress.core.dxElement, row?: dxDataGridRowObject }) => any);
-        /** A function that is executed after the pointer enters or leaves a cell. */
-        onCellHoverChanged?: ((e: { component?: dxDataGrid, element?: DevExpress.core.dxElement, model?: any, eventType?: string, data?: any, key?: any, value?: any, text?: string, displayValue?: any, columnIndex?: number, rowIndex?: number, column?: dxDataGridColumn, rowType?: string, cellElement?: DevExpress.core.dxElement, row?: dxDataGridRowObject }) => any);
-        /** A function that is executed after a cell is created. */
-        onCellPrepared?: ((e: { component?: dxDataGrid, element?: DevExpress.core.dxElement, model?: any, data?: any, key?: any, value?: any, displayValue?: any, text?: string, columnIndex?: number, column?: dxDataGridColumn, rowIndex?: number, rowType?: string, row?: dxDataGridRowObject, isSelected?: boolean, isExpanded?: boolean, cellElement?: DevExpress.core.dxElement, watch?: Function, oldValue?: any }) => any);
-        /** A function that is executed before the context menu is rendered. */
-        onContextMenuPreparing?: ((e: { component?: dxDataGrid, element?: DevExpress.core.dxElement, model?: any, items?: Array<any>, target?: string, targetElement?: DevExpress.core.dxElement, columnIndex?: number, column?: dxDataGridColumn, rowIndex?: number, row?: dxDataGridRowObject }) => any);
-        /** A function that is executed before a cell or row switches to the editing state. */
-        onEditingStart?: ((e: { component?: dxDataGrid, element?: DevExpress.core.dxElement, model?: any, data?: any, key?: any, cancel?: boolean, column?: any }) => any);
-        /** A function that is executed after an editor is created. */
-        onEditorPrepared?: ((options: { component?: dxDataGrid, element?: DevExpress.core.dxElement, model?: any, parentType?: string, value?: any, setValue?: any, updateValueTimeout?: number, width?: number, disabled?: boolean, rtlEnabled?: boolean, editorElement?: DevExpress.core.dxElement, readOnly?: boolean, dataField?: string, row?: dxDataGridRowObject }) => any);
-        /** A function that is executed before a cell's editor is created. Not executed for cells with an editCellTemplate. */
-        onEditorPreparing?: ((e: { component?: dxDataGrid, element?: DevExpress.core.dxElement, model?: any, parentType?: string, value?: any, setValue?: any, updateValueTimeout?: number, width?: number, disabled?: boolean, rtlEnabled?: boolean, cancel?: boolean, editorElement?: DevExpress.core.dxElement, readOnly?: boolean, editorName?: string, editorOptions?: any, dataField?: string, row?: dxDataGridRowObject }) => any);
-        /** A function that is executed after data is exported. */
-        onExported?: ((e: { component?: dxDataGrid, element?: DevExpress.core.dxElement, model?: any }) => any);
-        /** A function that is executed before data is exported. */
-        onExporting?: ((e: { component?: dxDataGrid, element?: DevExpress.core.dxElement, model?: any, fileName?: string, cancel?: boolean }) => any);
-        /** A function that is executed before a file with exported data is saved to the user's local storage. */
-        onFileSaving?: ((e: { component?: dxDataGrid, element?: DevExpress.core.dxElement, model?: any, fileName?: string, format?: string, data?: Blob, cancel?: boolean }) => any);
-        /** A function that is executed after the focused cell changes. */
-        onFocusedCellChanged?: ((e: { component?: dxDataGrid, element?: DevExpress.core.dxElement, model?: any, cellElement?: DevExpress.core.dxElement, columnIndex?: number, rowIndex?: number, row?: dxDataGridRowObject, column?: dxDataGridColumn }) => any);
-        /** A function that is executed before the focused cell changes. */
-        onFocusedCellChanging?: ((e: { component?: dxDataGrid, element?: DevExpress.core.dxElement, model?: any, cellElement?: DevExpress.core.dxElement, prevColumnIndex?: number, prevRowIndex?: number, newColumnIndex?: number, newRowIndex?: number, event?: event, rows?: Array<dxDataGridRowObject>, columns?: Array<dxDataGridColumn>, cancel?: boolean, isHighlighted?: boolean }) => any);
-        /** A function that is executed after the focused row changes. Applies only when focusedRowEnabled is true. */
-        onFocusedRowChanged?: ((e: { component?: dxDataGrid, element?: DevExpress.core.dxElement, model?: any, rowElement?: DevExpress.core.dxElement, rowIndex?: number, row?: dxDataGridRowObject }) => any);
-        /** A function that is executed before the focused row changes. Applies only when focusedRowEnabled is true. */
-        onFocusedRowChanging?: ((e: { component?: dxDataGrid, element?: DevExpress.core.dxElement, model?: any, rowElement?: DevExpress.core.dxElement, prevRowIndex?: number, newRowIndex?: number, event?: event, rows?: Array<dxDataGridRowObject>, cancel?: boolean }) => any);
-        /** A function that is executed when a row is clicked or tapped. */
-        onRowClick?: ((e: { component?: dxDataGrid, element?: DevExpress.core.dxElement, model?: any, jQueryEvent?: JQueryEventObject, event?: event, data?: any, key?: any, values?: Array<any>, columns?: Array<any>, rowIndex?: number, rowType?: string, isSelected?: boolean, isExpanded?: boolean, groupIndex?: number, rowElement?: DevExpress.core.dxElement, handled?: boolean }) => any) | string;
-        /** A function that is executed when a row is double-clicked or double-tapped. Executed after onCellDblClick. */
-        onRowDblClick?: ((e: { component?: dxDataGrid, element?: DevExpress.core.dxElement, model?: any, event?: event, data?: any, key?: any, values?: Array<any>, columns?: Array<dxDataGridColumn>, rowIndex?: number, rowType?: string, isSelected?: boolean, isExpanded?: boolean, groupIndex?: number, rowElement?: DevExpress.core.dxElement }) => any);
-        /** A function that is executed after a row is created. */
-        onRowPrepared?: ((e: { component?: dxDataGrid, element?: DevExpress.core.dxElement, model?: any, data?: any, key?: any, values?: Array<any>, columns?: Array<dxDataGridColumn>, rowIndex?: number, rowType?: string, groupIndex?: number, isSelected?: boolean, isExpanded?: boolean, rowElement?: DevExpress.core.dxElement }) => any);
-        /** Notifies the DataGrid of the server's data processing operations. */
-        remoteOperations?: boolean | { filtering?: boolean, groupPaging?: boolean, grouping?: boolean, paging?: boolean, sorting?: boolean, summary?: boolean } | 'auto';
-        /** Specifies a custom template for rows. */
-        rowTemplate?: template | ((rowElement: DevExpress.core.dxElement, rowInfo: any) => any);
-        /** Configures scrolling. */
-        scrolling?: dxDataGridScrolling;
-        /** Configures runtime selection. */
-        selection?: dxDataGridSelection;
-        /** Specifies filters for the rows that must be selected initially. Applies only if selection.deferred is true. */
-        selectionFilter?: string | Array<any> | Function;
-        /** Allows you to sort groups according to the values of group summary items. */
-        sortByGroupSummaryInfo?: Array<{ groupColumn?: string, sortOrder?: 'asc' | 'desc', summaryItem?: string | number }>;
-        /** Specifies the options of the grid summary. */
-        summary?: { calculateCustomSummary?: ((options: { component?: dxDataGrid, name?: string, summaryProcess?: string, value?: any, totalValue?: any, groupIndex?: number }) => any), groupItems?: Array<{ alignByColumn?: boolean, column?: string, customizeText?: ((itemInfo: { value?: string | number | Date, valueText?: string }) => string), displayFormat?: string, name?: string, showInColumn?: string, showInGroupFooter?: boolean, skipEmptyValues?: boolean, summaryType?: 'avg' | 'count' | 'custom' | 'max' | 'min' | 'sum' | string, valueFormat?: format }>, recalculateWhileEditing?: boolean, skipEmptyValues?: boolean, texts?: { avg?: string, avgOtherColumn?: string, count?: string, max?: string, maxOtherColumn?: string, min?: string, minOtherColumn?: string, sum?: string, sumOtherColumn?: string }, totalItems?: Array<{ alignment?: 'center' | 'left' | 'right', column?: string, cssClass?: string, customizeText?: ((itemInfo: { value?: string | number | Date, valueText?: string }) => string), displayFormat?: string, name?: string, showInColumn?: string, skipEmptyValues?: boolean, summaryType?: 'avg' | 'count' | 'custom' | 'max' | 'min' | 'sum' | string, valueFormat?: format }> };
-    }
-    /** Configures editing. */
-    export interface dxDataGridEditing extends GridBaseEditing {
-        /** Specifies whether a user can add new rows. */
-        allowAdding?: boolean;
-        /** Specifies whether a user can delete rows. It is called for each data row when defined as a function. */
-        allowDeleting?: boolean | ((options: { component?: dxDataGrid, row?: dxDataGridRowObject }) => boolean);
-        /** Specifies whether a user can update rows. It is called for each data row when defined as a function. */
-        allowUpdating?: boolean | ((options: { component?: dxDataGrid, row?: dxDataGridRowObject }) => boolean);
-        /** Contains options that specify texts for editing-related UI elements. */
-        texts?: any;
-    }
-    /** Configures scrolling. */
-    export interface dxDataGridScrolling extends GridBaseScrolling {
-        /** Specifies the scrolling mode. */
-        mode?: 'infinite' | 'standard' | 'virtual';
-    }
-    /** Configures runtime selection. */
-    export interface dxDataGridSelection extends GridBaseSelection {
-        /** Makes selection deferred. */
-        deferred?: boolean;
-        /** Specifies the mode in which all the records are selected. Applies only if selection.allowSelectAll is true. */
-        selectAllMode?: 'allPages' | 'page';
-        /** Specifies when to display check boxes in rows. Applies only if selection.mode is "multiple". */
-        showCheckBoxesMode?: 'always' | 'none' | 'onClick' | 'onLongTap';
-    }
-    /** The DataGrid is a widget that represents data from a local or remote source in the form of a grid. This widget offers such basic features as sorting, grouping, filtering, as well as more advanced capabilities, like state storing, export to Excel, master-detail interface, and many others. */
-    export class dxDataGrid extends GridBase {
-        constructor(element: Element, options?: dxDataGridOptions)
-        constructor(element: JQuery, options?: dxDataGridOptions)
-        /** Adds a new column. */
-        addColumn(columnOptions: any | string): void;
-        /** Adds an empty data row. */
-        addRow(): void;
-        /** Ungroups grid records. */
-        clearGrouping(): void;
-        /** Collapses master rows or groups of a specific level. */
-        collapseAll(groupIndex?: number): void;
-        /** Collapses a group or a master row with a specific key. */
-        collapseRow(key: any): Promise<void> & JQueryPromise<void>;
-        /** Expands master rows or groups of a specific level. Does not apply if data is remote. */
-        expandAll(groupIndex?: number): void;
-        /** Expands a group or a master row with a specific key. */
-        expandRow(key: any): Promise<void> & JQueryPromise<void>;
-        /** Exports grid data to Excel. */
-        exportToExcel(selectionOnly: boolean): void;
-        /** Gets the currently selected rows' keys. */
-        getSelectedRowKeys(): Array<any> & Promise<any> & JQueryPromise<any>;
-        /** Gets the selected rows' data objects. */
-        getSelectedRowsData(): Array<any> & Promise<any> & JQueryPromise<any>;
-        /** Gets the value of a total summary item. */
-        getTotalSummaryValue(summaryItemName: string): any;
-        /** Gets all visible columns. */
-        getVisibleColumns(): Array<dxDataGridColumn>;
-        /** Gets all visible columns at a specific hierarchical level of column headers. Use it to access banded columns. */
-        getVisibleColumns(headerLevel: number): Array<dxDataGridColumn>;
-        /** Gets currently rendered rows. */
-        getVisibleRows(): Array<dxDataGridRowObject>;
-        /** @deprecated Use addRow instead. */
-        /** Adds a new data row to a grid. */
-        insertRow(): void;
-        /** Checks whether a specific group or master row is expanded or collapsed. */
-        isRowExpanded(key: any): boolean;
-        /** Checks whether a row found using its data object is selected. Takes effect only if selection.deferred is true. */
-        isRowSelected(data: any): boolean;
-        /** Checks whether a row with a specific key is selected. */
-        isRowSelected(key: any): boolean;
-        /** @deprecated Use deleteRow instead. */
-        /** Removes a row with a specific index. */
-        removeRow(rowIndex: number): void;
-        /** Gets the total row count. */
-        totalCount(): number;
-    }
-    
-    export interface dxDataGridColumn extends GridBaseColumn {
-        /** Specifies whether data from this column should be exported. Applies only if the column is visible. */
-        allowExporting?: boolean;
-        /** Specifies whether the user can group data by values of this column. Applies only when grouping is enabled. */
-        allowGrouping?: boolean;
-        /** Specifies whether groups appear expanded or not when records are grouped by a specific column. Setting this option makes sense only when grouping is allowed for this column. */
-        autoExpandGroup?: boolean;
-        /** Allows you to customize buttons in the editing column or create a custom command column. Applies only if the column's type is "buttons". */
-        buttons?: Array<'cancel' | 'delete' | 'edit' | 'save' | 'undelete' | dxDataGridColumnButton>;
-        /** Specifies a field name or a function that returns a field name or a value to be used for grouping column cells. */
-        calculateGroupValue?: string | ((rowData: any) => any);
-        /** An array of grid columns. */
-        columns?: Array<dxDataGridColumn | string>;
-        /** Specifies a custom template for group cells. */
-        groupCellTemplate?: template | ((cellElement: DevExpress.core.dxElement, cellInfo: any) => any);
-        /** Specifies the index of a column when grid records are grouped by the values of this column. */
-        groupIndex?: number;
-        /** Specifies whether or not to display the column when grid records are grouped by it. */
-        showWhenGrouped?: boolean;
-        /** Specifies the command column that this object customizes. */
-        type?: 'adaptive' | 'buttons' | 'detailExpand' | 'groupExpand' | 'selection';
-    }
-    /** Allows you to customize buttons in the editing column or create a custom command column. Applies only if the column's type is "buttons". */
-    export interface dxDataGridColumnButton extends GridBaseColumnButton {
-        /** The name used to identify a built-in button. */
-        name?: 'cancel' | 'delete' | 'edit' | 'save' | 'undelete' | string;
-        /** A function that is executed when the button is clicked or tapped. */
-        onClick?: ((e: { component?: dxDataGrid, element?: DevExpress.core.dxElement, model?: any, event?: event, row?: dxDataGridRowObject, column?: dxDataGridColumn }) => any) | string;
-        /** Specifies a custom button template. */
-        template?: template | ((cellElement: DevExpress.core.dxElement, cellInfo: { component?: dxDataGrid, data?: any, key?: any, columnIndex?: number, column?: dxDataGridColumn, rowIndex?: number, rowType?: string, row?: dxDataGridRowObject }) => string | Element | JQuery);
-        /** Specifies the button's visibility. */
-        visible?: boolean | ((options: { component?: dxDataGrid, row?: dxDataGridRowObject, column?: dxDataGridColumn }) => boolean);
-    }
-    /** This section describes the properties of a grid row. An object containing these properties comes to certain event-handling functions. */
-    export interface dxDataGridRowObject {
-        /** The data object represented by the row. */
-        data?: any;
-        /** The group index of the row. Available when the rowType is "group". */
-        groupIndex?: number;
-        /** Indicates whether the row is in the editing state. */
-        isEditing?: boolean;
-        /** Indicates whether the row is expanded or collapsed. Available if rowType is "data", "detail" or "group". */
-        isExpanded?: boolean;
-        /** Indicates whether the row is selected. Available if rowType is "data". */
-        isSelected?: boolean;
-        /** The key of the data object represented by the row. */
-        key?: any;
-        /** The visible index of the row. */
-        rowIndex?: number;
-        /** The row's type. */
-        rowType?: string;
-        /** Values of the row as they exist in the data source. */
-        values?: Array<any>;
-    }
-    
-    export interface dxDateBoxOptions extends dxDropDownEditorOptions<dxDateBox> {
-        /** Specifies whether or not adaptive widget rendering is enabled on a small screen. */
-        adaptivityEnabled?: boolean;
-        /** The text displayed on the Apply button. */
-        applyButtonText?: string;
-        /** Configures the calendar's value picker. Applies only if the pickerType is "calendar". */
-        calendarOptions?: dxCalendarOptions;
-        /** The text displayed on the Cancel button. */
-        cancelButtonText?: string;
-        /** Specifies the message displayed if the specified date is later than the max value or earlier than the min value. */
-        dateOutOfRangeMessage?: string;
-        /** Specifies the date-time value serialization format. Use it only if you do not specify the value at design time. */
-        dateSerializationFormat?: string;
-        /** Specifies dates to be disabled. Applies only if pickerType is "calendar". */
-        disabledDates?: Array<Date> | ((data: { component?: dxDateBox, date?: Date, view?: string }) => boolean);
-        /** Specifies the date display format. Ignored if the pickerType option is "native" */
-        displayFormat?: format;
-        /** Specifies the interval between neighboring values in the popup list in minutes. */
-        interval?: number;
-        /** Specifies the message displayed if the typed value is not a valid date or time. */
-        invalidDateMessage?: string;
-        /** The last date that can be selected within the widget. */
-        max?: Date | number | string;
-        /** @deprecated Use the calendarOptions option instead. */
-        /** Specifies the maximum zoom level of a calendar, which is used to pick the date. */
-        maxZoomLevel?: 'century' | 'decade' | 'month' | 'year';
-        /** The minimum date that can be selected within the widget. */
-        min?: Date | number | string;
-        /** @deprecated Use the calendarOptions option instead. */
-        /** Specifies the minimal zoom level of a calendar, which is used to pick the date. */
-        minZoomLevel?: 'century' | 'decade' | 'month' | 'year';
-        /** Specifies the type of the date/time picker. */
-        pickerType?: 'calendar' | 'list' | 'native' | 'rollers';
-        /** Specifies a placeholder for the input field. */
-        placeholder?: string;
-        /** Specifies whether to show the analog clock in the value picker. Applies only if type is "datetime" and pickerType is "calendar". */
-        showAnalogClock?: boolean;
-        /** A format used to display date/time information. */
-        type?: 'date' | 'datetime' | 'time';
-        /** Specifies whether to control user input using a mask created based on the displayFormat. */
-        useMaskBehavior?: boolean;
-        /** An object or a value specifying the date and time currently selected using the date box. */
-        value?: Date | number | string;
-    }
-    /** The DateBox is a widget that displays date and time in a specified format, and enables a user to pick or type in the required date/time value. */
-    export class dxDateBox extends dxDropDownEditor {
-        constructor(element: Element, options?: dxDateBoxOptions)
-        constructor(element: JQuery, options?: dxDateBoxOptions)
-        /** Closes the drop-down editor. */
-        close(): void;
-        /** Opens the drop-down editor. */
-        open(): void;
-    }
-    
-    export interface dxDeferRenderingOptions extends WidgetOptions<dxDeferRendering> {
-        /** Specifies the animation to be used to show the rendered content. */
-        animation?: animationConfig;
-        /** A function that is executed when the content is rendered but not yet displayed. */
-        onRendered?: ((e: { component?: dxDeferRendering, element?: DevExpress.core.dxElement, model?: any }) => any);
-        /** A function that is executed when the content is displayed and animation is completed. */
-        onShown?: ((e: { component?: dxDeferRendering, element?: DevExpress.core.dxElement, model?: any }) => any);
-        /** Specifies when the widget content is rendered. */
-        renderWhen?: Promise<void> | JQueryPromise<void> | boolean;
-        /** Indicates if a load indicator should be shown until the widget's content is rendered. */
-        showLoadIndicator?: boolean;
-        /** Specifies a jQuery selector of items that should be rendered using a staggered animation. */
-        staggerItemSelector?: string;
-    }
-    /** The DeferRendering is a widget that waits for its content to be ready before rendering it. While the content is getting ready, the DeferRendering displays a loading indicator. */
-    export class dxDeferRendering extends Widget {
-        constructor(element: Element, options?: dxDeferRenderingOptions)
-        constructor(element: JQuery, options?: dxDeferRenderingOptions)
-    }
-
-    
-    export interface dxDiagramOptions extends WidgetOptions<dxDiagram> {
-    }
-
-    
-    export class dxDiagram extends Widget {
-        constructor(element: Element, options?: dxDiagramOptions)
-        constructor(element: JQuery, options?: dxDiagramOptions)
-    }
-    
-    export interface dxDrawerOptions extends WidgetOptions<dxDrawer> {
-        /** Specifies the duration of the drawer's opening and closing animation (in milliseconds). Applies only if animationEnabled is true. */
-        animationDuration?: number;
-        /** Specifies whether to use an opening and closing animation. */
-        animationEnabled?: boolean;
-        /** Specifies whether to close the drawer if a user clicks or taps the view area. */
-        closeOnOutsideClick?: boolean | ((event: event) => boolean);
-        /** Specifies the drawer's width or height (depending on the drawer's position) in the opened state. */
-        maxSize?: number;
-        /** Specifies the drawer's width or height (depending on the drawer's position) in the closed state. */
-        minSize?: number;
-        /** Specifies whether the drawer is opened. */
-        opened?: boolean;
-        /** Specifies how the drawer interacts with the view in the opened state. */
-        openedStateMode?: 'overlap' | 'shrink' | 'push';
-        /** Specifies the drawer's position in relation to the view. */
-        position?: 'left' | 'right' | 'top' | 'bottom' | 'before' | 'after';
-        /** Specifies the drawer's reveal mode. */
-        revealMode?: 'slide' | 'expand';
-        /** Specifies whether to shade the view when the drawer is opened. */
-        shading?: boolean;
-        /** Specifies the target element associated with the drawer. Applies only when the openedStateMode is "overlap". */
-        target?: string | Element | JQuery;
-        /** Specifies the drawer's content. */
-        template?: template | ((Element: DevExpress.core.dxElement) => any);
-    }
-    /** The Drawer is a dismissible or permanently visible panel used for navigation in responsive web application layouts. */
-    export class dxDrawer extends Widget {
-        constructor(element: Element, options?: dxDrawerOptions)
-        constructor(element: JQuery, options?: dxDrawerOptions)
-        /** Gets the drawer's content. */
-        content(): DevExpress.core.dxElement;
-        /** Closes the drawer. */
-        hide(): Promise<void> & JQueryPromise<void>;
-        /** Opens the drawer. */
-        show(): Promise<void> & JQueryPromise<void>;
-        /** Opens or closes the drawer, reversing the current state. */
-        toggle(): Promise<void> & JQueryPromise<void>;
-    }
-    
-    export interface dxDropDownBoxOptions extends DataExpressionMixinOptions<dxDropDownBox>, dxDropDownEditorOptions<dxDropDownBox> {
-        /** Specifies whether the widget allows a user to enter a custom value. */
-        acceptCustomValue?: boolean;
-        /** Specifies a custom template for the drop-down content. */
-        contentTemplate?: template | ((templateData: { component?: dxDropDownBox, value?: any }, contentElement: DevExpress.core.dxElement) => string | Element | JQuery);
-        /** Configures the drop-down field which holds the content. */
-        dropDownOptions?: dxPopupOptions;
-        /** Specifies a custom template for the text field. Must contain the TextBox widget. */
-        fieldTemplate?: template | ((value: any, fieldElement: DevExpress.core.dxElement) => string | Element | JQuery);
-        /** Specifies whether a user can open the drop-down list by clicking a text field. */
-        openOnFieldClick?: boolean;
-        /** Specifies the DOM events after which the widget's value should be updated. */
-        valueChangeEvent?: string;
-    }
-    /** The DropDownBox widget consists of a text field, which displays the current value, and a drop-down field, which can contain any UI element. */
-    export class dxDropDownBox extends dxDropDownEditor {
-        constructor(element: Element, options?: dxDropDownBoxOptions)
-        constructor(element: JQuery, options?: dxDropDownBoxOptions)
-        /** Gets the DataSource instance. */
-        getDataSource(): DevExpress.data.DataSource;
-    }
-    
-    export interface dxDropDownButtonOptions extends WidgetOptions<dxDropDownButton> {
-        
-        dataSource?: string | Array<CollectionWidgetItem | any> | DevExpress.data.DataSource | DevExpress.data.DataSourceOptions;
-        
-        deferRendering?: boolean;
-        
-        displayExpr?: string | ((itemData: any) => string);
-        
-        dropDownContentTemplate?: template | ((data: Array<string | number | any> | DevExpress.data.DataSource, contentElement: DevExpress.core.dxElement) => string | Element | JQuery);
-        
-        dropDownOptions?: dxPopupOptions;
-        
-        focusStateEnabled?: boolean;
-        
-        hoverStateEnabled?: boolean;
-        
-        icon?: string;
-        
-        itemTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery);
-        
-        items?: Array<CollectionWidgetItem | any>;
-        
-        keyExpr?: string;
-        
-        noDataText?: string;
-        
-        onButtonClick?: ((e: { component?: dxDropDownButton, element?: DevExpress.core.dxElement, model?: any, event?: event, selectedItem?: any }) => any) | string;
-        
-        onItemClick?: ((e: { component?: dxDropDownButton, element?: DevExpress.core.dxElement, model?: any, event?: event, itemData?: any, itemElement?: DevExpress.core.dxElement }) => any) | string;
-        
-        onSelectionChanged?: ((e: { component?: dxDropDownButton, element?: DevExpress.core.dxElement, model?: any, item?: any, previousItem?: any }) => any) | string;
-        
-        selectedItem?: string | number | any;
-        
-        selectedItemKey?: string | number;
-        
-        splitButton?: boolean;
-        
-        stylingMode?: 'text' | 'outlined' | 'contained';
-        
-        text?: string;
-        
-        useSelectMode?: boolean;
-    }
-    
-    export class dxDropDownButton extends Widget {
-        constructor(element: Element, options?: dxDropDownButtonOptions)
-        constructor(element: JQuery, options?: dxDropDownButtonOptions)
-        
-        close(): Promise<void> & JQueryPromise<void>;
-
-        /** Gets the DataSource instance. */
-        getDataSource(): DevExpress.data.DataSource;
-        
-        open(): Promise<void> & JQueryPromise<void>;
-        
-        toggle(): Promise<void> & JQueryPromise<void>;
-        
-        toggle(visibility: boolean): Promise<void> & JQueryPromise<void>;
-    }
-    
-    export interface dxDropDownEditorOptions<T = dxDropDownEditor> extends dxTextBoxOptions<T> {
-        /** Specifies whether or not the widget allows an end-user to enter a custom value. */
-        acceptCustomValue?: boolean;
-        /** Specifies whether or not the widget changes its state when interacting with a user. */
-        activeStateEnabled?: boolean;
-        /** Specifies the way an end-user applies the selected value. */
-        applyValueMode?: 'instantly' | 'useButtons';
-        /** Specifies whether to render the drop-down field's content when it is displayed. If false, the content is rendered immediately. */
-        deferRendering?: boolean;
-        /** Specifies a custom template for the drop-down button. */
-        dropDownButtonTemplate?: template | ((buttonData: { text?: string, icon?: string }, contentElement: DevExpress.core.dxElement) => string | Element | JQuery);
-        /** A function that is executed once the drop-down editor is closed. */
-        onClosed?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any }) => any);
-        /** A function that is executed once the drop-down editor is opened. */
-        onOpened?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any }) => any);
-        /** Specifies whether a user can open the drop-down list by clicking a text field. */
-        openOnFieldClick?: boolean;
-        /** Specifies whether or not the drop-down editor is displayed. */
-        opened?: boolean;
-        /** Specifies whether the drop-down button is visible. */
-        showDropDownButton?: boolean;
-        /** Specifies the currently selected value. */
-        value?: any;
-    }
-    /** A drop-down editor widget. */
-    export class dxDropDownEditor extends dxTextBox {
-        constructor(element: Element, options?: dxDropDownEditorOptions)
-        constructor(element: JQuery, options?: dxDropDownEditorOptions)
-        /** Closes the drop-down editor. */
-        close(): void;
-        /** Gets the popup window's content. */
-        content(): DevExpress.core.dxElement;
-        /** Gets the widget's `` element. */
-        field(): DevExpress.core.dxElement;
-        /** Opens the drop-down editor. */
-        open(): void;
-        /** Resets the value option to the default value. */
-        reset(): void;
-    }
-    
-    export interface dxDropDownListOptions<T = dxDropDownList> extends DataExpressionMixinOptions<T>, dxDropDownEditorOptions<T> {
-        /** Returns the value currently displayed by the widget. */
-        displayValue?: string;
-        /** Specifies a custom template for group captions. */
-        groupTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery);
-        /** Specifies whether data items should be grouped. */
-        grouped?: boolean;
-        /** The minimum number of characters that must be entered into the text box to begin a search. Applies only if searchEnabled is true. */
-        minSearchLength?: number;
-        /** The text or HTML markup displayed by the widget if the item collection is empty. */
-        noDataText?: string;
-        /** A function that is executed when a list item is clicked or tapped. */
-        onItemClick?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, itemData?: any, itemElement?: any, itemIndex?: number | any, event?: event }) => any);
-        /** A function that is executed when a list item is selected or selection is canceled. */
-        onSelectionChanged?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, selectedItem?: any }) => any);
-        /** A function that is executed after the widget's value is changed. */
-        onValueChanged?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, value?: any, previousValue?: any, jQueryEvent?: JQueryEventObject, event?: event }) => any);
-        /** Specifies whether to allow searching. */
-        searchEnabled?: boolean;
-        /** Specifies the name of a data source item field or an expression whose value is compared to the search criterion. */
-        searchExpr?: string | Function | Array<string | Function>;
-        /** Specifies a comparison operation used to search widget items. */
-        searchMode?: 'contains' | 'startswith';
-        /** Specifies the time delay, in milliseconds, after the last character has been typed in, before a search is executed. */
-        searchTimeout?: number;
-        /** Gets the currently selected item. */
-        selectedItem?: any;
-        /** Specifies whether or not the widget displays unfiltered values until a user types a number of characters exceeding the minSearchLength option value. */
-        showDataBeforeSearch?: boolean;
-        /** Specifies the currently selected value. May be an object if dataSource contains objects and valueExpr is not set. */
-        value?: any;
-        /** Specifies the DOM events after which the widget's value should be updated. */
-        valueChangeEvent?: string;
-    }
-    /** A base class for drop-down list widgets. */
-    export class dxDropDownList extends dxDropDownEditor {
-        constructor(element: Element, options?: dxDropDownListOptions)
-        constructor(element: JQuery, options?: dxDropDownListOptions)
-        /** Gets the DataSource instance. */
-        getDataSource(): DevExpress.data.DataSource;
-    }
-    
-    export interface dxDropDownMenuOptions extends WidgetOptions<dxDropDownMenu> {
-        /** Specifies whether or not the widget changes its state when interacting with a user. */
-        activeStateEnabled?: boolean;
-        /** The name of the icon to be displayed by the DropDownMenu button. */
-        buttonIcon?: string;
-        /** The text displayed in the DropDownMenu button. */
-        buttonText?: string;
-        /** Overriden */
-        dataSource?: string | Array<any> | DevExpress.data.DataSource | DevExpress.data.DataSourceOptions;
-        /** Specifies whether the widget changes its state when a user pauses on it. */
-        hoverStateEnabled?: boolean;
-        /** Specifies a custom template for items. */
-        itemTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery);
-        /** An array of items displayed by the widget. */
-        items?: Array<any>;
-        /** A function that is executed when the button that opens the drop-down menu is clicked or tapped. */
-        onButtonClick?: ((e: { component?: dxDropDownMenu, element?: DevExpress.core.dxElement, model?: any, jQueryEvent?: JQueryEventObject, event?: event }) => any) | string;
-        /** A function that is executed when a menu item is clicked or tapped. */
-        onItemClick?: ((e: { component?: dxDropDownMenu, element?: DevExpress.core.dxElement, model?: any, itemData?: any, itemElement?: DevExpress.core.dxElement, itemIndex?: number, event?: event }) => any) | string;
-        /** Specifies whether or not the drop-down menu is displayed. */
-        opened?: boolean;
-        /** Specifies the popup element's height in pixels. */
-        popupHeight?: number | string | Function;
-        /** Specifies the popup element's width in pixels. */
-        popupWidth?: number | string | Function;
-        /** Specifies whether or not to show the drop down menu within a Popover widget. */
-        usePopover?: boolean;
-    }
-    /** A drop-down menu widget. */
-    export class dxDropDownMenu extends Widget {
-        constructor(element: Element, options?: dxDropDownMenuOptions)
-        constructor(element: JQuery, options?: dxDropDownMenuOptions)
-        /** Closes the drop-down menu. */
-        close(): void;
-        /** Opens the drop-down menu. */
-        open(): void;
-    }
-    
-    export interface dxFileManagerOptions extends WidgetOptions<dxFileManager> {
-        
-        customizeThumbnail?: ((fileItem: any) => string);
-        
-        fileProvider?: any;
-        
-        itemView?: { mode?: 'details' | 'thumbnails', showFolders?: boolean, showParentFolder?: boolean };
-        
-        permissions?: { copy?: boolean, create?: boolean, move?: boolean, remove?: boolean, rename?: boolean, upload?: boolean };
-        
-        selectionMode?: 'multiple' | 'single';
-    }
-    
-    export class dxFileManager extends Widget {
-        constructor(element: Element, options?: dxFileManagerOptions)
-        constructor(element: JQuery, options?: dxFileManagerOptions)
-    }
-    
-    export interface dxFileUploaderOptions extends EditorOptions<dxFileUploader> {
-        /** Specifies a file type or several types accepted by the widget. */
-        accept?: string;
-        /** Specifies if an end user can remove a file from the selection and interrupt uploading. */
-        allowCanceling?: boolean;
-        /** Restricts file extensions that can be uploaded to the server. */
-        allowedFileExtensions?: Array<string>;
-        /** Specifies the chunk size in bytes. Applies only if uploadMode is "instantly" or "useButtons". Requires a server that can process file chunks. */
-        chunkSize?: number;
-        /** Specifies whether the widget can be focused using keyboard navigation. */
-        focusStateEnabled?: boolean;
-        /** The text displayed when the extension of the file being uploaded is not an allowed file extension. */
-        invalidFileExtensionMessage?: string;
-        /** The text displayed when the size of the file being uploaded is greater than the maxFileSize. */
-        invalidMaxFileSizeMessage?: string;
-        /** The text displayed when the size of the file being uploaded is less than the minFileSize. */
-        invalidMinFileSizeMessage?: string;
-        /** Specifies the text displayed on the area to which an end-user can drop a file. */
-        labelText?: string;
-        /** Specifies the maximum file size (in bytes) allowed for uploading. Applies only if uploadMode is "instantly" or "useButtons". */
-        maxFileSize?: number;
-        /** Specifies the minimum file size (in bytes) allowed for uploading. Applies only if uploadMode is "instantly" or "useButtons". */
-        minFileSize?: number;
-        /** Specifies whether the widget enables an end-user to select a single file or multiple files. */
-        multiple?: boolean;
-        /** Specifies the value passed to the name attribute of the underlying input element. Required to access uploaded files on the server. */
-        name?: string;
-        /** A function that is executed when a file segment is uploaded. */
-        onProgress?: ((e: { component?: dxFileUploader, element?: DevExpress.core.dxElement, model?: any, file?: File, segmentSize?: number, bytesLoaded?: number, bytesTotal?: number, jQueryEvent?: JQueryEventObject, event?: event, request?: XMLHttpRequest }) => any);
-        /** A function that is executed when the file upload is aborted. */
-        onUploadAborted?: ((e: { component?: dxFileUploader, element?: DevExpress.core.dxElement, model?: any, file?: File, jQueryEvent?: JQueryEventObject, event?: event, request?: XMLHttpRequest }) => any);
-        /** A function that is executed when an error occurs during the file upload. */
-        onUploadError?: ((e: { component?: dxFileUploader, element?: DevExpress.core.dxElement, model?: any, file?: File, jQueryEvent?: JQueryEventObject, event?: event, request?: XMLHttpRequest }) => any);
-        /** A function that is executed when the file upload is started. */
-        onUploadStarted?: ((e: { component?: dxFileUploader, element?: DevExpress.core.dxElement, model?: any, file?: File, jQueryEvent?: JQueryEventObject, event?: event, request?: XMLHttpRequest }) => any);
-        /** A function that is executed when a file is successfully uploaded. */
-        onUploaded?: ((e: { component?: dxFileUploader, element?: DevExpress.core.dxElement, model?: any, file?: File, jQueryEvent?: JQueryEventObject, event?: event, request?: XMLHttpRequest }) => any);
-        /** A function that is executed when one or several files are added to or removed from the selection. */
-        onValueChanged?: ((e: { component?: dxFileUploader, element?: DevExpress.core.dxElement, model?: any, value?: Array<File>, previousValue?: Array<File>, jQueryEvent?: JQueryEventObject, event?: event }) => any);
-        /** Gets the current progress in percentages. */
-        progress?: number;
-        /** The message displayed by the widget when it is ready to upload the specified files. */
-        readyToUploadMessage?: string;
-        /** The text displayed on the button that opens the file browser. */
-        selectButtonText?: string;
-        /** Specifies whether or not the widget displays the list of selected files. */
-        showFileList?: boolean;
-        /** The text displayed on the button that starts uploading. */
-        uploadButtonText?: string;
-        /** The message displayed by the widget on uploading failure. */
-        uploadFailedMessage?: string;
-        /** Specifies headers for the upload request. */
-        uploadHeaders?: any;
-        /** Specifies the method for the upload request. */
-        uploadMethod?: 'POST' | 'PUT';
-        /** Specifies how the widget uploads files. */
-        uploadMode?: 'instantly' | 'useButtons' | 'useForm';
-        /** Specifies a target Url for the upload request. */
-        uploadUrl?: string;
-        /** The message displayed by the widget when uploading is finished. */
-        uploadedMessage?: string;
-        /** Specifies a File instance representing the selected file. Read-only when uploadMode is "useForm". */
-        value?: Array<File>;
-    }
-    /** The FileUploader widget enables an end user to upload files to the server. An end user can select files in the file explorer or drag and drop files to the FileUploader area on the page. */
-    export class dxFileUploader extends Editor {
-        constructor(element: Element, options?: dxFileUploaderOptions)
-        constructor(element: JQuery, options?: dxFileUploaderOptions)
-    }
-    
-    export interface dxFilterBuilderOptions extends WidgetOptions<dxFilterBuilder> {
-        /** Specifies whether the widget can display hierarchical data fields. */
-        allowHierarchicalFields?: boolean;
-        /** Configures custom filter operations. */
-        customOperations?: Array<dxFilterBuilderCustomOperation>;
-        /** Configures fields. */
-        fields?: Array<dxFilterBuilderField>;
-        /** Specifies filter operation descriptions. */
-        filterOperationDescriptions?: { between?: string, contains?: string, endsWith?: string, equal?: string, greaterThan?: string, greaterThanOrEqual?: string, isBlank?: string, isNotBlank?: string, lessThan?: string, lessThanOrEqual?: string, notContains?: string, notEqual?: string, startsWith?: string };
-        /** Specifies group operation descriptions. */
-        groupOperationDescriptions?: { and?: string, notAnd?: string, notOr?: string, or?: string };
-        /** Specifies a set of available group operations. */
-        groupOperations?: Array<'and' | 'or' | 'notAnd' | 'notOr'>;
-        /** Specifies groups' maximum nesting level. */
-        maxGroupLevel?: number;
-        /** A function that is executed after an editor is created. */
-        onEditorPrepared?: ((e: { component?: dxFilterBuilder, element?: DevExpress.core.dxElement, model?: any, value?: any, setValue?: any, editorElement?: DevExpress.core.dxElement, editorName?: string, dataField?: string, filterOperation?: string, updateValueTimeout?: number, width?: number, readOnly?: boolean, disabled?: boolean, rtlEnabled?: boolean }) => any);
-        /** A function that is executed before an editor is created. */
-        onEditorPreparing?: ((e: { component?: dxFilterBuilder, element?: DevExpress.core.dxElement, model?: any, value?: any, setValue?: any, cancel?: boolean, editorElement?: DevExpress.core.dxElement, editorName?: string, editorOptions?: any, dataField?: string, filterOperation?: string, updateValueTimeout?: number, width?: number, readOnly?: boolean, disabled?: boolean, rtlEnabled?: boolean }) => any);
-        /** A function that is executed after the widget's value is changed. */
-        onValueChanged?: ((e: { component?: dxFilterBuilder, element?: DevExpress.core.dxElement, model?: any, value?: any, previousValue?: any }) => any);
-        /** Allows you to specify a filter. */
-        value?: string | Array<any> | Function;
-    }
-    /** The FilterBuilder widget allows a user to build complex filter expressions with an unlimited number of filter conditions, combined by logical operations using the UI. */
-    export class dxFilterBuilder extends Widget {
-        constructor(element: Element, options?: dxFilterBuilderOptions)
-        constructor(element: JQuery, options?: dxFilterBuilderOptions)
-        /** Gets a filter expression that contains only operations supported by the DataSource. */
-        getFilterExpression(): string | Array<any> | Function;
-    }
-    
-    export interface dxFilterBuilderCustomOperation {
-        /** Specifies a function that returns a filter expression for this custom operation. */
-        calculateFilterExpression?: ((filterValue: any, field: dxFilterBuilderField) => string | Array<any> | Function);
-        /** Specifies the operation's caption. */
-        caption?: string;
-        /** Customizes the field value's text representation. */
-        customizeText?: ((fieldInfo: { value?: string | number | Date, valueText?: string, field?: dxFilterBuilderField }) => string);
-        /** Specifies for which data types the operation is available by default. */
-        dataTypes?: Array<'string' | 'number' | 'date' | 'boolean' | 'object' | 'datetime'>;
-        /** Specifies a custom template for the widget used to edit the field value. */
-        editorTemplate?: template | ((conditionInfo: { value?: string | number | Date, field?: dxFilterBuilderField, setValue?: Function }, container: DevExpress.core.dxElement) => string | Element | JQuery);
-        /** Specifies whether the operation can have a value. If it can, the editor is displayed. */
-        hasValue?: boolean;
-        /** Specifies the icon that should represent the filter operation. */
-        icon?: string;
-        /** Specifies the operation's identifier. */
-        name?: string;
-    }
-    /** The FilterBuilder's field structure. */
-    export interface dxFilterBuilderField {
-        /** Specifies the field's custom filtering rules. */
-        calculateFilterExpression?: ((filterValue: any, selectedFilterOperation: string) => string | Array<any> | Function);
-        /** Specifies the data field's caption. */
-        caption?: string;
-        /** Customizes the input value's display text. */
-        customizeText?: ((fieldInfo: { value?: string | number | Date, valueText?: string }) => string);
-        /** Specifies the name of a field to be filtered. */
-        dataField?: string;
-        /** Casts field values to a specific data type. */
-        dataType?: 'string' | 'number' | 'date' | 'boolean' | 'object' | 'datetime';
-        /** Configures the widget used to edit the field value. */
-        editorOptions?: any;
-        /** Specifies the editor's custom template. */
-        editorTemplate?: template | ((conditionInfo: { value?: string | number | Date, filterOperation?: string, field?: dxFilterBuilderField, setValue?: Function }, container: DevExpress.core.dxElement) => string | Element | JQuery);
-        /** Specifies the false value text. Applies only if dataType is "boolean". */
-        falseText?: string;
-        /** Specifies a set of available filter operations. */
-        filterOperations?: Array<'=' | '<>' | '<' | '<=' | '>' | '>=' | 'contains' | 'endswith' | 'isblank' | 'isnotblank' | 'notcontains' | 'startswith' | 'between' | string>;
-        /** Formats a value before it is displayed. */
-        format?: format;
-        /** Configures the lookup field. */
-        lookup?: { allowClearing?: boolean, dataSource?: Array<any> | DevExpress.data.DataSourceOptions, displayExpr?: string | ((data: any) => any), valueExpr?: string | Function };
-        /** Specifies the true value text. Applies only if dataType is "boolean". */
-        trueText?: string;
-    }
-    
-    export interface dxFormOptions extends WidgetOptions<dxForm> {
-        /** Specifies whether or not all root item labels are aligned. */
-        alignItemLabels?: boolean;
-        /** Specifies whether or not item labels in all groups are aligned. */
-        alignItemLabelsInAllGroups?: boolean;
-        /** The count of columns in the form layout. */
-        colCount?: number | 'auto';
-        /** Specifies dependency between the screen factor and the count of columns in the form layout. */
-        colCountByScreen?: any;
-        /** Specifies a function that customizes a form item after it has been created. */
-        customizeItem?: ((item: dxFormSimpleItem | dxFormGroupItem | dxFormTabbedItem | dxFormEmptyItem | dxFormButtonItem) => any);
-        /** Provides the Form's data. Gets updated every time form fields change. */
-        formData?: any;
-        /** Holds an array of form items. */
-        items?: Array<dxFormSimpleItem | dxFormGroupItem | dxFormTabbedItem | dxFormEmptyItem | dxFormButtonItem>;
-        /** Specifies the location of a label against the editor. */
-        labelLocation?: 'left' | 'right' | 'top';
-        /** The minimum column width used for calculating column count in the form layout. */
-        minColWidth?: number;
-        /** A function that is executed when the Enter key has been pressed while an editor is focused. */
-        onEditorEnterKey?: ((e: { component?: dxForm, element?: DevExpress.core.dxElement, model?: any, dataField?: string }) => any);
-        /** A function that is executed when the value of a formData object field is changed. */
-        onFieldDataChanged?: ((e: { component?: dxForm, element?: DevExpress.core.dxElement, model?: any, dataField?: string, value?: any }) => any);
-        /** The text displayed for optional fields. */
-        optionalMark?: string;
-        /** Specifies whether all editors on the form are read-only. Applies only to non-templated items. */
-        readOnly?: boolean;
-        /** The text displayed for required fields. */
-        requiredMark?: string;
-        /** Specifies the message that is shown for end-users if a required field value is not specified. */
-        requiredMessage?: string;
-        /** Specifies a function that categorizes screens by their width. */
-        screenByWidth?: Function;
-        /** A Boolean value specifying whether to enable or disable form scrolling. */
-        scrollingEnabled?: boolean;
-        /** Specifies whether or not a colon is displayed at the end of form labels. */
-        showColonAfterLabel?: boolean;
-        /** Specifies whether or not the optional mark is displayed for optional fields. */
-        showOptionalMark?: boolean;
-        /** Specifies whether or not the required mark is displayed for required fields. */
-        showRequiredMark?: boolean;
-        /** Specifies whether or not the total validation summary is displayed on the form. */
-        showValidationSummary?: boolean;
-        /** Gives a name to the internal validation group. */
-        validationGroup?: string;
-    }
-    /** The Form widget represents fields of a data object as a collection of label-editor pairs. These pairs can be arranged in several groups, tabs and columns. */
-    export class dxForm extends Widget {
-        constructor(element: Element, options?: dxFormOptions)
-        constructor(element: JQuery, options?: dxFormOptions)
-        /** Gets a button's instance. */
-        getButton(name: string): dxButton | undefined;
-        /** Gets an editor instance. Takes effect only if the form item is visible. */
-        getEditor(dataField: string): Editor | undefined;
-        /** Gets a form item's configuration. */
-        itemOption(id: string): any;
-        /** Updates the value of a single item option. */
-        itemOption(id: string, option: string, value: any): void;
-        /** Updates the values of several item options. */
-        itemOption(id: string, options: any): void;
-        /** Resets the editor's value to undefined. */
-        resetValues(): void;
-        /** Updates formData fields and the corresponding editors. */
-        updateData(data: any): void;
-        /** Updates a formData field and the corresponding editor. */
-        updateData(dataField: string, value: any): void;
-        /** Updates the dimensions of the widget contents. */
-        updateDimensions(): Promise<void> & JQueryPromise<void>;
-        /** Validates the values of all editors on the form against the list of the validation rules specified for each form item. */
-        validate(): dxValidationGroupResult;
-    }
-    /** Configures a button form item. */
-    export interface dxFormButtonItem {
-        /** @deprecated Use horizontalAlignment instead. */
-        /** Specifies the button's horizontal alignment. */
-        alignment?: 'center' | 'left' | 'right';
-        /** Configures the button. */
-        buttonOptions?: dxButtonOptions;
-        /** Specifies how many columns the item spans. */
-        colSpan?: number;
-        /** Specifies a CSS class to be applied to the item. */
-        cssClass?: string;
-        /** Specifies the button's horizontal alignment. */
-        horizontalAlignment?: 'center' | 'left' | 'right';
-        /** Specifies the item's type. Set it to "button" to create a button item. */
-        itemType?: 'empty' | 'group' | 'simple' | 'tabbed' | 'button';
-        /** Specifies the item's identifier. */
-        name?: string;
-        /** Specifies the button's vertical alignment. */
-        verticalAlignment?: 'bottom' | 'center' | 'top';
-        /** Specifies whether the item is visible. */
-        visible?: boolean;
-        /** Specifies the item's position regarding other items in a group, tab, or the whole widget. */
-        visibleIndex?: number;
-    }
-    /** This article describes configuration options of an empty form item. */
-    export interface dxFormEmptyItem {
-        /** Specifies the number of columns spanned by the item. */
-        colSpan?: number;
-        /** Specifies a CSS class to be applied to the form item. */
-        cssClass?: string;
-        /** Specifies the item's type. Set it to "empty" to create an empty item. */
-        itemType?: 'empty' | 'group' | 'simple' | 'tabbed' | 'button';
-        /** Specifies a name that identifies the form item. */
-        name?: string;
-        /** Specifies whether or not the current form item is visible. */
-        visible?: boolean;
-        /** Specifies the sequence number of the item in a form, group or tab. */
-        visibleIndex?: number;
-    }
-    /** This article describes configuration options of a group form item. */
-    export interface dxFormGroupItem {
-        /** Specifies whether or not all group item labels are aligned. */
-        alignItemLabels?: boolean;
-        /** Specifies the group caption. */
-        caption?: string;
-        /** The count of columns in the group layout. */
-        colCount?: number;
-        /** Specifies the relation between the screen size qualifier and the number of columns in the grouped layout. */
-        colCountByScreen?: any;
-        /** Specifies the number of columns spanned by the item. */
-        colSpan?: number;
-        /** Specifies a CSS class to be applied to the form item. */
-        cssClass?: string;
-        /** Specifies the item's type. Set it to "group" to create a group item. */
-        itemType?: 'empty' | 'group' | 'simple' | 'tabbed' | 'button';
-        /** Holds an array of form items displayed within the group. */
-        items?: Array<dxFormSimpleItem | dxFormGroupItem | dxFormTabbedItem | dxFormEmptyItem | dxFormButtonItem>;
-        /** Specifies a name that identifies the form item. */
-        name?: string;
-        /** A template to be used for rendering a group item. */
-        template?: template | ((data: { component?: dxForm, formData?: any }, itemElement: DevExpress.core.dxElement) => string | Element | JQuery);
-        /** Specifies whether or not the current form item is visible. */
-        visible?: boolean;
-        /** Specifies the sequence number of the item in a form, group or tab. */
-        visibleIndex?: number;
-    }
-    /** This article describes configuration options of a simple form item. */
-    export interface dxFormSimpleItem {
-        /** Specifies the number of columns spanned by the item. */
-        colSpan?: number;
-        /** Specifies a CSS class to be applied to the form item. */
-        cssClass?: string;
-        /** Specifies the path to the formData object field bound to the current form item. */
-        dataField?: string;
-        /** Configures the form item's editor. */
-        editorOptions?: any;
-        /** Specifies which editor widget is used to display and edit the form item value. */
-        editorType?: 'dxAutocomplete' | 'dxCalendar' | 'dxCheckBox' | 'dxColorBox' | 'dxDateBox' | 'dxDropDownBox' | 'dxLookup' | 'dxNumberBox' | 'dxRadioGroup' | 'dxRangeSlider' | 'dxSelectBox' | 'dxSlider' | 'dxSwitch' | 'dxTagBox' | 'dxTextArea' | 'dxTextBox';
-        /** Specifies the help text displayed for the current form item. */
-        helpText?: string;
-        /** Specifies whether the current form item is required. */
-        isRequired?: boolean;
-        /** Specifies the item's type. Set it to "simple" to create a simple item. */
-        itemType?: 'empty' | 'group' | 'simple' | 'tabbed' | 'button';
-        /** Specifies options for the form item label. */
-        label?: { alignment?: 'center' | 'left' | 'right', location?: 'left' | 'right' | 'top', showColon?: boolean, text?: string, visible?: boolean };
-        /** Specifies a name that identifies the form item. */
-        name?: string;
-        /** A template to be used for rendering the form item. */
-        template?: template | ((data: { component?: dxForm, dataField?: string, editorOptions?: any, editorType?: string }, itemElement: DevExpress.core.dxElement) => string | Element | JQuery);
-        /** An array of validation rules to be checked for the form item editor. */
-        validationRules?: Array<RequiredRule | NumericRule | RangeRule | StringLengthRule | CustomRule | CompareRule | PatternRule | EmailRule>;
-        /** Specifies whether or not the current form item is visible. */
-        visible?: boolean;
-        /** Specifies the sequence number of the item in a form, group or tab. */
-        visibleIndex?: number;
-    }
-    /** This article describes configuration options of a tabbed form item. */
-    export interface dxFormTabbedItem {
-        /** Specifies the number of columns spanned by the item. */
-        colSpan?: number;
-        /** Specifies a CSS class to be applied to the form item. */
-        cssClass?: string;
-        /** Specifies the item's type. Set it to "tabbed" to create a tabbed item. */
-        itemType?: 'empty' | 'group' | 'simple' | 'tabbed' | 'button';
-        /** Specifies a name that identifies the form item. */
-        name?: string;
-        /** Holds a configuration object for the TabPanel widget used to display the current form item. */
-        tabPanelOptions?: dxTabPanelOptions;
-        /** An array of tab configuration objects. */
-        tabs?: Array<{ alignItemLabels?: boolean, badge?: string, colCount?: number, colCountByScreen?: any, disabled?: boolean, icon?: string, items?: Array<dxFormSimpleItem | dxFormGroupItem | dxFormTabbedItem | dxFormEmptyItem | dxFormButtonItem>, tabTemplate?: template | ((tabData: any, tabIndex: number, tabElement: DevExpress.core.dxElement) => any), template?: template | ((tabData: any, tabIndex: number, tabElement: DevExpress.core.dxElement) => any), title?: string }>;
-        /** Specifies whether or not the current form item is visible. */
-        visible?: boolean;
-        /** Specifies the sequence number of the item in a form, group or tab. */
-        visibleIndex?: number;
-    }
-    
-    export interface dxGalleryOptions extends CollectionWidgetOptions<dxGallery> {
-        /** The time, in milliseconds, spent on slide animation. */
-        animationDuration?: number;
-        /** Specifies whether or not to animate the displayed item change. */
-        animationEnabled?: boolean;
-        /** Specifies whether the widget can be focused using keyboard navigation. */
-        focusStateEnabled?: boolean;
-        /** A Boolean value specifying whether or not to allow users to switch between items by clicking an indicator. */
-        indicatorEnabled?: boolean;
-        /** Specifies the width of an area used to display a single image. */
-        initialItemWidth?: number;
-        /** An array of items displayed by the widget. */
-        items?: Array<string | dxGalleryItem | any>;
-        /** A Boolean value specifying whether or not to scroll back to the first item after the last item is swiped. */
-        loop?: boolean;
-        /** The index of the currently active gallery item. */
-        selectedIndex?: number;
-        /** A Boolean value specifying whether or not to display an indicator that points to the selected gallery item. */
-        showIndicator?: boolean;
-        /** A Boolean value that specifies the availability of the "Forward" and "Back" navigation buttons. */
-        showNavButtons?: boolean;
-        /** The time interval in milliseconds, after which the gallery switches to the next item. */
-        slideshowDelay?: number;
-        /** Specifies if the widget stretches images to fit the total gallery width. */
-        stretchImages?: boolean;
-        /** A Boolean value specifying whether or not to allow users to switch between items by swiping. */
-        swipeEnabled?: boolean;
-        /** Specifies whether or not to display parts of previous and next images along the sides of the current image. */
-        wrapAround?: boolean;
-    }
-    /** The Gallery is a widget that displays a collection of images in a carousel. The widget is supplied with various navigation controls that allow a user to switch between images. */
-    export class dxGallery extends CollectionWidget {
-        constructor(element: Element, options?: dxGalleryOptions)
-        constructor(element: JQuery, options?: dxGalleryOptions)
-        /** Shows a specific image. */
-        goToItem(itemIndex: number, animation: boolean): Promise<void> & JQueryPromise<void>;
-        /** Shows the next image. */
-        nextItem(animation: boolean): Promise<void> & JQueryPromise<void>;
-        /** Shows the previous image. */
-        prevItem(animation: boolean): Promise<void> & JQueryPromise<void>;
-    }
-    /** This section lists the data source fields that are used in a default template for gallery items. */
-    export interface dxGalleryItem extends CollectionWidgetItem {
-        /** Specifies the text passed to the alt attribute of the image markup element. */
-        imageAlt?: string;
-        /** Specifies the URL of the image displayed by the item. */
-        imageSrc?: string;
-    }
-    
-    export interface dxHtmlEditorOptions extends EditorOptions<dxHtmlEditor> {
-        
-        customizeModules?: ((config: any) => any);
-        /** Specifies whether the widget can be focused using keyboard navigation. */
-        focusStateEnabled?: boolean;
-        
-        mediaResizing?: dxHtmlEditorMediaResizing;
-        /** Configures mentions. */
-        mentions?: Array<dxHtmlEditorMention>;
-        /** The value to be assigned to the `name` attribute of the underlying HTML element. */
-        name?: string;
-        /** A function that is executed when the widget gets focus. */
-        onFocusIn?: ((e: { component?: dxHtmlEditor, element?: DevExpress.core.dxElement, model?: any, event?: event }) => any);
-        /** A function that is executed when the widget loses focus. */
-        onFocusOut?: ((e: { component?: dxHtmlEditor, element?: DevExpress.core.dxElement, model?: any, event?: event }) => any);
-        /** Specifies the text displayed when the input field is empty. */
-        placeholder?: string;
-        /** Configures the widget's toolbar. */
-        toolbar?: dxHtmlEditorToolbar;
-        /** Specifies in which markup language the value is stored. */
-        valueType?: 'html' | 'markdown';
-        /** Configures variables, which are placeholders to be replaced with actual values when processing text. */
-        variables?: dxHtmlEditorVariables;
-    }
-    /** [tags] ctp HtmlEditor is a WYSIWYG text editor build on top of Quill, designed to support HTML and Markdown output formats. HtmlEditor is at the Community Technology Preview (CTP) development stage. That means that the widget is available for testing, but its concept, design and behavior can be reconsidered and changed without notice. */
-    export class dxHtmlEditor extends Editor {
-        constructor(element: Element, options?: dxHtmlEditorOptions)
-        constructor(element: JQuery, options?: dxHtmlEditorOptions)
-        /** Clears the history of changes. */
-        clearHistory(): void;
-        /** Deletes content from the given range. */
-        delete(index: number, length: number): void;
-        /** Applies a format to the selected content. Cannot be used with embedded formats. */
-        format(formatName: string, formatValue: any): void;
-        /** Applies a single block format to all lines in the given range. */
-        formatLine(index: number, length: number, formatName: string, formatValue: any): void;
-        /** Applies several block formats to all lines in the given range. */
-        formatLine(index: number, length: number, formats: any): void;
-        /** Applies a single text format to all characters in the given range. */
-        formatText(index: number, length: number, formatName: string, formatValue: any): void;
-        /** Applies several text formats to all characters in the given range. */
-        formatText(index: number, length: number, formats: any): void;
-        
-        get(componentPath: string): any;
-        /** Gets formats applied to the content in the specified range. */
-        getFormat(index: number, length: number): any;
-        /** Gets the instance of a widget found using its DOM node. */
-        static getInstance(element: Element | JQuery): DOMComponent;
-        /** Gets the entire content's length. */
-        getLength(): number;
-        /** Gets Quill's instance. */
-        getQuillInstance(): any;
-        /** Gets the selected content's position and length. */
-        getSelection(): any;
-        /** Inserts an embedded content at the specified position. */
-        insertEmbed(index: number, type: string, config: any): void;
-        /** Inserts formatted text at the specified position. Used with all formats except embedded. */
-        insertText(index: number, text: string, formats: any): void;
-        /** Reapplies the most recent undone change. Repeated calls reapply preceding undone changes. */
-        redo(): void;
-        
-        register(modules: any): void;
-        /** Registers a handler to be executed when a user presses a specific key. */
-        registerKeyHandler(key: string, handler: Function): void;
-        /** Removes all formatting and embedded content from the specified range. */
-        removeFormat(index: number, length: number): void;
-        /** Selects and highlights content in the specified range. */
-        setSelection(index: number, length: number): void;
-        /** Reverses the most recent change. Repeated calls reverse preceding changes. */
-        undo(): void;
-    }
-    
-    export interface dxHtmlEditorMediaResizing {
-        /** Specifies media types that can be resized. Currently, only images are supported. */
-        allowedTargets?: Array<string>;
-        /** Enables media resizing. */
-        enabled?: boolean;
-    }
-    
-    export interface dxHtmlEditorMention {
-        /** Provides data for the suggestion list. */
-        dataSource?: Array<string> | DevExpress.data.DataSource | DevExpress.data.DataSourceOptions;
-        /** Specifies the data field whose values should be displayed in the suggestion list. */
-        displayExpr?: string | ((item: any) => string);
-        /** Specifies a custom template for suggestion list items. */
-        itemTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery);
-        /** Specifies the prefix that a user enters to activate mentions. You can use different prefixes with different dataSources. */
-        marker?: string;
-        /** Specifies the minimum number of characters that a user should type to trigger the search. */
-        minSearchLength?: number;
-        /** Specifies one or several data fields to search. */
-        searchExpr?: string | Function | Array<string | Function>;
-        /** Specifies the delay between when a user stops typing and when the search is executed. */
-        searchTimeout?: number;
-        /** Specifies a custom template for mentions. */
-        template?: template | ((mentionData: { marker?: string, id?: string | number, value?: any }, contentElement: DevExpress.core.dxElement) => string | Element | JQuery);
-        /** Specifies which data field provides unique values to the template's `id` parameter. */
-        valueExpr?: string | Function;
-    }
-    
-    export interface dxHtmlEditorToolbar {
-        /** Specifies the container in which to place the toolbar. */
-        container?: string | Element | JQuery;
-        
-        items?: Array<dxHtmlEditorToolbarItem | string>;
-    }
-    /** Configures toolbar controls. These controls allow users to format text and execute commands. */
-    export interface dxHtmlEditorToolbarItem extends dxToolbarItem {
-        /** Specifies the built-in control that this object customizes or a format with multiple choices. */
-        formatName?: string;
-        /** Specifies values for a format with multiple choices. Should be used with the formatName. */
-        formatValues?: Array<string | number | boolean>;
-        /** Specifies a location for the item on the toolbar. */
-        location?: 'after' | 'before' | 'center';
-    }
-    
-    export interface dxHtmlEditorVariables {
-        /** Specifies a collection of variables available for a user. */
-        dataSource?: string | Array<string> | DevExpress.data.DataSource | DevExpress.data.DataSourceOptions;
-        /** Specifies the special character(s) that should surround the variables. */
-        escapeChar?: string | Array<string>;
-    }
-    /** Specifies markup for a widget item. */
-    export var dxItem: any;
-    
-    export interface dxListOptions extends CollectionWidgetOptions<dxList>, SearchBoxMixinOptions<dxList> {
-        /** Specifies whether or not the widget changes its state when interacting with a user. */
-        activeStateEnabled?: boolean;
-        /** Specifies whether or not an end user can delete list items. */
-        allowItemDeleting?: boolean;
-        /** Specifies whether a user can reorder list items. Grouped items cannot be moved from one group to another. */
-        allowItemReordering?: boolean;
-        /** A Boolean value specifying whether to enable or disable the bounce-back effect. */
-        bounceEnabled?: boolean;
-        /** Specifies whether or not an end-user can collapse groups. */
-        collapsibleGroups?: boolean;
-        /** Specifies the data field whose values should be displayed. Defaults to "text" when the data source contains objects. */
-        displayExpr?: string | ((item: any) => any);
-        /** Specifies whether the widget can be focused using keyboard navigation. */
-        focusStateEnabled?: boolean;
-        /** Specifies a custom template for group captions. */
-        groupTemplate?: template | ((groupData: any, groupIndex: number, groupElement: DevExpress.core.dxElement) => string | Element | JQuery);
-        /** Specifies whether data items should be grouped. */
-        grouped?: boolean;
-        /** Specifies whether the widget changes its state when a user pauses on it. */
-        hoverStateEnabled?: boolean;
-        /** Specifies whether or not to show the loading panel when the DataSource bound to the widget is loading data. */
-        indicateLoading?: boolean;
-        /** Specifies the way a user can delete items from the list. */
-        itemDeleteMode?: 'context' | 'slideButton' | 'slideItem' | 'static' | 'swipe' | 'toggle';
-        /** An array of items displayed by the widget. */
-        items?: Array<string | dxListItem | any>;
-        /** Specifies the array of items for a context menu called for a list item. */
-        menuItems?: Array<{ action?: ((itemElement: DevExpress.core.dxElement, itemData: any) => any), text?: string }>;
-        /** Specifies whether an item context menu is shown when a user holds or swipes an item. */
-        menuMode?: 'context' | 'slide';
-        /** The text displayed on the button used to load the next page from the data source. */
-        nextButtonText?: string;
-        /** A function that is executed when a group element is rendered. */
-        onGroupRendered?: ((e: { component?: dxList, element?: DevExpress.core.dxElement, model?: any, groupData?: any, groupElement?: DevExpress.core.dxElement, groupIndex?: number }) => any);
-        /** A function that is executed when a collection item is clicked or tapped. */
-        onItemClick?: ((e: { component?: dxList, element?: DevExpress.core.dxElement, model?: any, itemData?: any, itemElement?: DevExpress.core.dxElement, itemIndex?: number | any, jQueryEvent?: JQueryEventObject, event?: event }) => any) | string;
-        /** A function that is executed when a collection item is right-clicked or pressed. */
-        onItemContextMenu?: ((e: { component?: dxList, element?: DevExpress.core.dxElement, model?: any, itemData?: any, itemElement?: DevExpress.core.dxElement, itemIndex?: number | any, jQueryEvent?: JQueryEventObject, event?: event }) => any);
-        /** A function that is executed after a list item is deleted from the data source. */
-        onItemDeleted?: ((e: { component?: dxList, element?: DevExpress.core.dxElement, model?: any, itemData?: any, itemElement?: DevExpress.core.dxElement, itemIndex?: number | any }) => any);
-        /** A function that is executed before a collection item is deleted from the data source. */
-        onItemDeleting?: ((e: { component?: dxList, element?: DevExpress.core.dxElement, model?: any, itemData?: any, itemElement?: DevExpress.core.dxElement, itemIndex?: number | any, cancel?: boolean | Promise<void> | JQueryPromise<void> }) => any);
-        /** A function that is executed when a collection item has been held for a specified period. */
-        onItemHold?: ((e: { component?: dxList, element?: DevExpress.core.dxElement, model?: any, itemData?: any, itemElement?: DevExpress.core.dxElement, itemIndex?: number | any, jQueryEvent?: JQueryEventObject, event?: event }) => any);
-        /** A function that is executed after a list item is moved to another position. */
-        onItemReordered?: ((e: { component?: dxList, element?: DevExpress.core.dxElement, model?: any, itemData?: any, itemElement?: DevExpress.core.dxElement, itemIndex?: number | any, fromIndex?: number, toIndex?: number }) => any);
-        /** A function that is executed when a list item is swiped. */
-        onItemSwipe?: ((e: { component?: dxList, element?: DevExpress.core.dxElement, model?: any, jQueryEvent?: JQueryEventObject, event?: event, itemData?: any, itemElement?: DevExpress.core.dxElement, itemIndex?: number | any, direction?: string }) => any);
-        /** A function that is executed before the next page is loaded. */
-        onPageLoading?: ((e: { component?: dxList, element?: DevExpress.core.dxElement, model?: any }) => any);
-        /** A function that is executed when the "pull to refresh" gesture is performed. Supported in mobile themes only. */
-        onPullRefresh?: ((e: { component?: dxList, element?: DevExpress.core.dxElement, model?: any }) => any);
-        /** A function that is executed on each scroll gesture. */
-        onScroll?: ((e: { component?: dxList, element?: DevExpress.core.dxElement, model?: any, jQueryEvent?: JQueryEventObject, event?: event, scrollOffset?: any, reachedLeft?: boolean, reachedRight?: boolean, reachedTop?: boolean, reachedBottom?: boolean }) => any);
-        /** A function that is executed when the "Select All" check box value is changed. Applies only if the selectionMode is "all". */
-        onSelectAllValueChanged?: ((e: { component?: dxList, element?: DevExpress.core.dxElement, model?: any, value?: boolean }) => any);
-        /** Specifies whether the next page is loaded when a user scrolls the widget to the bottom or when the "next" button is clicked. */
-        pageLoadMode?: 'nextButton' | 'scrollBottom';
-        /** Specifies the text shown in the pullDown panel, which is displayed when the list is scrolled to the bottom. */
-        pageLoadingText?: string;
-        /** A Boolean value specifying whether or not the widget supports the "pull down to refresh" gesture. */
-        pullRefreshEnabled?: boolean;
-        /** Specifies the text displayed in the pullDown panel when the list is pulled below the refresh threshold. */
-        pulledDownText?: string;
-        /** Specifies the text shown in the pullDown panel while the list is being pulled down to the refresh threshold. */
-        pullingDownText?: string;
-        /** Specifies the text displayed in the pullDown panel while the list is being refreshed. */
-        refreshingText?: string;
-        /** Specifies whether to repaint only those elements whose data changed. */
-        repaintChangesOnly?: boolean;
-        /** A Boolean value specifying if the list is scrolled by content. */
-        scrollByContent?: boolean;
-        /** A Boolean value specifying if the list is scrolled using the scrollbar. */
-        scrollByThumb?: boolean;
-        /** A Boolean value specifying whether to enable or disable list scrolling. */
-        scrollingEnabled?: boolean;
-        /** Specifies the mode in which all items are selected. */
-        selectAllMode?: 'allPages' | 'page';
-        /** Specifies item selection mode. */
-        selectionMode?: 'all' | 'multiple' | 'none' | 'single';
-        /** Specifies when the widget shows the scrollbar. */
-        showScrollbar?: 'always' | 'never' | 'onHover' | 'onScroll';
-        /** Specifies whether or not to display controls used to select list items. */
-        showSelectionControls?: boolean;
-        /** Specifies whether or not the widget uses native scrolling. */
-        useNativeScrolling?: boolean;
-    }
-    /** The List is a widget that represents a collection of items in a scrollable list. */
-    export class dxList extends CollectionWidget {
-        constructor(element: Element, options?: dxListOptions)
-        constructor(element: JQuery, options?: dxListOptions)
-        /** Gets the widget's height in pixels. */
-        clientHeight(): number;
-        /** Collapses a group with a specific index. */
-        collapseGroup(groupIndex: number): Promise<void> & JQueryPromise<void>;
-        /** Removes an item found using its DOM node. */
-        deleteItem(itemElement: Element): Promise<void> & JQueryPromise<void>;
-        /** Removes an item with a specific index. */
-        deleteItem(itemIndex: number | any): Promise<void> & JQueryPromise<void>;
-        /** Expands a group with a specific index. */
-        expandGroup(groupIndex: number): Promise<void> & JQueryPromise<void>;
-        /** Checks whether an item found using its DOM node is selected. */
-        isItemSelected(itemElement: Element): boolean;
-        /** Checks whether an item with a specific index is selected. */
-        isItemSelected(itemIndex: number | any): boolean;
-        /** Reloads list data. */
-        reload(): void;
-        /** Reorders items found using their DOM nodes. */
-        reorderItem(itemElement: Element, toItemElement: Element): Promise<void> & JQueryPromise<void>;
-        /** Reorders items with specific indexes. */
-        reorderItem(itemIndex: number | any, toItemIndex: number | any): Promise<void> & JQueryPromise<void>;
-        /** Scrolls the content by a specified distance. */
-        scrollBy(distance: number): void;
-        /** Gets the content's height in pixels. */
-        scrollHeight(): number;
-        /** Scrolls the content to a specific position. */
-        scrollTo(location: number): void;
-        /** Scrolls the content to an item found using its DOM node. */
-        scrollToItem(itemElement: Element): void;
-        /** Scrolls the content to an item with a specific index. */
-        scrollToItem(itemIndex: number | any): void;
-        /** Gets the top scroll offset. */
-        scrollTop(): number;
-        /** Selects all items. */
-        selectAll(): void;
-        /** Selects an item found using its DOM node. */
-        selectItem(itemElement: Element): void;
-        /** Selects an item with a specific index. */
-        selectItem(itemIndex: number | any): void;
-        /** Cancels the selection of all items. */
-        unselectAll(): void;
-        /** Cancels the selection of an item found using its DOM node. */
-        unselectItem(itemElement: Element): void;
-        /** Cancels the selection of an item with a specific index. */
-        unselectItem(itemIndex: number | any): void;
-        /** Updates the widget scrollbar according to widget content size. */
-        updateDimensions(): Promise<void> & JQueryPromise<void>;
-    }
-    /** This section lists the data source fields that are used in a default template for list items. */
-    export interface dxListItem extends CollectionWidgetItem {
-        /** Specifies the text of a badge displayed for the list item. */
-        badge?: string;
-        /** Specifies the list item's icon. */
-        icon?: string;
-        /** Specifies the name of the list items group in a grouped list. */
-        key?: string;
-        /** Specifies whether or not to display a chevron for the list item. */
-        showChevron?: boolean;
-    }
-    
-    export interface dxLoadIndicatorOptions extends WidgetOptions<dxLoadIndicator> {
-        /** Specifies the path to an image used as the indicator. */
-        indicatorSrc?: string;
-    }
-    /** The LoadIndicator is a UI element notifying the viewer that a process is in progress. */
-    export class dxLoadIndicator extends Widget {
-        constructor(element: Element, options?: dxLoadIndicatorOptions)
-        constructor(element: JQuery, options?: dxLoadIndicatorOptions)
-    }
-    
-    export interface dxLoadPanelOptions extends dxOverlayOptions<dxLoadPanel> {
-        /** Configures widget visibility animations. This object contains two fields: show and hide. */
-        animation?: dxLoadPanelAnimation;
-        /** Specifies the widget's container. */
-        container?: string | Element | JQuery;
-        /** The delay in milliseconds after which the load panel is displayed. */
-        delay?: number;
-        /** Specifies whether or not the widget can be focused. */
-        focusStateEnabled?: boolean;
-        /** Specifies the widget's height in pixels. */
-        height?: number | string | (() => number | string);
-        /** A URL pointing to an image to be used as a load indicator. */
-        indicatorSrc?: string;
-        /** Specifies the maximum height the widget can reach while resizing. */
-        maxHeight?: number | string | (() => number | string);
-        /** Specifies the maximum width the widget can reach while resizing. */
-        maxWidth?: number | string | (() => number | string);
-        /** The text displayed in the load panel. */
-        message?: string;
-        /** Positions the widget. */
-        position?: 'bottom' | 'center' | 'left' | 'left bottom' | 'left top' | 'right' | 'right bottom' | 'right top' | 'top' | positionConfig | Function;
-        /** Specifies the shading color. */
-        shadingColor?: string;
-        /** A Boolean value specifying whether or not to show a load indicator. */
-        showIndicator?: boolean;
-        /** A Boolean value specifying whether or not to show the pane behind the load indicator. */
-        showPane?: boolean;
-        /** Specifies the widget's width in pixels. */
-        width?: number | string | (() => number | string);
-    }
-    /** Configures widget visibility animations. This object contains two fields: show and hide. */
-    export interface dxLoadPanelAnimation extends dxOverlayAnimation {
-        /** An object that defines the animation options used when the widget is being hidden. */
-        hide?: animationConfig;
-        /** An object that defines the animation options used when the widget is being shown. */
-        show?: animationConfig;
-    }
-    /** The LoadPanel is an overlay widget notifying the viewer that loading is in progress. */
-    export class dxLoadPanel extends dxOverlay {
-        constructor(element: Element, options?: dxLoadPanelOptions)
-        constructor(element: JQuery, options?: dxLoadPanelOptions)
-    }
-    
-    export interface dxLookupOptions extends dxDropDownListOptions<dxLookup> {
-        /** Configures widget visibility animations. This object contains two fields: show and hide. */
-        animation?: { hide?: animationConfig, show?: animationConfig };
-        /** The text displayed on the Apply button. */
-        applyButtonText?: string;
-        /** Specifies the way an end-user applies the selected value. */
-        applyValueMode?: 'instantly' | 'useButtons';
-        /** The text displayed on the Cancel button. */
-        cancelButtonText?: string;
-        /** Specifies whether or not the widget cleans the search box when the popup window is displayed. */
-        cleanSearchOnOpening?: boolean;
-        /** The text displayed on the Clear button. */
-        clearButtonText?: string;
-        /** Specifies whether to close the drop-down menu if a user clicks outside it. */
-        closeOnOutsideClick?: boolean | (() => boolean);
-        /** Specifies a custom template for the input field. */
-        fieldTemplate?: template | ((selectedItem: any, fieldElement: DevExpress.core.dxElement) => string | Element | JQuery);
-        /** Specifies whether the widget can be focused using keyboard navigation. */
-        focusStateEnabled?: boolean;
-        /** A Boolean value specifying whether or not to display the lookup in full-screen mode. */
-        fullScreen?: boolean;
-        /** Specifies a custom template for group captions. */
-        groupTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery);
-        /** A Boolean value specifying whether or not to group widget items. */
-        grouped?: boolean;
-        /** The text displayed on the button used to load the next page from the data source. */
-        nextButtonText?: string;
-        /** A function that is executed before the next page is loaded. */
-        onPageLoading?: ((e: { component?: dxLookup, element?: DevExpress.core.dxElement, model?: any }) => any);
-        /** A function that is executed when the "pull to refresh" gesture is performed on the drop-down item list. Supported in mobile themes only. */
-        onPullRefresh?: ((e: { component?: dxLookup, element?: DevExpress.core.dxElement, model?: any }) => any);
-        /** A function that is executed on each scroll gesture performed on the drop-down item list. */
-        onScroll?: ((e: { component?: dxLookup, element?: DevExpress.core.dxElement, model?: any, jQueryEvent?: JQueryEventObject, event?: event, scrollOffset?: any, reachedLeft?: boolean, reachedRight?: boolean, reachedTop?: boolean, reachedBottom?: boolean }) => any);
-        /** A function that is executed when the drop-down list's title is rendered. */
-        onTitleRendered?: ((e: { component?: dxLookup, element?: DevExpress.core.dxElement, model?: any, titleElement?: DevExpress.core.dxElement }) => any);
-        /** A function that is executed after the widget's value is changed. */
-        onValueChanged?: ((e: { component?: dxLookup, element?: DevExpress.core.dxElement, model?: any, value?: any, previousValue?: any, jQueryEvent?: JQueryEventObject, event?: event }) => any);
-        /** Specifies whether the next page is loaded when a user scrolls the widget to the bottom or when the "next" button is clicked. */
-        pageLoadMode?: 'nextButton' | 'scrollBottom';
-        /** Specifies the text shown in the pullDown panel, which is displayed when the widget is scrolled to the bottom. */
-        pageLoadingText?: string;
-        /** The text displayed by the widget when nothing is selected. */
-        placeholder?: string;
-        /** Specifies the popup element's height. Applies only if fullScreen is false. */
-        popupHeight?: number | string | (() => number | string);
-        /** Specifies the popup element's width. Applies only if fullScreen is false. */
-        popupWidth?: number | string | (() => number | string);
-        /** An object defining widget positioning options. */
-        position?: positionConfig;
-        /** A Boolean value specifying whether or not the widget supports the "pull down to refresh" gesture. */
-        pullRefreshEnabled?: boolean;
-        /** Specifies the text displayed in the pullDown panel when the widget is pulled below the refresh threshold. */
-        pulledDownText?: string;
-        /** Specifies the text shown in the pullDown panel while the list is being pulled down to the refresh threshold. */
-        pullingDownText?: string;
-        /** Specifies the text displayed in the pullDown panel while the widget is being refreshed. */
-        refreshingText?: string;
-        /** Specifies whether the search box is visible. */
-        searchEnabled?: boolean;
-        /** The text that is provided as a hint in the lookup's search bar. */
-        searchPlaceholder?: string;
-        /** Specifies whether to shade the container when the lookup is active. Applies only if usePopover is false. */
-        shading?: boolean;
-        /** Specifies whether to display the Cancel button in the lookup window. */
-        showCancelButton?: boolean;
-        /** Specifies whether or not to display the Clear button in the lookup window. */
-        showClearButton?: boolean;
-        /** A Boolean value specifying whether or not to display the title in the popup window. */
-        showPopupTitle?: boolean;
-        /** The title of the lookup window. */
-        title?: string;
-        /** Specifies a custom template for the title. */
-        titleTemplate?: template | ((titleElement: DevExpress.core.dxElement) => string | Element | JQuery);
-        /** Specifies whether or not the widget uses native scrolling. */
-        useNativeScrolling?: boolean;
-        /** Specifies whether or not to show lookup contents in a Popover widget. */
-        usePopover?: boolean;
-    }
-    /** The Lookup is a widget that allows an end user to search for an item in a collection shown in a drop-down menu. */
-    export class dxLookup extends dxDropDownList {
-        constructor(element: Element, options?: dxLookupOptions)
-        constructor(element: JQuery, options?: dxLookupOptions)
-    }
-    
-    export interface dxMapOptions extends WidgetOptions<dxMap> {
-        /** Specifies whether the widget automatically adjusts center and zoom option values when adding a new marker or route, or if a new widget contains markers or routes by default. */
-        autoAdjust?: boolean;
-        /** An object, a string, or an array specifying which part of the map is displayed at the widget's center using coordinates. The widget can change this value if autoAdjust is enabled. */
-        center?: any | string | Array<number>;
-        /** Specifies whether or not map widget controls are available. */
-        controls?: boolean;
-        /** Specifies whether the widget can be focused using keyboard navigation. */
-        focusStateEnabled?: boolean;
-        /** Specifies the widget's height. */
-        height?: number | string | (() => number | string);
-        /** A key used to authenticate the application within the required map provider. */
-        key?: string | { bing?: string, google?: string, googleStatic?: string };
-        /** A URL pointing to the custom icon to be used for map markers. */
-        markerIconSrc?: string;
-        /** An array of markers displayed on a map. */
-        markers?: Array<{ iconSrc?: string, location?: any | string | Array<number>, onClick?: Function, tooltip?: string | { isShown?: boolean, text?: string } }>;
-        /** A function that is executed when any location on the map is clicked or tapped. */
-        onClick?: ((e: { component?: dxMap, element?: DevExpress.core.dxElement, model?: any, location?: any, jQueryEvent?: JQueryEventObject, event?: event }) => any) | string;
-        /** A function that is executed when a marker is created on the map. */
-        onMarkerAdded?: ((e: { component?: dxMap, element?: DevExpress.core.dxElement, model?: any, options?: any, originalMarker?: any }) => any);
-        /** A function that is executed when a marker is removed from the map. */
-        onMarkerRemoved?: ((e: { component?: dxMap, element?: DevExpress.core.dxElement, model?: any, options?: any }) => any);
-        /** A function that is executed when the map is ready. */
-        onReady?: ((e: { component?: dxMap, element?: DevExpress.core.dxElement, model?: any, originalMap?: any }) => any);
-        /** A function that is executed when a route is created on the map. */
-        onRouteAdded?: ((e: { component?: dxMap, element?: DevExpress.core.dxElement, model?: any, options?: any, originalRoute?: any }) => any);
-        /** A function that is executed when a route is removed from the map. */
-        onRouteRemoved?: ((e: { component?: dxMap, element?: DevExpress.core.dxElement, model?: any, options?: any }) => any);
-        /** The name of the current map data provider. */
-        provider?: 'bing' | 'google' | 'googleStatic';
-        /** An array of routes shown on the map. */
-        routes?: Array<{ color?: string, locations?: Array<any>, mode?: 'driving' | 'walking', opacity?: number, weight?: number }>;
-        /** The type of a map to display. */
-        type?: 'hybrid' | 'roadmap' | 'satellite';
-        /** Specifies the widget's width. */
-        width?: number | string | (() => number | string);
-        /** The map's zoom level. The widget can change this value if autoAdjust is enabled. */
-        zoom?: number;
-    }
-    /** The Map is an interactive widget that displays a geographic map with markers and routes. */
-    export class dxMap extends Widget {
-        constructor(element: Element, options?: dxMapOptions)
-        constructor(element: JQuery, options?: dxMapOptions)
-        /** Adds a marker to the map. */
-        addMarker(markerOptions: any | Array<any>): Promise<any> & JQueryPromise<any>;
-        /** Adds a route to the map. */
-        addRoute(options: any | Array<any>): Promise<any> & JQueryPromise<any>;
-        /** Removes a marker from the map. */
-        removeMarker(marker: any | number | Array<any>): Promise<void> & JQueryPromise<void>;
-        /** Removes a route from the map. */
-        removeRoute(route: any | number | Array<any>): Promise<void> & JQueryPromise<void>;
-    }
-    
-    export interface dxMenuOptions extends dxMenuBaseOptions<dxMenu> {
-        /** Specifies whether adaptive widget rendering is enabled on small screens. Applies only if the orientation is "horizontal". */
-        adaptivityEnabled?: boolean;
-        /** Specifies whether or not the submenu is hidden when the mouse pointer leaves it. */
-        hideSubmenuOnMouseLeave?: boolean;
-        /** Holds an array of menu items. */
-        items?: Array<dxMenuItem>;
-        /** A function that is executed after a submenu is hidden. */
-        onSubmenuHidden?: ((e: { component?: dxMenu, element?: DevExpress.core.dxElement, model?: any, rootItem?: DevExpress.core.dxElement }) => any);
-        /** A function that is executed before a submenu is hidden. */
-        onSubmenuHiding?: ((e: { component?: dxMenu, element?: DevExpress.core.dxElement, model?: any, rootItem?: DevExpress.core.dxElement, cancel?: boolean }) => any);
-        /** A function that is executed before a submenu is displayed. */
-        onSubmenuShowing?: ((e: { component?: dxMenu, element?: DevExpress.core.dxElement, model?: any, rootItem?: DevExpress.core.dxElement }) => any);
-        /** A function that is executed after a submenu is displayed. */
-        onSubmenuShown?: ((e: { component?: dxMenu, element?: DevExpress.core.dxElement, model?: any, rootItem?: DevExpress.core.dxElement }) => any);
-        /** Specifies whether the menu has horizontal or vertical orientation. */
-        orientation?: 'horizontal' | 'vertical';
-        /** Specifies options for showing and hiding the first level submenu. */
-        showFirstSubmenuMode?: { delay?: { hide?: number, show?: number } | number, name?: 'onClick' | 'onHover' } | 'onClick' | 'onHover';
-        /** Specifies the direction at which the submenus are displayed. */
-        submenuDirection?: 'auto' | 'leftOrTop' | 'rightOrBottom';
-    }
-    /** The Menu widget is a panel with clickable items. A click on an item opens a drop-down menu, which can contain several submenus. */
-    export class dxMenu extends dxMenuBase {
-        constructor(element: Element, options?: dxMenuOptions)
-        constructor(element: JQuery, options?: dxMenuOptions)
-    }
-    
-    export interface dxMenuBaseOptions<T = dxMenuBase> extends HierarchicalCollectionWidgetOptions<T> {
-        /** A Boolean value specifying whether or not the widget changes its state when interacting with a user. */
-        activeStateEnabled?: boolean;
-        /** Configures widget visibility animations. This object contains two fields: show and hide. */
-        animation?: { hide?: animationConfig, show?: animationConfig };
-        /** Specifies the name of the CSS class to be applied to the root menu level and all submenus. */
-        cssClass?: string;
-        /** Holds an array of menu items. */
-        items?: Array<dxMenuBaseItem>;
-        /** Specifies whether or not an item becomes selected if a user clicks it. */
-        selectByClick?: boolean;
-        /** Specifies the selection mode supported by the menu. */
-        selectionMode?: 'none' | 'single';
-        /** Specifies options of submenu showing and hiding. */
-        showSubmenuMode?: { delay?: { hide?: number, show?: number } | number, name?: 'onClick' | 'onHover' } | 'onClick' | 'onHover';
-    }
-    
-    export class dxMenuBase extends HierarchicalCollectionWidget {
-        constructor(element: Element, options?: dxMenuBaseOptions)
-        constructor(element: JQuery, options?: dxMenuBaseOptions)
-        /** Selects an item found using its DOM node. */
-        selectItem(itemElement: Element): void;
-        /** Cancels the selection of an item found using its DOM node. */
-        unselectItem(itemElement: Element): void;
-    }
-    /** This section lists the data source fields that are used in a default item template. */
-    export interface dxMenuBaseItem extends CollectionWidgetItem {
-        /** Specifies whether a group separator is displayed over the item. */
-        beginGroup?: boolean;
-        /** Specifies if a menu is closed when a user clicks the item. */
-        closeMenuOnClick?: boolean;
-        /** Specifies whether or not the menu item is disabled. */
-        disabled?: boolean;
-        /** Specifies the menu item's icon. */
-        icon?: string;
-        /** Holds an array of menu items. */
-        items?: Array<dxMenuBaseItem>;
-        /** Specifies whether or not a user can select a menu item. */
-        selectable?: boolean;
-        /** Specifies whether or not the item is selected. */
-        selected?: boolean;
-        /** Specifies the text inserted into the item element. */
-        text?: string;
-        /** Specifies whether or not the menu item is visible. */
-        visible?: boolean;
-    }
-    /** This section lists the data source fields that are used in a default item template. */
-    export interface dxMenuItem extends dxMenuBaseItem {
-        /** Holds an array of menu items. */
-        items?: Array<dxMenuItem>;
-    }
-    
-    export interface dxMultiViewOptions<T = dxMultiView> extends CollectionWidgetOptions<T> {
-        /** Specifies whether or not to animate the displayed item change. */
-        animationEnabled?: boolean;
-        /** Specifies whether to render the view's content when it is displayed. If false, the content is rendered immediately. */
-        deferRendering?: boolean;
-        /** Specifies whether the widget can be focused using keyboard navigation. */
-        focusStateEnabled?: boolean;
-        /** An array of items displayed by the widget. */
-        items?: Array<string | dxMultiViewItem | any>;
-        /** A Boolean value specifying whether or not to scroll back to the first item after the last item is swiped. */
-        loop?: boolean;
-        /** The index of the currently displayed item. */
-        selectedIndex?: number;
-        /** A Boolean value specifying whether or not to allow users to change the selected index by swiping. */
-        swipeEnabled?: boolean;
-    }
-    /** The MultiView is a widget that contains several views. An end user navigates through the views by swiping them in the horizontal direction. */
-    export class dxMultiView extends CollectionWidget {
-        constructor(element: Element, options?: dxMultiViewOptions)
-        constructor(element: JQuery, options?: dxMultiViewOptions)
-    }
-    /** This section lists the data source fields that are used in a default template for multi-view items. */
-    export interface dxMultiViewItem extends CollectionWidgetItem {
-    }
-    
-    export interface dxNavBarOptions extends dxTabsOptions<dxNavBar> {
-        /** Specifies whether or not an end-user can scroll tabs by swiping. */
-        scrollByContent?: boolean;
-    }
-    /** The NavBar is a widget that navigates the application views. */
-    export class dxNavBar extends dxTabs {
-        constructor(element: Element, options?: dxNavBarOptions)
-        constructor(element: JQuery, options?: dxNavBarOptions)
-    }
-    /** This section lists the data source fields that are used in a default template for navbar items. */
-    export interface dxNavBarItem extends dxTabsItem {
-        /** Specifies a badge text for the navbar item. */
-        badge?: string;
-    }
-    
-    export interface dxNumberBoxOptions extends dxTextEditorOptions<dxNumberBox> {
-        /** Specifies the value's display format and controls user input accordingly. */
-        format?: format;
-        /** Specifies the text of the message displayed if the specified value is not a number. */
-        invalidValueMessage?: string;
-        /** The maximum value accepted by the number box. */
-        max?: number;
-        /** The minimum value accepted by the number box. */
-        min?: number;
-        /** Specifies the value to be passed to the type attribute of the underlying `` element. */
-        mode?: 'number' | 'text' | 'tel';
-        /** Specifies whether to show the buttons that change the value by a step. */
-        showSpinButtons?: boolean;
-        /** Specifies how much the widget's value changes when using the spin buttons, Up/Down arrow keys, or mouse wheel. */
-        step?: number;
-        /** Specifies whether to use touch friendly spin buttons. Applies only if showSpinButtons is true. */
-        useLargeSpinButtons?: boolean;
-        /** The current number box value. */
-        value?: number;
-    }
-    /** The NumberBox is a widget that displays a numeric value and allows a user to modify it by typing in a value, and incrementing or decrementing it using the keyboard or mouse. */
-    export class dxNumberBox extends dxTextEditor {
-        constructor(element: Element, options?: dxNumberBoxOptions)
-        constructor(element: JQuery, options?: dxNumberBoxOptions)
-    }
-    
-    export interface dxOverlayOptions<T = dxOverlay> extends WidgetOptions<T> {
-        /** Configures widget visibility animations. This object contains two fields: show and hide. */
-        animation?: dxOverlayAnimation;
-        /** A Boolean value specifying whether or not the widget is closed if a user presses the Back hardware button. */
-        closeOnBackButton?: boolean;
-        /** Specifies whether to close the widget if a user clicks outside it. */
-        closeOnOutsideClick?: boolean | ((event: event) => boolean);
-        /** Specifies a custom template for the widget content. */
-        contentTemplate?: template | ((contentElement: DevExpress.core.dxElement) => string | Element | JQuery);
-        /** Specifies whether to render the widget's content when it is displayed. If false, the content is rendered immediately. */
-        deferRendering?: boolean;
-        /** Specifies whether or not an end-user can drag the widget. */
-        dragEnabled?: boolean;
-        /** Specifies the widget's height in pixels. */
-        height?: number | string | (() => number | string);
-        /** Specifies the maximum height the widget can reach while resizing. */
-        maxHeight?: number | string | (() => number | string);
-        /** Specifies the maximum width the widget can reach while resizing. */
-        maxWidth?: number | string | (() => number | string);
-        /** Specifies the minimum height the widget can reach while resizing. */
-        minHeight?: number | string | (() => number | string);
-        /** Specifies the minimum width the widget can reach while resizing. */
-        minWidth?: number | string | (() => number | string);
-        /** A function that is executed after the widget is hidden. */
-        onHidden?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any }) => any);
-        /** A function that is executed before the widget is hidden. */
-        onHiding?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, cancel?: boolean }) => any);
-        /** A function that is executed before the widget is displayed. */
-        onShowing?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any }) => any);
-        /** A function that is executed after the widget is displayed. */
-        onShown?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any }) => any);
-        /** Positions the widget. */
-        position?: any;
-        /** Specifies whether to shade the container when the widget is active. */
-        shading?: boolean;
-        /** Specifies the shading color. */
-        shadingColor?: string;
-        /** A Boolean value specifying whether or not the widget is visible. */
-        visible?: boolean;
-        /** Specifies the widget's width in pixels. */
-        width?: number | string | (() => number | string);
-    }
-    /** Configures widget visibility animations. This object contains two fields: show and hide. */
-    export interface dxOverlayAnimation {
-        /** An object that defines the animation options used when the widget is being hidden. */
-        hide?: animationConfig;
-        /** An object that defines the animation options used when the widget is being shown. */
-        show?: animationConfig;
-    }
-    /** The Overlay widget represents a window overlaying the current view. It displays data located within the HTML element representing the widget. */
-    export class dxOverlay extends Widget {
-        constructor(element: Element, options?: dxOverlayOptions)
-        constructor(element: JQuery, options?: dxOverlayOptions)
-        /** Gets the widget's content. */
-        content(): DevExpress.core.dxElement;
-        /** Hides the widget. */
-        hide(): Promise<void> & JQueryPromise<void>;
-        /** Recalculates the widget's size and position without rerendering. */
-        repaint(): void;
-        /** Shows the widget. */
-        show(): Promise<void> & JQueryPromise<void>;
-        /** Shows or hides the widget depending on the argument. */
-        toggle(showing: boolean): Promise<void> & JQueryPromise<void>;
-    }
-    
-    export interface dxPivotGridOptions extends WidgetOptions<dxPivotGrid> {
-        /** Allows an end-user to expand/collapse all header items within a header level. */
-        allowExpandAll?: boolean;
-        /** Allows a user to filter fields by selecting or deselecting values in the popup menu. */
-        allowFiltering?: boolean;
-        /** Allows an end-user to change sorting options. */
-        allowSorting?: boolean;
-        /** Allows an end-user to sort columns by summary values. */
-        allowSortingBySummary?: boolean;
-        /** Specifies the area to which data field headers must belong. */
-        dataFieldArea?: 'column' | 'row';
-        /** Binds the widget to data. */
-        dataSource?: Array<any> | DevExpress.data.PivotGridDataSource | DevExpress.data.PivotGridDataSourceOptions;
-        /** Configures client-side exporting. */
-        export?: { enabled?: boolean, fileName?: string, ignoreExcelErrors?: boolean, proxyUrl?: string };
-        /** The Field Chooser configuration options. */
-        fieldChooser?: { allowSearch?: boolean, applyChangesMode?: 'instantly' | 'onDemand', enabled?: boolean, height?: number, layout?: 0 | 1 | 2, searchTimeout?: number, texts?: { allFields?: string, columnFields?: string, dataFields?: string, filterFields?: string, rowFields?: string }, title?: string, width?: number };
-        /** Configures the field panel. */
-        fieldPanel?: { allowFieldDragging?: boolean, showColumnFields?: boolean, showDataFields?: boolean, showFilterFields?: boolean, showRowFields?: boolean, texts?: { columnFieldArea?: string, dataFieldArea?: string, filterFieldArea?: string, rowFieldArea?: string }, visible?: boolean };
-        /** Configures the header filter feature. */
-        headerFilter?: { allowSearch?: boolean, height?: number, searchTimeout?: number, showRelevantValues?: boolean, texts?: { cancel?: string, emptyValue?: string, ok?: string }, width?: number };
-        /** Specifies whether or not to hide rows and columns with no data. */
-        hideEmptySummaryCells?: boolean;
-        /** Specifies options configuring the load panel. */
-        loadPanel?: { enabled?: boolean, height?: number, indicatorSrc?: string, showIndicator?: boolean, showPane?: boolean, text?: string, width?: number };
-        /** A function that is executed when a pivot grid cell is clicked or tapped. */
-        onCellClick?: ((e: { component?: dxPivotGrid, element?: DevExpress.core.dxElement, model?: any, area?: string, cellElement?: DevExpress.core.dxElement, cell?: dxPivotGridPivotGridCell, rowIndex?: number, columnIndex?: number, columnFields?: Array<DevExpress.data.PivotGridDataSourceField>, rowFields?: Array<DevExpress.data.PivotGridDataSourceField>, dataFields?: Array<DevExpress.data.PivotGridDataSourceField>, jQueryEvent?: JQueryEventObject, event?: event, cancel?: boolean }) => any);
-        /** A function that is executed after a pivot grid cell is created. */
-        onCellPrepared?: ((e: { component?: dxPivotGrid, element?: DevExpress.core.dxElement, model?: any, area?: string, cellElement?: DevExpress.core.dxElement, cell?: dxPivotGridPivotGridCell, rowIndex?: number, columnIndex?: number }) => any);
-        /** A function that is executed before the context menu is rendered. */
-        onContextMenuPreparing?: ((e: { component?: dxPivotGrid, element?: DevExpress.core.dxElement, model?: any, items?: Array<any>, area?: string, cell?: dxPivotGridPivotGridCell, cellElement?: DevExpress.core.dxElement, columnIndex?: number, rowIndex?: number, dataFields?: Array<DevExpress.data.PivotGridDataSourceField>, rowFields?: Array<DevExpress.data.PivotGridDataSourceField>, columnFields?: Array<DevExpress.data.PivotGridDataSourceField>, field?: DevExpress.data.PivotGridDataSourceField }) => any);
-        /** A function that is executed after data is exported. */
-        onExported?: ((e: { component?: dxPivotGrid, element?: DevExpress.core.dxElement, model?: any }) => any);
-        /** A function that is executed before data is exported. */
-        onExporting?: ((e: { component?: dxPivotGrid, element?: DevExpress.core.dxElement, model?: any, fileName?: string, cancel?: boolean }) => any);
-        /** A function that is executed before a file with exported data is saved to the user's local storage. */
-        onFileSaving?: ((e: { component?: dxPivotGrid, element?: DevExpress.core.dxElement, model?: any, fileName?: string, format?: string, data?: Blob, cancel?: boolean }) => any);
-        /** Specifies the layout of items in the row header. */
-        rowHeaderLayout?: 'standard' | 'tree';
-        /** A configuration object specifying scrolling options. */
-        scrolling?: { mode?: 'standard' | 'virtual', useNative?: boolean | 'auto' };
-        /** Specifies whether the outer borders of the grid are visible or not. */
-        showBorders?: boolean;
-        /** Specifies whether to display the Grand Total column. */
-        showColumnGrandTotals?: boolean;
-        /** Specifies whether to display the Total columns. */
-        showColumnTotals?: boolean;
-        /** Specifies whether to display the Grand Total row. */
-        showRowGrandTotals?: boolean;
-        /** Specifies whether to display the Total rows. Applies only if rowHeaderLayout is "standard". */
-        showRowTotals?: boolean;
-        /** Specifies where to show the total rows or columns. Applies only if rowHeaderLayout is "standard". */
-        showTotalsPrior?: 'both' | 'columns' | 'none' | 'rows';
-        /** A configuration object specifying options related to state storing. */
-        stateStoring?: { customLoad?: (() => Promise<any> | JQueryPromise<any>), customSave?: ((state: any) => any), enabled?: boolean, savingTimeout?: number, storageKey?: string, type?: 'custom' | 'localStorage' | 'sessionStorage' };
-        /** Strings that can be changed or localized in the PivotGrid widget. */
-        texts?: { collapseAll?: string, dataNotAvailable?: string, expandAll?: string, exportToExcel?: string, grandTotal?: string, noData?: string, removeAllSorting?: string, showFieldChooser?: string, sortColumnBySummary?: string, sortRowBySummary?: string, total?: string };
-        /** Specifies whether long text in header items should be wrapped. */
-        wordWrapEnabled?: boolean;
-    }
-    /** The PivotGrid is a widget that allows you to display and analyze multi-dimensional data from a local storage or an OLAP cube. */
-    export class dxPivotGrid extends Widget {
-        constructor(element: Element, options?: dxPivotGridOptions)
-        constructor(element: JQuery, options?: dxPivotGridOptions)
-        /** Binds a Chart to the PivotGrid. */
-        bindChart(chart: string | JQuery | any, integrationOptions: { inverted?: boolean, dataFieldsDisplayMode?: string, putDataFieldsInto?: string, alternateDataFields?: boolean, processCell?: Function, customizeChart?: Function, customizeSeries?: Function }): Function & null;
-        /** Exports pivot grid data to the Excel file. */
-        exportToExcel(): void;
-        /** Gets the PivotGridDataSource instance. */
-        getDataSource(): DevExpress.data.PivotGridDataSource;
-        /** Gets the Popup instance of the field chooser window. */
-        getFieldChooserPopup(): dxPopup;
-        /** Updates the widget to the size of its content. */
-        updateDimensions(): void;
-    }
-    
-    export interface dxPivotGridFieldChooserOptions extends WidgetOptions<dxPivotGridFieldChooser> {
-        /** Specifies whether the field chooser allows searching in the "All Fields" section. */
-        allowSearch?: boolean;
-        /** Specifies when to apply changes made in the widget to the PivotGrid. */
-        applyChangesMode?: 'instantly' | 'onDemand';
-        /** The data source of a PivotGrid widget. */
-        dataSource?: DevExpress.data.PivotGridDataSource;
-        /** Configures the header filter feature. */
-        headerFilter?: { allowSearch?: boolean, height?: number, searchTimeout?: number, showRelevantValues?: boolean, texts?: { cancel?: string, emptyValue?: string, ok?: string }, width?: number };
-        /** Specifies the widget's height. */
-        height?: number | string | (() => number | string);
-        /** Specifies the field chooser layout. */
-        layout?: 0 | 1 | 2;
-        /** A function that is executed before the context menu is rendered. */
-        onContextMenuPreparing?: ((e: { component?: dxPivotGridFieldChooser, element?: DevExpress.core.dxElement, model?: any, items?: Array<any>, area?: string, field?: DevExpress.data.PivotGridDataSourceField, jQueryEvent?: JQueryEventObject, event?: event }) => any);
-        /** Specifies a delay in milliseconds between when a user finishes typing in the field chooser's search panel, and when the search is executed. */
-        searchTimeout?: number;
-        /** The widget's state. */
-        state?: any;
-        /** Strings that can be changed or localized in the PivotGridFieldChooser widget. */
-        texts?: { allFields?: string, columnFields?: string, dataFields?: string, filterFields?: string, rowFields?: string };
-    }
-    /** A complementary widget for the PivotGrid that allows you to manage data displayed in the PivotGrid. The field chooser is already integrated in the PivotGrid and can be invoked using the context menu. If you need to continuously display the field chooser near the PivotGrid widget, use the PivotGridFieldChooser widget. */
-    export class dxPivotGridFieldChooser extends Widget {
-        constructor(element: Element, options?: dxPivotGridFieldChooserOptions)
-        constructor(element: JQuery, options?: dxPivotGridFieldChooserOptions)
-        /** Applies changes made in the widget to the PivotGrid. Takes effect only if applyChangesMode is "onDemand". */
-        applyChanges(): void;
-        /** Cancels changes made in the widget without applying them to the PivotGrid. Takes effect only if applyChangesMode is "onDemand". */
-        cancelChanges(): void;
-        /** Gets the PivotGridDataSource instance. */
-        getDataSource(): DevExpress.data.PivotGridDataSource;
-        /** Updates the widget to the size of its content. */
-        updateDimensions(): void;
-    }
-    /** An object containing information about the pivot grid cell. */
-    export interface dxPivotGridPivotGridCell {
-        /** The cell's column path. Available for data area cells only. */
-        columnPath?: Array<string | number | Date>;
-        /** The type of the column to which the cell belongs. Available for data area cells only. */
-        columnType?: 'D' | 'T' | 'GT';
-        /** The data field's index. Available for data area cells only. */
-        dataIndex?: number;
-        /** Indicates whether the cell is expanded. Available for row or column area cells only. */
-        expanded?: boolean;
-        /** The path to the row/column cell. Available for row or column area cells only. */
-        path?: Array<string | number | Date>;
-        /** The cell's row path. Available for data area cells only. */
-        rowPath?: Array<string | number | Date>;
-        /** The type of the row to which the cell belongs. Available for data area cells only. */
-        rowType?: 'D' | 'T' | 'GT';
-        /** The text displayed in the cell. */
-        text?: string;
-        /** The cell's type. Available for row or column area cells only. */
-        type?: 'D' | 'T' | 'GT';
-        /** The cell's value. */
-        value?: any;
-    }
-    /** An object exposing methods that manipulate a summary cell and provide access to its neighboring cells. */
-    export class dxPivotGridSummaryCell {
-        /** Gets the child cell in a specified direction. */
-        child(direction: string, fieldValue: number | string): dxPivotGridSummaryCell;
-        /** Gets all child cells in a specified direction. */
-        children(direction: string): Array<dxPivotGridSummaryCell>;
-        /** Gets a pivot grid field that corresponds to the summary cell. */
-        field(area: string): DevExpress.data.PivotGridDataSourceField;
-        /** Gets the Grand Total of the entire pivot grid. */
-        grandTotal(): dxPivotGridSummaryCell;
-        /** Gets a partial Grand Total cell of a row or column. */
-        grandTotal(direction: string): dxPivotGridSummaryCell;
-        /** Gets the cell next to the current one in a specified direction. */
-        next(direction: string): dxPivotGridSummaryCell;
-        /** Gets the cell next to current in a specified direction. */
-        next(direction: string, allowCrossGroup: boolean): dxPivotGridSummaryCell;
-        /** Gets the parent cell in a specified direction. */
-        parent(direction: string): dxPivotGridSummaryCell;
-        /** Gets the cell prior to the current one in a specified direction. */
-        prev(direction: string): dxPivotGridSummaryCell;
-        /** Gets the cell previous to current in a specified direction. */
-        prev(direction: string, allowCrossGroup: boolean): dxPivotGridSummaryCell;
-        /** Gets the cell located by the path of the source cell with one field value changed. */
-        slice(field: DevExpress.data.PivotGridDataSourceField, value: number | string): dxPivotGridSummaryCell;
-        /** Gets the value of the current cell. */
-        value(): any;
-        /** Gets the value of any field linked with the current cell. */
-        value(field: DevExpress.data.PivotGridDataSourceField | string): any;
-        /** Gets the value of any field linked with the current cell. */
-        value(field: DevExpress.data.PivotGridDataSourceField | string, isCalculatedValue: boolean): any;
-        /** Gets the value of the current cell. */
-        value(isCalculatedValue: boolean): any;
-    }
-    
-    export interface dxPopoverOptions<T = dxPopover> extends dxPopupOptions<T> {
-        /** Configures widget visibility animations. This object contains two fields: show and hide. */
-        animation?: dxPopoverAnimation;
-        /** A Boolean value specifying whether or not the widget is closed if a user clicks outside of the popover window and outside the target element. */
-        closeOnOutsideClick?: boolean | ((event: event) => boolean);
-        /** Specifies the widget's height. */
-        height?: number | string | (() => number | string);
-        /** Specifies options of popover hiding. */
-        hideEvent?: { delay?: number, name?: string } | string;
-        /** An object defining widget positioning options. */
-        position?: 'bottom' | 'left' | 'right' | 'top' | positionConfig;
-        /** Specifies whether to shade the container when the widget is active. */
-        shading?: boolean;
-        /** Specifies options for displaying the widget. */
-        showEvent?: { delay?: number, name?: string } | string;
-        /** A Boolean value specifying whether or not to display the title in the overlay window. */
-        showTitle?: boolean;
-        /** The target element associated with the widget. */
-        target?: string | Element | JQuery;
-        /** Specifies the widget's width. */
-        width?: number | string | (() => number | string);
-    }
-    /** Configures widget visibility animations. This object contains two fields: show and hide. */
-    export interface dxPopoverAnimation extends dxPopupAnimation {
-        /** An object that defines the animation options used when the widget is being hidden. */
-        hide?: animationConfig;
-        /** An object that defines the animation options used when the widget is being shown. */
-        show?: animationConfig;
-    }
-    /** The Popover is a widget that shows notifications within a box with an arrow pointing to a specified UI element. */
-    export class dxPopover extends dxPopup {
-        constructor(element: Element, options?: dxPopoverOptions)
-        constructor(element: JQuery, options?: dxPopoverOptions)
-        /** Shows the widget. */
-        show(): Promise<void> & JQueryPromise<void>;
-        /** Shows the widget for a target element. */
-        show(target: string | Element | JQuery): Promise<void> & JQueryPromise<void>;
-    }
-    
-    export interface dxPopupOptions<T = dxPopup> extends dxOverlayOptions<T> {
-        /** Configures widget visibility animations. This object contains two fields: show and hide. */
-        animation?: dxPopupAnimation;
-        /** Specifies the container in which to place the widget. */
-        container?: string | Element | JQuery;
-        /** Specifies whether or not to allow a user to drag the popup window. */
-        dragEnabled?: boolean;
-        /** Specifies whether the widget can be focused using keyboard navigation. */
-        focusStateEnabled?: boolean;
-        /** A Boolean value specifying whether or not to display the widget in full-screen mode. */
-        fullScreen?: boolean;
-        /** Specifies the widget's height in pixels. */
-        height?: number | string | (() => number | string);
-        /** A function that is executed each time the widget is resized by one pixel. */
-        onResize?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any }) => any);
-        /** A function that is executed when resizing ends. */
-        onResizeEnd?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any }) => any);
-        /** A function that is executed when resizing starts. */
-        onResizeStart?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any }) => any);
-        /** A function that is executed when the widget's title is rendered. */
-        onTitleRendered?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, titleElement?: DevExpress.core.dxElement }) => any);
-        /** Positions the widget. */
-        position?: 'bottom' | 'center' | 'left' | 'left bottom' | 'left top' | 'right' | 'right bottom' | 'right top' | 'top' | positionConfig | Function;
-        /** Specifies whether or not an end user can resize the widget. */
-        resizeEnabled?: boolean;
-        /** Specifies whether or not the widget displays the Close button. */
-        showCloseButton?: boolean;
-        /** A Boolean value specifying whether or not to display the title in the popup window. */
-        showTitle?: boolean;
-        /** The title in the overlay window. */
-        title?: string;
-        /** Specifies a custom template for the widget title. Does not apply if the title is defined. */
-        titleTemplate?: template | ((titleElement: DevExpress.core.dxElement) => string | Element | JQuery);
-        /** Configures toolbar items. */
-        toolbarItems?: Array<dxPopupToolbarItem>;
-        /** Specifies the widget's width in pixels. */
-        width?: number | string | (() => number | string);
-    }
-    /** Configures widget visibility animations. This object contains two fields: show and hide. */
-    export interface dxPopupAnimation extends dxOverlayAnimation {
-        /** An object that defines the animation options used when the widget is being hidden. */
-        hide?: animationConfig;
-        /** An object that defines the animation options used when the widget is being shown. */
-        show?: animationConfig;
-    }
-    /** Configures toolbar items. */
-    export interface dxPopupToolbarItem {
-        /** Specifies whether or not a toolbar item must be displayed disabled. */
-        disabled?: boolean;
-        /** Specifies html code inserted into the toolbar item element. */
-        html?: string;
-        /** Specifies a location for the item on the toolbar. */
-        location?: 'after' | 'before' | 'center';
-        /** Specifies a configuration object for the widget that presents a toolbar item. */
-        options?: any;
-        /** Specifies an item template that should be used to render this item only. */
-        template?: template;
-        /** Specifies text displayed for the toolbar item. */
-        text?: string;
-        /** Specifies whether the item is displayed on a top or bottom toolbar. */
-        toolbar?: 'bottom' | 'top';
-        /** Specifies whether or not a widget item must be displayed. */
-        visible?: boolean;
-        /** A widget that presents a toolbar item. */
-        widget?: 'dxAutocomplete' | 'dxButton' | 'dxCheckBox' | 'dxDateBox' | 'dxMenu' | 'dxSelectBox' | 'dxTabs' | 'dxTextBox' | 'dxButtonGroup';
-    }
-    /** The Popup widget is a pop-up window overlaying the current view. */
-    export class dxPopup extends dxOverlay {
-        constructor(element: Element, options?: dxPopupOptions)
-        constructor(element: JQuery, options?: dxPopupOptions)
-    }
-    
-    export interface dxProgressBarOptions extends dxTrackBarOptions<dxProgressBar> {
-        /** A function that is executed when the value reaches the maximum. */
-        onComplete?: ((e: { component?: dxProgressBar, element?: DevExpress.core.dxElement, model?: any, jQueryEvent?: JQueryEventObject, event?: event }) => any);
-        /** Specifies whether or not the widget displays a progress status. */
-        showStatus?: boolean;
-        /** Specifies a format for the progress status. */
-        statusFormat?: string | ((ratio: number, value: number) => string);
-        /** The current widget value. */
-        value?: number;
-    }
-    /** The ProgressBar is a widget that shows current progress. */
-    export class dxProgressBar extends dxTrackBar {
-        constructor(element: Element, options?: dxProgressBarOptions)
-        constructor(element: JQuery, options?: dxProgressBarOptions)
-    }
-    
-    export interface dxRadioGroupOptions extends EditorOptions<dxRadioGroup>, DataExpressionMixinOptions<dxRadioGroup> {
-        /** Specifies whether or not the widget changes its state when interacting with a user. */
-        activeStateEnabled?: boolean;
-        /** Specifies whether the widget can be focused using keyboard navigation. */
-        focusStateEnabled?: boolean;
-        /** Specifies whether the widget changes its state when a user pauses on it. */
-        hoverStateEnabled?: boolean;
-        /** Specifies the radio group layout. */
-        layout?: 'horizontal' | 'vertical';
-        /** The value to be assigned to the `name` attribute of the underlying HTML element. */
-        name?: string;
-        /** Specifies the widget's value. */
-        value?: any;
-    }
-    /** The RadioGroup is a widget that contains a set of radio buttons and allows an end user to make a single selection from the set. */
-    export class dxRadioGroup extends Editor {
-        constructor(element: Element, options?: dxRadioGroupOptions)
-        constructor(element: JQuery, options?: dxRadioGroupOptions)
-        /** Gets the DataSource instance. */
-        getDataSource(): DevExpress.data.DataSource;
-    }
-    
-    export interface dxRangeSliderOptions extends dxSliderBaseOptions<dxRangeSlider> {
-        /** The right edge of the interval currently selected using the range slider. */
-        end?: number;
-        /** The value to be assigned to the name attribute of the underlying `` element. */
-        endName?: string;
-        /** A function that is executed after the widget's value is changed. */
-        onValueChanged?: ((e: { component?: dxRangeSlider, element?: DevExpress.core.dxElement, model?: any }) => any);
-        /** The left edge of the interval currently selected using the range slider. */
-        start?: number;
-        /** The value to be assigned to the name attribute of the underlying `` element. */
-        startName?: string;
-        /** Specifies the widget's value. */
-        value?: Array<number>;
-    }
-    /** The RangeSlider is a widget that allows an end user to choose a range of numeric values. */
-    export class dxRangeSlider extends dxSliderBase {
-        constructor(element: Element, options?: dxRangeSliderOptions)
-        constructor(element: JQuery, options?: dxRangeSliderOptions)
-        /** Resets the value option to the default value. */
-        reset(): void;
-    }
-    
-    export interface dxRecurrenceEditorOptions extends EditorOptions<dxRecurrenceEditor> {
-        /** Specifies the widget's value. */
-        value?: string;
-    }
-    /** A base class for editors. */
-    export class dxRecurrenceEditor extends Editor {
-        constructor(element: Element, options?: dxRecurrenceEditorOptions)
-        constructor(element: JQuery, options?: dxRecurrenceEditorOptions)
-    }
-    
-    export interface dxResizableOptions extends DOMComponentOptions<dxResizable> {
-        /** Specifies which borders of the widget element are used as a handle. */
-        handles?: 'bottom' | 'left' | 'right' | 'top' | 'all' | string;
-        /** Specifies the widget's height. */
-        height?: number | string | (() => number | string);
-        /** Specifies the upper height boundary for resizing. */
-        maxHeight?: number;
-        /** Specifies the upper width boundary for resizing. */
-        maxWidth?: number;
-        /** Specifies the lower height boundary for resizing. */
-        minHeight?: number;
-        /** Specifies the lower width boundary for resizing. */
-        minWidth?: number;
-        /** A function that is executed each time the widget is resized by one pixel. */
-        onResize?: ((e: { component?: dxResizable, element?: DevExpress.core.dxElement, model?: any, jQueryEvent?: JQueryEventObject, event?: event, width?: number, height?: number }) => any);
-        /** A function that is executed when resizing ends. */
-        onResizeEnd?: ((e: { component?: dxResizable, element?: DevExpress.core.dxElement, model?: any, jQueryEvent?: JQueryEventObject, event?: event, width?: number, height?: number }) => any);
-        /** A function that is executed when resizing starts. */
-        onResizeStart?: ((e: { component?: dxResizable, element?: DevExpress.core.dxElement, model?: any, jQueryEvent?: JQueryEventObject, event?: event, width?: number, height?: number }) => any);
-        /** Specifies the widget's width. */
-        width?: number | string | (() => number | string);
-    }
-    /** The Resizable widget enables its content to be resizable in the UI. */
-    export class dxResizable extends DOMComponent {
-        constructor(element: Element, options?: dxResizableOptions)
-        constructor(element: JQuery, options?: dxResizableOptions)
-    }
-    
-    export interface dxResponsiveBoxOptions extends CollectionWidgetOptions<dxResponsiveBox> {
-        /** Specifies the collection of columns for the grid used to position layout elements. */
-        cols?: Array<{ baseSize?: number | 'auto', ratio?: number, screen?: string, shrink?: number }>;
-        /** Specifies the widget's height. */
-        height?: number | string | (() => number | string);
-        /** An array of items displayed by the widget. */
-        items?: Array<string | dxResponsiveBoxItem | any>;
-        /** Specifies the collection of rows for the grid used to position layout elements. */
-        rows?: Array<{ baseSize?: number | 'auto', ratio?: number, screen?: string, shrink?: number }>;
-        /** Specifies the function returning the size qualifier depending on the screen's width. */
-        screenByWidth?: Function;
-        /** Specifies on which screens all layout elements should be arranged in a single column. Accepts a single or several size qualifiers separated by a space. */
-        singleColumnScreen?: string;
-        /** Specifies the widget's width. */
-        width?: number | string | (() => number | string);
-    }
-    /** The ResponsiveBox widget allows you to create an application or a website with a layout adapted to different screen sizes. */
-    export class dxResponsiveBox extends CollectionWidget {
-        constructor(element: Element, options?: dxResponsiveBoxOptions)
-        constructor(element: JQuery, options?: dxResponsiveBoxOptions)
-    }
-    /** This section lists the fields that are used in a default template for widget items. */
-    export interface dxResponsiveBoxItem extends CollectionWidgetItem {
-        /** Specifies the item location and size against the widget grid. */
-        location?: { col?: number, colspan?: number, row?: number, rowspan?: number, screen?: string } | Array<{ col?: number, colspan?: number, row?: number, rowspan?: number, screen?: string }>;
-    }
-    
-    export interface dxSchedulerOptions extends WidgetOptions<dxScheduler> {
-        
-        adaptivityEnabled?: boolean;
-        /** Specifies the name of the data source item field whose value defines whether or not the corresponding appointment is an all-day appointment. */
-        allDayExpr?: string;
-        /** Specifies an appointment collector's custom template. */
-        appointmentCollectorTemplate?: template | ((data: { appointmentCount?: number, isCompact?: boolean }, collectorElement: DevExpress.core.dxElement) => string | Element | JQuery);
-        /** Specifies a custom template for appointments. */
-        appointmentTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery);
-        /** Specifies a custom template for appointment tooltips. */
-        appointmentTooltipTemplate?: template | ((appointmentData: any, contentElement: DevExpress.core.dxElement, targetedAppointmentData: any) => string | Element | JQuery);
-        /** Specifies cell duration in minutes. */
-        cellDuration?: number;
-        /** Specifies whether or not an end-user can scroll the view in both directions at the same time. */
-        crossScrollingEnabled?: boolean;
-        /** Specifies a date displayed on the current scheduler view by default. */
-        currentDate?: Date | number | string;
-        /** Specifies the currently displayed view. Accepts the view's name or type. */
-        currentView?: 'agenda' | 'day' | 'month' | 'timelineDay' | 'timelineMonth' | 'timelineWeek' | 'timelineWorkWeek' | 'week' | 'workWeek';
-        /** Customizes the date navigator's text. */
-        customizeDateNavigatorText?: ((info: { startDate?: Date, endDate?: Date, text?: string }) => string);
-        /** Specifies a custom template for table cells. */
-        dataCellTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery);
-        /** Binds the widget to data. */
-        dataSource?: string | Array<dxSchedulerAppointment> | DevExpress.data.DataSource | DevExpress.data.DataSourceOptions;
-        /** Specifies a custom template for day scale items. */
-        dateCellTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery);
-        /** Specifies the date-time values' serialization format. Use it only if you do not specify the dataSource at design time. */
-        dateSerializationFormat?: string;
-        /** Specifies the name of the data source item field whose value holds the description of the corresponding appointment. */
-        descriptionExpr?: string;
-        /** Specifies a custom template for appointments in the appointment collector's drop-down list. */
-        dropDownAppointmentTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery);
-        /** Specifies which editing operations an end-user can perform on appointments. */
-        editing?: boolean | { allowAdding?: boolean, allowDeleting?: boolean, allowDragging?: boolean, allowResizing?: boolean, allowUpdating?: boolean };
-        /** Specifies the name of the data source item field that defines the ending of an appointment. */
-        endDateExpr?: string;
-        /** Specifies the name of the data source item field that defines the timezone of the appointment end date. */
-        endDateTimeZoneExpr?: string;
-        /** Specifies the last hour in the time scale. Cannot be greater than 24. */
-        endDayHour?: number;
-        /** Specifies the first day of a week. Does not apply to the agenda view. */
-        firstDayOfWeek?: 0 | 1 | 2 | 3 | 4 | 5 | 6;
-        /** Specifies whether the widget can be focused using keyboard navigation. */
-        focusStateEnabled?: boolean;
-        /** Specifies whether to group appointments by date first. Applies only if groupOrientation is "horizontal". */
-        groupByDate?: boolean;
-        /** Specifies the resource kinds by which the scheduler's appointments are grouped in a timetable. */
-        groups?: Array<string>;
-        /** Specifies the time interval between when the date-time indicator changes its position, in milliseconds. */
-        indicatorUpdateInterval?: number;
-        /** The latest date the widget allows you to select. */
-        max?: Date | number | string;
-        /** Specifies the limit of full-sized appointments displayed per cell. Applies to all views except "agenda". */
-        maxAppointmentsPerCell?: number | 'auto' | 'unlimited';
-        /** The earliest date the widget allows you to select. */
-        min?: Date | number | string;
-        /** The text or HTML markup displayed by the widget if the item collection is empty. Available for the Agenda view only. */
-        noDataText?: string;
-        /** A function that is executed after an appointment is added to the data source. */
-        onAppointmentAdded?: ((e: { component?: dxScheduler, element?: DevExpress.core.dxElement, model?: any, appointmentData?: any, error?: Error }) => any);
-        /** A function that is executed before an appointment is added to the data source. */
-        onAppointmentAdding?: ((e: { component?: dxScheduler, element?: DevExpress.core.dxElement, model?: any, appointmentData?: any, cancel?: boolean | Promise<boolean> | JQueryPromise<boolean> }) => any);
-        /** A function that is executed when an appointment is clicked or tapped. */
-        onAppointmentClick?: ((e: { component?: dxScheduler, element?: DevExpress.core.dxElement, model?: any, appointmentData?: any, targetedAppointmentData?: any, appointmentElement?: DevExpress.core.dxElement, jQueryEvent?: JQueryEventObject, event?: event, cancel?: boolean }) => any) | string;
-        /** A function that is executed when a user attempts to open the browser's context menu for an appointment. Allows you to replace this context menu with a custom context menu. */
-        onAppointmentContextMenu?: ((e: { component?: dxScheduler, element?: DevExpress.core.dxElement, model?: any, appointmentData?: any, targetedAppointmentData?: any, appointmentElement?: DevExpress.core.dxElement, jQueryEvent?: JQueryEventObject, event?: event }) => any) | string;
-        /** A function that is executed when an appointment is double-clicked or double-tapped. */
-        onAppointmentDblClick?: ((e: { component?: dxScheduler, element?: DevExpress.core.dxElement, model?: any, appointmentData?: any, targetedAppointmentData?: any, appointmentElement?: DevExpress.core.dxElement, jQueryEvent?: JQueryEventObject, event?: event, cancel?: boolean }) => any) | string;
-        /** A function that is executed after an appointment is deleted from the data source. */
-        onAppointmentDeleted?: ((e: { component?: dxScheduler, element?: DevExpress.core.dxElement, model?: any, appointmentData?: any, error?: Error }) => any);
-        /** A function that is executed before an appointment is deleted from the data source. */
-        onAppointmentDeleting?: ((e: { component?: dxScheduler, element?: DevExpress.core.dxElement, model?: any, appointmentData?: any, cancel?: boolean | Promise<boolean> | JQueryPromise<boolean> }) => any);
-        /** @deprecated Use the onAppointmentFormOpening option instead. */
-        /** A function that is executed before an appointment details form is opened. */
-        onAppointmentFormCreated?: ((e: { component?: dxScheduler, element?: DevExpress.core.dxElement, model?: any, appointmentData?: any, form?: dxForm }) => any);
-        /** A function that is executed before an appointment details form is opened. */
-        onAppointmentFormOpening?: ((e: { component?: dxScheduler, element?: DevExpress.core.dxElement, model?: any, appointmentData?: any, form?: dxForm }) => any);
-        /** A function that is executed when an appointment is rendered. */
-        onAppointmentRendered?: ((e: { component?: dxScheduler, element?: DevExpress.core.dxElement, model?: any, appointmentData?: any, targetedAppointmentData?: any, appointmentElement?: DevExpress.core.dxElement }) => any);
-        /** A function that is executed after an appointment is updated in the data source. */
-        onAppointmentUpdated?: ((e: { component?: dxScheduler, element?: DevExpress.core.dxElement, model?: any, appointmentData?: any, error?: Error }) => any);
-        /** A function that is executed before an appointment is updated in the data source. */
-        onAppointmentUpdating?: ((e: { component?: dxScheduler, element?: DevExpress.core.dxElement, model?: any, oldData?: any, newData?: any, cancel?: boolean | Promise<boolean> | JQueryPromise<boolean> }) => any);
-        /** A function that is executed when a view cell is clicked. */
-        onCellClick?: ((e: { component?: dxScheduler, element?: DevExpress.core.dxElement, model?: any, cellData?: any, cellElement?: DevExpress.core.dxElement, jQueryEvent?: JQueryEventObject, event?: event, cancel?: boolean }) => any) | string;
-        /** A function that is executed when a user attempts to open the browser's context menu for a cell. Allows you to replace this context menu with a custom context menu. */
-        onCellContextMenu?: ((e: { component?: dxScheduler, element?: DevExpress.core.dxElement, model?: any, cellData?: any, cellElement?: DevExpress.core.dxElement, jQueryEvent?: JQueryEventObject, event?: event }) => any) | string;
-        /** Specifies the edit mode for recurring appointments. */
-        recurrenceEditMode?: 'dialog' | 'occurrence' | 'series';
-        /** Specifies the name of the data source item field that defines exceptions for the current recurring appointment. */
-        recurrenceExceptionExpr?: string;
-        /** Specifies the name of the data source item field that defines a recurrence rule for generating recurring appointments. */
-        recurrenceRuleExpr?: string;
-        /** Specifies whether filtering is performed on the server or client side. */
-        remoteFiltering?: boolean;
-        /** Specifies a custom template for resource headers. */
-        resourceCellTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery);
-        /** Specifies an array of resources available in the scheduler. */
-        resources?: Array<{ allowMultiple?: boolean, colorExpr?: string, dataSource?: string | Array<any> | DevExpress.data.DataSource | DevExpress.data.DataSourceOptions, displayExpr?: string | ((resource: any) => any), fieldExpr?: string, label?: string, useColorAsDefault?: boolean, valueExpr?: string | Function }>;
-        /** Currently selected cells' data. */
-        selectedCellData?: Array<any>;
-        /** Specifies whether to apply shading to cover the timetable up to the current time. */
-        shadeUntilCurrentTime?: boolean;
-        /** Specifies the "All-day" panel's visibility. Setting this option to false hides the panel along with the all-day appointments. */
-        showAllDayPanel?: boolean;
-        /** Specifies the current date-time indicator's visibility. */
-        showCurrentTimeIndicator?: boolean;
-        /** Specifies the name of the data source item field that defines the start of an appointment. */
-        startDateExpr?: string;
-        /** Specifies the name of the data source item field that defines the timezone of the appointment start date. */
-        startDateTimeZoneExpr?: string;
-        /** Specifies the first hour in the time scale. */
-        startDayHour?: number;
-        /** Specifies the name of the data source item field that holds the subject of an appointment. */
-        textExpr?: string;
-        /** Specifies a custom template for time scale items. */
-        timeCellTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery);
-        /** Specifies the timezone of the widget. */
-        timeZone?: string;
-        /** Specifies whether a user can switch views using tabs or a drop-down menu. */
-        useDropDownViewSwitcher?: boolean;
-        /** Configures individual views. */
-        views?: Array<'day' | 'week' | 'workWeek' | 'month' | 'timelineDay' | 'timelineWeek' | 'timelineWorkWeek' | 'timelineMonth' | 'agenda' | { agendaDuration?: number, appointmentCollectorTemplate?: template | ((data: { appointmentCount?: number, isCompact?: boolean }, collectorElement: DevExpress.core.dxElement) => string | Element | JQuery), appointmentTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery), appointmentTooltipTemplate?: template | ((appointmentData: any, contentElement: DevExpress.core.dxElement, targetedAppointmentData: any) => string | Element | JQuery), cellDuration?: number, dataCellTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery), dateCellTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery), dropDownAppointmentTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery), endDayHour?: number, firstDayOfWeek?: 0 | 1 | 2 | 3 | 4 | 5 | 6, groupByDate?: boolean, groupOrientation?: 'horizontal' | 'vertical', groups?: Array<string>, intervalCount?: number, maxAppointmentsPerCell?: number | 'auto' | 'unlimited', name?: string, resourceCellTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery), startDate?: Date | number | string, startDayHour?: number, timeCellTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery), type?: 'agenda' | 'day' | 'month' | 'timelineDay' | 'timelineMonth' | 'timelineWeek' | 'timelineWorkWeek' | 'week' | 'workWeek' }>;
-    }
-    /** The Scheduler is a widget that represents scheduled data and allows a user to manage and edit it. */
-    export class dxScheduler extends Widget {
-        constructor(element: Element, options?: dxSchedulerOptions)
-        constructor(element: JQuery, options?: dxSchedulerOptions)
-        /** Adds an appointment. */
-        addAppointment(appointment: any): void;
-        /** Deletes an appointment from the timetable and its object from the data source. */
-        deleteAppointment(appointment: any): void;
-        /** Gets the DataSource instance. */
-        getDataSource(): DevExpress.data.DataSource;
-        /** Gets the current view's end date. */
-        getEndViewDate(): Date;
-        /** Gets the current view's start date. */
-        getStartViewDate(): Date;
-        /** Hides an appointment details form. */
-        hideAppointmentPopup(saveChanges?: boolean): void;
-        /** Hides an appointment tooltip. */
-        hideAppointmentTooltip(): void;
-        /** Registers a handler to be executed when a user presses a specific key. */
-        registerKeyHandler(): void;
-        /** Scrolls the current view to a specific day and time. */
-        scrollToTime(hours: number, minutes: number, date?: Date): void;
-        /** Shows the appointment details form. */
-        showAppointmentPopup(appointmentData: any, createNewAppointment?: boolean, currentAppointmentData?: any): void;
-        /** Shows a tooltip for a target element. */
-        showAppointmentTooltip(appointmentData: any, target: string | Element | JQuery, currentAppointmentData?: any): void;
-        /** Updates an appointment. */
-        updateAppointment(target: any, appointment: any): void;
-    }
-    /** This section lists the fields that are used in a default template for scheduler appointments. */
-    export interface dxSchedulerAppointment extends CollectionWidgetItem {
-        /** Specifies whether the appointment lasts all day. */
-        allDay?: boolean;
-        /** Specifies a detail description of the appointment. */
-        description?: string;
-        /** Specifies whether or not an appointment must be displayed disabled. */
-        disabled?: boolean;
-        /** Specifies the ending of the appointment. */
-        endDate?: Date;
-        /** Specifies the timezone of the appointment end date. Applies only if timeZone is not specified. */
-        endDateTimeZone?: string;
-        /** Specifies HTML code inserted into the appointment element. */
-        html?: string;
-        /** Specifies exceptions for the current recurring appointment. */
-        recurrenceException?: string;
-        /** Specifies a recurrence rule for generating recurring appointments in the scheduler. */
-        recurrenceRule?: string;
-        /** Specifies the start of the appointment. */
-        startDate?: Date;
-        /** Specifies the timezone of the appointment start date. Applies only if timeZone is not specified. */
-        startDateTimeZone?: string;
-        /** Specifies an appointment template that should be used to render this appointment only. */
-        template?: template;
-        /** Specifies the subject of the appointment. */
-        text?: string;
-        /** Specifies whether or not an appointment must be displayed. */
-        visible?: boolean;
-    }
-    /** This section lists the fields that are used in a default template for scheduler appointment tooltips. */
-    export interface dxSchedulerAppointmentTooltipTemplate {
-        /** Specifies whether or not the current appointment is an all-day appointment. */
-        allDay?: boolean;
-        /** Specifies the appointment description. */
-        description?: string;
-        /** Specifies the ending of the appointment. */
-        endDate?: Date;
-        /** Specifies the timezone of the appointment end date. */
-        endDateTimeZone?: string;
-        /** Specifies exceptions for a the current recurring appointment. */
-        recurrenceException?: string;
-        /** Specifies a recurrence rule for generating recurring appointments in the scheduler. */
-        recurrenceRule?: string;
-        /** Specifies the start of the appointment. */
-        startDate?: Date;
-        /** Specifies the timezone of the appointment start date. */
-        startDateTimeZone?: string;
-        /** Specifies the subject of the appointment. */
-        text?: string;
-    }
-    
-    export interface dxScrollViewOptions extends dxScrollableOptions<dxScrollView> {
-        /** A function that is executed when the "pull to refresh" gesture is performed. Supported in mobile themes only. */
-        onPullDown?: ((e: { component?: dxScrollView, element?: DevExpress.core.dxElement, model?: any }) => any);
-        /** A function that is executed when the content is scrolled down to the bottom. */
-        onReachBottom?: ((e: { component?: dxScrollView, element?: DevExpress.core.dxElement, model?: any }) => any);
-        /** Specifies the text shown in the pullDown panel when pulling the content down lowers the refresh threshold. */
-        pulledDownText?: string;
-        /** Specifies the text shown in the pullDown panel while pulling the content down to the refresh threshold. */
-        pullingDownText?: string;
-        /** Specifies the text shown in the pullDown panel displayed when content is scrolled to the bottom. */
-        reachBottomText?: string;
-        /** Specifies the text shown in the pullDown panel displayed when the content is being refreshed. */
-        refreshingText?: string;
-    }
-    /** The ScrollView is a widget that enables a user to scroll its content. */
-    export class dxScrollView extends dxScrollable {
-        constructor(element: Element, options?: dxScrollViewOptions)
-        constructor(element: JQuery, options?: dxScrollViewOptions)
-        /** Locks the widget until the release(preventScrollBottom) method is called and executes the function passed to the onPullDown option and the handler assigned to the pullDown event. */
-        refresh(): void;
-        /** Notifies the ScrollView that data loading is finished. */
-        release(preventScrollBottom: boolean): Promise<void> & JQueryPromise<void>;
-    }
-    
-    export interface dxScrollableOptions<T = dxScrollable> extends DOMComponentOptions<T> {
-        /** A Boolean value specifying whether to enable or disable the bounce-back effect. */
-        bounceEnabled?: boolean;
-        /** A string value specifying the available scrolling directions. */
-        direction?: 'both' | 'horizontal' | 'vertical';
-        /** A Boolean value specifying whether or not the widget can respond to user interaction. */
-        disabled?: boolean;
-        /** A function that is executed on each scroll gesture. */
-        onScroll?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, jQueryEvent?: JQueryEventObject, event?: event, scrollOffset?: any, reachedLeft?: boolean, reachedRight?: boolean, reachedTop?: boolean, reachedBottom?: boolean }) => any);
-        /** A function that is executed each time the widget is updated. */
-        onUpdated?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, jQueryEvent?: JQueryEventObject, event?: event, scrollOffset?: any, reachedLeft?: boolean, reachedRight?: boolean, reachedTop?: boolean, reachedBottom?: boolean }) => any);
-        /** A Boolean value specifying whether or not an end-user can scroll the widget content swiping it up or down. Applies only if useNative is false */
-        scrollByContent?: boolean;
-        /** A Boolean value specifying whether or not an end-user can scroll the widget content using the scrollbar. */
-        scrollByThumb?: boolean;
-        /** Specifies when the widget shows the scrollbar. */
-        showScrollbar?: 'onScroll' | 'onHover' | 'always' | 'never';
-        /** Indicates whether to use native or simulated scrolling. */
-        useNative?: boolean;
-    }
-    /** A widget used to display scrollable content. */
-    export class dxScrollable extends DOMComponent {
-        constructor(element: Element, options?: dxScrollableOptions)
-        constructor(element: JQuery, options?: dxScrollableOptions)
-        /** Gets the widget's height. */
-        clientHeight(): number;
-        /** Gets the widget's width. */
-        clientWidth(): number;
-        /** Gets the widget's content. */
-        content(): DevExpress.core.dxElement;
-        /** Scrolls the content by a specific distance. */
-        scrollBy(distance: number): void;
-        /** Scrolls the content by a specific distance in horizontal and vertical directions. */
-        scrollBy(distanceObject: any): void;
-        /** Gets the scrollable content's height in pixels. */
-        scrollHeight(): number;
-        /** Gets the left scroll offset. */
-        scrollLeft(): number;
-        /** Gets the scroll offset. */
-        scrollOffset(): any;
-        /** Scrolls the content to a specific position. */
-        scrollTo(targetLocation: number): void;
-        /** Scrolls the content to a specific position. */
-        scrollTo(targetLocation: any): void;
-        /** Scrolls the content to an element. */
-        scrollToElement(element: Element | JQuery): void;
-        /** Gets the top scroll offset. */
-        scrollTop(): number;
-        /** Gets the scrollable content's width in pixels. */
-        scrollWidth(): number;
-        /** Updates the scrollable contents' dimensions. */
-        update(): Promise<void> & JQueryPromise<void>;
-    }
-    
-    export interface dxSelectBoxOptions<T = dxSelectBox> extends dxDropDownListOptions<T> {
-        /** Specifies whether the widget allows a user to enter a custom value. Requires the onCustomItemCreating handler implementation. */
-        acceptCustomValue?: boolean;
-        /** Specifies a custom template for the text field. Must contain the TextBox widget. */
-        fieldTemplate?: template | ((selectedItem: any, fieldElement: DevExpress.core.dxElement) => string | Element | JQuery);
-        /** A function that is executed when a user adds a custom item. Requires acceptCustomValue to be set to true. */
-        onCustomItemCreating?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, text?: string, customItem?: string | any | Promise<any> | JQueryPromise<any> }) => any);
-        /** Specifies whether a user can open the drop-down list by clicking a text field. */
-        openOnFieldClick?: boolean;
-        /** The text that is provided as a hint in the select box editor. */
-        placeholder?: string;
-        /** Specifies whether the drop-down button is visible. */
-        showDropDownButton?: boolean;
-        /** Specifies whether or not to display selection controls. */
-        showSelectionControls?: boolean;
-        /** Specifies the DOM events after which the widget's value should be updated. Applies only if acceptCustomValue is set to true. */
-        valueChangeEvent?: string;
-    }
-    /** The SelectBox widget is an editor that allows an end user to select an item from a drop-down list. */
-    export class dxSelectBox extends dxDropDownList {
-        constructor(element: Element, options?: dxSelectBoxOptions)
-        constructor(element: JQuery, options?: dxSelectBoxOptions)
-    }
-    
-    export interface dxSlideOutOptions extends CollectionWidgetOptions<dxSlideOut> {
-        /** A Boolean value specifying whether or not the widget changes its state when interacting with a user. */
-        activeStateEnabled?: boolean;
-        /** Specifies a custom template for the widget content. Rendered only once - when the widget is created. */
-        contentTemplate?: template | ((container: DevExpress.core.dxElement) => string | Element | JQuery);
-        /** An array of items displayed by the widget. */
-        items?: Array<string | dxSlideOutItem | any>;
-        /** Specifies a custom template for group captions. */
-        menuGroupTemplate?: template | ((groupData: any, groupIndex: number, groupElement: any) => string | Element | JQuery);
-        /** A Boolean value specifying whether or not to display a grouped menu. */
-        menuGrouped?: boolean;
-        /** Specifies a custom template for menu items. */
-        menuItemTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery);
-        /** Specifies the current menu position. */
-        menuPosition?: 'inverted' | 'normal';
-        /** Specifies whether or not the slide-out menu is displayed. */
-        menuVisible?: boolean;
-        /** A function that is executed when a group menu item is rendered. */
-        onMenuGroupRendered?: ((e: { component?: dxSlideOut, element?: DevExpress.core.dxElement, model?: any }) => any);
-        /** A function that is executed when a regular menu item is rendered. */
-        onMenuItemRendered?: ((e: { component?: dxSlideOut, element?: DevExpress.core.dxElement, model?: any }) => any);
-        /** The index number of the currently selected item. */
-        selectedIndex?: number;
-        /** Indicates whether the menu can be shown/hidden by swiping the widget's main panel. */
-        swipeEnabled?: boolean;
-    }
-    /** The SlideOut widget is a classic slide-out menu paired with a view. An end user opens the menu by swiping away the view. */
-    export class dxSlideOut extends CollectionWidget {
-        constructor(element: Element, options?: dxSlideOutOptions)
-        constructor(element: JQuery, options?: dxSlideOutOptions)
-        /** Hides the widget's slide-out menu. */
-        hideMenu(): Promise<void> & JQueryPromise<void>;
-        /** Displays the widget's slide-out menu. */
-        showMenu(): Promise<void> & JQueryPromise<void>;
-        /** Shows or hides the slide-out menu depending on the argument. */
-        toggleMenuVisibility(showing: boolean): Promise<void> & JQueryPromise<void>;
-    }
-    /** This section lists the data source fields that are used in a default template for SlideOut items. */
-    export interface dxSlideOutItem extends CollectionWidgetItem {
-        /** Specifies a template that should be used to render a menu item. */
-        menuTemplate?: template | (() => string | Element | JQuery);
-    }
-    
-    export interface dxSlideOutViewOptions extends WidgetOptions<dxSlideOutView> {
-        /** Specifies a custom template for the widget content. */
-        contentTemplate?: template | ((contentElement: DevExpress.core.dxElement) => any);
-        /** Specifies the current menu position. */
-        menuPosition?: 'inverted' | 'normal';
-        /** Specifies a custom template for the menu content. */
-        menuTemplate?: template | ((menuElement: DevExpress.core.dxElement) => any);
-        /** Specifies whether or not the menu panel is visible. */
-        menuVisible?: boolean;
-        /** Specifies whether or not the menu is shown when a user swipes the widget content. */
-        swipeEnabled?: boolean;
-    }
-    /** The SlideOutView widget is a classic slide-out menu paired with a view. This widget is very similar to the SlideOut with only one difference - the SlideOut always contains the List in the slide-out menu, while the SlideOutView can hold any collection there. */
-    export class dxSlideOutView extends Widget {
-        constructor(element: Element, options?: dxSlideOutViewOptions)
-        constructor(element: JQuery, options?: dxSlideOutViewOptions)
-        /** Gets the widget's content. */
-        content(): DevExpress.core.dxElement;
-        /** Hides the widget's slide-out menu. */
-        hideMenu(): Promise<void> & JQueryPromise<void>;
-        /** Gets the slide-out menu's content. */
-        menuContent(): DevExpress.core.dxElement;
-        /** Shows the slide-out menu. */
-        showMenu(): Promise<void> & JQueryPromise<void>;
-        /** Shows or hides the slide-out menu depending on the argument. */
-        toggleMenuVisibility(): Promise<void> & JQueryPromise<void>;
-    }
-    
-    export interface dxSliderOptions extends dxSliderBaseOptions<dxSlider> {
-        /** The current slider value. */
-        value?: number;
-    }
-    /** The Slider is a widget that allows an end user to set a numeric value on a continuous range of possible values. */
-    export class dxSlider extends dxSliderBase {
-        constructor(element: Element, options?: dxSliderOptions)
-        constructor(element: JQuery, options?: dxSliderOptions)
-    }
-    
-    export interface dxSliderBaseOptions<T = dxSliderBase> extends dxTrackBarOptions<T> {
-        /** Specifies whether or not the widget changes its state when interacting with a user. */
-        activeStateEnabled?: boolean;
-        /** Specifies whether the widget can be focused using keyboard navigation. */
-        focusStateEnabled?: boolean;
-        /** Specifies whether the widget changes its state when a user pauses on it. */
-        hoverStateEnabled?: boolean;
-        /** Specifies the step by which a handle moves when a user presses Page Up or Page Down. */
-        keyStep?: number;
-        /** Configures the labels displayed at the min and max values. */
-        label?: { format?: format, position?: 'bottom' | 'top', visible?: boolean };
-        /** The value to be assigned to the `name` attribute of the underlying HTML element. */
-        name?: string;
-        /** Specifies whether to highlight the selected range. */
-        showRange?: boolean;
-        /** Specifies the step by which the widget's value changes when a user drags a handler. */
-        step?: number;
-        /** Configures a tooltip. */
-        tooltip?: { enabled?: boolean, format?: format, position?: 'bottom' | 'top', showMode?: 'always' | 'onHover' };
-    }
-    
-    export class dxSliderBase extends dxTrackBar {
-        constructor(element: Element, options?: dxSliderBaseOptions)
-        constructor(element: JQuery, options?: dxSliderBaseOptions)
-    }
-    
-    export interface dxSpeedDialActionOptions extends WidgetOptions<dxSpeedDialAction> {
-        
-        icon?: string;
-        
-        onClick?: ((e: { event?: event, component?: dxSpeedDialAction, element?: DevExpress.core.dxElement }) => any);
-    }
-    
-    export class dxSpeedDialAction extends Widget {
-        constructor(element: Element, options?: dxSpeedDialActionOptions)
-        constructor(element: JQuery, options?: dxSpeedDialActionOptions)
-    }
-    
-    export interface dxSwitchOptions extends EditorOptions<dxSwitch> {
-        /** Specifies whether or not the widget changes its state when interacting with a user. */
-        activeStateEnabled?: boolean;
-        /** Specifies whether the widget can be focused using keyboard navigation. */
-        focusStateEnabled?: boolean;
-        /** Specifies whether the widget changes its state when a user pauses on it. */
-        hoverStateEnabled?: boolean;
-        /** The value to be assigned to the `name` attribute of the underlying HTML element. */
-        name?: string;
-        /** @deprecated Use the switchedOffText option instead. */
-        /** Text displayed when the widget is in a disabled state. */
-        offText?: string;
-        /** @deprecated Use the switchedOnText option instead. */
-        /** Text displayed when the widget is in an enabled state. */
-        onText?: string;
-        /** Specifies the text displayed when the widget is switched off. */
-        switchedOffText?: string;
-        /** Specifies the text displayed when the widget is switched on. */
-        switchedOnText?: string;
-        /** A Boolean value specifying whether the current switch state is "On" or "Off". */
-        value?: boolean;
-    }
-    /** The Switch is a widget that can be in two states: "On" and "Off". */
-    export class dxSwitch extends Editor {
-        constructor(element: Element, options?: dxSwitchOptions)
-        constructor(element: JQuery, options?: dxSwitchOptions)
-    }
-    
-    export interface dxTabPanelOptions extends dxMultiViewOptions<dxTabPanel> {
-        /** Specifies whether or not to animate the displayed item change. */
-        animationEnabled?: boolean;
-        /** Specifies whether the widget can be focused using keyboard navigation. */
-        focusStateEnabled?: boolean;
-        /** Specifies whether the widget changes its state when a user pauses on it. */
-        hoverStateEnabled?: boolean;
-        /** Specifies a custom template for item titles. */
-        itemTitleTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery);
-        /** An array of items displayed by the widget. */
-        items?: Array<string | dxTabPanelItem | any>;
-        /** A function that is executed when a tab is clicked or tapped. */
-        onTitleClick?: ((e: { component?: dxTabPanel, element?: DevExpress.core.dxElement, model?: any, itemData?: any, itemElement?: DevExpress.core.dxElement, event?: event }) => any) | string;
-        /** A function that is executed when a tab has been held for a specified period. */
-        onTitleHold?: ((e: { component?: dxTabPanel, element?: DevExpress.core.dxElement, model?: any, itemData?: any, itemElement?: DevExpress.core.dxElement, event?: event }) => any);
-        /** A function that is executed after a tab is rendered. */
-        onTitleRendered?: ((e: { component?: dxTabPanel, element?: DevExpress.core.dxElement, model?: any, itemData?: any, itemElement?: DevExpress.core.dxElement }) => any);
-        /** Specifies whether to repaint only those elements whose data changed. */
-        repaintChangesOnly?: boolean;
-        /** A Boolean value specifying if tabs in the title are scrolled by content. */
-        scrollByContent?: boolean;
-        /** A Boolean indicating whether or not to add scrolling support for tabs in the title. */
-        scrollingEnabled?: boolean;
-        /** Specifies whether navigation buttons should be available when tabs exceed the widget's width. */
-        showNavButtons?: boolean;
-        /** A Boolean value specifying whether or not to allow users to change the selected index by swiping. */
-        swipeEnabled?: boolean;
-    }
-    /** The TabPanel is a widget consisting of the Tabs and MultiView widgets. It automatically synchronizes the selected tab with the currently displayed view and vice versa. */
-    export class dxTabPanel extends dxMultiView {
-        constructor(element: Element, options?: dxTabPanelOptions)
-        constructor(element: JQuery, options?: dxTabPanelOptions)
-    }
-    /** This section lists the data source fields that are used in a default template for tab panel items. */
-    export interface dxTabPanelItem extends dxMultiViewItem {
-        /** Specifies a badge text for the tab. */
-        badge?: string;
-        /** Specifies the icon to be displayed in the tab's title. */
-        icon?: string;
-        /** Specifies a template that should be used to render the tab for this item only. */
-        tabTemplate?: template | (() => string | Element | JQuery);
-        /** Specifies the item title text displayed on a corresponding tab. */
-        title?: string;
-    }
-    
-    export interface dxTabsOptions<T = dxTabs> extends CollectionWidgetOptions<T> {
-        /** Specifies whether the widget can be focused using keyboard navigation. */
-        focusStateEnabled?: boolean;
-        /** Specifies whether the widget changes its state when a user pauses on it. */
-        hoverStateEnabled?: boolean;
-        /** An array of items displayed by the widget. */
-        items?: Array<string | dxTabsItem | any>;
-        /** Specifies whether to repaint only those elements whose data changed. */
-        repaintChangesOnly?: boolean;
-        /** Specifies whether or not an end-user can scroll tabs by swiping. */
-        scrollByContent?: boolean;
-        /** Specifies whether or not an end-user can scroll tabs. */
-        scrollingEnabled?: boolean;
-        /** An array of currently selected item objects. */
-        selectedItems?: Array<string | number | any>;
-        /** Specifies whether the widget enables an end-user to select only a single item or multiple items. */
-        selectionMode?: 'multiple' | 'single';
-        /** Specifies whether navigation buttons should be available when tabs exceed the widget's width. */
-        showNavButtons?: boolean;
-    }
-    /** The Tabs is a tab strip used to switch between pages or views. This widget is included in the TabPanel widget, but you can use the Tabs separately as well. */
-    export class dxTabs extends CollectionWidget {
-        constructor(element: Element, options?: dxTabsOptions)
-        constructor(element: JQuery, options?: dxTabsOptions)
-    }
-    /** This section lists the data source fields that are used in a default template for tabs. */
-    export interface dxTabsItem extends CollectionWidgetItem {
-        /** Specifies a badge text for the tab. */
-        badge?: string;
-        /** Specifies the icon to be displayed on the tab. */
-        icon?: string;
-    }
-    
-    export interface dxTagBoxOptions extends dxSelectBoxOptions<dxTagBox> {
-        /** Specifies how the widget applies values. */
-        applyValueMode?: 'instantly' | 'useButtons';
-        /** A Boolean value specifying whether or not to hide selected items. */
-        hideSelectedItems?: boolean;
-        /** Specifies the limit on displayed tags. On exceeding it, the widget replaces all tags with a single multi-tag that displays the number of selected items. */
-        maxDisplayedTags?: number;
-        /** A Boolean value specifying whether or not the widget is multiline. */
-        multiline?: boolean;
-        /** A function that is executed before the multi-tag is rendered. */
-        onMultiTagPreparing?: ((e: { component?: dxTagBox, element?: DevExpress.core.dxElement, model?: any, multiTagElement?: DevExpress.core.dxElement, selectedItems?: Array<string | number | any>, text?: string, cancel?: boolean }) => any);
-        /** A function that is executed when the "Select All" check box value is changed. Applies only if showSelectionControls is true. */
-        onSelectAllValueChanged?: ((e: { component?: dxTagBox, element?: DevExpress.core.dxElement, model?: any, value?: boolean }) => any);
-        /** A function that is executed when a list item is selected or selection is canceled. */
-        onSelectionChanged?: ((e: { component?: dxTagBox, element?: DevExpress.core.dxElement, model?: any, addedItems?: Array<string | number | any>, removedItems?: Array<string | number | any> }) => any);
-        /** Specifies the mode in which all items are selected. */
-        selectAllMode?: 'allPages' | 'page';
-        /** Gets the currently selected items. */
-        selectedItems?: Array<string | number | any>;
-        /** Specifies whether the drop-down button is visible. */
-        showDropDownButton?: boolean;
-        /** Specifies whether the multi-tag is shown without ordinary tags. */
-        showMultiTagOnly?: boolean;
-        /** Specifies a custom template for tags. */
-        tagTemplate?: template | ((itemData: any, itemElement: DevExpress.core.dxElement) => string | Element | JQuery);
-        /** Specifies the selected items. */
-        value?: Array<string | number | any>;
-    }
-    /** The TagBox widget is an editor that allows an end user to select multiple items from a drop-down list. */
-    export class dxTagBox extends dxSelectBox {
-        constructor(element: Element, options?: dxTagBoxOptions)
-        constructor(element: JQuery, options?: dxTagBoxOptions)
-    }
-    
-    export interface dxTemplateOptions {
-        /** Specifies the name of the template. */
-        name?: string;
-    }
-    /** A custom template's markup. */
-    export class dxTemplate {
-        constructor(options?: dxTemplateOptions)
-    }
-    
-    export interface dxTextAreaOptions extends dxTextBoxOptions<dxTextArea> {
-        /** A Boolean value specifying whether or not the auto resizing mode is enabled. */
-        autoResizeEnabled?: boolean;
-        /** Specifies the maximum height of the widget. */
-        maxHeight?: number | string;
-        /** Specifies the minimum height of the widget. */
-        minHeight?: number | string;
-        /** Specifies whether or not the widget checks the inner text for spelling mistakes. */
-        spellcheck?: boolean;
-    }
-    /** The TextArea is a widget that enables a user to enter and edit a multi-line text. */
-    export class dxTextArea extends dxTextBox {
-        constructor(element: Element, options?: dxTextAreaOptions)
-        constructor(element: JQuery, options?: dxTextAreaOptions)
-    }
-    
-    export interface dxTextBoxOptions<T = dxTextBox> extends dxTextEditorOptions<T> {
-        /** Specifies the maximum number of characters you can enter into the textbox. */
-        maxLength?: string | number;
-        /** The "mode" attribute value of the actual HTML input element representing the text box. */
-        mode?: 'email' | 'password' | 'search' | 'tel' | 'text' | 'url';
-        /** Specifies a value the widget displays. */
-        value?: string;
-    }
-    /** The TextBox is a widget that enables a user to enter and edit a single line of text. */
-    export class dxTextBox extends dxTextEditor {
-        constructor(element: Element, options?: dxTextBoxOptions)
-        constructor(element: JQuery, options?: dxTextBoxOptions)
-    }
-    
-    export interface dxTextEditorOptions<T = dxTextEditor> extends EditorOptions<T> {
-        /** Allows you to add custom buttons to the input text field. */
-        buttons?: Array<'clear' | 'spins' | 'dropDown' | dxActionButton>;
-        /** Specifies whether the widget can be focused using keyboard navigation. */
-        focusStateEnabled?: boolean;
-        /** Specifies whether the widget changes its state when a user pauses on it. */
-        hoverStateEnabled?: boolean;
-        /** Specifies the attributes to be passed on to the underlying HTML element. */
-        inputAttr?: any;
-        /** The editor mask that specifies the format of the entered string. */
-        mask?: string;
-        /** Specifies a mask placeholder character. */
-        maskChar?: string;
-        /** A message displayed when the entered text does not match the specified pattern. */
-        maskInvalidMessage?: string;
-        /** Specifies custom mask rules. */
-        maskRules?: any;
-        /** The value to be assigned to the `name` attribute of the underlying HTML element. */
-        name?: string;
-        /** A function that is executed when the widget loses focus after the text field's content was changed using the keyboard. */
-        onChange?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, jQueryEvent?: JQueryEventObject, event?: event }) => any);
-        /** A function that is executed when the widget's input has been copied. */
-        onCopy?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, jQueryEvent?: JQueryEventObject, event?: event }) => any);
-        /** A function that is executed when the widget's input has been cut. */
-        onCut?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, jQueryEvent?: JQueryEventObject, event?: event }) => any);
-        /** A function that is executed when the Enter key has been pressed while the widget is focused. */
-        onEnterKey?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, jQueryEvent?: JQueryEventObject, event?: event }) => any);
-        /** A function that is executed when the widget gets focus. */
-        onFocusIn?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, jQueryEvent?: JQueryEventObject, event?: event }) => any);
-        /** A function that is executed when the widget loses focus. */
-        onFocusOut?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, jQueryEvent?: JQueryEventObject, event?: event }) => any);
-        /** A function that is executed each time the widget's input is changed while the widget is focused. */
-        onInput?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, jQueryEvent?: JQueryEventObject, event?: event }) => any);
-        /** A function that is executed when a user is pressing a key on the keyboard. */
-        onKeyDown?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, jQueryEvent?: JQueryEventObject, event?: event }) => any);
-        /** A function that is executed when a user presses a key on the keyboard. */
-        onKeyPress?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, jQueryEvent?: JQueryEventObject, event?: event }) => any);
-        /** A function that is executed when a user releases a key on the keyboard. */
-        onKeyUp?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, jQueryEvent?: JQueryEventObject, event?: event }) => any);
-        /** A function that is executed when the widget's input has been pasted. */
-        onPaste?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, jQueryEvent?: JQueryEventObject, event?: event }) => any);
-        /** The text displayed by the widget when the widget value is empty. */
-        placeholder?: string;
-        /** Specifies whether to display the Clear button in the widget. */
-        showClearButton?: boolean;
-        /** Specifies when the widget shows the mask. Applies only if useMaskedValue is true. */
-        showMaskMode?: 'always' | 'onFocus';
-        /** Specifies whether or not the widget checks the inner text for spelling mistakes. */
-        spellcheck?: boolean;
-        /** Specifies how the widget's text field is styled. */
-        stylingMode?: 'outlined' | 'underlined' | 'filled';
-        /** The read-only option that holds the text displayed by the widget input element. */
-        text?: string;
-        /** Specifies whether the value should contain mask characters or not. */
-        useMaskedValue?: boolean;
-        /** Specifies the current value displayed by the widget. */
-        value?: any;
-        /** Specifies the DOM events after which the widget's value should be updated. */
-        valueChangeEvent?: string;
-    }
-    /** A base class for text editing widgets. */
-    export class dxTextEditor extends Editor {
-        constructor(element: Element, options?: dxTextEditorOptions)
-        constructor(element: JQuery, options?: dxTextEditorOptions)
-        /** Removes focus from the input element. */
-        blur(): void;
-        /** Sets focus to the input element representing the widget. */
-        focus(): void;
-        /** Gets an instance of a custom action button. */
-        getButton(name: string): any;
-    }
-    
-    export interface dxTileViewOptions extends CollectionWidgetOptions<dxTileView> {
-        /** A Boolean value specifying whether or not the widget changes its state when interacting with a user. */
-        activeStateEnabled?: boolean;
-        /** Specifies the height of the base tile view item. */
-        baseItemHeight?: number;
-        /** Specifies the width of the base tile view item. */
-        baseItemWidth?: number;
-        /** Specifies whether tiles are placed horizontally or vertically. */
-        direction?: 'horizontal' | 'vertical';
-        /** Specifies whether the widget can be focused using keyboard navigation. */
-        focusStateEnabled?: boolean;
-        /** Specifies the widget's height. */
-        height?: number | string;
-        /** Specifies whether the widget changes its state when a user pauses on it. */
-        hoverStateEnabled?: boolean;
-        /** Specifies the distance in pixels between adjacent tiles. */
-        itemMargin?: number;
-        /** An array of items displayed by the widget. */
-        items?: Array<string | dxTileViewItem | any>;
-        /** A Boolean value specifying whether or not to display a scrollbar. */
-        showScrollbar?: boolean;
-    }
-    /** The TileView widget contains a collection of tiles. Tiles can store much more information than ordinary buttons, that is why they are very popular in apps designed for touch devices. */
-    export class dxTileView extends CollectionWidget {
-        constructor(element: Element, options?: dxTileViewOptions)
-        constructor(element: JQuery, options?: dxTileViewOptions)
-        /** Gets the current scroll position. */
-        scrollPosition(): number;
-    }
-    /** This section lists the data source fields that are used in a default template for tile view items. */
-    export interface dxTileViewItem extends CollectionWidgetItem {
-        /** Specifies a multiplier for the baseItemHeight option value (for the purpose of obtaining the actual item height). */
-        heightRatio?: number;
-        /** Specifies a multiplier for the baseItemWidth option value (for the purpose of obtaining the actual item width). */
-        widthRatio?: number;
-    }
-    
-    export interface dxToastOptions extends dxOverlayOptions<dxToast> {
-        /** Configures widget visibility animations. This object contains two fields: show and hide. */
-        animation?: dxToastAnimation;
-        /** A Boolean value specifying whether or not the widget is closed if a user presses the Back hardware button. */
-        closeOnBackButton?: boolean;
-        /** A Boolean value specifying whether or not the toast is closed if a user clicks it. */
-        closeOnClick?: boolean;
-        /** Specifies whether to close the widget if a user clicks outside it. */
-        closeOnOutsideClick?: boolean | ((event: event) => boolean);
-        /** A Boolean value specifying whether or not the toast is closed if a user swipes it out of the screen boundaries. */
-        closeOnSwipe?: boolean;
-        /** The time span in milliseconds during which the Toast widget is visible. */
-        displayTime?: number;
-        /** Specifies the widget's height in pixels. */
-        height?: number | string | (() => number | string);
-        /** Specifies the maximum width the widget can reach while resizing. */
-        maxWidth?: number | string | (() => number | string);
-        /** The Toast message text. */
-        message?: string;
-        /** Specifies the minimum width the widget can reach while resizing. */
-        minWidth?: number | string | (() => number | string);
-        /** Positions the widget. */
-        position?: positionConfig | string;
-        /** Specifies whether to shade the container when the widget is active. */
-        shading?: boolean;
-        /** Specifies the Toast widget type. */
-        type?: 'custom' | 'error' | 'info' | 'success' | 'warning';
-        /** Specifies the widget's width in pixels. */
-        width?: number | string | (() => number | string);
-    }
-    /** Configures widget visibility animations. This object contains two fields: show and hide. */
-    export interface dxToastAnimation extends dxOverlayAnimation {
-        /** An object that defines the animation options used when the widget is being hidden. */
-        hide?: animationConfig;
-        /** An object that defines the animation options used when the widget is being shown. */
-        show?: animationConfig;
-    }
-    /** The Toast is a widget that provides pop-up notifications. */
-    export class dxToast extends dxOverlay {
-        constructor(element: Element, options?: dxToastOptions)
-        constructor(element: JQuery, options?: dxToastOptions)
-    }
-    
-    export interface dxToolbarOptions extends CollectionWidgetOptions<dxToolbar> {
-        /** An array of items displayed by the widget. */
-        items?: Array<string | dxToolbarItem | any>;
-        /** Specifies a custom template for menu items. */
-        menuItemTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery);
-        /** Informs the widget about its location in a view HTML markup. */
-        renderAs?: 'bottomToolbar' | 'topToolbar';
-    }
-    /** The Toolbar is a widget containing items that usually manage screen content. Those items can be plain text or widgets. */
-    export class dxToolbar extends CollectionWidget {
-        constructor(element: Element, options?: dxToolbarOptions)
-        constructor(element: JQuery, options?: dxToolbarOptions)
-    }
-    /** This section lists the data source fields that are used in a default template for toolbar items. */
-    export interface dxToolbarItem extends CollectionWidgetItem {
-        /** Specifies a CSS class to be applied to the item. */
-        cssClass?: string;
-        /** Specifies when to display an item in the toolbar's overflow menu. */
-        locateInMenu?: 'always' | 'auto' | 'never';
-        /** Specifies a location for the item on the toolbar. */
-        location?: 'after' | 'before' | 'center';
-        /** Specifies a template that should be used to render a menu item. */
-        menuItemTemplate?: template | (() => string | Element | JQuery);
-        /** Specifies a configuration object for the widget that presents a toolbar item. */
-        options?: any;
-        /** Specifies when to display the text for the widget item. */
-        showText?: 'always' | 'inMenu';
-        /** A widget that presents a toolbar item. */
-        widget?: 'dxAutocomplete' | 'dxButton' | 'dxCheckBox' | 'dxDateBox' | 'dxMenu' | 'dxSelectBox' | 'dxTabs' | 'dxTextBox' | 'dxButtonGroup';
-    }
-    
-    export interface dxTooltipOptions extends dxPopoverOptions<dxTooltip> {
-    }
-    /** The Tooltip widget displays a tooltip for a specified element on the page. */
-    export class dxTooltip extends dxPopover {
-        constructor(element: Element, options?: dxTooltipOptions)
-        constructor(element: JQuery, options?: dxTooltipOptions)
-    }
-    
-    export interface dxTrackBarOptions<T = dxTrackBar> extends EditorOptions<T> {
-        /** The maximum value the widget can accept. */
-        max?: number;
-        /** The minimum value the widget can accept. */
-        min?: number;
-    }
-    /** A base class for track bar widgets. */
-    export class dxTrackBar extends Editor {
-        constructor(element: Element, options?: dxTrackBarOptions)
-        constructor(element: JQuery, options?: dxTrackBarOptions)
-    }
-    
-    export interface dxTreeListOptions extends GridBaseOptions<dxTreeList> {
-        /** Specifies whether all rows are expanded initially. */
-        autoExpandAll?: boolean;
-        /** Configures columns. */
-        columns?: Array<dxTreeListColumn | string>;
-        /** Customizes columns after they are created. */
-        customizeColumns?: ((columns: Array<dxTreeListColumn>) => any);
-        /** Notifies the widget of the used data structure. */
-        dataStructure?: 'plain' | 'tree';
-        /** Configures editing. */
-        editing?: dxTreeListEditing;
-        /** Specifies whether nodes appear expanded or collapsed after filtering is applied. */
-        expandNodesOnFiltering?: boolean;
-        /** Specifies keys of the initially expanded rows. */
-        expandedRowKeys?: Array<any>;
-        /** Specifies whether to show filtered rows with ancestors and descendants (full branch) or with ancestors only. */
-        filterMode?: 'fullBranch' | 'withAncestors';
-        /** Specifies which data field defines whether the node has children. */
-        hasItemsExpr?: string | Function;
-        /** Specifies which data field contains nested items. Set this option when your data has a hierarchical structure. */
-        itemsExpr?: string | Function;
-        /** Specifies which data field provides keys for nodes. */
-        keyExpr?: string | Function;
-        /** A function that is executed when a cell is clicked or tapped. Executed before onRowClick. */
-        onCellClick?: ((e: { component?: dxTreeList, element?: DevExpress.core.dxElement, model?: any, jQueryEvent?: JQueryEventObject, event?: event, data?: any, key?: any, value?: any, displayValue?: any, text?: string, columnIndex?: number, column?: any, rowIndex?: number, rowType?: string, cellElement?: DevExpress.core.dxElement, row?: dxTreeListRowObject }) => any) | string;
-        /** A function that is executed when a cell is double-clicked or double-tapped. Executed before onRowDblClick. */
-        onCellDblClick?: ((e: { component?: dxTreeList, element?: DevExpress.core.dxElement, model?: any, event?: event, data?: any, key?: any, value?: any, displayValue?: any, text?: string, columnIndex?: number, column?: dxTreeListColumn, rowIndex?: number, rowType?: string, cellElement?: DevExpress.core.dxElement, row?: dxTreeListRowObject }) => any);
-        /** A function that is executed after the pointer enters or leaves a cell. */
-        onCellHoverChanged?: ((e: { component?: dxTreeList, element?: DevExpress.core.dxElement, model?: any, eventType?: string, data?: any, key?: any, value?: any, text?: string, displayValue?: any, columnIndex?: number, rowIndex?: number, column?: dxTreeListColumn, rowType?: string, cellElement?: DevExpress.core.dxElement, row?: dxTreeListRowObject }) => any);
-        /** A function that is executed after a grid cell is created. */
-        onCellPrepared?: ((e: { component?: dxTreeList, element?: DevExpress.core.dxElement, model?: any, data?: any, key?: any, value?: any, displayValue?: any, text?: string, columnIndex?: number, column?: dxTreeListColumn, rowIndex?: number, rowType?: string, row?: dxTreeListRowObject, isSelected?: boolean, isExpanded?: boolean, cellElement?: DevExpress.core.dxElement, watch?: Function, oldValue?: any }) => any);
-        /** A function that is executed before the context menu is rendered. */
-        onContextMenuPreparing?: ((e: { component?: dxTreeList, element?: DevExpress.core.dxElement, model?: any, items?: Array<any>, target?: string, targetElement?: DevExpress.core.dxElement, columnIndex?: number, column?: dxTreeListColumn, rowIndex?: number, row?: dxTreeListRowObject }) => any);
-        /** A function that is executed before a cell or row switches to the editing state. */
-        onEditingStart?: ((e: { component?: dxTreeList, element?: DevExpress.core.dxElement, model?: any, data?: any, key?: any, cancel?: boolean, column?: any }) => any);
-        /** A function that is executed after an editor is created. */
-        onEditorPrepared?: ((options: { component?: dxTreeList, element?: DevExpress.core.dxElement, model?: any, parentType?: string, value?: any, setValue?: any, updateValueTimeout?: number, width?: number, disabled?: boolean, rtlEnabled?: boolean, editorElement?: DevExpress.core.dxElement, readOnly?: boolean, dataField?: string, row?: dxTreeListRowObject }) => any);
-        /** A function that is executed before a cell's editor is created. Not executed for cells with an editCellTemplate. */
-        onEditorPreparing?: ((e: { component?: dxTreeList, element?: DevExpress.core.dxElement, model?: any, parentType?: string, value?: any, setValue?: any, updateValueTimeout?: number, width?: number, disabled?: boolean, rtlEnabled?: boolean, cancel?: boolean, editorElement?: DevExpress.core.dxElement, readOnly?: boolean, editorName?: string, editorOptions?: any, dataField?: string, row?: dxTreeListRowObject }) => any);
-        /** A function that is executed after the focused cell changes. */
-        onFocusedCellChanged?: ((e: { component?: dxTreeList, element?: DevExpress.core.dxElement, model?: any, cellElement?: DevExpress.core.dxElement, columnIndex?: number, rowIndex?: number, row?: dxTreeListRowObject, column?: dxTreeListColumn }) => any);
-        /** A function that is executed before the focused cell changes. */
-        onFocusedCellChanging?: ((e: { component?: dxTreeList, element?: DevExpress.core.dxElement, model?: any, cellElement?: DevExpress.core.dxElement, prevColumnIndex?: number, prevRowIndex?: number, newColumnIndex?: number, newRowIndex?: number, event?: event, rows?: Array<dxTreeListRowObject>, columns?: Array<dxTreeListColumn>, cancel?: boolean, isHighlighted?: boolean }) => any);
-        /** A function that executed when the focused row changes. Applies only when focusedRowEnabled is true. */
-        onFocusedRowChanged?: ((e: { component?: dxTreeList, element?: DevExpress.core.dxElement, model?: any, rowElement?: DevExpress.core.dxElement, rowIndex?: number, row?: dxTreeListRowObject }) => any);
-        /** A function that is executed before the focused row changes. Applies only when focusedRowEnabled is true. */
-        onFocusedRowChanging?: ((e: { component?: dxTreeList, element?: DevExpress.core.dxElement, model?: any, rowElement?: DevExpress.core.dxElement, prevRowIndex?: number, newRowIndex?: number, event?: event, rows?: Array<dxTreeListRowObject>, cancel?: boolean }) => any);
-        /** A function that is executed after the loaded nodes are initialized. */
-        onNodesInitialized?: ((e: { component?: dxTreeList, element?: DevExpress.core.dxElement, model?: any, root?: dxTreeListNode }) => any);
-        /** A function that is executed when a grid row is clicked or tapped. */
-        onRowClick?: ((e: { component?: dxTreeList, element?: DevExpress.core.dxElement, model?: any, jQueryEvent?: JQueryEventObject, event?: event, data?: any, key?: any, values?: Array<any>, columns?: Array<any>, rowIndex?: number, rowType?: string, isSelected?: boolean, isExpanded?: boolean, rowElement?: DevExpress.core.dxElement, handled?: boolean }) => any) | string;
-        /** A function that is executed when a row is double-clicked or double-tapped. Executed after onCellDblClick. */
-        onRowDblClick?: ((e: { component?: dxTreeList, element?: DevExpress.core.dxElement, model?: any, event?: event, data?: any, key?: any, values?: Array<any>, columns?: Array<dxTreeListColumn>, rowIndex?: number, rowType?: string, isSelected?: boolean, isExpanded?: boolean, rowElement?: DevExpress.core.dxElement }) => any);
-        /** A function that is executed after a row is created. */
-        onRowPrepared?: ((e: { component?: dxTreeList, element?: DevExpress.core.dxElement, model?: any, data?: any, key?: any, values?: Array<any>, columns?: Array<dxTreeListColumn>, rowIndex?: number, rowType?: string, isSelected?: boolean, isExpanded?: boolean, rowElement?: DevExpress.core.dxElement }) => any);
-        /** Configures paging. */
-        paging?: dxTreeListPaging;
-        /** Specifies which data field provides parent keys. */
-        parentIdExpr?: string | Function;
-        /** Notifies the TreeList of the server's data processing operations. Applies only if data has a plain structure. */
-        remoteOperations?: { filtering?: boolean, grouping?: boolean, sorting?: boolean } | 'auto';
-        /** Specifies the root node's identifier. Applies if dataStructure is "plain". */
-        rootValue?: any;
-        /** Configures scrolling. */
-        scrolling?: dxTreeListScrolling;
-        /** Configures runtime selection. */
-        selection?: dxTreeListSelection;
-    }
-    /** Configures editing. */
-    export interface dxTreeListEditing extends GridBaseEditing {
-        /** Specifies whether a user can add new rows. It is called for each data row when defined as a function. */
-        allowAdding?: boolean | ((options: { component?: dxTreeList, row?: dxTreeListRowObject }) => boolean);
-        /** Specifies whether a user can delete rows. It is called for each data row when defined as a function. */
-        allowDeleting?: boolean | ((options: { component?: dxTreeList, row?: dxTreeListRowObject }) => boolean);
-        /** Specifies whether a user can update rows. It is called for each data row when defined as a function */
-        allowUpdating?: boolean | ((options: { component?: dxTreeList, row?: dxTreeListRowObject }) => boolean);
-        /** Contains options that specify texts for editing-related UI elements. */
-        texts?: dxTreeListEditingTexts;
-    }
-    /** Contains options that specify texts for editing-related UI elements. */
-    export interface dxTreeListEditingTexts extends GridBaseEditingTexts {
-        /** Specifies text for the button that adds a new nested row. Applies if the editing.mode is "batch" or "cell". */
-        addRowToNode?: string;
-    }
-    /** Configures paging. */
-    export interface dxTreeListPaging extends GridBasePaging {
-        /** Enables paging. */
-        enabled?: boolean;
-    }
-    /** Configures scrolling. */
-    export interface dxTreeListScrolling extends GridBaseScrolling {
-        /** Specifies the scrolling mode. */
-        mode?: 'standard' | 'virtual';
-    }
-    /** Configures runtime selection. */
-    export interface dxTreeListSelection extends GridBaseSelection {
-        /** Specifies whether selection is recursive. */
-        recursive?: boolean;
-    }
-    /** The TreeList is a widget that represents data from a local or remote source in the form of a multi-column tree view. This widget offers such features as sorting, filtering, editing, selection, etc. */
-    export class dxTreeList extends GridBase {
-        constructor(element: Element, options?: dxTreeListOptions)
-        constructor(element: JQuery, options?: dxTreeListOptions)
-        /** Adds a new column. */
-        addColumn(columnOptions: any | string): void;
-        /** Adds an empty data row to the highest hierarchical level. */
-        addRow(): void;
-        /** Adds an empty data row to a specified parent row. */
-        addRow(parentId: any): void;
-        /** Collapses a row with a specific key. */
-        collapseRow(key: any): Promise<void> & JQueryPromise<void>;
-        /** Expands a row with a specific key. */
-        expandRow(key: any): Promise<void> & JQueryPromise<void>;
-        /** Performs a pre-order tree traversal, executing a function on each visited node. Starts traversing from the top level nodes. */
-        forEachNode(callback: Function): void;
-        /** Performs a pre-order tree traversal, executing a function on each visited node. Starts traversing from the specified nodes. */
-        forEachNode(nodes: Array<dxTreeListNode>, callback: Function): void;
-        /** Gets a node with a specific key. */
-        getNodeByKey(key: any | string | number): dxTreeListNode;
-        /** Gets the root node. */
-        getRootNode(): dxTreeListNode;
-        /** Gets the keys of the rows selected explicitly via the API or via a click or tap. */
-        getSelectedRowKeys(): Array<any>;
-        /** @deprecated Use the [getSelectedRowKeys(mode)](/Documentation/ApiReference/UI_Widgets/dxTreeList/Methods/#getSelectedRowKeysmode) method instead. */
-        /** Gets the selected rows' keys. */
-        getSelectedRowKeys(leavesOnly: boolean): Array<any>;
-        /** Gets the selected rows' keys. */
-        getSelectedRowKeys(mode: string): Array<any>;
-        /** Gets the data objects of the rows selected explicitly via the API or via a click or tap. */
-        getSelectedRowsData(): Array<any>;
-        /** Gets the selected rows' data objects. */
-        getSelectedRowsData(mode: string): Array<any>;
-        /** Gets all visible columns. */
-        getVisibleColumns(): Array<dxTreeListColumn>;
-        /** Gets all visible columns at a specific hierarchical level of column headers. Use it to access banded columns. */
-        getVisibleColumns(headerLevel: number): Array<dxTreeListColumn>;
-        /** Gets currently rendered rows. */
-        getVisibleRows(): Array<dxTreeListRowObject>;
-        /** Checks whether a row is expanded or collapsed. */
-        isRowExpanded(key: any): boolean;
-        /** Loads all root node descendants (all data items). Takes effect only if data has the plain structure and remoteOperations | filtering is true. */
-        loadDescendants(): Promise<void> & JQueryPromise<void>;
-        /** Loads a specific node's descendants. Takes effect only if data has the plain structure and remoteOperations | filtering is true. */
-        loadDescendants(keys: Array<any>): Promise<void> & JQueryPromise<void>;
-        /** Loads all or only direct descendants of specific nodes. Takes effect only if data has the plain structure and remoteOperations | filtering is true. */
-        loadDescendants(keys: Array<any>, childrenOnly: boolean): Promise<void> & JQueryPromise<void>;
-    }
-    
-    export interface dxTreeListColumn extends GridBaseColumn {
-        /** Allows you to customize buttons in the editing column or create a custom command column. Applies only if the column's type is "buttons". */
-        buttons?: Array<'add' | 'cancel' | 'delete' | 'edit' | 'save' | 'undelete' | dxTreeListColumnButton>;
-        /** Configures columns. */
-        columns?: Array<dxTreeListColumn | string>;
-        /** Specifies the command column that this object customizes. */
-        type?: 'adaptive' | 'buttons';
-    }
-    /** Allows you to customize buttons in the editing column or create a custom command column. Applies only if the column's type is "buttons". */
-    export interface dxTreeListColumnButton extends GridBaseColumnButton {
-        /** The name used to identify a built-in button. */
-        name?: 'add' | 'cancel' | 'delete' | 'edit' | 'save' | 'undelete' | string;
-        /** A function that is executed when the button is clicked or tapped. */
-        onClick?: ((e: { component?: dxTreeList, element?: DevExpress.core.dxElement, model?: any, event?: event, row?: dxTreeListRowObject, column?: dxTreeListColumn }) => any) | string;
-        /** Specifies a custom button template. */
-        template?: template | ((cellElement: DevExpress.core.dxElement, cellInfo: { component?: dxTreeList, data?: any, key?: any, columnIndex?: number, column?: dxTreeListColumn, rowIndex?: number, rowType?: string, row?: dxTreeListRowObject }) => string | Element | JQuery);
-        /** Specifies the button's visibility. */
-        visible?: boolean | ((options: { component?: dxTreeList, row?: dxTreeListRowObject, column?: dxTreeListColumn }) => boolean);
-    }
-    /** A TreeList node's structure. */
-    export interface dxTreeListNode {
-        /** Contains all child nodes. */
-        children?: Array<dxTreeListNode>;
-        /** The node's data object. */
-        data?: any;
-        /** Indicates whether the node has child nodes. */
-        hasChildren?: boolean;
-        /** The node's key. */
-        key?: any;
-        /** The node's hierarchical level. */
-        level?: number;
-        /** The parent node. */
-        parent?: dxTreeListNode;
-        /** Indicates whether the node is visualized as a row. */
-        visible?: boolean;
-    }
-    /** The TreeList row object's structure. */
-    export interface dxTreeListRowObject {
-        /** Indicates whether the row is in the editing state. */
-        isEditing?: boolean;
-        /** Indicates whether the row is expanded or collapsed. Available if rowType is "data" or "detail". */
-        isExpanded?: boolean;
-        /** Indicates whether the row is selected. Available if rowType is "data" or "detail". */
-        isSelected?: boolean;
-        /** The row's key. Available if rowType is "data", "detail" or "detailAdaptive". */
-        key?: any;
-        /** The row's hierarchical level. Available if rowType is "data" or "detail". */
-        level?: number;
-        /** The row's node. Available if rowType is "data" or "detail". */
-        node?: dxTreeListNode;
-        /** The row's visible index. This index is zero-based and available if rowType is "data", "detail" or "detailAdaptive". */
-        rowIndex?: number;
-        /** The row's type. */
-        rowType?: string;
-        /** Values displayed in the row's cells. */
-        values?: Array<any>;
-    }
-    
-    export interface dxTreeViewOptions extends HierarchicalCollectionWidgetOptions<dxTreeView>, SearchBoxMixinOptions<dxTreeView> {
-        /** Specifies whether or not to animate item collapsing and expanding. */
-        animationEnabled?: boolean;
-        /** Allows you to load nodes. Applies if the dataStructure is "plain" and the dataSource and items are undefined. */
-        createChildren?: ((parentNode: dxTreeViewNode) => Promise<any> | JQueryPromise<any> | Array<any>);
-        /** Notifies the widget of the used data structure. */
-        dataStructure?: 'plain' | 'tree';
-        /** Specifies whether or not a user can expand all tree view items by the "*" hot key. */
-        expandAllEnabled?: boolean;
-        /** Specifies the event on which to expand/collapse a node. */
-        expandEvent?: 'dblclick' | 'click';
-        /** Specifies whether or not all parent nodes of an initially expanded node are displayed expanded. */
-        expandNodesRecursive?: boolean;
-        /** Specifies which data source field specifies whether an item is expanded. */
-        expandedExpr?: string | Function;
-        /** Specifies the name of the data source item field whose value defines whether or not the corresponding node includes child nodes. */
-        hasItemsExpr?: string | Function;
-        /** An array of items displayed by the widget. */
-        items?: Array<dxTreeViewItem>;
-        /** A function that is executed when a collection item is clicked or tapped. */
-        onItemClick?: ((e: { component?: dxTreeView, element?: DevExpress.core.dxElement, model?: any, itemData?: any, itemElement?: DevExpress.core.dxElement, itemIndex?: number | any, jQueryEvent?: JQueryEventObject, event?: event, node?: dxTreeViewNode }) => any);
-        /** A function that is executed when a tree view item is collapsed. */
-        onItemCollapsed?: ((e: { component?: dxTreeView, element?: DevExpress.core.dxElement, model?: any, itemData?: any, itemElement?: DevExpress.core.dxElement, itemIndex?: number, jQueryEvent?: JQueryEventObject, event?: event, node?: dxTreeViewNode }) => any);
-        /** A function that is executed when a collection item is right-clicked or pressed. */
-        onItemContextMenu?: ((e: { component?: dxTreeView, element?: DevExpress.core.dxElement, model?: any, itemData?: any, itemElement?: DevExpress.core.dxElement, itemIndex?: number | any, jQueryEvent?: JQueryEventObject, event?: event, node?: dxTreeViewNode }) => any);
-        /** A function that is executed when a tree view item is expanded. */
-        onItemExpanded?: ((e: { component?: dxTreeView, element?: DevExpress.core.dxElement, model?: any, itemData?: any, itemElement?: DevExpress.core.dxElement, itemIndex?: number, jQueryEvent?: JQueryEventObject, event?: event, node?: dxTreeViewNode }) => any);
-        /** A function that is executed when a collection item has been held for a specified period. */
-        onItemHold?: ((e: { component?: dxTreeView, element?: DevExpress.core.dxElement, model?: any, itemData?: any, itemElement?: DevExpress.core.dxElement, itemIndex?: number, event?: event, node?: dxTreeViewNode }) => any);
-        /** A function that is executed after a collection item is rendered. */
-        onItemRendered?: ((e: { component?: dxTreeView, element?: DevExpress.core.dxElement, model?: any, itemData?: any, itemElement?: DevExpress.core.dxElement, itemIndex?: number, node?: dxTreeViewNode }) => any);
-        /** A function that is executed when a tree view item is selected or selection is canceled. */
-        onItemSelectionChanged?: ((e: { component?: dxTreeView, element?: DevExpress.core.dxElement, model?: any, node?: dxTreeViewNode, itemElement?: DevExpress.core.dxElement }) => any);
-        /** A function that is executed when the "Select All" check box value is changed. Applies only if showCheckBoxesMode is "selectAll" and selectionMode is "multiple". */
-        onSelectAllValueChanged?: ((e: { component?: dxTreeView, element?: DevExpress.core.dxElement, model?: any, value?: boolean }) => any);
-        /** A function that is executed when a tree view item is selected or selection is canceled. */
-        onSelectionChanged?: ((e: { component?: dxTreeView, element?: DevExpress.core.dxElement, model?: any }) => any);
-        /** Specifies the name of the data source item field for holding the parent key of the corresponding node. */
-        parentIdExpr?: string | Function;
-        /** Specifies the parent ID value of the root item. */
-        rootValue?: any;
-        /** A string value specifying available scrolling directions. */
-        scrollDirection?: 'both' | 'horizontal' | 'vertical';
-        /** Specifies the text displayed at the "Select All" check box. */
-        selectAllText?: string;
-        /** Specifies whether or not an item becomes selected if a user clicks it. */
-        selectByClick?: boolean;
-        /** Specifies whether or not to select nodes recursively. */
-        selectNodesRecursive?: boolean;
-        /** Specifies item selection mode. */
-        selectionMode?: 'multiple' | 'single';
-        /** Specifies the current check boxes display mode. */
-        showCheckBoxesMode?: 'none' | 'normal' | 'selectAll';
-        /** Specifies if the virtual mode is enabled. */
-        virtualModeEnabled?: boolean;
-    }
-    /** The TreeView widget is a tree-like representation of textual data. */
-    export class dxTreeView extends HierarchicalCollectionWidget {
-        constructor(element: Element, options?: dxTreeViewOptions)
-        constructor(element: JQuery, options?: dxTreeViewOptions)
-        /** Collapses all items. */
-        collapseAll(): void;
-        /** Collapses an item with a specific key. */
-        collapseItem(itemData: any): void;
-        /** Collapses an item found using its DOM node. */
-        collapseItem(itemElement: Element): void;
-        /** Collapses an item with a specific key. */
-        collapseItem(key: any): void;
-        /** Expands all items. If you load items on demand, this method expands only the loaded items. */
-        expandAll(): void;
-        /** Expands an item found using its data object. */
-        expandItem(itemData: any): void;
-        /** Expands an item found using its DOM node. */
-        expandItem(itemElement: Element): void;
-        /** Expands an item with a specific key. */
-        expandItem(key: any): void;
-        /** Gets all nodes. */
-        getNodes(): Array<dxTreeViewNode>;
-        /** Selects all items. */
-        selectAll(): void;
-        /** Selects an item found using its data object. */
-        selectItem(itemData: any): void;
-        /** Selects an item found using its DOM node. */
-        selectItem(itemElement: Element): void;
-        /** Selects an item with a specific key. */
-        selectItem(key: any): void;
-        /** Cancels the selection of all items. */
-        unselectAll(): void;
-        /** Cancels the selection of an item found using its data object. */
-        unselectItem(itemData: any): void;
-        /** Cancels the selection of an item found using its DOM node. */
-        unselectItem(itemElement: Element): void;
-        /** Cancels the selection of an item with a specific key. */
-        unselectItem(key: any): void;
-        /** Updates the tree view scrollbars according to the current size of the widget content. */
-        updateDimensions(): Promise<void> & JQueryPromise<void>;
-    }
-    /** This section lists the data source fields that are used in a default item template. */
-    export interface dxTreeViewItem extends CollectionWidgetItem {
-        /** Specifies whether or not the tree view item is displayed expanded. */
-        expanded?: boolean;
-        /** Specifies whether or not the tree view item has children. */
-        hasItems?: boolean;
-        /** Specifies the tree view item's icon. */
-        icon?: string;
-        /** Holds an array of tree view items. */
-        items?: Array<dxTreeViewItem>;
-        /** Holds the key of the parent item. */
-        parentId?: number | string;
-        /** Specifies whether or not the tree view item is displayed selected. */
-        selected?: boolean;
-    }
-    /** A TreeView node. */
-    export interface dxTreeViewNode {
-        /** Contains all the child nodes of the current node. */
-        children?: Array<dxTreeViewNode>;
-        /** Equals to true if the node is disabled; otherwise false. */
-        disabled?: boolean;
-        /** Equals true if the node is expanded; false if collapsed. */
-        expanded?: boolean;
-        /** Contains the data source object corresponding to the node. */
-        itemData?: any;
-        /** Contains the key value of the node. */
-        key?: any;
-        /** Refers to the parent node of the current node. */
-        parent?: dxTreeViewNode;
-        /** Equals to true if the node is selected; false if not. */
-        selected?: boolean;
-        /** Contains the text displayed by the node. */
-        text?: string;
-    }
-    
-    export interface dxValidationGroupOptions extends DOMComponentOptions<dxValidationGroup> {
-    }
-    /** The ValidationGroup is a widget that allows you to validate several editors simultaneously. */
-    export class dxValidationGroup extends DOMComponent {
-        constructor(element: Element, options?: dxValidationGroupOptions)
-        constructor(element: JQuery, options?: dxValidationGroupOptions)
-        /** Resets the value and validation result of the editors that are included to the current validation group. */
-        reset(): void;
-        /** Validates rules of the validators that belong to the current validation group. */
-        validate(): dxValidationGroupResult;
-    }
-    /** A group validation result. */
-    export interface dxValidationGroupResult {
-        /** Rules that failed to pass the check. */
-        brokenRules?: Array<RequiredRule | NumericRule | RangeRule | StringLengthRule | CustomRule | CompareRule | PatternRule | EmailRule>;
-        /** Indicates whether all the rules checked for the group are satisfied. */
-        isValid?: boolean;
-        /** Validator widgets included in the validated group. */
-        validators?: Array<any>;
-    }
-    
-    export interface dxValidationSummaryOptions extends CollectionWidgetOptions<dxValidationSummary> {
-        /** Specifies the validation group for which summary should be generated. */
-        validationGroup?: string;
-    }
-    /** A widget for displaying the result of checking validation rules for editors. */
-    export class dxValidationSummary extends CollectionWidget {
-        constructor(element: Element, options?: dxValidationSummaryOptions)
-        constructor(element: JQuery, options?: dxValidationSummaryOptions)
-    }
-    
-    export interface dxValidatorOptions extends DOMComponentOptions<dxValidator> {
-        /** An object that specifies what and when to validate, and how to apply the validation result. */
-        adapter?: { applyValidationResults?: Function, bypass?: Function, focus?: Function, getValue?: Function, reset?: Function, validationRequestsCallbacks?: Array<Function> | JQueryCallback };
-        /** Specifies the editor name to be used in the validation default messages. */
-        name?: string;
-        /** A function that is executed after a value is validated. */
-        onValidated?: ((validatedInfo: { name?: string, isValid?: boolean, value?: any, validationRules?: Array<RequiredRule | NumericRule | RangeRule | StringLengthRule | CustomRule | CompareRule | PatternRule | EmailRule>, brokenRule?: RequiredRule | NumericRule | RangeRule | StringLengthRule | CustomRule | CompareRule | PatternRule | EmailRule }) => any);
-        /** Specifies the validation group the editor will be related to. */
-        validationGroup?: string;
-        /** An array of validation rules to be checked for the editor with which the dxValidator object is associated. */
-        validationRules?: Array<RequiredRule | NumericRule | RangeRule | StringLengthRule | CustomRule | CompareRule | PatternRule | EmailRule>;
-    }
-    /** A widget that is used to validate the associated DevExtreme editors against the defined validation rules. */
-    export class dxValidator extends DOMComponent {
-        constructor(element: Element, options?: dxValidatorOptions)
-        constructor(element: JQuery, options?: dxValidatorOptions)
-        /** Sets focus to the editor associated with the current Validator object. */
-        focus(): void;
-        /** Resets the value and validation result of the editor associated with the current Validator object. */
-        reset(): void;
-        /** Validates the value of the editor that is controlled by the current Validator object against the list of the specified validation rules. */
-        validate(): dxValidatorResult;
-    }
-    /** A validation result. */
-    export interface dxValidatorResult {
-        /** A rule that failed to pass the check. */
-        brokenRule?: RequiredRule | NumericRule | RangeRule | StringLengthRule | CustomRule | CompareRule | PatternRule | EmailRule;
-        /** Indicates whether all the checked rules are satisfied. */
-        isValid?: boolean;
-        /** Validation rules specified for the Validator. */
-        validationRules?: Array<RequiredRule | NumericRule | RangeRule | StringLengthRule | CustomRule | CompareRule | PatternRule | EmailRule>;
-        /** The value being validated. */
-        value?: any;
-    }
-    /** Formats values. */
-    export type format = 'billions' | 'currency' | 'day' | 'decimal' | 'exponential' | 'fixedPoint' | 'largeNumber' | 'longDate' | 'longTime' | 'millions' | 'millisecond' | 'month' | 'monthAndDay' | 'monthAndYear' | 'percent' | 'quarter' | 'quarterAndYear' | 'shortDate' | 'shortTime' | 'thousands' | 'trillions' | 'year' | 'dayOfWeek' | 'hour' | 'longDateLongTime' | 'minute' | 'second' | 'shortDateShortTime' | string | ((value: number | Date) => string) | { currency?: string, formatter?: ((value: number | Date) => string), parser?: ((value: string) => number | Date), precision?: number, type?: 'billions' | 'currency' | 'day' | 'decimal' | 'exponential' | 'fixedPoint' | 'largeNumber' | 'longDate' | 'longTime' | 'millions' | 'millisecond' | 'month' | 'monthAndDay' | 'monthAndYear' | 'percent' | 'quarter' | 'quarterAndYear' | 'shortDate' | 'shortTime' | 'thousands' | 'trillions' | 'year' | 'dayOfWeek' | 'hour' | 'longDateLongTime' | 'minute' | 'second' | 'shortDateShortTime' };
-    /** A template notation used to specify templates for widget elements. */
-    export type template = string | Function | Element | JQuery;
-    /** An object that serves as a namespace for methods displaying a message in an application/site. */
-    export class dialog {
-        /** Displays an alert dialog with a message and OK button. */
-        static alert(messageHtml: string, title: string): Promise<void> & JQueryPromise<void>;
-        /** Creates a confirmation dialog with a message and Yes and No buttons. */
-        static confirm(messageHtml: string, title: string): Promise<boolean> & JQueryPromise<boolean>;
-        /** Creates a dialog with custom buttons. */
-        static custom(options: { title?: string, messageHtml?: string, buttons?: Array<dxButtonOptions>, showTitle?: boolean, message?: string }): any;
-    }
-    /** An object that serves as a namespace for the methods that work with DevExtreme CSS Themes. */
-    export class themes {
-        /** Gets the current theme's name. */
-        static current(): string;
-        /** Sets a theme with a specific name. */
-        static current(themeName: string): void;
-        /** Specifies a function to be executed after the theme is loaded. */
-        static ready(callback: Function): void;
-    }
-}
 declare module DevExpress {
     
     export interface ComponentOptions<T = Component> {
@@ -9279,7 +9385,7 @@ declare module DevExpress {
         defaultCurrency?: string;
         /** Specifies how editors' text fields are styled in your application. */
         editorStylingMode?: 'outlined' | 'underlined' | 'filled';
-        
+        /** Configures a Floating Action Button (FAB) that emits a stack of related actions (speed dial). */
         floatingActionButtonConfig?: { closeIcon?: string, icon?: string, maxSpeedDialActionCount?: number, position?: 'bottom' | 'center' | 'left' | 'left bottom' | 'left top' | 'right' | 'right bottom' | 'right top' | 'top' | positionConfig | Function };
         /** Specifies whether dates are parsed and serialized according to the ISO 8601 standard in all browsers. */
         forceIsoDateParsing?: boolean;
@@ -9334,8 +9440,6 @@ declare module DevExpress {
         /** Specifies horizontal and vertical offset in pixels. */
         offset?: string | { x?: number, y?: number };
     }
-    /** Processes the hardware back button click. */
-    export function processHardwareBackButton(): void;
     /** Registers a new component in the DevExpress.ui namespace. */
     export function registerComponent(name: string, componentClass: any): void;
     /** Registers a new component in the specified namespace. */
@@ -9430,6 +9534,8 @@ declare module DevExpress.exporter {
         column?: DevExpress.ui.dxDataGridColumn;
         /** The data object of the cell's row. */
         data?: any;
+        /** The groupIndex of the cell's row. */
+        groupIndex?: number;
         /** Information about group summary items the cell represents. */
         groupSummaryItems?: Array<{ name?: string, value?: any }>;
         /** The type of the cell's row. */
