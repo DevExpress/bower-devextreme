@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 18.2.8 (build 19135)
-* Build date: May 15, 2019
+* Version: 18.2.8 (build 19149)
+* Build date: May 29, 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -7366,7 +7366,8 @@
   border-top: 1px solid #999999;
   height: 50px;
 }
-.dx-scheduler-date-table-cell > div {
+.dx-scheduler-date-table-cell > div,
+.dx-scheduler-all-day-table-cell > div {
   pointer-events: none;
 }
 .dx-scheduler-date-table-cell,
