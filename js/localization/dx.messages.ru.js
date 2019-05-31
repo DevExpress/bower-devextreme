@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.messages.ru.js)
-* Version: 19.1.3
-* Build date: Tue May 14 2019
+* Version: 19.1.3 (build 19151-2014)
+* Build date: Fri May 31 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -274,7 +274,12 @@
             "dxHtmlEditor-dialogImageWidthField": "\u0428\u0438\u0440\u0438\u043d\u0430 (px)",
             "dxHtmlEditor-dialogImageHeightField": "\u0412\u044b\u0441\u043e\u0442\u0430 (px)",
             "dxHtmlEditor-heading": "\u0417\u0430\u0433\u043e\u043b\u043e\u0432\u043e\u043a",
-            "dxHtmlEditor-normalText": "\u041e\u0431\u044b\u0447\u043d\u044b\u0439 \u0442\u0435\u043a\u0441\u0442"
+            "dxHtmlEditor-normalText": "\u041e\u0431\u044b\u0447\u043d\u044b\u0439 \u0442\u0435\u043a\u0441\u0442",
+            "dxFileManager-errorNoAccess": "TODO!",
+            "dxFileManager-errorDirectoryExistsFormat": "TODO!",
+            "dxFileManager-errorFileExistsFormat": "TODO!",
+            "dxFileManager-errorFileNotFoundFormat": "TODO!",
+            "dxFileManager-errorDefault": "TODO!"
         }
     })
 });

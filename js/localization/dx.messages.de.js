@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.messages.de.js)
-* Version: 19.1.3
-* Build date: Tue May 14 2019
+* Version: 19.1.3 (build 19151-2014)
+* Build date: Fri May 31 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -191,15 +191,15 @@
             "dxScheduler-editorLabelStartDate": "Anfangszeit",
             "dxScheduler-editorLabelEndDate": "Endzeit",
             "dxScheduler-editorLabelDescription": "Beschreibung",
-            "dxScheduler-editorLabelRecurrence": "Wiederholung",
+            "dxScheduler-editorLabelRecurrence": "Wiederholen",
             "dxScheduler-openAppointment": "Termin \xf6ffnen",
             "dxScheduler-recurrenceNever": "Nie",
             "dxScheduler-recurrenceDaily": "T\xe4glich",
             "dxScheduler-recurrenceWeekly": "W\xf6chentlich",
             "dxScheduler-recurrenceMonthly": "Monatlich",
             "dxScheduler-recurrenceYearly": "J\xe4hrlich",
-            "dxScheduler-recurrenceRepeatEvery": "Alle",
-            "dxScheduler-recurrenceRepeatOn": "Alle",
+            "dxScheduler-recurrenceRepeatEvery": "Wiederholen alle",
+            "dxScheduler-recurrenceRepeatOn": "Wiederholen an",
             "dxScheduler-recurrenceEnd": "Wiederholungsende",
             "dxScheduler-recurrenceAfter": "Nach",
             "dxScheduler-recurrenceOn": "Am",
@@ -274,7 +274,12 @@
             "dxHtmlEditor-dialogImageWidthField": "Breite (px)",
             "dxHtmlEditor-dialogImageHeightField": "Bildh\xf6he (px)",
             "dxHtmlEditor-heading": "\xdcberschrift",
-            "dxHtmlEditor-normalText": "Normaler Text"
+            "dxHtmlEditor-normalText": "Normaler Text",
+            "dxFileManager-errorNoAccess": "TODO!",
+            "dxFileManager-errorDirectoryExistsFormat": "TODO!",
+            "dxFileManager-errorFileExistsFormat": "TODO!",
+            "dxFileManager-errorFileNotFoundFormat": "TODO!",
+            "dxFileManager-errorDefault": "TODO!"
         }
     })
 });

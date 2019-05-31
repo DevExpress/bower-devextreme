@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.messages.ja.js)
-* Version: 19.1.3
-* Build date: Tue May 14 2019
+* Version: 19.1.3 (build 19151-2014)
+* Build date: Fri May 31 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -191,15 +191,15 @@
             "dxScheduler-editorLabelStartDate": "\u958b\u59cb\u6642\u523b",
             "dxScheduler-editorLabelEndDate": "\u7d42\u4e86\u6642\u523b",
             "dxScheduler-editorLabelDescription": "\u8aac\u660e",
-            "dxScheduler-editorLabelRecurrence": "\u30ea\u30d4\u30fc\u30c8",
+            "dxScheduler-editorLabelRecurrence": "\u7e70\u308a\u8fd4\u3057",
             "dxScheduler-openAppointment": "\u30aa\u30fc\u30d7\u30f3\u306e\u4e88\u5b9a",
             "dxScheduler-recurrenceNever": "\u7121\u52b9",
             "dxScheduler-recurrenceDaily": "\u65e5\u9593\u6bce\u65e5",
             "dxScheduler-recurrenceWeekly": "\u6bce\u9031",
             "dxScheduler-recurrenceMonthly": "\u6bce\u6708",
             "dxScheduler-recurrenceYearly": "\u6bce\u5e74",
-            "dxScheduler-recurrenceRepeatEvery": "\u30ea\u30d4\u30fc\u30c8\u306e\u983b\u5ea6",
-            "dxScheduler-recurrenceRepeatOn": "\u30ea\u30d4\u30fc\u30c8\u306e\u983b\u5ea6",
+            "dxScheduler-recurrenceRepeatEvery": "\u9593\u9694:",
+            "dxScheduler-recurrenceRepeatOn": "\u3053\u306e\u65e5\u306b\u7e70\u308a\u8fd4\u3059",
             "dxScheduler-recurrenceEnd": "\u30ea\u30d4\u30fc\u30c8\u306e\u7d42\u4e86\u65e5",
             "dxScheduler-recurrenceAfter": "\u6b21\u306e\u767a\u751f\u56de\u6570\u5f8c\u306b\u7d42\u4e86",
             "dxScheduler-recurrenceOn": "\u30ea\u30d4\u30fc\u30c8\u89e3\u9664\u306e\u65e5\u4ed8",
@@ -274,7 +274,12 @@
             "dxHtmlEditor-dialogImageWidthField": "\u5e45 (px)",
             "dxHtmlEditor-dialogImageHeightField": "\u9ad8\u3055 (px)",
             "dxHtmlEditor-heading": "\u898b\u51fa\u3057",
-            "dxHtmlEditor-normalText": "\u6a19\u6e96\u30c6\u30ad\u30b9\u30c8"
+            "dxHtmlEditor-normalText": "\u6a19\u6e96\u30c6\u30ad\u30b9\u30c8",
+            "dxFileManager-errorNoAccess": "TODO!",
+            "dxFileManager-errorDirectoryExistsFormat": "TODO!",
+            "dxFileManager-errorFileExistsFormat": "TODO!",
+            "dxFileManager-errorFileNotFoundFormat": "TODO!",
+            "dxFileManager-errorDefault": "TODO!"
         }
     })
 });

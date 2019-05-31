@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 19.1.3
-* Build date: May 14, 2019
+* Version: 19.1.3 (build 19151-2014)
+* Build date: May 31, 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -940,6 +940,9 @@
 }
 .dx-device-android .dx-scrollable-native.dx-scrollable-scrollbars-hidden ::-webkit-scrollbar {
   display: none;
+}
+.dx-scrollable-simulated .dx-scrollable-content {
+  overflow-anchor: none;
 }
 .dx-scrollable-native.dx-scrollable-native-generic .dx-scrollview-top-pocket {
   position: absolute;
@@ -2020,6 +2023,9 @@
   display: block;
   overflow: auto;
   white-space: pre-wrap;
+}
+.dx-textarea .dx-texteditor-input-auto-resize {
+  overflow-y: hidden;
 }
 .dx-textarea .dx-placeholder {
   height: auto;
@@ -3107,12 +3113,28 @@
   padding-left: 0px;
   padding-right: 0px;
 }
+.dx-rtl .dx-dropdownbutton-toggle {
+  border-right-width: 0;
+}
 .dx-dropdownbutton-action.dx-button .dx-button-content {
-  padding-right: 4px;
+  padding-right: 10px;
   padding-left: 10px;
 }
+.dx-dropdownbutton-action:not(.dx-buttongroup-last-item).dx-button .dx-button-content {
+  padding-left: 10px;
+  padding-right: 4px;
+}
+.dx-rtl .dx-dropdownbutton-action:not(.dx-buttongroup-last-item).dx-button .dx-button-content {
+  padding-left: 4px;
+  padding-right: 10px;
+}
 .dx-dropdownbutton-action:not(.dx-buttongroup-last-item).dx-button {
-  border-right: none;
+  border-right-width: 0;
+  border-left-width: 1px;
+}
+.dx-rtl .dx-dropdownbutton-action:not(.dx-buttongroup-last-item).dx-button {
+  border-right-width: 1px;
+  border-left-width: 0;
 }
 .dx-selectbox {
   cursor: pointer;
@@ -4573,7 +4595,7 @@ input.dx-hidden {
 }
 .dx-datagrid-filter-panel .dx-icon-filter {
   margin: auto;
-  padding-right: 7px;
+  margin-right: 7px;
   cursor: pointer;
 }
 .dx-datagrid {
@@ -5735,7 +5757,7 @@ input.dx-hidden {
 }
 .dx-treelist-filter-panel .dx-icon-filter {
   margin: auto;
-  padding-right: 7px;
+  margin-right: 7px;
   cursor: pointer;
 }
 .dx-treelist-container {
@@ -6998,7 +7020,6 @@ input.dx-hidden {
 .dx-htmleditor-content {
   -webkit-box-sizing: border-box;
           box-sizing: border-box;
-  counter-reset: list-0;
   line-height: 1.42;
   width: 100%;
   outline: none;
@@ -7016,6 +7037,7 @@ input.dx-hidden {
 }
 .dx-htmleditor-content p,
 .dx-htmleditor-content ol,
+.dx-htmleditor-content ul,
 .dx-htmleditor-content pre,
 .dx-htmleditor-content blockquote,
 .dx-htmleditor-content h1,
@@ -7033,7 +7055,9 @@ input.dx-hidden {
 .dx-htmleditor-content h3,
 .dx-htmleditor-content h4,
 .dx-htmleditor-content h5,
-.dx-htmleditor-content h6 {
+.dx-htmleditor-content h6,
+.dx-htmleditor-content ol,
+.dx-htmleditor-content ul {
   counter-reset: list-1 list-2 list-3 list-4 list-5 list-6 list-7 list-8 list-9;
 }
 .dx-htmleditor-content table {
@@ -7043,10 +7067,12 @@ input.dx-hidden {
   border: 1px solid #000;
   padding: 2px 5px;
 }
-.dx-htmleditor-content ol {
+.dx-htmleditor-content ol,
+.dx-htmleditor-content ul {
   padding-left: 1.5em;
 }
-.dx-rtl .dx-htmleditor-content ol {
+.dx-rtl .dx-htmleditor-content ol,
+.dx-rtl .dx-htmleditor-content ul {
   padding-left: 0;
   padding-right: 1.5em;
 }
@@ -7798,6 +7824,17 @@ input.dx-hidden {
 }
 .dx-diagram .dx-diagram-right-panel .dx-accordion {
   width: 280px;
+}
+.dx-diagram .dx-diagram-toolbar-separator {
+  height: 100%;
+  border-left: 1px solid transparent;
+}
+.dx-diagram .dx-diagram-toolbar-menu-separator {
+  width: 100%;
+  border-top: 1px solid transparent;
+}
+.dx-diagram .dx-diagram-toolbar-menu-separator::before {
+  content: none;
 }
 .dx-deferrendering .dx-deferrendering-loadindicator-container {
   width: 100%;

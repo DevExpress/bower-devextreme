@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.all.d.ts)
-* Version: 19.1.3
-* Build date: Tue May 14 2019
+* Version: 19.1.3 (build 19151-2014)
+* Build date: Fri May 31 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -569,23 +569,23 @@ interface JQuery {
 declare module DevExpress.ui {
     
     export interface AjaxFileProviderOptions extends FileProviderOptions<AjaxFileProvider> {
-        
+        /** Specifies which data field provides information about nested files and directories. */
         itemsExpr?: string | Function;
-        
+        /** Specifies the URL used to load an array of JSON objects that represent files and directories. */
         url?: string;
     }
-    
+    /** The Ajax file provider works with a virtual file system represented by an array of JSON objects loaded from a URL. */
     export class AjaxFileProvider extends FileProvider {
         constructor(options?: AjaxFileProviderOptions)
     }
     
     export interface ArrayFileProviderOptions extends FileProviderOptions<ArrayFileProvider> {
-        
+        /** Specifies an array of data objects that represent files and directories. */
         data?: Array<any>;
-        
+        /** Specifies which data field provides information about nested files and directories. */
         itemsExpr?: string | Function;
     }
-    
+    /** The Array file provider works with a virtual file system represented by an in-memory array of JSON objects. */
     export class ArrayFileProvider extends FileProvider {
         constructor(options?: ArrayFileProviderOptions)
     }
@@ -642,7 +642,7 @@ declare module DevExpress.ui {
     }
     /** This section lists the data source fields that are used in a default item template. */
     export interface CollectionWidgetItem {
-        /** Specifies whether or not a widget item must be displayed disabled. */
+        /** Specifies whether a widget item should be disabled. */
         disabled?: boolean;
         /** Specifies html code inserted into the widget item element. */
         html?: string;
@@ -748,15 +748,15 @@ declare module DevExpress.ui {
     }
     
     export interface FileProviderOptions<T = FileProvider> {
-        
+        /** Specifies which data field provides timestamps that indicate when a file was last modified. */
         dateModifiedExpr?: string | Function;
-        
+        /** Specifies which data field provides information about whether a file system item is a directory. */
         isDirectoryExpr?: string | Function;
-        
+        /** Specifies which data field provides file and directory names. */
         nameExpr?: string | Function;
-        
+        /** Specifies which data field provides file sizes. */
         sizeExpr?: string | Function;
-        
+        /** Specifies which data field provides icons to be used as thumbnails. */
         thumbnailExpr?: string | Function;
     }
     
@@ -1267,7 +1267,11 @@ declare module DevExpress.ui {
         type?: 'required' | 'numeric' | 'range' | 'stringLength' | 'custom' | 'compare' | 'pattern' | 'email';
     }
     
-    export interface OneDriveFileProvider extends FileProvider {
+    export interface OneDriveFileProviderOptions extends FileProviderOptions<OneDriveFileProvider> {
+    }
+    /** The OneDrive file provider allows you to connect to OneDrive. */
+    export class OneDriveFileProvider extends FileProvider {
+        constructor(options?: OneDriveFileProviderOptions)
     }
     /** A validation rule that demands that the validated field match a specified pattern. */
     export interface PatternRule {
@@ -1340,12 +1344,12 @@ declare module DevExpress.ui {
     }
     
     export interface WebApiFileProviderOptions extends FileProviderOptions<WebApiFileProvider> {
-        
+        /** Specifies the URL of an endpoint used to access and modify a file system located on the server. */
         endpointUrl?: string;
-        
+        /** Specifies which data field provides information about whether a directory has subdirectories. */
         hasSubDirectoriesExpr?: string | Function;
     }
-    
+    /** The Web API file provider works with a file system located on the server. */
     export class WebApiFileProvider extends FileProvider {
         constructor(options?: WebApiFileProviderOptions)
     }
@@ -2007,7 +2011,7 @@ declare module DevExpress.ui {
         
         onDataChanged?: ((e: { component?: dxDiagram, element?: DevExpress.core.dxElement, model?: any, data?: string }) => any);
     }
-    
+    /** [tags] ctp The Diagram widget provides a visual interface to help you design new and modify existing diagrams. #include common-ctp-note with { component: "Diagram" } */
     export class dxDiagram extends Widget {
         constructor(element: Element, options?: dxDiagramOptions)
         constructor(element: JQuery, options?: dxDiagramOptions)
@@ -2098,7 +2102,7 @@ declare module DevExpress.ui {
         focusStateEnabled?: boolean;
         /** Specifies whether the widget changes its state when a user hovers the mouse pointer over it. */
         hoverStateEnabled?: boolean;
-        /** Specifies the button's icon. Applies only if splitButton is true. */
+        /** Specifies the button's icon. */
         icon?: string;
         /** Specifies a custom template for drop-down menu items. */
         itemTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery);
@@ -2114,17 +2118,19 @@ declare module DevExpress.ui {
         onItemClick?: ((e: { component?: dxDropDownButton, element?: DevExpress.core.dxElement, model?: any, event?: event, itemData?: any, itemElement?: DevExpress.core.dxElement }) => any) | string;
         /** A function that is executed when an item is selected or selection is canceled. In effect when useSelectMode is true. */
         onSelectionChanged?: ((e: { component?: dxDropDownButton, element?: DevExpress.core.dxElement, model?: any, item?: any, previousItem?: any }) => any) | string;
-        
+        /** Specifies whether the drop-down menu is opened. */
         opened?: boolean;
         /** Contains the selected item's data. Available when useSelectMode is true. */
         selectedItem?: string | number | any;
         /** Contains the selected item's key and allows you to specify the initially selected item. Applies when useSelectMode is true. */
         selectedItemKey?: string | number;
+        
+        showArrowIcon?: boolean;
         /** Specifies whether to split the button in two: one executes an action, the other opens and closes the drop-down menu. */
         splitButton?: boolean;
         /** Specifies how the button is styled. */
         stylingMode?: 'text' | 'outlined' | 'contained';
-        /** Specifies the button's text. Applies only if useSelectMode is false and selectedItemKey is unspecified. */
+        /** Specifies the button's text. Applies only if useSelectMode is false. */
         text?: string;
         /** Specifies whether the widget stores the selected drop-down menu item. */
         useSelectMode?: boolean;
@@ -2270,9 +2276,9 @@ declare module DevExpress.ui {
     export interface dxFileManagerOptions extends WidgetOptions<dxFileManager> {
         
         customizeDetailColumns?: ((columns: Array<dxDataGridColumn>) => Array<dxDataGridColumn>);
-        /** Allows you to provide custom thumbnails. */
+        /** Allows you to provide custom icons to be used as thumbnails. */
         customizeThumbnail?: ((fileItem: any) => string);
-        
+        /** Specifies the file provider. */
         fileProvider?: any;
         /** Configures the file and folder view. */
         itemView?: { mode?: 'details' | 'thumbnails', showFolders?: boolean, showParentFolder?: boolean };
@@ -2283,7 +2289,7 @@ declare module DevExpress.ui {
         /** Specifies whether a user can select a single or multiple files and folders in the item view simultaneously. */
         selectionMode?: 'multiple' | 'single';
     }
-    /** [tags] ctp The FileManager is a widget that allows users to upload, select, and manage files and folders on different file storages. [note] The FileManager is at the Community Technology Preview (CTP) development stage: the component is available for testing, but its concept, design, and behavior can be reconsidered and changed without notice. */
+    /** [tags] ctp The FileManager is a widget that allows users to upload, select, and manage files and directories in different file storages. #include common-ctp-note with { component: "FileManager" } */
     export class dxFileManager extends Widget {
         constructor(element: Element, options?: dxFileManagerOptions)
         constructor(element: JQuery, options?: dxFileManagerOptions)
@@ -2698,7 +2704,7 @@ declare module DevExpress.ui {
         /** Configures variables, which are placeholders to be replaced with actual values when processing text. */
         variables?: dxHtmlEditorVariables;
     }
-    /** [tags] ctp HtmlEditor is a WYSIWYG text editor build on top of Quill, designed to support HTML and Markdown output formats. HtmlEditor is at the Community Technology Preview (CTP) development stage. That means that the widget is available for testing, but its concept, design and behavior can be reconsidered and changed without notice. */
+    /** [tags] ctp HtmlEditor is a WYSIWYG text editor build on top of Quill, designed to support HTML and Markdown output formats. #include common-ctp-note with { component: "HtmlEditor" } */
     export class dxHtmlEditor extends Editor {
         constructor(element: Element, options?: dxHtmlEditorOptions)
         constructor(element: JQuery, options?: dxHtmlEditorOptions)
@@ -3608,7 +3614,7 @@ declare module DevExpress.ui {
     }
     /** Configures toolbar items. */
     export interface dxPopupToolbarItem {
-        /** Specifies whether or not a toolbar item must be displayed disabled. */
+        /** Specifies whether a toolbar item should be disabled. */
         disabled?: boolean;
         /** Specifies html code inserted into the toolbar item element. */
         html?: string;
@@ -3797,7 +3803,7 @@ declare module DevExpress.ui {
         endDateExpr?: string;
         /** Specifies the name of the data source item field that defines the timezone of the appointment end date. */
         endDateTimeZoneExpr?: string;
-        /** Specifies the last hour in the time scale. Cannot be greater than 24. */
+        /** Specifies the last hour on the time scale. Accepts integer values from 0 to 24. */
         endDayHour?: number;
         /** Specifies the first day of a week. Does not apply to the agenda view. */
         firstDayOfWeek?: 0 | 1 | 2 | 3 | 4 | 5 | 6;
@@ -3870,7 +3876,7 @@ declare module DevExpress.ui {
         startDateExpr?: string;
         /** Specifies the name of the data source item field that defines the timezone of the appointment start date. */
         startDateTimeZoneExpr?: string;
-        /** Specifies the first hour in the time scale. */
+        /** Specifies the first hour on the time scale. Accepts integer values from 0 to 24. */
         startDayHour?: number;
         /** Specifies the name of the data source item field that holds the subject of an appointment. */
         textExpr?: string;
@@ -3901,8 +3907,6 @@ declare module DevExpress.ui {
         hideAppointmentPopup(saveChanges?: boolean): void;
         /** Hides an appointment tooltip. */
         hideAppointmentTooltip(): void;
-        /** Registers a handler to be executed when a user presses a specific key. */
-        registerKeyHandler(): void;
         /** Scrolls the current view to a specific day and time. */
         scrollToTime(hours: number, minutes: number, date?: Date): void;
         /** Shows the appointment details form. */
@@ -3918,7 +3922,7 @@ declare module DevExpress.ui {
         allDay?: boolean;
         /** Specifies a detail description of the appointment. */
         description?: string;
-        /** Specifies whether or not an appointment must be displayed disabled. */
+        /** Specifies whether an appointment should be disabled. */
         disabled?: boolean;
         /** Specifies the ending of the appointment. */
         endDate?: Date;
@@ -4625,11 +4629,11 @@ declare module DevExpress.ui {
         /** A function that is executed after the loaded nodes are initialized. */
         onNodesInitialized?: ((e: { component?: dxTreeList, element?: DevExpress.core.dxElement, model?: any, root?: dxTreeListNode }) => any);
         /** A function that is executed when a grid row is clicked or tapped. */
-        onRowClick?: ((e: { component?: dxTreeList, element?: DevExpress.core.dxElement, model?: any, jQueryEvent?: JQueryEventObject, event?: event, data?: any, key?: any, values?: Array<any>, columns?: Array<any>, rowIndex?: number, rowType?: string, isSelected?: boolean, isExpanded?: boolean, rowElement?: DevExpress.core.dxElement, handled?: boolean }) => any) | string;
+        onRowClick?: ((e: { component?: dxTreeList, element?: DevExpress.core.dxElement, model?: any, jQueryEvent?: JQueryEventObject, event?: event, data?: any, key?: any, values?: Array<any>, columns?: Array<any>, rowIndex?: number, rowType?: string, isSelected?: boolean, isExpanded?: boolean, rowElement?: DevExpress.core.dxElement, handled?: boolean, node?: dxTreeListNode, level?: number }) => any) | string;
         /** A function that is executed when a row is double-clicked or double-tapped. Executed after onCellDblClick. */
         onRowDblClick?: ((e: { component?: dxTreeList, element?: DevExpress.core.dxElement, model?: any, event?: event, data?: any, key?: any, values?: Array<any>, columns?: Array<dxTreeListColumn>, rowIndex?: number, rowType?: string, isSelected?: boolean, isExpanded?: boolean, rowElement?: DevExpress.core.dxElement }) => any);
         /** A function that is executed after a row is created. */
-        onRowPrepared?: ((e: { component?: dxTreeList, element?: DevExpress.core.dxElement, model?: any, data?: any, key?: any, values?: Array<any>, columns?: Array<dxTreeListColumn>, rowIndex?: number, rowType?: string, isSelected?: boolean, isExpanded?: boolean, rowElement?: DevExpress.core.dxElement }) => any);
+        onRowPrepared?: ((e: { component?: dxTreeList, element?: DevExpress.core.dxElement, model?: any, data?: any, key?: any, values?: Array<any>, columns?: Array<dxTreeListColumn>, rowIndex?: number, rowType?: string, isSelected?: boolean, isExpanded?: boolean, rowElement?: DevExpress.core.dxElement, node?: dxTreeListNode, level?: number }) => any);
         /** Configures paging. */
         paging?: dxTreeListPaging;
         /** Specifies which data field provides parent keys. */
@@ -4989,7 +4993,7 @@ declare module DevExpress.ui {
         /** Creates a confirmation dialog with a message and Yes and No buttons. */
         static confirm(messageHtml: string, title: string): Promise<boolean> & JQueryPromise<boolean>;
         /** Creates a dialog with custom buttons. */
-        static custom(options: { title?: string, messageHtml?: string, buttons?: Array<dxButtonOptions>, showTitle?: boolean, message?: string }): any;
+        static custom(options: { title?: string, messageHtml?: string, buttons?: Array<dxButtonOptions>, showTitle?: boolean, message?: string, dragEnabled?: boolean }): any;
     }
     /** An object that serves as a namespace for the methods that work with DevExtreme CSS Themes. */
     export class themes {
@@ -8727,7 +8731,7 @@ declare module DevExpress.viz {
         /** Specifies the RangeSelector's behavior options. */
         behavior?: { allowSlidersSwap?: boolean, animationEnabled?: boolean, callValueChanged?: 'onMoving' | 'onMovingComplete', manualRangeSelectionEnabled?: boolean, moveSelectedRangeByClick?: boolean, snapToTicks?: boolean };
         /** Specifies the options required to display a chart as the range selector's background. */
-        chart?: { barGroupPadding?: number, barGroupWidth?: number, barWidth?: number, bottomIndent?: number, commonSeriesSettings?: dxChartCommonSeriesSettings, dataPrepareSettings?: { checkTypeForAllData?: boolean, convertToAxisDataType?: boolean, sortingMethod?: boolean | ((a: { arg?: Date | number | string, val?: Date | number | string }, b: { arg?: Date | number | string, val?: Date | number | string }) => number) }, equalBarWidth?: boolean, negativesAsZeroes?: boolean, palette?: Array<string> | 'Bright' | 'Default' | 'Harmony Light' | 'Ocean' | 'Pastel' | 'Soft' | 'Soft Pastel' | 'Vintage' | 'Violet' | 'Carmine' | 'Dark Moon' | 'Dark Violet' | 'Green Mist' | 'Soft Blue' | 'Material' | 'Office', paletteExtensionMode?: 'alternate' | 'blend' | 'extrapolate', series?: ChartSeries | Array<ChartSeries>, seriesTemplate?: { customizeSeries?: ((seriesName: any) => ChartSeries), nameField?: string }, topIndent?: number, useAggregation?: boolean, valueAxis?: { inverted?: boolean, logarithmBase?: number, max?: number, min?: number, type?: 'continuous' | 'logarithmic', valueType?: 'datetime' | 'numeric' | 'string' } };
+        chart?: { barGroupPadding?: number, barGroupWidth?: number, barWidth?: number, bottomIndent?: number, commonSeriesSettings?: dxChartCommonSeriesSettings, dataPrepareSettings?: { checkTypeForAllData?: boolean, convertToAxisDataType?: boolean, sortingMethod?: boolean | ((a: { arg?: Date | number | string, val?: Date | number | string }, b: { arg?: Date | number | string, val?: Date | number | string }) => number) }, equalBarWidth?: boolean, maxBubbleSize?: number, minBubbleSize?: number, negativesAsZeroes?: boolean, palette?: Array<string> | 'Bright' | 'Default' | 'Harmony Light' | 'Ocean' | 'Pastel' | 'Soft' | 'Soft Pastel' | 'Vintage' | 'Violet' | 'Carmine' | 'Dark Moon' | 'Dark Violet' | 'Green Mist' | 'Soft Blue' | 'Material' | 'Office', paletteExtensionMode?: 'alternate' | 'blend' | 'extrapolate', series?: ChartSeries | Array<ChartSeries>, seriesTemplate?: { customizeSeries?: ((seriesName: any) => ChartSeries), nameField?: string }, topIndent?: number, useAggregation?: boolean, valueAxis?: { inverted?: boolean, logarithmBase?: number, max?: number, min?: number, type?: 'continuous' | 'logarithmic', valueType?: 'datetime' | 'numeric' | 'string' } };
         /** Specifies the color of the parent page element. */
         containerBackgroundColor?: string;
         /** Specifies a data source for the scale values and for the chart at the background. */
