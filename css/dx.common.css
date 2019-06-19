@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 18.2.9
-* Build date: Jun 10, 2019
+* Version: 18.2.9 (build 19170)
+* Build date: Jun 19, 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -627,7 +627,6 @@
   height: 100%;
 }
 .dx-box-item-content {
-  -webkit-flex-direction: column;
   -webkit-box-orient: vertical;
   -webkit-box-direction: normal;
       -ms-flex-direction: column;
@@ -640,15 +639,12 @@
 .dx-box-flex .dx-box-item-content > .dx-treeview,
 .dx-box-flex .dx-box-item > .dx-treeview > .dx-scrollable,
 .dx-box-flex .dx-box-item-content > .dx-treeview > .dx-scrollable {
-  display: -webkit-flex;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
-  -webkit-flex-grow: 1;
   -webkit-box-flex: 1;
       -ms-flex-positive: 1;
           flex-grow: 1;
-  -webkit-flex-direction: column;
   -webkit-box-orient: vertical;
   -webkit-box-direction: normal;
       -ms-flex-direction: column;
@@ -662,16 +658,13 @@
 .dx-box-flex .dx-box-item > .dx-treeview > .dx-scrollable > .dx-scrollable-wrapper,
 .dx-box-flex .dx-box-item-content > .dx-treeview > .dx-scrollable > .dx-scrollable-wrapper {
   display: -webkit-box;
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   -webkit-box-flex: 1;
-  -webkit-flex-grow: 1;
       -ms-flex-positive: 1;
           flex-grow: 1;
   -webkit-box-orient: vertical;
   -webkit-box-direction: normal;
-  -webkit-flex-direction: column;
       -ms-flex-direction: column;
           flex-direction: column;
   height: auto;
@@ -746,18 +739,15 @@
 }
 .dx-buttongroup-wrapper {
   display: -webkit-box;
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   -webkit-box-orient: horizontal;
   -webkit-box-direction: normal;
-  -webkit-flex-flow: row nowrap;
       -ms-flex-flow: row nowrap;
           flex-flow: row nowrap;
 }
 .dx-buttongroup-item {
   -webkit-box-flex: 0;
-  -webkit-flex: 0 1 auto;
       -ms-flex: 0 1 auto;
           flex: 0 1 auto;
 }
@@ -774,7 +764,6 @@
 }
 .dx-buttongroup-item-has-width {
   -webkit-box-flex: 1;
-  -webkit-flex: 1 1 auto;
       -ms-flex: 1 1 auto;
           flex: 1 1 auto;
   width: 100%;
@@ -1278,7 +1267,6 @@
 }
 .dx-switch-inner {
   display: -webkit-box;
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
 }
@@ -2119,12 +2107,10 @@
           user-select: none;
   -webkit-touch-callout: none;
   display: -webkit-box;
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   -webkit-box-orient: horizontal;
   -webkit-box-direction: normal;
-  -webkit-flex-flow: row nowrap;
       -ms-flex-flow: row nowrap;
           flex-flow: row nowrap;
 }
@@ -2133,7 +2119,6 @@
   vertical-align: top;
   cursor: pointer;
   -webkit-box-flex: 1;
-  -webkit-flex: 1 1 auto;
       -ms-flex: 1 1 auto;
           flex: 1 1 auto;
 }
@@ -2763,12 +2748,10 @@
 }
 .dx-gallery-item-image {
   max-width: 100%;
-  -webkit-align-self: flex-start;
-      -ms-flex-item-align: start;
-          align-self: flex-start;
-  -webkit-flex-shrink: 0;
-      -ms-flex-negative: 0;
-          flex-shrink: 0;
+  -ms-flex-item-align: start;
+      align-self: flex-start;
+  -ms-flex-negative: 0;
+      flex-shrink: 0;
   height: auto;
   margin: auto;
 }
@@ -2776,12 +2759,10 @@
   width: 100%;
   height: 100%;
   display: -webkit-box;
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   -webkit-box-orient: vertical;
   -webkit-box-direction: normal;
-  -webkit-flex-direction: column;
       -ms-flex-direction: column;
           flex-direction: column;
 }
@@ -3783,12 +3764,10 @@
 }
 .dx-gridbase-container {
   display: -webkit-box;
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   -webkit-box-orient: vertical;
   -webkit-box-direction: normal;
-  -webkit-flex-direction: column;
       -ms-flex-direction: column;
           flex-direction: column;
   height: 100%;
@@ -3797,7 +3776,6 @@
 }
 .dx-gridbase-container > * {
   -webkit-box-flex: 0;
-  -webkit-flex: 0 0 auto;
       -ms-flex: 0 0 auto;
           flex: 0 0 auto;
 }
@@ -4358,20 +4336,17 @@ input.dx-hidden {
 }
 .dx-gridbase-container > .dx-datagrid-rowsview {
   -webkit-box-flex: 1;
-  -webkit-flex: auto;
       -ms-flex: auto;
           flex: auto;
   height: auto;
 }
 .dx-gridbase-container > .dx-datagrid-rowsview.dx-scrollable {
   display: -webkit-box;
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
 }
 .dx-gridbase-container > .dx-datagrid-rowsview.dx-scrollable > .dx-scrollable-wrapper {
   -webkit-box-flex: 1;
-  -webkit-flex: 1;
       -ms-flex: 1;
           flex: 1;
   height: auto;
@@ -4605,16 +4580,13 @@ input.dx-hidden {
 .dx-datagrid-filter-panel,
 .dx-datagrid-filter-panel-left {
   display: -webkit-box;
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   -webkit-box-pack: justify;
-  -webkit-justify-content: space-between;
       -ms-flex-pack: justify;
           justify-content: space-between;
   -webkit-box-orient: horizontal;
   -webkit-box-direction: normal;
-  -webkit-flex-direction: row;
       -ms-flex-direction: row;
           flex-direction: row;
   min-width: 0;
@@ -4876,7 +4848,6 @@ input.dx-hidden {
   position: relative;
 }
 .dx-pivotgridfieldchooser .dx-pivotgridfieldchooser-container {
-  display: -webkit-flex;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -4884,61 +4855,50 @@ input.dx-hidden {
   height: 100%;
 }
 .dx-pivotgridfieldchooser .dx-pivotgridfieldchooser-container.dx-layout-0 {
-  -webkit-flex-direction: column;
   -webkit-box-orient: vertical;
   -webkit-box-direction: normal;
       -ms-flex-direction: column;
           flex-direction: column;
 }
 .dx-pivotgridfieldchooser .dx-pivotgridfieldchooser-container.dx-layout-2 {
-  -webkit-flex-direction: column;
   -webkit-box-orient: vertical;
   -webkit-box-direction: normal;
       -ms-flex-direction: column;
           flex-direction: column;
 }
 .dx-pivotgridfieldchooser .dx-pivotgridfieldchooser-container.dx-layout-2 .dx-row:nth-child(1) {
-  -webkit-flex-grow: 3;
   -webkit-box-flex: 3;
       -ms-flex-positive: 3;
           flex-grow: 3;
 }
 .dx-pivotgridfieldchooser .dx-pivotgridfieldchooser-container.dx-layout-2 .dx-row:nth-child(2) {
-  display: -webkit-flex;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
-  -webkit-flex-direction: row;
   -webkit-box-orient: horizontal;
   -webkit-box-direction: normal;
       -ms-flex-direction: row;
           flex-direction: row;
-  -webkit-flex-wrap: wrap;
-      -ms-flex-wrap: wrap;
-          flex-wrap: wrap;
-  -webkit-flex-grow: 4;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
   -webkit-box-flex: 4;
       -ms-flex-positive: 4;
           flex-grow: 4;
 }
 .dx-pivotgridfieldchooser .dx-col {
   width: 50%;
-  display: -webkit-flex;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
-  -webkit-flex-direction: column;
   -webkit-box-orient: vertical;
   -webkit-box-direction: normal;
       -ms-flex-direction: column;
           flex-direction: column;
 }
 .dx-pivotgridfieldchooser .dx-row {
-  display: -webkit-flex;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
-  -webkit-flex-direction: row;
   -webkit-box-orient: horizontal;
   -webkit-box-direction: normal;
       -ms-flex-direction: row;
@@ -4946,13 +4906,11 @@ input.dx-hidden {
   height: 0;
 }
 .dx-pivotgridfieldchooser .dx-pivotgridfieldchooser-container .dx-row:nth-child(1) {
-  -webkit-flex-grow: 2;
   -webkit-box-flex: 2;
       -ms-flex-positive: 2;
           flex-grow: 2;
 }
 .dx-pivotgridfieldchooser .dx-pivotgridfieldchooser-container .dx-row:nth-child(2) {
-  -webkit-flex-grow: 1;
   -webkit-box-flex: 1;
       -ms-flex-positive: 1;
           flex-grow: 1;
@@ -5524,20 +5482,17 @@ input.dx-hidden {
 }
 .dx-gridbase-container > .dx-treelist-rowsview {
   -webkit-box-flex: 1;
-  -webkit-flex: auto;
       -ms-flex: auto;
           flex: auto;
   height: auto;
 }
 .dx-gridbase-container > .dx-treelist-rowsview.dx-scrollable {
   display: -webkit-box;
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
 }
 .dx-gridbase-container > .dx-treelist-rowsview.dx-scrollable > .dx-scrollable-wrapper {
   -webkit-box-flex: 1;
-  -webkit-flex: 1;
       -ms-flex: 1;
           flex: 1;
   height: auto;
@@ -5771,16 +5726,13 @@ input.dx-hidden {
 .dx-treelist-filter-panel,
 .dx-treelist-filter-panel-left {
   display: -webkit-box;
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   -webkit-box-pack: justify;
-  -webkit-justify-content: space-between;
       -ms-flex-pack: justify;
           justify-content: space-between;
   -webkit-box-orient: horizontal;
   -webkit-box-direction: normal;
-  -webkit-flex-direction: row;
       -ms-flex-direction: row;
           flex-direction: row;
   min-width: 0;
@@ -5979,18 +5931,15 @@ input.dx-hidden {
 }
 .dx-menu-adaptive-mode-overlay-wrapper {
   display: -webkit-box;
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   -webkit-box-orient: horizontal;
   -webkit-box-direction: normal;
-  -webkit-flex-flow: row wrap;
       -ms-flex-flow: row wrap;
           flex-flow: row wrap;
 }
 .dx-menu-adaptive-mode-overlay-wrapper .dx-overlay-content {
   display: -webkit-box;
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   position: relative;
@@ -5998,7 +5947,6 @@ input.dx-hidden {
 .dx-menu-adaptive-mode-overlay-wrapper .dx-overlay-content .dx-treeview {
   height: auto;
   -webkit-box-flex: 1;
-  -webkit-flex: 1 1 auto;
       -ms-flex: 1 1 auto;
           flex: 1 1 auto;
 }
@@ -6685,7 +6633,6 @@ input.dx-hidden {
 }
 .dx-layout-manager .dx-label-h-align.dx-flex-layout {
   display: -webkit-box;
-  display: -webkit-flex;
   display: -moz-flex;
   display: -ms-flexbox;
   display: flex;
@@ -6695,20 +6642,16 @@ input.dx-hidden {
 }
 .dx-layout-manager .dx-label-h-align.dx-flex-layout .dx-field-item-content,
 .dx-layout-manager .dx-label-h-align.dx-flex-layout .dx-field-item-content-wrapper {
-  -webkit-flex-shrink: 1;
-      -ms-flex-negative: 1;
-          flex-shrink: 1;
+  -ms-flex-negative: 1;
+      flex-shrink: 1;
   -webkit-box-flex: 1;
-  -webkit-flex-grow: 1;
       -ms-flex-positive: 1;
           flex-grow: 1;
-  -webkit-flex-basis: auto;
-      -ms-flex-preferred-size: auto;
-          flex-basis: auto;
+  -ms-flex-preferred-size: auto;
+      flex-basis: auto;
   display: block;
 }
 .dx-layout-manager .dx-label-h-align.dx-flex-layout:not(.dx-field-item-label-align) {
-  -webkit-align-items: baseline;
   -webkit-box-align: baseline;
   -ms-flex-align: baseline;
       align-items: baseline;
@@ -6942,30 +6885,25 @@ input.dx-hidden {
   position: relative;
   overflow: hidden;
   -webkit-box-flex: 0;
-  -webkit-flex: 0 0 auto;
       -ms-flex: 0 0 auto;
           flex: 0 0 auto;
   height: 100%;
 }
 .dx-drawer-shrink .dx-drawer-wrapper {
   -webkit-box-flex: 1;
-  -webkit-flex: 1 0 auto;
       -ms-flex: 1 0 auto;
           flex: 1 0 auto;
   display: -webkit-box;
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   -webkit-box-orient: horizontal;
   -webkit-box-direction: normal;
-  -webkit-flex-direction: row;
       -ms-flex-direction: row;
           flex-direction: row;
 }
 .dx-drawer-shrink .dx-drawer-content {
   position: relative;
   -webkit-box-flex: 1;
-  -webkit-flex: 1 1 auto;
       -ms-flex: 1 1 auto;
           flex: 1 1 auto;
 }
@@ -6973,7 +6911,6 @@ input.dx-hidden {
 .dx-drawer-shrink.dx-drawer-bottom .dx-drawer-wrapper {
   -webkit-box-orient: vertical;
   -webkit-box-direction: normal;
-  -webkit-flex-direction: column;
       -ms-flex-direction: column;
           flex-direction: column;
 }
@@ -7000,12 +6937,10 @@ input.dx-hidden {
 }
 .dx-htmleditor {
   display: -webkit-box;
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   -webkit-box-orient: vertical;
   -webkit-box-direction: normal;
-  -webkit-flex-direction: column;
       -ms-flex-direction: column;
           flex-direction: column;
   border: 1px solid transparent;
@@ -7014,16 +6949,13 @@ input.dx-hidden {
   -webkit-box-sizing: border-box;
           box-sizing: border-box;
   display: -webkit-box;
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   -webkit-box-flex: 1;
-  -webkit-flex: 1;
       -ms-flex: 1;
           flex: 1;
-  -webkit-flex-basis: auto;
-      -ms-flex-preferred-size: auto;
-          flex-basis: auto;
+  -ms-flex-preferred-size: auto;
+      flex-basis: auto;
   min-height: 1px;
   margin: 0px;
   position: relative;

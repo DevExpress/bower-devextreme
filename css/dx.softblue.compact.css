@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 18.2.9
-* Build date: Jun 10, 2019
+* Version: 18.2.9 (build 19170)
+* Build date: Jun 19, 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -614,15 +614,12 @@
 }
 .dx-pivotgridfieldchooser .dx-area {
   padding: 5px;
-  display: -webkit-flex;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
-  -webkit-flex-grow: 1;
   -webkit-box-flex: 1;
       -ms-flex-positive: 1;
           flex-grow: 1;
-  -webkit-flex-direction: column;
   -webkit-box-orient: vertical;
   -webkit-box-direction: normal;
       -ms-flex-direction: column;
@@ -631,17 +628,14 @@
 .dx-pivotgridfieldchooser .dx-area > .dx-scrollable,
 .dx-pivotgridfieldchooser .dx-area > .dx-treeview,
 .dx-pivotgridfieldchooser .dx-area > .dx-treeview > .dx-scrollable {
-  display: -webkit-flex;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
   -webkit-box-flex: 1;
-  -webkit-flex-grow: 1;
       -ms-flex-positive: 1;
           flex-grow: 1;
   -webkit-box-orient: vertical;
   -webkit-box-direction: normal;
-  -webkit-flex-direction: column;
       -ms-flex-direction: column;
           flex-direction: column;
   height: 0;
@@ -649,17 +643,14 @@
 .dx-pivotgridfieldchooser .dx-area > .dx-scrollable > .dx-scrollable-wrapper,
 .dx-pivotgridfieldchooser .dx-area > .dx-treeview > .dx-scrollable-wrapper,
 .dx-pivotgridfieldchooser .dx-area > .dx-treeview > .dx-scrollable > .dx-scrollable-wrapper {
-  display: -webkit-flex;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
   -webkit-box-flex: 1;
-  -webkit-flex-grow: 1;
       -ms-flex-positive: 1;
           flex-grow: 1;
   -webkit-box-orient: vertical;
   -webkit-box-direction: normal;
-  -webkit-flex-direction: column;
       -ms-flex-direction: column;
           flex-direction: column;
   height: 0;
@@ -672,11 +663,9 @@
 .dx-pivotgridfieldchooser .dx-area .dx-area-fields {
   margin-top: 3px;
   border: 1px solid #e8eaeb;
-  display: -webkit-flex;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
-  -webkit-flex-direction: column;
   -webkit-box-orient: vertical;
   -webkit-box-direction: normal;
       -ms-flex-direction: column;
@@ -684,14 +673,12 @@
   height: 0;
 }
 .dx-pivotgridfieldchooser .dx-area-fields-header .dx-area-caption {
-  -webkit-align-self: center;
-      -ms-flex-item-align: center;
-          align-self: center;
+  -ms-flex-item-align: center;
+      align-self: center;
 }
 .dx-pivotgridfieldchooser .dx-area-fields[group] {
   padding: 5px;
   background-color: rgba(245, 245, 245, 0.7);
-  display: -webkit-flex;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -820,7 +807,6 @@
   margin-right: 5px;
 }
 .dx-rtl.dx-pivotgrid .dx-pivotgridfieldchooser-container .dx-col {
-  display: -webkit-flex;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -1086,6 +1072,10 @@
 .dx-invalid-message > .dx-overlay-content {
   color: #fff;
   background-color: #d9534f;
+}
+.dx-scheduler-win-no-touch .dx-scheduler-appointment {
+  -ms-touch-action: none;
+      touch-action: none;
 }
 .dx-filterbuilder {
   background-color: #fff;
@@ -2953,8 +2943,9 @@
   padding-bottom: 8px;
 }
 .dx-scrollable-customizable-scrollbars .dx-scrollable-container {
-  -ms-scrollbar-base-color: #fff;
-  -ms-scrollbar-arrow-color: #4b4b4b;
+  -ms-scrollbar-base-color: #757575;
+  -ms-scrollbar-arrow-color: #757575;
+  -ms-scrollbar-shadow-color: #fff;
   -ms-scrollbar-track-color: #fff;
 }
 .dx-scrollable-customizable-scrollbars .dx-scrollable-container::-webkit-scrollbar:horizontal {
@@ -3148,9 +3139,8 @@
 .dx-switch-on,
 .dx-switch-off {
   float: left;
-  -webkit-flex-shrink: 0;
-      -ms-flex-negative: 0;
-          flex-shrink: 0;
+  -ms-flex-negative: 0;
+      flex-shrink: 0;
   width: 50%;
   padding-right: 14px;
   line-height: 16px;
@@ -3173,12 +3163,10 @@
 .dx-switch-handle {
   position: relative;
   float: left;
-  -webkit-flex-basis: 14px;
-      -ms-flex-preferred-size: 14px;
-          flex-basis: 14px;
-  -webkit-flex-shrink: 0;
-      -ms-flex-negative: 0;
-          flex-shrink: 0;
+  -ms-flex-preferred-size: 14px;
+      flex-basis: 14px;
+  -ms-flex-negative: 0;
+      flex-shrink: 0;
   width: 14px;
   height: 14px;
   margin-top: 1px;
@@ -4739,12 +4727,10 @@
 .dx-device-phone .dx-dateview-rollers,
 .dx-dateview-compact .dx-dateview-rollers {
   display: -webkit-box;
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   -webkit-box-orient: horizontal;
   -webkit-box-direction: normal;
-  -webkit-flex-flow: row nowrap;
       -ms-flex-flow: row nowrap;
           flex-flow: row nowrap;
 }
@@ -9207,15 +9193,15 @@
 .dx-timeview-clock {
   min-height: 169px;
   min-width: 169px;
-  background: url("data:image/svg+xml;charset=UTF-8,%3C%3Fxml%20version%3D%221.0%22%20encoding%3D%22utf-8%22%3F%3E%0A%3C!--%20Generator%3A%20Adobe%20Illustrator%2016.0.3%2C%20SVG%20Export%20Plug-In%20.%20SVG%20Version%3A%206.00%20Build%200)%20%20--%3E%0A%3C!DOCTYPE%20svg%20PUBLIC%20%22-%2F%2FW3C%2F%2FDTD%20SVG%201.1%2F%2FEN%22%20%22http%3A%2F%2Fwww.w3.org%2FGraphics%2FSVG%2F1.1%2FDTD%2Fsvg11.dtd%22%3E%0A%3Csvg%20version%3D%221.1%22%20id%3D%22Layer_1%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20xmlns%3Axlink%3D%22http%3A%2F%2Fwww.w3.org%2F1999%2Fxlink%22%20x%3D%220px%22%20y%3D%220px%22%0A%09%20width%3D%22191px%22%20height%3D%22191px%22%20viewBox%3D%220%200%20191%20191%22%20enable-background%3D%22new%200%200%20191%20191%22%20xml%3Aspace%3D%22preserve%22%3E%0A%3Cpath%20fill%3D%22%23636363%22%20d%3D%22M95.5%2C0C42.8%2C0%2C0%2C42.8%2C0%2C95.5S42.8%2C191%2C95.5%2C191S191%2C148.2%2C191%2C95.5S148.2%2C0%2C95.5%2C0z%20M95.5%2C187.6%0A%09c-50.848%2C0-92.1-41.25-92.1-92.1c0-50.848%2C41.252-92.1%2C92.1-92.1c50.85%2C0%2C92.1%2C41.252%2C92.1%2C92.1%0A%09C187.6%2C146.35%2C146.35%2C187.6%2C95.5%2C187.6z%22%2F%3E%0A%3Cg%3E%0A%09%3Cpath%20fill%3D%22%23636363%22%20d%3D%22M92.9%2C10v8.6H91v-6.5c-0.1%2C0.1-0.2%2C0.2-0.4%2C0.3c-0.2%2C0.1-0.3%2C0.2-0.4%2C0.2c-0.1%2C0-0.3%2C0.1-0.5%2C0.2%0A%09%09c-0.2%2C0.1-0.3%2C0.1-0.5%2C0.1v-1.6c0.5-0.1%2C0.9-0.3%2C1.4-0.5c0.5-0.2%2C0.8-0.5%2C1.2-0.7h1.1V10z%22%2F%3E%0A%09%3Cpath%20fill%3D%22%23636363%22%20d%3D%22M97.1%2C17.1h3.602v1.5h-5.6V18c0-0.4%2C0.1-0.8%2C0.2-1.2c0.1-0.4%2C0.3-0.6%2C0.5-0.9c0.2-0.3%2C0.5-0.5%2C0.7-0.7%0A%09%09c0.2-0.2%2C0.5-0.4%2C0.7-0.6c0.199-0.2%2C0.5-0.3%2C0.6-0.5c0.102-0.2%2C0.301-0.3%2C0.5-0.5c0.2-0.2%2C0.2-0.3%2C0.301-0.5%0A%09%09c0.101-0.2%2C0.101-0.3%2C0.101-0.5c0-0.4-0.101-0.6-0.3-0.8c-0.2-0.2-0.4-0.3-0.801-0.3c-0.699%2C0-1.399%2C0.3-2.101%2C0.9v-1.6%0A%09%09c0.7-0.5%2C1.5-0.7%2C2.5-0.7c0.399%2C0%2C0.8%2C0.1%2C1.101%2C0.2c0.301%2C0.1%2C0.601%2C0.3%2C0.899%2C0.5c0.3%2C0.2%2C0.399%2C0.5%2C0.5%2C0.8%0A%09%09c0.101%2C0.3%2C0.2%2C0.6%2C0.2%2C1s-0.102%2C0.7-0.2%2C1c-0.099%2C0.3-0.3%2C0.6-0.5%2C0.8c-0.2%2C0.2-0.399%2C0.5-0.7%2C0.7c-0.3%2C0.2-0.5%2C0.4-0.8%2C0.6%0A%09%09c-0.2%2C0.1-0.399%2C0.3-0.5%2C0.4s-0.3%2C0.3-0.5%2C0.4s-0.2%2C0.3-0.3%2C0.4C97.1%2C17%2C97.1%2C17%2C97.1%2C17.1z%22%2F%3E%0A%3C%2Fg%3E%0A%3Cg%3E%0A%09%3Cpath%20fill%3D%22%23636363%22%20d%3D%22M15%2C95.4c0%2C0.7-0.1%2C1.4-0.2%2C2c-0.1%2C0.6-0.4%2C1.1-0.7%2C1.5C13.8%2C99.3%2C13.4%2C99.6%2C12.9%2C99.8s-1%2C0.3-1.5%2C0.3%0A%09%09c-0.7%2C0-1.3-0.1-1.8-0.3v-1.5c0.4%2C0.3%2C1%2C0.4%2C1.6%2C0.4c0.6%2C0%2C1.1-0.2%2C1.5-0.7c0.4-0.5%2C0.5-1.1%2C0.5-1.9l0%2C0%0A%09%09C12.8%2C96.7%2C12.3%2C96.9%2C11.5%2C96.9c-0.3%2C0-0.7-0.102-1-0.2c-0.3-0.101-0.5-0.3-0.8-0.5c-0.3-0.2-0.4-0.5-0.5-0.8%0A%09%09c-0.1-0.3-0.2-0.7-0.2-1c0-0.4%2C0.1-0.8%2C0.2-1.2c0.1-0.4%2C0.3-0.7%2C0.6-0.9c0.3-0.2%2C0.6-0.5%2C0.9-0.6c0.3-0.1%2C0.8-0.2%2C1.2-0.2%0A%09%09c0.5%2C0%2C0.9%2C0.1%2C1.2%2C0.3c0.3%2C0.2%2C0.7%2C0.4%2C0.9%2C0.8s0.5%2C0.7%2C0.6%2C1.2S15%2C94.8%2C15%2C95.4z%20M13.1%2C94.4c0-0.2%2C0-0.4-0.1-0.6%0A%09%09c-0.1-0.2-0.1-0.4-0.2-0.5c-0.1-0.1-0.2-0.2-0.4-0.3c-0.2-0.1-0.3-0.1-0.5-0.1c-0.2%2C0-0.3%2C0-0.4%2C0.1s-0.3%2C0.2-0.3%2C0.3%0A%09%09c0%2C0.1-0.2%2C0.3-0.2%2C0.4c0%2C0.1-0.1%2C0.4-0.1%2C0.6c0%2C0.2%2C0%2C0.4%2C0.1%2C0.6c0.1%2C0.2%2C0.1%2C0.3%2C0.2%2C0.4c0.1%2C0.1%2C0.2%2C0.2%2C0.4%2C0.3%0A%09%09c0.2%2C0.1%2C0.3%2C0.1%2C0.5%2C0.1c0.2%2C0%2C0.3%2C0%2C0.4-0.1s0.2-0.2%2C0.3-0.3c0.1-0.1%2C0.2-0.2%2C0.2-0.4C13%2C94.7%2C13.1%2C94.6%2C13.1%2C94.4z%22%2F%3E%0A%3C%2Fg%3E%0A%3Cg%3E%0A%09%3Cpath%20fill%3D%22%23636363%22%20d%3D%22M176%2C99.7V98.1c0.6%2C0.4%2C1.2%2C0.602%2C2%2C0.602c0.5%2C0%2C0.8-0.102%2C1.1-0.301c0.301-0.199%2C0.4-0.5%2C0.4-0.801%0A%09%09c0-0.398-0.2-0.699-0.5-0.898c-0.3-0.2-0.8-0.301-1.3-0.301h-0.802V95h0.701c1.101%2C0%2C1.601-0.4%2C1.601-1.1c0-0.7-0.4-1-1.302-1%0A%09%09c-0.6%2C0-1.1%2C0.2-1.6%2C0.5v-1.5c0.6-0.3%2C1.301-0.4%2C2.1-0.4c0.9%2C0%2C1.5%2C0.2%2C2%2C0.6s0.701%2C0.9%2C0.701%2C1.5c0%2C1.1-0.601%2C1.8-1.701%2C2.1l0%2C0%0A%09%09c0.602%2C0.1%2C1.102%2C0.3%2C1.4%2C0.6s0.5%2C0.8%2C0.5%2C1.3c0%2C0.801-0.3%2C1.4-0.9%2C1.9c-0.6%2C0.5-1.398%2C0.7-2.398%2C0.7%0A%09%09C177.2%2C100.1%2C176.5%2C100%2C176%2C99.7z%22%2F%3E%0A%3C%2Fg%3E%0A%3Cg%3E%0A%09%3Cpath%20fill%3D%22%23636363%22%20d%3D%22M98.5%2C179.102c0%2C0.398-0.1%2C0.799-0.2%2C1.199C98.2%2C180.7%2C98%2C181%2C97.7%2C181.2s-0.601%2C0.5-0.9%2C0.601%0A%09%09c-0.3%2C0.1-0.7%2C0.199-1.2%2C0.199c-0.5%2C0-0.9-0.1-1.3-0.3c-0.4-0.2-0.7-0.399-0.9-0.8c-0.2-0.4-0.5-0.7-0.6-1.2%0A%09%09c-0.1-0.5-0.2-1-0.2-1.601c0-0.699%2C0.1-1.399%2C0.3-2c0.2-0.601%2C0.4-1.101%2C0.8-1.5c0.4-0.399%2C0.7-0.699%2C1.2-1c0.5-0.3%2C1-0.3%2C1.6-0.3%0A%09%09c0.6%2C0%2C1.2%2C0.101%2C1.5%2C0.199v1.5c-0.4-0.199-0.9-0.399-1.4-0.399c-0.3%2C0-0.6%2C0.101-0.8%2C0.2c-0.2%2C0.101-0.5%2C0.3-0.7%2C0.5%0A%09%09c-0.2%2C0.199-0.3%2C0.5-0.4%2C0.8c-0.1%2C0.301-0.2%2C0.7-0.2%2C1.101l0%2C0c0.4-0.601%2C1-0.8%2C1.8-0.8c0.3%2C0%2C0.7%2C0.1%2C0.9%2C0.199%0A%09%09c0.2%2C0.101%2C0.5%2C0.301%2C0.7%2C0.5c0.199%2C0.2%2C0.398%2C0.5%2C0.5%2C0.801C98.5%2C178.2%2C98.5%2C178.7%2C98.5%2C179.102z%20M96.7%2C179.2%0A%09%09c0-0.899-0.4-1.399-1.1-1.399c-0.2%2C0-0.3%2C0-0.5%2C0.1c-0.2%2C0.101-0.3%2C0.201-0.4%2C0.301c-0.1%2C0.101-0.2%2C0.199-0.2%2C0.4%0A%09%09c0%2C0.199-0.1%2C0.299-0.1%2C0.5c0%2C0.199%2C0%2C0.398%2C0.1%2C0.6s0.1%2C0.3%2C0.2%2C0.5c0.1%2C0.199%2C0.2%2C0.199%2C0.4%2C0.3c0.2%2C0.101%2C0.3%2C0.101%2C0.5%2C0.101%0A%09%09c0.2%2C0%2C0.3%2C0%2C0.5-0.101c0.2-0.101%2C0.301-0.199%2C0.301-0.3c0-0.1%2C0.199-0.301%2C0.199-0.399C96.6%2C179.7%2C96.7%2C179.4%2C96.7%2C179.2z%22%2F%3E%0A%3C%2Fg%3E%0A%3Ccircle%20fill%3D%22%23636363%22%20cx%3D%2295%22%20cy%3D%2295%22%20r%3D%227%22%2F%3E%0A%3C%2Fsvg%3E%0A") no-repeat 50% 50%;
+  background: url("data:image/svg+xml;charset=UTF-8,%3C%3Fxml%20version%3D%221.0%22%20encoding%3D%22utf-8%22%3F%3E%0A%3C!DOCTYPE%20svg%20PUBLIC%20%22-%2F%2FW3C%2F%2FDTD%20SVG%201.1%2F%2FEN%22%20%22http%3A%2F%2Fwww.w3.org%2FGraphics%2FSVG%2F1.1%2FDTD%2Fsvg11.dtd%22%3E%0A%3Csvg%20version%3D%221.1%22%20id%3D%22Layer_1%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20xmlns%3Axlink%3D%22http%3A%2F%2Fwww.w3.org%2F1999%2Fxlink%22%20x%3D%220px%22%20y%3D%220px%22%0A%09%20width%3D%22191px%22%20height%3D%22191px%22%20viewBox%3D%220%200%20191%20191%22%20enable-background%3D%22new%200%200%20191%20191%22%20xml%3Aspace%3D%22preserve%22%3E%0A%3Cpath%20fill%3D%22%23636363%22%20d%3D%22M95.5%2C0C42.8%2C0%2C0%2C42.8%2C0%2C95.5S42.8%2C191%2C95.5%2C191S191%2C148.2%2C191%2C95.5S148.2%2C0%2C95.5%2C0z%20M95.5%2C187.6%0A%09c-50.848%2C0-92.1-41.25-92.1-92.1c0-50.848%2C41.252-92.1%2C92.1-92.1c50.85%2C0%2C92.1%2C41.252%2C92.1%2C92.1%0A%09C187.6%2C146.35%2C146.35%2C187.6%2C95.5%2C187.6z%22%2F%3E%0A%3Cg%3E%0A%09%3Cpath%20fill%3D%22%23636363%22%20d%3D%22M92.9%2C10v8.6H91v-6.5c-0.1%2C0.1-0.2%2C0.2-0.4%2C0.3c-0.2%2C0.1-0.3%2C0.2-0.4%2C0.2c-0.1%2C0-0.3%2C0.1-0.5%2C0.2%0A%09%09c-0.2%2C0.1-0.3%2C0.1-0.5%2C0.1v-1.6c0.5-0.1%2C0.9-0.3%2C1.4-0.5c0.5-0.2%2C0.8-0.5%2C1.2-0.7h1.1V10z%22%2F%3E%0A%09%3Cpath%20fill%3D%22%23636363%22%20d%3D%22M97.1%2C17.1h3.602v1.5h-5.6V18c0-0.4%2C0.1-0.8%2C0.2-1.2c0.1-0.4%2C0.3-0.6%2C0.5-0.9c0.2-0.3%2C0.5-0.5%2C0.7-0.7%0A%09%09c0.2-0.2%2C0.5-0.4%2C0.7-0.6c0.199-0.2%2C0.5-0.3%2C0.6-0.5c0.102-0.2%2C0.301-0.3%2C0.5-0.5c0.2-0.2%2C0.2-0.3%2C0.301-0.5%0A%09%09c0.101-0.2%2C0.101-0.3%2C0.101-0.5c0-0.4-0.101-0.6-0.3-0.8c-0.2-0.2-0.4-0.3-0.801-0.3c-0.699%2C0-1.399%2C0.3-2.101%2C0.9v-1.6%0A%09%09c0.7-0.5%2C1.5-0.7%2C2.5-0.7c0.399%2C0%2C0.8%2C0.1%2C1.101%2C0.2c0.301%2C0.1%2C0.601%2C0.3%2C0.899%2C0.5c0.3%2C0.2%2C0.399%2C0.5%2C0.5%2C0.8%0A%09%09c0.101%2C0.3%2C0.2%2C0.6%2C0.2%2C1s-0.102%2C0.7-0.2%2C1c-0.099%2C0.3-0.3%2C0.6-0.5%2C0.8c-0.2%2C0.2-0.399%2C0.5-0.7%2C0.7c-0.3%2C0.2-0.5%2C0.4-0.8%2C0.6%0A%09%09c-0.2%2C0.1-0.399%2C0.3-0.5%2C0.4s-0.3%2C0.3-0.5%2C0.4s-0.2%2C0.3-0.3%2C0.4C97.1%2C17%2C97.1%2C17%2C97.1%2C17.1z%22%2F%3E%0A%3C%2Fg%3E%0A%3Cg%3E%0A%09%3Cpath%20fill%3D%22%23636363%22%20d%3D%22M15%2C95.4c0%2C0.7-0.1%2C1.4-0.2%2C2c-0.1%2C0.6-0.4%2C1.1-0.7%2C1.5C13.8%2C99.3%2C13.4%2C99.6%2C12.9%2C99.8s-1%2C0.3-1.5%2C0.3%0A%09%09c-0.7%2C0-1.3-0.1-1.8-0.3v-1.5c0.4%2C0.3%2C1%2C0.4%2C1.6%2C0.4c0.6%2C0%2C1.1-0.2%2C1.5-0.7c0.4-0.5%2C0.5-1.1%2C0.5-1.9l0%2C0%0A%09%09C12.8%2C96.7%2C12.3%2C96.9%2C11.5%2C96.9c-0.3%2C0-0.7-0.102-1-0.2c-0.3-0.101-0.5-0.3-0.8-0.5c-0.3-0.2-0.4-0.5-0.5-0.8%0A%09%09c-0.1-0.3-0.2-0.7-0.2-1c0-0.4%2C0.1-0.8%2C0.2-1.2c0.1-0.4%2C0.3-0.7%2C0.6-0.9c0.3-0.2%2C0.6-0.5%2C0.9-0.6c0.3-0.1%2C0.8-0.2%2C1.2-0.2%0A%09%09c0.5%2C0%2C0.9%2C0.1%2C1.2%2C0.3c0.3%2C0.2%2C0.7%2C0.4%2C0.9%2C0.8s0.5%2C0.7%2C0.6%2C1.2S15%2C94.8%2C15%2C95.4z%20M13.1%2C94.4c0-0.2%2C0-0.4-0.1-0.6%0A%09%09c-0.1-0.2-0.1-0.4-0.2-0.5c-0.1-0.1-0.2-0.2-0.4-0.3c-0.2-0.1-0.3-0.1-0.5-0.1c-0.2%2C0-0.3%2C0-0.4%2C0.1s-0.3%2C0.2-0.3%2C0.3%0A%09%09c0%2C0.1-0.2%2C0.3-0.2%2C0.4c0%2C0.1-0.1%2C0.4-0.1%2C0.6c0%2C0.2%2C0%2C0.4%2C0.1%2C0.6c0.1%2C0.2%2C0.1%2C0.3%2C0.2%2C0.4c0.1%2C0.1%2C0.2%2C0.2%2C0.4%2C0.3%0A%09%09c0.2%2C0.1%2C0.3%2C0.1%2C0.5%2C0.1c0.2%2C0%2C0.3%2C0%2C0.4-0.1s0.2-0.2%2C0.3-0.3c0.1-0.1%2C0.2-0.2%2C0.2-0.4C13%2C94.7%2C13.1%2C94.6%2C13.1%2C94.4z%22%2F%3E%0A%3C%2Fg%3E%0A%3Cg%3E%0A%09%3Cpath%20fill%3D%22%23636363%22%20d%3D%22M176%2C99.7V98.1c0.6%2C0.4%2C1.2%2C0.602%2C2%2C0.602c0.5%2C0%2C0.8-0.102%2C1.1-0.301c0.301-0.199%2C0.4-0.5%2C0.4-0.801%0A%09%09c0-0.398-0.2-0.699-0.5-0.898c-0.3-0.2-0.8-0.301-1.3-0.301h-0.802V95h0.701c1.101%2C0%2C1.601-0.4%2C1.601-1.1c0-0.7-0.4-1-1.302-1%0A%09%09c-0.6%2C0-1.1%2C0.2-1.6%2C0.5v-1.5c0.6-0.3%2C1.301-0.4%2C2.1-0.4c0.9%2C0%2C1.5%2C0.2%2C2%2C0.6s0.701%2C0.9%2C0.701%2C1.5c0%2C1.1-0.601%2C1.8-1.701%2C2.1l0%2C0%0A%09%09c0.602%2C0.1%2C1.102%2C0.3%2C1.4%2C0.6s0.5%2C0.8%2C0.5%2C1.3c0%2C0.801-0.3%2C1.4-0.9%2C1.9c-0.6%2C0.5-1.398%2C0.7-2.398%2C0.7%0A%09%09C177.2%2C100.1%2C176.5%2C100%2C176%2C99.7z%22%2F%3E%0A%3C%2Fg%3E%0A%3Cg%3E%0A%09%3Cpath%20fill%3D%22%23636363%22%20d%3D%22M98.5%2C179.102c0%2C0.398-0.1%2C0.799-0.2%2C1.199C98.2%2C180.7%2C98%2C181%2C97.7%2C181.2s-0.601%2C0.5-0.9%2C0.601%0A%09%09c-0.3%2C0.1-0.7%2C0.199-1.2%2C0.199c-0.5%2C0-0.9-0.1-1.3-0.3c-0.4-0.2-0.7-0.399-0.9-0.8c-0.2-0.4-0.5-0.7-0.6-1.2%0A%09%09c-0.1-0.5-0.2-1-0.2-1.601c0-0.699%2C0.1-1.399%2C0.3-2c0.2-0.601%2C0.4-1.101%2C0.8-1.5c0.4-0.399%2C0.7-0.699%2C1.2-1c0.5-0.3%2C1-0.3%2C1.6-0.3%0A%09%09c0.6%2C0%2C1.2%2C0.101%2C1.5%2C0.199v1.5c-0.4-0.199-0.9-0.399-1.4-0.399c-0.3%2C0-0.6%2C0.101-0.8%2C0.2c-0.2%2C0.101-0.5%2C0.3-0.7%2C0.5%0A%09%09c-0.2%2C0.199-0.3%2C0.5-0.4%2C0.8c-0.1%2C0.301-0.2%2C0.7-0.2%2C1.101l0%2C0c0.4-0.601%2C1-0.8%2C1.8-0.8c0.3%2C0%2C0.7%2C0.1%2C0.9%2C0.199%0A%09%09c0.2%2C0.101%2C0.5%2C0.301%2C0.7%2C0.5c0.199%2C0.2%2C0.398%2C0.5%2C0.5%2C0.801C98.5%2C178.2%2C98.5%2C178.7%2C98.5%2C179.102z%20M96.7%2C179.2%0A%09%09c0-0.899-0.4-1.399-1.1-1.399c-0.2%2C0-0.3%2C0-0.5%2C0.1c-0.2%2C0.101-0.3%2C0.201-0.4%2C0.301c-0.1%2C0.101-0.2%2C0.199-0.2%2C0.4%0A%09%09c0%2C0.199-0.1%2C0.299-0.1%2C0.5c0%2C0.199%2C0%2C0.398%2C0.1%2C0.6s0.1%2C0.3%2C0.2%2C0.5c0.1%2C0.199%2C0.2%2C0.199%2C0.4%2C0.3c0.2%2C0.101%2C0.3%2C0.101%2C0.5%2C0.101%0A%09%09c0.2%2C0%2C0.3%2C0%2C0.5-0.101c0.2-0.101%2C0.301-0.199%2C0.301-0.3c0-0.1%2C0.199-0.301%2C0.199-0.399C96.6%2C179.7%2C96.7%2C179.4%2C96.7%2C179.2z%22%2F%3E%0A%3C%2Fg%3E%0A%3Ccircle%20fill%3D%22%23636363%22%20cx%3D%2295%22%20cy%3D%2295%22%20r%3D%227%22%2F%3E%0A%3C%2Fsvg%3E%0A") no-repeat 50% 50%;
   background-size: 161px;
 }
 .dx-timeview-hourarrow {
-  background-image: url("data:image/svg+xml;charset=UTF-8,%3C%3Fxml%20version%3D%221.0%22%20encoding%3D%22utf-8%22%3F%3E%0A%3C!--%20Generator%3A%20Adobe%20Illustrator%2016.0.3%2C%20SVG%20Export%20Plug-In%20.%20SVG%20Version%3A%206.00%20Build%200)%20%20--%3E%0A%3C!DOCTYPE%20svg%20PUBLIC%20%22-%2F%2FW3C%2F%2FDTD%20SVG%201.1%2F%2FEN%22%20%22http%3A%2F%2Fwww.w3.org%2FGraphics%2FSVG%2F1.1%2FDTD%2Fsvg11.dtd%22%3E%0A%3Csvg%20version%3D%221.1%22%20id%3D%22Layer_1%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20xmlns%3Axlink%3D%22http%3A%2F%2Fwww.w3.org%2F1999%2Fxlink%22%20x%3D%220px%22%20y%3D%220px%22%0A%09%20width%3D%225px%22%20height%3D%2257px%22%20viewBox%3D%220%200%205%2057%22%20enable-background%3D%22new%200%200%205%2057%22%20xml%3Aspace%3D%22preserve%22%3E%0A%3Cpath%20fill%3D%22%23636363%22%20d%3D%22M5%2C54c0%2C1.7-1.1%2C3-2.5%2C3S0%2C55.7%2C0%2C54V3c0-1.6%2C1.1-3%2C2.5-3S5%2C1.4%2C5%2C3V54z%22%2F%3E%0A%3C%2Fsvg%3E%0A");
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3C%3Fxml%20version%3D%221.0%22%20encoding%3D%22utf-8%22%3F%3E%0A%3C!DOCTYPE%20svg%20PUBLIC%20%22-%2F%2FW3C%2F%2FDTD%20SVG%201.1%2F%2FEN%22%20%22http%3A%2F%2Fwww.w3.org%2FGraphics%2FSVG%2F1.1%2FDTD%2Fsvg11.dtd%22%3E%0A%3Csvg%20version%3D%221.1%22%20id%3D%22Layer_1%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20xmlns%3Axlink%3D%22http%3A%2F%2Fwww.w3.org%2F1999%2Fxlink%22%20x%3D%220px%22%20y%3D%220px%22%0A%09%20width%3D%225px%22%20height%3D%2257px%22%20viewBox%3D%220%200%205%2057%22%20enable-background%3D%22new%200%200%205%2057%22%20xml%3Aspace%3D%22preserve%22%3E%0A%3Cpath%20fill%3D%22%23636363%22%20d%3D%22M5%2C54c0%2C1.7-1.1%2C3-2.5%2C3S0%2C55.7%2C0%2C54V3c0-1.6%2C1.1-3%2C2.5-3S5%2C1.4%2C5%2C3V54z%22%2F%3E%0A%3C%2Fsvg%3E%0A");
   background-size: 5px 37px;
 }
 .dx-timeview-minutearrow {
-  background-image: url("data:image/svg+xml;charset=UTF-8,%3C%3Fxml%20version%3D%221.0%22%20encoding%3D%22utf-8%22%3F%3E%0A%3C!--%20Generator%3A%20Adobe%20Illustrator%2016.0.3%2C%20SVG%20Export%20Plug-In%20.%20SVG%20Version%3A%206.00%20Build%200)%20%20--%3E%0A%3C!DOCTYPE%20svg%20PUBLIC%20%22-%2F%2FW3C%2F%2FDTD%20SVG%201.1%2F%2FEN%22%20%22http%3A%2F%2Fwww.w3.org%2FGraphics%2FSVG%2F1.1%2FDTD%2Fsvg11.dtd%22%3E%0A%3Csvg%20version%3D%221.1%22%20id%3D%22Layer_1%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20xmlns%3Axlink%3D%22http%3A%2F%2Fwww.w3.org%2F1999%2Fxlink%22%20x%3D%220px%22%20y%3D%220px%22%0A%09%20width%3D%225px%22%20height%3D%2279px%22%20viewBox%3D%220%200%205%2079%22%20enable-background%3D%22new%200%200%205%2079%22%20xml%3Aspace%3D%22preserve%22%3E%0A%3Cpath%20fill%3D%22%23636363%22%20d%3D%22M5%2C76c0%2C1.7-1.1%2C3-2.5%2C3S0%2C77.7%2C0%2C76V3c0-1.6%2C1.1-3%2C2.5-3S5%2C1.4%2C5%2C3V76z%22%2F%3E%0A%3C%2Fsvg%3E%0A");
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3C%3Fxml%20version%3D%221.0%22%20encoding%3D%22utf-8%22%3F%3E%0A%3C!DOCTYPE%20svg%20PUBLIC%20%22-%2F%2FW3C%2F%2FDTD%20SVG%201.1%2F%2FEN%22%20%22http%3A%2F%2Fwww.w3.org%2FGraphics%2FSVG%2F1.1%2FDTD%2Fsvg11.dtd%22%3E%0A%3Csvg%20version%3D%221.1%22%20id%3D%22Layer_1%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20xmlns%3Axlink%3D%22http%3A%2F%2Fwww.w3.org%2F1999%2Fxlink%22%20x%3D%220px%22%20y%3D%220px%22%0A%09%20width%3D%225px%22%20height%3D%2279px%22%20viewBox%3D%220%200%205%2079%22%20enable-background%3D%22new%200%200%205%2079%22%20xml%3Aspace%3D%22preserve%22%3E%0A%3Cpath%20fill%3D%22%23636363%22%20d%3D%22M5%2C76c0%2C1.7-1.1%2C3-2.5%2C3S0%2C77.7%2C0%2C76V3c0-1.6%2C1.1-3%2C2.5-3S5%2C1.4%2C5%2C3V76z%22%2F%3E%0A%3C%2Fsvg%3E%0A");
   background-size: 5px 69px;
 }
 .dx-timeview-format12 {
@@ -9454,12 +9440,10 @@
 .dx-scheduler-timeline-day.dx-scheduler-work-space-count .dx-scheduler-header-panel,
 .dx-scheduler-timeline-month .dx-scheduler-header-panel {
   display: -webkit-box;
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   -webkit-box-orient: horizontal;
   -webkit-box-direction: normal;
-  -webkit-flex-flow: row nowrap;
       -ms-flex-flow: row nowrap;
           flex-flow: row nowrap;
 }
@@ -9468,12 +9452,10 @@
 .dx-scheduler-timeline-day.dx-scheduler-work-space-count .dx-scheduler-header-panel thead,
 .dx-scheduler-timeline-month .dx-scheduler-header-panel thead {
   display: -webkit-box;
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   -webkit-box-orient: vertical;
   -webkit-box-direction: normal;
-  -webkit-flex-flow: column nowrap;
       -ms-flex-flow: column nowrap;
           flex-flow: column nowrap;
   width: 100%;
@@ -9483,12 +9465,10 @@
 .dx-scheduler-timeline-day.dx-scheduler-work-space-count .dx-scheduler-header-row,
 .dx-scheduler-timeline-month .dx-scheduler-header-row {
   display: -webkit-box;
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   -webkit-box-orient: horizontal;
   -webkit-box-direction: normal;
-  -webkit-flex-flow: row nowrap;
       -ms-flex-flow: row nowrap;
           flex-flow: row nowrap;
 }
@@ -9497,24 +9477,19 @@
 .dx-scheduler-timeline-day.dx-scheduler-work-space-count .dx-scheduler-header-panel-cell,
 .dx-scheduler-timeline-month .dx-scheduler-header-panel-cell {
   -webkit-box-flex: 1;
-  -webkit-flex-grow: 1;
       -ms-flex-positive: 1;
           flex-grow: 1;
   -webkit-box-pack: center;
-  -webkit-justify-content: center;
       -ms-flex-pack: center;
           justify-content: center;
   -webkit-box-align: center;
-  -webkit-align-items: center;
       -ms-flex-align: center;
           align-items: center;
   display: -webkit-box;
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   -webkit-box-orient: horizontal;
   -webkit-box-direction: normal;
-  -webkit-flex-flow: row nowrap;
       -ms-flex-flow: row nowrap;
           flex-flow: row nowrap;
 }
@@ -9522,9 +9497,8 @@
 .dx-scheduler-timeline-work-week .dx-scheduler-header-panel-week-cell,
 .dx-scheduler-timeline-day.dx-scheduler-work-space-count .dx-scheduler-header-panel-week-cell,
 .dx-scheduler-timeline-month .dx-scheduler-header-panel-week-cell {
-  -webkit-flex-basis: 0;
-      -ms-flex-preferred-size: 0;
-          flex-basis: 0;
+  -ms-flex-preferred-size: 0;
+      flex-basis: 0;
 }
 .dx-scheduler-timeline-week .dx-scheduler-header-row .dx-scheduler-header-panel-cell,
 .dx-scheduler-timeline-work-week .dx-scheduler-header-row .dx-scheduler-header-panel-cell,
@@ -9891,23 +9865,19 @@
 }
 .dx-scheduler-timeline .dx-scheduler-date-table {
   display: -webkit-box;
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   -webkit-box-orient: vertical;
   -webkit-box-direction: normal;
-  -webkit-flex-flow: column nowrap;
       -ms-flex-flow: column nowrap;
           flex-flow: column nowrap;
 }
 .dx-scheduler-timeline .dx-scheduler-date-table tbody {
   display: -webkit-box;
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   -webkit-box-orient: vertical;
   -webkit-box-direction: normal;
-  -webkit-flex-flow: column nowrap;
       -ms-flex-flow: column nowrap;
           flex-flow: column nowrap;
   height: 100%;
@@ -9915,35 +9885,28 @@
 }
 .dx-scheduler-timeline .dx-scheduler-date-table .dx-scheduler-date-table-row {
   display: -webkit-box;
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   -webkit-box-orient: horizontal;
   -webkit-box-direction: normal;
-  -webkit-flex-flow: row nowrap;
       -ms-flex-flow: row nowrap;
           flex-flow: row nowrap;
   -webkit-box-flex: 1;
-  -webkit-flex: 1;
       -ms-flex: 1;
           flex: 1;
 }
 .dx-scheduler-timeline .dx-scheduler-date-table .dx-scheduler-date-table-cell {
   display: -webkit-box;
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   -webkit-box-orient: horizontal;
   -webkit-box-direction: normal;
-  -webkit-flex-flow: row nowrap;
       -ms-flex-flow: row nowrap;
           flex-flow: row nowrap;
   -webkit-box-align: stretch;
-  -webkit-align-items: stretch;
       -ms-flex-align: stretch;
           align-items: stretch;
   -webkit-box-flex: 1;
-  -webkit-flex: 1 1 auto;
       -ms-flex: 1 1 auto;
           flex: 1 1 auto;
   height: inherit;
@@ -9952,58 +9915,47 @@
   border-spacing: 0;
   border-collapse: separate;
   display: -webkit-box;
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   -webkit-box-orient: vertical;
   -webkit-box-direction: normal;
-  -webkit-flex-flow: column nowrap;
       -ms-flex-flow: column nowrap;
           flex-flow: column nowrap;
 }
 .dx-scheduler-timeline .dx-scheduler-group-table tbody {
   display: -webkit-box;
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   -webkit-box-orient: vertical;
   -webkit-box-direction: normal;
-  -webkit-flex-flow: column nowrap;
       -ms-flex-flow: column nowrap;
           flex-flow: column nowrap;
   height: 100%;
 }
 .dx-scheduler-timeline .dx-scheduler-group-row {
   display: -webkit-box;
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   -webkit-box-orient: horizontal;
   -webkit-box-direction: normal;
-  -webkit-flex-flow: row nowrap;
       -ms-flex-flow: row nowrap;
           flex-flow: row nowrap;
   -webkit-box-flex: 1;
-  -webkit-flex: 1;
       -ms-flex: 1;
           flex: 1;
 }
 .dx-scheduler-timeline .dx-scheduler-group-header {
   display: -webkit-box;
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   -webkit-box-orient: horizontal;
   -webkit-box-direction: normal;
-  -webkit-flex-flow: row nowrap;
       -ms-flex-flow: row nowrap;
           flex-flow: row nowrap;
   -webkit-box-align: center;
-  -webkit-align-items: center;
       -ms-flex-align: center;
           align-items: center;
   -webkit-box-flex: 1;
-  -webkit-flex: 1 1 auto;
       -ms-flex: 1 1 auto;
           flex: 1 1 auto;
   padding: 0 10px 0 5px;
@@ -10018,7 +9970,6 @@
   overflow: visible;
   margin: auto;
   -webkit-box-flex: 1;
-  -webkit-flex-grow: 1;
       -ms-flex-positive: 1;
           flex-grow: 1;
 }
@@ -11458,49 +11409,40 @@
 }
 .dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline .dx-scheduler-header-panel {
   display: -webkit-box;
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   -webkit-box-orient: horizontal;
   -webkit-box-direction: normal;
-  -webkit-flex-flow: row nowrap;
       -ms-flex-flow: row nowrap;
           flex-flow: row nowrap;
 }
 .dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline .dx-scheduler-header-row,
 .dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline .dx-scheduler-group-row {
   display: -webkit-box;
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   -webkit-box-orient: horizontal;
   -webkit-box-direction: normal;
-  -webkit-flex-flow: row nowrap;
       -ms-flex-flow: row nowrap;
           flex-flow: row nowrap;
 }
 .dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline.dx-scheduler-work-space-grouped .dx-scheduler-group-header {
   -webkit-box-flex: 1;
-  -webkit-flex-grow: 1;
       -ms-flex-positive: 1;
           flex-grow: 1;
-  -webkit-flex-basis: 0;
-      -ms-flex-preferred-size: 0;
-          flex-basis: 0;
+  -ms-flex-preferred-size: 0;
+      flex-basis: 0;
   display: -webkit-box;
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   -webkit-box-orient: horizontal;
   -webkit-box-direction: normal;
-  -webkit-flex-flow: row nowrap;
       -ms-flex-flow: row nowrap;
           flex-flow: row nowrap;
 }
 .dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline.dx-scheduler-work-space-group-by-date .dx-scheduler-group-header {
-  -webkit-flex-basis: auto;
-      -ms-flex-preferred-size: auto;
-          flex-basis: auto;
+  -ms-flex-preferred-size: auto;
+      flex-basis: auto;
 }
 .dx-scheduler-work-space-horizontal-grouped.dx-scheduler-timeline:not(.dx-scheduler-work-space-group-by-date) .dx-scheduler-header-row .dx-scheduler-header-panel-cell {
   border-right: none;
@@ -11756,39 +11698,32 @@
   border-top: 1px solid rgba(232, 234, 235, 0.6);
   border-collapse: collapse;
   display: -webkit-box;
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   -webkit-box-orient: vertical;
   -webkit-box-direction: normal;
-  -webkit-flex-flow: column nowrap;
       -ms-flex-flow: column nowrap;
           flex-flow: column nowrap;
 }
 .dx-scheduler-work-space-vertical-grouped .dx-scheduler-work-space-vertical-group-table tbody {
   height: 100%;
   display: -webkit-box;
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   -webkit-box-orient: vertical;
   -webkit-box-direction: normal;
-  -webkit-flex-flow: column nowrap;
       -ms-flex-flow: column nowrap;
           flex-flow: column nowrap;
 }
 .dx-scheduler-work-space-vertical-grouped .dx-scheduler-group-row {
   display: -webkit-box;
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   -webkit-box-orient: horizontal;
   -webkit-box-direction: normal;
-  -webkit-flex-flow: row nowrap;
       -ms-flex-flow: row nowrap;
           flex-flow: row nowrap;
   -webkit-box-flex: 1;
-  -webkit-flex: 1;
       -ms-flex: 1;
           flex: 1;
 }
@@ -11797,16 +11732,13 @@
 }
 .dx-scheduler-work-space-vertical-grouped .dx-scheduler-group-header {
   display: -webkit-box;
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   -webkit-box-orient: horizontal;
   -webkit-box-direction: normal;
-  -webkit-flex-flow: row nowrap;
       -ms-flex-flow: row nowrap;
           flex-flow: row nowrap;
   -webkit-box-flex: 1;
-  -webkit-flex: 1 1 auto;
       -ms-flex: 1 1 auto;
           flex: 1 1 auto;
   height: auto;
@@ -11829,7 +11761,6 @@
   padding-top: 16px;
   overflow: visible;
   -webkit-box-flex: 1;
-  -webkit-flex-grow: 1;
       -ms-flex-positive: 1;
           flex-grow: 1;
 }

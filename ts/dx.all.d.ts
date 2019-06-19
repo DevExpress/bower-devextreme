@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.all.d.ts)
-* Version: 18.2.9
-* Build date: Mon Jun 10 2019
+* Version: 18.2.9 (build 19170)
+* Build date: Wed Jun 19 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -1268,7 +1268,7 @@ declare module DevExpress.data {
         /** Gets a data item with a specific key. */
         byKey(key: any | string | number): Promise<any> & JQueryPromise<any>;
         /** Gets an entity with a specific key. */
-        byKey(key: any | string | number, extraOptions: { expand?: string | Array<string> }): Promise<any> & JQueryPromise<any>;
+        byKey(key: any | string | number, extraOptions: { expand?: string | Array<string>, select?: string | Array<string> }): Promise<any> & JQueryPromise<any>;
         /** Creates a Query for the OData endpoint. */
         createQuery(loadOptions: any): any;
     }
