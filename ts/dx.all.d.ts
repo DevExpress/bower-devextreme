@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.all.d.ts)
-* Version: 19.1.3 (build 19151-2014)
-* Build date: Fri May 31 2019
+* Version: 19.1.4
+* Build date: Mon Jun 17 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -659,7 +659,7 @@ declare module DevExpress.ui {
         comparisonTarget?: (() => any);
         /** Specifies the operator to be used for comparing the validated value with the target. */
         comparisonType?: '!=' | '!==' | '<' | '<=' | '==' | '===' | '>' | '>=';
-        /** Specifies whether empty values are valid. */
+        /** If set to true, empty values are valid. */
         ignoreEmptyValue?: boolean;
         /** Specifies the message that is shown for end-users if the current rule is broken. */
         message?: string;
@@ -721,7 +721,7 @@ declare module DevExpress.ui {
         isValid?: boolean;
         /** A function that is executed after the widget's value is changed. */
         onValueChanged?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any, value?: any, previousValue?: any, jQueryEvent?: JQueryEventObject, event?: event }) => any);
-        /** A Boolean value specifying whether or not the widget is read-only. */
+        /** Specifies whether the editor is read-only. */
         readOnly?: boolean;
         /** Specifies information on the validation error when using a custom validation engine. Should be changed at runtime along with the isValid option. */
         validationError?: any;
@@ -739,7 +739,7 @@ declare module DevExpress.ui {
     }
     /** A validation rule that demands that the validated field match the Email pattern. */
     export interface EmailRule {
-        /** Specifies whether empty values are valid. */
+        /** If set to true, empty values are valid. */
         ignoreEmptyValue?: boolean;
         /** Specifies the message that is shown for end-users if the current rule is broken. */
         message?: string;
@@ -1259,7 +1259,7 @@ declare module DevExpress.ui {
     }
     /** A validation rule that demands that the validated field has a numeric value. */
     export interface NumericRule {
-        /** Specifies whether empty values are valid. */
+        /** If set to true, empty values are valid. */
         ignoreEmptyValue?: boolean;
         /** Specifies the message that is shown for end-users if the current rule is broken. */
         message?: string;
@@ -1275,7 +1275,7 @@ declare module DevExpress.ui {
     }
     /** A validation rule that demands that the validated field match a specified pattern. */
     export interface PatternRule {
-        /** Specifies whether empty values are valid. */
+        /** If set to true, empty values are valid. */
         ignoreEmptyValue?: boolean;
         /** Specifies the message that is shown for end-users if the current rule is broken. */
         message?: string;
@@ -1286,7 +1286,7 @@ declare module DevExpress.ui {
     }
     /** A validation rule that demands the target value be within the specified value range (including the range's end points). */
     export interface RangeRule {
-        /** Specifies whether empty values are valid. */
+        /** If set to true, empty values are valid. */
         ignoreEmptyValue?: boolean;
         /** Specifies the maximum value allowed for the validated value. */
         max?: Date | number;
@@ -1329,7 +1329,7 @@ declare module DevExpress.ui {
     }
     /** A validation rule that demands the target value length be within the specified value range (including the range's end points). */
     export interface StringLengthRule {
-        /** Specifies whether empty values are valid. */
+        /** If set to true, empty values are valid. */
         ignoreEmptyValue?: boolean;
         /** Specifies the maximum length allowed for the validated value. */
         max?: number;
@@ -1999,7 +1999,7 @@ declare module DevExpress.ui {
     
     export interface dxDiagramOptions extends WidgetOptions<dxDiagram> {
         
-        customShapes?: Array<{ allowHasText?: boolean, defaultHeight?: number, defaultWidth?: number, id?: number, svgUrl?: string, title?: string }>;
+        customShapes?: Array<{ allowHasText?: boolean, connectionPoints?: Array<{ side?: 'north' | 'east' | 'south' | 'west', x?: number, y?: number }>, defaultHeight?: number, defaultText?: string, defaultWidth?: number, id?: number, svgHeight?: number, svgLeft?: number, svgTop?: number, svgUrl?: string, svgWidth?: number, textHeight?: number, textLeft?: number, textTop?: number, textWidth?: number, title?: string }>;
         
         edges?: { dataSource?: Array<any> | DevExpress.data.DataSource | DevExpress.data.DataSourceOptions, fromExpr?: string | ((data: any) => any), keyExpr?: string | ((data: any) => any), toExpr?: string | ((data: any) => any) };
         
@@ -5299,7 +5299,7 @@ declare module DevExpress.data {
         /** Gets a data item with a specific key. */
         byKey(key: any | string | number): Promise<any> & JQueryPromise<any>;
         /** Gets an entity with a specific key. */
-        byKey(key: any | string | number, extraOptions: { expand?: string | Array<string> }): Promise<any> & JQueryPromise<any>;
+        byKey(key: any | string | number, extraOptions: { expand?: string | Array<string>, select?: string | Array<string> }): Promise<any> & JQueryPromise<any>;
         /** Creates a Query for the OData endpoint. */
         createQuery(loadOptions: any): any;
     }
@@ -7014,7 +7014,7 @@ declare module DevExpress.viz {
         /** Specifies the name of the value axis on which the value is specified. Useful for a multi-axis chart. */
         axis?: string;
         /** Configures the appearance of the annotation's border. */
-        border?: { color?: string, dashStyle?: 'dash' | 'dot' | 'longDash' | 'solid', opacity?: number, visible?: boolean, width?: number };
+        border?: { color?: string, cornerRadius?: number, dashStyle?: 'dash' | 'dot' | 'longDash' | 'solid', opacity?: number, visible?: boolean, width?: number };
         /** Specifies the color that fills the annotation. */
         color?: string;
         /** Customizes the text and appearance of the annotation's tooltip. */
