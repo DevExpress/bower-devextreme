@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.all.d.ts)
-* Version: 18.2.9 (build 19170)
-* Build date: Wed Jun 19 2019
+* Version: 18.2.9 (build 19184)
+* Build date: Wed Jul 03 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -5098,6 +5098,7 @@ declare module DevExpress.ui {
         format?: format;
         /** Configures the lookup field. */
         lookup?: { dataSource?: Array<any> | DevExpress.data.DataSourceOptions, valueExpr?: string | Function, displayExpr?: string | ((data: any) => any), allowClearing?: boolean };
+        name?: string;
         /** Specifies the true value text. Applies only if dataType is "boolean". */
         trueText?: string;
     }
