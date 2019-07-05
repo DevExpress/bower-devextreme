@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.all.d.ts)
-* Version: 19.1.4
-* Build date: Mon Jun 17 2019
+* Version: 19.1.4 (build 19186-1854)
+* Build date: Fri Jul 05 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -693,7 +693,7 @@ declare module DevExpress.ui {
         items?: Array<CollectionWidgetItem | any>;
         /** Specifies the currently selected value. May be an object if dataSource contains objects and valueExpr is not set. */
         value?: any;
-        /** Specifies which data field provides unique values to the widget's value. When the data field is not set, the value is the entire data object. */
+        /** Specifies which data field provides unique values to the widget's value. */
         valueExpr?: string | Function;
     }
     
@@ -910,12 +910,12 @@ declare module DevExpress.ui {
         selectTextOnEditStart?: boolean;
         /** Specifies whether a single or double click should switch a cell to the editing state. Applies if editing.mode is "cell" or "batch". */
         startEditAction?: 'click' | 'dblClick';
-        /** Overriden. */
+        /** Contains options that specify texts for editing-related UI elements. */
         texts?: GridBaseEditingTexts;
         /** Specifies whether the editing column uses icons instead of links. */
         useIcons?: boolean;
     }
-    /** Overriden. */
+    /** Contains options that specify texts for editing-related UI elements. */
     export interface GridBaseEditingTexts {
         /** Specifies text for a hint that appears when a user pauses on the global "Add" button. Applies only if editing.allowAdding is true. */
         addRow?: string;
@@ -1069,7 +1069,7 @@ declare module DevExpress.ui {
         isRowSelected(key: any): boolean;
         /** Gets a data object's key. */
         keyOf(obj: any): any;
-        /** Scrolls the grid to the row with the specified key. */
+        /** Navigates the grid to the data page that contains the row with the specified key and scrolls the grid to display the row if it is not in the viewport. */
         navigateToRow(key: any): void;
         /** Gets the total page count. */
         pageCount(): number;
@@ -1130,7 +1130,7 @@ declare module DevExpress.ui {
         allowSearch?: boolean;
         /** Specifies whether a user can sort rows by this column at runtime. Applies only if sorting.mode differs from "none". */
         allowSorting?: boolean;
-        /** Calculates custom values for column cells. */
+        /** Calculates custom cell values. Use this function to create an unbound data column. */
         calculateCellValue?: ((rowData: any) => any);
         /** Calculates custom display values for column cells. Requires specifying the dataField or calculateCellValue option. Used in lookup optimization. */
         calculateDisplayValue?: string | ((rowData: any) => any);
@@ -1998,30 +1998,30 @@ declare module DevExpress.ui {
     }
     
     export interface dxDiagramOptions extends WidgetOptions<dxDiagram> {
-        
+        /** An array of custom shapes. */
         customShapes?: Array<{ allowHasText?: boolean, connectionPoints?: Array<{ side?: 'north' | 'east' | 'south' | 'west', x?: number, y?: number }>, defaultHeight?: number, defaultText?: string, defaultWidth?: number, id?: number, svgHeight?: number, svgLeft?: number, svgTop?: number, svgUrl?: string, svgWidth?: number, textHeight?: number, textLeft?: number, textTop?: number, textWidth?: number, title?: string }>;
-        
+        /** An array of diagram edges. */
         edges?: { dataSource?: Array<any> | DevExpress.data.DataSource | DevExpress.data.DataSourceOptions, fromExpr?: string | ((data: any) => any), keyExpr?: string | ((data: any) => any), toExpr?: string | ((data: any) => any) };
-        
+        /** Configures export features. */
         export?: { fileName?: string, proxyUrl?: string };
-        
+        /** Specifies an auto-layout algorithm that the widget uses to build a diagram. */
         layout?: 'tree' | 'sugiyama';
-        
+        /** An array of diagram nodes. */
         nodes?: { dataSource?: Array<any> | DevExpress.data.DataSource | DevExpress.data.DataSourceOptions, itemsExpr?: string | ((data: any) => any), keyExpr?: string | ((data: any) => any), parentKeyExpr?: string | ((data: any) => any), textExpr?: string | ((data: any) => any), typeExpr?: string | ((data: any) => any) };
-        
+        /** A function that is executed when the diagram's data changes. */
         onDataChanged?: ((e: { component?: dxDiagram, element?: DevExpress.core.dxElement, model?: any, data?: string }) => any);
     }
     /** [tags] ctp The Diagram widget provides a visual interface to help you design new and modify existing diagrams. #include common-ctp-note with { component: "Diagram" } */
     export class dxDiagram extends Widget {
         constructor(element: Element, options?: dxDiagramOptions)
         constructor(element: JQuery, options?: dxDiagramOptions)
-        
+        /** Populates the toolbox with items from a data source. */
         createDataSource(parameters: DiagramDataSourceParameters): void;
-        
+        /** Removes data source items from the toolbox. */
         deleteDataSource(key: string): void;
-        
+        /** Gets the diagram data. */
         getData(): string;
-        
+        /** Sets the diagram data. */
         setData(data: string, updateExistingItemsOnly: boolean): void;
     }
     
@@ -2439,6 +2439,8 @@ declare module DevExpress.ui {
         format?: format;
         /** Configures the lookup field. */
         lookup?: { allowClearing?: boolean, dataSource?: Array<any> | DevExpress.data.DataSourceOptions, displayExpr?: string | ((data: any) => any), valueExpr?: string | Function };
+        
+        name?: string;
         /** Specifies the true value text. Applies only if dataType is "boolean". */
         trueText?: string;
     }
@@ -2983,7 +2985,7 @@ declare module DevExpress.ui {
         maxHeight?: number | string | (() => number | string);
         /** Specifies the maximum width the widget can reach while resizing. */
         maxWidth?: number | string | (() => number | string);
-        /** The text displayed in the load panel. */
+        /** Specifies the text displayed in the load panel. Ignored in the Material Design theme. */
         message?: string;
         /** Positions the widget. */
         position?: 'bottom' | 'center' | 'left' | 'left bottom' | 'left top' | 'right' | 'right bottom' | 'right top' | 'top' | positionConfig | Function;
@@ -5837,7 +5839,7 @@ declare module DevExpress.viz {
         /** Specifies an empty space between item rows in pixels. */
         rowItemSpacing?: number;
         /** Configures the legend title. */
-        title?: { font?: Font, margin?: { bottom?: number, top?: number }, placeholderSize?: number, subtitle?: { font?: Font, offset?: number, text?: string } | string, text?: string, verticalAlignment?: 'bottom' | 'top' } | string;
+        title?: { font?: Font, horizontalAlignment?: 'center' | 'left' | 'right', margin?: { bottom?: number, left?: number, right?: number, top?: number }, placeholderSize?: number, subtitle?: { font?: Font, offset?: number, text?: string } | string, text?: string, verticalAlignment?: 'bottom' | 'top' } | string;
         /** Along with horizontalAlignment, specifies the legend's position. */
         verticalAlignment?: 'bottom' | 'top';
         /** Specifies the legend's visibility. */
@@ -5978,6 +5980,8 @@ declare module DevExpress.viz {
         color?: string;
         /** Specifies the container in which to draw tooltips. The default container is the HTML DOM `` element. */
         container?: string | Element | JQuery;
+        
+        cornerRadius?: number;
         /** Enables tooltips. */
         enabled?: boolean;
         /** Specifies tooltips' font options. */
@@ -7005,6 +7009,8 @@ declare module DevExpress.viz {
     }
     
     export interface dxChartCommonAnnotationConfig {
+        
+        allowDragging?: boolean;
         /** Positions the annotation relative to a specific argument. */
         argument?: number | Date | string;
         /** Specifies the length of the annotation's arrow in pixels. */
@@ -7027,6 +7033,10 @@ declare module DevExpress.viz {
         height?: number;
         /** Configures the image to be displayed in the annotation. Applies only if the type is "image". */
         image?: string | { height?: number, url?: string, width?: number };
+        
+        offsetX?: number;
+        
+        offsetY?: number;
         /** Specifies the annotation's opacity. */
         opacity?: number;
         /** Along with paddingTopBottom, generates an empty space around the annotation's text or image; specified in pixels. */
@@ -8603,7 +8613,7 @@ declare module DevExpress.viz {
         hoverMode?: 'allArgumentPoints' | 'allSeriesPoints' | 'excludePoints' | 'includePoints' | 'nearestPoint' | 'none' | 'onlyPoint';
         /** An object defining configuration options for a hovered series. */
         hoverStyle?: { border?: { color?: string, dashStyle?: 'dash' | 'dot' | 'longDash' | 'solid', visible?: boolean, width?: number }, color?: string, dashStyle?: 'dash' | 'dot' | 'longDash' | 'solid', hatching?: { direction?: 'left' | 'none' | 'right', opacity?: number, step?: number, width?: number }, width?: number };
-        /** Specifies whether a chart ignores null data points or not. */
+        /** Specifies whether the series should ignore null data points. */
         ignoreEmptyPoints?: boolean;
         /** An object defining the label configuration options. */
         label?: dxPolarChartSeriesTypesCommonPolarChartSeriesLabel;
@@ -8884,7 +8894,7 @@ declare module DevExpress.viz {
         dataSource?: Array<any> | DevExpress.data.DataSource | DevExpress.data.DataSourceOptions | string;
         /** Sets a color for the boundary of both the first and last points on a sparkline. */
         firstLastColor?: string;
-        /** Specifies whether a sparkline ignores null data points or not. */
+        /** Specifies whether the sparkline should ignore null data points. */
         ignoreEmptyPoints?: boolean;
         /** Sets a color for a line on a sparkline. Available for the sparklines of the line- and area-like types. */
         lineColor?: string;
@@ -9181,7 +9191,7 @@ declare module DevExpress {
     export interface ComponentOptions<T = Component> {
         /** A function that is executed before the widget is disposed of. */
         onDisposing?: ((e: { component?: T }) => any);
-        /** A function that is executed only once, after the widget is initialized. */
+        /** A function used in JavaScript frameworks to save the widget instance. */
         onInitialized?: ((e: { component?: T, element?: DevExpress.core.dxElement }) => any);
         /** A function that is executed after a widget option is changed. */
         onOptionChanged?: ((e: { component?: T, name?: string, fullName?: string, value?: any }) => any);
@@ -9454,6 +9464,8 @@ declare module DevExpress {
         static notify(message: string, type?: string, displayTime?: number): void;
         /** Creates a toast message. */
         static notify(options: any, type?: string, displayTime?: number): void;
+        
+        static repaintFloatingActionButton(): void;
         /** Sets a template engine. */
         static setTemplateEngine(templateEngineName: string): void;
         /** Sets a custom template engine defined via custom compile and render functions. */

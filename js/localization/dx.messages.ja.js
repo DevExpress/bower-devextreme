@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.messages.ja.js)
-* Version: 19.1.4
-* Build date: Mon Jun 17 2019
+* Version: 19.1.4 (build 19186-1854)
+* Build date: Fri Jul 05 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -275,6 +275,7 @@
             "dxHtmlEditor-dialogImageHeightField": "\u9ad8\u3055 (px)",
             "dxHtmlEditor-heading": "\u898b\u51fa\u3057",
             "dxHtmlEditor-normalText": "\u6a19\u6e96\u30c6\u30ad\u30b9\u30c8",
+            "dxFileManager-newFolderName": "TODO",
             "dxFileManager-errorNoAccess": "TODO!",
             "dxFileManager-errorDirectoryExistsFormat": "TODO!",
             "dxFileManager-errorFileExistsFormat": "TODO!",
