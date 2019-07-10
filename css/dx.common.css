@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 19.1.4 (build 19186-1854)
-* Build date: Jul 5, 2019
+* Version: 19.1.4 (build 19191-0321)
+* Build date: Jul 10, 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -3232,6 +3232,9 @@
 .dx-tag {
   max-width: calc(100% - 1px);
   display: inline-block;
+  -webkit-align-self: flex-start;
+      -ms-flex-item-align: start;
+          align-self: flex-start;
 }
 .dx-tag-container.dx-texteditor-input-container {
   padding: 0;
@@ -6587,6 +6590,12 @@ input.dx-hidden {
   font-size: 12px;
   opacity: 0.8;
   margin-top: 10px;
+}
+.dx-scheduler .dx-scheduler-appointment-content-details {
+  margin-top: 2px;
+}
+.dx-scheduler .dx-scheduler-appointment-content-details .dx-scheduler-appointment-content-date {
+  line-height: 0.8;
 }
 .dx-scheduler .dx-scheduler-overlay-panel .dx-overlay-content {
   position: relative;
