@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 18.2.9 (build 19191)
-* Build date: Jul 10, 2019
+* Version: 18.2.10
+* Build date: Jul 29, 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -4906,7 +4906,8 @@
 .dx-toolbar-menu-section {
   border-bottom: 1px solid #343840;
 }
-.dx-toolbar-menu-section .dx-toolbar-hidden-button .dx-button-content {
+.dx-toolbar-menu-section .dx-toolbar-hidden-button .dx-button-content,
+.dx-toolbar-menu-section .dx-toolbar-item-auto-hide .dx-button-content {
   padding: 0;
 }
 .dx-toolbar-menu-section .dx-button-content {
