@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.messages.es.js)
-* Version: 19.1.4 (build 19191-0321)
-* Build date: Wed Jul 10 2019
+* Version: 19.1.5
+* Build date: Tue Jul 30 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -34,6 +34,7 @@
             Back: "Volver",
             OK: "Aceptar",
             "dxCollectionWidget-noDataText": "Sin datos para mostrar",
+            "dxDropDownEditor-selectLabel": "Seleccionar",
             "validation-required": "Obligatorio",
             "validation-required-formatted": "{0} es obligatorio",
             "validation-numeric": "Valor debe ser un n\xfamero",
@@ -274,7 +275,13 @@
             "dxHtmlEditor-dialogImageWidthField": "Anchura (px)",
             "dxHtmlEditor-dialogImageHeightField": "Altura (px)",
             "dxHtmlEditor-heading": "Encabezamiento",
-            "dxHtmlEditor-normalText": "Texto normal"
+            "dxHtmlEditor-normalText": "Texto normal",
+            "dxFileManager-newFolder": "Sin t\xedtulo",
+            "dxFileManager-errorNoAccess": "Acceso denegado. La operaci\xf3n no se puede completar.",
+            "dxFileManager-errorDirectoryExistsFormat": "Carpeta {0} ya existe.",
+            "dxFileManager-errorFileExistsFormat": "Archivo {0} ya existe.",
+            "dxFileManager-errorFileNotFoundFormat": "Archivo {0} no encontrado.",
+            "dxFileManager-errorDefault": "Error no especificado"
         }
     })
 });

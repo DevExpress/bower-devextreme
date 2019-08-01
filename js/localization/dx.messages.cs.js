@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.messages.cs.js)
-* Version: 19.1.4 (build 19191-0321)
-* Build date: Wed Jul 10 2019
+* Version: 19.1.5
+* Build date: Tue Jul 30 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -34,6 +34,7 @@
             Back: "Zp\u011bt",
             OK: "OK",
             "dxCollectionWidget-noDataText": "\u017d\xe1dn\xe1 data k zobrazen\xed",
+            "dxDropDownEditor-selectLabel": "V\xfdb\u011br",
             "validation-required": "povinn\xe9",
             "validation-required-formatted": "{0} je povinn\xfdch",
             "validation-numeric": "Hodnota mus\xed b\xfdt \u010d\xedslo",

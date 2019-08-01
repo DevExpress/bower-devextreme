@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.messages.it.js)
-* Version: 19.1.4 (build 19191-0321)
-* Build date: Wed Jul 10 2019
+* Version: 19.1.5
+* Build date: Tue Jul 30 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -34,6 +34,7 @@
             Back: "Indietro",
             OK: "OK",
             "dxCollectionWidget-noDataText": "Nessun dato da mostrare",
+            "dxDropDownEditor-selectLabel": "Seleziona",
             "validation-required": "Richiesto",
             "validation-required-formatted": "{0} \xe8 richiesto",
             "validation-numeric": "Il valore deve essere numerico",

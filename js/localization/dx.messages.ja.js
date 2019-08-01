@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.messages.ja.js)
-* Version: 19.1.4 (build 19191-0321)
-* Build date: Wed Jul 10 2019
+* Version: 19.1.5
+* Build date: Tue Jul 30 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -34,6 +34,7 @@
             Back: "\u623b\u308b",
             OK: "OK",
             "dxCollectionWidget-noDataText": "\u8868\u793a\u3059\u308b\u30c7\u30fc\u30bf\u304c\u3042\u308a\u307e\u305b\u3093\u3002",
+            "dxDropDownEditor-selectLabel": "\u9078\u629e",
             "validation-required": "\u5fc5\u9808",
             "validation-required-formatted": "{0} \u306f\u5fc5\u9808\u3067\u3059\u3002",
             "validation-numeric": "\u6570\u5024\u3092\u6307\u5b9a\u3057\u3066\u304f\u3060\u3055\u3044\u3002",
@@ -275,12 +276,12 @@
             "dxHtmlEditor-dialogImageHeightField": "\u9ad8\u3055 (px)",
             "dxHtmlEditor-heading": "\u898b\u51fa\u3057",
             "dxHtmlEditor-normalText": "\u6a19\u6e96\u30c6\u30ad\u30b9\u30c8",
-            "dxFileManager-newFolderName": "TODO",
-            "dxFileManager-errorNoAccess": "TODO!",
-            "dxFileManager-errorDirectoryExistsFormat": "TODO!",
-            "dxFileManager-errorFileExistsFormat": "TODO!",
-            "dxFileManager-errorFileNotFoundFormat": "TODO!",
-            "dxFileManager-errorDefault": "TODO!"
+            "dxFileManager-newFolderName": "\u7121\u984c\u306e\u30d5\u30a9\u30eb\u30c0",
+            "dxFileManager-errorNoAccess": "\u30a2\u30af\u30bb\u30b9\u304c\u62d2\u5426\u3055\u308c\u307e\u3057\u305f\u3002\u64cd\u4f5c\u3092\u5b8c\u4e86\u3067\u304d\u307e\u305b\u3093\u3002",
+            "dxFileManager-errorDirectoryExistsFormat": "\u30c7\u30a3\u30ec\u30af\u30c8\u30ea {0} \u306f\u65e2\u306b\u5b58\u5728\u3057\u307e\u3059\u3002",
+            "dxFileManager-errorFileExistsFormat": "\u30d5\u30a1\u30a4\u30eb {0} \u306f\u65e2\u306b\u5b58\u5728\u3057\u307e\u3059\u3002",
+            "dxFileManager-errorFileNotFoundFormat": "\u30d5\u30a1\u30a4\u30eb {0} \u304c\u898b\u3064\u304b\u308a\u307e\u305b\u3093\u3002",
+            "dxFileManager-errorDefault": "\u7279\u5b9a\u3067\u304d\u306a\u3044\u30a8\u30e9\u30fc"
         }
     })
 });

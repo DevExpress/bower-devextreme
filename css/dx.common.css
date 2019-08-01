@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 19.1.4 (build 19191-0321)
-* Build date: Jul 10, 2019
+* Version: 19.1.5
+* Build date: Jul 30, 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -477,6 +477,9 @@
 .dx-icon {
   background-position: 50% 50%;
 }
+.dx-svg-icon {
+  pointer-events: none;
+}
 .dx-color-scheme {
   font-family: "#";
 }
@@ -943,6 +946,9 @@
 }
 .dx-scrollable-simulated .dx-scrollable-content {
   overflow-anchor: none;
+}
+.dx-scrollable-simulated.dx-scrollable-disabled .dx-scrollable-scrollbar {
+  pointer-events: none;
 }
 .dx-scrollable-native.dx-scrollable-native-generic .dx-scrollview-top-pocket {
   position: absolute;

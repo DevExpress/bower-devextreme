@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 19.1.4 (build 19191-0321)
-* Build date: Jul 10, 2019
+* Version: 19.1.5
+* Build date: Jul 30, 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -203,6 +203,16 @@
   line-height: 1.33334;
 }
 .dx-datagrid-export-menu .dx-menu-item .dx-icon-exportxlsx {
+  width: 16px;
+  height: 16px;
+  background-position: 0px 0px;
+  background-size: 16px 16px;
+  padding: 0px;
+  font-size: 16px;
+  text-align: center;
+  line-height: 16px;
+}
+.dx-datagrid-export-menu .dx-menu-item .dx-icon-exportselected {
   width: 16px;
   height: 16px;
   background-position: 0px 0px;
@@ -5074,7 +5084,8 @@
 .dx-toolbar-menu-section {
   border-bottom: 1px solid #dee1e3;
 }
-.dx-toolbar-menu-section .dx-toolbar-hidden-button .dx-button-content {
+.dx-toolbar-menu-section .dx-toolbar-hidden-button .dx-button-content,
+.dx-toolbar-menu-section .dx-toolbar-item-auto-hide .dx-button-content {
   padding: 0;
 }
 .dx-toolbar-menu-section .dx-button-content {

@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.messages.ru.js)
-* Version: 19.1.4 (build 19191-0321)
-* Build date: Wed Jul 10 2019
+* Version: 19.1.5
+* Build date: Tue Jul 30 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -34,6 +34,7 @@
             Back: "\u041d\u0430\u0437\u0430\u0434",
             OK: "OK",
             "dxCollectionWidget-noDataText": "\u041d\u0435\u0442 \u0434\u0430\u043d\u043d\u044b\u0445 \u0434\u043b\u044f \u043e\u0442\u043e\u0431\u0440\u0430\u0436\u0435\u043d\u0438\u044f",
+            "dxDropDownEditor-selectLabel": "\u0412\u044b\u0431\u0440\u0430\u0442\u044c",
             "validation-required": "\u041f\u043e\u043b\u0435 \u043d\u0435\u043e\u0431\u0445\u043e\u0434\u0438\u043c\u043e \u0437\u0430\u043f\u043e\u043b\u043d\u0438\u0442\u044c",
             "validation-required-formatted": "\u041d\u0435\u043e\u0431\u0445\u043e\u0434\u0438\u043c\u043e \u0437\u0430\u043f\u043e\u043b\u043d\u0438\u0442\u044c: {0}",
             "validation-numeric": "\u0417\u043d\u0430\u0447\u0435\u043d\u0438\u0435 \u0434\u043e\u043b\u0436\u043d\u043e \u0431\u044b\u0442\u044c \u0447\u0438\u0441\u043b\u043e\u043c",
@@ -275,12 +276,12 @@
             "dxHtmlEditor-dialogImageHeightField": "\u0412\u044b\u0441\u043e\u0442\u0430 (px)",
             "dxHtmlEditor-heading": "\u0417\u0430\u0433\u043e\u043b\u043e\u0432\u043e\u043a",
             "dxHtmlEditor-normalText": "\u041e\u0431\u044b\u0447\u043d\u044b\u0439 \u0442\u0435\u043a\u0441\u0442",
-            "dxFileManager-newFolder": "TODO!",
-            "dxFileManager-errorNoAccess": "TODO!",
-            "dxFileManager-errorDirectoryExistsFormat": "TODO!",
-            "dxFileManager-errorFileExistsFormat": "TODO!",
-            "dxFileManager-errorFileNotFoundFormat": "TODO!",
-            "dxFileManager-errorDefault": "TODO!"
+            "dxFileManager-newFolder": "\u0411\u0435\u0437 \u043d\u0430\u0437\u0432\u0430\u043d\u0438\u044f",
+            "dxFileManager-errorNoAccess": "\u0414\u043e\u0441\u0442\u0443\u043f \u0437\u0430\u043f\u0440\u0435\u0449\u0451\u043d. \u041e\u043f\u0435\u0440\u0430\u0446\u0438\u044f \u043d\u0435 \u043c\u043e\u0436\u0435\u0442 \u0431\u044b\u0442\u044c \u0437\u0430\u0432\u0435\u0440\u0448\u0435\u043d\u0430.",
+            "dxFileManager-errorDirectoryExistsFormat": "\u041a\u0430\u0442\u0430\u043b\u043e\u0433 {0} \u0443\u0436\u0435 \u0441\u0443\u0449\u0435\u0441\u0442\u0432\u0443\u0435\u0442.",
+            "dxFileManager-errorFileExistsFormat": "\u0424\u0430\u0439\u043b {0} \u0443\u0436\u0435 \u0441\u0443\u0449\u0435\u0441\u0442\u0432\u0443\u0435\u0442.",
+            "dxFileManager-errorFileNotFoundFormat": "\u0424\u0430\u0439\u043b {0} \u043d\u0435 \u043d\u0430\u0439\u0434\u0435\u043d.",
+            "dxFileManager-errorDefault": "\u041d\u0435\u0438\u0437\u0432\u0435\u0441\u0442\u043d\u0430\u044f \u043e\u0448\u0438\u0431\u043a\u0430"
         }
     })
 });

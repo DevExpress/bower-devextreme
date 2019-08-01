@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.messages.nl.js)
-* Version: 19.1.4 (build 19191-0321)
-* Build date: Wed Jul 10 2019
+* Version: 19.1.5
+* Build date: Tue Jul 30 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -34,6 +34,7 @@
             Back: "Terug",
             OK: "OK",
             "dxCollectionWidget-noDataText": "Geen gegevens om te tonen",
+            "dxDropDownEditor-selectLabel": "Kiezen",
             "validation-required": "Verplicht",
             "validation-required-formatted": "{0} is verplicht",
             "validation-numeric": "Waarde moet numeriek zijn",

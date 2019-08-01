@@ -1,7 +1,7 @@
 /*!
  * DevExpress Diagram (dx-diagram)
- * Version: 0.0.29
- * Build date: Mon Jul 01 2019
+ * Version: 0.0.30
+ * Build date: Tue Jul 23 2019
  * 
  * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
  * Read about DevExpress licensing here: https://www.devexpress.com/Support/EULAs
@@ -1458,7 +1458,7 @@ var Graph_1 = __webpack_require__(34);
 var WideTree_1 = __webpack_require__(61);
 var Sugiyama_1 = __webpack_require__(40);
 var LayoutSettings_1 = __webpack_require__(18);
-var Base_1 = __webpack_require__(20);
+var Base_1 = __webpack_require__(19);
 var CloneShapeHistoryItem_1 = __webpack_require__(154);
 var CloneConnectorHistoryItem_1 = __webpack_require__(155);
 var ModelUtils = /** @class */ (function () {
@@ -1929,10 +1929,10 @@ var ModelChange_1 = __webpack_require__(48);
 var Event_1 = __webpack_require__(14);
 var Evt_1 = __webpack_require__(49);
 var Utils_1 = __webpack_require__(0);
-var Base_1 = __webpack_require__(20);
+var Base_1 = __webpack_require__(19);
 var UnitConverter_1 = __webpack_require__(13);
 var KeyCode_1 = __webpack_require__(16);
-var Browser_1 = __webpack_require__(19);
+var Browser_1 = __webpack_require__(20);
 var Shape_1 = __webpack_require__(9);
 var Connector_1 = __webpack_require__(5);
 var Utils_2 = __webpack_require__(26);
@@ -2500,7 +2500,7 @@ var ShapeDescription = /** @class */ (function () {
         if (!this.allowHasText || shape.text === undefined || shape.text === "")
             return [];
         var rect = this.getTextRectangle(shape.rectangle);
-        var clipPathId = !preventClipping && Utils_2.RenderUtils.getSvgElementId(shape.key, "clipText");
+        var clipPathId = !preventClipping && Utils_2.RenderUtils.generateSvgElementId("clipText");
         var textPoint = this.getTextPosition(rect, shape.styleText["text-anchor"]);
         return [
             new TextPrimitive_1.TextPrimitive(textPoint.x, textPoint.y, shape.text, rect.width, shape.styleText, false, clipPathId),
@@ -3151,224 +3151,7 @@ var Alignment;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var Browser = /** @class */ (function () {
-    function Browser() {
-    }
-    Browser.IdentUserAgent = function (userAgent, ignoreDocumentMode) {
-        if (ignoreDocumentMode === void 0) { ignoreDocumentMode = false; }
-        var browserTypesOrderedList = ["Mozilla", "IE", "Firefox", "Netscape", "Safari", "Chrome", "Opera", "Opera10", "Edge"];
-        var defaultBrowserType = "IE";
-        var defaultPlatform = "Win";
-        var defaultVersions = { Safari: 2, Chrome: 0.1, Mozilla: 1.9, Netscape: 8, Firefox: 2, Opera: 9, IE: 6, Edge: 12 };
-        if (!userAgent || userAgent.length == 0) {
-            Browser.fillUserAgentInfo(browserTypesOrderedList, defaultBrowserType, defaultVersions[defaultBrowserType], defaultPlatform);
-            return;
-        }
-        userAgent = userAgent.toLowerCase();
-        Browser.indentPlatformMajorVersion(userAgent);
-        try {
-            var platformIdentStrings = {
-                "Windows": "Win",
-                "Macintosh": "Mac",
-                "Mac OS": "Mac",
-                "Mac_PowerPC": "Mac",
-                "cpu os": "MacMobile",
-                "cpu iphone os": "MacMobile",
-                "Android": "Android",
-                "!Windows Phone": "WinPhone",
-                "!WPDesktop": "WinPhone",
-                "!ZuneWP": "WinPhone"
-            };
-            var optSlashOrSpace = "(?:/|\\s*)?";
-            var versionString = "(\\d+)(?:\\.((?:\\d+?[1-9])|\\d)0*?)?";
-            var optVersion = "(?:" + versionString + ")?";
-            var patterns = {
-                Safari: "applewebkit(?:.*?(?:version/" + versionString + "[\\.\\w\\d]*?(?:\\s+mobile\/\\S*)?\\s+safari))?",
-                Chrome: "(?:chrome|crios)(?!frame)" + optSlashOrSpace + optVersion,
-                Mozilla: "mozilla(?:.*rv:" + optVersion + ".*Gecko)?",
-                Netscape: "(?:netscape|navigator)\\d*/?\\s*" + optVersion,
-                Firefox: "firefox" + optSlashOrSpace + optVersion,
-                Opera: "(?:opera|\sopr)" + optSlashOrSpace + optVersion,
-                Opera10: "opera.*\\s*version" + optSlashOrSpace + optVersion,
-                IE: "msie\\s*" + optVersion,
-                Edge: "edge" + optSlashOrSpace + optVersion
-            };
-            var browserType;
-            var version = -1;
-            for (var i = 0; i < browserTypesOrderedList.length; i++) {
-                var browserTypeCandidate = browserTypesOrderedList[i];
-                var regExp = new RegExp(patterns[browserTypeCandidate], "i");
-                if (regExp.compile)
-                    regExp.compile(patterns[browserTypeCandidate], "i");
-                var matches = regExp.exec(userAgent);
-                if (matches && matches.index >= 0) {
-                    if (browserType == "IE" && version >= 11 && browserTypeCandidate == "Safari") // WinPhone8.1 update
-                        continue;
-                    browserType = browserTypeCandidate;
-                    if (browserType == "Opera10")
-                        browserType = "Opera";
-                    var tridentPattern = "trident" + optSlashOrSpace + optVersion;
-                    version = Browser.GetBrowserVersion(userAgent, matches, tridentPattern, Browser.getIECompatibleVersionString());
-                    if (browserType == "Mozilla" && version >= 11)
-                        browserType = "IE";
-                }
-            }
-            if (!browserType)
-                browserType = defaultBrowserType;
-            var browserVersionDetected = version != -1;
-            if (!browserVersionDetected)
-                version = defaultVersions[browserType];
-            var platform;
-            var minOccurenceIndex = Number.MAX_VALUE;
-            for (var identStr in platformIdentStrings) {
-                if (!platformIdentStrings.hasOwnProperty(identStr))
-                    continue;
-                var importantIdent = identStr.substr(0, 1) == "!";
-                var occurenceIndex = userAgent.indexOf((importantIdent ? identStr.substr(1) : identStr).toLowerCase());
-                if (occurenceIndex >= 0 && (occurenceIndex < minOccurenceIndex || importantIdent)) {
-                    minOccurenceIndex = importantIdent ? 0 : occurenceIndex;
-                    platform = platformIdentStrings[identStr];
-                }
-            }
-            var samsungPattern = "SM-[A-Z]";
-            var m = userAgent.toUpperCase().match(samsungPattern);
-            var isSamsungAndroidDevice = m && m.length > 0;
-            if (platform == "WinPhone" && version < 9)
-                version = Math.floor(Browser.getVersionFromTrident(userAgent, "trident" + optSlashOrSpace + optVersion));
-            if (!ignoreDocumentMode && browserType == "IE" && version > 7 && document.documentMode < version)
-                version = document.documentMode;
-            if (platform == "WinPhone")
-                version = Math.max(9, version);
-            if (!platform)
-                platform = defaultPlatform;
-            if (platform == platformIdentStrings["cpu os"] && !browserVersionDetected) // Terra browser
-                version = 4;
-            Browser.fillUserAgentInfo(browserTypesOrderedList, browserType, version, platform, isSamsungAndroidDevice);
-        }
-        catch (e) {
-            Browser.fillUserAgentInfo(browserTypesOrderedList, defaultBrowserType, defaultVersions[defaultBrowserType], defaultPlatform);
-        }
-    };
-    Browser.GetBrowserVersion = function (userAgent, matches, tridentPattern, ieCompatibleVersionString) {
-        var version = Browser.getVersionFromMatches(matches);
-        if (ieCompatibleVersionString) {
-            var versionFromTrident = Browser.getVersionFromTrident(userAgent, tridentPattern);
-            if (ieCompatibleVersionString === "edge" || parseInt(ieCompatibleVersionString) === versionFromTrident)
-                return versionFromTrident;
-        }
-        return version;
-    };
-    Browser.getIECompatibleVersionString = function () {
-        if (document.compatible) {
-            for (var i = 0; i < document.compatible.length; i++)
-                if (document.compatible[i].userAgent === "IE" && document.compatible[i].version)
-                    return document.compatible[i].version.toLowerCase();
-        }
-        return "";
-    };
-    Browser.fillUserAgentInfo = function (browserTypesOrderedList, browserType, version, platform, isSamsungAndroidDevice) {
-        if (isSamsungAndroidDevice === void 0) { isSamsungAndroidDevice = false; }
-        for (var i = 0; i < browserTypesOrderedList.length; i++) {
-            var type = browserTypesOrderedList[i];
-            Browser[type] = type == browserType;
-        }
-        Browser.Version = Math.floor(10.0 * version) / 10.0;
-        Browser.MajorVersion = Math.floor(Browser.Version);
-        Browser.WindowsPlatform = platform == "Win" || platform == "WinPhone";
-        Browser.MacOSPlatform = platform == "Mac";
-        Browser.MacOSMobilePlatform = platform == "MacMobile";
-        Browser.AndroidMobilePlatform = platform == "Android";
-        Browser.WindowsPhonePlatform = platform == "WinPhone";
-        Browser.WebKitFamily = Browser.Safari || Browser.Chrome || Browser.Opera && Browser.MajorVersion >= 15;
-        Browser.NetscapeFamily = Browser.Netscape || Browser.Mozilla || Browser.Firefox;
-        Browser.HardwareAcceleration = (Browser.IE && Browser.MajorVersion >= 9) || (Browser.Firefox && Browser.MajorVersion >= 4) ||
-            (Browser.AndroidMobilePlatform && Browser.Chrome) || (Browser.Chrome && Browser.MajorVersion >= 37) ||
-            (Browser.Safari && !Browser.WindowsPlatform) || Browser.Edge || (Browser.Opera && Browser.MajorVersion >= 46);
-        Browser.WebKitTouchUI = Browser.MacOSMobilePlatform || Browser.AndroidMobilePlatform;
-        var isIETouchUI = Browser.IE && Browser.MajorVersion > 9 && Browser.WindowsPlatform && Browser.UserAgent.toLowerCase().indexOf("touch") >= 0;
-        Browser.MSTouchUI = isIETouchUI || (Browser.Edge && !!window.navigator.maxTouchPoints);
-        Browser.TouchUI = Browser.WebKitTouchUI || Browser.MSTouchUI;
-        Browser.MobileUI = Browser.WebKitTouchUI || Browser.WindowsPhonePlatform;
-        Browser.AndroidDefaultBrowser = Browser.AndroidMobilePlatform && !Browser.Chrome;
-        Browser.AndroidChromeBrowser = Browser.AndroidMobilePlatform && Browser.Chrome;
-        if (isSamsungAndroidDevice)
-            Browser.SamsungAndroidDevice = isSamsungAndroidDevice;
-        if (Browser.MSTouchUI) {
-            var isARMArchitecture = Browser.UserAgent.toLowerCase().indexOf("arm;") > -1;
-            Browser.VirtualKeyboardSupported = isARMArchitecture || Browser.WindowsPhonePlatform;
-        }
-        else {
-            Browser.VirtualKeyboardSupported = Browser.WebKitTouchUI;
-        }
-        Browser.fillDocumentElementBrowserTypeClassNames(browserTypesOrderedList);
-    };
-    Browser.indentPlatformMajorVersion = function (userAgent) {
-        var regex = /(?:(?:windows nt|macintosh|mac os|cpu os|cpu iphone os|android|windows phone|linux) )(\d+)(?:[-0-9_.])*/;
-        var matches = regex.exec(userAgent);
-        if (matches)
-            Browser.PlaformMajorVersion = matches[1];
-    };
-    Browser.prototype.GetBrowserVersion = function (userAgent, matches, tridentPattern, ieCompatibleVersionString) {
-        var version = Browser.getVersionFromMatches(matches);
-        if (ieCompatibleVersionString) {
-            var versionFromTrident = Browser.getVersionFromTrident(userAgent, tridentPattern);
-            if (ieCompatibleVersionString === "edge" || parseInt(ieCompatibleVersionString) === versionFromTrident)
-                return versionFromTrident;
-        }
-        return version;
-    };
-    Browser.getVersionFromMatches = function (matches) {
-        var result = -1;
-        var versionStr = "";
-        if (matches[1]) {
-            versionStr += matches[1];
-            if (matches[2])
-                versionStr += "." + matches[2];
-        }
-        if (versionStr != "") {
-            result = parseFloat(versionStr);
-            if (isNaN(result))
-                result = -1;
-        }
-        return result;
-    };
-    Browser.getVersionFromTrident = function (userAgent, tridentPattern) {
-        var tridentDiffFromVersion = 4;
-        var matches = new RegExp(tridentPattern, "i").exec(userAgent);
-        return Browser.getVersionFromMatches(matches) + tridentDiffFromVersion;
-    };
-    Browser.fillDocumentElementBrowserTypeClassNames = function (browserTypesOrderedList) {
-        var documentElementClassName = "";
-        var browserTypeslist = browserTypesOrderedList.concat(["WindowsPlatform", "MacOSPlatform", "MacOSMobilePlatform", "AndroidMobilePlatform",
-            "WindowsPhonePlatform", "WebKitFamily", "WebKitTouchUI", "MSTouchUI", "TouchUI", "AndroidDefaultBrowser"]);
-        for (var i = 0; i < browserTypeslist.length; i++) {
-            var type = browserTypeslist[i];
-            if (Browser[type])
-                documentElementClassName += "dx" + type + " ";
-        }
-        documentElementClassName += "dxBrowserVersion-" + Browser.MajorVersion;
-        if (document && document.documentElement) {
-            if (document.documentElement.className != "")
-                documentElementClassName = " " + documentElementClassName;
-            document.documentElement.className += documentElementClassName;
-            Browser.Info = documentElementClassName;
-        }
-    };
-    Browser.UserAgent = window.navigator.userAgent.toLowerCase();
-    Browser._foo = Browser.IdentUserAgent(Browser.UserAgent); // to init
-    return Browser;
-}());
-exports.Browser = Browser;
-
-
-/***/ }),
-/* 20 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var Browser_1 = __webpack_require__(19);
+var Browser_1 = __webpack_require__(20);
 var Data_1 = __webpack_require__(102);
 var Str_1 = __webpack_require__(103);
 var Attr_1 = __webpack_require__(104);
@@ -4282,6 +4065,223 @@ exports.GetShortcutCodeByEvent = GetShortcutCodeByEvent;
 
 
 /***/ }),
+/* 20 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var Browser = /** @class */ (function () {
+    function Browser() {
+    }
+    Browser.IdentUserAgent = function (userAgent, ignoreDocumentMode) {
+        if (ignoreDocumentMode === void 0) { ignoreDocumentMode = false; }
+        var browserTypesOrderedList = ["Mozilla", "IE", "Firefox", "Netscape", "Safari", "Chrome", "Opera", "Opera10", "Edge"];
+        var defaultBrowserType = "IE";
+        var defaultPlatform = "Win";
+        var defaultVersions = { Safari: 2, Chrome: 0.1, Mozilla: 1.9, Netscape: 8, Firefox: 2, Opera: 9, IE: 6, Edge: 12 };
+        if (!userAgent || userAgent.length == 0) {
+            Browser.fillUserAgentInfo(browserTypesOrderedList, defaultBrowserType, defaultVersions[defaultBrowserType], defaultPlatform);
+            return;
+        }
+        userAgent = userAgent.toLowerCase();
+        Browser.indentPlatformMajorVersion(userAgent);
+        try {
+            var platformIdentStrings = {
+                "Windows": "Win",
+                "Macintosh": "Mac",
+                "Mac OS": "Mac",
+                "Mac_PowerPC": "Mac",
+                "cpu os": "MacMobile",
+                "cpu iphone os": "MacMobile",
+                "Android": "Android",
+                "!Windows Phone": "WinPhone",
+                "!WPDesktop": "WinPhone",
+                "!ZuneWP": "WinPhone"
+            };
+            var optSlashOrSpace = "(?:/|\\s*)?";
+            var versionString = "(\\d+)(?:\\.((?:\\d+?[1-9])|\\d)0*?)?";
+            var optVersion = "(?:" + versionString + ")?";
+            var patterns = {
+                Safari: "applewebkit(?:.*?(?:version/" + versionString + "[\\.\\w\\d]*?(?:\\s+mobile\/\\S*)?\\s+safari))?",
+                Chrome: "(?:chrome|crios)(?!frame)" + optSlashOrSpace + optVersion,
+                Mozilla: "mozilla(?:.*rv:" + optVersion + ".*Gecko)?",
+                Netscape: "(?:netscape|navigator)\\d*/?\\s*" + optVersion,
+                Firefox: "firefox" + optSlashOrSpace + optVersion,
+                Opera: "(?:opera|\sopr)" + optSlashOrSpace + optVersion,
+                Opera10: "opera.*\\s*version" + optSlashOrSpace + optVersion,
+                IE: "msie\\s*" + optVersion,
+                Edge: "edge" + optSlashOrSpace + optVersion
+            };
+            var browserType;
+            var version = -1;
+            for (var i = 0; i < browserTypesOrderedList.length; i++) {
+                var browserTypeCandidate = browserTypesOrderedList[i];
+                var regExp = new RegExp(patterns[browserTypeCandidate], "i");
+                if (regExp.compile)
+                    regExp.compile(patterns[browserTypeCandidate], "i");
+                var matches = regExp.exec(userAgent);
+                if (matches && matches.index >= 0) {
+                    if (browserType == "IE" && version >= 11 && browserTypeCandidate == "Safari") // WinPhone8.1 update
+                        continue;
+                    browserType = browserTypeCandidate;
+                    if (browserType == "Opera10")
+                        browserType = "Opera";
+                    var tridentPattern = "trident" + optSlashOrSpace + optVersion;
+                    version = Browser.GetBrowserVersion(userAgent, matches, tridentPattern, Browser.getIECompatibleVersionString());
+                    if (browserType == "Mozilla" && version >= 11)
+                        browserType = "IE";
+                }
+            }
+            if (!browserType)
+                browserType = defaultBrowserType;
+            var browserVersionDetected = version != -1;
+            if (!browserVersionDetected)
+                version = defaultVersions[browserType];
+            var platform;
+            var minOccurenceIndex = Number.MAX_VALUE;
+            for (var identStr in platformIdentStrings) {
+                if (!platformIdentStrings.hasOwnProperty(identStr))
+                    continue;
+                var importantIdent = identStr.substr(0, 1) == "!";
+                var occurenceIndex = userAgent.indexOf((importantIdent ? identStr.substr(1) : identStr).toLowerCase());
+                if (occurenceIndex >= 0 && (occurenceIndex < minOccurenceIndex || importantIdent)) {
+                    minOccurenceIndex = importantIdent ? 0 : occurenceIndex;
+                    platform = platformIdentStrings[identStr];
+                }
+            }
+            var samsungPattern = "SM-[A-Z]";
+            var m = userAgent.toUpperCase().match(samsungPattern);
+            var isSamsungAndroidDevice = m && m.length > 0;
+            if (platform == "WinPhone" && version < 9)
+                version = Math.floor(Browser.getVersionFromTrident(userAgent, "trident" + optSlashOrSpace + optVersion));
+            if (!ignoreDocumentMode && browserType == "IE" && version > 7 && document.documentMode < version)
+                version = document.documentMode;
+            if (platform == "WinPhone")
+                version = Math.max(9, version);
+            if (!platform)
+                platform = defaultPlatform;
+            if (platform == platformIdentStrings["cpu os"] && !browserVersionDetected) // Terra browser
+                version = 4;
+            Browser.fillUserAgentInfo(browserTypesOrderedList, browserType, version, platform, isSamsungAndroidDevice);
+        }
+        catch (e) {
+            Browser.fillUserAgentInfo(browserTypesOrderedList, defaultBrowserType, defaultVersions[defaultBrowserType], defaultPlatform);
+        }
+    };
+    Browser.GetBrowserVersion = function (userAgent, matches, tridentPattern, ieCompatibleVersionString) {
+        var version = Browser.getVersionFromMatches(matches);
+        if (ieCompatibleVersionString) {
+            var versionFromTrident = Browser.getVersionFromTrident(userAgent, tridentPattern);
+            if (ieCompatibleVersionString === "edge" || parseInt(ieCompatibleVersionString) === versionFromTrident)
+                return versionFromTrident;
+        }
+        return version;
+    };
+    Browser.getIECompatibleVersionString = function () {
+        if (document.compatible) {
+            for (var i = 0; i < document.compatible.length; i++)
+                if (document.compatible[i].userAgent === "IE" && document.compatible[i].version)
+                    return document.compatible[i].version.toLowerCase();
+        }
+        return "";
+    };
+    Browser.fillUserAgentInfo = function (browserTypesOrderedList, browserType, version, platform, isSamsungAndroidDevice) {
+        if (isSamsungAndroidDevice === void 0) { isSamsungAndroidDevice = false; }
+        for (var i = 0; i < browserTypesOrderedList.length; i++) {
+            var type = browserTypesOrderedList[i];
+            Browser[type] = type == browserType;
+        }
+        Browser.Version = Math.floor(10.0 * version) / 10.0;
+        Browser.MajorVersion = Math.floor(Browser.Version);
+        Browser.WindowsPlatform = platform == "Win" || platform == "WinPhone";
+        Browser.MacOSPlatform = platform == "Mac";
+        Browser.MacOSMobilePlatform = platform == "MacMobile";
+        Browser.AndroidMobilePlatform = platform == "Android";
+        Browser.WindowsPhonePlatform = platform == "WinPhone";
+        Browser.WebKitFamily = Browser.Safari || Browser.Chrome || Browser.Opera && Browser.MajorVersion >= 15;
+        Browser.NetscapeFamily = Browser.Netscape || Browser.Mozilla || Browser.Firefox;
+        Browser.HardwareAcceleration = (Browser.IE && Browser.MajorVersion >= 9) || (Browser.Firefox && Browser.MajorVersion >= 4) ||
+            (Browser.AndroidMobilePlatform && Browser.Chrome) || (Browser.Chrome && Browser.MajorVersion >= 37) ||
+            (Browser.Safari && !Browser.WindowsPlatform) || Browser.Edge || (Browser.Opera && Browser.MajorVersion >= 46);
+        Browser.WebKitTouchUI = Browser.MacOSMobilePlatform || Browser.AndroidMobilePlatform;
+        var isIETouchUI = Browser.IE && Browser.MajorVersion > 9 && Browser.WindowsPlatform && Browser.UserAgent.toLowerCase().indexOf("touch") >= 0;
+        Browser.MSTouchUI = isIETouchUI || (Browser.Edge && !!window.navigator.maxTouchPoints);
+        Browser.TouchUI = Browser.WebKitTouchUI || Browser.MSTouchUI;
+        Browser.MobileUI = Browser.WebKitTouchUI || Browser.WindowsPhonePlatform;
+        Browser.AndroidDefaultBrowser = Browser.AndroidMobilePlatform && !Browser.Chrome;
+        Browser.AndroidChromeBrowser = Browser.AndroidMobilePlatform && Browser.Chrome;
+        if (isSamsungAndroidDevice)
+            Browser.SamsungAndroidDevice = isSamsungAndroidDevice;
+        if (Browser.MSTouchUI) {
+            var isARMArchitecture = Browser.UserAgent.toLowerCase().indexOf("arm;") > -1;
+            Browser.VirtualKeyboardSupported = isARMArchitecture || Browser.WindowsPhonePlatform;
+        }
+        else {
+            Browser.VirtualKeyboardSupported = Browser.WebKitTouchUI;
+        }
+        Browser.fillDocumentElementBrowserTypeClassNames(browserTypesOrderedList);
+    };
+    Browser.indentPlatformMajorVersion = function (userAgent) {
+        var regex = /(?:(?:windows nt|macintosh|mac os|cpu os|cpu iphone os|android|windows phone|linux) )(\d+)(?:[-0-9_.])*/;
+        var matches = regex.exec(userAgent);
+        if (matches)
+            Browser.PlaformMajorVersion = matches[1];
+    };
+    Browser.prototype.GetBrowserVersion = function (userAgent, matches, tridentPattern, ieCompatibleVersionString) {
+        var version = Browser.getVersionFromMatches(matches);
+        if (ieCompatibleVersionString) {
+            var versionFromTrident = Browser.getVersionFromTrident(userAgent, tridentPattern);
+            if (ieCompatibleVersionString === "edge" || parseInt(ieCompatibleVersionString) === versionFromTrident)
+                return versionFromTrident;
+        }
+        return version;
+    };
+    Browser.getVersionFromMatches = function (matches) {
+        var result = -1;
+        var versionStr = "";
+        if (matches[1]) {
+            versionStr += matches[1];
+            if (matches[2])
+                versionStr += "." + matches[2];
+        }
+        if (versionStr != "") {
+            result = parseFloat(versionStr);
+            if (isNaN(result))
+                result = -1;
+        }
+        return result;
+    };
+    Browser.getVersionFromTrident = function (userAgent, tridentPattern) {
+        var tridentDiffFromVersion = 4;
+        var matches = new RegExp(tridentPattern, "i").exec(userAgent);
+        return Browser.getVersionFromMatches(matches) + tridentDiffFromVersion;
+    };
+    Browser.fillDocumentElementBrowserTypeClassNames = function (browserTypesOrderedList) {
+        var documentElementClassName = "";
+        var browserTypeslist = browserTypesOrderedList.concat(["WindowsPlatform", "MacOSPlatform", "MacOSMobilePlatform", "AndroidMobilePlatform",
+            "WindowsPhonePlatform", "WebKitFamily", "WebKitTouchUI", "MSTouchUI", "TouchUI", "AndroidDefaultBrowser"]);
+        for (var i = 0; i < browserTypeslist.length; i++) {
+            var type = browserTypeslist[i];
+            if (Browser[type])
+                documentElementClassName += "dx" + type + " ";
+        }
+        documentElementClassName += "dxBrowserVersion-" + Browser.MajorVersion;
+        if (document && document.documentElement) {
+            if (document.documentElement.className != "")
+                documentElementClassName = " " + documentElementClassName;
+            document.documentElement.className += documentElementClassName;
+            Browser.Info = documentElementClassName;
+        }
+    };
+    Browser.UserAgent = window.navigator.userAgent.toLowerCase();
+    Browser._foo = Browser.IdentUserAgent(Browser.UserAgent); // to init
+    return Browser;
+}());
+exports.Browser = Browser;
+
+
+/***/ }),
 /* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -4723,6 +4723,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var Event_1 = __webpack_require__(14);
 var __1 = __webpack_require__(46);
 var Utils_1 = __webpack_require__(0);
+var Base_1 = __webpack_require__(19);
 var RenderUtils = /** @class */ (function () {
     function RenderUtils() {
     }
@@ -4781,8 +4782,8 @@ var RenderUtils = /** @class */ (function () {
                 element.style.setProperty(elPropertyName, "");
         });
     };
-    RenderUtils.getSvgElementId = function (key, prefix, suffix) {
-        return prefix + (key || "") + (suffix || "");
+    RenderUtils.generateSvgElementId = function (prefix) {
+        return prefix + "_" + Base_1.CreateGuid();
     };
     RenderUtils.getSvgTextRectangle = function (textEl, lineWidth) {
         if (lineWidth === void 0) { lineWidth = 0; }
@@ -5845,14 +5846,18 @@ var DataSource = /** @class */ (function () {
                 result.getText = importer.getText;
             if (importer.setText)
                 result.setText = importer.setText;
-            if (importer.setType)
-                result.setType = importer.setType;
+            if (importer.getType)
+                result.getType = importer.getType;
             if (importer.setType)
                 result.setType = importer.setType;
             if (importer.getParentKey)
                 result.getParentKey = importer.getParentKey;
+            if (importer.setParentKey)
+                result.setParentKey = importer.setParentKey;
             if (importer.getItems)
                 result.getItems = importer.getItems;
+            if (importer.setItems)
+                result.setItems = importer.setItems;
         }
         return result;
     };
@@ -6867,11 +6872,11 @@ var GroupPrimitive_1 = __webpack_require__(183);
 var MaskPrimitive_1 = __webpack_require__(184);
 var TextFilterPrimitive_1 = __webpack_require__(72);
 var RenderManager_1 = __webpack_require__(10);
-var Browser_1 = __webpack_require__(19);
+var Browser_1 = __webpack_require__(20);
 var LinePrimitive_1 = __webpack_require__(69);
 var ExtensionLinesVisualizer_1 = __webpack_require__(92);
 var Utils_2 = __webpack_require__(26);
-var Base_1 = __webpack_require__(20);
+var Base_1 = __webpack_require__(19);
 var CanvasManager = /** @class */ (function () {
     function CanvasManager(svgElement) {
         this.itemSelectorGroupContainers = {};
@@ -6889,6 +6894,9 @@ var CanvasManager = /** @class */ (function () {
         this.connectionTargetElements = [];
         this.connectionMarkElements = [];
         this.extensionLineElements = [];
+        this.gridPatternId = Utils_2.RenderUtils.generateSvgElementId("gridPattern");
+        this.pagesGridPatternId = Utils_2.RenderUtils.generateSvgElementId("pagesGridPattern");
+        this.pagesGridClipId = Utils_2.RenderUtils.generateSvgElementId("pagesGridClip");
         this.initializeContainerElements(svgElement);
     }
     CanvasManager.prototype.initializeContainerElements = function (svgElement) {
@@ -7204,8 +7212,9 @@ var CanvasManager = /** @class */ (function () {
         return this.gridPatternElement;
     };
     CanvasManager.prototype.updateGridElements = function (visible, size) {
+        var _this = this;
         var gridRectPrimitive = new RectaglePrimitive_1.RectanglePrimitive("0", "0", "100%", "100%", null, null, null, function (element) {
-            element.style.setProperty("fill", "url('#" + CanvasManager.gridPatternId + "')");
+            element.style.setProperty("fill", "url('#" + _this.gridPatternId + "')");
         });
         var rectEl = this.getGridRectElement(gridRectPrimitive);
         if (!visible)
@@ -7228,7 +7237,7 @@ var CanvasManager = /** @class */ (function () {
                 innerPathCommands.push(new PathPrimitive_1.PathPrimitiveMoveToCommand("0", sizes[i].toString()));
                 innerPathCommands.push(new PathPrimitive_1.PathPrimitiveLineToCommand(sizes[4].toString(), sizes[i].toString()));
             }
-            var gridPatternPrimitive = new PatternPrimitive_1.PatternPrimitive(CanvasManager.gridPatternId, [
+            var gridPatternPrimitive = new PatternPrimitive_1.PatternPrimitive(this.gridPatternId, [
                 new PathPrimitive_1.PathPrimitive(outerPathCommands, null, "grid-outer-line"),
                 new PathPrimitive_1.PathPrimitive(innerPathCommands, null, "grid-inner-line")
             ], 0, 0, (size * 4 / this.svgWidth).toString(), (size * 4 / this.svgHeight).toString());
@@ -7251,8 +7260,9 @@ var CanvasManager = /** @class */ (function () {
         return this.pagesGridPatternElement;
     };
     CanvasManager.prototype.updatePagesGridElements = function (width, height) {
-        var pagesGridRectPrimitive = new RectaglePrimitive_1.RectanglePrimitive("0", "0", "100%", "100%", null, null, "pageGridClip", function (element) {
-            element.style.setProperty("fill", "url('#" + CanvasManager.pagesGridPatternId + "')");
+        var _this = this;
+        var pagesGridRectPrimitive = new RectaglePrimitive_1.RectanglePrimitive("0", "0", "100%", "100%", null, null, this.pagesGridClipId, function (element) {
+            element.style.setProperty("fill", "url('#" + _this.pagesGridPatternId + "')");
         });
         this.changePrimitiveElement(pagesGridRectPrimitive, this.getPagesGridRectElement(pagesGridRectPrimitive));
         var horPages = Math.round(this.svgWidth / width);
@@ -7262,11 +7272,11 @@ var CanvasManager = /** @class */ (function () {
             new PathPrimitive_1.PathPrimitiveLineToCommand((width - CanvasManager.pagesGridLineWidth / 2).toString(), (height - CanvasManager.pagesGridLineWidth / 2).toString()),
             new PathPrimitive_1.PathPrimitiveLineToCommand("0", (height - CanvasManager.pagesGridLineWidth / 2).toString())
         ];
-        var pagesGridPatternPrimitive = new PatternPrimitive_1.PatternPrimitive(CanvasManager.pagesGridPatternId, [
+        var pagesGridPatternPrimitive = new PatternPrimitive_1.PatternPrimitive(this.pagesGridPatternId, [
             new PathPrimitive_1.PathPrimitive(pageGridPathCommands, null, "pages-grid-line")
         ], 0, 0, ((horPages > 1) ? 1 / horPages : 1).toString(), ((verPages > 1) ? 1 / verPages : 1).toString());
         this.changePrimitiveElement(pagesGridPatternPrimitive, this.getPagesGridPatternElement(pagesGridPatternPrimitive));
-        var pagesGridClipPathPrimitive = new ClipPathPrimitive_1.ClipPathPrimitive("pageGridClip", [
+        var pagesGridClipPathPrimitive = new ClipPathPrimitive_1.ClipPathPrimitive(this.pagesGridClipId, [
             new RectaglePrimitive_1.RectanglePrimitive(0, 0, (this.svgWidth - CanvasManager.pagesGridLineWidth * 2).toString(), (this.svgHeight - CanvasManager.pagesGridLineWidth * 2).toString())
         ]);
         this.changePrimitiveElement(pagesGridClipPathPrimitive, this.getPagesGridClipPathElement(pagesGridClipPathPrimitive));
@@ -7519,8 +7529,8 @@ var CanvasManager = /** @class */ (function () {
             var offsetY = (difY < CanvasManager.connectorSelectionLineWidth ? CanvasManager.connectorSelectionLineWidth : 0);
             pathCommands.push(new PathPrimitive_1.PathPrimitiveLineToCommand(lastPt.x - offsetX, lastPt.y - offsetY));
         }
-        var maskId = Utils_2.RenderUtils.getSvgElementId(connector.key, "maskSel");
-        var cliPathId = Utils_2.RenderUtils.getSvgElementId(connector.key, "clipSel");
+        var maskId = Utils_2.RenderUtils.generateSvgElementId("maskSel");
+        var cliPathId = Utils_2.RenderUtils.generateSvgElementId("clipSel");
         var primitive = new GroupPrimitive_1.GroupPrimitive([
             new PathPrimitive_1.PathPrimitive(pathCommands, null, className, cliPathId, function (el) {
                 el.setAttribute("mask", "url(#" + maskId + ")");
@@ -7546,7 +7556,7 @@ var CanvasManager = /** @class */ (function () {
                 var text = connector.getText(textObj.position);
                 if (text && text !== "") {
                     var position = connector.getTextPoint(textObj.position);
-                    var filterId = Utils_2.RenderUtils.getSvgElementId(connector.key, "filterSel", "_" + index_1);
+                    var filterId = Utils_2.RenderUtils.generateSvgElementId("filterSel");
                     var textPrimitive = new GroupPrimitive_1.GroupPrimitive([
                         new TextPrimitive_1.TextPrimitive(position.x, position.y, text, undefined, connector.styleText, true, null, filterId),
                         new TextFilterPrimitive_1.TextFilterPrimitive(filterId, false)
@@ -7981,8 +7991,6 @@ var CanvasManager = /** @class */ (function () {
     CanvasManager.resizeInfoTextOffset = UnitConverter_1.UnitConverter.pixelsToTwips(2);
     CanvasManager.resizeInfoLineWidth = UnitConverter_1.UnitConverter.pixelsToTwips(1);
     CanvasManager.pagesGridLineWidth = 2;
-    CanvasManager.gridPatternId = "gridPattern";
-    CanvasManager.pagesGridPatternId = "pagesGridPattern";
     CanvasManager.base64Start = 'data:image/svg+xml;base64,';
     CanvasManager.exportStyleRules = [
         ".dxdi-canvas .shape ", ".dxdi-canvas .connector "
@@ -8070,7 +8078,7 @@ exports.ShapeType = ShapeType_1.ShapeType;
 exports.ShapeCategory = ShapeType_1.ShapeCategory;
 var UnitConverter_1 = __webpack_require__(13);
 exports.UnitConverter = UnitConverter_1.UnitConverter;
-var Browser_1 = __webpack_require__(19);
+var Browser_1 = __webpack_require__(20);
 exports.Browser = Browser_1.Browser;
 var DataSource_1 = __webpack_require__(37);
 exports.DataLayoutType = DataSource_1.DataLayoutType;
@@ -8263,9 +8271,9 @@ exports.PageChange = PageChange;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var Browser_1 = __webpack_require__(19);
+var Browser_1 = __webpack_require__(20);
 var TouchUIHelper_1 = __webpack_require__(70);
-var Base_1 = __webpack_require__(20);
+var Base_1 = __webpack_require__(19);
 var Evt = /** @class */ (function () {
     function Evt() {
     }
@@ -9706,8 +9714,8 @@ exports.LinePrimitive = LinePrimitive;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var Browser_1 = __webpack_require__(19);
-var Base_1 = __webpack_require__(20);
+var Browser_1 = __webpack_require__(20);
+var Base_1 = __webpack_require__(19);
 var TouchUIHelper = /** @class */ (function () {
     function TouchUIHelper() {
     }
@@ -11668,7 +11676,7 @@ exports.ChangeConnectorTextHistoryItem = ChangeConnectorTextHistoryItem;
 Object.defineProperty(exports, "__esModule", { value: true });
 var Utils_1 = __webpack_require__(0);
 var Evt_1 = __webpack_require__(49);
-var Base_1 = __webpack_require__(20);
+var Base_1 = __webpack_require__(19);
 var Toolbox = /** @class */ (function () {
     function Toolbox() {
         this.dragStartLimit = 3;
@@ -11843,7 +11851,7 @@ exports.MoveShapeHistoryItem = MoveShapeHistoryItem;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var Base_1 = __webpack_require__(20);
+var Base_1 = __webpack_require__(19);
 var Data = /** @class */ (function () {
     function Data() {
     }
@@ -12085,7 +12093,7 @@ exports.Data = Data;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var Base_1 = __webpack_require__(20);
+var Base_1 = __webpack_require__(19);
 var Str = /** @class */ (function () {
     function Str() {
     }
@@ -12167,7 +12175,7 @@ exports.Str = Str;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var Browser_1 = __webpack_require__(19);
+var Browser_1 = __webpack_require__(20);
 var Attr = /** @class */ (function () {
     function Attr() {
     }
@@ -15062,7 +15070,7 @@ var MultipleDocumentsShapeDescription = /** @class */ (function (_super) {
         rect = rect.inflate(-documentOffsetX, -documentOffsetY).offset(-documentOffsetX, -documentOffsetY);
         var rect1 = rect.offset(documentOffsetX, documentOffsetY);
         var rect2 = rect.offset(2 * documentOffsetX, 2 * documentOffsetY);
-        var clipPathId = Utils_1.RenderUtils.getSvgElementId(shape.key, "clipRect", "_");
+        var clipPathId = Utils_1.RenderUtils.generateSvgElementId("clipRect");
         var primitives = [];
         return primitives
             .concat(this.createDocumentPrimitives(rect, shape.style, clipPathId + "1", rect1))
@@ -17781,7 +17789,7 @@ var SetSelectionHistoryItem_1 = __webpack_require__(29);
 var ClipboardCommand_1 = __webpack_require__(65);
 var UnitConverter_1 = __webpack_require__(13);
 var ModelUtils_1 = __webpack_require__(8);
-var Browser_1 = __webpack_require__(19);
+var Browser_1 = __webpack_require__(20);
 var PasteSelectionCommand = /** @class */ (function (_super) {
     __extends(PasteSelectionCommand, _super);
     function PasteSelectionCommand() {
@@ -22518,7 +22526,7 @@ var DataToolboxManager = /** @class */ (function (_super) {
                 if (node) {
                     var evt = new Toolbox_1.DiagramDraggingEvent();
                     evt.item = node;
-                    evt.shapeType = ShapeType_1.ShapeType.Rectangle;
+                    evt.shapeType = node.type || ShapeType_1.ShapeType.Rectangle;
                     evt.dataSource = this.dataSource;
                     return new Toolbox_1.ToolboxDraggingObject(evt);
                 }

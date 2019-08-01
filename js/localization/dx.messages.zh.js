@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.messages.zh.js)
-* Version: 19.1.4 (build 19191-0321)
-* Build date: Wed Jul 10 2019
+* Version: 19.1.5
+* Build date: Tue Jul 30 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -34,6 +34,7 @@
             Back: "\u8fd4\u56de",
             OK: "\u786e\u5b9a",
             "dxCollectionWidget-noDataText": "\u6ca1\u6709\u8981\u663e\u793a\u7684\u6570\u636e",
+            "dxDropDownEditor-selectLabel": "\u9009\u62e9",
             "validation-required": "\u5fc5\u9700",
             "validation-required-formatted": "{0} \u662f\u5fc5\u9700\u7684",
             "validation-numeric": "\u503c\u5fc5\u987b\u662f\u4e00\u4e2a\u6570\u5b57",

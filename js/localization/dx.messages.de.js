@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.messages.de.js)
-* Version: 19.1.4 (build 19191-0321)
-* Build date: Wed Jul 10 2019
+* Version: 19.1.5
+* Build date: Tue Jul 30 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -34,6 +34,7 @@
             Back: "Zur\xfcck",
             OK: "OK",
             "dxCollectionWidget-noDataText": "Keine Daten verf\xfcgbar",
+            "dxDropDownEditor-selectLabel": "Ausw\xe4hlen",
             "validation-required": "Pflichtfeld",
             "validation-required-formatted": "{0} ist ein Pflichtfeld",
             "validation-numeric": "Der Wert muss eine Zahl sein",
@@ -275,12 +276,12 @@
             "dxHtmlEditor-dialogImageHeightField": "Bildh\xf6he (px)",
             "dxHtmlEditor-heading": "\xdcberschrift",
             "dxHtmlEditor-normalText": "Normaler Text",
-            "dxFileManager-newFolderName": "TODO!",
-            "dxFileManager-errorNoAccess": "TODO!",
-            "dxFileManager-errorDirectoryExistsFormat": "TODO!",
-            "dxFileManager-errorFileExistsFormat": "TODO!",
-            "dxFileManager-errorFileNotFoundFormat": "TODO!",
-            "dxFileManager-errorDefault": "TODO!"
+            "dxFileManager-newFolderName": "Ohne Titel",
+            "dxFileManager-errorNoAccess": "Zugriff verweigert. Die Operation kann nicht durchgef\xfchrt werden.",
+            "dxFileManager-errorDirectoryExistsFormat": "Ordner {0} existiert bereits.",
+            "dxFileManager-errorFileExistsFormat": "Datei {0} existiert bereits.",
+            "dxFileManager-errorFileNotFoundFormat": "Datei {0} wurde nicht gefunden.",
+            "dxFileManager-errorDefault": "Unbekannter Fehler"
         }
     })
 });

@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.all.d.ts)
-* Version: 19.1.4 (build 19191-0321)
-* Build date: Wed Jul 10 2019
+* Version: 19.1.5
+* Build date: Tue Jul 30 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -2107,7 +2107,7 @@ declare module DevExpress.ui {
         /** Specifies a custom template for drop-down menu items. */
         itemTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery);
         /** Provides drop-down menu items. */
-        items?: Array<CollectionWidgetItem | any>;
+        items?: Array<dxDropDownButtonItem | any>;
         /** Specifies which data field provides keys used to distinguish between the selected drop-down menu items. */
         keyExpr?: string;
         /** Specifies text or HTML markup displayed in the drop-down menu when it does not contain any items. */
@@ -2149,6 +2149,9 @@ declare module DevExpress.ui {
         toggle(): Promise<void> & JQueryPromise<void>;
         /** Opens or closes the drop-down menu, depending on the argument. */
         toggle(visibility: boolean): Promise<void> & JQueryPromise<void>;
+    }
+    
+    export interface dxDropDownButtonItem extends dxListItem {
     }
     
     export interface dxDropDownEditorOptions<T = dxDropDownEditor> extends dxTextBoxOptions<T> {
@@ -2507,7 +2510,7 @@ declare module DevExpress.ui {
         itemOption(id: string, options: any): void;
         /** Resets the editor's value to undefined. */
         resetValues(): void;
-        /** Updates formData fields and the corresponding editors. */
+        /** Merges the passed `data` object with formData. Matching properties in formData are overwritten and new properties added. */
         updateData(data: any): void;
         /** Updates a formData field and the corresponding editor. */
         updateData(dataField: string, value: any): void;
@@ -2605,7 +2608,7 @@ declare module DevExpress.ui {
         /** Specifies a name that identifies the form item. */
         name?: string;
         /** A template to be used for rendering the form item. */
-        template?: template | ((data: { component?: dxForm, dataField?: string, editorOptions?: any, editorType?: string }, itemElement: DevExpress.core.dxElement) => string | Element | JQuery);
+        template?: template | ((data: { component?: dxForm, dataField?: string, editorOptions?: any, editorType?: string, name?: string }, itemElement: DevExpress.core.dxElement) => string | Element | JQuery);
         /** An array of validation rules to be checked for the form item editor. */
         validationRules?: Array<RequiredRule | NumericRule | RangeRule | StringLengthRule | CustomRule | CompareRule | PatternRule | EmailRule>;
         /** Specifies whether or not the current form item is visible. */
