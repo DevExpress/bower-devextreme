@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.all.d.ts)
-* Version: 19.1.5
-* Build date: Tue Jul 30 2019
+* Version: 19.1.5 (build 19226-0309)
+* Build date: Wed Aug 14 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -953,7 +953,7 @@ declare module DevExpress.ui {
     export interface GridBaseScrolling {
         /** Specifies the rendering mode for columns. Applies when columns are left outside the viewport. Requires the columnWidth, columnAutoWidth, or width (for all columns) option specified. */
         columnRenderingMode?: 'standard' | 'virtual';
-        /** Specifies whether the widget should load pages adjacent to the current page. Applies only if scrolling.mode is "virtual". */
+        /** Specifies whether the widget should load adjacent pages. Applies only if scrolling.mode is "virtual" or "infinite". */
         preloadEnabled?: boolean;
         /** Specifies the rendering mode for loaded rows. */
         rowRenderingMode?: 'standard' | 'virtual';
@@ -2124,7 +2124,7 @@ declare module DevExpress.ui {
         selectedItem?: string | number | any;
         /** Contains the selected item's key and allows you to specify the initially selected item. Applies when useSelectMode is true. */
         selectedItemKey?: string | number;
-        
+        /** Specifies whether the arrow icon should be displayed. */
         showArrowIcon?: boolean;
         /** Specifies whether to split the button in two: one executes an action, the other opens and closes the drop-down menu. */
         splitButton?: boolean;
@@ -2150,7 +2150,7 @@ declare module DevExpress.ui {
         /** Opens or closes the drop-down menu, depending on the argument. */
         toggle(visibility: boolean): Promise<void> & JQueryPromise<void>;
     }
-    
+    /** This section describes object fields that can be used in the default item template. */
     export interface dxDropDownButtonItem extends dxListItem {
     }
     
@@ -2442,7 +2442,7 @@ declare module DevExpress.ui {
         format?: format;
         /** Configures the lookup field. */
         lookup?: { allowClearing?: boolean, dataSource?: Array<any> | DevExpress.data.DataSourceOptions, displayExpr?: string | ((data: any) => any), valueExpr?: string | Function };
-        
+        /** Specifies the field's name. Use it to distinguish the field from other fields when they have identical dataField values. */
         name?: string;
         /** Specifies the true value text. Applies only if dataType is "boolean". */
         trueText?: string;
@@ -2709,7 +2709,7 @@ declare module DevExpress.ui {
         /** Configures variables, which are placeholders to be replaced with actual values when processing text. */
         variables?: dxHtmlEditorVariables;
     }
-    /** [tags] ctp HtmlEditor is a WYSIWYG text editor build on top of Quill, designed to support HTML and Markdown output formats. #include common-ctp-note with { component: "HtmlEditor" } */
+    /** [tags] ctp HtmlEditor is a WYSIWYG editor that allows you to format textual and visual content and to output it in HTML or Markdown. HtmlEditor is built on top of and requires Quill. #include common-ctp-note with { component: "HtmlEditor" } */
     export class dxHtmlEditor extends Editor {
         constructor(element: Element, options?: dxHtmlEditorOptions)
         constructor(element: JQuery, options?: dxHtmlEditorOptions)
@@ -2949,7 +2949,7 @@ declare module DevExpress.ui {
         /** Updates the widget scrollbar according to widget content size. */
         updateDimensions(): Promise<void> & JQueryPromise<void>;
     }
-    /** This section lists the data source fields that are used in a default template for list items. */
+    /** This section describes object fields that can be used in the default item template. */
     export interface dxListItem extends CollectionWidgetItem {
         /** Specifies the text of a badge displayed for the list item. */
         badge?: string;
@@ -3333,7 +3333,7 @@ declare module DevExpress.ui {
         onShown?: ((e: { component?: T, element?: DevExpress.core.dxElement, model?: any }) => any);
         /** Positions the widget. */
         position?: any;
-        /** Specifies whether to shade the container when the widget is active. */
+        /** Specifies whether to shade the background when the widget is active. */
         shading?: boolean;
         /** Specifies the shading color. */
         shadingColor?: string;
@@ -3544,7 +3544,7 @@ declare module DevExpress.ui {
         hideEvent?: { delay?: number, name?: string } | string;
         /** An object defining widget positioning options. */
         position?: 'bottom' | 'left' | 'right' | 'top' | positionConfig;
-        /** Specifies whether to shade the container when the widget is active. */
+        /** Specifies whether to shade the background when the widget is active. */
         shading?: boolean;
         /** Specifies options for displaying the widget. */
         showEvent?: { delay?: number, name?: string } | string;
@@ -3891,7 +3891,7 @@ declare module DevExpress.ui {
         timeZone?: string;
         /** Specifies whether a user can switch views using tabs or a drop-down menu. */
         useDropDownViewSwitcher?: boolean;
-        /** Configures individual views. */
+        /** Specifies and configures the views to be available in the view switcher. */
         views?: Array<'day' | 'week' | 'workWeek' | 'month' | 'timelineDay' | 'timelineWeek' | 'timelineWorkWeek' | 'timelineMonth' | 'agenda' | { agendaDuration?: number, appointmentCollectorTemplate?: template | ((data: { appointmentCount?: number, isCompact?: boolean }, collectorElement: DevExpress.core.dxElement) => string | Element | JQuery), appointmentTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery), appointmentTooltipTemplate?: template | ((appointmentData: any, contentElement: DevExpress.core.dxElement, targetedAppointmentData: any, itemIndex: number) => string | Element | JQuery), cellDuration?: number, dataCellTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery), dateCellTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery), dropDownAppointmentTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery), endDayHour?: number, firstDayOfWeek?: 0 | 1 | 2 | 3 | 4 | 5 | 6, groupByDate?: boolean, groupOrientation?: 'horizontal' | 'vertical', groups?: Array<string>, intervalCount?: number, maxAppointmentsPerCell?: number | 'auto' | 'unlimited', name?: string, resourceCellTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery), startDate?: Date | number | string, startDayHour?: number, timeCellTemplate?: template | ((itemData: any, itemIndex: number, itemElement: DevExpress.core.dxElement) => string | Element | JQuery), type?: 'agenda' | 'day' | 'month' | 'timelineDay' | 'timelineMonth' | 'timelineWeek' | 'timelineWorkWeek' | 'week' | 'workWeek' }>;
     }
     /** The Scheduler is a widget that represents scheduled data and allows a user to manage and edit it. */
@@ -4513,7 +4513,7 @@ declare module DevExpress.ui {
         minWidth?: number | string | (() => number | string);
         /** Positions the widget. */
         position?: positionConfig | string;
-        /** Specifies whether to shade the container when the widget is active. */
+        /** Specifies whether to shade the background when the widget is active. */
         shading?: boolean;
         /** Specifies the Toast widget type. */
         type?: 'custom' | 'error' | 'info' | 'success' | 'warning';
@@ -4793,7 +4793,7 @@ declare module DevExpress.ui {
     export interface dxTreeViewOptions extends HierarchicalCollectionWidgetOptions<dxTreeView>, SearchBoxMixinOptions<dxTreeView> {
         /** Specifies whether or not to animate item collapsing and expanding. */
         animationEnabled?: boolean;
-        /** Allows you to load nodes. Applies if the dataStructure is "plain" and the dataSource and items are undefined. */
+        /** Allows you to load nodes on demand. */
         createChildren?: ((parentNode: dxTreeViewNode) => Promise<any> | JQueryPromise<any> | Array<any>);
         /** Notifies the widget of the used data structure. */
         dataStructure?: 'plain' | 'tree';
@@ -4843,7 +4843,7 @@ declare module DevExpress.ui {
         selectionMode?: 'multiple' | 'single';
         /** Specifies the current check boxes display mode. */
         showCheckBoxesMode?: 'none' | 'normal' | 'selectAll';
-        /** Specifies if the virtual mode is enabled. */
+        /** Enables the virtual mode in which nodes are loaded on demand. Use it to enhance the performance on large datasets. */
         virtualModeEnabled?: boolean;
     }
     /** The TreeView widget is a tree-like representation of textual data. */
@@ -5983,7 +5983,7 @@ declare module DevExpress.viz {
         color?: string;
         /** Specifies the container in which to draw tooltips. The default container is the HTML DOM `` element. */
         container?: string | Element | JQuery;
-        
+        /** Makes all the tooltip's corners rounded. */
         cornerRadius?: number;
         /** Enables tooltips. */
         enabled?: boolean;

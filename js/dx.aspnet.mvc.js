@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.aspnet.mvc.js)
-* Version: 19.1.5
-* Build date: Tue Jul 30 2019
+* Version: 19.1.5 (build 19226-0309)
+* Build date: Wed Aug 14 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -103,12 +103,12 @@
 
     function createComponent(name, options, id, validatorOptions) {
         var render = function(_, container) {
+            templateRendered.remove(render);
             var selector = "#" + id.replace(/[^\w-]/g, "\\$&"),
                 $component = $(selector, container)[name](options);
             if ($.isPlainObject(validatorOptions)) {
                 $component.dxValidator(validatorOptions)
             }
-            templateRendered.remove(render)
         };
         templateRendered.add(render)
     }

@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 19.1.5
-* Build date: Jul 30, 2019
+* Version: 19.1.5 (build 19226-0309)
+* Build date: Aug 14, 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -1513,6 +1513,8 @@
 .dx-placeholder:before {
   display: inline-block;
   vertical-align: middle;
+  max-width: 100%;
+  text-overflow: ellipsis;
   overflow: hidden;
   content: attr(DATA-DX_PLACEHOLDER);
   pointer-events: none;
@@ -2029,6 +2031,7 @@
   display: block;
   overflow: auto;
   white-space: pre-wrap;
+  margin: 0;
 }
 .dx-textarea .dx-texteditor-input-auto-resize {
   overflow-y: hidden;
@@ -2328,6 +2331,9 @@
 }
 .dx-overlay-wrapper {
   top: 0;
+  pointer-events: none;
+  width: 100%;
+  height: 100%;
   left: 0;
   z-index: 1000;
 }
@@ -2346,9 +2352,11 @@
 }
 .dx-overlay-shader {
   background-color: rgba(128, 128, 128, 0.5);
+  pointer-events: auto;
 }
 .dx-overlay-content {
   position: absolute;
+  pointer-events: auto;
   z-index: 1000;
   outline: 0;
   overflow: hidden;
@@ -2507,6 +2515,13 @@
 }
 .dx-dialog-message {
   padding: 10px 10px 5px 10px;
+}
+.dx-prevent-safari-scrolling {
+  position: fixed;
+  margin: 0;
+  left: 0;
+  right: 0;
+  top: 0;
 }
 .dx-popover-wrapper .dx-popover-arrow:after {
   width: 14.14227125px;
@@ -3733,6 +3748,9 @@
 }
 .dx-colorbox-input-container.dx-colorbox-color-is-not-defined .dx-colorbox-color-result-preview {
   border: none;
+}
+.dx-colorbox-input-container .dx-placeholder:before {
+  max-width: calc(100% - 25px);
 }
 .dx-colorbox .dx-texteditor-input-container:before {
   content: "";
@@ -5971,7 +5989,6 @@ input.dx-hidden {
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  position: relative;
 }
 .dx-menu-adaptive-mode-overlay-wrapper .dx-overlay-content .dx-treeview {
   height: auto;
