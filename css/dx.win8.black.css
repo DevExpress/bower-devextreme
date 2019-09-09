@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 18.2.10 (build 19233)
-* Build date: Aug 21, 2019
+* Version: 18.2.10 (build 19252)
+* Build date: Sep 9, 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -2136,16 +2136,16 @@
 .dx-icon-fontsize:before {
   content: "\f07c";
 }
-.dx-icon-growfont {
-  font: 14px/1 DXIcons;
-}
-.dx-icon-growfont:before {
-  content: "\f07d";
-}
 .dx-icon-shrinkfont {
   font: 14px/1 DXIcons;
 }
 .dx-icon-shrinkfont:before {
+  content: "\f07d";
+}
+.dx-icon-growfont {
+  font: 14px/1 DXIcons;
+}
+.dx-icon-growfont:before {
   content: "\f07e";
 }
 .dx-icon-color {
