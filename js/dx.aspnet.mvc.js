@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.aspnet.mvc.js)
-* Version: 19.1.5 (build 19226-0309)
-* Build date: Wed Aug 14 2019
+* Version: 19.1.6
+* Build date: Wed Sep 11 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -17,6 +17,7 @@
     }
 }(function($, setTemplateEngine, templateRendered, Guid, validationEngine, iteratorUtils, extractTemplateMarkup, encodeHtml) {
     var templateCompiler = createTemplateCompiler();
+    var pendingCreateComponentRoutines = [];
 
     function createTemplateCompiler() {
         var OPEN_TAG = "<%",
@@ -102,16 +103,21 @@
     }
 
     function createComponent(name, options, id, validatorOptions) {
-        var render = function(_, container) {
-            templateRendered.remove(render);
-            var selector = "#" + id.replace(/[^\w-]/g, "\\$&"),
-                $component = $(selector, container)[name](options);
+        var selector = "#" + id.replace(/[^\w-]/g, "\\$&");
+        pendingCreateComponentRoutines.push(function() {
+            var $component = $(selector)[name](options);
             if ($.isPlainObject(validatorOptions)) {
                 $component.dxValidator(validatorOptions)
             }
-        };
-        templateRendered.add(render)
+        })
     }
+    templateRendered.add(function() {
+        var snapshot = pendingCreateComponentRoutines.slice();
+        pendingCreateComponentRoutines = [];
+        snapshot.forEach(function(func) {
+            func()
+        })
+    });
     return {
         createComponent: createComponent,
         renderComponent: function(name, options, id, validatorOptions) {

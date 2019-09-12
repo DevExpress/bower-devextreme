@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 19.1.5 (build 19226-0309)
-* Build date: Aug 14, 2019
+* Version: 19.1.6
+* Build date: Sep 11, 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -2376,16 +2376,16 @@
 .dx-icon-fontsize:before {
   content: "\f07c";
 }
-.dx-icon-growfont {
-  font: 14px/1 DXIcons;
-}
-.dx-icon-growfont:before {
-  content: "\f07d";
-}
 .dx-icon-shrinkfont {
   font: 14px/1 DXIcons;
 }
 .dx-icon-shrinkfont:before {
+  content: "\f07d";
+}
+.dx-icon-growfont {
+  font: 14px/1 DXIcons;
+}
+.dx-icon-growfont:before {
   content: "\f07e";
 }
 .dx-icon-color {
@@ -3354,9 +3354,6 @@
 .dx-editor-underlined .dx-texteditor-buttons-container > .dx-button {
   height: 29px;
   margin: 0 5px 3px;
-}
-.dx-editor-underlined .dx-texteditor-buttons-container > .dx-button .dx-button-content {
-  padding-bottom: 3px;
 }
 .dx-editor-underlined .dx-texteditor-buttons-container:first-child > .dx-button:first-child {
   margin-left: 0;
@@ -6852,9 +6849,6 @@
 .dx-lookup.dx-editor-underlined .dx-lookup-field {
   padding: 7px 0 6px;
 }
-.dx-lookup.dx-state-focused:before {
-  content: none;
-}
 .dx-lookup.dx-invalid {
   border-bottom-color: rgba(244, 67, 54, 0.4);
 }
@@ -6882,6 +6876,22 @@
 }
 .dx-lookup-field {
   font-size: 16px;
+}
+.dx-lookup-field .dx-texteditor {
+  border: none;
+}
+.dx-lookup-field .dx-texteditor:before,
+.dx-lookup-field .dx-texteditor:after {
+  content: none;
+}
+.dx-lookup-field .dx-texteditor.dx-state-hover,
+.dx-lookup-field .dx-texteditor.dx-state-focused,
+.dx-lookup-field .dx-texteditor.dx-state-active,
+.dx-lookup-field .dx-texteditor.dx-state-disabled,
+.dx-lookup-field .dx-texteditor.dx-state-readonly,
+.dx-lookup-field .dx-texteditor.dx-state-readonly.dx-state-hover,
+.dx-lookup-field .dx-texteditor {
+  background-color: transparent;
 }
 .dx-lookup-arrow {
   font: 14px/1 DXIcons;

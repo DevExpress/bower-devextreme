@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.all.d.ts)
-* Version: 19.1.5 (build 19226-0309)
-* Build date: Wed Aug 14 2019
+* Version: 19.1.6
+* Build date: Wed Sep 11 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -773,7 +773,7 @@ declare module DevExpress.ui {
         cacheEnabled?: boolean;
         /** Enables a hint that appears when a user hovers the mouse pointer over a cell with truncated content. */
         cellHintEnabled?: boolean;
-        /** Specifies whether columns should adjust their widths to the content. */
+        
         columnAutoWidth?: boolean;
         /** Configures the column chooser. */
         columnChooser?: { allowSearch?: boolean, emptyPanelText?: string, enabled?: boolean, height?: number, mode?: 'dragAndDrop' | 'select', searchTimeout?: number, title?: string, width?: number };
@@ -819,7 +819,7 @@ declare module DevExpress.ui {
         focusedRowKey?: any;
         /** Configures the header filter feature. */
         headerFilter?: { allowSearch?: boolean, height?: number, searchTimeout?: number, texts?: { cancel?: string, emptyValue?: string, ok?: string }, visible?: boolean, width?: number };
-        /** Specifies whether to highlight rows and cells whose data changed. */
+        /** Specifies whether to highlight rows and cells with edited data. repaintChangesOnly should be true. */
         highlightChanges?: boolean;
         /** Configures keyboard navigation. */
         keyboardNavigation?: { editOnKeyPress?: boolean, enterKeyAction?: 'startEdit' | 'moveFocus', enterKeyDirection?: 'none' | 'column' | 'row' };
@@ -1152,7 +1152,7 @@ declare module DevExpress.ui {
         dataType?: 'string' | 'number' | 'date' | 'boolean' | 'object' | 'datetime';
         /** Specifies a custom template for column cells in the editing state. */
         editCellTemplate?: template | ((cellElement: DevExpress.core.dxElement, cellInfo: any) => any);
-        /** Specifies options for the underlain editor. */
+        /** Configures the default widget used for editing and filtering in the filter row. */
         editorOptions?: any;
         /** Specifies whether HTML tags are displayed as plain text or applied to the values of the column. */
         encodeHtml?: boolean;
@@ -1756,9 +1756,9 @@ declare module DevExpress.ui {
         onContextMenuPreparing?: ((e: { component?: dxDataGrid, element?: DevExpress.core.dxElement, model?: any, items?: Array<any>, target?: string, targetElement?: DevExpress.core.dxElement, columnIndex?: number, column?: dxDataGridColumn, rowIndex?: number, row?: dxDataGridRowObject }) => any);
         /** A function that is executed before a cell or row switches to the editing state. */
         onEditingStart?: ((e: { component?: dxDataGrid, element?: DevExpress.core.dxElement, model?: any, data?: any, key?: any, cancel?: boolean, column?: any }) => any);
-        /** A function that is executed after an editor is created. */
+        /** A function that is executed after an editor is created. Not executed for cells with an editCellTemplate. */
         onEditorPrepared?: ((options: { component?: dxDataGrid, element?: DevExpress.core.dxElement, model?: any, parentType?: string, value?: any, setValue?: any, updateValueTimeout?: number, width?: number, disabled?: boolean, rtlEnabled?: boolean, editorElement?: DevExpress.core.dxElement, readOnly?: boolean, dataField?: string, row?: dxDataGridRowObject }) => any);
-        /** A function that is executed before a cell's editor is created. Not executed for cells with an editCellTemplate. */
+        /** A function used to customize or replace default editors. Not executed for cells with an editCellTemplate. */
         onEditorPreparing?: ((e: { component?: dxDataGrid, element?: DevExpress.core.dxElement, model?: any, parentType?: string, value?: any, setValue?: any, updateValueTimeout?: number, width?: number, disabled?: boolean, rtlEnabled?: boolean, cancel?: boolean, editorElement?: DevExpress.core.dxElement, readOnly?: boolean, editorName?: string, editorOptions?: any, dataField?: string, row?: dxDataGridRowObject }) => any);
         /** A function that is executed after data is exported. */
         onExported?: ((e: { component?: dxDataGrid, element?: DevExpress.core.dxElement, model?: any }) => any);
@@ -2718,13 +2718,13 @@ declare module DevExpress.ui {
         /** Deletes content from the given range. */
         delete(index: number, length: number): void;
         /** Applies a format to the selected content. Cannot be used with embedded formats. */
-        format(formatName: string, formatValue: any): void;
+        format(formatName: 'background' | 'bold' | 'color' | 'font' | 'italic' | 'link' | 'size' | 'strike' | 'script' | 'underline' | 'blockquote' | 'header' | 'indent' | 'list' | 'align' | 'code-block' | string, formatValue: any): void;
         /** Applies a single block format to all lines in the given range. */
-        formatLine(index: number, length: number, formatName: string, formatValue: any): void;
+        formatLine(index: number, length: number, formatName: 'background' | 'bold' | 'color' | 'font' | 'italic' | 'link' | 'size' | 'strike' | 'script' | 'underline' | 'blockquote' | 'header' | 'indent' | 'list' | 'align' | 'code-block' | string, formatValue: any): void;
         /** Applies several block formats to all lines in the given range. */
         formatLine(index: number, length: number, formats: any): void;
         /** Applies a single text format to all characters in the given range. */
-        formatText(index: number, length: number, formatName: string, formatValue: any): void;
+        formatText(index: number, length: number, formatName: 'background' | 'bold' | 'color' | 'font' | 'italic' | 'link' | 'size' | 'strike' | 'script' | 'underline' | 'blockquote' | 'header' | 'indent' | 'list' | 'align' | 'code-block' | string, formatValue: any): void;
         /** Applies several text formats to all characters in the given range. */
         formatText(index: number, length: number, formats: any): void;
         /** Gets a format, module, or Parchment. */
@@ -2789,12 +2789,12 @@ declare module DevExpress.ui {
         /** Specifies the container in which to place the toolbar. */
         container?: string | Element | JQuery;
         
-        items?: Array<dxHtmlEditorToolbarItem | string>;
+        items?: Array<dxHtmlEditorToolbarItem | 'background' | 'bold' | 'color' | 'italic' | 'link' | 'image' | 'strike' | 'subscript' | 'superscript' | 'underline' | 'blockquote' | 'header' | 'increaseIndent' | 'decreaseIndent' | 'orderedList' | 'bulletList' | 'alignLeft' | 'alignCenter' | 'alignRight' | 'alignJustify' | 'codeBlock' | 'variable' | 'separator' | 'undo' | 'redo' | 'clear'>;
     }
     /** Configures toolbar controls. These controls allow users to format text and execute commands. */
     export interface dxHtmlEditorToolbarItem extends dxToolbarItem {
         /** Specifies the built-in control that this object customizes or a format with multiple choices. */
-        formatName?: string;
+        formatName?: 'background' | 'bold' | 'color' | 'italic' | 'link' | 'image' | 'strike' | 'subscript' | 'superscript' | 'underline' | 'blockquote' | 'header' | 'increaseIndent' | 'decreaseIndent' | 'orderedList' | 'bulletList' | 'alignLeft' | 'alignCenter' | 'alignRight' | 'alignJustify' | 'codeBlock' | 'variable' | 'separator' | 'undo' | 'redo' | 'clear' | string;
         /** Specifies values for a format with multiple choices. Should be used with the formatName. */
         formatValues?: Array<string | number | boolean>;
         /** Specifies a location for the item on the toolbar. */
@@ -4381,7 +4381,7 @@ declare module DevExpress.ui {
         hoverStateEnabled?: boolean;
         /** Specifies the attributes to be passed on to the underlying HTML element. */
         inputAttr?: any;
-        /** The editor mask that specifies the format of the entered string. */
+        /** The editor mask that specifies the custom format of the entered string. */
         mask?: string;
         /** Specifies a mask placeholder character. */
         maskChar?: string;
@@ -4619,9 +4619,9 @@ declare module DevExpress.ui {
         onContextMenuPreparing?: ((e: { component?: dxTreeList, element?: DevExpress.core.dxElement, model?: any, items?: Array<any>, target?: string, targetElement?: DevExpress.core.dxElement, columnIndex?: number, column?: dxTreeListColumn, rowIndex?: number, row?: dxTreeListRowObject }) => any);
         /** A function that is executed before a cell or row switches to the editing state. */
         onEditingStart?: ((e: { component?: dxTreeList, element?: DevExpress.core.dxElement, model?: any, data?: any, key?: any, cancel?: boolean, column?: any }) => any);
-        /** A function that is executed after an editor is created. */
+        /** A function that is executed after an editor is created. Not executed for cells with an editCellTemplate. */
         onEditorPrepared?: ((options: { component?: dxTreeList, element?: DevExpress.core.dxElement, model?: any, parentType?: string, value?: any, setValue?: any, updateValueTimeout?: number, width?: number, disabled?: boolean, rtlEnabled?: boolean, editorElement?: DevExpress.core.dxElement, readOnly?: boolean, dataField?: string, row?: dxTreeListRowObject }) => any);
-        /** A function that is executed before a cell's editor is created. Not executed for cells with an editCellTemplate. */
+        /** A function used to customize or replace default editors. Not executed for cells with an editCellTemplate. */
         onEditorPreparing?: ((e: { component?: dxTreeList, element?: DevExpress.core.dxElement, model?: any, parentType?: string, value?: any, setValue?: any, updateValueTimeout?: number, width?: number, disabled?: boolean, rtlEnabled?: boolean, cancel?: boolean, editorElement?: DevExpress.core.dxElement, readOnly?: boolean, editorName?: string, editorOptions?: any, dataField?: string, row?: dxTreeListRowObject }) => any);
         /** A function that is executed after the focused cell changes. */
         onFocusedCellChanged?: ((e: { component?: dxTreeList, element?: DevExpress.core.dxElement, model?: any, cellElement?: DevExpress.core.dxElement, columnIndex?: number, rowIndex?: number, row?: dxTreeListRowObject, column?: dxTreeListColumn }) => any);
@@ -5204,6 +5204,8 @@ declare module DevExpress.data {
         group?: any;
         /** A group summary expression. Used with the group setting. */
         groupSummary?: any;
+        
+        parentIds?: Array<any>;
         /** Indicates whether a top-level group count is required. Used in conjunction with the filter, take, skip, requireTotalCount, and group settings. */
         requireGroupCount?: boolean;
         /** Indicates whether the total count of data objects is needed. */

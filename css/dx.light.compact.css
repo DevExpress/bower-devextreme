@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 19.1.5 (build 19226-0309)
-* Build date: Aug 14, 2019
+* Version: 19.1.6
+* Build date: Sep 11, 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -2305,16 +2305,16 @@
 .dx-icon-fontsize:before {
   content: "\f07c";
 }
-.dx-icon-growfont {
-  font: 14px/1 DXIcons;
-}
-.dx-icon-growfont:before {
-  content: "\f07d";
-}
 .dx-icon-shrinkfont {
   font: 14px/1 DXIcons;
 }
 .dx-icon-shrinkfont:before {
+  content: "\f07d";
+}
+.dx-icon-growfont {
+  font: 14px/1 DXIcons;
+}
+.dx-icon-growfont:before {
   content: "\f07e";
 }
 .dx-icon-color {
@@ -4071,11 +4071,15 @@
   text-align: left;
 }
 .dx-list.dx-list-select-decorator-enabled .dx-list-item.dx-state-hover .dx-radiobutton-icon:before,
-.dx-list.dx-list-select-decorator-enabled .dx-list-item.dx-state-hover .dx-checkbox-icon {
+.dx-list.dx-list-select-decorator-enabled .dx-list-select-all.dx-state-hover .dx-radiobutton-icon:before,
+.dx-list.dx-list-select-decorator-enabled .dx-list-item.dx-state-hover .dx-checkbox-icon,
+.dx-list.dx-list-select-decorator-enabled .dx-list-select-all.dx-state-hover .dx-checkbox-icon {
   border-color: #265a87;
 }
 .dx-list.dx-list-select-decorator-enabled .dx-list-item.dx-state-focused .dx-radiobutton-icon:before,
-.dx-list.dx-list-select-decorator-enabled .dx-list-item.dx-state-focused .dx-checkbox-icon {
+.dx-list.dx-list-select-decorator-enabled .dx-list-select-all.dx-state-focused .dx-radiobutton-icon:before,
+.dx-list.dx-list-select-decorator-enabled .dx-list-item.dx-state-focused .dx-checkbox-icon,
+.dx-list.dx-list-select-decorator-enabled .dx-list-select-all.dx-state-focused .dx-checkbox-icon {
   border: 1px solid #337ab7;
 }
 .dx-list:not(.dx-list-select-decorator-enabled) .dx-list-item.dx-state-hover {
@@ -4122,6 +4126,10 @@
   color: #fff;
 }
 .dx-list:not(.dx-list-select-decorator-enabled) .dx-list-item .dx-icon {
+  color: #333;
+}
+.dx-list:not(.dx-list-select-decorator-enabled) .dx-list-item.dx-state-active .dx-button .dx-icon,
+.dx-list:not(.dx-list-select-decorator-enabled) .dx-list-item.dx-state-focused .dx-button .dx-icon {
   color: #333;
 }
 .dx-list-group-header {
@@ -4341,11 +4349,15 @@
   text-align: left;
 }
 .dx-device-mobile .dx-list.dx-list-select-decorator-enabled .dx-list-item.dx-state-hover .dx-radiobutton-icon:before,
-.dx-device-mobile .dx-list.dx-list-select-decorator-enabled .dx-list-item.dx-state-hover .dx-checkbox-icon {
+.dx-device-mobile .dx-list.dx-list-select-decorator-enabled .dx-list-select-all.dx-state-hover .dx-radiobutton-icon:before,
+.dx-device-mobile .dx-list.dx-list-select-decorator-enabled .dx-list-item.dx-state-hover .dx-checkbox-icon,
+.dx-device-mobile .dx-list.dx-list-select-decorator-enabled .dx-list-select-all.dx-state-hover .dx-checkbox-icon {
   border-color: #265a87;
 }
 .dx-device-mobile .dx-list.dx-list-select-decorator-enabled .dx-list-item.dx-state-focused .dx-radiobutton-icon:before,
-.dx-device-mobile .dx-list.dx-list-select-decorator-enabled .dx-list-item.dx-state-focused .dx-checkbox-icon {
+.dx-device-mobile .dx-list.dx-list-select-decorator-enabled .dx-list-select-all.dx-state-focused .dx-radiobutton-icon:before,
+.dx-device-mobile .dx-list.dx-list-select-decorator-enabled .dx-list-item.dx-state-focused .dx-checkbox-icon,
+.dx-device-mobile .dx-list.dx-list-select-decorator-enabled .dx-list-select-all.dx-state-focused .dx-checkbox-icon {
   border: 1px solid #337ab7;
 }
 .dx-device-mobile .dx-list:not(.dx-list-select-decorator-enabled) .dx-list-item.dx-state-hover {
@@ -4392,6 +4404,10 @@
   color: #fff;
 }
 .dx-device-mobile .dx-list:not(.dx-list-select-decorator-enabled) .dx-list-item .dx-icon {
+  color: #333;
+}
+.dx-device-mobile .dx-list:not(.dx-list-select-decorator-enabled) .dx-list-item.dx-state-active .dx-button .dx-icon,
+.dx-device-mobile .dx-list:not(.dx-list-select-decorator-enabled) .dx-list-item.dx-state-focused .dx-button .dx-icon {
   color: #333;
 }
 .dx-device-mobile .dx-list-group-header {
@@ -4690,7 +4706,8 @@
 }
 .dx-state-hover.dx-numberbox-spin-button .dx-numberbox-spin-down-icon,
 .dx-state-hover.dx-numberbox-spin-button .dx-numberbox-spin-up-icon {
-  border: 1px solid transparent;
+  -webkit-box-shadow: 0 0 0 1px transparent inset;
+          box-shadow: 0 0 0 1px transparent inset;
   background-color: #e6e6e6;
 }
 .dx-state-active.dx-numberbox-spin-button .dx-numberbox-spin-down-icon,
@@ -6015,6 +6032,13 @@
 }
 .dx-tagbox:not(.dx-tagbox-single-line) .dx-texteditor-input {
   height: auto;
+}
+.dx-tag-container.dx-texteditor-input-container {
+  padding-bottom: 2px;
+}
+.dx-tag-container.dx-texteditor-input-container .dx-texteditor-input {
+  padding-bottom: 2px;
+  min-height: 22px;
 }
 .dx-tag-content {
   margin: 2px 0 0 2px;

@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 19.1.5 (build 19226-0309)
-* Build date: Aug 14, 2019
+* Version: 19.1.6
+* Build date: Sep 11, 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -619,56 +619,6 @@
       -ms-flex-direction: column;
           flex-direction: column;
   max-width: 100%;
-}
-.dx-box-flex .dx-box-item > .dx-scrollable,
-.dx-box-flex .dx-box-item-content > .dx-scrollable,
-.dx-box-flex .dx-box-item > .dx-treeview,
-.dx-box-flex .dx-box-item-content > .dx-treeview,
-.dx-box-flex .dx-box-item > .dx-treeview > .dx-scrollable,
-.dx-box-flex .dx-box-item-content > .dx-treeview > .dx-scrollable {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-flex: 1;
-  -webkit-flex-grow: 1;
-      -ms-flex-positive: 1;
-          flex-grow: 1;
-  -webkit-box-orient: vertical;
-  -webkit-box-direction: normal;
-  -webkit-flex-direction: column;
-      -ms-flex-direction: column;
-          flex-direction: column;
-  height: auto;
-}
-.dx-box-flex .dx-box-item > .dx-scrollable > .dx-scrollable-wrapper,
-.dx-box-flex .dx-box-item-content > .dx-scrollable > .dx-scrollable-wrapper,
-.dx-box-flex .dx-box-item > .dx-treeview > .dx-scrollable-wrapper,
-.dx-box-flex .dx-box-item-content > .dx-treeview > .dx-scrollable-wrapper,
-.dx-box-flex .dx-box-item > .dx-treeview > .dx-scrollable > .dx-scrollable-wrapper,
-.dx-box-flex .dx-box-item-content > .dx-treeview > .dx-scrollable > .dx-scrollable-wrapper {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-flex: 1;
-  -webkit-flex-grow: 1;
-      -ms-flex-positive: 1;
-          flex-grow: 1;
-  -webkit-box-orient: vertical;
-  -webkit-box-direction: normal;
-  -webkit-flex-direction: column;
-      -ms-flex-direction: column;
-          flex-direction: column;
-  height: auto;
-}
-.dx-box-flex .dx-box-item > .dx-scrollable > .dx-scrollable-wrapper > .dx-scrollable-container,
-.dx-box-flex .dx-box-item-content > .dx-scrollable > .dx-scrollable-wrapper > .dx-scrollable-container,
-.dx-box-flex .dx-box-item > .dx-treeview > .dx-scrollable-wrapper > .dx-scrollable-container,
-.dx-box-flex .dx-box-item-content > .dx-treeview > .dx-scrollable-wrapper > .dx-scrollable-container,
-.dx-box-flex .dx-box-item > .dx-treeview > .dx-scrollable > .dx-scrollable-wrapper > .dx-scrollable-container,
-.dx-box-flex .dx-box-item-content > .dx-treeview > .dx-scrollable > .dx-scrollable-wrapper > .dx-scrollable-container {
-  height: auto;
 }
 .dx-button-disabled {
   cursor: default;
@@ -2331,9 +2281,6 @@
 }
 .dx-overlay-wrapper {
   top: 0;
-  pointer-events: none;
-  width: 100%;
-  height: 100%;
   left: 0;
   z-index: 1000;
 }
@@ -2352,11 +2299,9 @@
 }
 .dx-overlay-shader {
   background-color: rgba(128, 128, 128, 0.5);
-  pointer-events: auto;
 }
 .dx-overlay-content {
   position: absolute;
-  pointer-events: auto;
   z-index: 1000;
   outline: 0;
   overflow: hidden;
@@ -5989,6 +5934,7 @@ input.dx-hidden {
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
+  position: relative;
 }
 .dx-menu-adaptive-mode-overlay-wrapper .dx-overlay-content .dx-treeview {
   height: auto;
