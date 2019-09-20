@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 19.1.6
-* Build date: Sep 11, 2019
+* Version: 19.1.6 (build 19263-1729)
+* Build date: Sep 20, 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -32,7 +32,8 @@
       -ms-user-select: text;
           user-select: text;
 }
-.dx-state-invisible {
+.dx-state-invisible,
+.dx-hidden {
   display: none !important;
 }
 .dx-gesture-cover {
@@ -3978,9 +3979,6 @@
   table-layout: fixed;
   width: 100%;
 }
-.dx-hidden {
-  display: none;
-}
 input.dx-hidden {
   display: inline-block !important;
   width: 0 !important;
@@ -5125,9 +5123,6 @@ input.dx-hidden {
 .dx-treelist-table-fixed {
   table-layout: fixed;
   width: 100%;
-}
-.dx-hidden {
-  display: none;
 }
 input.dx-hidden {
   display: inline-block !important;

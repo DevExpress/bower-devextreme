@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 19.1.6
-* Build date: Sep 11, 2019
+* Version: 19.1.6 (build 19263-1729)
+* Build date: Sep 20, 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -7231,57 +7231,57 @@
 .dx-datagrid-rowsview .dx-row-focused.dx-group-row .dx-datagrid-summary-item {
   color: #fff;
 }
-.dx-datagrid-rowsview .dx-selection.dx-row > td,
-.dx-datagrid-rowsview .dx-selection.dx-row:hover > td,
-.dx-datagrid-rowsview .dx-selection.dx-row > tr > td,
-.dx-datagrid-rowsview .dx-selection.dx-row:hover > tr > td {
+.dx-datagrid-rowsview .dx-selection.dx-row:not(.dx-row-focused) > td,
+.dx-datagrid-rowsview .dx-selection.dx-row:not(.dx-row-focused):hover > td,
+.dx-datagrid-rowsview .dx-selection.dx-row:not(.dx-row-focused) > tr > td,
+.dx-datagrid-rowsview .dx-selection.dx-row:not(.dx-row-focused):hover > tr > td {
   background-color: #e6e6e6;
   color: #333;
 }
-.dx-datagrid-rowsview .dx-selection.dx-row > td.dx-datagrid-group-space,
-.dx-datagrid-rowsview .dx-selection.dx-row:hover > td.dx-datagrid-group-space,
-.dx-datagrid-rowsview .dx-selection.dx-row > tr > td.dx-datagrid-group-space,
-.dx-datagrid-rowsview .dx-selection.dx-row:hover > tr > td.dx-datagrid-group-space {
+.dx-datagrid-rowsview .dx-selection.dx-row:not(.dx-row-focused) > td.dx-datagrid-group-space,
+.dx-datagrid-rowsview .dx-selection.dx-row:not(.dx-row-focused):hover > td.dx-datagrid-group-space,
+.dx-datagrid-rowsview .dx-selection.dx-row:not(.dx-row-focused) > tr > td.dx-datagrid-group-space,
+.dx-datagrid-rowsview .dx-selection.dx-row:not(.dx-row-focused):hover > tr > td.dx-datagrid-group-space {
   border-right-color: #e6e6e6;
 }
-.dx-datagrid-rowsview .dx-selection.dx-row > td.dx-pointer-events-none,
-.dx-datagrid-rowsview .dx-selection.dx-row:hover > td.dx-pointer-events-none,
-.dx-datagrid-rowsview .dx-selection.dx-row > tr > td.dx-pointer-events-none,
-.dx-datagrid-rowsview .dx-selection.dx-row:hover > tr > td.dx-pointer-events-none {
+.dx-datagrid-rowsview .dx-selection.dx-row:not(.dx-row-focused) > td.dx-pointer-events-none,
+.dx-datagrid-rowsview .dx-selection.dx-row:not(.dx-row-focused):hover > td.dx-pointer-events-none,
+.dx-datagrid-rowsview .dx-selection.dx-row:not(.dx-row-focused) > tr > td.dx-pointer-events-none,
+.dx-datagrid-rowsview .dx-selection.dx-row:not(.dx-row-focused):hover > tr > td.dx-pointer-events-none {
   border-left-color: #ddd;
   border-right-color: #ddd;
 }
-.dx-datagrid-rowsview .dx-selection.dx-row > td.dx-focused,
-.dx-datagrid-rowsview .dx-selection.dx-row:hover > td.dx-focused,
-.dx-datagrid-rowsview .dx-selection.dx-row > tr > td.dx-focused,
-.dx-datagrid-rowsview .dx-selection.dx-row:hover > tr > td.dx-focused {
+.dx-datagrid-rowsview .dx-selection.dx-row:not(.dx-row-focused) > td.dx-focused,
+.dx-datagrid-rowsview .dx-selection.dx-row:not(.dx-row-focused):hover > td.dx-focused,
+.dx-datagrid-rowsview .dx-selection.dx-row:not(.dx-row-focused) > tr > td.dx-focused,
+.dx-datagrid-rowsview .dx-selection.dx-row:not(.dx-row-focused):hover > tr > td.dx-focused {
   background-color: #fff;
   color: #333;
 }
-.dx-datagrid-rowsview .dx-selection.dx-row:not(.dx-row-lines):not(.dx-row-focused) > td,
-.dx-datagrid-rowsview .dx-selection.dx-row:hover:not(.dx-row-lines):not(.dx-row-focused) > td {
+.dx-datagrid-rowsview .dx-selection.dx-row:not(.dx-row-focused):not(.dx-row-lines) > td,
+.dx-datagrid-rowsview .dx-selection.dx-row:not(.dx-row-focused):hover:not(.dx-row-lines) > td {
   border-bottom: 1px solid #e6e6e6;
   border-top: 1px solid #e6e6e6;
 }
-.dx-datagrid-rowsview .dx-selection.dx-row:not(.dx-row-lines):not(.dx-row-focused) > tr:first-child > td,
-.dx-datagrid-rowsview .dx-selection.dx-row:hover:not(.dx-row-lines):not(.dx-row-focused) > tr:first-child > td {
+.dx-datagrid-rowsview .dx-selection.dx-row:not(.dx-row-focused):not(.dx-row-lines) > tr:first-child > td,
+.dx-datagrid-rowsview .dx-selection.dx-row:not(.dx-row-focused):hover:not(.dx-row-lines) > tr:first-child > td {
   border-top: 1px solid #e6e6e6;
 }
-.dx-datagrid-rowsview .dx-selection.dx-row:not(.dx-row-lines):not(.dx-row-focused) > tr:last-child > td,
-.dx-datagrid-rowsview .dx-selection.dx-row:hover:not(.dx-row-lines):not(.dx-row-focused) > tr:last-child > td {
+.dx-datagrid-rowsview .dx-selection.dx-row:not(.dx-row-focused):not(.dx-row-lines) > tr:last-child > td,
+.dx-datagrid-rowsview .dx-selection.dx-row:not(.dx-row-focused):hover:not(.dx-row-lines) > tr:last-child > td {
   border-bottom: 1px solid #e6e6e6;
 }
-.dx-datagrid-rowsview .dx-selection.dx-row.dx-column-lines > td,
-.dx-datagrid-rowsview .dx-selection.dx-row:hover.dx-column-lines > td,
-.dx-datagrid-rowsview .dx-selection.dx-row.dx-column-lines > tr > td,
-.dx-datagrid-rowsview .dx-selection.dx-row:hover.dx-column-lines > tr > td {
+.dx-datagrid-rowsview .dx-selection.dx-row:not(.dx-row-focused).dx-column-lines > td,
+.dx-datagrid-rowsview .dx-selection.dx-row:not(.dx-row-focused):hover.dx-column-lines > td,
+.dx-datagrid-rowsview .dx-selection.dx-row:not(.dx-row-focused).dx-column-lines > tr > td,
+.dx-datagrid-rowsview .dx-selection.dx-row:not(.dx-row-focused):hover.dx-column-lines > tr > td {
   border-left-color: #ddd;
   border-right-color: #ddd;
 }
-.dx-datagrid-rowsview .dx-selection.dx-row.dx-row-lines > td,
-.dx-datagrid-rowsview .dx-selection.dx-row:hover.dx-row-lines > td,
-.dx-datagrid-rowsview .dx-selection.dx-row.dx-row-lines > tr > td,
-.dx-datagrid-rowsview .dx-selection.dx-row:hover.dx-row-lines > tr > td {
+.dx-datagrid-rowsview .dx-selection.dx-row:not(.dx-row-focused).dx-row-lines > td,
+.dx-datagrid-rowsview .dx-selection.dx-row:not(.dx-row-focused):hover.dx-row-lines > td,
+.dx-datagrid-rowsview .dx-selection.dx-row:not(.dx-row-focused).dx-row-lines > tr > td,
+.dx-datagrid-rowsview .dx-selection.dx-row:not(.dx-row-focused):hover.dx-row-lines > tr > td {
   border-bottom-color: #ddd;
 }
 .dx-datagrid-rowsview.dx-scrollable-scrollbars-alwaysvisible.dx-scrollable-both .dx-scrollable-content {
@@ -8258,57 +8258,57 @@
 .dx-treelist-rowsview .dx-row-focused.dx-group-row .dx-datagrid-summary-item {
   color: #fff;
 }
-.dx-treelist-rowsview .dx-selection.dx-row > td,
-.dx-treelist-rowsview .dx-selection.dx-row:hover > td,
-.dx-treelist-rowsview .dx-selection.dx-row > tr > td,
-.dx-treelist-rowsview .dx-selection.dx-row:hover > tr > td {
+.dx-treelist-rowsview .dx-selection.dx-row:not(.dx-row-focused) > td,
+.dx-treelist-rowsview .dx-selection.dx-row:not(.dx-row-focused):hover > td,
+.dx-treelist-rowsview .dx-selection.dx-row:not(.dx-row-focused) > tr > td,
+.dx-treelist-rowsview .dx-selection.dx-row:not(.dx-row-focused):hover > tr > td {
   background-color: #e6e6e6;
   color: #333;
 }
-.dx-treelist-rowsview .dx-selection.dx-row > td.dx-treelist-group-space,
-.dx-treelist-rowsview .dx-selection.dx-row:hover > td.dx-treelist-group-space,
-.dx-treelist-rowsview .dx-selection.dx-row > tr > td.dx-treelist-group-space,
-.dx-treelist-rowsview .dx-selection.dx-row:hover > tr > td.dx-treelist-group-space {
+.dx-treelist-rowsview .dx-selection.dx-row:not(.dx-row-focused) > td.dx-treelist-group-space,
+.dx-treelist-rowsview .dx-selection.dx-row:not(.dx-row-focused):hover > td.dx-treelist-group-space,
+.dx-treelist-rowsview .dx-selection.dx-row:not(.dx-row-focused) > tr > td.dx-treelist-group-space,
+.dx-treelist-rowsview .dx-selection.dx-row:not(.dx-row-focused):hover > tr > td.dx-treelist-group-space {
   border-right-color: #e6e6e6;
 }
-.dx-treelist-rowsview .dx-selection.dx-row > td.dx-pointer-events-none,
-.dx-treelist-rowsview .dx-selection.dx-row:hover > td.dx-pointer-events-none,
-.dx-treelist-rowsview .dx-selection.dx-row > tr > td.dx-pointer-events-none,
-.dx-treelist-rowsview .dx-selection.dx-row:hover > tr > td.dx-pointer-events-none {
+.dx-treelist-rowsview .dx-selection.dx-row:not(.dx-row-focused) > td.dx-pointer-events-none,
+.dx-treelist-rowsview .dx-selection.dx-row:not(.dx-row-focused):hover > td.dx-pointer-events-none,
+.dx-treelist-rowsview .dx-selection.dx-row:not(.dx-row-focused) > tr > td.dx-pointer-events-none,
+.dx-treelist-rowsview .dx-selection.dx-row:not(.dx-row-focused):hover > tr > td.dx-pointer-events-none {
   border-left-color: #ddd;
   border-right-color: #ddd;
 }
-.dx-treelist-rowsview .dx-selection.dx-row > td.dx-focused,
-.dx-treelist-rowsview .dx-selection.dx-row:hover > td.dx-focused,
-.dx-treelist-rowsview .dx-selection.dx-row > tr > td.dx-focused,
-.dx-treelist-rowsview .dx-selection.dx-row:hover > tr > td.dx-focused {
+.dx-treelist-rowsview .dx-selection.dx-row:not(.dx-row-focused) > td.dx-focused,
+.dx-treelist-rowsview .dx-selection.dx-row:not(.dx-row-focused):hover > td.dx-focused,
+.dx-treelist-rowsview .dx-selection.dx-row:not(.dx-row-focused) > tr > td.dx-focused,
+.dx-treelist-rowsview .dx-selection.dx-row:not(.dx-row-focused):hover > tr > td.dx-focused {
   background-color: #fff;
   color: #333;
 }
-.dx-treelist-rowsview .dx-selection.dx-row:not(.dx-row-lines):not(.dx-row-focused) > td,
-.dx-treelist-rowsview .dx-selection.dx-row:hover:not(.dx-row-lines):not(.dx-row-focused) > td {
+.dx-treelist-rowsview .dx-selection.dx-row:not(.dx-row-focused):not(.dx-row-lines) > td,
+.dx-treelist-rowsview .dx-selection.dx-row:not(.dx-row-focused):hover:not(.dx-row-lines) > td {
   border-bottom: 1px solid #e6e6e6;
   border-top: 1px solid #e6e6e6;
 }
-.dx-treelist-rowsview .dx-selection.dx-row:not(.dx-row-lines):not(.dx-row-focused) > tr:first-child > td,
-.dx-treelist-rowsview .dx-selection.dx-row:hover:not(.dx-row-lines):not(.dx-row-focused) > tr:first-child > td {
+.dx-treelist-rowsview .dx-selection.dx-row:not(.dx-row-focused):not(.dx-row-lines) > tr:first-child > td,
+.dx-treelist-rowsview .dx-selection.dx-row:not(.dx-row-focused):hover:not(.dx-row-lines) > tr:first-child > td {
   border-top: 1px solid #e6e6e6;
 }
-.dx-treelist-rowsview .dx-selection.dx-row:not(.dx-row-lines):not(.dx-row-focused) > tr:last-child > td,
-.dx-treelist-rowsview .dx-selection.dx-row:hover:not(.dx-row-lines):not(.dx-row-focused) > tr:last-child > td {
+.dx-treelist-rowsview .dx-selection.dx-row:not(.dx-row-focused):not(.dx-row-lines) > tr:last-child > td,
+.dx-treelist-rowsview .dx-selection.dx-row:not(.dx-row-focused):hover:not(.dx-row-lines) > tr:last-child > td {
   border-bottom: 1px solid #e6e6e6;
 }
-.dx-treelist-rowsview .dx-selection.dx-row.dx-column-lines > td,
-.dx-treelist-rowsview .dx-selection.dx-row:hover.dx-column-lines > td,
-.dx-treelist-rowsview .dx-selection.dx-row.dx-column-lines > tr > td,
-.dx-treelist-rowsview .dx-selection.dx-row:hover.dx-column-lines > tr > td {
+.dx-treelist-rowsview .dx-selection.dx-row:not(.dx-row-focused).dx-column-lines > td,
+.dx-treelist-rowsview .dx-selection.dx-row:not(.dx-row-focused):hover.dx-column-lines > td,
+.dx-treelist-rowsview .dx-selection.dx-row:not(.dx-row-focused).dx-column-lines > tr > td,
+.dx-treelist-rowsview .dx-selection.dx-row:not(.dx-row-focused):hover.dx-column-lines > tr > td {
   border-left-color: #ddd;
   border-right-color: #ddd;
 }
-.dx-treelist-rowsview .dx-selection.dx-row.dx-row-lines > td,
-.dx-treelist-rowsview .dx-selection.dx-row:hover.dx-row-lines > td,
-.dx-treelist-rowsview .dx-selection.dx-row.dx-row-lines > tr > td,
-.dx-treelist-rowsview .dx-selection.dx-row:hover.dx-row-lines > tr > td {
+.dx-treelist-rowsview .dx-selection.dx-row:not(.dx-row-focused).dx-row-lines > td,
+.dx-treelist-rowsview .dx-selection.dx-row:not(.dx-row-focused):hover.dx-row-lines > td,
+.dx-treelist-rowsview .dx-selection.dx-row:not(.dx-row-focused).dx-row-lines > tr > td,
+.dx-treelist-rowsview .dx-selection.dx-row:not(.dx-row-focused):hover.dx-row-lines > tr > td {
   border-bottom-color: #ddd;
 }
 .dx-treelist-rowsview.dx-scrollable-scrollbars-alwaysvisible.dx-scrollable-both .dx-scrollable-content {
@@ -9070,8 +9070,6 @@
 }
 .dx-treeview-item-without-checkbox.dx-state-focused > .dx-treeview-item {
   background-color: #337ab7;
-}
-.dx-treeview-item-without-checkbox.dx-state-focused > .dx-treeview-item * {
   color: #fff;
 }
 .dx-treeview-item {
@@ -13369,6 +13367,9 @@
 }
 .dx-htmleditor.dx-invalid.dx-state-focused {
   border-color: #d9534f;
+}
+.dx-htmleditor-content.ql-blank::before {
+  color: #999999;
 }
 .dx-htmleditor-content pre {
   color: rgba(51, 51, 51, 0.8);
