@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.aspnet.mvc.js)
-* Version: 19.1.6 (build 19263-1729)
-* Build date: Fri Sep 20 2019
+* Version: 19.1.6 (build 19268-0309)
+* Build date: Wed Sep 25 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
