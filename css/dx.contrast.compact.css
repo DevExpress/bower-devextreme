@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 19.1.6 (build 19268-0309)
-* Build date: Sep 25, 2019
+* Version: 19.1.6 (build 19275-1420)
+* Build date: Oct 2, 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -7137,6 +7137,9 @@
   border-top: 1px solid #fff;
   border-bottom: 1px solid #fff;
 }
+.dx-datagrid-rowsview .dx-row.dx-datagrid-edit-form {
+  white-space: normal;
+}
 .dx-datagrid-rowsview .dx-master-detail-row > .dx-datagrid-group-space,
 .dx-datagrid-rowsview .dx-master-detail-row .dx-master-detail-cell {
   border-top: 1px solid #fff;
@@ -8166,6 +8169,9 @@
 .dx-treelist-rowsview .dx-row.dx-edit-row > td {
   border-top: 1px solid #fff;
   border-bottom: 1px solid #fff;
+}
+.dx-treelist-rowsview .dx-row.dx-treelist-edit-form {
+  white-space: normal;
 }
 .dx-treelist-rowsview .dx-master-detail-row > .dx-treelist-group-space,
 .dx-treelist-rowsview .dx-master-detail-row .dx-master-detail-cell {
@@ -9726,6 +9732,20 @@
       -ms-flex-flow: row nowrap;
           flex-flow: row nowrap;
 }
+.dx-scheduler-timeline-week .dx-scheduler-header-panel-cell:not(.dx-scheduler-header-panel-week-cell),
+.dx-scheduler-timeline-work-week .dx-scheduler-header-panel-cell:not(.dx-scheduler-header-panel-week-cell),
+.dx-scheduler-timeline-day.dx-scheduler-work-space-count .dx-scheduler-header-panel-cell:not(.dx-scheduler-header-panel-week-cell),
+.dx-scheduler-timeline-month .dx-scheduler-header-panel-cell:not(.dx-scheduler-header-panel-week-cell) {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: reverse;
+  -webkit-flex-flow: row-reverse nowrap;
+      -ms-flex-flow: row-reverse nowrap;
+          flex-flow: row-reverse nowrap;
+}
 .dx-scheduler-timeline-week .dx-scheduler-header-panel-week-cell,
 .dx-scheduler-timeline-work-week .dx-scheduler-header-panel-week-cell,
 .dx-scheduler-timeline-day.dx-scheduler-work-space-count .dx-scheduler-header-panel-week-cell,
@@ -10506,7 +10526,7 @@
   border-left: 1px solid #fff;
 }
 .dx-scheduler-header-panel {
-  border-collapse: collapse;
+  border-spacing: 0;
   table-layout: fixed;
   margin-top: 10px;
   width: 100%;
@@ -10852,7 +10872,7 @@
   line-height: 50px;
 }
 .dx-scheduler-all-day-table {
-  border-collapse: collapse;
+  border-spacing: 0;
   table-layout: fixed;
   width: 100%;
 }
@@ -10922,7 +10942,7 @@
 }
 .dx-scheduler-date-table {
   width: 100%;
-  border-collapse: collapse;
+  border-spacing: 0;
   table-layout: fixed;
   float: left;
   margin-left: -100px;
@@ -11413,7 +11433,6 @@
 }
 .dx-scheduler-agenda .dx-scheduler-group-table {
   border-spacing: 0;
-  border-collapse: collapse;
   margin-top: 0;
   height: 100%;
   float: left;
@@ -11926,7 +11945,7 @@
   min-height: 100px;
   border-right: 1px solid #fff;
   border-top: 1px solid #fff;
-  border-collapse: collapse;
+  border-spacing: 0;
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -12700,6 +12719,7 @@
 .dx-scheduler-work-space-vertical-group-table .dx-scheduler-group-header {
   font-weight: bold;
   color: #fff;
+  padding: 0;
 }
 .dx-scheduler-all-day-panel {
   background-color: #000;

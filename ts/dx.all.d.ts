@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.all.d.ts)
-* Version: 19.1.6 (build 19268-0309)
-* Build date: Wed Sep 25 2019
+* Version: 19.1.6 (build 19275-1420)
+* Build date: Wed Oct 02 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -2942,7 +2942,7 @@ declare module DevExpress.ui {
         isEditing?: boolean;
         /** Indicates whether the row is expanded or collapsed. Available if rowType is "data", "detail" or "group". */
         isExpanded?: boolean;
-        
+        /**  */
         isNewRow?: boolean;
         /** Indicates whether the row is selected. Available if rowType is "data". */
         isSelected?: boolean;
@@ -3079,7 +3079,7 @@ declare module DevExpress.ui {
         revealMode?: 'slide' | 'expand';
         /** Specifies whether to shade the view when the drawer is opened. */
         shading?: boolean;
-        /** Specifies the target element associated with the drawer. Applies only when the openedStateMode is "overlap". */
+        /** Specifies a CSS selector for the element in which the drawer should be rendered. Applies only when the openedStateMode is "overlap". */
         target?: string | Element | JQuery;
         /** Specifies the drawer's content. */
         template?: template | ((Element: DevExpress.core.dxElement) => any);
@@ -4336,8 +4336,6 @@ declare module DevExpress.ui {
     export interface dxOverlayOptions<T = dxOverlay> extends WidgetOptions<T> {
         /** Configures widget visibility animations. This object contains two fields: show and hide. */
         animation?: dxOverlayAnimation;
-        /** A Boolean value specifying whether or not the widget is closed if a user presses the Back hardware button. */
-        closeOnBackButton?: boolean;
         /** Specifies whether to close the widget if a user clicks outside it. */
         closeOnOutsideClick?: boolean | ((event: event) => boolean);
         /** Specifies a custom template for the widget content. */
@@ -5526,8 +5524,6 @@ declare module DevExpress.ui {
     export interface dxToastOptions extends dxOverlayOptions<dxToast> {
         /** Configures widget visibility animations. This object contains two fields: show and hide. */
         animation?: dxToastAnimation;
-        /** A Boolean value specifying whether or not the widget is closed if a user presses the Back hardware button. */
-        closeOnBackButton?: boolean;
         /** A Boolean value specifying whether or not the toast is closed if a user clicks it. */
         closeOnClick?: boolean;
         /** Specifies whether to close the widget if a user clicks outside it. */
@@ -5807,7 +5803,7 @@ declare module DevExpress.ui {
         isEditing?: boolean;
         /** Indicates whether the row is expanded or collapsed. Available if rowType is "data" or "detail". */
         isExpanded?: boolean;
-        
+        /**  */
         isNewRow?: boolean;
         /** Indicates whether the row is selected. Available if rowType is "data" or "detail". */
         isSelected?: boolean;

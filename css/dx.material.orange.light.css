@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 19.1.6 (build 19268-0309)
-* Build date: Sep 25, 2019
+* Version: 19.1.6 (build 19275-1420)
+* Build date: Oct 2, 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -11864,6 +11864,20 @@
       -ms-flex-flow: row nowrap;
           flex-flow: row nowrap;
 }
+.dx-scheduler-timeline-week .dx-scheduler-header-panel-cell:not(.dx-scheduler-header-panel-week-cell),
+.dx-scheduler-timeline-work-week .dx-scheduler-header-panel-cell:not(.dx-scheduler-header-panel-week-cell),
+.dx-scheduler-timeline-day.dx-scheduler-work-space-count .dx-scheduler-header-panel-cell:not(.dx-scheduler-header-panel-week-cell),
+.dx-scheduler-timeline-month .dx-scheduler-header-panel-cell:not(.dx-scheduler-header-panel-week-cell) {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: reverse;
+  -webkit-flex-flow: row-reverse nowrap;
+      -ms-flex-flow: row-reverse nowrap;
+          flex-flow: row-reverse nowrap;
+}
 .dx-scheduler-timeline-week .dx-scheduler-header-panel-week-cell,
 .dx-scheduler-timeline-work-week .dx-scheduler-header-panel-week-cell,
 .dx-scheduler-timeline-day.dx-scheduler-work-space-count .dx-scheduler-header-panel-week-cell,
@@ -12644,7 +12658,7 @@
   border-left: 1px solid #e0e0e0;
 }
 .dx-scheduler-header-panel {
-  border-collapse: collapse;
+  border-spacing: 0;
   table-layout: fixed;
   margin-top: 10px;
   width: 100%;
@@ -12990,7 +13004,7 @@
   line-height: 50px;
 }
 .dx-scheduler-all-day-table {
-  border-collapse: collapse;
+  border-spacing: 0;
   table-layout: fixed;
   width: 100%;
 }
@@ -13060,7 +13074,7 @@
 }
 .dx-scheduler-date-table {
   width: 100%;
-  border-collapse: collapse;
+  border-spacing: 0;
   table-layout: fixed;
   float: left;
   margin-left: -65px;
@@ -13553,7 +13567,6 @@
 }
 .dx-scheduler-agenda .dx-scheduler-group-table {
   border-spacing: 0;
-  border-collapse: collapse;
   margin-top: 0;
   height: 100%;
   float: left;
@@ -14066,7 +14079,7 @@
   min-height: 100px;
   border-right: 1px solid #e0e0e0;
   border-top: 1px solid #e0e0e0;
-  border-collapse: collapse;
+  border-spacing: 0;
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -14814,12 +14827,6 @@
 .dx-scheduler-work-space.dx-scheduler-work-space-month .dx-scheduler-header-panel-cell {
   height: 22px;
 }
-.dx-scheduler-work-space.dx-scheduler-timeline.dx-scheduler-timeline-day .dx-scheduler-header-panel-cell {
-  height: 34px;
-  font-size: 12px;
-  padding-left: 14px;
-  padding-right: 14px;
-}
 .dx-scheduler-work-space.dx-scheduler-timeline.dx-scheduler-timeline-week .dx-scheduler-header-panel-cell:not(.dx-scheduler-header-panel-week-cell),
 .dx-scheduler-work-space.dx-scheduler-timeline.dx-scheduler-timeline-work-week .dx-scheduler-header-panel-cell:not(.dx-scheduler-header-panel-week-cell) {
   height: 34px;
@@ -14853,6 +14860,28 @@
   -webkit-justify-content: flex-end;
       -ms-flex-pack: end;
           justify-content: flex-end;
+}
+.dx-scheduler-work-space.dx-scheduler-timeline.dx-scheduler-timeline-day .dx-scheduler-header-panel-cell {
+  -webkit-box-align: end;
+  -webkit-align-items: flex-end;
+      -ms-flex-align: end;
+          align-items: flex-end;
+}
+.dx-scheduler-work-space.dx-scheduler-timeline.dx-scheduler-timeline-day .dx-scheduler-header-panel-cell:not(.dx-scheduler-header-panel-week-cell) {
+  height: 34px;
+  font-size: 12px;
+  padding-left: 14px;
+  padding-right: 14px;
+}
+.dx-scheduler-work-space.dx-scheduler-timeline.dx-scheduler-timeline-day .dx-scheduler-header-panel-cell.dx-scheduler-header-panel-week-cell {
+  -webkit-box-align: start;
+  -webkit-align-items: flex-start;
+      -ms-flex-align: start;
+          align-items: flex-start;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
 }
 .dx-scheduler-header-panel-cell.dx-scheduler-header-panel-week-cell {
   border-bottom: 1px solid #e0e0e0;
