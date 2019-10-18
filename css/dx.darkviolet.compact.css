@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 19.1.7
-* Build date: Oct 11, 2019
+* Version: 19.1.7 (build 19291-1133)
+* Build date: Oct 18, 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -2527,7 +2527,6 @@
   line-height: 0;
 }
 .dx-button-text {
-  display: inline-block;
   line-height: normal;
 }
 .dx-button a {
@@ -3497,6 +3496,13 @@
 .dx-switch.dx-rtl .dx-switch-container {
   margin: 0 0 0 -4px;
 }
+.dx-invalid.dx-switch .dx-switch-container {
+  border-color: rgba(217, 83, 79, 0.4);
+}
+.dx-invalid.dx-state-focused .dx-switch-container,
+.dx-invalid.dx-state-hover .dx-switch-container {
+  border-color: #d9534f;
+}
 .dx-tabs {
   border: 1px solid #343840;
 }
@@ -3785,7 +3791,7 @@
 .dx-texteditor-input {
   margin: 0;
   padding: 4px 5px 4px;
-  background: #17171f;
+  background: rgba(0, 0, 0, 0);
   color: #f5f6f7;
   font-size: 1em;
   border-radius: 1px;
@@ -4701,7 +4707,6 @@
   margin-left: -7px;
 }
 .dx-numberbox-spin-button {
-  background-color: #17171f;
   padding: 1px;
 }
 .dx-editor-underlined .dx-numberbox-spin-button {
@@ -4775,9 +4780,6 @@
   margin-top: -7px;
   left: 50%;
   margin-left: -7px;
-}
-.dx-datebox-calendar.dx-dropdowneditor-active .dx-texteditor-input {
-  background: #17171f;
 }
 .dx-datebox-calendar.dx-rtl.dx-dropdowneditor-active .dx-dropdowneditor-button .dx-dropdowneditor-icon {
   opacity: 1;

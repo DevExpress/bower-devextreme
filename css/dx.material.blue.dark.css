@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 19.1.7
-* Build date: Oct 11, 2019
+* Version: 19.1.7 (build 19291-1133)
+* Build date: Oct 18, 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -2612,7 +2612,6 @@
   line-height: 0;
 }
 .dx-button-text {
-  display: inline-block;
   line-height: 23px;
   text-transform: uppercase;
   font-weight: 500;
@@ -3964,6 +3963,17 @@
 .dx-rtl .dx-switch .dx-switch-container,
 .dx-switch.dx-rtl .dx-switch-container {
   margin: 0 0 0 -6px;
+}
+.dx-switch.dx-invalid .dx-switch-container:before {
+  background-color: rgba(244, 67, 54, 0.5);
+}
+.dx-switch-on-value:not(.dx-state-readonly):not(.dx-state-disabled).dx-invalid .dx-switch-container .dx-switch-handle:before {
+  background-color: #F44336;
+}
+.dx-state-active.dx-switch-on-value:not(.dx-state-readonly):not(.dx-state-disabled).dx-invalid .dx-switch-container .dx-switch-handle:before,
+.dx-state-focused.dx-switch-on-value:not(.dx-state-readonly):not(.dx-state-disabled).dx-invalid .dx-switch-container .dx-switch-handle:before {
+  -webkit-box-shadow: 0 0 0 10px rgba(244, 67, 54, 0.1);
+          box-shadow: 0 0 0 10px rgba(244, 67, 54, 0.1);
 }
 .dx-tabs {
   padding: 0;

@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.all.d.ts)
-* Version: 19.1.7
-* Build date: Fri Oct 11 2019
+* Version: 19.1.7 (build 19291-1133)
+* Build date: Fri Oct 18 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -1562,7 +1562,7 @@ declare module DevExpress.exporter {
         column?: DevExpress.ui.dxDataGridColumn;
         /** The data object of the cell's row. */
         data?: any;
-        /** The groupIndex of the cell's row. */
+        /** The group index of the cell's row. Available when the rowType is "group". */
         groupIndex?: number;
         /** Information about group summary items the cell represents. */
         groupSummaryItems?: Array<{ name?: string, value?: any }>;
@@ -2199,7 +2199,7 @@ declare module DevExpress.ui {
         filterValues?: Array<any>;
         /** Fixes the column. */
         fixed?: boolean;
-        /** Specifies the widget's edge to which the column is fixed. Applies only if columns].[fixed is true. */
+        /** Specifies the widget's edge to which the column is fixed. Applies only if columns[].fixed is true. */
         fixedPosition?: 'left' | 'right';
         /** Configures the form item that the column produces in the editing state. Applies only if editing.mode is "form" or "popup". */
         formItem?: dxFormSimpleItem;
@@ -5736,7 +5736,7 @@ declare module DevExpress.ui {
         getRootNode(): dxTreeListNode;
         /** Gets the keys of the rows selected explicitly via the API or via a click or tap. */
         getSelectedRowKeys(): Array<any>;
-        /** @deprecated Use the [getSelectedRowKeys(mode)](/Documentation/ApiReference/UI_Widgets/dxTreeList/Methods/#getSelectedRowKeysmode) method instead. */
+        /** @deprecated Use the [getSelectedRowKeys(mode)](/api-reference/10%20UI%20Widgets/dxTreeList/3%20Methods/getSelectedRowKeys(mode).md '/Documentation/ApiReference/UI_Widgets/dxTreeList/Methods/#getSelectedRowKeysmode') method instead. */
         /** Gets the selected rows' keys. */
         getSelectedRowKeys(leavesOnly: boolean): Array<any>;
         /** Gets the selected rows' keys. */
