@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 19.1.6 (build 19275-1420)
-* Build date: Oct 2, 2019
+* Version: 19.1.7
+* Build date: Oct 11, 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -4634,7 +4634,10 @@
 }
 .dx-dropdownlist-popup-wrapper .dx-list {
   height: 100%;
-  min-height: 33px;
+  min-height: 26.00008px;
+}
+.dx-dropdownlist-popup-wrapper .dx-list:not(.dx-list-select-decorator-enabled) {
+  min-height: 20.00008px;
 }
 .dx-dropdownlist-popup-wrapper .dx-list:not(.dx-list-select-decorator-enabled) .dx-list-item-content {
   padding: 2px 4px;
@@ -6008,6 +6011,42 @@
 }
 .dx-dropdownmenu-popup-wrapper .dx-list-item {
   border-top: 0;
+}
+.dx-dropdownbutton-popup-wrapper {
+  height: 100%;
+}
+.dx-dropdownbutton-popup-wrapper.dx-popup-wrapper .dx-overlay-content {
+  border-top-width: 0;
+  border-bottom-width: 1px;
+}
+.dx-dropdownbutton-popup-wrapper.dx-popup-wrapper .dx-overlay-content.dx-dropdowneditor-overlay-flipped {
+  border-top-width: 1px;
+  border-bottom-width: 0;
+}
+.dx-dropdownbutton-popup-wrapper .dx-popup-content {
+  height: 100%;
+  padding: 1px;
+}
+.dx-dropdownbutton-popup-wrapper .dx-list {
+  height: 100%;
+  min-height: 26.00008px;
+}
+.dx-dropdownbutton-popup-wrapper .dx-list:not(.dx-list-select-decorator-enabled) {
+  min-height: 20.00008px;
+}
+.dx-dropdownbutton-popup-wrapper .dx-list:not(.dx-list-select-decorator-enabled) .dx-list-item-content {
+  padding: 2px 4px;
+}
+.dx-dropdownbutton-popup-wrapper .dx-list-select-all {
+  padding: 7px 0 3px;
+}
+.dx-dropdownbutton-popup-wrapper .dx-list-item,
+.dx-dropdownbutton-popup-wrapper .dx-empty-message {
+  border-top: 0;
+}
+.dx-dropdownbutton-popup-wrapper .dx-list-item:last-of-type,
+.dx-dropdownbutton-popup-wrapper .dx-empty-message:last-of-type {
+  border-bottom: none;
 }
 .dx-selectbox-popup-wrapper .dx-overlay-content {
   -webkit-box-shadow: 0 6px 12px transparent;
@@ -13472,7 +13511,10 @@
 }
 .dx-suggestion-list-wrapper .dx-list {
   height: 100%;
-  min-height: 33px;
+  min-height: 26.00008px;
+}
+.dx-suggestion-list-wrapper .dx-list:not(.dx-list-select-decorator-enabled) {
+  min-height: 20.00008px;
 }
 .dx-suggestion-list-wrapper .dx-list:not(.dx-list-select-decorator-enabled) .dx-list-item-content {
   padding: 2px 4px;
