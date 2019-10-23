@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.all.d.ts)
-* Version: 19.1.7 (build 19291-1133)
-* Build date: Fri Oct 18 2019
+* Version: 19.1.7 (build 19296-1028)
+* Build date: Wed Oct 23 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -3821,10 +3821,10 @@ declare module DevExpress.ui {
     export interface dxHtmlEditorToolbar {
         /** Specifies the container in which to place the toolbar. */
         container?: string | Element | JQuery;
-        
+        /** Configures toolbar controls. These controls allow users to format text and execute commands. */
         items?: Array<dxHtmlEditorToolbarItem | 'background' | 'bold' | 'color' | 'italic' | 'link' | 'image' | 'strike' | 'subscript' | 'superscript' | 'underline' | 'blockquote' | 'header' | 'increaseIndent' | 'decreaseIndent' | 'orderedList' | 'bulletList' | 'alignLeft' | 'alignCenter' | 'alignRight' | 'alignJustify' | 'codeBlock' | 'variable' | 'separator' | 'undo' | 'redo' | 'clear'>;
     }
-    /** Configures toolbar controls. These controls allow users to format text and execute commands. */
+    /** This section lists the data source fields that are used in a default template for toolbar items. */
     export interface dxHtmlEditorToolbarItem extends dxToolbarItem {
         /** Specifies the built-in control that this object customizes or a format with multiple choices. */
         formatName?: 'background' | 'bold' | 'color' | 'italic' | 'link' | 'image' | 'strike' | 'subscript' | 'superscript' | 'underline' | 'blockquote' | 'header' | 'increaseIndent' | 'decreaseIndent' | 'orderedList' | 'bulletList' | 'alignLeft' | 'alignCenter' | 'alignRight' | 'alignJustify' | 'codeBlock' | 'variable' | 'separator' | 'undo' | 'redo' | 'clear' | string;
@@ -7471,7 +7471,7 @@ declare module DevExpress.viz {
     }
     
     export interface dxChartCommonAnnotationConfig {
-        
+        /** Specifies whether users can drag and drop the annotation. */
         allowDragging?: boolean;
         /** Positions the annotation relative to a specific argument. */
         argument?: number | Date | string;
@@ -7495,9 +7495,9 @@ declare module DevExpress.viz {
         height?: number;
         /** Configures the image to be displayed in the annotation. Applies only if the type is "image". */
         image?: string | { height?: number, url?: string, width?: number };
-        
+        /** Moves the annotation horizontally. */
         offsetX?: number;
-        
+        /** Moves the annotation vertically. */
         offsetY?: number;
         /** Specifies the annotation's opacity. */
         opacity?: number;
