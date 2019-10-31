@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 19.1.7 (build 19296-1028)
-* Build date: Oct 23, 2019
+* Version: 19.1.7 (build 19304-1606)
+* Build date: Oct 31, 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -1633,6 +1633,12 @@
       -ms-flex-align: baseline;
           align-items: baseline;
 }
+.dx-dropdowneditor-field-template-wrapper > * {
+  -webkit-box-flex: 1;
+  -webkit-flex-grow: 1;
+      -ms-flex-positive: 1;
+          flex-grow: 1;
+}
 .dx-dropdowneditor-active .dx-dropdowneditor-icon {
   opacity: 0.35;
 }
@@ -2039,9 +2045,6 @@
 }
 .dx-texteditor input[type=date]::-webkit-inner-spin-button {
   height: 20px;
-}
-.dx-datebox-native .dx-texteditor-buttons-container {
-  pointer-events: none;
 }
 .dx-datebox-native.dx-state-focused.dx-texteditor-empty .dx-placeholder {
   display: none;
@@ -4426,6 +4429,10 @@ input.dx-hidden {
 .dx-datagrid-hidden-column {
   white-space: nowrap;
 }
+.dx-datagrid .dx-row .dx-datagrid-hidden-column {
+  border-right-width: 0;
+  border-left-width: 0;
+}
 .dx-datagrid-hidden-column > * {
   display: none !important;
 }
@@ -4518,10 +4525,12 @@ input.dx-hidden {
   padding: 7px 32px 7px 7px;
 }
 .dx-rtl .dx-datagrid-headers,
+.dx-rtl .dx-datagrid-rowsview,
 .dx-rtl .dx-datagrid-total-footer {
   direction: ltr;
 }
 .dx-rtl .dx-datagrid-headers .dx-datagrid-table,
+.dx-rtl .dx-datagrid-rowsview .dx-datagrid-table,
 .dx-rtl .dx-datagrid-total-footer .dx-datagrid-table {
   direction: rtl;
 }
@@ -5571,6 +5580,10 @@ input.dx-hidden {
 .dx-treelist-hidden-column {
   white-space: nowrap;
 }
+.dx-treelist .dx-row .dx-treelist-hidden-column {
+  border-right-width: 0;
+  border-left-width: 0;
+}
 .dx-treelist-hidden-column > * {
   display: none !important;
 }
@@ -5663,10 +5676,12 @@ input.dx-hidden {
   padding: 7px 32px 7px 7px;
 }
 .dx-rtl .dx-treelist-headers,
+.dx-rtl .dx-treelist-rowsview,
 .dx-rtl .dx-treelist-total-footer {
   direction: ltr;
 }
 .dx-rtl .dx-treelist-headers .dx-treelist-table,
+.dx-rtl .dx-treelist-rowsview .dx-treelist-table,
 .dx-rtl .dx-treelist-total-footer .dx-treelist-table {
   direction: rtl;
 }

@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.all.d.ts)
-* Version: 19.1.7 (build 19296-1028)
-* Build date: Wed Oct 23 2019
+* Version: 19.1.7 (build 19304-1606)
+* Build date: Thu Oct 31 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -1733,17 +1733,17 @@ declare module DevExpress.ui {
         /** Gets the DataSource instance. */
         getDataSource(): DevExpress.data.DataSource;
     }
-    
+    /** The DiagramDataSourceParameters object. */
     export interface DiagramDataSourceParameters {
-        
+        /** The edges. */
         edges?: { dataSource?: Array<any> | DevExpress.data.DataSource | DevExpress.data.DataSourceOptions, fromExpr?: string | ((data: any) => any), keyExpr?: string | ((data: any) => any), toExpr?: string | ((data: any) => any) };
-        
+        /** The key. */
         key?: string;
-        
+        /** The layout. */
         layout?: 'tree' | 'sugiyama';
-        
+        /** The nodes. */
         nodes?: { dataSource?: Array<any> | DevExpress.data.DataSource | DevExpress.data.DataSourceOptions, itemsExpr?: string | ((data: any) => any), keyExpr?: string | ((data: any) => any), parentKeyExpr?: string | ((data: any) => any), textExpr?: string | ((data: any) => any), typeExpr?: string | ((data: any) => any) };
-        
+        /** The title. */
         title?: string;
     }
     

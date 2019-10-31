@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 19.1.7 (build 19296-1028)
-* Build date: Oct 23, 2019
+* Version: 19.1.7 (build 19304-1606)
+* Build date: Oct 31, 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -4583,10 +4583,6 @@
   -webkit-box-shadow: none;
           box-shadow: none;
 }
-.dx-dropdowneditor .dx-clear-button-area {
-  width: 24px;
-  min-width: 24px;
-}
 .dx-invalid.dx-dropdowneditor-button-visible.dx-editor-underlined .dx-texteditor-input {
   padding-right: 24px;
 }
@@ -4963,9 +4959,9 @@
   margin: -1px 0 -3px 16px;
 }
 .dx-list-select-all-label {
-  line-height: 1;
+  line-height: 17px;
   padding: 0 35px;
-  margin-top: 3px;
+  margin-top: 2px;
 }
 .dx-list-item-after-bag.dx-list-static-delete-button-container {
   width: 43px;
@@ -5362,9 +5358,9 @@
   margin: -1px 0 -3px 15px;
 }
 .dx-device-mobile .dx-list-select-all-label {
-  line-height: 1;
+  line-height: 17px;
   padding: 0 35px;
-  margin-top: 3px;
+  margin-top: 2px;
 }
 .dx-device-mobile .dx-list-item-after-bag.dx-list-static-delete-button-container {
   width: 42px;
