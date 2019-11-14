@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.messages.fi.js)
-* Version: 18.2.10 (build 19312)
-* Build date: Fri Nov 08 2019
+* Version: 18.2.11
+* Build date: Mon Nov 11 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
