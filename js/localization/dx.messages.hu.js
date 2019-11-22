@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.messages.hu.js)
-* Version: 19.1.7 (build 19315-1208)
-* Build date: Mon Nov 11 2019
+* Version: 19.1.8
+* Build date: Thu Nov 14 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -89,6 +89,7 @@
             "dxForm-optionalMark": "v\xe1laszthat\xf3",
             "dxForm-requiredMessage": "{0} k\xf6telez\u0151",
             "dxNumberBox-invalidValueMessage": "Az \xe9rt\xe9k sz\xe1m kell legyen",
+            "dxNumberBox-noDataText": "Nincs adat",
             "dxDataGrid-columnChooserTitle": "Oszlopv\xe1laszt\xf3",
             "dxDataGrid-columnChooserEmptyText": "H\xfazza ide az oszlopot az elrejt\xe9shez",
             "dxDataGrid-groupContinuesMessage": "A k\xf6vetkez\u0151 oldalon folytat\xf3dik",

@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.aspnet.mvc.js)
-* Version: 19.1.7 (build 19315-1208)
-* Build date: Mon Nov 11 2019
+* Version: 19.1.8
+* Build date: Thu Nov 14 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -18,12 +18,15 @@
 }(function($, setTemplateEngine, templateRendered, Guid, validationEngine, iteratorUtils, extractTemplateMarkup, encodeHtml) {
     var templateCompiler = createTemplateCompiler();
     var pendingCreateComponentRoutines = [];
+    var enableAlternateTemplateTags = true;
 
     function createTemplateCompiler() {
         var OPEN_TAG = "<%",
             CLOSE_TAG = "%>",
             ENCODE_QUALIFIER = "-",
             INTERPOLATE_QUALIFIER = "=";
+        var EXTENDED_OPEN_TAG = /[<[]%/g,
+            EXTENDED_CLOSE_TAG = /%[>\]]/g;
 
         function acceptText(bag, text) {
             if (text) {
@@ -45,10 +48,10 @@
         }
         return function(text) {
             var bag = ["var _ = [];", "with(obj||{}) {"],
-                chunks = text.split(OPEN_TAG);
+                chunks = text.split(enableAlternateTemplateTags ? EXTENDED_OPEN_TAG : OPEN_TAG);
             acceptText(bag, chunks.shift());
             for (var i = 0; i < chunks.length; i++) {
-                var tmp = chunks[i].split(CLOSE_TAG);
+                var tmp = chunks[i].split(enableAlternateTemplateTags ? EXTENDED_CLOSE_TAG : CLOSE_TAG);
                 if (2 !== tmp.length) {
                     throw "Template syntax error"
                 }
@@ -139,6 +142,9 @@
             if (setTemplateEngine) {
                 setTemplateEngine(createTemplateEngine())
             }
+        },
+        enableAlternateTemplateTags: function(value) {
+            enableAlternateTemplateTags = value
         },
         createValidationSummaryItems: function(validationGroup, editorNames) {
             var groupConfig, items, summary = getValidationSummary(validationGroup);

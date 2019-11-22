@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.messages.cs.js)
-* Version: 19.1.7 (build 19315-1208)
-* Build date: Mon Nov 11 2019
+* Version: 19.1.8
+* Build date: Thu Nov 14 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -89,6 +89,7 @@
             "dxForm-optionalMark": "voliteln\xfd",
             "dxForm-requiredMessage": "{0} je vy\u017eadov\xe1no",
             "dxNumberBox-invalidValueMessage": "Hodnota mus\xed b\xfdt \u010d\xedslo",
+            "dxNumberBox-noDataText": "\u017d\xe1dn\xe1 data",
             "dxDataGrid-columnChooserTitle": "V\xfdb\u011br sloupc\u016f",
             "dxDataGrid-columnChooserEmptyText": "P\u0159esu\u0148te sloupec zde pro skyt\xed",
             "dxDataGrid-groupContinuesMessage": "Pokra\u010dovat na dal\u0161\xed stran\u011b",

@@ -1,6 +1,6 @@
 {
   "name": "devextreme",
-  "version": "19.1.8-build-19315-1208",
+  "version": "19.1.8",
   "description": "A blazing-fast HTML5 Data Grid and rich libraries of high-performance touch-enabled data vizualization and UI widgets",
   "moduleType": [
     "globals"

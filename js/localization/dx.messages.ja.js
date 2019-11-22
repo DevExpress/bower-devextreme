@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.messages.ja.js)
-* Version: 19.1.7 (build 19315-1208)
-* Build date: Mon Nov 11 2019
+* Version: 19.1.8
+* Build date: Thu Nov 14 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -89,6 +89,7 @@
             "dxForm-optionalMark": "\u4efb\u610f",
             "dxForm-requiredMessage": "{0} \u306f\u5fc5\u9808\u30d5\u30a3\u30fc\u30eb\u30c9\u3067\u3059",
             "dxNumberBox-invalidValueMessage": "\u6570\u5024\u3092\u6307\u5b9a\u3057\u3066\u304f\u3060\u3055\u3044\u3002",
+            "dxNumberBox-noDataText": "\u30c7\u30fc\u30bf\u304c\u3042\u308a\u307e\u305b\u3093",
             "dxDataGrid-columnChooserTitle": "\u5217\u306e\u9078\u629e",
             "dxDataGrid-columnChooserEmptyText": "\u96a0\u3057\u305f\u3044\u5217\u306e\u30d8\u30c3\u30c0\u30fc\u3092\u3053\u3053\u306b\u30c9\u30e9\u30c3\u30b0\u3057\u3066\u304f\u3060\u3055\u3044\u3002",
             "dxDataGrid-groupContinuesMessage": "\u6b21\u30da\u30fc\u30b8\u306b\u7d9a\u304f",

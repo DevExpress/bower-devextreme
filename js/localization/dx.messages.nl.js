@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.messages.nl.js)
-* Version: 19.1.7 (build 19315-1208)
-* Build date: Mon Nov 11 2019
+* Version: 19.1.8
+* Build date: Thu Nov 14 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -89,6 +89,7 @@
             "dxForm-optionalMark": "optioneel",
             "dxForm-requiredMessage": "{0} is verplicht",
             "dxNumberBox-invalidValueMessage": "Waarde moet een nummer zijn",
+            "dxNumberBox-noDataText": "Geen gegevens",
             "dxDataGrid-columnChooserTitle": "Kolom Kiezer",
             "dxDataGrid-columnChooserEmptyText": "Sleep hier een kolomkop om hem te verbergen",
             "dxDataGrid-groupContinuesMessage": "Gaat verder op de volgende pagina",

@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.messages.vi.js)
-* Version: 19.1.7 (build 19315-1208)
-* Build date: Mon Nov 11 2019
+* Version: 19.1.8
+* Build date: Thu Nov 14 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -89,6 +89,7 @@
             "dxForm-optionalMark": "t\xf9y ch\u1ecdn",
             "dxForm-requiredMessage": "{0} l\xe0 b\u1eaft bu\u1ed9c",
             "dxNumberBox-invalidValueMessage": "Gi\xe1 tr\u1ecb ph\u1ea3i l\xe0 m\u1ed9t s\u1ed1",
+            "dxNumberBox-noDataText": "Kh\xf4ng c\xf3 d\u1eef li\u1ec7u",
             "dxDataGrid-columnChooserTitle": "Tr\xecnh ch\u1ecdn c\u1ed9t",
             "dxDataGrid-columnChooserEmptyText": "K\xe9o m\u1ed9t c\u1ed9t v\xe0o \u0111\xe2y \u0111\u1ec3 \u1ea9n n\xf3 \u0111i",
             "dxDataGrid-groupContinuesMessage": "Ti\u1ebfp t\u1ee5c \u1edf trang ti\u1ebfp theo",

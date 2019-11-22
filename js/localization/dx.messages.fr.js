@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.messages.fr.js)
-* Version: 19.1.7 (build 19315-1208)
-* Build date: Mon Nov 11 2019
+* Version: 19.1.8
+* Build date: Thu Nov 14 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -89,6 +89,7 @@
             "dxForm-optionalMark": "optionnel",
             "dxForm-requiredMessage": "{0} est obligatoire",
             "dxNumberBox-invalidValueMessage": "La valeur doit \xeatre un nombre",
+            "dxNumberBox-noDataText": "Pas de donn\xe9es",
             "dxDataGrid-columnChooserTitle": "Choisir les colonnes",
             "dxDataGrid-columnChooserEmptyText": "Faites glisser une colonne ici pour la cacher",
             "dxDataGrid-groupContinuesMessage": "Suite \xe0 la page suivante",

@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.messages.fi.js)
-* Version: 19.1.7 (build 19315-1208)
-* Build date: Mon Nov 11 2019
+* Version: 19.1.8
+* Build date: Thu Nov 14 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -89,6 +89,7 @@
             "dxForm-optionalMark": "valinnainen",
             "dxForm-requiredMessage": "{0} on valinnainen",
             "dxNumberBox-invalidValueMessage": "Arvon on oltava numero",
+            "dxNumberBox-noDataText": "Ei dataa",
             "dxDataGrid-columnChooserTitle": "Sarakkeenvalitsin",
             "dxDataGrid-columnChooserEmptyText": "Ved\xe4 sarake t\xe4\xe4ll\xe4 piilottaa sen",
             "dxDataGrid-groupContinuesMessage": "Jatkuu seuraavalla sivulla",

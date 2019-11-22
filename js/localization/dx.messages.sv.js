@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.messages.sv.js)
-* Version: 19.1.7 (build 19315-1208)
-* Build date: Mon Nov 11 2019
+* Version: 19.1.8
+* Build date: Thu Nov 14 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -89,6 +89,7 @@
             "dxForm-optionalMark": "valfri",
             "dxForm-requiredMessage": "{0} \xe4r n\xf6dv\xe4ndigt",
             "dxNumberBox-invalidValueMessage": "V\xe4rdet m\xe5ste vara ett nummer",
+            "dxNumberBox-noDataText": "Inget data",
             "dxDataGrid-columnChooserTitle": "Kolumnv\xe4ljare",
             "dxDataGrid-columnChooserEmptyText": "Dra en kolumn hit f\xf6r att d\xf6lja den",
             "dxDataGrid-groupContinuesMessage": "Forts\xe4tter p\xe5 n\xe4sta sida",
