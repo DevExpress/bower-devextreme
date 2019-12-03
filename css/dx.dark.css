@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 19.1.8
-* Build date: Nov 14, 2019
+* Version: 19.1.8 (build 19337-1057)
+* Build date: Dec 3, 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -3476,11 +3476,11 @@
 .dx-rtl .dx-switch .dx-switch-off,
 .dx-switch.dx-rtl .dx-switch-off {
   float: right;
-  padding-right: 2px;
 }
 .dx-rtl .dx-switch .dx-switch-on,
 .dx-switch.dx-rtl .dx-switch-on {
   padding-left: 16px;
+  padding-right: 2px;
 }
 .dx-rtl .dx-switch .dx-switch-off,
 .dx-switch.dx-rtl .dx-switch-off {

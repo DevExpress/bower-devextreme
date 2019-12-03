@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 19.1.8
-* Build date: Nov 14, 2019
+* Version: 19.1.8 (build 19337-1057)
+* Build date: Dec 3, 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -8815,6 +8815,15 @@
   background-color: #fff;
   color: #FF5722;
 }
+.dx-datagrid-rowsview .dx-row-focused.dx-data-row > td,
+.dx-datagrid-rowsview .dx-row-focused.dx-data-row > tr:last-child > td {
+  border-bottom: 1px solid #FF5722;
+}
+.dx-datagrid-rowsview .dx-row-focused.dx-data-row:not(.dx-row-lines) > td,
+.dx-datagrid-rowsview .dx-row-focused.dx-data-row:not(.dx-row-lines) > tr:first-child > td {
+  border-top: 1px solid #FF5722;
+  border-bottom: 1px solid #FF5722;
+}
 .dx-datagrid-rowsview .dx-row-focused.dx-data-row.dx-edit-row > td.dx-editor-cell:not(.dx-command-select),
 .dx-datagrid-rowsview .dx-row-focused.dx-data-row.dx-edit-row > tr > td.dx-editor-cell:not(.dx-command-select) {
   background-color: #fff;
@@ -10324,6 +10333,15 @@
 .dx-treelist-rowsview .dx-row-focused.dx-data-row .dx-command-edit .dx-link:focus {
   background-color: #fff;
   color: #FF5722;
+}
+.dx-treelist-rowsview .dx-row-focused.dx-data-row > td,
+.dx-treelist-rowsview .dx-row-focused.dx-data-row > tr:last-child > td {
+  border-bottom: 1px solid #FF5722;
+}
+.dx-treelist-rowsview .dx-row-focused.dx-data-row:not(.dx-row-lines) > td,
+.dx-treelist-rowsview .dx-row-focused.dx-data-row:not(.dx-row-lines) > tr:first-child > td {
+  border-top: 1px solid #FF5722;
+  border-bottom: 1px solid #FF5722;
 }
 .dx-treelist-rowsview .dx-row-focused.dx-data-row.dx-edit-row > td.dx-editor-cell:not(.dx-command-select),
 .dx-treelist-rowsview .dx-row-focused.dx-data-row.dx-edit-row > tr > td.dx-editor-cell:not(.dx-command-select) {
