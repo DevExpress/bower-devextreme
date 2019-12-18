@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.messages.fr.js)
-* Version: 19.1.8 (build 19337-1057)
-* Build date: Tue Dec 03 2019
+* Version: 19.1.8 (build 19352-0935)
+* Build date: Wed Dec 18 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -77,8 +77,8 @@
             "dxFileUploader-Gb": "Gb",
             "dxFileUploader-upload": "T\xe9l\xe9charger",
             "dxFileUploader-uploaded": "T\xe9l\xe9charg\xe9",
-            "dxFileUploader-readyToUpload": "Pret \xe0 t\xe9l\xe9charger",
-            "dxFileUploader-uploadFailedMessage": "Echec du t\xe9l\xe9chargement",
+            "dxFileUploader-readyToUpload": "Pr\xeat \xe0 t\xe9l\xe9charger",
+            "dxFileUploader-uploadFailedMessage": "\xc9chec du t\xe9l\xe9chargement",
             "dxFileUploader-invalidFileExtension": "Type de fichier non autoris\xe9",
             "dxFileUploader-invalidMaxFileSize": "Fichier trop volumineux",
             "dxFileUploader-invalidMinFileSize": "Fichier trop petit",

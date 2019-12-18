@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.messages.it.js)
-* Version: 19.1.8 (build 19337-1057)
-* Build date: Tue Dec 03 2019
+* Version: 19.1.8 (build 19352-0935)
+* Build date: Wed Dec 18 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -264,19 +264,19 @@
             "dxFilterBuilder-filterOperationBetween": "Compreso",
             "dxFilterBuilder-filterOperationAnyOf": "Include",
             "dxFilterBuilder-filterOperationNoneOf": "Non include",
-            "dxHtmlEditor-dialogColorCaption": "!TODO!",
-            "dxHtmlEditor-dialogBackgroundCaption": "!TODO!",
-            "dxHtmlEditor-dialogLinkCaption": "!TODO!",
-            "dxHtmlEditor-dialogLinkUrlField": "!TODO!",
-            "dxHtmlEditor-dialogLinkTextField": "!TODO!",
-            "dxHtmlEditor-dialogLinkTargetField": "!TODO!",
-            "dxHtmlEditor-dialogImageCaption": "!TODO!",
-            "dxHtmlEditor-dialogImageUrlField": "!TODO!",
-            "dxHtmlEditor-dialogImageAltField": "!TODO!",
-            "dxHtmlEditor-dialogImageWidthField": "!TODO!",
-            "dxHtmlEditor-dialogImageHeightField": "!TODO!",
-            "dxHtmlEditor-heading": "!TODO!",
-            "dxHtmlEditor-normalText": "!TODO!"
+            "dxHtmlEditor-dialogColorCaption": "Cambia il colore del testo",
+            "dxHtmlEditor-dialogBackgroundCaption": "Cambia il colore di sfondo",
+            "dxHtmlEditor-dialogLinkCaption": "Aggiungi link",
+            "dxHtmlEditor-dialogLinkUrlField": "URL",
+            "dxHtmlEditor-dialogLinkTextField": "Testo",
+            "dxHtmlEditor-dialogLinkTargetField": "Apri link in una nuova finestra",
+            "dxHtmlEditor-dialogImageCaption": "Agguingi Immagine",
+            "dxHtmlEditor-dialogImageUrlField": "URL",
+            "dxHtmlEditor-dialogImageAltField": "Testo alternativo",
+            "dxHtmlEditor-dialogImageWidthField": "Larghezza (px)",
+            "dxHtmlEditor-dialogImageHeightField": "Altezza (px)",
+            "dxHtmlEditor-heading": "Intestazione",
+            "dxHtmlEditor-normalText": "Testo Normale"
         }
     })
 });
