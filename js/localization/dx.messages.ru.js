@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.messages.ru.js)
-* Version: 19.1.8 (build 19359-1325)
-* Build date: Wed Dec 25 2019
+* Version: 19.1.8 (build 19365-1014)
+* Build date: Tue Dec 31 2019
 *
 * Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -146,6 +146,7 @@
             "dxDataGrid-columnFixingRightPosition": "\u041d\u0430\u043f\u0440\u0430\u0432\u043e",
             "dxDataGrid-exportTo": "\u042d\u043a\u0441\u043f\u043e\u0440\u0442\u0438\u0440\u043e\u0432\u0430\u0442\u044c",
             "dxDataGrid-exportToExcel": "\u042d\u043a\u0441\u043f\u043e\u0440\u0442\u0438\u0440\u043e\u0432\u0430\u0442\u044c \u0432 Excel \u0444\u0430\u0439\u043b",
+            "dxDataGrid-exporting": "\u042d\u043a\u0441\u043f\u043e\u0440\u0442...",
             "dxDataGrid-excelFormat": "Excel \u0444\u0430\u0439\u043b",
             "dxDataGrid-selectedRows": "\u0412\u044b\u0431\u0440\u0430\u043d\u043d\u044b\u0435 \u0441\u0442\u0440\u043e\u043a\u0438",
             "dxDataGrid-exportAll": "\u042d\u043a\u0441\u043f\u043e\u0440\u0442\u0438\u0440\u043e\u0432\u0430\u0442\u044c \u0432\u0441\u0451",
