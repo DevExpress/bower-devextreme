@@ -1,9 +1,9 @@
 /*!
 * DevExtreme
-* Version: 19.1.8 (build 19365-1014)
-* Build date: Dec 31, 2019
+* Version: 19.1.8 (build 20016-1654)
+* Build date: Jan 16, 2020
 *
-* Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
+* Copyright (c) 2012 - 2020 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
 */
 .dx-colorview-palette-handle {
@@ -3211,19 +3211,19 @@
 .dx-scrollbar-horizontal.dx-scrollbar-hoverable.dx-scrollable-scrollbar-active .dx-scrollable-scroll {
   height: 15px;
 }
-.dx-scrollable-scrollbars-alwaysvisible.dx-scrollable-vertical .dx-scrollable-content,
-.dx-scrollable-scrollbars-alwaysvisible.dx-scrollable-both .dx-scrollable-content {
+.dx-scrollable-scrollbars-alwaysvisible.dx-scrollable-vertical > .dx-scrollable-wrapper > .dx-scrollable-container > .dx-scrollable-content,
+.dx-scrollable-scrollbars-alwaysvisible.dx-scrollable-both > .dx-scrollable-wrapper > .dx-scrollable-container > .dx-scrollable-content {
   padding-right: 8px;
 }
-.dx-rtl.dx-scrollable-scrollbars-alwaysvisible.dx-scrollable-vertical .dx-scrollable-content,
-.dx-rtl.dx-scrollable-scrollbars-alwaysvisible.dx-scrollable-both .dx-scrollable-content,
-.dx-rtl .dx-scrollable-scrollbars-alwaysvisible.dx-scrollable-vertical .dx-scrollable-content,
-.dx-rtl .dx-scrollable-scrollbars-alwaysvisible.dx-scrollable-both .dx-scrollable-content {
+.dx-rtl.dx-scrollable-scrollbars-alwaysvisible.dx-scrollable-vertical > .dx-scrollable-wrapper > .dx-scrollable-container > .dx-scrollable-content,
+.dx-rtl.dx-scrollable-scrollbars-alwaysvisible.dx-scrollable-both > .dx-scrollable-wrapper > .dx-scrollable-container > .dx-scrollable-content,
+.dx-rtl .dx-scrollable-scrollbars-alwaysvisible.dx-scrollable-vertical > .dx-scrollable-wrapper > .dx-scrollable-container > .dx-scrollable-content,
+.dx-rtl .dx-scrollable-scrollbars-alwaysvisible.dx-scrollable-both > .dx-scrollable-wrapper > .dx-scrollable-container > .dx-scrollable-content {
   padding-right: 0;
   padding-left: 8px;
 }
-.dx-scrollable-scrollbars-alwaysvisible.dx-scrollable-horizontal .dx-scrollable-content,
-.dx-scrollable-scrollbars-alwaysvisible.dx-scrollable-both .dx-scrollable-content {
+.dx-scrollable-scrollbars-alwaysvisible.dx-scrollable-horizontal > .dx-scrollable-wrapper > .dx-scrollable-container > .dx-scrollable-content,
+.dx-scrollable-scrollbars-alwaysvisible.dx-scrollable-both > .dx-scrollable-wrapper > .dx-scrollable-container > .dx-scrollable-content {
   padding-bottom: 8px;
 }
 .dx-scrollable-customizable-scrollbars .dx-scrollable-container {

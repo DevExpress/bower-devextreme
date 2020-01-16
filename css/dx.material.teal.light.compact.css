@@ -1,9 +1,9 @@
 /*!
 * DevExtreme
-* Version: 19.1.8 (build 19365-1014)
-* Build date: Dec 31, 2019
+* Version: 19.1.8 (build 20016-1654)
+* Build date: Jan 16, 2020
 *
-* Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
+* Copyright (c) 2012 - 2020 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
 */
 @import "https://fonts.googleapis.com/css?family=Roboto:300,400,500,700";
@@ -3320,6 +3320,12 @@
 .dx-editor-filled .dx-texteditor-buttons-container:last-child > .dx-dropdowneditor-button:last-child {
   margin-right: 8px;
 }
+.dx-editor-outlined .dx-texteditor-buttons-container:last-child > .dx-clear-button-area:last-child,
+.dx-editor-filled .dx-texteditor-buttons-container:last-child > .dx-clear-button-area:last-child,
+.dx-editor-outlined .dx-texteditor-buttons-container:last-child > .dx-numberbox-spin-container:last-child,
+.dx-editor-filled .dx-texteditor-buttons-container:last-child > .dx-numberbox-spin-container:last-child {
+  margin-right: 8px;
+}
 .dx-rtl.dx-editor-outlined .dx-texteditor-buttons-container:first-child > .dx-button:first-child,
 .dx-rtl.dx-editor-filled .dx-texteditor-buttons-container:first-child > .dx-button:first-child {
   margin-left: 5px;
@@ -3347,6 +3353,13 @@
 }
 .dx-rtl.dx-editor-outlined .dx-texteditor-buttons-container:last-child > .dx-dropdowneditor-button:last-child,
 .dx-rtl.dx-editor-filled .dx-texteditor-buttons-container:last-child > .dx-dropdowneditor-button:last-child {
+  margin-left: 8px;
+  margin-right: 0;
+}
+.dx-rtl.dx-editor-outlined .dx-texteditor-buttons-container:last-child > .dx-clear-button-area:last-child,
+.dx-rtl.dx-editor-filled .dx-texteditor-buttons-container:last-child > .dx-clear-button-area:last-child,
+.dx-rtl.dx-editor-outlined .dx-texteditor-buttons-container:last-child > .dx-numberbox-spin-container:last-child,
+.dx-rtl.dx-editor-filled .dx-texteditor-buttons-container:last-child > .dx-numberbox-spin-container:last-child {
   margin-left: 8px;
   margin-right: 0;
 }
@@ -3614,19 +3627,19 @@
 .dx-scrollbar-horizontal.dx-scrollbar-hoverable.dx-scrollable-scrollbar-active .dx-scrollable-scroll {
   height: 13px;
 }
-.dx-scrollable-scrollbars-alwaysvisible.dx-scrollable-vertical .dx-scrollable-content,
-.dx-scrollable-scrollbars-alwaysvisible.dx-scrollable-both .dx-scrollable-content {
+.dx-scrollable-scrollbars-alwaysvisible.dx-scrollable-vertical > .dx-scrollable-wrapper > .dx-scrollable-container > .dx-scrollable-content,
+.dx-scrollable-scrollbars-alwaysvisible.dx-scrollable-both > .dx-scrollable-wrapper > .dx-scrollable-container > .dx-scrollable-content {
   padding-right: 6px;
 }
-.dx-rtl.dx-scrollable-scrollbars-alwaysvisible.dx-scrollable-vertical .dx-scrollable-content,
-.dx-rtl.dx-scrollable-scrollbars-alwaysvisible.dx-scrollable-both .dx-scrollable-content,
-.dx-rtl .dx-scrollable-scrollbars-alwaysvisible.dx-scrollable-vertical .dx-scrollable-content,
-.dx-rtl .dx-scrollable-scrollbars-alwaysvisible.dx-scrollable-both .dx-scrollable-content {
+.dx-rtl.dx-scrollable-scrollbars-alwaysvisible.dx-scrollable-vertical > .dx-scrollable-wrapper > .dx-scrollable-container > .dx-scrollable-content,
+.dx-rtl.dx-scrollable-scrollbars-alwaysvisible.dx-scrollable-both > .dx-scrollable-wrapper > .dx-scrollable-container > .dx-scrollable-content,
+.dx-rtl .dx-scrollable-scrollbars-alwaysvisible.dx-scrollable-vertical > .dx-scrollable-wrapper > .dx-scrollable-container > .dx-scrollable-content,
+.dx-rtl .dx-scrollable-scrollbars-alwaysvisible.dx-scrollable-both > .dx-scrollable-wrapper > .dx-scrollable-container > .dx-scrollable-content {
   padding-right: 0;
   padding-left: 6px;
 }
-.dx-scrollable-scrollbars-alwaysvisible.dx-scrollable-horizontal .dx-scrollable-content,
-.dx-scrollable-scrollbars-alwaysvisible.dx-scrollable-both .dx-scrollable-content {
+.dx-scrollable-scrollbars-alwaysvisible.dx-scrollable-horizontal > .dx-scrollable-wrapper > .dx-scrollable-container > .dx-scrollable-content,
+.dx-scrollable-scrollbars-alwaysvisible.dx-scrollable-both > .dx-scrollable-wrapper > .dx-scrollable-container > .dx-scrollable-content {
   padding-bottom: 6px;
 }
 .dx-scrollview-scrollbottom-text,

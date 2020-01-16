@@ -1,9 +1,9 @@
 /*!
 * DevExtreme
-* Version: 19.1.8 (build 19365-1014)
-* Build date: Dec 31, 2019
+* Version: 19.1.8 (build 20016-1654)
+* Build date: Jan 16, 2020
 *
-* Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
+* Copyright (c) 2012 - 2020 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
 */
 .dx-clearfix:before,
@@ -4094,6 +4094,7 @@ input.dx-hidden {
   max-width: 70px;
 }
 .dx-datagrid-content .dx-datagrid-table .dx-row .dx-command-edit {
+  text-overflow: clip;
   width: 100px;
   min-width: 100px;
 }
@@ -5245,6 +5246,7 @@ input.dx-hidden {
   max-width: 70px;
 }
 .dx-treelist-content .dx-treelist-table .dx-row .dx-command-edit {
+  text-overflow: clip;
   width: 100px;
   min-width: 100px;
 }
