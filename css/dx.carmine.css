@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 19.1.8 (build 20016-1654)
-* Build date: Jan 16, 2020
+* Version: 19.1.8 (build 20023-1011)
+* Build date: Jan 23, 2020
 *
 * Copyright (c) 2012 - 2020 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -8992,21 +8992,21 @@
           box-shadow: inset 0 -1px 0 1000px #faebe8;
   color: #333;
 }
-.dx-calendar-cell.dx-calendar-other-view,
-.dx-calendar-cell.dx-calendar-empty-cell {
+.dx-calendar-cell.dx-calendar-other-view:not(.dx-calendar-selected-date),
+.dx-calendar-cell.dx-calendar-empty-cell:not(.dx-calendar-selected-date) {
   color: #8c8c8c;
 }
-.dx-calendar-cell.dx-calendar-other-view.dx-state-hover,
-.dx-calendar-cell.dx-calendar-empty-cell.dx-state-hover,
-.dx-calendar-cell.dx-calendar-other-view.dx-state-active,
-.dx-calendar-cell.dx-calendar-empty-cell.dx-state-active {
+.dx-calendar-cell.dx-calendar-other-view:not(.dx-calendar-selected-date).dx-state-hover,
+.dx-calendar-cell.dx-calendar-empty-cell:not(.dx-calendar-selected-date).dx-state-hover,
+.dx-calendar-cell.dx-calendar-other-view:not(.dx-calendar-selected-date).dx-state-active,
+.dx-calendar-cell.dx-calendar-empty-cell:not(.dx-calendar-selected-date).dx-state-active {
   color: #b0b0b0;
 }
 .dx-calendar-cell.dx-calendar-empty-cell {
   cursor: default;
   background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAAWCAYAAADEtGw7AAAAm0lEQVRIx7XVwQnAIAwF0ExSdBF1a6Er9dIRqsVAazWJmh4+iuBT4YMQ4w4pWxk1clt5YlOOFKeAumJZXAgKOKIBb6yBv9AansU/aAsexZtoD5biXZSCOZxEObiHs6gErnERKoURP0uCZM9IpRB2WvDz+eIqzvRUhMNkT1mcQz1xsKfwWZTFV1ASX0W7uAbaxPOCUUBr3MBfn+kF3CNLT2/yky4AAAAASUVORK5CYII=) center center no-repeat;
 }
-.dx-calendar-cell.dx-calendar-empty-cell.dx-state-hover {
+.dx-calendar-cell.dx-calendar-empty-cell.dx-state-hover:not(.dx-calendar-selected-date) {
   -webkit-box-shadow: none;
           box-shadow: none;
 }

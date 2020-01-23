@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 19.1.8 (build 20016-1654)
-* Build date: Jan 16, 2020
+* Version: 19.1.8 (build 20023-1011)
+* Build date: Jan 23, 2020
 *
 * Copyright (c) 2012 - 2020 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -11155,10 +11155,10 @@
   cursor: default;
   color: rgba(0, 0, 0, 0.25);
 }
-.dx-calendar-cell.dx-calendar-empty-cell.dx-state-hover {
+.dx-calendar-cell.dx-calendar-empty-cell.dx-state-hover:not(.dx-calendar-selected-date) {
   color: rgba(0, 0, 0, 0.25);
 }
-.dx-calendar-cell.dx-calendar-empty-cell.dx-state-hover span {
+.dx-calendar-cell.dx-calendar-empty-cell.dx-state-hover:not(.dx-calendar-selected-date) span {
   background-color: transparent;
 }
 .dx-calendar-cell.dx-state-active:not(.dx-calendar-empty-cell):not(.dx-calendar-selected-date) span {
