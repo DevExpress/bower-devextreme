@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.all.d.ts)
-* Version: 19.1.9
-* Build date: Mon Jan 27 2020
+* Version: 19.1.9 (build 20034-1114)
+* Build date: Mon Feb 03 2020
 *
 * Copyright (c) 2012 - 2020 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -676,7 +676,7 @@ declare module DevExpress {
         on(events: any): this;
         /** Returns the current device orientation. */
         orientation(): string;
-        /** Returns real information about the current device regardless of the value passed to the devices.current(deviceName) method. */
+        /** Returns real information about the current device regardless of the value passed to the DevExpress.devices.current(deviceName) method. */
         real(): Device;
     }
     /** The EndpointSelector is an object for managing OData endpoints in your application. */
