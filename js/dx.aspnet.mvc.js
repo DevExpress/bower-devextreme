@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.aspnet.mvc.js)
-* Version: 19.1.9 (build 20036-0309)
-* Build date: Wed Feb 05 2020
+* Version: 19.1.9 (build 20043-1805)
+* Build date: Wed Feb 12 2020
 *
 * Copyright (c) 2012 - 2020 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -18,7 +18,7 @@
 }(function($, setTemplateEngine, templateRendered, Guid, validationEngine, iteratorUtils, extractTemplateMarkup, encodeHtml) {
     var templateCompiler = createTemplateCompiler();
     var pendingCreateComponentRoutines = [];
-    var enableAlternateTemplateTags = true;
+    var enableAlternativeTemplateTags = true;
 
     function createTemplateCompiler() {
         var OPEN_TAG = "<%",
@@ -48,10 +48,10 @@
         }
         return function(text) {
             var bag = ["var _ = [];", "with(obj||{}) {"],
-                chunks = text.split(enableAlternateTemplateTags ? EXTENDED_OPEN_TAG : OPEN_TAG);
+                chunks = text.split(enableAlternativeTemplateTags ? EXTENDED_OPEN_TAG : OPEN_TAG);
             acceptText(bag, chunks.shift());
             for (var i = 0; i < chunks.length; i++) {
-                var tmp = chunks[i].split(enableAlternateTemplateTags ? EXTENDED_CLOSE_TAG : CLOSE_TAG);
+                var tmp = chunks[i].split(enableAlternativeTemplateTags ? EXTENDED_CLOSE_TAG : CLOSE_TAG);
                 if (2 !== tmp.length) {
                     throw "Template syntax error"
                 }
@@ -143,8 +143,8 @@
                 setTemplateEngine(createTemplateEngine())
             }
         },
-        enableAlternateTemplateTags: function(value) {
-            enableAlternateTemplateTags = value
+        enableAlternativeTemplateTags: function(value) {
+            enableAlternativeTemplateTags = value
         },
         createValidationSummaryItems: function(validationGroup, editorNames) {
             var groupConfig, items, summary = getValidationSummary(validationGroup);
