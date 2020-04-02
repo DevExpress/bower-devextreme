@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 19.1.9
-* Build date: Jan 27, 2020
+* Version: 19.1.10
+* Build date: Mar 26, 2020
 *
 * Copyright (c) 2012 - 2020 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -6982,7 +6982,7 @@
   color: rgba(148, 148, 148, 0.87);
 }
 .dx-lookup-popup-search .dx-list {
-  height: calc(100% - 70px);
+  height: calc(100% - 36px);
 }
 .dx-lookup-search-wrapper {
   padding: 8px;
@@ -8883,7 +8883,7 @@
 .dx-datagrid-rowsview .dx-selection.dx-row:not(.dx-row-focused):hover.dx-row-lines > td {
   border-bottom-color: #e0e0e0;
 }
-.dx-datagrid-rowsview.dx-scrollable-scrollbars-alwaysvisible.dx-scrollable-both .dx-scrollable-content {
+.dx-datagrid-rowsview.dx-scrollable-scrollbars-alwaysvisible.dx-scrollable-both .dx-scrollable-wrapper .dx-scrollable-container .dx-scrollable-content {
   padding-right: 0;
 }
 .dx-datagrid-search-text {
@@ -9048,7 +9048,7 @@
 .dx-rtl .dx-datagrid-rowsview .dx-selection.dx-row:hover > tr > td.dx-pointer-events-none {
   border-left-color: #e0e0e0;
 }
-.dx-rtl .dx-datagrid-rowsview.dx-scrollable-scrollbars-alwaysvisible.dx-scrollable-both .dx-scrollable-content {
+.dx-rtl .dx-datagrid-rowsview.dx-scrollable-scrollbars-alwaysvisible.dx-scrollable-both .dx-scrollable-wrapper .dx-scrollable-container .dx-scrollable-content {
   padding-left: 0;
 }
 .dx-header-filter-menu .dx-popup-content {
@@ -10402,7 +10402,7 @@
 .dx-treelist-rowsview .dx-selection.dx-row:not(.dx-row-focused):hover.dx-row-lines > td {
   border-bottom-color: #e0e0e0;
 }
-.dx-treelist-rowsview.dx-scrollable-scrollbars-alwaysvisible.dx-scrollable-both .dx-scrollable-content {
+.dx-treelist-rowsview.dx-scrollable-scrollbars-alwaysvisible.dx-scrollable-both .dx-scrollable-wrapper .dx-scrollable-container .dx-scrollable-content {
   padding-right: 0;
 }
 .dx-treelist-search-text {
@@ -10567,7 +10567,7 @@
 .dx-rtl .dx-treelist-rowsview .dx-selection.dx-row:hover > tr > td.dx-pointer-events-none {
   border-left-color: #e0e0e0;
 }
-.dx-rtl .dx-treelist-rowsview.dx-scrollable-scrollbars-alwaysvisible.dx-scrollable-both .dx-scrollable-content {
+.dx-rtl .dx-treelist-rowsview.dx-scrollable-scrollbars-alwaysvisible.dx-scrollable-both .dx-scrollable-wrapper .dx-scrollable-container .dx-scrollable-content {
   padding-left: 0;
 }
 .dx-header-filter-menu .dx-popup-content {
