@@ -1,7 +1,7 @@
 /*!
 * DevExtreme
-* Version: 19.1.10
-* Build date: Mar 26, 2020
+* Version: 19.1.11
+* Build date: May 15, 2020
 *
 * Copyright (c) 2012 - 2020 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -4391,13 +4391,13 @@ input.dx-hidden {
 .dx-datagrid-rowsview .dx-selection.dx-row:hover > tr > td .dx-link {
   color: inherit;
 }
-.dx-datagrid-rowsview .dx-datagrid-table .dx-freespace-row,
-.dx-datagrid-rowsview .dx-datagrid-table .dx-virtual-row {
+.dx-datagrid-rowsview .dx-datagrid-table .dx-row.dx-freespace-row,
+.dx-datagrid-rowsview .dx-datagrid-table .dx-row.dx-virtual-row {
   border-top: 0;
   border-bottom: 0;
 }
-.dx-datagrid-rowsview .dx-datagrid-table .dx-freespace-row > td,
-.dx-datagrid-rowsview .dx-datagrid-table .dx-virtual-row > td {
+.dx-datagrid-rowsview .dx-datagrid-table .dx-row.dx-freespace-row > td,
+.dx-datagrid-rowsview .dx-datagrid-table .dx-row.dx-virtual-row > td {
   padding-top: 0;
   padding-bottom: 0;
 }
@@ -5551,13 +5551,13 @@ input.dx-hidden {
 .dx-treelist-rowsview .dx-selection.dx-row:hover > tr > td .dx-link {
   color: inherit;
 }
-.dx-treelist-rowsview .dx-treelist-table .dx-freespace-row,
-.dx-treelist-rowsview .dx-treelist-table .dx-virtual-row {
+.dx-treelist-rowsview .dx-treelist-table .dx-row.dx-freespace-row,
+.dx-treelist-rowsview .dx-treelist-table .dx-row.dx-virtual-row {
   border-top: 0;
   border-bottom: 0;
 }
-.dx-treelist-rowsview .dx-treelist-table .dx-freespace-row > td,
-.dx-treelist-rowsview .dx-treelist-table .dx-virtual-row > td {
+.dx-treelist-rowsview .dx-treelist-table .dx-row.dx-freespace-row > td,
+.dx-treelist-rowsview .dx-treelist-table .dx-row.dx-virtual-row > td {
   padding-top: 0;
   padding-bottom: 0;
 }
