@@ -1,9 +1,9 @@
 /*!
 * DevExtreme (dx.all.d.ts)
-* Version: 17.2.13 (build 19091)
-* Build date: Mon Apr 01 2019
+* Version: 17.2.15
+* Build date: Wed May 27 2020
 *
-* Copyright (c) 2012 - 2019 Developer Express Inc. ALL RIGHTS RESERVED
+* Copyright (c) 2012 - 2020 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
 */
 /* #StartGlobalDeclaration */
