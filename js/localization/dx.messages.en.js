@@ -1,7 +1,7 @@
 /*!
 * DevExtreme (dx.messages.en.js)
-* Version: 18.1.16
-* Build date: Thu Apr 22 2021
+* Version: 18.1.17
+* Build date: Fri Dec 03 2021
 *
 * Copyright (c) 2012 - 2021 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
